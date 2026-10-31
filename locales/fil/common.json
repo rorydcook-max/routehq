@@ -1304,7 +1304,7 @@
     "deleteRecordsTitle": "Mabubura rin ang mga record na ito",
     "deleteRecordsPayments": "Mga naitalang bayad: {count}",
     "deleteRecordsInspections": "Mga check sa handover at pagbalik, may litrato: {count}",
-    "deleteRecordsSigned": "Maliban sa pinirmahang kasunduan: itatago pero mananatiling naka-file",
+    "deleteRecordsSigned": "Ang pinirmahang kasunduan",
     "deleteRecordsBody": "Hindi na ito maibabalik.",
     "deleteAnyway": "Burahin pa rin"
   },
@@ -2733,8 +2733,11 @@
     "filterAll": "Ipakita lahat",
     "filterEmpty": "Walang sasakyan sa grupong ito ngayon.",
     "addDates": "Magdagdag ng petsa",
-    "deleteWithBookings": "Mabubura rin ang {count} kasalukuyan o paparating na booking nito, pati mga bayad at check. Hindi na ito maibabalik.",
-    "deleteWithBookingsBtn": "Burahin ang sasakyan at mga booking"
+    "deleteWithBookings": "Mabubura rin ang {count} booking nito, pati mga bayad, check at kasunduan. Hindi na ito maibabalik.",
+    "deleteWithBookingsBtn": "Burahin ang sasakyan at mga booking",
+    "noticeOwnerOnly": "Ang may-ari lang ng negosyo ang puwedeng magbura ng sasakyan.",
+    "bulkDeleteWarning": "Buburahin ang mga ito kasama ang lahat ng booking at record. Hindi na ito maibabalik.",
+    "deleteVehicleConfirm": "Buburahin ang sasakyan kasama ang mga gastos, papeles at litrato nito. Hindi na ito maibabalik."
   },
   "customers": {
     "noRentals": "Wala pang rental",
@@ -3314,7 +3317,7 @@
     "backToFleet": "Bumalik sa fleet",
     "backToVehicle": "Bumalik sa sasakyan",
     "addTitle": "Magdagdag ng sasakyan",
-    "addSubtitle": "Sapat na muna ang brand, modelo, plaka at isang presyo. Idagdag ang iba mamaya.",
+    "addSubtitle": "Sapat na muna ang brand at modelo. Idagdag ang iba mamaya.",
     "import": "Mag-import ng listahan",
     "editTitle": "I-edit ang {name}",
     "ratesTitle": "Mga rate at deposit",
@@ -3421,12 +3424,12 @@
     "archiveBtn": "I-archive ang sasakyan",
     "archiving": "Ina-archive…",
     "deleteLead": "I-delete",
-    "deleteBody": "permanenteng binubura ito, kasama ang mga kasalukuyan o paparating na booking at ang mga bayad nito.",
+    "deleteBody": "permanenteng binubura ito, kasama ang lahat ng booking, bayad, check at papeles nito.",
     "n_placeholder": "Anumang dapat tandaan: kakaibang ugali nito, paalala sa service, nasaan ang spare key",
     "n_auto": "Nase-save kapag nag-tap ka sa labas",
     "n_edited": "Huling na-edit {date}",
     "needMake": "Pumili muna ng brand at modelo.",
-    "ratesBody": "Punan ang kahit isa. Kinukuwenta ang iba mula rito kapag may booking.",
+    "ratesBody": "Opsyonal. Punan ang isa at kukuwentahin ang iba mula rito.",
     "needPrice": "Magdagdag ng kahit isang presyo bago i-save.",
     "bookChange": "Gumamit ng ibang litrato",
     "purchaseDate": "Petsa ng bili",
@@ -3462,7 +3465,8 @@
     "notSetShort": "hindi nakatakda",
     "seatsCount": "{count, plural, one {# upuan} other {# upuan}}",
     "trimHint": "Variant, hal. 1.0 Turbo SV",
-    "yearPlaceholder": "hal. {year}"
+    "yearPlaceholder": "hal. {year}",
+    "plateLater": "Puwedeng idagdag mamaya"
   },
   "bookingEdit": {
     "crumbBookings": "Mga booking",

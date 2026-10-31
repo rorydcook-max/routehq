@@ -1344,7 +1344,7 @@
     "deleteRecordsTitle": "Các bản ghi này cũng sẽ bị xóa",
     "deleteRecordsPayments": "Khoản thanh toán đã ghi: {count}",
     "deleteRecordsInspections": "Kiểm tra lúc giao và nhận lại xe, kèm ảnh: {count}",
-    "deleteRecordsSigned": "Trừ hợp đồng đã ký: được ẩn nhưng vẫn lưu lại",
+    "deleteRecordsSigned": "Hợp đồng đã ký",
     "deleteRecordsBody": "Không thể hoàn tác.",
     "deleteAnyway": "Vẫn xóa"
   },
@@ -2773,8 +2773,11 @@
     "filterEmpty": "Hiện không có phương tiện nào trong nhóm này.",
     "bandVehicles": "{count, plural, other {xe}}",
     "addDates": "Thêm ngày",
-    "deleteWithBookings": "Thao tác này cũng xóa {count} đặt xe đang diễn ra hoặc sắp tới, cùng thanh toán và biên bản kiểm tra. Không thể hoàn tác.",
-    "deleteWithBookingsBtn": "Xóa xe và đặt xe"
+    "deleteWithBookings": "Thao tác này cũng xóa {count} đặt xe của nó, cùng thanh toán, biên bản kiểm tra và hợp đồng. Không thể hoàn tác.",
+    "deleteWithBookingsBtn": "Xóa xe và đặt xe",
+    "noticeOwnerOnly": "Chỉ chủ doanh nghiệp mới xóa được xe.",
+    "bulkDeleteWarning": "Xóa cùng mọi đặt xe và bản ghi của chúng. Không thể hoàn tác.",
+    "deleteVehicleConfirm": "Xóa xe cùng chi phí, giấy tờ và ảnh. Không thể hoàn tác."
   },
   "customers": {
     "noRentals": "Chưa có lượt thuê nào",
@@ -3354,7 +3357,7 @@
     "backToFleet": "Quay lại đội xe",
     "backToVehicle": "Quay lại xe",
     "addTitle": "Thêm xe",
-    "addSubtitle": "Hãng, dòng xe, biển số và một mức giá là đủ cho bây giờ. Thêm phần còn lại sau.",
+    "addSubtitle": "Chỉ cần hãng và mẫu xe là đủ. Thêm phần còn lại sau.",
     "import": "Nhập danh sách",
     "editTitle": "Chỉnh sửa {name}",
     "ratesTitle": "Giá cước và tiền cọc",
@@ -3461,12 +3464,12 @@
     "archiveBtn": "Lưu trữ xe",
     "archiving": "Đang lưu trữ…",
     "deleteLead": "Xóa",
-    "deleteBody": "xóa vĩnh viễn, cùng các đặt xe đang diễn ra hoặc sắp tới và thanh toán của chúng.",
+    "deleteBody": "xóa vĩnh viễn, cùng mọi đặt xe, thanh toán, biên bản kiểm tra và giấy tờ.",
     "n_placeholder": "Ghi chú: đặc điểm riêng, lịch bảo dưỡng, vị trí chìa khóa phụ",
     "n_auto": "Tự động lưu khi bạn bấm ra ngoài",
     "n_edited": "Chỉnh sửa lần cuối {date}",
     "needMake": "Chọn hãng và dòng xe trước.",
-    "ratesBody": "Điền ít nhất một mức giá. Các mức khác sẽ tự động tính khi nhận đơn đặt xe.",
+    "ratesBody": "Không bắt buộc. Điền một mức, các mức khác được tính từ đó.",
     "needPrice": "Thêm ít nhất một giá trước khi lưu.",
     "bookChange": "Dùng ảnh khác",
     "purchaseDate": "Ngày mua",
@@ -3502,7 +3505,8 @@
     "notSetShort": "chưa đặt",
     "seatsCount": "{count} chỗ",
     "trimHint": "Phiên bản, ví dụ 1.0 Turbo SV",
-    "yearPlaceholder": "ví dụ {year}"
+    "yearPlaceholder": "ví dụ {year}",
+    "plateLater": "Có thể thêm sau"
   },
   "bookingEdit": {
     "crumbBookings": "Đặt xe",

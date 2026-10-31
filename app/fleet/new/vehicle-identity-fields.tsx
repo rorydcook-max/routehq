@@ -714,7 +714,7 @@ export function VehicleIdentityFields({
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className={labelClass}>{say("plate")}</span>
-            <input className={`${inputClass} font-mono-data`} name="registrationNumber" onChange={(event) => setRegistrationNumber(event.target.value)} required value={registrationNumber} />
+            <input className={`${inputClass} font-mono-data`} name="registrationNumber" onChange={(event) => setRegistrationNumber(event.target.value)} placeholder={say("plateLater")} value={registrationNumber} />
           </label>
           <label className="block">
             <span className={labelClass}>{say("colour")}</span>

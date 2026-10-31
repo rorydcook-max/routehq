@@ -60,14 +60,13 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
 
   // What was paid, what it is worth and any loan are for the owner only.
   const isOwner = (await getCurrentMembership())?.role === "owner";
-  // Current and upcoming bookings: deleting the vehicle deletes them too (owner only), so the confirm says how many.
+  // Every booking this vehicle has had: deleting the vehicle deletes them too (owner only), so the confirm says how many.
   const { count: liveBookings } = await supabase
     .from("rentals")
     .select("id", { count: "exact", head: true })
     .eq("organization_id", organization.id)
     .eq("vehicle_id", vehicle.id)
-    .is("deleted_at", null)
-    .in("status", ["draft", "booked", "active", "due_soon", "overdue", "extended"]);
+    .is("deleted_at", null);
   const specifications = vehicle.specifications || {};
   const acquisition = vehicle.metadata?.acquisition || {};
   const compliance = vehicle.metadata?.compliance || {};
@@ -149,7 +148,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <span className="measure mt-1 block font-medium text-[var(--muted)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: `฿${usualDeposit.toLocaleString("en-US")}` }) : say("depositHintNone")}</span>
             </label>
           </Fold>
-          <Fold summary={`${vehicle.make} ${vehicle.model} · ${vehicle.registration_number}`} title={say("identTitle")}>
+          <Fold summary={[`${vehicle.make} ${vehicle.model}`, vehicle.registration_number].filter(Boolean).join(" · ")} title={say("identTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className={labelClass}>{say("category")}</span>

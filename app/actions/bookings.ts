@@ -27,6 +27,7 @@ import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
 import { bookingRules } from "@/lib/booking-rules";
+import { removeStoredFiles } from "@/lib/supabase/remove-stored-files";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 function requiredString(formData: FormData, key: string) {
@@ -950,12 +951,8 @@ export type DeleteBookingResult = {
 };
 
 /**
- * Delete a booking (owner only; Rory, 31 Oct 2026: test bookings must be removable).
- * - Payments, inspections or a signed agreement on record: the first call returns needsConfirm, and the owner confirms.
- * - No agreement record at all: the booking and everything on it are deleted outright.
- * - An agreement record exists (even a draft keeps locked versions, and signatures and certificates are protected
- *   by the database as evidence): payments, inspections, links and reminders are deleted, and the booking is marked
- *   deleted, so it leaves every list and screen while the locked agreement record stays in the database.
+ * Delete a booking and everything on it (owner only; Rory, 31 Oct 2026: delete removes everything, archive keeps).
+ * Payments, inspections or a signed agreement on record: the first call returns needsConfirm, and the owner confirms.
  */
 export async function deleteBooking(rentalId: string, confirmed = false): Promise<DeleteBookingResult> {
   const supabase = (await createSupabaseServerClient()) as any;
@@ -1000,72 +997,25 @@ export async function deleteBooking(rentalId: string, confirmed = false): Promis
     return { success: false, needsConfirm: { signed, payments, inspections: inspectionIds.length } };
   }
 
-  // Null out receipt FKs before deleting transactions
-  const { data: txIds } = await supabase
-    .from("transactions")
-    .select("id")
-    .eq("rental_id", cleanId)
-    .eq("organization_id", rental.organization_id);
-
-  if (txIds?.length) {
-    const ids = txIds.map((t: any) => t.id);
-    await supabase.from("receipts").update({ transaction_id: null }).in("transaction_id", ids);
-    await supabase.from("rental_payments").update({ transaction_id: null }).in("transaction_id", ids);
-  }
-
-  // receipts.rental_id has no ON DELETE SET NULL, so detach receipts before deleting the rental.
-  await supabase
-    .from("receipts")
-    .update({ rental_id: null })
-    .eq("rental_id", cleanId)
-    .eq("organisation_id", rental.organization_id);
-
-  // The owner is checked above; the clean-up runs with the service role, because members may not delete some of
-  // these rows themselves (booking links, for one), and a deleted booking must not leave a working customer link.
+  // The owner is checked above. Everything on the booking goes (Rory, 31 Oct 2026): payments, money entries,
+  // handover and return checks with their photos, links, reminders, To do items and the agreement, signed or not.
+  // Archive is how an owner keeps records. The database does it in one transaction (purge_rental), which is the
+  // only path allowed to remove signed agreement records; then the files it lists are removed from storage.
   const db = createSupabaseAdminClient() as any;
-  // Inspection photos' manifest rows hold on to the inspection (no cascade): remove them first.
-  if (inspectionIds.length) await db.from("inspection_media_manifest").delete().in("inspection_id", inspectionIds);
-  // A deposit taken on this booking is referenced from other money rows: let go of it.
-  await db.from("transactions").update({ deposit_rental_id: null }).eq("deposit_rental_id", cleanId).eq("organization_id", org);
-  // Switch the customer's link off first (as cancelling does): a link a renter signed through can't be deleted,
-  // because the locked signature record points at it, so the delete below only removes unsigned ones.
-  await db.from("booking_links").update({ status: "cancelled" }).eq("rental_id", cleanId).eq("organization_id", org);
+  const { data: vehicleBefore } = await db.from("vehicles").select("current_rental_id").eq("id", rental.vehicle_id).maybeSingle();
+  const wasOnThisBooking = vehicleBefore?.current_rental_id === cleanId;
+  const { data: files, error: purgeError } = await db.rpc("purge_rental", { p_rental: cleanId });
+  if (purgeError) return { success: false, error: purgeError.message };
+  await removeStoredFiles(db, files);
 
-  await Promise.allSettled([
-    db.from("rental_payments").delete().eq("rental_id", cleanId).eq("organization_id", org),
-    db.from("transactions").delete().eq("rental_id", cleanId).eq("organization_id", org),
-    db.from("inspections").delete().eq("rental_id", cleanId).eq("organization_id", org),
-    db.from("booking_links").delete().eq("rental_id", cleanId).eq("organization_id", org),
-    db.from("contracts").delete().eq("rental_id", cleanId).eq("organization_id", org),
-    db.from("reminders").delete().eq("rental_id", cleanId),
-    db.from("customer_reminders").delete().eq("rental_id", cleanId),
-    db.from("tasks").delete().eq("rental_id", cleanId),
-    db.from("activity_events").delete().eq("rental_id", cleanId).eq("organization_id", org),
-    db.from("communication_log").delete().eq("rental_id", cleanId).eq("organisation_id", org),
-  ]);
-
-  if (documents.length) {
-    // The agreement record can't be deleted (locked versions, and signatures are evidence): the booking is marked
-    // deleted instead, which takes it off every list, the calendar and availability.
-    const { error: hideError } = await supabase.from("rentals").update({ deleted_at: new Date().toISOString() }).eq("id", cleanId).eq("organization_id", org);
-    if (hideError) return { success: false, error: hideError.message };
-  } else {
-    await Promise.allSettled([
-      db.from("customer_portal_actions").delete().eq("rental_id", cleanId),
-      db.from("line_messages").update({ rental_id: null }).eq("rental_id", cleanId),
-      db.from("deposit_reconciliations").delete().eq("rental_id", cleanId)
-    ]);
-    const { error: deleteError } = await supabase.from("rentals").delete().eq("id", cleanId).eq("organization_id", org);
-    if (deleteError) return { success: false, error: deleteError.message };
+  // Free up the vehicle if it was out on this booking
+  if (wasOnThisBooking) {
+    await supabase
+      .from("vehicles")
+      .update({ status: "available", availability_status: "available_now", current_customer_id: null, current_rental_id: null })
+      .eq("id", rental.vehicle_id)
+      .eq("organization_id", rental.organization_id);
   }
-
-  // Free up the vehicle if it was assigned to this rental
-  await supabase
-    .from("vehicles")
-    .update({ status: "available", availability_status: "available_now", current_customer_id: null, current_rental_id: null })
-    .eq("id", rental.vehicle_id)
-    .eq("organization_id", rental.organization_id)
-    .eq("current_rental_id", cleanId);
   await syncVehicleStatusFromBookings(supabase, rental.organization_id, rental.vehicle_id);
 
   revalidatePath("/");

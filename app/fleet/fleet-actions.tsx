@@ -42,6 +42,7 @@ export function FleetBulkActions({
           <Archive size={16} />
           {t("archive")}
         </PendingButton>
+        {confirming ? <span className="basis-full text-right text-sm font-semibold text-[var(--danger)] md:basis-auto">{t("bulkDeleteWarning", { count })}</span> : null}
         {confirming ? (
           <PendingButton className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--danger)] px-3 py-2 text-sm font-bold text-white disabled:opacity-70" formAction={deleteAction} pendingLabel={t("deleting")} type="submit">
             <Trash2 size={16} />
@@ -78,7 +79,8 @@ export function ConfirmDeleteVehicleButton({
 }) {
   const t = useTranslations("fleet");
   const [confirming, setConfirming] = useState(false);
-  const blocked = liveBookings > 0 && !canDeleteBookings;
+  // Deleting removes the vehicle with all its bookings and records, so only the owner can do it.
+  const blocked = !canDeleteBookings;
   if (!confirming) {
     return (
       <button
@@ -86,23 +88,25 @@ export function ConfirmDeleteVehicleButton({
         className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--danger-line)] bg-white text-[var(--danger)] hover:bg-[var(--danger-light)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white"
         disabled={blocked}
         onClick={() => setConfirming(true)}
-        title={blocked ? t("noticeBookings") : t("deleteVehicle")}
+        title={blocked ? t("noticeOwnerOnly") : t("deleteVehicle")}
         type="button"
       >
         <Trash2 size={16} />
       </button>
     );
   }
-  if (liveBookings > 0) {
+  {
     return (
       <form action={deleteAction} className="grid max-w-xs gap-2 rounded-xl border border-[var(--danger-line)] bg-[var(--danger-light)] p-3" role="alertdialog">
         <input name="vehicleId" type="hidden" value={vehicleId} />
         <input name="organizationId" type="hidden" value={organizationId} />
         <input name="deleteBookings" type="hidden" value="1" />
-        <p className="text-xs font-semibold leading-snug text-[var(--danger)]">{t("deleteWithBookings", { count: liveBookings })}</p>
+        <p className="text-xs font-semibold leading-snug text-[var(--danger)]">
+          {liveBookings > 0 ? t("deleteWithBookings", { count: liveBookings }) : t("deleteVehicleConfirm")}
+        </p>
         <div className="flex flex-wrap items-center gap-1">
           <PendingButton className="inline-flex h-8 items-center justify-center rounded-lg bg-[var(--danger)] px-3 text-xs font-bold text-white" pendingLabel="…" type="submit">
-            {t("deleteWithBookingsBtn")}
+            {liveBookings > 0 ? t("deleteWithBookingsBtn") : t("delete")}
           </PendingButton>
           <button className="inline-flex h-8 items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 text-xs font-semibold" onClick={() => setConfirming(false)} type="button">
             {t("keep")}
@@ -111,16 +115,4 @@ export function ConfirmDeleteVehicleButton({
       </form>
     );
   }
-  return (
-    <form action={deleteAction} className="flex items-center gap-1">
-      <input name="vehicleId" type="hidden" value={vehicleId} />
-      <input name="organizationId" type="hidden" value={organizationId} />
-      <PendingButton className="inline-flex h-8 items-center justify-center rounded-lg bg-[var(--danger)] px-2 text-xs font-bold text-white" pendingLabel="…" type="submit">
-        {t("delete")}
-      </PendingButton>
-      <button className="inline-flex h-8 items-center justify-center rounded-full border border-[var(--border)] bg-white px-2 text-xs font-semibold" onClick={() => setConfirming(false)} type="button">
-        {t("keep")}
-      </button>
-    </form>
-  );
 }

@@ -1344,7 +1344,7 @@
     "deleteRecordsTitle": "这些记录也会被删除",
     "deleteRecordsPayments": "已记录的付款：{count}",
     "deleteRecordsInspections": "交车和还车检查（含照片）：{count}",
-    "deleteRecordsSigned": "已签署的合同除外：会隐藏，但仍保留存档",
+    "deleteRecordsSigned": "已签署的合同",
     "deleteRecordsBody": "此操作无法撤销。",
     "deleteAnyway": "仍然删除"
   },
@@ -2773,8 +2773,11 @@
     "filterEmpty": "此分组目前没有车辆。",
     "bandVehicles": "{count, select, other {辆车}}",
     "addDates": "添加日期",
-    "deleteWithBookings": "这也会删除它的{count}个进行中或即将到来的预订及其付款和检查记录。此操作无法撤销。",
-    "deleteWithBookingsBtn": "删除车辆和预订"
+    "deleteWithBookings": "这也会删除它的{count}个预订，以及付款、检查记录和合同。此操作无法撤销。",
+    "deleteWithBookingsBtn": "删除车辆和预订",
+    "noticeOwnerOnly": "只有企业所有者可以删除车辆。",
+    "bulkDeleteWarning": "连同其所有预订和记录一起删除。此操作无法撤销。",
+    "deleteVehicleConfirm": "删除车辆及其费用、证件和照片。此操作无法撤销。"
   },
   "customers": {
     "noRentals": "暂无租车记录",
@@ -3354,7 +3357,7 @@
     "backToFleet": "返回车队",
     "backToVehicle": "返回车辆",
     "addTitle": "添加车辆",
-    "addSubtitle": "目前只需填写品牌、型号、车牌和一个价格。其余以后再加。",
+    "addSubtitle": "先填品牌和型号就够了，其余以后再补。",
     "import": "导入列表",
     "editTitle": "编辑 {name}",
     "ratesTitle": "费率与押金",
@@ -3461,12 +3464,12 @@
     "archiveBtn": "归档车辆",
     "archiving": "正在归档…",
     "deleteLead": "删除",
-    "deleteBody": "永久删除，并一并删除进行中或即将到来的预订及其付款。",
+    "deleteBody": "永久删除，并删除其所有预订、付款、检查记录和证件。",
     "n_placeholder": "任何值得记下的事情：小毛病、保养提醒、备用钥匙存放处",
     "n_auto": "点击离开时自动保存",
     "n_edited": "最后编辑于 {date}",
     "needMake": "请先选择品牌和型号。",
-    "ratesBody": "请至少填写一个价格。接受预订时系统会根据它计算其他价格。",
+    "ratesBody": "选填。填一项，其他会自动算出。",
     "needPrice": "保存前请至少添加一个价格。",
     "bookChange": "使用其他照片",
     "purchaseDate": "购买日期",
@@ -3502,7 +3505,8 @@
     "notSetShort": "未设置",
     "seatsCount": "{count} 座",
     "trimHint": "配置，例如 1.0 Turbo SV",
-    "yearPlaceholder": "例如 {year}"
+    "yearPlaceholder": "例如 {year}",
+    "plateLater": "可以以后再填"
   },
   "bookingEdit": {
     "crumbBookings": "预订",

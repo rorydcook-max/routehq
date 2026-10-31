@@ -1304,7 +1304,7 @@
     "deleteRecordsTitle": "這些紀錄也會被刪除",
     "deleteRecordsPayments": "已記錄的付款：{count}",
     "deleteRecordsInspections": "交車和還車檢查（含照片）：{count}",
-    "deleteRecordsSigned": "已簽署的合約除外：會隱藏，但仍保留存檔",
+    "deleteRecordsSigned": "已簽署的合約",
     "deleteRecordsBody": "此操作無法復原。",
     "deleteAnyway": "仍然刪除"
   },
@@ -2733,8 +2733,11 @@
     "filterAll": "顯示全部",
     "filterEmpty": "此分類目前沒有車輛。",
     "addDates": "新增日期",
-    "deleteWithBookings": "這也會刪除它的{count}筆進行中或即將到來的預訂及其付款和檢查紀錄。此操作無法復原。",
-    "deleteWithBookingsBtn": "刪除車輛和預訂"
+    "deleteWithBookings": "這也會刪除它的{count}筆預訂，以及付款、檢查紀錄和合約。此操作無法復原。",
+    "deleteWithBookingsBtn": "刪除車輛和預訂",
+    "noticeOwnerOnly": "只有企業擁有者可以刪除車輛。",
+    "bulkDeleteWarning": "連同所有預訂和紀錄一起刪除。此操作無法復原。",
+    "deleteVehicleConfirm": "刪除車輛及其費用、證件和照片。此操作無法復原。"
   },
   "customers": {
     "noRentals": "尚無租車紀錄",
@@ -3314,7 +3317,7 @@
     "backToFleet": "返回車隊",
     "backToVehicle": "返回車輛",
     "addTitle": "新增車輛",
-    "addSubtitle": "目前只需廠牌、車型、車牌和一個價格，其餘可稍後新增。",
+    "addSubtitle": "先填品牌和型號就夠了，其餘之後再補。",
     "import": "匯入清單",
     "editTitle": "編輯 {name}",
     "ratesTitle": "價格與押金",
@@ -3421,12 +3424,12 @@
     "archiveBtn": "封存車輛",
     "archiving": "封存中…",
     "deleteLead": "刪除",
-    "deleteBody": "永久刪除，並一併刪除進行中或即將到來的預訂及其付款。",
+    "deleteBody": "永久刪除，並刪除所有預訂、付款、檢查紀錄和證件。",
     "n_placeholder": "值得記下的事：特殊狀況、保養提醒、備用鑰匙放在哪裡",
     "n_auto": "點選其他地方即自動儲存",
     "n_edited": "上次編輯 {date}",
     "needMake": "請先選擇廠牌和車型。",
-    "ratesBody": "請至少填寫一項。接受預訂時，其他價格會依此計算。",
+    "ratesBody": "選填。填一項，其他會自動算出。",
     "needPrice": "儲存前請至少新增一個價格。",
     "bookChange": "使用其他照片",
     "purchaseDate": "購入日期",
@@ -3462,7 +3465,8 @@
     "notSetShort": "未設定",
     "seatsCount": "{count} 人座",
     "trimHint": "車型等級，例如 1.0 Turbo SV",
-    "yearPlaceholder": "例如 {year}"
+    "yearPlaceholder": "例如 {year}",
+    "plateLater": "可以之後再填"
   },
   "bookingEdit": {
     "crumbBookings": "預約",

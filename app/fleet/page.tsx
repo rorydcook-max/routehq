@@ -236,9 +236,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
           </Link>
         </p>
       ) : null}
-      {notice === "vehicle-has-bookings" ? (
+      {notice === "vehicle-owner-only" ? (
         <p className="mb-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-medium text-[var(--warning)]" role="alert">
-          {t("noticeBookings")}
+          {t("noticeOwnerOnly")}
         </p>
       ) : null}
 

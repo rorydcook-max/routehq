@@ -1304,7 +1304,7 @@
     "deleteRecordsTitle": "Estes registros também serão excluídos",
     "deleteRecordsPayments": "Pagamentos registrados: {count}",
     "deleteRecordsInspections": "Vistorias de entrega e devolução, com fotos: {count}",
-    "deleteRecordsSigned": "Exceto o contrato assinado: fica oculto, mas guardado",
+    "deleteRecordsSigned": "O contrato assinado",
     "deleteRecordsBody": "Não dá para desfazer.",
     "deleteAnyway": "Excluir mesmo assim"
   },
@@ -2733,8 +2733,11 @@
     "filterAll": "Mostrar todos",
     "filterEmpty": "Nenhum veículo neste grupo no momento.",
     "addDates": "Adicionar datas",
-    "deleteWithBookings": "Isso também exclui as {count} reservas em andamento ou futuras, com pagamentos e vistorias. Não pode ser desfeito.",
-    "deleteWithBookingsBtn": "Excluir veículo e reservas"
+    "deleteWithBookings": "Isso também exclui as {count} reservas, com pagamentos, vistorias e contratos. Não pode ser desfeito.",
+    "deleteWithBookingsBtn": "Excluir veículo e reservas",
+    "noticeOwnerOnly": "Só o dono do negócio pode excluir veículos.",
+    "bulkDeleteWarning": "Exclui com todas as reservas e registros. Não pode ser desfeito.",
+    "deleteVehicleConfirm": "Exclui o veículo com custos, documentos e fotos. Não pode ser desfeito."
   },
   "customers": {
     "noRentals": "Nenhum aluguel ainda",
@@ -3314,7 +3317,7 @@
     "backToFleet": "Voltar à frota",
     "backToVehicle": "Voltar ao veículo",
     "addTitle": "Adicionar veículo",
-    "addSubtitle": "Marca, modelo, placa e um preço bastam por agora. Adicione o resto depois.",
+    "addSubtitle": "Marca e modelo bastam por agora. Adicione o resto depois.",
     "import": "Importar uma lista",
     "editTitle": "Editar {name}",
     "ratesTitle": "Preços e caução",
@@ -3421,12 +3424,12 @@
     "archiveBtn": "Arquivar veículo",
     "archiving": "Arquivando…",
     "deleteLead": "Excluir",
-    "deleteBody": "remove de vez, junto com as reservas em andamento ou futuras e seus pagamentos.",
+    "deleteBody": "remove de vez, com todas as reservas, pagamentos, vistorias e documentos.",
     "n_placeholder": "Algo que valha lembrar: manias, lembretes de revisão, onde fica a chave reserva",
     "n_auto": "Salva quando você toca fora",
     "n_edited": "Editado em {date}",
     "needMake": "Escolha a marca e o modelo primeiro.",
-    "ratesBody": "Preencha pelo menos um. Os outros são calculados a partir dele quando você faz uma reserva.",
+    "ratesBody": "Opcional. Preencha um e os outros são calculados a partir dele.",
     "needPrice": "Adicione pelo menos um preço antes de salvar.",
     "bookChange": "Usar outra foto",
     "purchaseDate": "Data da compra",
@@ -3462,7 +3465,8 @@
     "notSetShort": "não informado",
     "seatsCount": "{count, plural, one {# lugar} other {# lugares}}",
     "trimHint": "Versão, ex.: 1.0 Turbo SV",
-    "yearPlaceholder": "ex.: {year}"
+    "yearPlaceholder": "ex.: {year}",
+    "plateLater": "Pode ser adicionada depois"
   },
   "bookingEdit": {
     "crumbBookings": "Reservas",

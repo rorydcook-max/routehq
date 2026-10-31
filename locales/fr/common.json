@@ -1344,7 +1344,7 @@
     "deleteRecordsTitle": "Ces enregistrements seront aussi supprimés",
     "deleteRecordsPayments": "Paiements enregistrés : {count}",
     "deleteRecordsInspections": "Contrôles de remise et de retour, avec photos : {count}",
-    "deleteRecordsSigned": "Sauf le contrat signé : il est masqué mais conservé",
+    "deleteRecordsSigned": "Le contrat signé",
     "deleteRecordsBody": "Impossible d'annuler.",
     "deleteAnyway": "Supprimer quand même"
   },
@@ -2773,8 +2773,11 @@
     "filterAll": "Tout afficher",
     "filterEmpty": "Aucun véhicule dans ce groupe pour le moment.",
     "addDates": "Ajouter des dates",
-    "deleteWithBookings": "Cela supprime aussi ses {count} réservations en cours ou à venir, avec leurs paiements et contrôles. C'est irréversible.",
-    "deleteWithBookingsBtn": "Supprimer le véhicule et les réservations"
+    "deleteWithBookings": "Cela supprime aussi ses {count} réservations, avec paiements, contrôles et contrats. C'est irréversible.",
+    "deleteWithBookingsBtn": "Supprimer le véhicule et les réservations",
+    "noticeOwnerOnly": "Seul le propriétaire de l'entreprise peut supprimer des véhicules.",
+    "bulkDeleteWarning": "Les supprime avec toutes leurs réservations et données. C'est irréversible.",
+    "deleteVehicleConfirm": "Supprime le véhicule avec ses frais, papiers et photos. C'est irréversible."
   },
   "customers": {
     "noRentals": "Aucune location pour l’instant",
@@ -3354,7 +3357,7 @@
     "backToFleet": "Retour à la flotte",
     "backToVehicle": "Retour au véhicule",
     "addTitle": "Ajouter un véhicule",
-    "addSubtitle": "Marque, modèle, plaque et un prix suffisent pour l’instant. Ajoutez le reste plus tard.",
+    "addSubtitle": "La marque et le modèle suffisent pour l'instant. Le reste plus tard.",
     "import": "Importer une liste",
     "editTitle": "Modifier {name}",
     "ratesTitle": "Tarifs et caution",
@@ -3461,12 +3464,12 @@
     "archiveBtn": "Archiver le véhicule",
     "archiving": "Archivage…",
     "deleteLead": "Supprimer",
-    "deleteBody": "le supprime définitivement, avec ses réservations en cours ou à venir et leurs paiements.",
+    "deleteBody": "le supprime définitivement, avec toutes ses réservations, paiements, contrôles et papiers.",
     "n_placeholder": "Tout ce qui vaut la peine d’être noté : particularités, rappels d’entretien, où se trouve le double de clé",
     "n_auto": "Enregistré quand vous quittez le champ",
     "n_edited": "Dernière modification le {date}",
     "needMake": "Choisissez d’abord la marque et le modèle.",
-    "ratesBody": "Remplissez-en au moins un. Les autres sont calculés à partir de celui-ci lors d’une réservation.",
+    "ratesBody": "Facultatif. Remplissez-en un, les autres en sont déduits.",
     "needPrice": "Ajoutez au moins un prix avant d’enregistrer.",
     "bookChange": "Utiliser une autre photo",
     "purchaseDate": "Date d’achat",
@@ -3502,7 +3505,8 @@
     "notSetShort": "non renseigné",
     "seatsCount": "{count, plural, one {# place} many {# places} other {# places}}",
     "trimHint": "Finition, ex. 1.0 Turbo SV",
-    "yearPlaceholder": "ex. {year}"
+    "yearPlaceholder": "ex. {year}",
+    "plateLater": "Peut être ajoutée plus tard"
   },
   "bookingEdit": {
     "crumbBookings": "Réservations",

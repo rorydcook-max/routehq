@@ -7,16 +7,13 @@ import { MoneyInput } from "@/components/money-input";
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
 /**
- * Prices for a new vehicle. At least one is needed: a vehicle saved with no
- * price at all could then be booked for nothing by mistake. Any one will do;
- * the others are worked out from it when a booking is made.
+ * Prices for a new vehicle. Optional (Rory, 31 Oct 2026): a vehicle with no price stays off the online booking
+ * page, and a new booking asks for the price. Any one will do; the others are worked out from it.
  */
 export function RatesFields({ currency, usualDeposit = 0 }: { currency: string; usualDeposit?: number }) {
   const say = useTranslations("vehicleForm") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const [rates, setRates] = useState({ dailyRate: "", weeklyRate: "", monthlyRate: "" });
-  const [asked, setAsked] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const hasPrice = Object.values(rates).some((value) => Number(value) > 0);
   const set = (key: keyof typeof rates) => (digits: string) => setRates((current) => ({ ...current, [key]: digits }));
 
   return (
@@ -37,21 +34,6 @@ export function RatesFields({ currency, usualDeposit = 0 }: { currency: string; 
           <MoneyInput currency={currency} name="monthlyRate" onValueChange={set("monthlyRate")} />
         </label>
       </div>
-      {/* Stops the form being sent with no price, and brings this card into view to say why. */}
-      <input
-        aria-hidden="true"
-        className="pointer-events-none absolute h-px w-px opacity-0"
-        onChange={() => undefined}
-        onInvalid={(event) => {
-          event.preventDefault();
-          setAsked(true);
-          cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }}
-        required
-        tabIndex={-1}
-        value={hasPrice ? "ok" : ""}
-      />
-      {asked && !hasPrice ? <p className="mt-3 rounded-xl bg-[var(--warning-light)] p-3 font-semibold text-[var(--foreground)]">{say("needPrice")}</p> : null}
       <label className="mt-4 block sm:max-w-xs">
         <span className={labelClass}>{say("deposit")}</span>
         <MoneyInput currency={currency} name="depositAmount" />

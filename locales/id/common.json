@@ -1344,7 +1344,7 @@
     "deleteRecordsTitle": "Catatan ini juga akan dihapus",
     "deleteRecordsPayments": "Pembayaran tercatat: {count}",
     "deleteRecordsInspections": "Pemeriksaan serah terima dan pengembalian, dengan foto: {count}",
-    "deleteRecordsSigned": "Kecuali perjanjian yang sudah ditandatangani: disembunyikan, tetapi tetap disimpan",
+    "deleteRecordsSigned": "Perjanjian yang sudah ditandatangani",
     "deleteRecordsBody": "Tindakan ini tidak dapat dibatalkan.",
     "deleteAnyway": "Tetap hapus"
   },
@@ -2773,8 +2773,11 @@
     "filterAll": "Tampilkan semua",
     "filterEmpty": "Tidak ada kendaraan di grup ini saat ini.",
     "addDates": "Tambah tanggal",
-    "deleteWithBookings": "Ini juga menghapus {count} pemesanan yang berjalan atau mendatang, beserta pembayaran dan pemeriksaannya. Tidak bisa dibatalkan.",
-    "deleteWithBookingsBtn": "Hapus kendaraan dan pemesanan"
+    "deleteWithBookings": "Ini juga menghapus {count} pemesanannya, beserta pembayaran, pemeriksaan, dan perjanjian. Tidak bisa dibatalkan.",
+    "deleteWithBookingsBtn": "Hapus kendaraan dan pemesanan",
+    "noticeOwnerOnly": "Hanya pemilik usaha yang bisa menghapus kendaraan.",
+    "bulkDeleteWarning": "Menghapusnya beserta semua pemesanan dan catatannya. Tidak bisa dibatalkan.",
+    "deleteVehicleConfirm": "Menghapus kendaraan beserta biaya, dokumen, dan fotonya. Tidak bisa dibatalkan."
   },
   "customers": {
     "noRentals": "Belum ada sewa",
@@ -3354,7 +3357,7 @@
     "backToFleet": "Kembali ke armada",
     "backToVehicle": "Kembali ke kendaraan",
     "addTitle": "Tambah kendaraan",
-    "addSubtitle": "Merek, model, pelat, dan satu harga sudah cukup untuk sekarang. Tambahkan sisanya nanti.",
+    "addSubtitle": "Merek dan model sudah cukup. Sisanya bisa ditambahkan nanti.",
     "import": "Impor daftar",
     "editTitle": "Ubah {name}",
     "ratesTitle": "Tarif dan uang jaminan",
@@ -3461,12 +3464,12 @@
     "archiveBtn": "Arsipkan kendaraan",
     "archiving": "Mengarsipkan…",
     "deleteLead": "Hapus",
-    "deleteBody": "menghapusnya permanen, beserta pemesanan yang berjalan atau mendatang dan pembayarannya.",
+    "deleteBody": "menghapusnya permanen, beserta semua pemesanan, pembayaran, pemeriksaan, dan dokumen.",
     "n_placeholder": "Apa pun yang perlu diingat: kebiasaan unik, pengingat servis, letak kunci cadangan",
     "n_auto": "Tersimpan saat Anda mengetuk di luar",
     "n_edited": "Terakhir diubah {date}",
     "needMake": "Pilih merek dan model terlebih dahulu.",
-    "ratesBody": "Isi minimal satu. Yang lain dihitung darinya saat Anda menerima pemesanan.",
+    "ratesBody": "Opsional. Isi satu, yang lain dihitung darinya.",
     "needPrice": "Tambahkan minimal satu harga sebelum menyimpan.",
     "bookChange": "Gunakan foto lain",
     "purchaseDate": "Tanggal beli",
@@ -3502,7 +3505,8 @@
     "notSetShort": "belum diatur",
     "seatsCount": "{count} kursi",
     "trimHint": "Varian, mis. 1.0 Turbo SV",
-    "yearPlaceholder": "mis. {year}"
+    "yearPlaceholder": "mis. {year}",
+    "plateLater": "Bisa ditambahkan nanti"
   },
   "bookingEdit": {
     "crumbBookings": "Pemesanan",

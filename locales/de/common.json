@@ -1344,7 +1344,7 @@
     "deleteRecordsTitle": "Diese Einträge werden ebenfalls gelöscht",
     "deleteRecordsPayments": "Erfasste Zahlungen: {count}",
     "deleteRecordsInspections": "Übergabe- und Rückgabeprüfungen mit Fotos: {count}",
-    "deleteRecordsSigned": "Nicht der unterschriebene Vertrag: Er wird ausgeblendet, bleibt aber gespeichert",
+    "deleteRecordsSigned": "Der unterschriebene Vertrag",
     "deleteRecordsBody": "Das lässt sich nicht rückgängig machen.",
     "deleteAnyway": "Trotzdem löschen"
   },
@@ -2773,8 +2773,11 @@
     "filterAll": "Alle anzeigen",
     "filterEmpty": "Derzeit keine Fahrzeuge in dieser Gruppe.",
     "addDates": "Daten hinzufügen",
-    "deleteWithBookings": "Damit werden auch seine {count} laufenden oder anstehenden Buchungen samt Zahlungen und Prüfungen gelöscht. Das lässt sich nicht rückgängig machen.",
-    "deleteWithBookingsBtn": "Fahrzeug und Buchungen löschen"
+    "deleteWithBookings": "Damit werden auch seine {count} Buchungen samt Zahlungen, Prüfungen und Verträgen gelöscht. Das lässt sich nicht rückgängig machen.",
+    "deleteWithBookingsBtn": "Fahrzeug und Buchungen löschen",
+    "noticeOwnerOnly": "Nur der Inhaber kann Fahrzeuge löschen.",
+    "bulkDeleteWarning": "Löscht sie samt allen Buchungen und Einträgen. Das lässt sich nicht rückgängig machen.",
+    "deleteVehicleConfirm": "Löscht das Fahrzeug samt Kosten, Unterlagen und Fotos. Das lässt sich nicht rückgängig machen."
   },
   "customers": {
     "noRentals": "Noch keine Mieten",
@@ -3354,7 +3357,7 @@
     "backToFleet": "Zurück zur Flotte",
     "backToVehicle": "Zurück zum Fahrzeug",
     "addTitle": "Fahrzeug hinzufügen",
-    "addSubtitle": "Marke, Modell, Kennzeichen und ein Preis reichen für den Anfang. Den Rest später ergänzen.",
+    "addSubtitle": "Marke und Modell reichen fürs Erste. Den Rest später ergänzen.",
     "import": "Liste importieren",
     "editTitle": "{name} bearbeiten",
     "ratesTitle": "Preise und Kaution",
@@ -3461,12 +3464,12 @@
     "archiveBtn": "Fahrzeug archivieren",
     "archiving": "Wird archiviert…",
     "deleteLead": "Löschen",
-    "deleteBody": "entfernt es endgültig, samt laufender oder anstehender Buchungen und deren Zahlungen.",
+    "deleteBody": "entfernt es endgültig, samt aller Buchungen, Zahlungen, Prüfungen und Unterlagen.",
     "n_placeholder": "Alles, was man sich merken sollte: Eigenheiten, Serviceerinnerungen, wo der Ersatzschlüssel ist",
     "n_auto": "Wird beim Verlassen des Felds gespeichert",
     "n_edited": "Zuletzt bearbeitet {date}",
     "needMake": "Wählen Sie zuerst Marke und Modell.",
-    "ratesBody": "Füllen Sie mindestens einen aus. Die anderen werden daraus berechnet, wenn Sie eine Buchung annehmen.",
+    "ratesBody": "Optional. Einen eintragen, die anderen werden daraus berechnet.",
     "needPrice": "Fügen Sie vor dem Speichern mindestens einen Preis hinzu.",
     "bookChange": "Anderes Foto verwenden",
     "purchaseDate": "Kaufdatum",
@@ -3502,7 +3505,8 @@
     "notSetShort": "nicht angegeben",
     "seatsCount": "{count, plural, one {# Sitz} other {# Sitze}}",
     "trimHint": "Ausstattung, z. B. 1.0 Turbo SV",
-    "yearPlaceholder": "z. B. {year}"
+    "yearPlaceholder": "z. B. {year}",
+    "plateLater": "Kann später ergänzt werden"
   },
   "bookingEdit": {
     "crumbBookings": "Buchungen",

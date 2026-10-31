@@ -1304,7 +1304,7 @@
     "deleteRecordsTitle": "これらの記録も削除されます",
     "deleteRecordsPayments": "記録された支払い：{count}",
     "deleteRecordsInspections": "引き渡し・返却時のチェック（写真付き）：{count}",
-    "deleteRecordsSigned": "署名済みの契約書は除く：非表示になりますが保管されます",
+    "deleteRecordsSigned": "署名済みの契約書",
     "deleteRecordsBody": "元に戻せません。",
     "deleteAnyway": "それでも削除"
   },
@@ -2733,8 +2733,11 @@
     "filterAll": "すべて表示",
     "filterEmpty": "現在このグループに車両はありません。",
     "addDates": "日付を追加",
-    "deleteWithBookings": "進行中または今後の予約{count}件と、その支払い・チェック記録も削除されます。元に戻せません。",
-    "deleteWithBookingsBtn": "車両と予約を削除"
+    "deleteWithBookings": "予約{count}件と、その支払い・チェック記録・契約書も削除されます。元に戻せません。",
+    "deleteWithBookingsBtn": "車両と予約を削除",
+    "noticeOwnerOnly": "車両を削除できるのはオーナーだけです。",
+    "bulkDeleteWarning": "すべての予約と記録ごと削除します。元に戻せません。",
+    "deleteVehicleConfirm": "車両を費用・書類・写真ごと削除します。元に戻せません。"
   },
   "customers": {
     "noRentals": "まだレンタルがありません",
@@ -3314,7 +3317,7 @@
     "backToFleet": "車両一覧に戻る",
     "backToVehicle": "車両に戻る",
     "addTitle": "車両を追加",
-    "addSubtitle": "今はメーカー、モデル、ナンバー、料金1つで十分です。その他は後で追加できます。",
+    "addSubtitle": "まずはメーカーとモデルだけで大丈夫です。残りはあとで追加できます。",
     "import": "リストをインポート",
     "editTitle": "{name}を編集",
     "ratesTitle": "料金と保証金",
@@ -3421,12 +3424,12 @@
     "archiveBtn": "車両をアーカイブ",
     "archiving": "アーカイブ中…",
     "deleteLead": "削除",
-    "deleteBody": "完全に削除します。進行中または今後の予約とその支払いも削除されます。",
+    "deleteBody": "完全に削除します。すべての予約、支払い、チェック記録、書類も削除されます。",
     "n_placeholder": "覚えておきたいこと：クセ、点検のリマインダー、スペアキーの場所",
     "n_auto": "他の場所をタップすると保存されます",
     "n_edited": "最終編集 {date}",
     "needMake": "先にメーカーとモデルを選んでください。",
-    "ratesBody": "少なくとも1つ入力してください。他の料金は予約時にそこから計算されます。",
+    "ratesBody": "任意。1つ入力すれば、ほかは自動で計算されます。",
     "needPrice": "保存する前に料金を1つ以上追加してください。",
     "bookChange": "別の写真を使う",
     "purchaseDate": "購入日",
@@ -3462,7 +3465,8 @@
     "notSetShort": "未設定",
     "seatsCount": "{count} 人乗り",
     "trimHint": "グレード（例：1.0 Turbo SV）",
-    "yearPlaceholder": "例：{year}"
+    "yearPlaceholder": "例：{year}",
+    "plateLater": "あとで追加できます"
   },
   "bookingEdit": {
     "crumbBookings": "予約",

@@ -1304,7 +1304,7 @@
     "deleteRecordsTitle": "이 기록도 함께 삭제돼요",
     "deleteRecordsPayments": "기록된 결제: {count}",
     "deleteRecordsInspections": "인도 및 반납 점검(사진 포함): {count}",
-    "deleteRecordsSigned": "서명된 계약서는 제외: 숨겨지지만 보관돼요",
+    "deleteRecordsSigned": "서명된 계약서",
     "deleteRecordsBody": "되돌릴 수 없어요.",
     "deleteAnyway": "그래도 삭제"
   },
@@ -2733,8 +2733,11 @@
     "filterAll": "전체 보기",
     "filterEmpty": "지금 이 그룹에 차량이 없어요.",
     "addDates": "날짜 추가",
-    "deleteWithBookings": "진행 중이거나 예정된 예약 {count}건과 그 결제·점검 기록도 함께 삭제돼요. 되돌릴 수 없어요.",
-    "deleteWithBookingsBtn": "차량과 예약 삭제"
+    "deleteWithBookings": "예약 {count}건과 그 결제·점검 기록·계약서도 함께 삭제돼요. 되돌릴 수 없어요.",
+    "deleteWithBookingsBtn": "차량과 예약 삭제",
+    "noticeOwnerOnly": "사업체 소유자만 차량을 삭제할 수 있어요.",
+    "bulkDeleteWarning": "모든 예약과 기록까지 함께 삭제돼요. 되돌릴 수 없어요.",
+    "deleteVehicleConfirm": "차량을 비용, 서류, 사진과 함께 삭제해요. 되돌릴 수 없어요."
   },
   "customers": {
     "noRentals": "렌탈 내역 없음",
@@ -3314,7 +3317,7 @@
     "backToFleet": "차량 목록으로",
     "backToVehicle": "차량으로 돌아가기",
     "addTitle": "차량 추가",
-    "addSubtitle": "지금은 제조사, 모델, 번호판, 요금 하나면 충분해요. 나머지는 나중에 추가하세요.",
+    "addSubtitle": "지금은 제조사와 모델만 있으면 돼요. 나머지는 나중에 추가하세요.",
     "import": "목록 가져오기",
     "editTitle": "{name} 편집",
     "ratesTitle": "요금 및 보증금",
@@ -3421,12 +3424,12 @@
     "archiveBtn": "차량 보관",
     "archiving": "보관 중…",
     "deleteLead": "삭제",
-    "deleteBody": "영구적으로 삭제합니다. 진행 중이거나 예정된 예약과 그 결제도 함께 삭제돼요.",
+    "deleteBody": "영구적으로 삭제합니다. 모든 예약, 결제, 점검 기록, 서류도 함께 삭제돼요.",
     "n_placeholder": "기억할 내용: 특이 사항, 정비 알림, 보조 키 위치",
     "n_auto": "다른 곳을 탭하면 저장돼요",
     "n_edited": "마지막 편집 {date}",
     "needMake": "먼저 제조사와 모델을 선택하세요.",
-    "ratesBody": "하나 이상 입력하세요. 예약할 때 나머지는 입력한 요금으로 계산해요.",
+    "ratesBody": "선택 사항이에요. 하나만 입력하면 나머지는 계산돼요.",
     "needPrice": "저장하기 전에 요금을 하나 이상 추가하세요.",
     "bookChange": "다른 사진 사용",
     "purchaseDate": "구입일",
@@ -3462,7 +3465,8 @@
     "notSetShort": "미설정",
     "seatsCount": "{count}인승",
     "trimHint": "트림 (예: 1.0 Turbo SV)",
-    "yearPlaceholder": "예: {year}"
+    "yearPlaceholder": "예: {year}",
+    "plateLater": "나중에 추가할 수 있어요"
   },
   "bookingEdit": {
     "crumbBookings": "예약",

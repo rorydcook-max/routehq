@@ -1344,7 +1344,7 @@
     "deleteRecordsTitle": "Rekod ini juga akan dipadam",
     "deleteRecordsPayments": "Bayaran direkodkan: {count}",
     "deleteRecordsInspections": "Pemeriksaan serahan dan pemulangan, dengan foto: {count}",
-    "deleteRecordsSigned": "Kecuali perjanjian yang ditandatangani: disembunyikan tetapi disimpan",
+    "deleteRecordsSigned": "Perjanjian yang ditandatangani",
     "deleteRecordsBody": "Ini tidak boleh dibuat asal.",
     "deleteAnyway": "Padam juga"
   },
@@ -2773,8 +2773,11 @@
     "filterAll": "Tunjuk semua",
     "filterEmpty": "Tiada kenderaan dalam kumpulan ini sekarang.",
     "addDates": "Tambah tarikh",
-    "deleteWithBookings": "Ini juga memadam {count} tempahan semasa atau akan datang, bersama bayaran dan pemeriksaannya. Tidak boleh dibuat asal.",
-    "deleteWithBookingsBtn": "Padam kenderaan dan tempahan"
+    "deleteWithBookings": "Ini juga memadam {count} tempahannya, bersama bayaran, pemeriksaan dan perjanjian. Tidak boleh dibuat asal.",
+    "deleteWithBookingsBtn": "Padam kenderaan dan tempahan",
+    "noticeOwnerOnly": "Hanya pemilik perniagaan boleh memadam kenderaan.",
+    "bulkDeleteWarning": "Memadamnya bersama semua tempahan dan rekod. Tidak boleh dibuat asal.",
+    "deleteVehicleConfirm": "Memadam kenderaan bersama kos, dokumen dan fotonya. Tidak boleh dibuat asal."
   },
   "customers": {
     "noRentals": "Belum ada sewaan",
@@ -3354,7 +3357,7 @@
     "backToFleet": "Kembali ke armada",
     "backToVehicle": "Kembali ke kenderaan",
     "addTitle": "Tambah kenderaan",
-    "addSubtitle": "Jenama, model, plat dan satu harga sudah memadai buat masa ini. Tambah yang lain kemudian.",
+    "addSubtitle": "Jenama dan model sudah memadai. Tambah yang lain kemudian.",
     "import": "Import senarai",
     "editTitle": "Edit {name}",
     "ratesTitle": "Kadar dan deposit",
@@ -3461,12 +3464,12 @@
     "archiveBtn": "Arkibkan kenderaan",
     "archiving": "Mengarkibkan…",
     "deleteLead": "Padam",
-    "deleteBody": "memadamnya terus, bersama tempahan semasa atau akan datang dan bayarannya.",
+    "deleteBody": "memadamnya terus, bersama semua tempahan, bayaran, pemeriksaan dan dokumen.",
     "n_placeholder": "Apa-apa yang patut diingat: keanehan, peringatan servis, tempat kunci pendua",
     "n_auto": "Disimpan apabila anda ketik di tempat lain",
     "n_edited": "Kali terakhir diedit {date}",
     "needMake": "Pilih jenama dan model dahulu.",
-    "ratesBody": "Isi sekurang-kurangnya satu. Yang lain dikira daripadanya semasa anda menerima tempahan.",
+    "ratesBody": "Pilihan. Isi satu, yang lain dikira daripadanya.",
     "needPrice": "Tambah sekurang-kurangnya satu harga sebelum menyimpan.",
     "bookChange": "Guna foto lain",
     "purchaseDate": "Tarikh dibeli",
@@ -3502,7 +3505,8 @@
     "notSetShort": "belum ditetapkan",
     "seatsCount": "{count} tempat duduk",
     "trimHint": "Varian, cth. 1.0 Turbo SV",
-    "yearPlaceholder": "cth. {year}"
+    "yearPlaceholder": "cth. {year}",
+    "plateLater": "Boleh ditambah kemudian"
   },
   "bookingEdit": {
     "crumbBookings": "Tempahan",

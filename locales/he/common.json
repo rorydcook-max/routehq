@@ -1344,7 +1344,7 @@
     "deleteRecordsTitle": "גם הרשומות האלה יימחקו",
     "deleteRecordsPayments": "תשלומים שנרשמו: {count}",
     "deleteRecordsInspections": "בדיקות מסירה והחזרה, עם תמונות: {count}",
-    "deleteRecordsSigned": "חוץ מהחוזה החתום: הוא מוסתר אבל נשמר",
+    "deleteRecordsSigned": "החוזה החתום",
     "deleteRecordsBody": "אי אפשר לבטל את זה.",
     "deleteAnyway": "למחוק בכל זאת"
   },
@@ -2773,8 +2773,11 @@
     "filterAll": "הצגת הכול",
     "filterEmpty": "אין רכבים בקבוצה זו כרגע.",
     "addDates": "הוספת תאריכים",
-    "deleteWithBookings": "זה ימחק גם את {count} ההזמנות הנוכחיות או הקרובות שלו, עם התשלומים והבדיקות. אי אפשר לבטל את זה.",
-    "deleteWithBookingsBtn": "למחוק את הרכב וההזמנות"
+    "deleteWithBookings": "זה ימחק גם את {count} ההזמנות שלו, עם תשלומים, בדיקות וחוזים. אי אפשר לבטל את זה.",
+    "deleteWithBookingsBtn": "למחוק את הרכב וההזמנות",
+    "noticeOwnerOnly": "רק בעל העסק יכול למחוק רכבים.",
+    "bulkDeleteWarning": "מוחק אותם עם כל ההזמנות והרשומות. אי אפשר לבטל את זה.",
+    "deleteVehicleConfirm": "מוחק את הרכב עם ההוצאות, המסמכים והתמונות שלו. אי אפשר לבטל את זה."
   },
   "customers": {
     "noRentals": "אין השכרות עדיין",
@@ -3354,7 +3357,7 @@
     "backToFleet": "חזרה לצי הרכבים",
     "backToVehicle": "חזרה לרכב",
     "addTitle": "הוספת רכב",
-    "addSubtitle": "יצרן, דגם, לוחית רישוי ומחיר אחד מספיקים בשלב זה. את השאר אפשר להוסיף אחר כך.",
+    "addSubtitle": "יצרן ודגם מספיקים בינתיים. את השאר מוסיפים אחר כך.",
     "import": "ייבוא רשימה",
     "editTitle": "עריכת {name}",
     "ratesTitle": "תעריפים ופיקדון",
@@ -3461,12 +3464,12 @@
     "archiveBtn": "העברת הרכב לארכיון",
     "archiving": "מעביר לארכיון…",
     "deleteLead": "מחיקה",
-    "deleteBody": "מסיר אותו לצמיתות, יחד עם הזמנות נוכחיות או קרובות והתשלומים שלהן.",
+    "deleteBody": "מסיר אותו לצמיתות, עם כל ההזמנות, התשלומים, הבדיקות והמסמכים.",
     "n_placeholder": "כל דבר שכדאי לזכור: מאפיינים מיוחדים, תזכורות טיפול, איפה המפתח הרזרבי",
     "n_auto": "נשמר כשמקישים במקום אחר",
     "n_edited": "נערך לאחרונה {date}",
     "needMake": "בחרו קודם את היצרן והדגם.",
-    "ratesBody": "מלאו לפחות אחד. האחרים מחושבים ממנו כשמקבלים הזמנה.",
+    "ratesBody": "לא חובה. ממלאים אחד והשאר מחושבים ממנו.",
     "needPrice": "הוסיפו לפחות מחיר אחד לפני השמירה.",
     "bookChange": "שימוש בתמונה אחרת",
     "purchaseDate": "תאריך הקנייה",
@@ -3502,7 +3505,8 @@
     "notSetShort": "לא הוגדר",
     "seatsCount": "{count, plural, one {מושב אחד} two {שני מושבים} other {# מושבים}}",
     "trimHint": "רמת גימור, למשל 1.0 Turbo SV",
-    "yearPlaceholder": "למשל {year}"
+    "yearPlaceholder": "למשל {year}",
+    "plateLater": "אפשר להוסיף אחר כך"
   },
   "bookingEdit": {
     "crumbBookings": "הזמנות",

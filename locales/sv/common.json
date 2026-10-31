@@ -1304,7 +1304,7 @@
     "deleteRecordsTitle": "De här posterna raderas också",
     "deleteRecordsPayments": "Registrerade betalningar: {count}",
     "deleteRecordsInspections": "Utlämnings- och återlämningskontroller, med foton: {count}",
-    "deleteRecordsSigned": "Inte det signerade avtalet: det döljs men sparas",
+    "deleteRecordsSigned": "Det signerade avtalet",
     "deleteRecordsBody": "Det går inte att ångra.",
     "deleteAnyway": "Radera ändå"
   },
@@ -2733,8 +2733,11 @@
     "filterAll": "Visa alla",
     "filterEmpty": "Inga fordon i den här gruppen just nu.",
     "addDates": "Lägg till datum",
-    "deleteWithBookings": "Det raderar också {count} pågående eller kommande bokningar, med betalningar och kontroller. Det går inte att ångra.",
-    "deleteWithBookingsBtn": "Radera fordon och bokningar"
+    "deleteWithBookings": "Det raderar också {count} bokningar, med betalningar, kontroller och avtal. Det går inte att ångra.",
+    "deleteWithBookingsBtn": "Radera fordon och bokningar",
+    "noticeOwnerOnly": "Bara företagets ägare kan radera fordon.",
+    "bulkDeleteWarning": "Raderar dem med alla bokningar och poster. Det går inte att ångra.",
+    "deleteVehicleConfirm": "Raderar fordonet med kostnader, papper och foton. Det går inte att ångra."
   },
   "customers": {
     "noRentals": "Inga uthyrningar än",
@@ -3314,7 +3317,7 @@
     "backToFleet": "Tillbaka till flottan",
     "backToVehicle": "Tillbaka till fordonet",
     "addTitle": "Lägg till fordon",
-    "addSubtitle": "Märke, modell, registreringsnummer och ett pris räcker för nu. Lägg till resten senare.",
+    "addSubtitle": "Märke och modell räcker för nu. Lägg till resten senare.",
     "import": "Importera en lista",
     "editTitle": "Redigera {name}",
     "ratesTitle": "Priser och deposition",
@@ -3421,12 +3424,12 @@
     "archiveBtn": "Arkivera fordon",
     "archiving": "Arkiverar…",
     "deleteLead": "Radera",
-    "deleteBody": "tar bort det för gott, tillsammans med pågående eller kommande bokningar och deras betalningar.",
+    "deleteBody": "tar bort det för gott, med alla bokningar, betalningar, kontroller och papper.",
     "n_placeholder": "Allt värt att komma ihåg: egenheter, servicepåminnelser, var reservnyckeln finns",
     "n_auto": "Sparas när du trycker utanför",
     "n_edited": "Senast redigerad {date}",
     "needMake": "Välj märke och modell först.",
-    "ratesBody": "Fyll i minst ett. De andra beräknas utifrån det när du tar en bokning.",
+    "ratesBody": "Valfritt. Fyll i ett så räknas de andra ut.",
     "needPrice": "Lägg till minst ett pris innan du sparar.",
     "bookChange": "Använd ett annat foto",
     "purchaseDate": "Inköpsdatum",
@@ -3462,7 +3465,8 @@
     "notSetShort": "ej angivet",
     "seatsCount": "{count, plural, one {# sits} other {# sitsar}}",
     "trimHint": "Utförande, t.ex. 1.0 Turbo SV",
-    "yearPlaceholder": "t.ex. {year}"
+    "yearPlaceholder": "t.ex. {year}",
+    "plateLater": "Kan läggas till senare"
   },
   "bookingEdit": {
     "crumbBookings": "Bokningar",

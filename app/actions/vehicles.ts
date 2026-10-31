@@ -9,7 +9,7 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { asCondition, valueForCondition } from "@/lib/vehicle-condition";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { deleteBooking } from "@/app/actions/bookings";
+import { removeStoredFiles } from "@/lib/supabase/remove-stored-files";
 
 function numberFromForm(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").replace(/,/g, "").trim();
@@ -224,8 +224,9 @@ export async function createVehicle(formData: FormData) {
   const registrationNumber = String(formData.get("registrationNumber") || "").trim().toUpperCase();
   const serviceArea = String(formData.get("serviceArea") || "home_branch");
 
-  if (!organizationId || !categoryId || !make || !model || !registrationNumber) {
-    throw new Error("Vehicle category, make, model, and registration number are required.");
+  // Only the type, make and model are needed; the plate, prices and the rest can be added later (Rory, 31 Oct 2026).
+  if (!organizationId || !categoryId || !make || !model) {
+    throw new Error("Vehicle category, make and model are required.");
   }
 
   if (!["home_branch", "all_branches"].includes(serviceArea)) {
@@ -387,8 +388,8 @@ export async function updateVehicle(formData: FormData) {
   const registrationNumber = String(formData.get("registrationNumber") || "").trim().toUpperCase();
   const serviceArea = String(formData.get("serviceArea") || "home_branch");
 
-  if (!vehicleId || !organizationId || !categoryId || !make || !model || !registrationNumber) {
-    throw new Error("Vehicle category, make, model, and registration number are required.");
+  if (!vehicleId || !organizationId || !categoryId || !make || !model) {
+    throw new Error("Vehicle category, make and model are required.");
   }
 
   if (!["home_branch", "all_branches"].includes(serviceArea)) {
@@ -1072,73 +1073,57 @@ export async function archiveVehicle(formData: FormData) {
   redirect("/fleet");
 }
 
-export async function deleteVehicle(formData: FormData) {
+/**
+ * Delete vehicles and everything about them (owner only; Rory, 31 Oct 2026): every booking they have had, with its
+ * payments, checks, photos and agreement, and their own costs, papers and photos. Archive is how an owner keeps
+ * records. The database does it in one transaction per vehicle (purge_vehicle); the files it lists are then removed.
+ */
+async function purgeVehicles(organizationId: string, vehicleIds: string[]) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
   } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
-  if (!user) {
-    redirect("/login");
+  const membership = await getCurrentMembership();
+  if (!membership || membership.organizationId !== organizationId || membership.role !== "owner") {
+    redirect("/fleet?notice=vehicle-owner-only");
   }
 
-  const vehicleId = String(formData.get("vehicleId") || "");
-  const organizationId = String(formData.get("organizationId") || "");
-
-  if (!vehicleId || !organizationId) {
-    throw new Error("Vehicle is required.");
+  const db = createSupabaseAdminClient() as any;
+  // Only vehicles of this business.
+  const { data: owned } = await db.from("vehicles").select("id").eq("organization_id", organizationId).in("id", vehicleIds);
+  const ids: string[] = (owned || []).map((row: { id: string }) => row.id);
+  for (const id of ids) {
+    const { data: files, error } = await db.rpc("purge_vehicle", { p_vehicle: id });
+    if (error) throw new Error(error.message);
+    await removeStoredFiles(db, files);
   }
 
-  // A vehicle out on rent or booked can't be deleted from under its booking. On the vehicle page the owner
-  // can confirm deleting its current and upcoming bookings with it (Rory, 31 Oct 2026: test vehicles).
-  const { data: liveRows } = await supabase
-    .from("rentals")
-    .select("id")
-    .eq("organization_id", organizationId)
-    .eq("vehicle_id", vehicleId)
-    .is("deleted_at", null)
-    .in("status", ["draft", "booked", "active", "due_soon", "overdue", "extended"]);
-  const liveIds: string[] = (liveRows || []).map((r: { id: string }) => r.id);
-  if (liveIds.length > 0) {
-    const isOwner = (await getCurrentMembership())?.role === "owner";
-    if (!isOwner || String(formData.get("deleteBookings") || "") !== "1") {
-      redirect("/fleet?notice=vehicle-has-bookings");
-    }
-    for (const id of liveIds) {
-      const result = await deleteBooking(id, true);
-      if (!result.success) {
-        throw new Error(result.error || "Could not delete this vehicle's bookings.");
-      }
-    }
+  if (ids.length) {
+    await recordActivityEvent(supabase, {
+      organization_id: organizationId,
+      actor_id: user.id,
+      entity_type: "vehicle",
+      entity_id: ids[0],
+      event_type: ids.length === 1 ? "vehicle_deleted" : "vehicles_deleted",
+      title: ids.length === 1 ? "Vehicle deleted" : "Vehicles deleted",
+      detail: `${ids.length} vehicle${ids.length === 1 ? "" : "s"} deleted with all their bookings and records.`
+    });
   }
-
-  const { error } = await supabase
-    .from("vehicles")
-    .update({
-      deleted_at: new Date().toISOString(),
-      status: "retired",
-      availability_status: "offline"
-    })
-    .eq("id", vehicleId)
-    .eq("organization_id", organizationId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  await recordActivityEvent(supabase, {
-    organization_id: organizationId,
-    actor_id: user.id,
-    entity_type: "vehicle",
-    entity_id: vehicleId,
-    vehicle_id: vehicleId,
-    event_type: "vehicle_deleted",
-    title: "Vehicle deleted",
-    detail: "Vehicle was soft-deleted from the fleet."
-  });
 
   revalidatePath("/");
   revalidatePath("/fleet");
+  revalidatePath("/bookings");
+}
+
+export async function deleteVehicle(formData: FormData) {
+  const vehicleId = String(formData.get("vehicleId") || "");
+  const organizationId = String(formData.get("organizationId") || "");
+  if (!vehicleId || !organizationId) {
+    throw new Error("Vehicle is required.");
+  }
+  await purgeVehicles(organizationId, [vehicleId]);
   redirect("/fleet");
 }
 
@@ -1188,58 +1173,10 @@ export async function bulkArchiveVehicles(formData: FormData) {
 }
 
 export async function bulkDeleteVehicles(formData: FormData) {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
   const organizationId = String(formData.get("organizationId") || "");
   const vehicleIds = formData.getAll("vehicleIds").map((value) => String(value)).filter(Boolean);
-
   if (!organizationId || vehicleIds.length === 0) {
     throw new Error("Select at least one vehicle.");
   }
-
-  const { count: liveBookings } = await supabase
-    .from("rentals")
-    .select("id", { count: "exact", head: true })
-    .eq("organization_id", organizationId)
-    .in("vehicle_id", vehicleIds)
-    .is("deleted_at", null)
-    .in("status", ["booked", "active", "due_soon", "overdue", "extended"]);
-  if ((liveBookings || 0) > 0) {
-    redirect("/fleet?notice=vehicle-has-bookings");
-  }
-
-  const { error } = await supabase
-    .from("vehicles")
-    .update({
-      deleted_at: new Date().toISOString(),
-      status: "retired",
-      availability_status: "offline"
-    })
-    .eq("organization_id", organizationId)
-    .in("id", vehicleIds);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  await recordActivityEvent(supabase, {
-    organization_id: organizationId,
-    actor_id: user.id,
-    entity_type: "vehicle",
-    entity_id: vehicleIds[0],
-    vehicle_id: vehicleIds[0],
-    event_type: "vehicles_deleted",
-    title: "Vehicles deleted",
-    detail: `${vehicleIds.length} vehicle${vehicleIds.length === 1 ? "" : "s"} soft-deleted.`
-  });
-
-  revalidatePath("/");
-  revalidatePath("/fleet");
+  await purgeVehicles(organizationId, vehicleIds);
 }

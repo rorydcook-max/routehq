@@ -1304,7 +1304,7 @@
     "deleteRecordsTitle": "Disse oppføringene slettes også",
     "deleteRecordsPayments": "Registrerte betalinger: {count}",
     "deleteRecordsInspections": "Utleverings- og innleveringskontroller, med bilder: {count}",
-    "deleteRecordsSigned": "Ikke den signerte avtalen: den skjules, men beholdes",
+    "deleteRecordsSigned": "Den signerte avtalen",
     "deleteRecordsBody": "Dette kan ikke angres.",
     "deleteAnyway": "Slett likevel"
   },
@@ -2733,8 +2733,11 @@
     "filterEmpty": "Ingen kjøretøy i denne gruppen akkurat nå.",
     "bandVehicles": "{count, plural, one {kjøretøy} other {kjøretøy}}",
     "addDates": "Legg til datoer",
-    "deleteWithBookings": "Dette sletter også {count} pågående eller kommende bestillinger, med betalinger og kontroller. Det kan ikke angres.",
-    "deleteWithBookingsBtn": "Slett kjøretøy og bestillinger"
+    "deleteWithBookings": "Dette sletter også {count} bestillinger, med betalinger, kontroller og avtaler. Det kan ikke angres.",
+    "deleteWithBookingsBtn": "Slett kjøretøy og bestillinger",
+    "noticeOwnerOnly": "Bare eieren av bedriften kan slette kjøretøy.",
+    "bulkDeleteWarning": "Sletter dem med alle bestillinger og oppføringer. Det kan ikke angres.",
+    "deleteVehicleConfirm": "Sletter kjøretøyet med kostnader, papirer og bilder. Det kan ikke angres."
   },
   "customers": {
     "noRentals": "Ingen utleie ennå",
@@ -3314,7 +3317,7 @@
     "backToFleet": "Tilbake til flåten",
     "backToVehicle": "Tilbake til kjøretøy",
     "addTitle": "Legg til kjøretøy",
-    "addSubtitle": "Merke, modell, skilt og én pris holder for nå. Resten kan legges til senere.",
+    "addSubtitle": "Merke og modell holder foreløpig. Legg til resten senere.",
     "import": "Importer en liste",
     "editTitle": "Rediger {name}",
     "ratesTitle": "Priser og kausjon",
@@ -3421,12 +3424,12 @@
     "archiveBtn": "Arkiver kjøretøy",
     "archiving": "Arkiverer…",
     "deleteLead": "Slett",
-    "deleteBody": "fjerner det for godt, sammen med pågående eller kommende bestillinger og betalingene deres.",
+    "deleteBody": "fjerner det for godt, med alle bestillinger, betalinger, kontroller og papirer.",
     "n_placeholder": "Verdt å huske: særpreg, servicepåminnelser, hvor ekstrahjulnøkkelen er",
     "n_auto": "Lagres når du klikker deg videre",
     "n_edited": "Sist redigert {date}",
     "needMake": "Velg merke og modell først.",
-    "ratesBody": "Fyll ut minst én. De andre beregnes ut fra den når du tar imot en booking.",
+    "ratesBody": "Valgfritt. Fyll inn én, så regnes de andre ut fra den.",
     "needPrice": "Legg til minst én pris før lagring.",
     "bookChange": "Bruk et annet bilde",
     "purchaseDate": "Kjøpsdato",
@@ -3462,7 +3465,8 @@
     "notSetShort": "ikke angitt",
     "seatsCount": "{count, plural, one {# sete} other {# seter}}",
     "trimHint": "Utstyrsnivå, f.eks. 1.0 Turbo SV",
-    "yearPlaceholder": "f.eks. {year}"
+    "yearPlaceholder": "f.eks. {year}",
+    "plateLater": "Kan legges til senere"
   },
   "bookingEdit": {
     "crumbBookings": "Bestillinger",

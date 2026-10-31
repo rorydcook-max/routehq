@@ -233,7 +233,7 @@ export async function createRentalAmendment(input: {
       return { ok: false, error: await said("This rental has ended, so its agreement can't be amended.") };
     }
     if (!ctx.signedAgreement) {
-      return { ok: false, error: await said("The customer hasn't signed the rental agreement yet. Edit the booking instead - they will sign the updated terms.") };
+      return { ok: false, error: await said("Not signed yet, so just edit the booking. They'll sign the new terms.") };
     }
     if (!ctx.customer) return { ok: false, error: await said("Assign a customer to this rental first.") };
     const gaps = onlineSigningGaps(organization);
@@ -311,7 +311,7 @@ export async function createRentalAmendment(input: {
       .single();
     if (error) {
       if (String(error.code) === "23505") {
-        return { ok: false, error: await said("This rental already has an amendment waiting for the customer. Cancel it first to prepare a different one.") };
+        return { ok: false, error: await said("A change is already waiting for the customer. Cancel it first.") };
       }
       throw new Error(error.message);
     }
@@ -362,7 +362,7 @@ export async function cancelRentalAmendment(amendmentId: string): Promise<Result
     const { user } = await operatorFor(amendment.rental_id);
     if (amendment.status !== "awaiting_signature") return { ok: false, error: await said("Only an amendment waiting for a signature can be cancelled.") };
     if (amendment.changes?.applied_before_signature) {
-      return { ok: false, error: await said("The vehicle has already been changed, so this still needs the customer's signature. To undo it, change the vehicle back.") };
+      return { ok: false, error: await said("The vehicle has already changed and needs the customer's signature. To undo, change it back.") };
     }
     const { error } = await admin
       .from("rental_amendments")

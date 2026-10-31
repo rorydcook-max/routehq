@@ -91,7 +91,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     .in("status", ["pending", "viewed", "details_submitted"])
     .is("customer_details_submitted_at", null)
     .in("customers.phone", phoneVariants(phone));
-  if ((unfinished || []).length >= 2) return { ok: false, error: await said("You already have bookings waiting for your details. Please finish those first, or contact the business.") };
+  if ((unfinished || []).length >= 2) return { ok: false, error: await said("You have a booking waiting for your details. Finish it first or contact the business.") };
 
   // A returning customer keeps their record: the same phone AND the same name. The phone alone is not
   // enough on a public page, because the booking link then shows that person's saved passport details.

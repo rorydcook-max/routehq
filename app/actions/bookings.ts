@@ -1124,7 +1124,7 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
   let scheduleFrom: string | null = null;
   if (rental.start_date && handoverDate < String(rental.start_date).slice(0, 10)) {
     const inWay = await earlyHandoverBlocker(supabase, { organizationId: rental.organization_id, vehicleId: String(rental.vehicle_id || ""), rentalId: cleanId, startDate: rental.start_date, endDate: rental.end_date || null, today: handoverDate });
-    if (inWay) return { success: false, error: await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.") };
+    if (inWay) return { success: false, error: await said("This vehicle is still out on another rental. Return it first or pick another vehicle.") };
     const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", rental.vehicle_id).eq("organization_id", rental.organization_id).maybeSingle();
     const early = earlyStartFor(rental, rates, handoverDate);
     const choice = settleEarlyChoice(earlyStart, early, canDecideMoney((await getCurrentMembership())?.role));

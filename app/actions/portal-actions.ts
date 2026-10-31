@@ -81,7 +81,7 @@ export async function answerExtensionRequest(input: { actionId: string; rentalId
     if (input.move) {
       // A customer who has signed for their vehicle signs any change to it (More > Change vehicle on their booking).
       const { data: signedLink } = await admin.from("booking_links").select("id").eq("rental_id", input.move.rentalId).not("contract_signed_at", "is", null).limit(1).maybeSingle();
-      if (signedLink) return { ok: false, error: await said("That customer has signed for their vehicle, so they need to sign the change. Open their booking and use More > Change vehicle.") };
+      if (signedLink) return { ok: false, error: await said("That customer has signed, so they must sign the change. Open their booking > More > Change vehicle.") };
       const { data: before } = await admin.from("rentals").select("vehicle_id").eq("id", input.move.rentalId).eq("organization_id", organizationId).maybeSingle();
       const result = await moveBookingToVehicle(admin, { organizationId, rentalId: input.move.rentalId, vehicleId: input.move.vehicleId });
       if (!result.ok) return result;

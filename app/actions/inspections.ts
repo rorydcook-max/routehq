@@ -470,7 +470,7 @@ export async function submitInspection(formData: FormData) {
     const blocker = await earlyHandoverBlocker(supabase, { organizationId, vehicleId, rentalId, startDate: booked?.start_date, endDate: booked?.end_date || null, today: todayDate() });
     if (blocker) {
       const who = [blocker.code, blocker.customerName].filter(Boolean).join(", ");
-      throw new Error(`${await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.")}${who ? ` (${who}${blocker.endDate ? ` → ${blocker.endDate}` : ""})` : ""}`);
+      throw new Error(`${await said("This vehicle is still out on another rental. Return it first or pick another vehicle.")}${who ? ` (${who}${blocker.endDate ? ` → ${blocker.endDate}` : ""})` : ""}`);
     }
   }
 
@@ -646,7 +646,7 @@ export async function submitInspection(formData: FormData) {
           // Not linked to the booking: take the new record away again, so trying the handover again doesn't leave
           // a trail of customers with no rentals behind it.
           await supabase.from("customers").update({ deleted_at: new Date().toISOString() }).eq("id", created.id).eq("organization_id", organizationId);
-          throw new Error(isDoubleBookingError(linkError) ? await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.") : linkError.message);
+          throw new Error(isDoubleBookingError(linkError) ? await said("This vehicle is still out on another rental. Return it first or pick another vehicle.") : linkError.message);
         }
         bookedRental.customer_id = created.id;
       }
@@ -687,7 +687,7 @@ export async function submitInspection(formData: FormData) {
       .eq("id", rentalId)
       .eq("organization_id", organizationId);
     if (rentalError) {
-      throw new Error(isDoubleBookingError(rentalError) ? await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.") : rentalError.message);
+      throw new Error(isDoubleBookingError(rentalError) ? await said("This vehicle is still out on another rental. Return it first or pick another vehicle.") : rentalError.message);
     }
 
     const { error: vehicleError } = await supabase

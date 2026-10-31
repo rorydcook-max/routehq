@@ -35,7 +35,7 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
   if (!rental) return { ok: false, error: await said("This booking could not be found.") };
   if (rental.status === "cancelled" || link.status === "cancelled") return { ok: false, error: await said("This booking has already been cancelled.") };
   // Once the vehicle is with the customer it is a return, not a cancellation.
-  if (!["booked", "draft"].includes(String(rental.status))) return { ok: false, error: await said("This rental has already started, so it can't be cancelled here. Please tell us when you would like to return the vehicle instead.") };
+  if (!["booked", "draft"].includes(String(rental.status))) return { ok: false, error: await said("Your rental has started, so it can't be cancelled. Tell us when you'll return the vehicle instead.") };
 
   const { data: payments } = await admin.from("rental_payments").select("amount, status, voided, metadata").eq("rental_id", rental.id);
   const live = (payments || []).filter((payment: any) => !payment.voided);

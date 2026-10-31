@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     if (!visionProvider()) return NextResponse.json({ error: await said("Reading photos isn't switched on yet. Send them to us in Help and we'll bring them in.") }, { status: 400 });
     if (photos.length > MAX_IMPORT_PHOTOS) return NextResponse.json({ error: await said(`Send up to ${MAX_IMPORT_PHOTOS} photos at a time.`) }, { status: 400 });
     const { sheets, readings } = await readImportPhotos(await Promise.all(photos.map(async (photo) => ({ bytes: Buffer.from(await photo.arrayBuffer()), mediaType: photo.type, name: photo.name }))));
-    if (!sheets.length) return NextResponse.json({ error: await said("We couldn't find vehicles, bookings or payments in these photos. Try a sharper photo in good light, or send them to us in Help."), readings }, { status: 400 });
+    if (!sheets.length) return NextResponse.json({ error: await said("Nothing found in these photos. Try sharper ones in good light, or send them to us in Help."), readings }, { status: 400 });
     const kinds = photoSheetKinds();
     const analysis = normaliseAnalysis({ sheets: sheets.map((sheet) => ({ sheet_name: sheet.sheetName, primary_data_type: kinds[sheet.sheetName], confidence: 0.9, column_mappings: sheet.headers.map((header) => ({ source_column: header, routehq_field: header, confidence: 0.9 })) })) }, sheets);
     const skipped = readings.filter((reading) => reading.kind === "other" || reading.kind === "unreadable").map((reading) => reading.name);
@@ -76,14 +76,14 @@ export async function POST(request: Request) {
   if (chatText || chatFile) {
     if (!canReadChat()) return NextResponse.json({ error: await said("Reading messages isn't switched on yet. Send them to us in Help and we'll bring them in.") }, { status: 400 });
     const read = await readChatText(chatText || (await (file as File).text()));
-    if (!read.sheets.length) return NextResponse.json({ error: await said("We couldn't find vehicles, bookings, customers or payments in these messages. Paste the messages that list them, or send them to us in Help.") }, { status: 400 });
+    if (!read.sheets.length) return NextResponse.json({ error: await said("Nothing found in these messages. Paste the ones that list bookings, or send them to us in Help.") }, { status: 400 });
     const kinds = chatSheetKinds();
     const analysis = normaliseAnalysis({ sheets: read.sheets.map((sheet) => ({ sheet_name: sheet.sheetName, primary_data_type: kinds[sheet.sheetName], confidence: 0.9, column_mappings: sheet.headers.map((header) => ({ source_column: header, routehq_field: header, confidence: 0.9 })) })) }, read.sheets);
     return NextResponse.json({
       analysis,
       ...(await previewAndBatch(read.sheets, analysis, chatFile ? (file as File).name : "Pasted messages", membership.userId)),
       warning: read.trimmed
-        ? await said("This chat is long, so only its most recent messages were read. Check each card, especially names, dates and amounts.")
+        ? await said("Long chat: only the latest messages were read. Check names, dates and amounts.")
         : await said("Read from messages: check each card, especially names, dates and amounts.")
     });
   }

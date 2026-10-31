@@ -43,7 +43,7 @@ export async function fileCustomerReport(formData: FormData): Promise<Result> {
   // A report stands on a rental that really happened, not on a booking that never went out.
   if (!isHandedOver(rental.status)) return { ok: false, error: await said("Only rentals where the vehicle went out can be reported.") };
   const keys = customerMatchKeys(customer);
-  if (!keys.length) return { ok: false, error: await said("Add the customer's passport, licence or phone number first, so other businesses can recognise them.") };
+  if (!keys.length) return { ok: false, error: await said("Add the customer's passport, licence or phone first, so others can recognise them.") };
 
   const { error } = await supabase.from("customer_reports").insert({ organization_id: organizationId, customer_id: customer.id, rental_id: rental.id, kind, amount, occurred_on: occurredOn, notes, summary, match_keys: keys, created_by: membership.userId });
   if (error) {

@@ -3161,7 +3161,11 @@
     "pq_frameNote": "ໃຫ້ບໍລິການໂດຍ {partner}, ນາຍໜ້າທີ່ມີໃບອະນຸຍາດ{licence}. RoveHQ ບໍ່ແມ່ນນາຍໜ້າ.",
     "pq_licence": " (ໃບອະນຸຍາດ OIC {licence})",
     "gl_allTime": "ທັງໝົດ",
-    "gl_thisMonth": "ເດືອນນີ້"
+    "gl_thisMonth": "ເດືອນນີ້",
+    "l_monthsLeft": "ເຫຼືອອີກ (ເດືອນ)",
+    "l_totalCost": "ຍອດທີ່ຕ້ອງຈ່າຍທັງໝົດ",
+    "l_interest": "ດອກເບ້ຍ",
+    "l_flatRate": "ດອກເບ້ຍຄົງທີ່ {rate}% ຕໍ່ປີ"
   },
   "customerPage": {
     "back": "ລູກຄ້າ",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count} ບ່ອນນັ່ງ",
     "trimHint": "ລຸ້ນຍ່ອຍ, ເຊັ່ນ: 1.0 Turbo SV",
     "yearPlaceholder": "ເຊັ່ນ: {year}",
-    "plateLater": "ເພີ່ມພາຍຫຼັງໄດ້"
+    "plateLater": "ເພີ່ມພາຍຫຼັງໄດ້",
+    "loanSalePrice": "ລາຄາລົດ",
+    "loanDownPayment": "ເງິນດາວ",
+    "loanTermMonths": "ໄລຍະຜ່ອນ (ເດືອນ)",
+    "loanMonthsLeft": "ເຫຼືອອີກ (ເດືອນ)",
+    "loanBorrowed": "ຍອດກູ້",
+    "loanTotalCost": "ຍອດທີ່ຕ້ອງຈ່າຍທັງໝົດ",
+    "loanInterest": "ດອກເບ້ຍ",
+    "loanFlatRate": "ດອກເບ້ຍຄົງທີ່ {rate}% ຕໍ່ປີ",
+    "loanStillToPay": "ຍອດທີ່ຍັງຕ້ອງຈ່າຍ"
   },
   "bookingEdit": {
     "crumbBookings": "ການຈອງ",

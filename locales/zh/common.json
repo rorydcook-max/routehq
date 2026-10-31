@@ -3201,7 +3201,11 @@
     "pq_frameNote": "由持牌经纪人 {partner}{licence} 提供。RoveHQ 不是保险经纪人。",
     "pq_licence": "（泰国保险业委员会 OIC 许可证号 {licence}）",
     "gl_allTime": "全部时间",
-    "gl_thisMonth": "本月"
+    "gl_thisMonth": "本月",
+    "l_monthsLeft": "剩余月数",
+    "l_totalCost": "总共支付",
+    "l_interest": "利息",
+    "l_flatRate": "年利率 {rate}%（固定）"
   },
   "customerPage": {
     "back": "客户",
@@ -3506,7 +3510,16 @@
     "seatsCount": "{count} 座",
     "trimHint": "配置，例如 1.0 Turbo SV",
     "yearPlaceholder": "例如 {year}",
-    "plateLater": "可以以后再填"
+    "plateLater": "可以以后再填",
+    "loanSalePrice": "售价",
+    "loanDownPayment": "首付",
+    "loanTermMonths": "贷款期限（月）",
+    "loanMonthsLeft": "剩余月数",
+    "loanBorrowed": "贷款金额",
+    "loanTotalCost": "总共支付",
+    "loanInterest": "利息",
+    "loanFlatRate": "年利率 {rate}%（固定）",
+    "loanStillToPay": "尚需支付"
   },
   "bookingEdit": {
     "crumbBookings": "预订",

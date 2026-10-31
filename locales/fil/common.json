@@ -3161,7 +3161,11 @@
     "pq_frameNote": "Ibinibigay ng {partner}, isang lisensyadong broker{licence}. Hindi broker ang RoveHQ.",
     "pq_licence": " (OIC lisensya {licence})",
     "gl_allTime": "Lahat ng panahon",
-    "gl_thisMonth": "Ngayong buwan"
+    "gl_thisMonth": "Ngayong buwan",
+    "l_monthsLeft": "Natitirang buwan",
+    "l_totalCost": "Kabuuang babayaran",
+    "l_interest": "Interes",
+    "l_flatRate": "{rate}% kada taon, flat"
   },
   "customerPage": {
     "back": "Mga customer",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count, plural, one {# upuan} other {# upuan}}",
     "trimHint": "Variant, hal. 1.0 Turbo SV",
     "yearPlaceholder": "hal. {year}",
-    "plateLater": "Puwedeng idagdag mamaya"
+    "plateLater": "Puwedeng idagdag mamaya",
+    "loanSalePrice": "Presyo ng benta",
+    "loanDownPayment": "Down payment",
+    "loanTermMonths": "Haba ng loan (buwan)",
+    "loanMonthsLeft": "Natitirang buwan",
+    "loanBorrowed": "Hiniram",
+    "loanTotalCost": "Kabuuang babayaran",
+    "loanInterest": "Interes",
+    "loanFlatRate": "{rate}% kada taon, flat",
+    "loanStillToPay": "Natitirang babayaran"
   },
   "bookingEdit": {
     "crumbBookings": "Mga booking",

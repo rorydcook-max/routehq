@@ -3161,7 +3161,11 @@
     "pq_frameNote": "Tillhandahålls av {partner}, en licensierad mäklare{licence}. RoveHQ är inte mäklare.",
     "pq_licence": " (OIC-licens {licence})",
     "gl_allTime": "Totalt",
-    "gl_thisMonth": "Den här månaden"
+    "gl_thisMonth": "Den här månaden",
+    "l_monthsLeft": "Månader kvar",
+    "l_totalCost": "Totalt att betala",
+    "l_interest": "Ränta",
+    "l_flatRate": "{rate} % per år, fast"
   },
   "customerPage": {
     "back": "Kunder",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count, plural, one {# sits} other {# sitsar}}",
     "trimHint": "Utförande, t.ex. 1.0 Turbo SV",
     "yearPlaceholder": "t.ex. {year}",
-    "plateLater": "Kan läggas till senare"
+    "plateLater": "Kan läggas till senare",
+    "loanSalePrice": "Försäljningspris",
+    "loanDownPayment": "Kontantinsats",
+    "loanTermMonths": "Löptid (månader)",
+    "loanMonthsLeft": "Månader kvar",
+    "loanBorrowed": "Lånat",
+    "loanTotalCost": "Totalt att betala",
+    "loanInterest": "Ränta",
+    "loanFlatRate": "{rate} % per år, fast",
+    "loanStillToPay": "Kvar att betala"
   },
   "bookingEdit": {
     "crumbBookings": "Bokningar",

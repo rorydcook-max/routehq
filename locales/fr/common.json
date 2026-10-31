@@ -3201,7 +3201,11 @@
     "pq_frameNote": "Fourni par {partner}, courtier agréé{licence}. RoveHQ n’est pas courtier.",
     "pq_licence": " (licence OIC {licence})",
     "gl_allTime": "Depuis le début",
-    "gl_thisMonth": "Ce mois-ci"
+    "gl_thisMonth": "Ce mois-ci",
+    "l_monthsLeft": "Mois restants",
+    "l_totalCost": "Coût total",
+    "l_interest": "Intérêts",
+    "l_flatRate": "{rate} % par an, fixe"
   },
   "customerPage": {
     "back": "Clients",
@@ -3506,7 +3510,16 @@
     "seatsCount": "{count, plural, one {# place} many {# places} other {# places}}",
     "trimHint": "Finition, ex. 1.0 Turbo SV",
     "yearPlaceholder": "ex. {year}",
-    "plateLater": "Peut être ajoutée plus tard"
+    "plateLater": "Peut être ajoutée plus tard",
+    "loanSalePrice": "Prix de vente",
+    "loanDownPayment": "Apport",
+    "loanTermMonths": "Durée (mois)",
+    "loanMonthsLeft": "Mois restants",
+    "loanBorrowed": "Emprunté",
+    "loanTotalCost": "Coût total",
+    "loanInterest": "Intérêts",
+    "loanFlatRate": "{rate} % par an, fixe",
+    "loanStillToPay": "Reste à payer"
   },
   "bookingEdit": {
     "crumbBookings": "Réservations",

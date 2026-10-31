@@ -3161,7 +3161,11 @@
     "pq_frameNote": "உரிமம் பெற்ற தரகரான {partner}{licence} வழங்குகிறார். RoveHQ தரகர் அல்ல.",
     "pq_licence": " (OIC உரிமம் {licence})",
     "gl_allTime": "எல்லா காலமும்",
-    "gl_thisMonth": "இந்த மாதம்"
+    "gl_thisMonth": "இந்த மாதம்",
+    "l_monthsLeft": "மீதமுள்ள மாதங்கள்",
+    "l_totalCost": "மொத்தம் செலுத்துவது",
+    "l_interest": "வட்டி",
+    "l_flatRate": "ஆண்டுக்கு {rate}%, நிலையான"
   },
   "customerPage": {
     "back": "வாடிக்கையாளர்கள்",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count, plural, one {# இருக்கை} other {# இருக்கைகள்}}",
     "trimHint": "டிரிம், எ.கா. 1.0 Turbo SV",
     "yearPlaceholder": "எ.கா. {year}",
-    "plateLater": "பிறகு சேர்க்கலாம்"
+    "plateLater": "பிறகு சேர்க்கலாம்",
+    "loanSalePrice": "விற்பனை விலை",
+    "loanDownPayment": "முன்பணம்",
+    "loanTermMonths": "கடன் காலம் (மாதங்கள்)",
+    "loanMonthsLeft": "மீதமுள்ள மாதங்கள்",
+    "loanBorrowed": "கடன் தொகை",
+    "loanTotalCost": "மொத்தம் செலுத்துவது",
+    "loanInterest": "வட்டி",
+    "loanFlatRate": "ஆண்டுக்கு {rate}%, நிலையான",
+    "loanStillToPay": "இன்னும் செலுத்த வேண்டியது"
   },
   "bookingEdit": {
     "crumbBookings": "முன்பதிவுகள்",

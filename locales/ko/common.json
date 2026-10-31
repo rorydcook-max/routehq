@@ -3161,7 +3161,11 @@
     "pq_frameNote": "허가받은 중개사{licence}인 {partner}에서 제공해요. RoveHQ는 중개사가 아니에요.",
     "pq_licence": " (OIC 허가 {licence})",
     "gl_allTime": "전체 기간",
-    "gl_thisMonth": "이번 달"
+    "gl_thisMonth": "이번 달",
+    "l_monthsLeft": "남은 개월 수",
+    "l_totalCost": "총 납부액",
+    "l_interest": "이자",
+    "l_flatRate": "연 {rate}%(고정)"
   },
   "customerPage": {
     "back": "고객",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count}인승",
     "trimHint": "트림 (예: 1.0 Turbo SV)",
     "yearPlaceholder": "예: {year}",
-    "plateLater": "나중에 추가할 수 있어요"
+    "plateLater": "나중에 추가할 수 있어요",
+    "loanSalePrice": "판매 가격",
+    "loanDownPayment": "선수금",
+    "loanTermMonths": "대출 기간(개월)",
+    "loanMonthsLeft": "남은 개월 수",
+    "loanBorrowed": "대출금",
+    "loanTotalCost": "총 납부액",
+    "loanInterest": "이자",
+    "loanFlatRate": "연 {rate}%(고정)",
+    "loanStillToPay": "남은 납부액"
   },
   "bookingEdit": {
     "crumbBookings": "예약",

@@ -33,6 +33,7 @@ import { isQuietActivityEvent } from "@/lib/activity-noise";
 import { activityTitle, tidyDetail, visibleActivity } from "@/lib/activity-display";
 import { businessToday, businessNow, toWallTime } from "@/lib/business-time";
 import { longDate, dateFormat } from "@/lib/i18n/dates";
+import { hasLoan, loanFigures } from "@/lib/vehicle-loan";
 
 // The wording for this page is in locales/<language>/common.json under "vehiclePage".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -107,8 +108,8 @@ function getComplianceItems(detail: VehicleDetail, tx: Vx) {
     { key: "service", name: tx.say("c_service"), date: compliance.next_service_date, cost: lastCost("service", "next_service_date"), icon: Wrench },
     { key: "oil", name: tx.say("c_oil"), date: compliance.oil_change_due_date, cost: lastCost("oil", "oil_change_due_date"), icon: Fuel }
   ];
-  if (finance.lender || finance.monthly_payment || finance.outstanding_balance || finance.end_date) {
-    items.push({ key: "finance", name: tx.say("c_finance"), date: finance.end_date, cost: finance.monthly_payment || lastCost("finance", "end_date"), icon: Banknote });
+  if (hasLoan(finance)) {
+    items.push({ key: "finance", name: tx.say("c_finance"), date: loanFigures(finance).endDate || finance.end_date, cost: finance.monthly_payment || lastCost("finance", "end_date"), icon: Banknote });
   }
   return items;
 }
@@ -903,16 +904,26 @@ function SpecsSection({ detail }: { detail: VehicleDetail }) {
 function FinanceSection({ detail }: { detail: VehicleDetail }) {
   const tx = useVx();
   const finance = detail.vehicle.metadata?.finance || {};
-  if (!finance.lender && !finance.monthly_payment && !finance.outstanding_balance && !finance.end_date) return null;
+  if (!hasLoan(finance)) return null;
   const totalPaid = detail.transactions.filter((transaction) => transaction.type === "finance").reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
+  // Worked out from the sale price, down payment, monthly payment, loan length and months left (lib/vehicle-loan.ts).
+  const f = loanFigures(finance);
 
   return (
-    <Pane summary={finance.outstanding_balance ? `${tx.say("l_balance")} ${money(finance.outstanding_balance)}` : undefined} title={tx.say("l_title")}>
+    <Pane summary={f.stillToPay ? `${tx.say("l_balance")} ${money(f.stillToPay)}` : undefined} title={tx.say("l_title")}>
       <div className="grid grid-cols-2 gap-2.5">
         {finance.lender ? <InfoRow label={tx.say("l_lender")} value={finance.lender} /> : null}
         <InfoRow label={tx.say("l_monthly")} value={money(finance.monthly_payment)} />
-        <InfoRow label={tx.say("l_balance")} value={money(finance.outstanding_balance)} />
-        <InfoRow label={tx.say("l_end")} value={formatDate(finance.end_date, tx)} />
+        <InfoRow label={tx.say("l_balance")} value={money(f.stillToPay)} />
+        {f.monthsLeftNow !== null ? <InfoRow label={tx.say("l_monthsLeft")} value={String(f.monthsLeftNow)} /> : null}
+        <InfoRow label={tx.say("l_end")} value={formatDate(f.endDate || finance.end_date, tx)} />
+        {f.totalCost !== null ? <InfoRow label={tx.say("l_totalCost")} value={money(f.totalCost)} /> : null}
+        {f.interest !== null ? (
+          <InfoRow
+            label={tx.say("l_interest")}
+            value={f.flatRatePerYear !== null && f.interest > 0 ? `${money(f.interest)} · ${tx.say("l_flatRate", { rate: f.flatRatePerYear.toFixed(1) })}` : money(f.interest)}
+          />
+        ) : null}
         <InfoRow label={tx.say("l_paid")} value={money(totalPaid)} />
       </div>
     </Pane>

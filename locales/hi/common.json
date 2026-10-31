@@ -3161,7 +3161,11 @@
     "pq_frameNote": "{partner} द्वारा प्रदान, एक लाइसेंस प्राप्त ब्रोकर{licence}। RoveHQ ब्रोकर नहीं है।",
     "pq_licence": " (OIC लाइसेंस {licence})",
     "gl_allTime": "अब तक का",
-    "gl_thisMonth": "इस महीने"
+    "gl_thisMonth": "इस महीने",
+    "l_monthsLeft": "बचे महीने",
+    "l_totalCost": "कुल भुगतान",
+    "l_interest": "ब्याज",
+    "l_flatRate": "{rate}% सालाना, फ़्लैट"
   },
   "customerPage": {
     "back": "ग्राहक",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count, plural, one {# सीट} other {# सीटें}}",
     "trimHint": "ट्रिम, जैसे 1.0 Turbo SV",
     "yearPlaceholder": "जैसे {year}",
-    "plateLater": "बाद में जोड़ सकते हैं"
+    "plateLater": "बाद में जोड़ सकते हैं",
+    "loanSalePrice": "बिक्री मूल्य",
+    "loanDownPayment": "डाउन पेमेंट",
+    "loanTermMonths": "लोन अवधि (महीने)",
+    "loanMonthsLeft": "बचे महीने",
+    "loanBorrowed": "उधार राशि",
+    "loanTotalCost": "कुल भुगतान",
+    "loanInterest": "ब्याज",
+    "loanFlatRate": "{rate}% सालाना, फ़्लैट",
+    "loanStillToPay": "अभी चुकाना बाकी"
   },
   "bookingEdit": {
     "crumbBookings": "बुकिंग",

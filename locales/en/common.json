@@ -3161,7 +3161,11 @@
     "pq_frameNote": "Provided by {partner}, a licensed broker{licence}. RoveHQ is not a broker.",
     "pq_licence": " (OIC licence {licence})",
     "gl_allTime": "All time",
-    "gl_thisMonth": "This month"
+    "gl_thisMonth": "This month",
+    "l_monthsLeft": "Months left",
+    "l_totalCost": "Total you pay",
+    "l_interest": "Interest",
+    "l_flatRate": "{rate}% a year, flat"
   },
   "customerPage": {
     "back": "Customers",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count, plural, one {# seat} other {# seats}}",
     "moreNotSet": "Nothing added yet",
     "dangerZone": "Danger zone",
-    "plateLater": "Can be added later"
+    "plateLater": "Can be added later",
+    "loanSalePrice": "Sale price",
+    "loanDownPayment": "Down payment",
+    "loanTermMonths": "Loan length (months)",
+    "loanMonthsLeft": "Months left",
+    "loanBorrowed": "Borrowed",
+    "loanTotalCost": "Total you pay",
+    "loanInterest": "Interest",
+    "loanFlatRate": "{rate}% a year, flat",
+    "loanStillToPay": "Still to pay"
   },
   "bookingEdit": {
     "crumbBookings": "Bookings",

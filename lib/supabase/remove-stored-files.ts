@@ -6,6 +6,9 @@ export async function removeStoredFiles(db: any, files: Array<{ bucket: string |
   const byBucket = new Map<string, string[]>();
   for (const file of files || []) {
     if (!file?.bucket || !file?.path) continue;
+    // The business's own logo and signature are shared by every agreement (a signature row points at the same
+    // file): never remove them when one booking or vehicle goes.
+    if (file.bucket === "branding" || file.path.includes("/branding/")) continue;
     const list = byBucket.get(file.bucket) || [];
     list.push(file.path);
     byBucket.set(file.bucket, list);

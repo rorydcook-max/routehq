@@ -3161,7 +3161,11 @@
     "pq_frameNote": "Fornecido pela {partner}, uma corretora licenciada{licence}. O RoveHQ não é corretor.",
     "pq_licence": " (licença OIC {licence})",
     "gl_allTime": "Desde sempre",
-    "gl_thisMonth": "Este mês"
+    "gl_thisMonth": "Este mês",
+    "l_monthsLeft": "Meses restantes",
+    "l_totalCost": "Total a pagar",
+    "l_interest": "Juros",
+    "l_flatRate": "{rate}% ao ano, fixo"
   },
   "customerPage": {
     "back": "Clientes",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count, plural, one {# lugar} other {# lugares}}",
     "trimHint": "Versão, ex.: 1.0 Turbo SV",
     "yearPlaceholder": "ex.: {year}",
-    "plateLater": "Pode ser adicionada depois"
+    "plateLater": "Pode ser adicionada depois",
+    "loanSalePrice": "Preço de venda",
+    "loanDownPayment": "Entrada",
+    "loanTermMonths": "Prazo (meses)",
+    "loanMonthsLeft": "Meses restantes",
+    "loanBorrowed": "Financiado",
+    "loanTotalCost": "Total a pagar",
+    "loanInterest": "Juros",
+    "loanFlatRate": "{rate}% ao ano, fixo",
+    "loanStillToPay": "Ainda a pagar"
   },
   "bookingEdit": {
     "crumbBookings": "Reservas",

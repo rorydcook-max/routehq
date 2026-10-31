@@ -3161,7 +3161,11 @@
     "pq_frameNote": "Leveres av {partner}, en lisensiert megler{licence}. RoveHQ er ikke en megler.",
     "pq_licence": " (OIC-lisens {licence})",
     "gl_allTime": "Totalt",
-    "gl_thisMonth": "Denne måneden"
+    "gl_thisMonth": "Denne måneden",
+    "l_monthsLeft": "Måneder igjen",
+    "l_totalCost": "Totalt du betaler",
+    "l_interest": "Renter",
+    "l_flatRate": "{rate} % i året, flat"
   },
   "customerPage": {
     "back": "Kunder",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count, plural, one {# sete} other {# seter}}",
     "trimHint": "Utstyrsnivå, f.eks. 1.0 Turbo SV",
     "yearPlaceholder": "f.eks. {year}",
-    "plateLater": "Kan legges til senere"
+    "plateLater": "Kan legges til senere",
+    "loanSalePrice": "Salgspris",
+    "loanDownPayment": "Egenandel",
+    "loanTermMonths": "Nedbetalingstid (måneder)",
+    "loanMonthsLeft": "Måneder igjen",
+    "loanBorrowed": "Lånt",
+    "loanTotalCost": "Totalt du betaler",
+    "loanInterest": "Renter",
+    "loanFlatRate": "{rate} % i året, flat",
+    "loanStillToPay": "Gjenstår å betale"
   },
   "bookingEdit": {
     "crumbBookings": "Bestillinger",

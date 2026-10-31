@@ -3201,7 +3201,11 @@
     "pq_frameNote": "Disediakan oleh {partner}, broker berlesen{licence}. RoveHQ bukan broker.",
     "pq_licence": " (lesen OIC {licence})",
     "gl_allTime": "Sepanjang masa",
-    "gl_thisMonth": "Bulan ini"
+    "gl_thisMonth": "Bulan ini",
+    "l_monthsLeft": "Baki bulan",
+    "l_totalCost": "Jumlah yang dibayar",
+    "l_interest": "Faedah",
+    "l_flatRate": "{rate}% setahun, kadar rata"
   },
   "customerPage": {
     "back": "Pelanggan",
@@ -3506,7 +3510,16 @@
     "seatsCount": "{count} tempat duduk",
     "trimHint": "Varian, cth. 1.0 Turbo SV",
     "yearPlaceholder": "cth. {year}",
-    "plateLater": "Boleh ditambah kemudian"
+    "plateLater": "Boleh ditambah kemudian",
+    "loanSalePrice": "Harga jualan",
+    "loanDownPayment": "Wang pendahuluan",
+    "loanTermMonths": "Tempoh pinjaman (bulan)",
+    "loanMonthsLeft": "Baki bulan",
+    "loanBorrowed": "Dipinjam",
+    "loanTotalCost": "Jumlah yang dibayar",
+    "loanInterest": "Faedah",
+    "loanFlatRate": "{rate}% setahun, kadar rata",
+    "loanStillToPay": "Baki untuk dibayar"
   },
   "bookingEdit": {
     "crumbBookings": "Tempahan",

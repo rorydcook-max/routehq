@@ -3161,7 +3161,11 @@
     "pq_frameNote": "由持牌經紀人 {partner}{licence} 提供。RoveHQ 並非經紀人。",
     "pq_licence": " （OIC 執照 {licence}）",
     "gl_allTime": "全部期間",
-    "gl_thisMonth": "本月"
+    "gl_thisMonth": "本月",
+    "l_monthsLeft": "剩餘月數",
+    "l_totalCost": "總共支付",
+    "l_interest": "利息",
+    "l_flatRate": "年利率 {rate}%（固定）"
   },
   "customerPage": {
     "back": "客人",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count} 人座",
     "trimHint": "車型等級，例如 1.0 Turbo SV",
     "yearPlaceholder": "例如 {year}",
-    "plateLater": "可以之後再填"
+    "plateLater": "可以之後再填",
+    "loanSalePrice": "售價",
+    "loanDownPayment": "頭期款",
+    "loanTermMonths": "貸款期限（月）",
+    "loanMonthsLeft": "剩餘月數",
+    "loanBorrowed": "貸款金額",
+    "loanTotalCost": "總共支付",
+    "loanInterest": "利息",
+    "loanFlatRate": "年利率 {rate}%（固定）",
+    "loanStillToPay": "尚需支付"
   },
   "bookingEdit": {
     "crumbBookings": "預約",

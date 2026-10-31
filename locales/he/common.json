@@ -3201,7 +3201,11 @@
     "pq_frameNote": "מסופק על ידי {partner}, ברוקר מורשה{licence}. RoveHQ אינה ברוקר.",
     "pq_licence": " (רישיון OIC {licence})",
     "gl_allTime": "כל הזמנים",
-    "gl_thisMonth": "החודש"
+    "gl_thisMonth": "החודש",
+    "l_monthsLeft": "חודשים שנותרו",
+    "l_totalCost": "סך הכול לתשלום",
+    "l_interest": "ריבית",
+    "l_flatRate": "{rate}% לשנה, קבועה"
   },
   "customerPage": {
     "back": "לקוחות",
@@ -3506,7 +3510,16 @@
     "seatsCount": "{count, plural, one {מושב אחד} two {שני מושבים} other {# מושבים}}",
     "trimHint": "רמת גימור, למשל 1.0 Turbo SV",
     "yearPlaceholder": "למשל {year}",
-    "plateLater": "אפשר להוסיף אחר כך"
+    "plateLater": "אפשר להוסיף אחר כך",
+    "loanSalePrice": "מחיר מכירה",
+    "loanDownPayment": "מקדמה",
+    "loanTermMonths": "תקופת ההלוואה (חודשים)",
+    "loanMonthsLeft": "חודשים שנותרו",
+    "loanBorrowed": "סכום ההלוואה",
+    "loanTotalCost": "סך הכול לתשלום",
+    "loanInterest": "ריבית",
+    "loanFlatRate": "{rate}% לשנה, קבועה",
+    "loanStillToPay": "נותר לתשלום"
   },
   "bookingEdit": {
     "crumbBookings": "הזמנות",

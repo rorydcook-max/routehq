@@ -3170,7 +3170,11 @@
     "pq_frameNote": "ให้บริการโดย {partner} นายหน้าที่ได้รับอนุญาต{licence} RoveHQ ไม่ใช่นายหน้า",
     "pq_licence": " (ใบอนุญาต คปภ. {licence})",
     "gl_allTime": "ทั้งหมด",
-    "gl_thisMonth": "เดือนนี้"
+    "gl_thisMonth": "เดือนนี้",
+    "l_monthsLeft": "เหลืออีก (เดือน)",
+    "l_totalCost": "ยอดที่ต้องจ่ายทั้งหมด",
+    "l_interest": "ดอกเบี้ย",
+    "l_flatRate": "ดอกเบี้ยคงที่ {rate}% ต่อปี"
   },
   "customerPage": {
     "back": "ลูกค้า",
@@ -3475,7 +3479,16 @@
     "seatsCount": "{count} ที่นั่ง",
     "trimHint": "รุ่นย่อย เช่น 1.0 Turbo SV",
     "yearPlaceholder": "เช่น {year}",
-    "plateLater": "เพิ่มทีหลังได้"
+    "plateLater": "เพิ่มทีหลังได้",
+    "loanSalePrice": "ราคารถ",
+    "loanDownPayment": "เงินดาวน์",
+    "loanTermMonths": "ระยะผ่อน (เดือน)",
+    "loanMonthsLeft": "เหลืออีก (เดือน)",
+    "loanBorrowed": "ยอดจัดไฟแนนซ์",
+    "loanTotalCost": "ยอดที่ต้องจ่ายทั้งหมด",
+    "loanInterest": "ดอกเบี้ย",
+    "loanFlatRate": "ดอกเบี้ยคงที่ {rate}% ต่อปี",
+    "loanStillToPay": "ยอดที่ยังต้องจ่าย"
   },
   "bookingEdit": {
     "crumbBookings": "การจอง",

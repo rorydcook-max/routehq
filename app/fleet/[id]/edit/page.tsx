@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { archiveVehicle, deleteVehicle, updateVehicle } from "@/app/actions/vehicles";
 import { ConfirmDeleteVehicleButton } from "@/app/fleet/fleet-actions";
+import { LoanFields } from "@/app/fleet/new/loan-fields";
 import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
@@ -277,12 +278,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
           ) : null}
           {isOwner ? (
           <Fold summary={say("loanSummary")} title={say("loanTitle")}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {textField("lender", "financeLender", finance.lender)}
-              {moneyField("loanMonthly", "financeMonthlyPayment", finance.monthly_payment)}
-              {moneyField("loanOutstanding", "financeOutstanding", finance.outstanding_balance)}
-              {dateField("loanEnd", "financeEndDate", finance.end_date)}
-            </div>
+            <LoanFields currency={currency} loan={finance} />
           </Fold>
           ) : null}
 

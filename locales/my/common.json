@@ -3201,7 +3201,11 @@
     "pq_frameNote": "လိုင်စင်ရ ပွဲစား {partner}{licence} က ပံ့ပိုးပါသည်။ RoveHQ သည် ပွဲစား မဟုတ်ပါ။",
     "pq_licence": " (OIC လိုင်စင် {licence})",
     "gl_allTime": "စုစုပေါင်း",
-    "gl_thisMonth": "ဒီလ"
+    "gl_thisMonth": "ဒီလ",
+    "l_monthsLeft": "ကျန်သည့်လ",
+    "l_totalCost": "စုစုပေါင်းပေးရမည့်ငွေ",
+    "l_interest": "အတိုး",
+    "l_flatRate": "နှစ်စဉ် {rate}% (ပုံသေ)"
   },
   "customerPage": {
     "back": "ဖောက်သည်များ",
@@ -3506,7 +3510,16 @@
     "seatsCount": "ထိုင်ခုံ {count} ခုံ",
     "trimHint": "ဗားရှင်း၊ ဥပမာ 1.0 Turbo SV",
     "yearPlaceholder": "ဥပမာ {year}",
-    "plateLater": "နောက်မှ ထည့်နိုင်သည်"
+    "plateLater": "နောက်မှ ထည့်နိုင်သည်",
+    "loanSalePrice": "ရောင်းဈေး",
+    "loanDownPayment": "စရန်ငွေ",
+    "loanTermMonths": "ချေးငွေကာလ (လ)",
+    "loanMonthsLeft": "ကျန်သည့်လ",
+    "loanBorrowed": "ချေးငွေ",
+    "loanTotalCost": "စုစုပေါင်းပေးရမည့်ငွေ",
+    "loanInterest": "အတိုး",
+    "loanFlatRate": "နှစ်စဉ် {rate}% (ပုံသေ)",
+    "loanStillToPay": "ပေးရန်ကျန်ငွေ"
   },
   "bookingEdit": {
     "crumbBookings": "ဘိုကင်များ",

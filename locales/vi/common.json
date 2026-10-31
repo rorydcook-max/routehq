@@ -3201,7 +3201,11 @@
     "pq_licence": " (Giấy phép OIC {licence})",
     "rn_taxAgeUnknown": "Ô tô đến {car} năm tuổi và xe máy đến {bike} năm tuổi có thể gia hạn trực tuyến; xe cũ hơn cần kiểm định (ตรอ.) trước. Lưu năm sản xuất của xe để biết trường hợp nào áp dụng.",
     "gl_allTime": "Toàn thời gian",
-    "gl_thisMonth": "Tháng này"
+    "gl_thisMonth": "Tháng này",
+    "l_monthsLeft": "Số tháng còn lại",
+    "l_totalCost": "Tổng số tiền phải trả",
+    "l_interest": "Tiền lãi",
+    "l_flatRate": "{rate}%/năm, lãi phẳng"
   },
   "customerPage": {
     "back": "Khách hàng",
@@ -3506,7 +3510,16 @@
     "seatsCount": "{count} chỗ",
     "trimHint": "Phiên bản, ví dụ 1.0 Turbo SV",
     "yearPlaceholder": "ví dụ {year}",
-    "plateLater": "Có thể thêm sau"
+    "plateLater": "Có thể thêm sau",
+    "loanSalePrice": "Giá bán",
+    "loanDownPayment": "Trả trước",
+    "loanTermMonths": "Thời hạn vay (tháng)",
+    "loanMonthsLeft": "Số tháng còn lại",
+    "loanBorrowed": "Số tiền vay",
+    "loanTotalCost": "Tổng số tiền phải trả",
+    "loanInterest": "Tiền lãi",
+    "loanFlatRate": "{rate}%/năm, lãi phẳng",
+    "loanStillToPay": "Còn phải trả"
   },
   "bookingEdit": {
     "crumbBookings": "Đặt xe",

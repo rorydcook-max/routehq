@@ -3161,7 +3161,11 @@
     "pq_frameNote": "認可を受けた仲介業者{partner}{licence}が提供しています。RoveHQは仲介業者ではありません。",
     "pq_licence": "（OIC認可番号 {licence}）",
     "gl_allTime": "全期間",
-    "gl_thisMonth": "今月"
+    "gl_thisMonth": "今月",
+    "l_monthsLeft": "残りの月数",
+    "l_totalCost": "支払総額",
+    "l_interest": "利息",
+    "l_flatRate": "年{rate}%（アドオン）"
   },
   "customerPage": {
     "back": "お客様",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count} 人乗り",
     "trimHint": "グレード（例：1.0 Turbo SV）",
     "yearPlaceholder": "例：{year}",
-    "plateLater": "あとで追加できます"
+    "plateLater": "あとで追加できます",
+    "loanSalePrice": "販売価格",
+    "loanDownPayment": "頭金",
+    "loanTermMonths": "ローン期間（月）",
+    "loanMonthsLeft": "残りの月数",
+    "loanBorrowed": "借入額",
+    "loanTotalCost": "支払総額",
+    "loanInterest": "利息",
+    "loanFlatRate": "年{rate}%（アドオン）",
+    "loanStillToPay": "残りの支払額"
   },
   "bookingEdit": {
     "crumbBookings": "予約",

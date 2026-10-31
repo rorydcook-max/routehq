@@ -3161,7 +3161,11 @@
     "pq_frameNote": "සපයන්නේ බලපත්‍රලාභී තැරැව්කරුවෙකු වන {partner}{licence}. RoveHQ තැරැව්කරුවෙකු නොවේ.",
     "pq_licence": " (OIC බලපත්‍රය {licence})",
     "gl_allTime": "සියලු කාලය",
-    "gl_thisMonth": "මෙම මාසය"
+    "gl_thisMonth": "මෙම මාසය",
+    "l_monthsLeft": "ඉතිරි මාස",
+    "l_totalCost": "මුළු ගෙවීම",
+    "l_interest": "පොලිය",
+    "l_flatRate": "වසරකට {rate}%, ස්ථාවර"
   },
   "customerPage": {
     "back": "පාරිභෝගිකයින්",
@@ -3466,7 +3470,16 @@
     "seatsCount": "{count, plural, one {ආසන #} other {ආසන #}}",
     "trimHint": "අනුවාදය, උදා. 1.0 Turbo SV",
     "yearPlaceholder": "උදා. {year}",
-    "plateLater": "පසුව එක් කළ හැක"
+    "plateLater": "පසුව එක් කළ හැක",
+    "loanSalePrice": "විකුණුම් මිල",
+    "loanDownPayment": "මූලික ගෙවීම",
+    "loanTermMonths": "ණය කාලය (මාස)",
+    "loanMonthsLeft": "ඉතිරි මාස",
+    "loanBorrowed": "ණය මුදල",
+    "loanTotalCost": "මුළු ගෙවීම",
+    "loanInterest": "පොලිය",
+    "loanFlatRate": "වසරකට {rate}%, ස්ථාවර",
+    "loanStillToPay": "තවත් ගෙවිය යුතු"
   },
   "bookingEdit": {
     "crumbBookings": "බුකින්",

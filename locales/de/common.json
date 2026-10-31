@@ -3201,7 +3201,11 @@
     "pq_frameNote": "Bereitgestellt von {partner}, einem lizenzierten Makler{licence}. RoveHQ ist kein Makler.",
     "pq_licence": " (OIC-Lizenz {licence})",
     "gl_allTime": "Gesamt",
-    "gl_thisMonth": "Dieser Monat"
+    "gl_thisMonth": "Dieser Monat",
+    "l_monthsLeft": "Restmonate",
+    "l_totalCost": "Gesamtkosten",
+    "l_interest": "Zinsen",
+    "l_flatRate": "{rate} % p. a., flat"
   },
   "customerPage": {
     "back": "Kunden",
@@ -3506,7 +3510,16 @@
     "seatsCount": "{count, plural, one {# Sitz} other {# Sitze}}",
     "trimHint": "Ausstattung, z. B. 1.0 Turbo SV",
     "yearPlaceholder": "z. B. {year}",
-    "plateLater": "Kann später ergänzt werden"
+    "plateLater": "Kann später ergänzt werden",
+    "loanSalePrice": "Kaufpreis",
+    "loanDownPayment": "Anzahlung",
+    "loanTermMonths": "Laufzeit (Monate)",
+    "loanMonthsLeft": "Restmonate",
+    "loanBorrowed": "Finanziert",
+    "loanTotalCost": "Gesamtkosten",
+    "loanInterest": "Zinsen",
+    "loanFlatRate": "{rate} % p. a., flat",
+    "loanStillToPay": "Noch zu zahlen"
   },
   "bookingEdit": {
     "crumbBookings": "Buchungen",

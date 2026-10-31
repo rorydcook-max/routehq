@@ -3201,7 +3201,11 @@
     "pq_frameNote": "Предоставлено {partner}, лицензированным брокером{licence}. RoveHQ не является брокером.",
     "pq_licence": " (лицензия OIC {licence})",
     "gl_allTime": "За всё время",
-    "gl_thisMonth": "Этот месяц"
+    "gl_thisMonth": "Этот месяц",
+    "l_monthsLeft": "Осталось месяцев",
+    "l_totalCost": "Всего к оплате",
+    "l_interest": "Проценты",
+    "l_flatRate": "{rate}% в год, фиксированно"
   },
   "customerPage": {
     "back": "Клиенты",
@@ -3506,7 +3510,16 @@
     "seatsCount": "{count, plural, one {# место} few {# места} many {# мест} other {# места}}",
     "trimHint": "Комплектация, напр. 1.0 Turbo SV",
     "yearPlaceholder": "напр. {year}",
-    "plateLater": "Можно добавить позже"
+    "plateLater": "Можно добавить позже",
+    "loanSalePrice": "Цена покупки",
+    "loanDownPayment": "Первый взнос",
+    "loanTermMonths": "Срок (месяцев)",
+    "loanMonthsLeft": "Осталось месяцев",
+    "loanBorrowed": "Сумма займа",
+    "loanTotalCost": "Всего к оплате",
+    "loanInterest": "Проценты",
+    "loanFlatRate": "{rate}% в год, фиксированно",
+    "loanStillToPay": "Осталось заплатить"
   },
   "bookingEdit": {
     "crumbBookings": "Бронирования",

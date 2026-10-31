@@ -9,6 +9,7 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { asCondition, valueForCondition } from "@/lib/vehicle-condition";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { loanFromForm } from "@/lib/vehicle-loan";
 import { removeStoredFiles } from "@/lib/supabase/remove-stored-files";
 
 function numberFromForm(formData: FormData, key: string) {
@@ -255,12 +256,7 @@ export async function createVehicle(formData: FormData) {
     oil_change_due_date: optionalStringFromForm(formData, "oilChangeDueDate")
   });
 
-  const finance = compactObject({
-    lender: optionalStringFromForm(formData, "financeLender"),
-    monthly_payment: optionalNumberFromForm(formData, "financeMonthlyPayment"),
-    outstanding_balance: optionalNumberFromForm(formData, "financeOutstanding"),
-    end_date: optionalStringFromForm(formData, "financeEndDate")
-  });
+  const finance = loanFromForm(formData);
 
   const acquisition = compactObject({
     purchase_mileage: optionalNumberFromForm(formData, "purchaseMileage")
@@ -421,13 +417,6 @@ export async function updateVehicle(formData: FormData) {
     oil_change_due_date: optionalStringFromForm(formData, "oilChangeDueDate")
   };
 
-  const finance = {
-    lender: optionalStringFromForm(formData, "financeLender"),
-    monthly_payment: optionalNumberFromForm(formData, "financeMonthlyPayment"),
-    outstanding_balance: optionalNumberFromForm(formData, "financeOutstanding"),
-    end_date: optionalStringFromForm(formData, "financeEndDate")
-  };
-
   const acquisition = {
     purchase_mileage: optionalNumberFromForm(formData, "purchaseMileage")
   };
@@ -500,7 +489,8 @@ export async function updateVehicle(formData: FormData) {
           : {}),
         acquisition: ownerFields ? merged("acquisition", acquisition) : kept.acquisition || {},
         compliance: merged("compliance", compliance),
-        finance: ownerFields ? merged("finance", finance) : kept.finance || {}
+        // The loan is replaced as a whole, so clearing a field clears it (lib/vehicle-loan.ts).
+        finance: ownerFields ? loanFromForm(formData, kept.finance) : kept.finance || {}
       }
     })
     .eq("id", vehicleId)

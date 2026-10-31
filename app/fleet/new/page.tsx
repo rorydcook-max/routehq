@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { createVehicle } from "@/app/actions/vehicles";
 import { ComplianceFields } from "@/app/fleet/new/compliance-fields";
+import { LoanFields } from "@/app/fleet/new/loan-fields";
 import { RatesFields } from "@/app/fleet/new/rates-fields";
 import { VehicleIdentityFields } from "@/app/fleet/new/vehicle-identity-fields";
 import { AppShell } from "@/components/app-shell";
@@ -137,24 +138,7 @@ export default async function NewVehiclePage() {
             </>
           )}
           <Fold summary={say("loanSummary")} title={say("loanTitle")}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block">
-                <span className={labelClass}>{say("lender")}</span>
-                <input className={inputClass} name="financeLender" type="text" />
-              </label>
-              <label className="block">
-                <span className={labelClass}>{say("loanMonthly")}</span>
-                <MoneyInput currency={currency} name="financeMonthlyPayment" />
-              </label>
-              <label className="block">
-                <span className={labelClass}>{say("loanOutstanding")}</span>
-                <MoneyInput currency={currency} name="financeOutstanding" />
-              </label>
-              <label className="block">
-                <span className={labelClass}>{say("loanEnd")}</span>
-                <LocalizedDateInput calendar={preferredCalendar} inputClass={inputClass} name="financeEndDate" preferredLocale={preferredLocale} />
-              </label>
-            </div>
+            <LoanFields currency={currency} />
           </Fold>
 
           <div className="sticky-actions sticky z-10 -mx-1 flex gap-2 bg-[var(--background)] px-1 py-3 sm:justify-end [&>*:last-child]:flex-1 sm:[&>*:last-child]:flex-none">

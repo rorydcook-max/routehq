@@ -23,6 +23,7 @@ import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { VehicleArt } from "@/components/vehicle-art";
 import { vehiclePhotoUrls } from "@/lib/vehicle-photos";
+import { amountDueNowByRental } from "@/lib/rental-balances";
 import { Dot, FleetLot, InOutBars, Ring, Spark, TileHead, type LotState, type LotVehicle } from "@/components/glance";
 import { AgendaCalendar } from "@/components/agenda-calendar";
 import { getCalendarEventsBetween, type CalendarEvent } from "@/lib/calendar";
@@ -162,7 +163,21 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     db.from("conversations").select("unread_count").eq("organization_id", organization.id).eq("status", "open").gt("unread_count", 0),
     db.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).is("deleted_at", null).in("status", ["active", "due_soon", "overdue", "extended"]),
     db.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).is("deleted_at", null).eq("status", "booked").gte("start_date", todayForCounts).lte("start_date", weekEndForCounts),
-    db.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).is("deleted_at", null).neq("status", "cancelled").gt("balance_due", 0)
+    // Unpaid = money due now, as on Bookings (Rory, 1 Nov 2026): the stored balance also counts rent not due yet,
+    // so an open-ended rental paid to date showed as unpaid here and not there.
+    db
+      .from("rentals")
+      .select("id")
+      .eq("organization_id", organization.id)
+      .is("deleted_at", null)
+      .neq("status", "cancelled")
+      .gt("balance_due", 0)
+      .then(async (result: any) => {
+        const ids = ((result?.data || []) as Array<{ id: string }>).map((row) => row.id);
+        if (!ids.length) return { count: 0 };
+        const dueNow = await amountDueNowByRental(db, ids).catch(() => new Map<string, number>());
+        return { count: ids.filter((id) => Number(dueNow.get(id) || 0) > 0).length };
+      })
   ]);
   const hasChatChannel = (channelsResult?.count || 0) > 0;
   const latestChats = ((chatsResult?.data || []) as Array<{ id: string; display_name: string | null; unread_count: number | null; last_message_at: string | null; last_message_preview: string | null; last_message_direction: string | null }>).filter((chat) => chat.last_message_at);

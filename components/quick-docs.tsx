@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { CheckCircle2, Camera, Loader2 } from "lucide-react";
 import { uploadCustomerDocumentQuick } from "@/app/actions/customers";
 import { shownError } from "@/lib/error-text";
+import { compressImage } from "@/lib/direct-upload-client";
 
 /**
  * Passport and driving licence photos added straight from the booking (Rory, 1 Nov 2026: a rental that has
@@ -35,7 +36,7 @@ export function QuickDocs({
       formData.set("customerId", customerId);
       formData.set("organizationId", organizationId);
       formData.set("category", category);
-      formData.set("documentFile", file);
+      formData.set("documentFile", await compressImage(file, 2000, 0.82));
       const result = await uploadCustomerDocumentQuick(formData).catch((caught) => ({ success: false, error: shownError(caught, say("docsFailed")), documentStatus: undefined }));
       setBusy("");
       if (!result.success) return setError(result.error || say("docsFailed"));

@@ -13,12 +13,15 @@ import type { PreparedUploads, UploadRequest } from "@/lib/direct-uploads";
 export async function compressImage(file: File, maxSide = 1600, quality = 0.75): Promise<File> {
   if (!file.type.startsWith("image/") || file.type === "image/gif" || file.size < 400 * 1024) return file;
   try {
-    const bitmap = await createImageBitmap(file);
+    // createImageBitmap can fail on an iPhone for big photos; an <img> reads them instead (Rory, 1 Nov 2026).
+    const bitmap: { width: number; height: number; source: CanvasImageSource; close?: () => void } = await createImageBitmap(file)
+      .then((image) => ({ width: image.width, height: image.height, source: image as CanvasImageSource, close: () => image.close() }))
+      .catch(() => imageElement(file));
     const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
     const canvas = document.createElement("canvas");
     canvas.width = Math.round(bitmap.width * scale);
     canvas.height = Math.round(bitmap.height * scale);
-    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    canvas.getContext("2d")?.drawImage(bitmap.source, 0, 0, canvas.width, canvas.height);
     bitmap.close?.();
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
     if (!blob || blob.size >= file.size) return file;
@@ -26,6 +29,22 @@ export async function compressImage(file: File, maxSide = 1600, quality = 0.75):
   } catch {
     return file;
   }
+}
+
+function imageElement(file: File): Promise<{ width: number; height: number; source: CanvasImageSource }> {
+  const url = URL.createObjectURL(file);
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => {
+      resolve({ width: image.naturalWidth, height: image.naturalHeight, source: image });
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
+    image.onerror = (error) => {
+      URL.revokeObjectURL(url);
+      reject(error);
+    };
+    image.src = url;
+  });
 }
 
 /** A copy of the form data with every photo shrunk (see compressImage). */

@@ -543,14 +543,15 @@ export async function uploadVehiclePhotos(formData: FormData) {
   const admin = createSupabaseAdminClient() as any;
 
   for (const file of files) {
-    if (!file.type.startsWith("image/")) {
+    // An iPhone can send a photo with no type at all; its name still says what it is.
+    if (!file.type.startsWith("image/") && !/\.(jpe?g|png|heic|heif|webp)$/i.test(file.name)) {
       throw new Error("Vehicle photos must be image files.");
     }
 
     const extension = file.name.split(".").pop()?.toLowerCase() || "upload";
     const storagePath = `${organizationId}/vehicle/${vehicleId}/photos/${Date.now()}-${crypto.randomUUID()}-${safeFileName(file.name || `vehicle-photo.${extension}`)}`;
     const { error: uploadError } = await admin.storage.from("documents").upload(storagePath, file, {
-      contentType: file.type || undefined,
+      contentType: file.type || (/\.hei[cf]$/i.test(file.name) ? "image/heic" : /\.png$/i.test(file.name) ? "image/png" : "image/jpeg"),
       upsert: false
     });
 

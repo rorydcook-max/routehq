@@ -6,6 +6,7 @@ import { Camera, ImagePlus, Move, Trash2, X } from "lucide-react";
 import { removeVehiclePhoto, reorderVehiclePhotos, uploadVehiclePhotos } from "@/app/actions/vehicles";
 import type { VehicleDetailDocument } from "@/lib/vehicle-detail";
 import { PhotoGallery } from "@/components/photo-gallery";
+import { compressImage } from "@/lib/direct-upload-client";
 import { refreshVehiclePhotos } from "@/components/vehicle-photo-store";
 
 type VehiclePhotoManagerProps = {
@@ -74,16 +75,26 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
   // Choosing photos uploads them straight away: no second button to find.
   function uploadChosen(files: FileList | null) {
     if (!files || files.length === 0) return;
-    const formData = new FormData();
-    formData.set("vehicleId", vehicleId);
-    formData.set("organizationId", organizationId);
-    Array.from(files).forEach((file) => formData.append("vehiclePhotos", file));
+    const chosen = Array.from(files);
     setMessage("");
     startTransition(async () => {
+      // Made smaller in the browser, then sent one at a time, so no request goes over the server's size limit
+      // (Rory, 1 Nov 2026: iPhone photos failed). One that fails doesn't stop the rest.
+      let failed = 0;
       try {
-        await uploadVehiclePhotos(formData);
+        for (const original of chosen) {
+          const formData = new FormData();
+          formData.set("vehicleId", vehicleId);
+          formData.set("organizationId", organizationId);
+          formData.append("vehiclePhotos", await compressImage(original, 2000, 0.82));
+          try {
+            await uploadVehiclePhotos(formData);
+          } catch {
+            failed += 1;
+          }
+        }
         refreshVehiclePhotos();
-        setMessage(say("ph_updated"));
+        setMessage(failed === chosen.length ? say("ph_uploadFailed") : say("ph_updated"));
       } catch {
         setMessage(say("ph_uploadFailed"));
       } finally {

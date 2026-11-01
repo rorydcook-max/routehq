@@ -83,6 +83,7 @@ export function CustomerSelector({
         onSelect?.(newCustomer);
         setOpen(false);
         setCreating(false);
+        setSearch("");
       } catch (createError) {
         setError(shownError(createError, say("sel_failed")));
       }
@@ -92,6 +93,61 @@ export function CustomerSelector({
   return (
     <div className="relative">
       <input name={name} type="hidden" value={selectedId} />
+      {/* Nobody chosen yet: a search field with the matches right under it, and "Add a new customer" (Rory, 1 Nov 2026:
+          no "Choose customer" button to open first). Chosen: their card, with Change. */}
+      {!selectedCustomer ? (
+        <div className="space-y-2">
+          <div className="relative">
+            <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={18} />
+            <input
+              aria-label={say("search")}
+              className={`${inputClass} !pl-10`}
+              onChange={(event) => setSearch(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") event.preventDefault();
+              }}
+              placeholder={say("search")}
+              type="search"
+              value={search}
+            />
+          </div>
+          {search.trim() ? (
+            <div className="max-h-72 overflow-y-auto">
+              {filteredCustomers.slice(0, 12).map((customer) => (
+                <button
+                  className="flex min-h-12 w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-[var(--panel-secondary)]"
+                  key={customer.id}
+                  onClick={() => {
+                    setSelectedId(customer.id);
+                    onSelect?.(customer);
+                    setSearch("");
+                  }}
+                  type="button"
+                >
+                  <span className="num flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[15px] text-[var(--primary)]">{initialsOf(customer.full_name)}</span>
+                  <span className="min-w-0">
+                    <span className="block truncate font-bold text-[var(--foreground)]">{customer.full_name}</span>
+                    <span className="block truncate text-sm text-[var(--muted)]">
+                      {[customer.phone, customer.nationality ? `${flagForNationality(customer.nationality)} ${customer.nationality}` : null].filter(Boolean).join(" · ") || say("noPhone")}
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <button
+            className="inline-flex min-h-11 items-center gap-2 font-bold text-[var(--primary)]"
+            onClick={() => {
+              setCreating(true);
+              setOpen(true);
+            }}
+            type="button"
+          >
+            <Plus size={18} />
+            {say("sel_create")}
+          </button>
+        </div>
+      ) : (
       <button
         className="flex w-full items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-left text-[var(--foreground)]"
         onClick={() => setOpen(true)}
@@ -117,6 +173,7 @@ export function CustomerSelector({
         </span>
         {selectedCustomer ? <span className="shrink-0 font-semibold text-[var(--primary)]">{say("sel_change")}</span> : <Search className="text-[var(--muted)]" size={18} />}
       </button>
+      )}
 
       {open ? (
         <div className="fixed inset-0 z-50 bg-[var(--foreground)]/30 sm:absolute sm:inset-auto sm:top-full sm:z-30 sm:mt-2 sm:w-full sm:bg-transparent">
@@ -160,7 +217,8 @@ export function CustomerSelector({
             ref={formRef}
           >
                   <input name="organizationId" type="hidden" value={organizationId} />
-                  <input className={inputClass} name="fullName" placeholder={say("sel_fullName")} required />
+                  {/* A name typed in the search that found nobody carries over. */}
+                  <input className={inputClass} defaultValue={/\d/.test(search) ? "" : search.trim()} name="fullName" placeholder={say("sel_fullName")} required />
                   {/* Type or paste the whole number; the country code is found from it. */}
                   <PhoneField
                     inputClass={inputClass}

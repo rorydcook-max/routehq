@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "あと {km} km",
+    "kmOver": "{km} km超過",
     "title": "ダッシュボード",
     "monthlyRevenue": "月間売上",
     "outstanding": "未収金",
@@ -1384,6 +1386,11 @@
     "toSendBooking": "予約を開く"
   },
   "money": {
+    "sv_title": "点検の詳細",
+    "sv_oil": "オイル交換済み",
+    "sv_nextDate": "次回点検（日付）",
+    "sv_nextKm": "次回点検（km）",
+    "sv_hint": "日付・距離、または両方を設定。早い方が期限です。",
     "rc_title": "レシートをアップロード",
     "rc_subtitle": "写真を撮るか選んで、どこに付けるか選びます。",
     "rc_pick": "レシートの写真",
@@ -2915,6 +2922,16 @@
     "handoverLateBar": "未引き渡し、{days} 日遅れ"
   },
   "vehiclePage": {
+    "m_nextLabel": "次回点検",
+    "m_last": "前回点検",
+    "m_lastOil": "前回オイル交換",
+    "m_notYet": "未記録",
+    "m_oil": "オイル交換済み",
+    "m_hintBoth": "日付・距離、または両方を設定。早い方が期限です。",
+    "sv_nextBoth": "{date} または {km} km（早い方）",
+    "sv_kmOnly": "{km} km時点",
+    "sv_kmLeft": "あと {km} km",
+    "sv_kmOver": "{km} km超過",
     "sh_back": "戻りました・貸出可能",
     "sh_in": "整備に出す",
     "yr_title": "1年のようす",

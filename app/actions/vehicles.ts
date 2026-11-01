@@ -8,6 +8,7 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { asCondition, valueForCondition } from "@/lib/vehicle-condition";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { costTypeForService, recordService } from "@/lib/vehicle-service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loanFromForm } from "@/lib/vehicle-loan";
 import { removeStoredFiles } from "@/lib/supabase/remove-stored-files";
@@ -896,93 +897,75 @@ export async function logVehicleMaintenance(formData: FormData) {
   const notes = optionalStringFromForm(formData, "notes");
   const nextDueDate = optionalStringFromForm(formData, "nextDueDate");
   const nextDueMileage = optionalNumberFromForm(formData, "nextDueMileage");
+  const oilChanged = String(formData.get("oilChanged") || "") === "true" || eventType === "oil_change";
 
   if (!vehicleId || !organizationId || !eventType || !serviceDate) {
     throw new Error("Vehicle, maintenance type, and service date are required.");
   }
 
-  let transactionId: string | null = null;
+  // The receipt belongs to the car's files and to the money entry.
+  const receiptFile = formData.get("receiptFile");
+  const receiptDocumentId = receiptFile instanceof File && receiptFile.size > 0
+    ? await attachVehicleDocument({ supabase, file: receiptFile, organizationId, vehicleId, userId: user.id, category: "maintenance_receipt" })
+    : null;
 
+  // What it cost is a money entry like any other, so it's in Money in & out and the reports.
+  let transactionId: string | null = null;
   if (cost && cost > 0) {
     const { data: transaction, error: transactionError } = await supabase
       .from("transactions")
       .insert({
         organization_id: organizationId,
         vehicle_id: vehicleId,
-        type: eventType === "repair" ? "repair" : "maintenance",
+        type: costTypeForService(eventType),
         amount: cost,
         currency: "THB",
         transaction_date: serviceDate,
         supplier,
         mileage,
-        notes: notes || `${eventType} logged from vehicle profile.`,
+        notes: notes || null,
+        receipt_document_id: receiptDocumentId,
         created_by: user.id
       })
       .select("id")
       .single();
-
     if (transactionError) {
       throw new Error(transactionError.message);
     }
-
     transactionId = transaction.id;
   }
 
-  const receiptFile = formData.get("receiptFile");
-  const receiptDocumentId = receiptFile instanceof File && receiptFile.size > 0
-    ? await attachVehicleDocument({
-        supabase,
-        file: receiptFile,
-        organizationId,
-        vehicleId,
-        userId: user.id,
-        category: "maintenance_receipt"
-      })
-    : null;
-
-  const { data: maintenance, error: maintenanceError } = await supabase
-    .from("maintenance_events")
-    .insert({
-      organization_id: organizationId,
-      vehicle_id: vehicleId,
-      transaction_id: transactionId,
-      event_type: eventType,
-      service_date: serviceDate,
-      mileage,
-      cost,
-      supplier,
-      notes: [notes, receiptDocumentId ? `Receipt: ${receiptDocumentId}` : ""].filter(Boolean).join("\n") || null,
-      next_due_date: nextDueDate,
-      next_due_mileage: nextDueMileage,
-      created_by: user.id
-    })
-    .select("id")
-    .single();
-
-  if (maintenanceError) {
-    throw new Error(maintenanceError.message);
-  }
-
-  if (mileage !== null) {
-    const { data: vehicle } = await supabase.from("vehicles").select("mileage").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
-    if (vehicle && mileage > Number(vehicle.mileage || 0)) {
-      await supabase.from("vehicles").update({ mileage }).eq("id", vehicleId).eq("organization_id", organizationId);
-    }
-  }
+  const maintenanceId = await recordService(supabase, {
+    organizationId,
+    vehicleId,
+    userId: user.id,
+    kind: eventType,
+    date: serviceDate,
+    mileage,
+    cost,
+    supplier,
+    notes,
+    nextDueDate,
+    nextDueMileage,
+    oilChanged,
+    transactionId
+  });
 
   await recordActivityEvent(supabase, {
     organization_id: organizationId,
     actor_id: user.id,
     entity_type: "maintenance",
-    entity_id: maintenance.id,
+    entity_id: maintenanceId,
     vehicle_id: vehicleId,
     event_type: "maintenance_completed",
     title: "Maintenance logged",
-    detail: `${eventType} completed${cost ? `, cost THB ${cost}` : ""}.`
+    detail: `${eventType} completed${oilChanged && eventType !== "oil_change" ? " with an oil change" : ""}${cost ? `, cost THB ${cost}` : ""}.`
   });
 
   revalidatePath("/");
   revalidatePath("/fleet");
+  revalidatePath("/transactions");
+  revalidatePath("/reports");
   revalidatePath(`/fleet/${vehicleId}`);
 }
 

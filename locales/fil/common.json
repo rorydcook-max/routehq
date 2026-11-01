@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "{km} km pa",
+    "kmOver": "lampas {km} km",
     "title": "Dashboard",
     "monthlyRevenue": "Kita kada buwan",
     "outstanding": "Hindi pa bayad",
@@ -1384,6 +1386,11 @@
     "toSendBooking": "Buksan ang booking"
   },
   "money": {
+    "sv_title": "Detalye ng serbisyo",
+    "sv_oil": "Napalitan ang langis",
+    "sv_nextDate": "Susunod na serbisyo (petsa)",
+    "sv_nextKm": "Susunod na serbisyo (km)",
+    "sv_hint": "Maglagay ng petsa, km o pareho. Kung alin ang mauna, iyon ang takdang oras.",
     "rc_title": "Mag-upload ng resibo",
     "rc_subtitle": "Kumuha o pumili ng litrato, saka sabihin kung saan ito.",
     "rc_pick": "Litrato ng resibo",
@@ -2915,6 +2922,16 @@
     "handoverLateBar": "hindi pa naiabot, huli nang {days, plural, one {# araw} other {# araw}}"
   },
   "vehiclePage": {
+    "m_nextLabel": "Susunod na serbisyo",
+    "m_last": "Huling serbisyo",
+    "m_lastOil": "Huling palit-langis",
+    "m_notYet": "Wala pang naitala",
+    "m_oil": "Napalitan ang langis",
+    "m_hintBoth": "Maglagay ng petsa, km o pareho. Kung alin ang mauna, iyon ang takdang oras.",
+    "sv_nextBoth": "{date} o {km} km, alinman ang mauna",
+    "sv_kmOnly": "sa {km} km",
+    "sv_kmLeft": "{km} km pa",
+    "sv_kmOver": "lampas {km} km",
     "sh_back": "Balik na at puwede nang iparenta",
     "sh_in": "Ipasok sa talyer",
     "yr_title": "Ang taon sa isang tingin",

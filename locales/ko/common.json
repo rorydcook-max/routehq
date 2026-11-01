@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "{km} km 남음",
+    "kmOver": "{km} km 초과",
     "title": "대시보드",
     "monthlyRevenue": "월 수익",
     "outstanding": "미결제",
@@ -1384,6 +1386,11 @@
     "toSendBooking": "예약 열기"
   },
   "money": {
+    "sv_title": "정비 내용",
+    "sv_oil": "오일 교환함",
+    "sv_nextDate": "다음 정비 (날짜)",
+    "sv_nextKm": "다음 정비 (km)",
+    "sv_hint": "날짜, km 또는 둘 다 정하세요. 먼저 오는 쪽이 기한이에요.",
     "rc_title": "영수증 올리기",
     "rc_subtitle": "사진을 찍거나 고른 뒤, 어디에 넣을지 고르세요.",
     "rc_pick": "영수증 사진",
@@ -2915,6 +2922,16 @@
     "handoverLateBar": "미인도, {days}일 지연"
   },
   "vehiclePage": {
+    "m_nextLabel": "다음 정비",
+    "m_last": "마지막 정비",
+    "m_lastOil": "마지막 오일 교환",
+    "m_notYet": "아직 기록 없음",
+    "m_oil": "오일 교환함",
+    "m_hintBoth": "날짜, km 또는 둘 다 정하세요. 먼저 오는 쪽이 기한이에요.",
+    "sv_nextBoth": "{date} 또는 {km} km 중 먼저",
+    "sv_kmOnly": "{km} km에",
+    "sv_kmLeft": "{km} km 남음",
+    "sv_kmOver": "{km} km 초과",
     "sh_back": "돌아옴, 대여 가능",
     "sh_in": "정비소에 맡기기",
     "yr_title": "한눈에 보는 1년",

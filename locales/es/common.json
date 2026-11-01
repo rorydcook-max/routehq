@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "faltan {km} km",
+    "kmOver": "{km} km pasado",
     "title": "Panel",
     "monthlyRevenue": "Ingresos mensuales",
     "outstanding": "Pendiente",
@@ -1384,6 +1386,11 @@
     "toSendBooking": "Abrir la reserva"
   },
   "money": {
+    "sv_title": "Detalles del servicio",
+    "sv_oil": "Aceite cambiado",
+    "sv_nextDate": "Próximo servicio (fecha)",
+    "sv_nextKm": "Próximo servicio (km)",
+    "sv_hint": "Pon una fecha, unos km o ambos. Lo que llegue antes marca cuándo toca.",
     "rc_title": "Subir un recibo",
     "rc_subtitle": "Haz o elige una foto y di a dónde va.",
     "rc_pick": "Una foto del recibo",
@@ -2915,6 +2922,16 @@
     "handoverLateBar": "sin entregar, {days, plural, one {# día} other {# días}} de retraso"
   },
   "vehiclePage": {
+    "m_nextLabel": "Próximo servicio",
+    "m_last": "Último servicio",
+    "m_lastOil": "Último cambio de aceite",
+    "m_notYet": "Aún sin registrar",
+    "m_oil": "Aceite cambiado",
+    "m_hintBoth": "Pon una fecha, unos km o ambos. Lo que llegue antes marca cuándo toca.",
+    "sv_nextBoth": "{date} o {km} km, lo que llegue antes",
+    "sv_kmOnly": "a los {km} km",
+    "sv_kmLeft": "faltan {km} km",
+    "sv_kmOver": "{km} km pasado",
     "sh_back": "De vuelta y libre para alquilar",
     "sh_in": "Enviar al taller",
     "yr_title": "El año de un vistazo",

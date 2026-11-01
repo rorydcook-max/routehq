@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "{km} km igjen",
+    "kmOver": "{km} km over",
     "title": "Oversikt",
     "monthlyRevenue": "Månedlig inntekt",
     "outstanding": "Utestående",
@@ -1384,6 +1386,11 @@
     "toSendBooking": "Åpne reservasjonen"
   },
   "money": {
+    "sv_title": "Servicedetaljer",
+    "sv_oil": "Olje skiftet",
+    "sv_nextDate": "Neste service (dato)",
+    "sv_nextKm": "Neste service (km)",
+    "sv_hint": "Sett en dato, km eller begge. Det som kommer først gjelder.",
     "rc_title": "Last opp en kvittering",
     "rc_subtitle": "Ta eller velg et bilde, og si hvor det hører hjemme.",
     "rc_pick": "Et bilde av kvitteringen",
@@ -2915,6 +2922,16 @@
     "handoverLateBar": "ikke overlevert, {days, plural, one {# dag} other {# dager}} forsinket"
   },
   "vehiclePage": {
+    "m_nextLabel": "Neste service",
+    "m_last": "Siste service",
+    "m_lastOil": "Siste oljeskift",
+    "m_notYet": "Ikke registrert ennå",
+    "m_oil": "Olje skiftet",
+    "m_hintBoth": "Sett en dato, km eller begge. Det som kommer først gjelder.",
+    "sv_nextBoth": "{date} eller {km} km, det som kommer først",
+    "sv_kmOnly": "ved {km} km",
+    "sv_kmLeft": "{km} km igjen",
+    "sv_kmOver": "{km} km over",
     "sh_back": "Tilbake og ledig for utleie",
     "sh_in": "Sett på verksted",
     "yr_title": "Året i korte trekk",

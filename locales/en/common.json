@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "{km} km to go",
+    "kmOver": "{km} km over",
     "title": "Dashboard",
     "monthlyRevenue": "Monthly revenue",
     "outstanding": "Outstanding",
@@ -1384,6 +1386,11 @@
     "toSendBooking": "Open the booking"
   },
   "money": {
+    "sv_title": "Service details",
+    "sv_oil": "Oil changed",
+    "sv_nextDate": "Next service due (date)",
+    "sv_nextKm": "Next service due (km)",
+    "sv_hint": "Set a date, a km or both. Whichever comes first is when it's due.",
     "rc_title": "Upload a receipt",
     "rc_subtitle": "Take or choose a photo, then say where it belongs.",
     "rc_pick": "A photo of the receipt",
@@ -2915,6 +2922,16 @@
     "chipBack": "Back"
   },
   "vehiclePage": {
+    "m_nextLabel": "Next service",
+    "m_last": "Last service",
+    "m_lastOil": "Last oil change",
+    "m_notYet": "Not recorded yet",
+    "m_oil": "Oil changed",
+    "m_hintBoth": "Set a date, a km or both. Whichever comes first is when it's due.",
+    "sv_nextBoth": "{date} or {km} km, whichever comes first",
+    "sv_kmOnly": "at {km} km",
+    "sv_kmLeft": "{km} km to go",
+    "sv_kmOver": "{km} km over",
     "sh_back": "Back and free to rent",
     "sh_in": "Put in the shop",
     "yr_title": "The year at a glance",

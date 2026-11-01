@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "faltam {km} km",
+    "kmOver": "{km} km passado",
     "title": "Painel",
     "monthlyRevenue": "Receita mensal",
     "outstanding": "A receber",
@@ -1384,6 +1386,11 @@
     "toSendBooking": "Abrir a reserva"
   },
   "money": {
+    "sv_title": "Detalhes da revisão",
+    "sv_oil": "Óleo trocado",
+    "sv_nextDate": "Próxima revisão (data)",
+    "sv_nextKm": "Próxima revisão (km)",
+    "sv_hint": "Defina uma data, km ou ambos. O que vier primeiro vale.",
     "rc_title": "Enviar um recibo",
     "rc_subtitle": "Tire ou escolha uma foto e diga onde ela entra.",
     "rc_pick": "Uma foto do recibo",
@@ -2915,6 +2922,16 @@
     "handoverLateBar": "não entregue, {days, plural, one {# dia} other {# dias}} de atraso"
   },
   "vehiclePage": {
+    "m_nextLabel": "Próxima revisão",
+    "m_last": "Última revisão",
+    "m_lastOil": "Última troca de óleo",
+    "m_notYet": "Ainda não registrado",
+    "m_oil": "Óleo trocado",
+    "m_hintBoth": "Defina uma data, km ou ambos. O que vier primeiro vale.",
+    "sv_nextBoth": "{date} ou {km} km, o que vier primeiro",
+    "sv_kmOnly": "aos {km} km",
+    "sv_kmLeft": "faltam {km} km",
+    "sv_kmOver": "{km} km passado",
     "sh_back": "De volta e livre para alugar",
     "sh_in": "Mandar para a oficina",
     "yr_title": "O ano num relance",

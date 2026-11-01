@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "encore {km} km",
+    "kmOver": "{km} km de dépassement",
     "title": "Tableau de bord",
     "monthlyRevenue": "Revenus mensuels",
     "outstanding": "Montants dus",
@@ -1424,6 +1426,11 @@
     "toSendBooking": "Ouvrir la réservation"
   },
   "money": {
+    "sv_title": "Détails de l'entretien",
+    "sv_oil": "Vidange faite",
+    "sv_nextDate": "Prochain entretien (date)",
+    "sv_nextKm": "Prochain entretien (km)",
+    "sv_hint": "Indiquez une date, des km ou les deux. Le premier atteint fait foi.",
     "rc_title": "Ajouter un reçu",
     "rc_subtitle": "Prenez ou choisissez une photo, puis dites où elle va.",
     "rc_pick": "Une photo du reçu",
@@ -2955,6 +2962,16 @@
     "handoverLateBar": "non remis, {days, plural, one {# jour} many {# jours} other {# jours}} de retard"
   },
   "vehiclePage": {
+    "m_nextLabel": "Prochain entretien",
+    "m_last": "Dernier entretien",
+    "m_lastOil": "Dernière vidange",
+    "m_notYet": "Pas encore enregistré",
+    "m_oil": "Vidange faite",
+    "m_hintBoth": "Indiquez une date, des km ou les deux. Le premier atteint fait foi.",
+    "sv_nextBoth": "{date} ou {km} km, au premier atteint",
+    "sv_kmOnly": "à {km} km",
+    "sv_kmLeft": "encore {km} km",
+    "sv_kmOver": "{km} km de dépassement",
     "sh_back": "De retour, libre à la location",
     "sh_in": "Mettre au garage",
     "yr_title": "L'année en un coup d'œil",

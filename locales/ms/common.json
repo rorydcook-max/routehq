@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "{km} km lagi",
+    "kmOver": "lebih {km} km",
     "title": "Papan pemuka",
     "monthlyRevenue": "Hasil bulanan",
     "outstanding": "Tunggakan",
@@ -1424,6 +1426,11 @@
     "toSendBooking": "Buka tempahan"
   },
   "money": {
+    "sv_title": "Butiran servis",
+    "sv_oil": "Minyak ditukar",
+    "sv_nextDate": "Servis seterusnya (tarikh)",
+    "sv_nextKm": "Servis seterusnya (km)",
+    "sv_hint": "Tetapkan tarikh, km atau kedua-duanya. Yang mana dahulu, itulah tarikh akhirnya.",
     "rc_title": "Muat naik resit",
     "rc_subtitle": "Ambil atau pilih foto, kemudian pilih tempatnya.",
     "rc_pick": "Foto resit",
@@ -2955,6 +2962,16 @@
     "handoverLateBar": "belum diserahkan, lewat {days} hari"
   },
   "vehiclePage": {
+    "m_nextLabel": "Servis seterusnya",
+    "m_last": "Servis terakhir",
+    "m_lastOil": "Tukar minyak terakhir",
+    "m_notYet": "Belum direkod",
+    "m_oil": "Minyak ditukar",
+    "m_hintBoth": "Tetapkan tarikh, km atau kedua-duanya. Yang mana dahulu, itulah tarikh akhirnya.",
+    "sv_nextBoth": "{date} atau {km} km, mana yang dahulu",
+    "sv_kmOnly": "pada {km} km",
+    "sv_kmLeft": "{km} km lagi",
+    "sv_kmOver": "lebih {km} km",
     "sh_back": "Sudah kembali, sedia disewa",
     "sh_in": "Hantar ke bengkel",
     "yr_title": "Setahun sepintas lalu",

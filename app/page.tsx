@@ -356,7 +356,11 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           tone: item.daysLeft < 0 ? "red" : "amber",
           icon: <FileWarning size={17} />,
           title: item.daysLeft < 0 ? t(service ? "paperOverdue" : "paperExpired", { label, name }) : t("paperDue", { label, name }),
-          detail: item.daysLeft < 0 ? t(service ? "overdueSince" : "expiredSince", { date: shortDate(item.date) }) : item.daysLeft === 0 ? t("today") : `${dayLabel(item.date)}`,
+          // Due by km: say how far, not a date.
+          detail:
+            item.kmLeft !== undefined
+              ? t(item.kmLeft < 0 ? "kmOver" : "kmToGo", { km: Math.abs(item.kmLeft).toLocaleString("en-US") })
+              : item.daysLeft < 0 ? t(service ? "overdueSince" : "expiredSince", { date: shortDate(item.date) }) : item.daysLeft === 0 ? t("today") : `${dayLabel(item.date)}`,
           href: `/fleet/${v.id}`,
           action: t("update")
         });

@@ -19,7 +19,11 @@ function overlapDays(start: number, end: number, windowStart: number, windowEnd:
   return to >= from ? Math.round((to - from) / DAY) + 1 : 0;
 }
 
-export type ComplianceItem = { key: string; label: string; date: string; daysLeft: number };
+/** kmLeft: set when the service is due by km (within 500 km, or past it) rather than by date. */
+export type ComplianceItem = { key: string; label: string; date: string; daysLeft: number; kmLeft?: number };
+
+/** A service is flagged this many km before its next-due km. */
+export const SERVICE_KM_WARNING = 500;
 
 export type VehicleFigures = {
   revenue: number;
@@ -38,22 +42,33 @@ const COMPLIANCE_LABELS: Record<string, string> = {
   next_service_date: "Service"
 };
 
-export function complianceItems(metadata: any, today = businessToday()): ComplianceItem[] {
+export function complianceItems(metadata: any, today = businessToday(), mileage?: number | null): ComplianceItem[] {
   const compliance = metadata?.compliance || {};
-  return Object.entries(COMPLIANCE_LABELS)
+  const items = Object.entries(COMPLIANCE_LABELS)
     .map(([key, label]) => {
       const date = String(compliance[key] || "").slice(0, 10);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
-      return { key, label, date, daysLeft: Math.round((toDay(date) - toDay(today)) / DAY) };
+      return { key, label, date, daysLeft: Math.round((toDay(date) - toDay(today)) / DAY) } as ComplianceItem;
     })
-    .filter((item): item is ComplianceItem => Boolean(item))
-    .sort((a, b) => a.daysLeft - b.daysLeft);
+    .filter((item): item is ComplianceItem => Boolean(item));
+
+  // Service by km, whichever comes first: close to (or past) the km, it is due now even if the date is months away.
+  const dueKm = Number(compliance.next_service_mileage || 0);
+  const odometer = Number(mileage || 0);
+  if (dueKm > 0 && odometer > 0 && dueKm - odometer <= SERVICE_KM_WARNING) {
+    const kmLeft = dueKm - odometer;
+    const byKm: ComplianceItem = { key: "next_service_date", label: "Service", date: today, daysLeft: kmLeft < 0 ? -1 : 0, kmLeft };
+    const index = items.findIndex((item) => item.key === "next_service_date");
+    if (index === -1) items.push(byKm);
+    else if (items[index].daysLeft > byKm.daysLeft) items[index] = byKm;
+  }
+  return items.sort((a, b) => a.daysLeft - b.daysLeft);
 }
 
 /** Loads what computeVehicleFigures needs for a whole business. */
 export async function loadFleetFigures(supabase: any, organizationId: string) {
   const [vehicles, rentals, transactions] = await Promise.all([
-    supabase.from("vehicles").select("id, purchase_date, created_at, metadata").eq("organization_id", organizationId).is("deleted_at", null),
+    supabase.from("vehicles").select("id, purchase_date, created_at, mileage, metadata").eq("organization_id", organizationId).is("deleted_at", null),
     supabase.from("rentals").select("vehicle_id, status, start_date, end_date").eq("organization_id", organizationId).is("deleted_at", null),
     supabase.from("transactions").select("vehicle_id, amount, type, is_deposit, voided").eq("organization_id", organizationId).is("deleted_at", null)
   ]);
@@ -101,7 +116,7 @@ export function computeVehicleFigures(input: {
     const rented12 = rentalSpans.reduce((sum, span) => sum + overlapDays(span.start, span.end, windowStart, todayMs), 0);
     const rentedLifetime = rentalSpans.reduce((sum, span) => sum + overlapDays(span.start, span.end, ownedSince, todayMs), 0);
 
-    const compliance = complianceItems(vehicle.metadata, today);
+    const compliance = complianceItems(vehicle.metadata, today, vehicle.mileage);
     // Health reflects paperwork: anything expired costs a lot, anything due within 30 days a little.
     const healthScore = Math.max(
       0,

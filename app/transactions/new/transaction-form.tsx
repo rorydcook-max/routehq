@@ -262,6 +262,12 @@ export function TransactionForm({
   // A shop's rent or a phone bill belongs to the business, not to one vehicle.
   const canSkipVehicle = !isMoneyIn && !/refund|deposit/.test(type);
   const noVehicle = vehicleId === "none";
+  // Work on a car: its service history and next service are filled in from this entry too.
+  const isServiceWork = ["servicing", "maintenance", "repair"].includes(type) && Boolean(vehicleId) && !noVehicle;
+  // The mileage matters for a service: shown, not tucked away.
+  useEffect(() => {
+    if (isServiceWork) setMoreOpen(true);
+  }, [isServiceWork]);
   const linkedBadge = linkedRentalPaymentId ? say("linkedPayment") : linkedTaskId ? say("linkedTask") : "";
   const chooseDirection = (moneyIn: boolean) => {
     setFormOpen(true);
@@ -495,6 +501,28 @@ export function TransactionForm({
               </div>
             </details>
           )}
+
+          {/* Servicing or a repair on a car also goes in its service history; the next service is set here, by date, km or both. */}
+          {isServiceWork ? (
+            <div className="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:col-span-2 sm:grid-cols-2">
+              <p className="text-[14px] font-semibold text-[var(--foreground)] sm:col-span-2">{say("sv_title")}</p>
+              {type !== "repair" ? (
+                <label className="flex items-center gap-3 text-[14px] font-semibold text-[var(--foreground)] sm:col-span-2">
+                  <input className="h-5 w-5 shrink-0" name="oilChanged" type="checkbox" value="true" />
+                  {say("sv_oil")}
+                </label>
+              ) : null}
+              <label className="block">
+                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("sv_nextDate")}</span>
+                <input className={inputClass} name="serviceNextDate" type="date" />
+              </label>
+              <label className="block">
+                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("sv_nextKm")}</span>
+                <input className={inputClass} inputMode="numeric" min="0" name="serviceNextKm" type="number" />
+              </label>
+              <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{say("sv_hint")}</p>
+            </div>
+          ) : null}
 
           {!isMoneyIn && BILLABLE.includes(type) && rentalsForVehicle.length > 0 ? (
             <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:col-span-2">

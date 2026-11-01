@@ -7,6 +7,7 @@ import { ArrowRight, Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, Map
 import { createVehicleTask } from "@/app/actions/tasks";
 import { logVehicleMaintenance, renewVehicleCompliance, setVehicleInShop } from "@/app/actions/vehicles";
 import { OpenFoldsOnHash } from "@/components/open-folds-on-hash";
+import { serviceKmLeft } from "@/lib/vehicle-service";
 import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
 import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
 import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
@@ -630,19 +631,48 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
   const tx = useVx();
   const compliance = detail.vehicle.metadata?.compliance || {};
   const typeName = (type: string) => (tx.has(`mt_${type}`) ? tx.say(`mt_${type}`) : type.replace(/_/g, " "));
+  const km = (value: unknown) => Number(value || 0).toLocaleString("en-US");
+  const nextKm = Number(compliance.next_service_mileage || 0) || null;
+  const kmLeft = serviceKmLeft(compliance, detail.vehicle.mileage);
 
   return (
     <Fold
       id="maintenance"
-      summary={compliance.next_service_date ? tx.say("m_summaryNext", { date: formatDate(compliance.next_service_date, tx) }) : tx.say("m_summaryNone")}
+      summary={
+        compliance.next_service_date
+          ? tx.say("m_summaryNext", { date: nextKm ? tx.say("sv_nextBoth", { date: formatDate(compliance.next_service_date, tx), km: km(nextKm) }) : formatDate(compliance.next_service_date, tx) })
+          : nextKm
+            ? tx.say("m_summaryNext", { date: tx.say("sv_kmOnly", { km: km(nextKm) }) })
+            : tx.say("m_summaryNone")
+      }
       title={tx.say("m_title")}
     >
-      {compliance.next_service_date || compliance.next_service_mileage ? (
+      {/* Next service by date, km or both (whichever comes first), and when it was last serviced and the oil last changed. */}
+      <div className="grid gap-2 sm:grid-cols-3">
         <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
-          <p className="font-bold text-[var(--foreground)]">{tx.say("m_next", { date: formatDate(compliance.next_service_date, tx) })}</p>
-          {compliance.next_service_mileage ? <p className="font-medium text-[var(--foreground-secondary)]">{tx.say("m_atKm", { km: Number(compliance.next_service_mileage).toLocaleString("en-US") })}</p> : null}
+          <p className="font-semibold text-[var(--muted)]">{tx.say("m_nextLabel")}</p>
+          <p className="mt-0.5 font-bold text-[var(--foreground)]">
+            {compliance.next_service_date && nextKm
+              ? tx.say("sv_nextBoth", { date: formatDate(compliance.next_service_date, tx), km: km(nextKm) })
+              : compliance.next_service_date
+                ? formatDate(compliance.next_service_date, tx)
+                : nextKm
+                  ? tx.say("m_atKm", { km: km(nextKm) })
+                  : tx.say("m_notYet")}
+          </p>
+          {kmLeft !== null ? <p className={`font-medium ${kmLeft < 0 ? "text-[var(--danger)]" : kmLeft <= 500 ? "text-[var(--warning)]" : "text-[var(--foreground-secondary)]"}`}>{kmLeft < 0 ? tx.say("sv_kmOver", { km: km(-kmLeft) }) : tx.say("sv_kmLeft", { km: km(kmLeft) })}</p> : null}
         </div>
-      ) : null}
+        <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+          <p className="font-semibold text-[var(--muted)]">{tx.say("m_last")}</p>
+          <p className="mt-0.5 font-bold text-[var(--foreground)]">{compliance.last_service_date ? formatDate(compliance.last_service_date, tx) : tx.say("m_notYet")}</p>
+          {compliance.last_service_mileage ? <p className="font-medium text-[var(--foreground-secondary)]">{tx.say("km", { km: km(compliance.last_service_mileage) })}</p> : null}
+        </div>
+        <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+          <p className="font-semibold text-[var(--muted)]">{tx.say("m_lastOil")}</p>
+          <p className="mt-0.5 font-bold text-[var(--foreground)]">{compliance.last_oil_change_date ? formatDate(compliance.last_oil_change_date, tx) : tx.say("m_notYet")}</p>
+          {compliance.last_oil_change_mileage ? <p className="font-medium text-[var(--foreground-secondary)]">{tx.say("km", { km: km(compliance.last_oil_change_mileage) })}</p> : null}
+        </div>
+      </div>
       <details className="mt-3 scroll-mt-4" id="log-service">
         <summary className="secondary-action pressable inline-flex cursor-pointer list-none [&::-webkit-details-marker]:hidden">
           <Wrench size={17} />
@@ -675,6 +705,11 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
             <span className={labelClass}>{tx.say("m_garage")}</span>
             <input className={inputClass} name="supplier" />
           </label>
+          {/* Some services include an oil change and some don't; when the oil was last changed is tracked on its own. */}
+          <label className="flex items-center gap-3 font-semibold text-[var(--foreground)] sm:col-span-2">
+            <input className="h-5 w-5 shrink-0" name="oilChanged" type="checkbox" value="true" />
+            {tx.say("m_oil")}
+          </label>
           <label className="block">
             <span className={labelClass}>{tx.say("m_nextDate")}</span>
             <input className={inputClass} name="nextDueDate" type="date" />
@@ -683,6 +718,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
             <span className={labelClass}>{tx.say("m_nextKm")}</span>
             <input className={inputClass} inputMode="numeric" min="0" name="nextDueMileage" type="number" />
           </label>
+          <p className="text-[14px] text-[var(--muted)] sm:col-span-2">{tx.say("m_hintBoth")}</p>
           <label className="block sm:col-span-2">
             <span className={labelClass}>{tx.say("m_receipt")}</span>
             <input className="mt-1 w-full" name="receiptFile" type="file" />
@@ -704,7 +740,10 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
             <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5" key={event.id}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[16px] font-bold text-[var(--foreground)]">{typeName(String(event.event_type || ""))}</p>
+                  <p className="text-[16px] font-bold text-[var(--foreground)]">
+                    {typeName(String(event.event_type || ""))}
+                    {(event as any).oil_changed && event.event_type !== "oil_change" ? <span className="ml-2 rounded-full bg-[var(--primary-light)] px-2 py-0.5 text-[13px] font-bold text-[var(--primary)]">{tx.say("m_oil")}</span> : null}
+                  </p>
                   <p className="font-medium text-[var(--foreground-secondary)]">
                     {[formatDate(event.service_date, tx), event.mileage ? tx.say("km", { km: Number(event.mileage).toLocaleString("en-US") }) : null, event.supplier || null].filter(Boolean).join(" · ")}
                   </p>

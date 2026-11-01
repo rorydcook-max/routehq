@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "還剩 {km} 公里",
+    "kmOver": "超出 {km} 公里",
     "title": "儀表板",
     "monthlyRevenue": "每月收入",
     "outstanding": "未完成",
@@ -1384,6 +1386,11 @@
     "toSendBooking": "開啟預約"
   },
   "money": {
+    "sv_title": "保養詳情",
+    "sv_oil": "已換機油",
+    "sv_nextDate": "下次保養（日期）",
+    "sv_nextKm": "下次保養（公里）",
+    "sv_hint": "設定日期、公里數或兩者，以先到者為準。",
     "rc_title": "上傳收據",
     "rc_subtitle": "拍攝或選擇照片，然後選擇歸屬。",
     "rc_pick": "收據照片",
@@ -2915,6 +2922,16 @@
     "handoverLateBar": "未交車，已逾期 {days} 天"
   },
   "vehiclePage": {
+    "m_nextLabel": "下次保養",
+    "m_last": "上次保養",
+    "m_lastOil": "上次換機油",
+    "m_notYet": "尚未記錄",
+    "m_oil": "已換機油",
+    "m_hintBoth": "設定日期、公里數或兩者，以先到者為準。",
+    "sv_nextBoth": "{date} 或 {km} 公里，以先到者為準",
+    "sv_kmOnly": "在 {km} 公里時",
+    "sv_kmLeft": "還剩 {km} 公里",
+    "sv_kmOver": "超出 {km} 公里",
     "sh_back": "已回來，可出租",
     "sh_in": "送修",
     "yr_title": "全年一覽",

@@ -20,6 +20,7 @@ import { notifyPaymentReceived } from "@/lib/line/notifications";
 import { buildPaymentReminderMessage, sendLineMessage } from "@/services/messaging/line";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { findMatchingOutstandingItems } from "@/lib/transaction-matching";
+import { recordService, SERVICE_COST_TYPES } from "@/lib/vehicle-service";
 
 function optionalString(formData: FormData, key: string) {
   return String(formData.get(key) || "").trim() || null;
@@ -599,6 +600,27 @@ export async function createTransaction(formData: FormData) {
     throw new Error(error.message);
   }
 
+  // Servicing or a repair on a car is also work on the car: it goes in the car's service history and moves its next/last service,
+  // the same as logging it from the car page (Rory, 1 Nov 2026).
+  const serviceKind = vehicleId ? SERVICE_COST_TYPES[type] : undefined;
+  if (vehicleId && serviceKind) {
+    await recordService(supabase, {
+      organizationId,
+      vehicleId,
+      userId: user.id,
+      kind: serviceKind,
+      date: transactionDate,
+      mileage: numberField(formData, "mileage"),
+      cost: amount,
+      supplier: optionalString(formData, "supplier"),
+      notes: optionalString(formData, "notes"),
+      nextDueDate: optionalString(formData, "serviceNextDate"),
+      nextDueMileage: numberField(formData, "serviceNextKm"),
+      oilChanged: String(formData.get("oilChanged") || "") === "true",
+      transactionId: data.id
+    });
+  }
+
   // A deposit taken for a booking is held against it (as when recorded from the booking page).
   if (type === "deposit_received" && rentalId) {
     const { data: depositRental } = await supabase
@@ -860,6 +882,14 @@ export async function updateTransaction(transactionId: string, fields: Transacti
     throw new Error(updateError.message);
   }
 
+  // The service or repair it paid for shows the corrected cost, date and car too.
+  await supabase
+    .from("maintenance_events")
+    .update({ cost: Math.abs(amount), service_date: transactionDate, vehicle_id: vehicleId })
+    .eq("transaction_id", transaction.id)
+    .eq("organization_id", transaction.organization_id)
+    .is("deleted_at", null);
+
   const detail = `Transaction corrected: ${oldType} ${niceMoney(oldAmount)} -> ${type} ${niceMoney(amount)}${description ? ` (${description})` : ""}`;
   await recordActivityEvent(supabase, {
     organization_id: transaction.organization_id,
@@ -905,6 +935,9 @@ async function voidTransactions(supabase: any, transactions: any[], userId: stri
     .in("id", ids)
     .is("deleted_at", null);
   if (error) throw new Error(error.message);
+
+  // A service or repair recorded with this money goes with it (deleting removes everything).
+  await supabase.from("maintenance_events").update({ deleted_at: now }).in("transaction_id", ids).is("deleted_at", null);
 
   const paymentIds = transactions.map((transaction) => transaction.rental_payment_id).filter(Boolean);
   const [{ data: byTransaction }, { data: byId }] = await Promise.all([

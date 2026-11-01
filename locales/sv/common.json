@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "{km} km kvar",
+    "kmOver": "{km} km över",
     "title": "Översikt",
     "monthlyRevenue": "Månadsintäkter",
     "outstanding": "Utestående",
@@ -1384,6 +1386,11 @@
     "toSendBooking": "Öppna bokningen"
   },
   "money": {
+    "sv_title": "Servicedetaljer",
+    "sv_oil": "Olja bytt",
+    "sv_nextDate": "Nästa service (datum)",
+    "sv_nextKm": "Nästa service (km)",
+    "sv_hint": "Ange ett datum, km eller båda. Det som kommer först gäller.",
     "rc_title": "Ladda upp ett kvitto",
     "rc_subtitle": "Ta eller välj ett foto och säg var det hör hemma.",
     "rc_pick": "Ett foto av kvittot",
@@ -2915,6 +2922,16 @@
     "handoverLateBar": "inte överlämnad, {days, plural, one {# dag} other {# dagar}} sen"
   },
   "vehiclePage": {
+    "m_nextLabel": "Nästa service",
+    "m_last": "Senaste service",
+    "m_lastOil": "Senaste oljebyte",
+    "m_notYet": "Inte registrerat än",
+    "m_oil": "Olja bytt",
+    "m_hintBoth": "Ange ett datum, km eller båda. Det som kommer först gäller.",
+    "sv_nextBoth": "{date} eller {km} km, det som kommer först",
+    "sv_kmOnly": "vid {km} km",
+    "sv_kmLeft": "{km} km kvar",
+    "sv_kmOver": "{km} km över",
     "sh_back": "Tillbaka och ledig att hyra ut",
     "sh_in": "Lämna på verkstad",
     "yr_title": "Året i korthet",

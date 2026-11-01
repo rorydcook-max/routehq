@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "còn {km} km",
+    "kmOver": "quá {km} km",
     "title": "Bảng điều khiển",
     "monthlyRevenue": "Doanh thu tháng",
     "outstanding": "Công nợ",
@@ -1424,6 +1426,11 @@
     "toSendBooking": "Mở đơn đặt xe"
   },
   "money": {
+    "sv_title": "Chi tiết bảo dưỡng",
+    "sv_oil": "Đã thay dầu",
+    "sv_nextDate": "Bảo dưỡng tiếp theo (ngày)",
+    "sv_nextKm": "Bảo dưỡng tiếp theo (km)",
+    "sv_hint": "Đặt ngày, số km hoặc cả hai. Cái nào đến trước thì tính hạn.",
     "rc_title": "Tải lên hóa đơn",
     "rc_subtitle": "Chụp hoặc chọn ảnh, rồi chọn nơi gắn vào.",
     "rc_pick": "Ảnh hóa đơn",
@@ -2955,6 +2962,16 @@
     "handoverLateBar": "chưa giao xe, trễ {days} ngày"
   },
   "vehiclePage": {
+    "m_nextLabel": "Bảo dưỡng tiếp theo",
+    "m_last": "Bảo dưỡng gần nhất",
+    "m_lastOil": "Thay dầu gần nhất",
+    "m_notYet": "Chưa ghi nhận",
+    "m_oil": "Đã thay dầu",
+    "m_hintBoth": "Đặt ngày, số km hoặc cả hai. Cái nào đến trước thì tính hạn.",
+    "sv_nextBoth": "{date} hoặc {km} km, tùy cái nào đến trước",
+    "sv_kmOnly": "ở {km} km",
+    "sv_kmLeft": "còn {km} km",
+    "sv_kmOver": "quá {km} km",
     "sh_back": "Đã về, sẵn sàng cho thuê",
     "sh_in": "Đưa vào xưởng",
     "yr_title": "Cả năm trong một cái nhìn",

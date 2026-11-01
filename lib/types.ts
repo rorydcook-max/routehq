@@ -32,7 +32,7 @@ export type Vehicle = {
   /** How many compliance dates are expired or due within 30 days. */
   complianceAttentionCount?: number;
   /** Every recorded compliance date, soonest first. */
-  compliance?: Array<{ key: string; label: string; date: string; daysLeft: number }>;
+  compliance?: Array<{ key: string; label: string; date: string; daysLeft: number; kmLeft?: number }>;
 };
 
 export type Rental = {

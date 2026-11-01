@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "noch {km} km",
+    "kmOver": "{km} km drüber",
     "title": "Übersicht",
     "monthlyRevenue": "Monatseinnahmen",
     "outstanding": "Ausstehend",
@@ -1424,6 +1426,11 @@
     "toSendBooking": "Buchung öffnen"
   },
   "money": {
+    "sv_title": "Service-Details",
+    "sv_oil": "Öl gewechselt",
+    "sv_nextDate": "Nächster Service fällig (Datum)",
+    "sv_nextKm": "Nächster Service fällig (km)",
+    "sv_hint": "Datum, km oder beides angeben. Was zuerst eintritt, gilt.",
     "rc_title": "Beleg hochladen",
     "rc_subtitle": "Foto aufnehmen oder wählen, dann zuordnen.",
     "rc_pick": "Ein Foto des Belegs",
@@ -2955,6 +2962,16 @@
     "handoverLateBar": "nicht übergeben, {days, plural, one {# Tag} other {# Tage}} überfällig"
   },
   "vehiclePage": {
+    "m_nextLabel": "Nächster Service",
+    "m_last": "Letzter Service",
+    "m_lastOil": "Letzter Ölwechsel",
+    "m_notYet": "Noch nicht erfasst",
+    "m_oil": "Öl gewechselt",
+    "m_hintBoth": "Datum, km oder beides angeben. Was zuerst eintritt, gilt.",
+    "sv_nextBoth": "{date} oder {km} km, je nachdem, was zuerst kommt",
+    "sv_kmOnly": "bei {km} km",
+    "sv_kmLeft": "noch {km} km",
+    "sv_kmOver": "{km} km drüber",
     "sh_back": "Zurück und frei zum Vermieten",
     "sh_in": "In die Werkstatt",
     "yr_title": "Das Jahr im Überblick",

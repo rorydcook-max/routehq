@@ -1,5 +1,7 @@
 {
   "dashboard": {
+    "kmToGo": "{km} km lagi",
+    "kmOver": "lewat {km} km",
     "title": "Dasbor",
     "monthlyRevenue": "Pendapatan bulanan",
     "outstanding": "Piutang",
@@ -1424,6 +1426,11 @@
     "toSendBooking": "Buka pemesanan"
   },
   "money": {
+    "sv_title": "Detail servis",
+    "sv_oil": "Oli diganti",
+    "sv_nextDate": "Servis berikutnya (tanggal)",
+    "sv_nextKm": "Servis berikutnya (km)",
+    "sv_hint": "Isi tanggal, km, atau keduanya. Mana yang lebih dulu, itu jatuh temponya.",
     "rc_title": "Unggah struk",
     "rc_subtitle": "Ambil atau pilih foto, lalu pilih tujuannya.",
     "rc_pick": "Foto struk",
@@ -2955,6 +2962,16 @@
     "handoverLateBar": "belum diserahkan, terlambat {days} hari"
   },
   "vehiclePage": {
+    "m_nextLabel": "Servis berikutnya",
+    "m_last": "Servis terakhir",
+    "m_lastOil": "Ganti oli terakhir",
+    "m_notYet": "Belum dicatat",
+    "m_oil": "Oli diganti",
+    "m_hintBoth": "Isi tanggal, km, atau keduanya. Mana yang lebih dulu, itu jatuh temponya.",
+    "sv_nextBoth": "{date} atau {km} km, mana yang lebih dulu",
+    "sv_kmOnly": "di {km} km",
+    "sv_kmLeft": "{km} km lagi",
+    "sv_kmOver": "lewat {km} km",
     "sh_back": "Sudah kembali, siap disewa",
     "sh_in": "Masukkan ke bengkel",
     "yr_title": "Setahun sekilas",

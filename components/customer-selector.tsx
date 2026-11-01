@@ -5,8 +5,10 @@ import { shownError } from "@/lib/error-text";
 import { useTranslations, useLocale } from "next-intl";
 import { Plus, Search, UserRound, X } from "lucide-react";
 import { createInlineCustomer } from "@/app/actions/customers";
-import { commonCountries, flagForNationality, phoneCodeOptions, countryLabel } from "@/lib/customer-options";
+import { allCountries, countriesSorted, flagForNationality } from "@/lib/customer-options";
 import { initialsOf } from "@/components/glance";
+import { PhoneField } from "@/components/phone-field";
+import { ContactChoice } from "@/components/contact-choice";
 
 type SelectorCustomer = {
   id: string;
@@ -18,16 +20,6 @@ type SelectorCustomer = {
 
 const inputClass =
   "w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
-
-const contactMethodOptions = [
-  { value: "whatsapp", label: "WhatsApp" },
-  { value: "messenger", label: "Messenger" },
-  { value: "line", label: "LINE" },
-  { value: "telegram", label: "Telegram" },
-  { value: "sms", label: "SMS" },
-  { value: "email", label: "Email" },
-  { value: "phone", label: "" }
-];
 
 export function CustomerSelector({
   customers,
@@ -53,6 +45,9 @@ export function CustomerSelector({
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLDivElement>(null);
   const [contact, setContact] = useState("whatsapp");
+  const nationalityOptions = useMemo(() => countriesSorted(locale), [locale]);
+  const [nationality, setNationality] = useState("Thai");
+  const [nationalityTouched, setNationalityTouched] = useState(false);
 
   const selectedCustomer = localCustomers.find((customer) => customer.id === selectedId);
   const filteredCustomers = useMemo(() => {
@@ -155,41 +150,34 @@ export function CustomerSelector({
           >
                   <input name="organizationId" type="hidden" value={organizationId} />
                   <input className={inputClass} name="fullName" placeholder={say("sel_fullName")} required />
-                  <div className="grid grid-cols-[124px_1fr] gap-2">
-                    <select aria-label={say("sel_countryCode")} className={inputClass} defaultValue="+66" name="phoneCountryCode">
-                      {phoneCodeOptions.map((option) => (
-                        <option key={`selector-${option.code}`} value={option.code}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <input className={inputClass} name="phone" placeholder={say("sel_phone")} required type="tel" />
-                  </div>
-                  <select className={inputClass} defaultValue="Thai" name="nationality" required>
-                    {commonCountries.map((country) => (
+                  {/* Type or paste the whole number; the country code is found from it. */}
+                  <PhoneField
+                    inputClass={inputClass}
+                    onCountryFound={(code) => {
+                      if (nationalityTouched) return;
+                      const found = allCountries.find((country) => country.code === code);
+                      if (found) setNationality(found.name);
+                    }}
+                    required
+                  />
+                  <select
+                    aria-label={say("sel_nationality")}
+                    className={inputClass}
+                    name="nationality"
+                    onChange={(event) => {
+                      setNationality(event.target.value);
+                      setNationalityTouched(true);
+                    }}
+                    required
+                    value={nationality}
+                  >
+                    {nationalityOptions.map((country) => (
                       <option key={country.code} value={country.name}>
-                        {country.flag} {countryLabel(country.code, country.country, locale)}
+                        {country.flag} {country.label}
                       </option>
                     ))}
                   </select>
-                  <div className="rounded-lg border border-[var(--border)] bg-white p-3">
-                    <p className="text-xs font-bold uppercase text-[var(--primary)]">{say("sel_channels")}</p>
-                    <div className="mt-2 grid gap-2">
-                      <select className={inputClass} name="preferredContactMethod" onChange={(event) => setContact(event.target.value)} value={contact}>
-                        {contactMethodOptions.map((method) => (
-                          <option key={`selector-contact-${method.value}`} value={method.value}>
-                            {method.label || say("sel_phoneCall")}
-                          </option>
-                        ))}
-                      </select>
-                      {/* WhatsApp defaults to the phone number, so nothing extra to type for the usual case. */}
-                      {contact === "whatsapp" ? <input className={inputClass} name="whatsappNumber" placeholder={say("sel_whatsappSame")} type="tel" /> : null}
-                      {contact === "email" ? <input className={inputClass} name="email" placeholder={say("sel_email")} type="email" /> : null}
-                      {contact === "messenger" ? <input className={inputClass} name="messengerId" placeholder={say("sel_messenger")} /> : null}
-                      {contact === "line" ? <input className={inputClass} name="lineId" placeholder="@lineusername" /> : null}
-                      {contact === "telegram" ? <input className={inputClass} name="telegramUsername" placeholder="@telegramusername" /> : null}
-                    </div>
-                  </div>
+                  <ContactChoice contact={contact} inputClass={inputClass} say={say} setContact={setContact} />
                   {error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
                   <button className="inline-flex w-full justify-center rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white disabled:opacity-70" disabled={isPending} onClick={handleCreateCustomer} type="button">
                     {isPending ? say("sel_creating") : say("sel_createSelect")}

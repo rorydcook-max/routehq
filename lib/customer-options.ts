@@ -1,5 +1,6 @@
 import { customerLocaleOptions } from "@/lib/i18n/locales";
 import { displayNamesLocale } from "@/lib/i18n/dates";
+import { getCountries, getCountryCallingCode, parsePhoneNumberFromString, type CountryCode } from "libphonenumber-js/min";
 
 /**
  * Nationalities renters on the islands most often have. Thailand first, then by
@@ -68,20 +69,73 @@ export const commonCountries = [
 /** Every language the customer-facing pages and contracts are available in. */
 export const customerLanguages = customerLocaleOptions.map((option) => ({ code: option.code, label: option.label }));
 
-/** Dialling codes with a flag, one entry per code, Thailand first. */
-export const phoneCodeOptions = (() => {
-  const seen = new Set<string>();
-  const options: Array<{ code: string; label: string }> = [];
-  for (const country of commonCountries) {
-    if (seen.has(country.phoneCode)) continue;
-    seen.add(country.phoneCode);
-    const shared = commonCountries.filter((item) => item.phoneCode === country.phoneCode).map((item) => item.flag).join("");
-    options.push({ code: country.phoneCode, label: `${shared} ${country.phoneCode}` });
+/** A flag from a two-letter country code ("FR" -> 🇫🇷). */
+export function flagOf(code: string) {
+  return code.toUpperCase().replace(/./g, (letter) => String.fromCodePoint(127397 + letter.charCodeAt(0)));
+}
+
+const englishRegionNames = (() => {
+  try {
+    return new Intl.DisplayNames(["en"], { type: "region" });
+  } catch {
+    return null;
   }
-  return options;
 })();
 
-export const countryCodes = phoneCodeOptions.map((option) => option.code);
+/**
+ * Every country with a dialling code (Rory, 1 Nov 2026: a renter from Réunion, +262, wasn't in the short list).
+ * Countries in commonCountries keep their saved nationality word ("British"); the rest use the country's name.
+ */
+export const allCountries: Array<{ code: string; name: string; country: string; flag: string; phoneCode: string }> = getCountries().map((code) => {
+  const common = commonCountries.find((item) => item.code === code);
+  const english = englishRegionNames?.of(code) || code;
+  return {
+    code,
+    name: common?.name || english,
+    country: common?.country || english,
+    flag: flagOf(code),
+    phoneCode: `+${getCountryCallingCode(code as CountryCode)}`
+  };
+});
+
+/** Countries in alphabetical order of their name in the reader's language (Rory, 1 Nov 2026: every list like this is alphabetical). */
+export function countriesSorted(locale: string) {
+  let collator: Intl.Collator;
+  try {
+    collator = new Intl.Collator(displayNamesLocale(locale));
+  } catch {
+    collator = new Intl.Collator("en");
+  }
+  return allCountries
+    .map((country) => ({ ...country, label: countryLabel(country.code, country.country, locale) }))
+    .sort((a, b) => collator.compare(a.label, b.label));
+}
+
+/** Dialling codes, one per country, alphabetical by English country name ("🇫🇷 France +33"). */
+export const phoneCodeOptions = countriesSorted("en").map((country) => ({ code: country.phoneCode, country: country.code, label: `${country.flag} ${country.label} ${country.phoneCode}` }));
+
+export const countryCodes = Array.from(new Set(allCountries.map((country) => country.phoneCode)));
+
+/**
+ * Read a typed or pasted phone number (Rory, 1 Nov 2026): "+262 693 47 87 99" or "00262…" finds the country by
+ * itself; a number without a country code stays with the country already chosen.
+ */
+export function readPhone(input: string, fallbackCountry: string) {
+  const cleaned = input.replace(/[^\d+]/g, "").replace(/^00/, "+");
+  if (cleaned.startsWith("+")) {
+    const parsed = parsePhoneNumberFromString(cleaned);
+    if (parsed?.countryCallingCode) {
+      const country = parsed.country || allCountries.find((item) => item.phoneCode === `+${parsed.countryCallingCode}`)?.code || fallbackCountry;
+      return { country, phoneCode: `+${parsed.countryCallingCode}`, national: String(parsed.nationalNumber), detected: true, valid: parsed.isValid() };
+    }
+  }
+  return { country: fallbackCountry, phoneCode: allCountries.find((item) => item.code === fallbackCountry)?.phoneCode || "+66", national: cleaned.replace(/^\+/, ""), detected: false, valid: false };
+}
+
+/** True when the digits are already a valid number for that country without any code. */
+export function isLocalNumber(digits: string, country: string) {
+  return Boolean(parsePhoneNumberFromString(digits, country as CountryCode)?.isValid());
+}
 
 export function flagForNationality(nationality?: string | null) {
   if (!nationality) {
@@ -89,7 +143,7 @@ export function flagForNationality(nationality?: string | null) {
   }
 
   const normalized = nationality.toLowerCase();
-  return commonCountries.find((country) => [country.name, country.country, country.code].some((value) => value.toLowerCase() === normalized))?.flag || "🌐";
+  return allCountries.find((country) => [country.name, country.country, country.code].some((value) => value.toLowerCase() === normalized))?.flag || "🌐";
 }
 
 /** A country's name in the reader's language ("ไทย", "สหราชอาณาจักร"), falling back to the English name kept here. */

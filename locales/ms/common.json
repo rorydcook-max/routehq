@@ -2477,6 +2477,11 @@
     "handoverNotYet": "Belum diisi. Gunakan Mula serahan di bahagian atas apabila pelanggan mengambil kenderaan."
   },
   "newBooking": {
+    "missingDocsHere": "Dokumen tiada. Tambah foto sekarang atau kemudian di halaman pelanggan.",
+    "missingDocsAdd": "Dokumen tiada. Tambah foto sekarang, atau pelanggan menambahnya melalui pautan tempahan.",
+    "docsPassport": "Pasport",
+    "docsLicence": "Lesen memandu",
+    "docsFailed": "Gagal memuat naik. Cuba lagi.",
     "pageBack": "Tempahan",
     "pageTitle": "Tempahan baharu",
     "step_0": "Kenderaan",
@@ -2799,6 +2804,12 @@
     "qp_failed": "Harga tidak dapat disimpan. Cuba lagi."
   },
   "customers": {
+    "sel_nationality": "Kewarganegaraan",
+    "sel_phonePaste": "Telefon, atau tampal nombor penuh",
+    "sel_messengerName": "Nama atau pautan profil (pilihan)",
+    "sel_lineId": "ID LINE atau telefon (pilihan)",
+    "sel_telegramId": "Nama pengguna Telegram atau telefon (pilihan)",
+    "sel_paste": "Tampal",
     "noRentals": "Belum ada sewaan",
     "doc_complete": "Lengkap",
     "doc_missing": "Dokumen tidak lengkap",

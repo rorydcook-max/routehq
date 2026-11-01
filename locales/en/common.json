@@ -2437,6 +2437,11 @@
     "handoverNotYet": "Not filled in yet. Use Start handover at the top when the customer collects the vehicle."
   },
   "newBooking": {
+    "missingDocsHere": "Documents missing. Add photos now or later on the customer's page.",
+    "missingDocsAdd": "Documents missing. Add photos now, or the customer adds them on the booking link.",
+    "docsPassport": "Passport",
+    "docsLicence": "Driving licence",
+    "docsFailed": "Couldn't upload. Try again.",
     "pageBack": "Bookings",
     "pageTitle": "New booking",
     "step_0": "Vehicle",
@@ -2759,6 +2764,12 @@
     "qp_failed": "Couldn't save the price. Try again."
   },
   "customers": {
+    "sel_nationality": "Nationality",
+    "sel_phonePaste": "Phone, or paste the full number",
+    "sel_messengerName": "Their name or profile link (optional)",
+    "sel_lineId": "LINE ID or phone (optional)",
+    "sel_telegramId": "Telegram username or phone (optional)",
+    "sel_paste": "Paste",
     "noRentals": "No rentals yet",
     "doc_complete": "Complete",
     "doc_missing": "Documents missing",

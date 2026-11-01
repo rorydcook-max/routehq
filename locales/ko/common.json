@@ -2437,6 +2437,11 @@
     "handoverNotYet": "아직 작성되지 않았어요. 고객이 차량을 인수할 때 상단의 인도 시작을 사용하세요."
   },
   "newBooking": {
+    "missingDocsHere": "서류가 없습니다. 지금 또는 나중에 고객 페이지에서 사진을 추가하세요.",
+    "missingDocsAdd": "서류가 없습니다. 지금 사진을 추가하거나 고객이 예약 링크에서 추가합니다.",
+    "docsPassport": "여권",
+    "docsLicence": "운전면허증",
+    "docsFailed": "업로드하지 못했습니다. 다시 시도하세요.",
     "pageBack": "예약",
     "pageTitle": "새 예약",
     "step_0": "차량",
@@ -2759,6 +2764,12 @@
     "qp_failed": "요금을 저장하지 못했어요. 다시 시도해 주세요."
   },
   "customers": {
+    "sel_nationality": "국적",
+    "sel_phonePaste": "전화번호 또는 전체 번호 붙여넣기",
+    "sel_messengerName": "이름 또는 프로필 링크(선택)",
+    "sel_lineId": "LINE ID 또는 전화번호(선택)",
+    "sel_telegramId": "텔레그램 사용자명 또는 전화번호(선택)",
+    "sel_paste": "붙여넣기",
     "noRentals": "렌탈 내역 없음",
     "doc_complete": "완료",
     "doc_missing": "서류 부족",

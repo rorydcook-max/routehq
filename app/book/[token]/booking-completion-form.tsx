@@ -1665,13 +1665,17 @@ function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string;
 
   const filtered = useMemo(() => {
     const needle = search.toLowerCase().trim();
-    if (!needle) return NATIONALITIES.slice(0, 25);
-    return NATIONALITIES.filter(
-      (n) =>
-        n.name.toLowerCase().includes(needle) ||
-        n.country.toLowerCase().includes(needle) ||
-        countryName(n).toLowerCase().includes(needle) ||
-        n.code.toLowerCase().includes(needle)
+    // Alphabetical in the renter's language (Rory, 1 Nov 2026: every list like this is alphabetical).
+    const alphabetical = (list: typeof NATIONALITIES) => [...list].sort((a, b) => countryName(a).localeCompare(countryName(b)));
+    if (!needle) return alphabetical(NATIONALITIES);
+    return alphabetical(
+      NATIONALITIES.filter(
+        (n) =>
+          n.name.toLowerCase().includes(needle) ||
+          n.country.toLowerCase().includes(needle) ||
+          countryName(n).toLowerCase().includes(needle) ||
+          n.code.toLowerCase().includes(needle)
+      )
     ).slice(0, 40);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, regionNames]);
@@ -1753,12 +1757,14 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
   const searchRef = useRef<HTMLInputElement | null>(null);
   const selected = phoneCountrySvgOptions.find((country) => country.callingCode === value) || phoneCountrySvgOptions[0];
 
-  const filtered = search.trim()
+  // Alphabetical by country name (Rory, 1 Nov 2026).
+  const filtered = (search.trim()
     ? phoneCountrySvgOptions.filter((c) => {
         const q = search.toLowerCase();
         return c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || c.callingCode.includes(q);
       })
-    : phoneCountrySvgOptions;
+    : [...phoneCountrySvgOptions]
+  ).sort((a, b) => a.name.localeCompare(b.name));
 
   function openDropdown() {
     setOpen(true);

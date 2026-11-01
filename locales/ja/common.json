@@ -2437,6 +2437,11 @@
     "handoverNotYet": "まだ入力されていません。お客様が車両を受け取る際に、上部の「引き渡しを開始」を使ってください。"
   },
   "newBooking": {
+    "missingDocsHere": "書類がありません。今すぐ、または後で顧客ページで写真を追加してください。",
+    "missingDocsAdd": "書類がありません。今すぐ写真を追加するか、顧客が予約リンクから追加します。",
+    "docsPassport": "パスポート",
+    "docsLicence": "運転免許証",
+    "docsFailed": "アップロードできませんでした。もう一度お試しください。",
     "pageBack": "予約",
     "pageTitle": "新規予約",
     "step_0": "車両",
@@ -2759,6 +2764,12 @@
     "qp_failed": "料金を保存できませんでした。もう一度お試しください。"
   },
   "customers": {
+    "sel_nationality": "国籍",
+    "sel_phonePaste": "電話番号（番号全体を貼り付けも可）",
+    "sel_messengerName": "名前またはプロフィールリンク（任意）",
+    "sel_lineId": "LINE ID または電話番号（任意）",
+    "sel_telegramId": "Telegram ユーザー名または電話番号（任意）",
+    "sel_paste": "貼り付け",
     "noRentals": "まだレンタルがありません",
     "doc_complete": "完了",
     "doc_missing": "書類不足",

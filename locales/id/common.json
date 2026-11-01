@@ -2477,6 +2477,11 @@
     "handoverNotYet": "Belum diisi. Gunakan Mulai serah terima di atas saat pelanggan mengambil kendaraan."
   },
   "newBooking": {
+    "missingDocsHere": "Dokumen belum ada. Tambahkan foto sekarang atau nanti di halaman pelanggan.",
+    "missingDocsAdd": "Dokumen belum ada. Tambahkan foto sekarang, atau pelanggan menambahkannya lewat tautan pemesanan.",
+    "docsPassport": "Paspor",
+    "docsLicence": "SIM",
+    "docsFailed": "Gagal mengunggah. Coba lagi.",
     "pageBack": "Pemesanan",
     "pageTitle": "Pemesanan baru",
     "step_0": "Kendaraan",
@@ -2799,6 +2804,12 @@
     "qp_failed": "Harga tidak bisa disimpan. Coba lagi."
   },
   "customers": {
+    "sel_nationality": "Kewarganegaraan",
+    "sel_phonePaste": "Telepon, atau tempel nomor lengkap",
+    "sel_messengerName": "Nama atau tautan profil (opsional)",
+    "sel_lineId": "ID LINE atau telepon (opsional)",
+    "sel_telegramId": "Username Telegram atau telepon (opsional)",
+    "sel_paste": "Tempel",
     "noRentals": "Belum ada sewa",
     "doc_complete": "Lengkap",
     "doc_missing": "Dokumen kurang",

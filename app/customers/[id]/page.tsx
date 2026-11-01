@@ -21,7 +21,7 @@ import { BackLink, Badge, Card, Pane } from "@/components/ui";
 import { DateLeaf, ElapsedBar, Ring, TileHead, initialsOf } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
-import { commonCountries, customerLanguages, flagForNationality, countryLabel } from "@/lib/customer-options";
+import { countriesSorted, customerLanguages, flagForNationality } from "@/lib/customer-options";
 import { getCustomerDetail, getCustomerDocumentCompleteness, type CustomerDetail, refundsOf } from "@/lib/customer-detail";
 import { longDate } from "@/lib/i18n/dates";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -201,9 +201,9 @@ function DetailsForm({ customer, organizationId }: { customer: any; organization
       <input name="customerId" type="hidden" value={customer.id} />
       <input name="organizationId" type="hidden" value={organizationId} />
       <datalist id="customer-country-options">
-        {commonCountries.map((country) => (
+        {countriesSorted(locale).map((country) => (
           <option key={country.code} value={country.name}>
-            {country.flag} {countryLabel(country.code, country.country, locale)}
+            {country.flag} {country.label}
           </option>
         ))}
       </datalist>

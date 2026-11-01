@@ -2437,6 +2437,11 @@
     "handoverNotYet": "Inte ifyllt ännu. Använd Starta överlämning högst upp när kunden hämtar fordonet."
   },
   "newBooking": {
+    "missingDocsHere": "Dokument saknas. Lägg till foton nu eller senare på kundsidan.",
+    "missingDocsAdd": "Dokument saknas. Lägg till foton nu, eller så lägger kunden till dem via bokningslänken.",
+    "docsPassport": "Pass",
+    "docsLicence": "Körkort",
+    "docsFailed": "Uppladdningen misslyckades. Försök igen.",
     "pageBack": "Bokningar",
     "pageTitle": "Ny bokning",
     "step_0": "Fordon",
@@ -2759,6 +2764,12 @@
     "qp_failed": "Det gick inte att spara priset. Försök igen."
   },
   "customers": {
+    "sel_nationality": "Nationalitet",
+    "sel_phonePaste": "Telefon, eller klistra in hela numret",
+    "sel_messengerName": "Namn eller profillänk (valfritt)",
+    "sel_lineId": "LINE-ID eller telefon (valfritt)",
+    "sel_telegramId": "Telegram-användarnamn eller telefon (valfritt)",
+    "sel_paste": "Klistra in",
     "noRentals": "Inga uthyrningar än",
     "doc_complete": "Komplett",
     "doc_missing": "Dokument saknas",

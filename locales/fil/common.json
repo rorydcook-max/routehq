@@ -2437,6 +2437,11 @@
     "handoverNotYet": "Hindi pa napupunan. Gamitin ang Simulan ang pag-abot sa itaas kapag kinuha ng customer ang sasakyan."
   },
   "newBooking": {
+    "missingDocsHere": "Kulang ang dokumento. Magdagdag ng litrato ngayon o mamaya sa page ng customer.",
+    "missingDocsAdd": "Kulang ang dokumento. Magdagdag ng litrato ngayon, o idaragdag ito ng customer sa booking link.",
+    "docsPassport": "Pasaporte",
+    "docsLicence": "Lisensya sa pagmamaneho",
+    "docsFailed": "Hindi na-upload. Subukan ulit.",
     "pageBack": "Mga Booking",
     "pageTitle": "Bagong booking",
     "step_0": "Sasakyan",
@@ -2759,6 +2764,12 @@
     "qp_failed": "Hindi na-save ang presyo. Subukan ulit."
   },
   "customers": {
+    "sel_nationality": "Nasyonalidad",
+    "sel_phonePaste": "Telepono, o i-paste ang buong numero",
+    "sel_messengerName": "Pangalan o link ng profile (opsyonal)",
+    "sel_lineId": "LINE ID o telepono (opsyonal)",
+    "sel_telegramId": "Telegram username o telepono (opsyonal)",
+    "sel_paste": "I-paste",
     "noRentals": "Wala pang rental",
     "doc_complete": "Kumpleto",
     "doc_missing": "Kulang ang dokumento",

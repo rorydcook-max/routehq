@@ -2437,6 +2437,11 @@
     "handoverNotYet": "Ikke fylt ut ennå. Bruk Start overlevering øverst når kunden henter kjøretøyet."
   },
   "newBooking": {
+    "missingDocsHere": "Dokumenter mangler. Legg til bilder nå eller senere på kundesiden.",
+    "missingDocsAdd": "Dokumenter mangler. Legg til bilder nå, eller kunden legger dem til via bookinglenken.",
+    "docsPassport": "Pass",
+    "docsLicence": "Førerkort",
+    "docsFailed": "Opplasting mislyktes. Prøv igjen.",
     "pageBack": "Bestillinger",
     "pageTitle": "Ny bestilling",
     "step_0": "Kjøretøy",
@@ -2759,6 +2764,12 @@
     "qp_failed": "Kunne ikke lagre prisen. Prøv igjen."
   },
   "customers": {
+    "sel_nationality": "Nasjonalitet",
+    "sel_phonePaste": "Telefon, eller lim inn hele nummeret",
+    "sel_messengerName": "Navn eller profillenke (valgfritt)",
+    "sel_lineId": "LINE-ID eller telefon (valgfritt)",
+    "sel_telegramId": "Telegram-brukernavn eller telefon (valgfritt)",
+    "sel_paste": "Lim inn",
     "noRentals": "Ingen utleie ennå",
     "doc_complete": "Fullført",
     "doc_missing": "Manglende dokumenter",

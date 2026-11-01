@@ -2437,6 +2437,11 @@
     "handoverNotYet": "尚未填寫。客戶取車時，請使用上方的「開始交車」。"
   },
   "newBooking": {
+    "missingDocsHere": "缺少證件。現在或稍後在客戶頁面新增照片。",
+    "missingDocsAdd": "缺少證件。現在新增照片，或由客戶透過預訂連結新增。",
+    "docsPassport": "護照",
+    "docsLicence": "駕照",
+    "docsFailed": "上傳失敗，請再試一次。",
     "pageBack": "預訂",
     "pageTitle": "新增預訂",
     "step_0": "車輛",
@@ -2759,6 +2764,12 @@
     "qp_failed": "價格儲存失敗，請再試一次。"
   },
   "customers": {
+    "sel_nationality": "國籍",
+    "sel_phonePaste": "電話，或貼上完整號碼",
+    "sel_messengerName": "姓名或個人檔案連結（選填）",
+    "sel_lineId": "LINE ID 或電話（選填）",
+    "sel_telegramId": "Telegram 使用者名稱或電話（選填）",
+    "sel_paste": "貼上",
     "noRentals": "尚無租車紀錄",
     "doc_complete": "齊全",
     "doc_missing": "缺少文件",

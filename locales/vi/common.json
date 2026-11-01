@@ -2477,6 +2477,11 @@
     "handoverNotYet": "Chưa điền. Dùng nút Bắt đầu giao xe ở phía trên khi khách hàng nhận xe."
   },
   "newBooking": {
+    "missingDocsHere": "Thiếu giấy tờ. Thêm ảnh ngay hoặc sau trên trang khách hàng.",
+    "missingDocsAdd": "Thiếu giấy tờ. Thêm ảnh ngay, hoặc khách tự thêm qua liên kết đặt xe.",
+    "docsPassport": "Hộ chiếu",
+    "docsLicence": "Bằng lái xe",
+    "docsFailed": "Không tải lên được. Thử lại.",
     "pageBack": "Đặt xe",
     "pageTitle": "Đặt xe mới",
     "step_0": "Xe",
@@ -2799,6 +2804,12 @@
     "qp_failed": "Không lưu được giá. Hãy thử lại."
   },
   "customers": {
+    "sel_nationality": "Quốc tịch",
+    "sel_phonePaste": "Số điện thoại, hoặc dán cả số",
+    "sel_messengerName": "Tên hoặc liên kết hồ sơ (không bắt buộc)",
+    "sel_lineId": "LINE ID hoặc số điện thoại (không bắt buộc)",
+    "sel_telegramId": "Tên Telegram hoặc số điện thoại (không bắt buộc)",
+    "sel_paste": "Dán",
     "noRentals": "Chưa có lượt thuê nào",
     "doc_complete": "Đã hoàn tất",
     "doc_missing": "Thiếu giấy tờ",

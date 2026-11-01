@@ -15,25 +15,26 @@ export function DuplicatePhoneHint({ organizationId, codeName = "phoneCountryCod
   useEffect(() => {
     const form = marker.current?.closest("form");
     if (!form) return;
-    const input = form.querySelector<HTMLInputElement>(`[name="${inputName}"]`);
-    const code = form.querySelector<HTMLSelectElement>(`[name="${codeName}"]`);
-    if (!input) return;
+    // The phone field keeps its values in hidden inputs, so listen to the whole form and read them when checking.
     let timer: ReturnType<typeof setTimeout> | undefined;
     let asked = 0;
     const check = () => {
       if (timer) clearTimeout(timer);
       timer = setTimeout(async () => {
+        const input = form.querySelector<HTMLInputElement>(`[name="${inputName}"]`);
+        const code = form.querySelector<HTMLInputElement>(`[name="${codeName}"]`);
+        if (!input?.value) return setMatch(null);
         const ask = ++asked;
         const found = await customerWithPhone(organizationId, code?.value || "+66", input.value).catch(() => null);
         if (ask === asked) setMatch(found);
       }, 450);
     };
-    input.addEventListener("input", check);
-    code?.addEventListener("change", check);
+    form.addEventListener("input", check);
+    form.addEventListener("change", check);
     return () => {
       if (timer) clearTimeout(timer);
-      input.removeEventListener("input", check);
-      code?.removeEventListener("change", check);
+      form.removeEventListener("input", check);
+      form.removeEventListener("change", check);
     };
   }, [organizationId, codeName, inputName]);
 

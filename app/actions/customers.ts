@@ -442,3 +442,49 @@ export async function uploadCustomerDocument(formData: FormData) {
   revalidatePath("/customers");
   revalidatePath(`/customers/${customerId}`);
 }
+
+/**
+ * A passport or driving licence photo added while making a booking (Rory, 1 Nov 2026): a rental that has already
+ * started has no booking link, so the documents are added there and then. Returns the customer's new document status.
+ */
+export async function uploadCustomerDocumentQuick(formData: FormData): Promise<{ success: boolean; error?: string; documentStatus?: string }> {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "You must be signed in." };
+
+  const customerId = String(formData.get("customerId") || "");
+  const organizationId = String(formData.get("organizationId") || "");
+  const category = String(formData.get("category") || "");
+  const file = formData.get("documentFile");
+  if (!customerId || !organizationId || !["passport", "driver_license"].includes(category)) return { success: false, error: "Choose a document to upload." };
+  if (!(file instanceof File) || file.size === 0) return { success: false, error: "Choose a document to upload." };
+
+  try {
+    const documentId = await uploadCustomerDocumentFile({ supabase, file, organizationId, customerId, userId: user.id, category });
+    const { data: documents } = await supabase
+      .from("documents")
+      .select("category")
+      .eq("organization_id", organizationId)
+      .eq("owner_type", "customer")
+      .eq("owner_id", customerId)
+      .is("deleted_at", null);
+    const documentStatus = documentStatusFromCategories((documents || []).map((document: any) => document.category));
+    await supabase.from("customers").update({ document_status: documentStatus }).eq("id", customerId).eq("organization_id", organizationId);
+    await recordActivityEvent(supabase, {
+      organization_id: organizationId,
+      actor_id: user.id,
+      entity_type: "document",
+      entity_id: documentId || customerId,
+      customer_id: customerId,
+      event_type: "customer_document_uploaded",
+      title: "Customer document uploaded",
+      detail: `${category.replace(/_/g, " ")} uploaded while making a booking.`
+    });
+    revalidatePath(`/customers/${customerId}`);
+    return { success: true, documentStatus };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : "Upload failed." };
+  }
+}

@@ -6,7 +6,8 @@ import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
 import { BackLink, Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
-import { commonCountries, countryLabel, customerLanguages, phoneCodeOptions } from "@/lib/customer-options";
+import { countriesSorted, customerLanguages } from "@/lib/customer-options";
+import { PhoneField } from "@/components/phone-field";
 import { DuplicatePhoneHint } from "@/components/duplicate-phone-hint";
 import { getDefaultOrganization } from "@/lib/organization";
 
@@ -21,28 +22,12 @@ function CountryDatalist({ id }: { id: string }) {
   const locale = useLocale();
   return (
     <datalist id={id}>
-      {commonCountries.map((country) => (
+      {countriesSorted(locale).map((country) => (
         <option key={`${id}-${country.code}`} value={country.name}>
-          {country.flag} {countryLabel(country.code, country.country, locale)}
+          {country.flag} {country.label}
         </option>
       ))}
     </datalist>
-  );
-}
-
-function PhoneFields({ codeName, inputName, codeLabel, required = false }: { codeName: string; inputName: string; codeLabel: string; required?: boolean }) {
-  return (
-    <div className="grid grid-cols-[132px_1fr] gap-2">
-      <select aria-label={codeLabel} className={inputClass} defaultValue="+66" name={codeName}>
-        {phoneCodeOptions.map((option) => (
-          <option key={`${codeName}-${option.code}`} value={option.code}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      {/* Spaced like a real number so it reads as an example, not a value already typed in. */}
-      <input className={inputClass} inputMode="tel" name={inputName} placeholder="81 234 5678" required={required} type="tel" />
-    </div>
   );
 }
 
@@ -74,7 +59,7 @@ export default async function NewCustomerPage() {
               </label>
               <label className="block">
                 <span className={labelClass}>{say("f_phone")}</span>
-                <PhoneFields codeLabel={say("new_countryCode")} codeName="phoneCountryCode" inputName="phone" required />
+                <PhoneField defaultCountry={(organization as any).country_code || "TH"} inputClass={inputClass} required />
               </label>
               <DuplicatePhoneHint organizationId={organization.id} />
               <label className="block">
@@ -179,7 +164,7 @@ export default async function NewCustomerPage() {
               </label>
               <label className="block">
                 <span className={labelClass}>{say("new_emPhone")}</span>
-                <PhoneFields codeLabel={say("new_countryCode")} codeName="emergencyPhoneCountryCode" inputName="emergencyContactPhone" />
+                <PhoneField codeName="emergencyPhoneCountryCode" defaultCountry={(organization as any).country_code || "TH"} inputClass={inputClass} inputName="emergencyContactPhone" />
               </label>
             </div>
           </Fold>

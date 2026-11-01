@@ -2437,6 +2437,11 @@
     "handoverNotYet": "Ainda não preenchido. Use Iniciar entrega no topo quando o cliente retirar o veículo."
   },
   "newBooking": {
+    "missingDocsHere": "Faltam documentos. Adicione fotos agora ou depois na página do cliente.",
+    "missingDocsAdd": "Faltam documentos. Adicione fotos agora, ou o cliente as envia pelo link da reserva.",
+    "docsPassport": "Passaporte",
+    "docsLicence": "Carteira de motorista",
+    "docsFailed": "Não foi possível enviar. Tente de novo.",
     "pageBack": "Reservas",
     "pageTitle": "Nova reserva",
     "step_0": "Veículo",
@@ -2759,6 +2764,12 @@
     "qp_failed": "Não foi possível salvar o preço. Tente de novo."
   },
   "customers": {
+    "sel_nationality": "Nacionalidade",
+    "sel_phonePaste": "Telefone, ou cole o número completo",
+    "sel_messengerName": "Nome ou link do perfil (opcional)",
+    "sel_lineId": "ID do LINE ou telefone (opcional)",
+    "sel_telegramId": "Usuário do Telegram ou telefone (opcional)",
+    "sel_paste": "Colar",
     "noRentals": "Nenhum aluguel ainda",
     "doc_complete": "Completo",
     "doc_missing": "Documentos faltando",

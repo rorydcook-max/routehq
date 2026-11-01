@@ -15,6 +15,7 @@ import { ArrowRight, CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPl
 import { DateLeaf } from "@/components/glance";
 import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
+import { QuickDocs } from "@/components/quick-docs";
 import { Badge, ProgressBar } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
 import { findConflict, type BusyPeriod } from "@/lib/rental-conflicts";
@@ -325,6 +326,8 @@ export function BookingForm({
   const [walkInPaymentNote, setWalkInPaymentNote] = useState("");
   const [upfrontEnabled, setUpfrontEnabled] = useState(false);
   const [upfrontPeriods, setUpfrontPeriods] = useState(1);
+  // What is typed in "How many upfront?": it may be empty while the number is being changed (Rory, 1 Nov 2026).
+  const [upfrontDraft, setUpfrontDraft] = useState<string | null>(null);
   const [upfrontRate, setUpfrontRate] = useState(0);
   const formRef = useRef<HTMLFormElement | null>(null);
   const submitIntentRef = useRef<"default" | "booking_link" | "walk_in">("default");
@@ -845,7 +848,18 @@ export function BookingForm({
                 </p>
               ) : null}
               {selectedCustomer.document_status !== "complete" ? (
-                <p className="rounded-lg bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">{say("missingDocs")}</p>
+                <>
+                  {/* A rental that has already started has no booking link, so say only what can be done here. */}
+                  <p className="rounded-lg bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">
+                    {say(bookingMode === "existing_rental" ? "missingDocsHere" : "missingDocsAdd")}
+                  </p>
+                  <QuickDocs
+                    customerId={selectedCustomer.id}
+                    key={selectedCustomer.id}
+                    onStatus={(documentStatus) => setSelectedCustomer((current) => (current ? { ...current, document_status: documentStatus } : current))}
+                    organizationId={organizationId}
+                  />
+                </>
               ) : null}
             </div>
           ) : null}
@@ -1121,10 +1135,14 @@ export function BookingForm({
                   <input
                     className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
                     inputMode="numeric"
-                    min={1}
-                    onChange={(event) => setUpfrontPeriods(Math.max(1, Number(event.target.value) || 1))}
-                    type="number"
-                    value={upfrontPeriods}
+                    onBlur={() => setUpfrontDraft(null)}
+                    onChange={(event) => {
+                      const digits = event.target.value.replace(/[^0-9]/g, "").slice(0, 3);
+                      setUpfrontDraft(digits);
+                      if (Number(digits) >= 1) setUpfrontPeriods(Number(digits));
+                    }}
+                    type="text"
+                    value={upfrontDraft ?? String(upfrontPeriods)}
                   />
                 </label>
                 <label className="block">

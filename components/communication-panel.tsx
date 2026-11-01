@@ -312,13 +312,28 @@ function buildChannels(customer: Customer): Channel[] {
 }
 
 function channelUrl(channel: Channel) {
-  if (channel.key === "messenger") return `https://m.me/${cleanHandle(channel.handle)}`;
+  if (channel.key === "messenger") return messengerUrl(channel.handle);
   if (channel.key === "telegram") return `https://t.me/${cleanHandle(channel.handle)}`;
   if (channel.key === "phone") return `tel:${channel.handle}`;
   if (channel.key === "email") return `mailto:${channel.handle}`;
   if (channel.key === "instagram") return `https://instagram.com/${cleanHandle(channel.handle)}`;
   if (channel.key === "line") return `https://line.me/ti/p/${encodeURIComponent(channel.handle)}`;
   return null;
+}
+
+/**
+ * Messenger may be saved as a pasted link (facebook.com/name, facebook.com/profile.php?id=…, messenger.com/t/…,
+ * m.me/…) or just as the person's name. A link or username opens the chat; a plain name (with spaces) opens
+ * Messenger, where the operator finds them by that name.
+ */
+function messengerUrl(value: string) {
+  const text = value.trim();
+  const id = text.match(/[?&]id=(\d+)/)?.[1];
+  if (id) return `https://m.me/${id}`;
+  const path = text.match(/(?:facebook\.com|fb\.com|messenger\.com\/t|m\.me)\/([^/?#\s]+)/i)?.[1];
+  if (path && path !== "profile.php") return `https://m.me/${path}`;
+  if (/^[A-Za-z0-9.]{3,}$/.test(text)) return `https://m.me/${text}`;
+  return "https://www.messenger.com/";
 }
 
 function cleanHandle(value: string) {

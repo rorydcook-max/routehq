@@ -2477,6 +2477,11 @@
     "handoverNotYet": "Noch nicht ausgefüllt. Nutzen Sie oben „Übergabe starten“, wenn der Kunde das Fahrzeug abholt."
   },
   "newBooking": {
+    "missingDocsHere": "Dokumente fehlen. Fotos jetzt oder später auf der Kundenseite hinzufügen.",
+    "missingDocsAdd": "Dokumente fehlen. Fotos jetzt hinzufügen, oder der Kunde lädt sie über den Buchungslink hoch.",
+    "docsPassport": "Reisepass",
+    "docsLicence": "Führerschein",
+    "docsFailed": "Hochladen fehlgeschlagen. Bitte erneut versuchen.",
     "pageBack": "Buchungen",
     "pageTitle": "Neue Buchung",
     "step_0": "Fahrzeug",
@@ -2799,6 +2804,12 @@
     "qp_failed": "Preis konnte nicht gespeichert werden. Bitte erneut versuchen."
   },
   "customers": {
+    "sel_nationality": "Nationalität",
+    "sel_phonePaste": "Telefon oder ganze Nummer einfügen",
+    "sel_messengerName": "Name oder Profillink (optional)",
+    "sel_lineId": "LINE-ID oder Telefon (optional)",
+    "sel_telegramId": "Telegram-Name oder Telefon (optional)",
+    "sel_paste": "Einfügen",
     "noRentals": "Noch keine Mieten",
     "doc_complete": "Vollständig",
     "doc_missing": "Dokumente fehlen",

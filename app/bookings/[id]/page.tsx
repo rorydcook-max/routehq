@@ -815,7 +815,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 </summary>
                 {/* Only the buttons in this row are stretched: the cancel and change-vehicle dialogs open from inside it,
                     and stretching every button in them squeezed the dialog's heading into a sliver beside its close button. */}
-                <div className="mt-2 flex flex-wrap gap-2 [&>*]:flex-1 [&>a]:w-full [&>button]:w-full [&>*>button]:w-full [&>button]:!min-h-11 [&>button]:!rounded-full [&>button]:!border-2 [&>button]:!px-4 [&>button]:!text-[15px] [&>button]:!font-bold lg:mt-0 lg:[&>*]:flex-none lg:[&>a]:w-auto lg:[&>button]:w-auto">
+                {/* Every button here the same: one height, one line, the same text (Rory, 1 Nov 2026: "Cancel booking" wrapped
+                    to two lines and made its row taller than the rest). */}
+                <div className="mt-2 grid grid-cols-2 gap-2 [&>a]:!h-11 [&>a]:!min-h-0 [&>a]:overflow-hidden [&>a]:whitespace-nowrap [&>a]:!px-3 [&>a]:!text-[15px] [&>button]:!h-11 [&>button]:!min-h-0 [&>button]:w-full [&>button]:overflow-hidden [&>button]:whitespace-nowrap [&>button]:!rounded-full [&>button]:!border-2 [&>button]:!px-3 [&>button]:!text-[15px] [&>button]:!font-bold [&_svg]:shrink-0 lg:mt-0 lg:flex lg:flex-wrap lg:[&>a]:w-auto lg:[&>button]:w-auto">
               <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
                 {tx.say("editBooking")}
               </ActionButton>

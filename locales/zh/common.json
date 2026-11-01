@@ -2477,6 +2477,11 @@
     "handoverNotYet": "尚未填写。客户取车时，请使用顶部的“开始交车”。"
   },
   "newBooking": {
+    "missingDocsHere": "缺少证件。现在或稍后在客户页面添加照片。",
+    "missingDocsAdd": "缺少证件。现在添加照片，或由客户通过预订链接添加。",
+    "docsPassport": "护照",
+    "docsLicence": "驾照",
+    "docsFailed": "上传失败，请重试。",
     "pageBack": "预订",
     "pageTitle": "新预订",
     "step_0": "车辆",
@@ -2799,6 +2804,12 @@
     "qp_failed": "价格保存失败，请重试。"
   },
   "customers": {
+    "sel_nationality": "国籍",
+    "sel_phonePaste": "电话，或粘贴完整号码",
+    "sel_messengerName": "姓名或主页链接（可选）",
+    "sel_lineId": "LINE ID 或电话（可选）",
+    "sel_telegramId": "Telegram 用户名或电话（可选）",
+    "sel_paste": "粘贴",
     "noRentals": "暂无租车记录",
     "doc_complete": "已完成",
     "doc_missing": "缺少证件",

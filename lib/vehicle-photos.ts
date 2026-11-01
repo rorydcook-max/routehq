@@ -24,7 +24,9 @@ export async function vehiclePhotoUrls(client: any, organizationId: string, perV
 
   const chosen = new Map<string, string[]>();
   for (const [vehicleId, list] of byVehicle) {
-    chosen.set(vehicleId, list.sort((a, b) => a.order - b.order || a.index - b.index).slice(0, perVehicle).map((item) => item.path));
+    // The same order as the vehicle page (lib/vehicle-detail.ts): photos with a set place first, in that order; the
+    // rest newest first (Rory, 1 Nov 2026: the Ranger's thumbnail was its oldest photo, not the main one).
+    chosen.set(vehicleId, list.sort((a, b) => a.order - b.order || b.index - a.index).slice(0, perVehicle).map((item) => item.path));
   }
   const paths = [...chosen.values()].flat();
   const signedByPath = new Map<string, string>();

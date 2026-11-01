@@ -1221,3 +1221,46 @@ export async function setVehicleRate(formData: FormData): Promise<{ success: boo
   revalidatePath(`/fleet/${vehicleId}`);
   return { success: true };
 }
+
+/**
+ * In the shop, or back and free to rent (Rory, 1 Nov 2026: there was no way to take a car out of "In the shop").
+ * Only between those two: a car on rent or booked follows its booking.
+ */
+export async function setVehicleInShop(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("You must be signed in.");
+  const membership = await getCurrentMembership();
+  if (!membership) throw new Error("You must be signed in.");
+  const vehicleId = String(formData.get("vehicleId") || "");
+  const inShop = String(formData.get("inShop") || "") === "true";
+  const { data: vehicle } = await supabase
+    .from("vehicles")
+    .select("id, status, make, model, registration_number")
+    .eq("id", vehicleId)
+    .eq("organization_id", membership.organizationId)
+    .maybeSingle();
+  if (!vehicle) throw new Error("Vehicle not found.");
+  if (!["available", "maintenance"].includes(String(vehicle.status || ""))) return;
+  const { error } = await supabase
+    .from("vehicles")
+    .update(inShop ? { status: "maintenance", availability_status: "offline" } : { status: "available", availability_status: "available_now" })
+    .eq("id", vehicleId)
+    .eq("organization_id", membership.organizationId);
+  if (error) throw new Error(error.message);
+  await recordActivityEvent(supabase, {
+    organization_id: membership.organizationId,
+    actor_id: user.id,
+    entity_type: "vehicle",
+    entity_id: vehicleId,
+    vehicle_id: vehicleId,
+    event_type: inShop ? "vehicle_in_shop" : "vehicle_back_in_service",
+    title: inShop ? "Vehicle in the shop" : "Vehicle back and free to rent",
+    detail: [vehicle.make, vehicle.model, vehicle.registration_number].filter(Boolean).join(" ")
+  });
+  revalidatePath("/fleet");
+  revalidatePath(`/fleet/${vehicleId}`);
+  revalidatePath("/");
+}

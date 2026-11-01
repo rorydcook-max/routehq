@@ -7,6 +7,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { shortDate } from "@/lib/i18n/dates";
 import { createTransaction, findTransactionMatches } from "@/app/actions/transactions";
 import { PendingButton } from "@/components/pending-button";
+import { smallReceipt } from "@/components/receipt-attach";
+import { takePendingReceipt } from "@/components/receipt-handoff";
 import { Card } from "@/components/ui";
 import { TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import type { MatchResult } from "@/lib/transaction-matching";
@@ -194,15 +196,34 @@ export function TransactionForm({
   const snapInput = useRef<HTMLInputElement>(null);
   useEffect(() => () => { if (receiptPreview) URL.revokeObjectURL(receiptPreview); }, [receiptPreview]);
 
-  async function readReceiptPhoto(file: File) {
-    setReadError("");
-    setRead(null);
-    // The same picture is kept as the cost's receipt.
-    if (receiptInput.current && receiptInput.current.files?.[0] !== file) {
+  /** Puts the photo in the form's receipt field, made small first so a phone photo isn't turned away on saving. */
+  async function keepReceipt(original: File) {
+    const file = await smallReceipt(original);
+    if (receiptInput.current) {
       const transfer = new DataTransfer();
       transfer.items.add(file);
       receiptInput.current.files = transfer.files;
     }
+    return file;
+  }
+
+  // Came from "Upload a receipt": the photo is already chosen. A cost is read and filled in; a payment just keeps it.
+  useEffect(() => {
+    const handed = takePendingReceipt();
+    if (!handed) return;
+    if (MONEY_IN.includes(type)) {
+      void keepReceipt(handed);
+      setReceiptPreview(handed.type.startsWith("image/") ? URL.createObjectURL(handed) : "");
+    } else {
+      void readReceiptPhoto(handed);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function readReceiptPhoto(original: File) {
+    setReadError("");
+    setRead(null);
+    const file = await keepReceipt(original);
     setReceiptPreview(file.type.startsWith("image/") ? URL.createObjectURL(file) : "");
     setReading(true);
     try {
@@ -567,6 +588,7 @@ export function TransactionForm({
                 // Picked here with nothing typed yet: read it, the same as the button at the top.
                 const file = event.target.files?.[0];
                 if (file && !isMoneyIn && !amount && !reading) void readReceiptPhoto(file);
+                else if (file) void keepReceipt(file);
               }}
               ref={receiptInput}
               type="file"

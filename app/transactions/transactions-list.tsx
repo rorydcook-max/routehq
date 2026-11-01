@@ -7,6 +7,7 @@ import { shownError } from "@/lib/error-text";
 import { ArrowDownLeft, ArrowUpRight, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Plus, Search, Trash2, X } from "lucide-react";
 import { Dot } from "@/components/glance";
 import { EmptyState } from "@/components/ui";
+import { ReceiptAttach } from "@/components/receipt-attach";
 import { useLocale, useTranslations } from "next-intl";
 import { dateFormat } from "@/lib/i18n/dates";
 
@@ -107,9 +108,10 @@ function TransactionEditForm({
         <label>
           {tx.say("f_amount")}
           <div className="relative mt-1">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]">฿</span>
+            {/* The ฿ sits right against the number, as it is written (Rory, 1 Nov 2026: the gap looked odd). */}
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--foreground)]">฿</span>
             <input
-              className="w-full !pl-9"
+              className="w-full !pl-7"
               min="0"
               onChange={(event) => setAmount(event.target.value)}
               step="0.01"
@@ -152,6 +154,7 @@ function TransactionEditForm({
           <input className="mt-1 w-full" onChange={(event) => setNotes(event.target.value)} value={notes} />
         </label>
       </div>
+      <ReceiptAttach receiptDocumentId={transaction.receiptDocumentId} transactionId={transaction.id} />
       {error ? <p className="mt-2 rounded-xl bg-[var(--danger-light)] px-3 py-2 text-[14px] font-semibold text-[var(--danger)]">{error}</p> : null}
       <div className="mt-3 flex flex-wrap justify-end gap-2">
         <button className="secondary-action pressable min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={isPending} onClick={onCancel} type="button">

@@ -1,6 +1,6 @@
 "use client";
 
-import { Car, CarFront, ClipboardCheck, ReceiptText, RotateCcw, UploadCloud, UserPlus, X } from "lucide-react";
+import { Camera, Car, CarFront, ClipboardCheck, ReceiptText, RotateCcw, UploadCloud, UserPlus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { Route } from "next";
@@ -13,7 +13,9 @@ const everyday: Action[] = [
   { key: "newBooking", href: "/bookings/new", icon: CarFront },
   { key: "handOver", href: "/inspections/start/delivery" as Route, icon: ClipboardCheck },
   { key: "takeBack", href: "/inspections/start/return" as Route, icon: RotateCcw },
-  { key: "recordMoney", href: "/transactions/new", icon: ReceiptText }
+  { key: "recordMoney", href: "/transactions/new", icon: ReceiptText },
+  // A photo first, then where it goes: a new entry, one already recorded, or a payment being waited for (Rory, 1 Nov 2026).
+  { key: "uploadReceipt", href: "/receipts/new" as Route, icon: Camera }
 ];
 
 const lessOften: Action[] = [

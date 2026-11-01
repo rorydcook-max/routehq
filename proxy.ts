@@ -51,7 +51,7 @@ function missingSiteContent(path: string, locale: string) {
 
 /** The app's and website's own top-level pages: on rove.rent these still go to RoveHQ, never read as a business's name. */
 const APP_TOP_LEVEL = new Set(
-  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,faq,guides,home,pricing,resources,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko".split(",")
+  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,faq,guides,home,pricing,resources,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko".split(",")
 );
 
 /** Search engines and link previews: never sent to a language by their Accept-Language (they index each address as it is). */

@@ -5,7 +5,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowRight, Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, MapPin, PenLine, ReceiptText, ShieldCheck, Wrench } from "lucide-react";
 import { createVehicleTask } from "@/app/actions/tasks";
-import { logVehicleMaintenance, renewVehicleCompliance } from "@/app/actions/vehicles";
+import { logVehicleMaintenance, renewVehicleCompliance, setVehicleInShop } from "@/app/actions/vehicles";
+import { OpenFoldsOnHash } from "@/components/open-folds-on-hash";
 import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
 import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
 import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
@@ -153,7 +154,8 @@ function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; stat
   const shown = [recordMoney, edit].filter((action) => action.label !== primary.label);
   const more = [
     { href: detailUrl("/bookings/new", vehicleId), label: tx.say("a_newBooking"), icon: CalendarDays },
-    { href: "#upkeep", label: tx.say("a_logMaintenance"), icon: Wrench },
+    // Opens Paperwork & service with the service form already open (Rory, 1 Nov 2026: it went to a folded card and seemed to do nothing).
+    { href: "#log-service", label: tx.say("a_logMaintenance"), icon: Wrench },
     { href: `/inspections/condition/${vehicleId}`, label: tx.say("a_condition"), icon: ClipboardCheck },
     { href: `/transactions/new?fine=1&vehicleId=${vehicleId}`, label: tx.say("a_fine"), icon: ReceiptText }
   ].filter((action) => action.label !== primary.label);
@@ -188,6 +190,17 @@ function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; stat
               </Link>
             );
           })}
+          {/* Free cars can be taken off the road while they're being fixed; booked and rented ones follow their booking. */}
+          {status === "available" ? (
+            <form action={setVehicleInShop}>
+              <input name="vehicleId" type="hidden" value={vehicleId} />
+              <input name="inShop" type="hidden" value="true" />
+              <PendingButton className="pressable secondary-action w-full !px-3 text-center leading-tight" pendingLabel={tx.say("saving")} type="submit">
+                <Wrench className="shrink-0" size={18} />
+                {tx.say("sh_in")}
+              </PendingButton>
+            </form>
+          ) : null}
         </div>
       </details>
     </div>
@@ -630,7 +643,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
           {compliance.next_service_mileage ? <p className="font-medium text-[var(--foreground-secondary)]">{tx.say("m_atKm", { km: Number(compliance.next_service_mileage).toLocaleString("en-US") })}</p> : null}
         </div>
       ) : null}
-      <details className="mt-3">
+      <details className="mt-3 scroll-mt-4" id="log-service">
         <summary className="secondary-action pressable inline-flex cursor-pointer list-none [&::-webkit-details-marker]:hidden">
           <Wrench size={17} />
           {tx.say("m_log")}
@@ -1067,6 +1080,16 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
                     ) : (
                       <Badge tone={statusTone}>{tx.has(`vs_${status}`) ? tx.say(`vs_${status}`) : vehicle.status}</Badge>
                     )}
+                    {/* In the shop: one tap puts it back on the road (Rory, 1 Nov 2026). */}
+                    {status === "maintenance" ? (
+                      <form action={setVehicleInShop}>
+                        <input name="vehicleId" type="hidden" value={vehicle.id} />
+                        <input name="inShop" type="hidden" value="false" />
+                        <PendingButton className="pressable inline-flex min-h-9 items-center gap-1.5 rounded-full bg-[var(--success)] px-3.5 text-sm font-bold text-white" pendingLabel={tx.say("saving")} type="submit">
+                          {tx.say("sh_back")}
+                        </PendingButton>
+                      </form>
+                    ) : null}
                   </div>
                   {/* The one vehicle header: name, year, plate chip. */}
                   <VehicleTitle
@@ -1090,7 +1113,8 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
         <ActiveRentalCard detail={detail} dueNow={dueNow} />
         <Glance detail={detail} isOwner={isOwner} />
         <YearSection detail={detail} />
-        <PageTabs aliases={{ maintenance: "upkeep", inspections: "checks" }} initial={firstTab} label={tx.say("tab_label")} tabs={tabs} />
+        <OpenFoldsOnHash hash="log-service" ids={["maintenance", "log-service"]} />
+        <PageTabs aliases={{ maintenance: "upkeep", inspections: "checks", "log-service": "upkeep" }} initial={firstTab} label={tx.say("tab_label")} tabs={tabs} />
       </div>
     </AppShell>
   );

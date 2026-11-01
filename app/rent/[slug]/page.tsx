@@ -6,6 +6,7 @@ import { Catalog } from "./catalog";
 import { EmbedHeight } from "./embed-height";
 import { getTranslations } from "next-intl/server";
 import { CustomerLanguagePicker } from "@/components/customer-language-picker";
+import { renterUrl } from "@/lib/booking-address";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const catalog = await getPublicCatalog(slug);
   const t = await getTranslations("customer");
-  return { title: catalog ? `${catalog.name} · ${t("bookAVehicle")}` : t("bookAVehicle") };
+  // One address for search engines (Rory, 1 Nov 2026): the business's own domain or subdomain when it has one,
+  // else rove.rent/<slug>, however the page was reached.
+  const canonical = catalog && catalog.enabled ? catalog.canonicalUrl : `${renterUrl()}/${slug}`;
+  return { title: catalog ? `${catalog.name} · ${t("bookAVehicle")}` : t("bookAVehicle"), alternates: { canonical } };
 }
 
 function Notice({ title, message }: { title: string; message: string }) {

@@ -551,6 +551,8 @@ export async function updateOwnerSignature(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/bookings/new");
   revalidatePath("/settings/signature");
+  // Settings shows the signature too (Rory, 1 Nov 2026: a new one saved but the old one still showed there).
+  revalidatePath("/settings");
 
   if (replacingSignature) {
     await recordActivityEvent(supabase, {

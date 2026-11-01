@@ -27,9 +27,9 @@ export function RouteHqLogo({ className, product = "fleet", showDescriptor = tru
       <RouteHqMark className="h-10 w-10 shrink-0" navy={onDark ? "#ffffff" : "var(--logo-ink, #1B2430)"} teal={onDark ? "var(--band-logo-accent, #12BCB8)" : "#06B6B6"} />
       <div className="min-w-0">
         <div className="flex items-baseline whitespace-nowrap text-[1.35rem] font-black leading-none tracking-[-0.04em]">
-          {/* RoveHQ (31 Oct 2026): "Rove" + teal "HQ"; the renter site is "Rove" + teal ".rent", its address. */}
+          {/* RoveHQ (31 Oct 2026): "Rove" + teal "HQ"; the renter site is just "Rove" (Rory, 1 Nov 2026). */}
           <span className={onDark ? "text-white" : "text-[var(--logo-ink,#1B2430)]"}>Rove</span>
-          <span className={onDark ? "text-[var(--band-logo-accent,#12BCB8)]" : "text-[#06B6B6]"}>{product === "keys" ? ".rent" : "HQ"}</span>
+          {product === "keys" ? null : <span className={onDark ? "text-[var(--band-logo-accent,#12BCB8)]" : "text-[#06B6B6]"}>HQ</span>}
         </div>
         {/* No English strapline under the name: the name is enough, in every language. */}
       </div>

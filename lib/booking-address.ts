@@ -176,7 +176,9 @@ export type BookingAddressOrg = Plan & { slug: string; booking_subdomain?: strin
 export function bookingAddress(org: BookingAddressOrg): { url: string; kind: "domain" | "subdomain" | "path" } {
   if (org.custom_domain && org.custom_domain_status === "live" && canUseOwnDomain(org)) return { url: `https://${org.custom_domain}`, kind: "domain" };
   if (org.booking_subdomain && canUseSubdomain(org)) return { url: subdomainUrl(org.booking_subdomain), kind: "subdomain" };
-  return { url: `${appUrl()}/rent/${org.slug}`, kind: "path" };
+  // On Rove, the renter site, at its short address (Rory, 1 Nov 2026): rove.rent/<slug>. rovehq.app/rent/<slug>
+  // still works for links already shared.
+  return { url: `${renterUrl()}/${org.slug}`, kind: "path" };
 }
 
 /**

@@ -7,6 +7,7 @@ import { businessToday } from "@/lib/business-time";
 import { kindFromCategory, type VehicleKind } from "@/lib/vehicle-groups";
 import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { vehiclePhotoUrls } from "@/lib/vehicle-photos";
+import { bookingAddress } from "@/lib/booking-address";
 
 /**
  * The public booking page: anyone with the link sees a business's vehicles,
@@ -125,6 +126,8 @@ export async function getPublicCatalog(slug: string) {
     enabled: true as const,
     organizationId: String(organization.id),
     name: String(organization.name || "Vehicle rental"),
+    /** The business's own booking address (its domain, subdomain or rove.rent/<slug>): the one search engines are told. */
+    canonicalUrl: bookingAddress(organization as any).url,
     logoUrl: (branding as any)?.logoUrl || null,
     brandColour: (organization.contract_accent_colour as string | null) || null,
     location: String(orgSettings.main_location?.label || orgSettings.location || ""),

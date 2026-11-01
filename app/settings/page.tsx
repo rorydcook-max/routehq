@@ -39,7 +39,7 @@ import { UsualDepositPanel } from "@/app/settings/usual-deposit-panel";
 import { PartnerNetworkPanel } from "@/app/settings/partner-network-panel";
 import { DirectoryPanel } from "@/app/settings/directory-panel";
 import { BookingAddressPanel } from "@/app/settings/booking-address-panel";
-import { bookingAddress, canUseOwnDomain, canUseSubdomain, cleanSubdomain, rootDomain, subdomainUrl } from "@/lib/booking-address";
+import { bookingAddress, canUseOwnDomain, canUseSubdomain, cleanSubdomain, renterUrl, rootDomain, subdomainUrl } from "@/lib/booking-address";
 import { canBeListed, directorySettings } from "@/lib/directory";
 import { partnerNetworkSettings } from "@/lib/partner-network";
 import { FINDERS_FEE_PCT } from "@/lib/plans";
@@ -562,19 +562,23 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               slug={organization.slug}
               totalVehicles={publicVehicleCounts.total}
             />
-          </Fold>
-          <Fold id="booking-address" summary={bookingAddress(addressOrg).url.replace(/^https?:\/\//, "")} title={say("ba_title")}>
-            <BookingAddressPanel
-              canDomain={canUseOwnDomain(addressOrg)}
-              canSubdomain={canUseSubdomain(addressOrg)}
-              domain={addressOrg.custom_domain || null}
-              domainStatus={addressOrg.custom_domain_status || null}
-              pathUrl={`${String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "")}/rent/${organization.slug}`}
-              rootDomain={rootDomain()}
-              subdomain={addressOrg.booking_subdomain || null}
-              subdomainUrl={addressOrg.booking_subdomain ? subdomainUrl(addressOrg.booking_subdomain) : null}
-              suggestion={cleanSubdomain(String(organization.name || organization.slug).replace(/\b(car|cars|rent|rental|rentals|test\d*)\b/gi, "")) || cleanSubdomain(organization.slug).slice(0, 20)}
-            />
+            {/* The page and its address in one place (Rory, 1 Nov 2026): no separate "booking address" card. */}
+            <div className="mt-4 border-t border-[var(--border)] pt-4" id="booking-address">
+              <h3 className="font-bold text-[var(--foreground)]">{say("ba_title")}</h3>
+              <div className="mt-2">
+                <BookingAddressPanel
+                  canDomain={canUseOwnDomain(addressOrg)}
+                  canSubdomain={canUseSubdomain(addressOrg)}
+                  domain={addressOrg.custom_domain || null}
+                  domainStatus={addressOrg.custom_domain_status || null}
+                  pathUrl={`${renterUrl()}/${organization.slug}`}
+                  rootDomain={rootDomain()}
+                  subdomain={addressOrg.booking_subdomain || null}
+                  subdomainUrl={addressOrg.booking_subdomain ? subdomainUrl(addressOrg.booking_subdomain) : null}
+                  suggestion={cleanSubdomain(String(organization.name || organization.slug).replace(/\b(car|cars|rent|rental|rentals|test\d*)\b/gi, "")) || cleanSubdomain(organization.slug).slice(0, 20)}
+                />
+              </div>
+            </div>
           </Fold>
           <Fold id="directory" summary={directorySettings(organization.settings).enabled && canBeListed(organization as any) && publicBookingSettings(organization.settings).enabled ? stateLine("st_dirOn", true) : stateLine("st_dirOff", false)} title={say("dir_title")}>
             <DirectoryPanel

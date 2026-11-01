@@ -49,6 +49,11 @@ function missingSiteContent(path: string, locale: string) {
   }
 }
 
+/** The app's and website's own top-level pages: on rove.rent these still go to RoveHQ, never read as a business's name. */
+const APP_TOP_LEVEL = new Set(
+  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,faq,guides,home,pricing,resources,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko".split(",")
+);
+
 /** Search engines and link previews: never sent to a language by their Accept-Language (they index each address as it is). */
 const BOT = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|lighthouse|headless/i;
 
@@ -61,6 +66,14 @@ export async function proxy(request: NextRequest) {
   // Rove (rove.rent), the renter booking site: its home is the /rent search; booking links work there too;
   // anything else (the operator app, the RoveHQ website) belongs on rovehq.app.
   if (isRenterHost(requestHost)) {
+    // A business's booking page at its short address, rove.rent/<their-name> (Rory, 1 Nov 2026): served from
+    // /rent/<their-name>. One renter domain for the search page and every business's page.
+    if (/^\/[a-z0-9][a-z0-9-]{1,62}$/.test(pathname) && !isRenterSitePath(pathname) && !APP_TOP_LEVEL.has(pathname.slice(1))) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/rent${pathname}`;
+      request.headers.set("x-routehq-customer-page", "1");
+      return NextResponse.rewrite(url, { request });
+    }
     if (!isRenterSitePath(pathname)) {
       const appHome = String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "");
       if (!/\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(appHome)) return NextResponse.redirect(new URL(`${pathname}${request.nextUrl.search}`, appHome));

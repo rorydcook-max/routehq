@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { updateOwnerSignature } from "@/app/actions/settings";
 import { SignaturePad } from "@/components/signature-pad";
 
@@ -37,6 +38,7 @@ export function SignatureUploadSection({
   }
 
   function handleRemove() {
+    setJustSaved("");
     const fd = new FormData();
     fd.set("remove_signature", "true");
     submit(fd);
@@ -98,6 +100,9 @@ export function SignatureUploadSection({
   // The drawn signature, saved as a PNG the same way an uploaded one is.
   const [drawn, setDrawn] = useState("");
   const [padKey, setPadKey] = useState(0);
+  // The signature just saved shows straight away, before the page's own copy is fetched again.
+  const [justSaved, setJustSaved] = useState("");
+  const router = useRouter();
   function saveDrawn() {
     if (!acknowledgementRef.current?.checked) {
       setMessage({ text: say("sg_tick"), type: "error" });
@@ -117,8 +122,10 @@ export function SignatureUploadSection({
         fd.set("authorised_signatory_title", authorisedSignatoryTitle || "");
         await updateOwnerSignature(fd);
         setMessage({ text: say("sg_saved"), type: "success" });
+        setJustSaved(drawn);
         setReplacing(false);
         setDrawn("");
+        router.refresh();
         setPadKey((value) => value + 1);
       } catch {
         setMessage({ text: say("sg_failed"), type: "error" });
@@ -128,15 +135,16 @@ export function SignatureUploadSection({
 
   function picked() {
     if (!fileRef.current?.files?.[0]) return;
+    setJustSaved(URL.createObjectURL(fileRef.current.files[0]));
     handleReplace();
     fileRef.current.value = "";
   }
 
-  const preview = signatureUrl ? (
+  const preview = signatureUrl || justSaved ? (
     <img
       alt={orgName}
       className="stay-light h-16 w-40 shrink-0 rounded-xl bg-white object-contain p-2 ring-1 ring-[var(--border)]"
-      src={signatureUrl}
+      src={justSaved || signatureUrl || ""}
     />
   ) : (
     <div aria-hidden="true" className="flex h-16 w-40 shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-[var(--border-strong)] bg-white text-sm font-semibold text-[var(--muted)]">

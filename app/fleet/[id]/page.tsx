@@ -8,6 +8,7 @@ import { createVehicleTask } from "@/app/actions/tasks";
 import { logVehicleMaintenance, renewVehicleCompliance, setVehicleInShop } from "@/app/actions/vehicles";
 import { OpenFoldsOnHash } from "@/components/open-folds-on-hash";
 import { serviceKmLeft } from "@/lib/vehicle-service";
+import { HashLink } from "@/components/hash-link";
 import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
 import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
 import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
@@ -184,6 +185,14 @@ function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; stat
         <div className="mt-2 grid gap-2">
           {more.map((action) => {
             const Icon = action.icon;
+            if (action.href.startsWith("#")) {
+              return (
+                <HashLink className="pressable secondary-action !px-3 text-center leading-tight" hash={action.href.slice(1)} key={action.label}>
+                  <Icon className="shrink-0" size={18} />
+                  {action.label}
+                </HashLink>
+              );
+            }
             return (
               <Link className="pressable secondary-action !px-3 text-center leading-tight" href={action.href as Route} key={action.label}>
                 <Icon className="shrink-0" size={18} />

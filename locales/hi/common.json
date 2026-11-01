@@ -2884,6 +2884,14 @@
     "handoverLateBar": "हैंडओवर नहीं हुआ, {days, plural, one {# दिन} other {# दिन}} देर"
   },
   "vehiclePage": {
+    "yr_title": "साल एक नज़र में",
+    "yr_rentals": "किराए",
+    "yr_upkeep": "सर्विस और कागज़ात",
+    "yr_today": "आज",
+    "yr_service": "सर्विस या मरम्मत",
+    "yr_paper": "कागज़ात खत्म",
+    "yr_check": "जाँच",
+    "yr_nothing": "इस समय किराए पर नहीं",
     "fleet": "फ़्लीट",
     "notSet": "सेट नहीं",
     "km": "{km} km",

@@ -2924,6 +2924,14 @@
     "handoverLateBar": "chưa giao xe, trễ {days} ngày"
   },
   "vehiclePage": {
+    "yr_title": "Cả năm trong một cái nhìn",
+    "yr_rentals": "Lượt thuê",
+    "yr_upkeep": "Bảo dưỡng và giấy tờ",
+    "yr_today": "Hôm nay",
+    "yr_service": "Bảo dưỡng hoặc sửa",
+    "yr_paper": "Giấy tờ hết hạn",
+    "yr_check": "Kiểm tra",
+    "yr_nothing": "Không cho thuê trong thời gian này",
     "fleet": "Đội xe",
     "notSet": "Chưa đặt",
     "km": "{km} km",

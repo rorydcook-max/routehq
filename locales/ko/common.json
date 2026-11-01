@@ -2884,6 +2884,14 @@
     "handoverLateBar": "미인도, {days}일 지연"
   },
   "vehiclePage": {
+    "yr_title": "한눈에 보는 1년",
+    "yr_rentals": "대여",
+    "yr_upkeep": "정비와 서류",
+    "yr_today": "오늘",
+    "yr_service": "정비 또는 수리",
+    "yr_paper": "서류 만료",
+    "yr_check": "점검",
+    "yr_nothing": "이 기간에 대여 없음",
     "fleet": "차량",
     "notSet": "미설정",
     "km": "{km} km",

@@ -2924,6 +2924,14 @@
     "handoverLateBar": "belum diserahkan, lewat {days} hari"
   },
   "vehiclePage": {
+    "yr_title": "Setahun sepintas lalu",
+    "yr_rentals": "Sewaan",
+    "yr_upkeep": "Servis dan dokumen",
+    "yr_today": "Hari ini",
+    "yr_service": "Servis atau baiki",
+    "yr_paper": "Dokumen tamat",
+    "yr_check": "Pemeriksaan",
+    "yr_nothing": "Tidak disewa dalam tempoh ini",
     "fleet": "Armada",
     "notSet": "Belum ditetapkan",
     "km": "{km} km",

@@ -2924,6 +2924,14 @@
     "handoverLateBar": "не выдан, опоздание {days, plural, one {# день} few {# дня} many {# дней} other {# дня}}"
   },
   "vehiclePage": {
+    "yr_title": "Год одним взглядом",
+    "yr_rentals": "Аренды",
+    "yr_upkeep": "Обслуживание и документы",
+    "yr_today": "Сегодня",
+    "yr_service": "Обслуживание или ремонт",
+    "yr_paper": "Истекает документ",
+    "yr_check": "Осмотр",
+    "yr_nothing": "В этот период не сдавался",
     "fleet": "Автопарк",
     "notSet": "Не указано",
     "km": "{km} км",

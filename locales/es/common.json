@@ -2884,6 +2884,14 @@
     "handoverLateBar": "sin entregar, {days, plural, one {# día} other {# días}} de retraso"
   },
   "vehiclePage": {
+    "yr_title": "El año de un vistazo",
+    "yr_rentals": "Alquileres",
+    "yr_upkeep": "Servicio y papeles",
+    "yr_today": "Hoy",
+    "yr_service": "Servicio o reparación",
+    "yr_paper": "Vence un papel",
+    "yr_check": "Revisión",
+    "yr_nothing": "Sin alquilar en este tiempo",
     "fleet": "Flota",
     "notSet": "No establecido",
     "km": "{km} km",

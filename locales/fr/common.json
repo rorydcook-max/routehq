@@ -2924,6 +2924,14 @@
     "handoverLateBar": "non remis, {days, plural, one {# jour} many {# jours} other {# jours}} de retard"
   },
   "vehiclePage": {
+    "yr_title": "L'année en un coup d'œil",
+    "yr_rentals": "Locations",
+    "yr_upkeep": "Entretien et papiers",
+    "yr_today": "Aujourd'hui",
+    "yr_service": "Entretien ou réparation",
+    "yr_paper": "Papier qui expire",
+    "yr_check": "Contrôle",
+    "yr_nothing": "Pas loué sur cette période",
     "fleet": "Flotte",
     "notSet": "Non renseigné",
     "km": "{km} km",

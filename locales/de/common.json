@@ -2924,6 +2924,14 @@
     "handoverLateBar": "nicht übergeben, {days, plural, one {# Tag} other {# Tage}} überfällig"
   },
   "vehiclePage": {
+    "yr_title": "Das Jahr im Überblick",
+    "yr_rentals": "Vermietungen",
+    "yr_upkeep": "Service und Papiere",
+    "yr_today": "Heute",
+    "yr_service": "Service oder Reparatur",
+    "yr_paper": "Papiere laufen ab",
+    "yr_check": "Prüfung",
+    "yr_nothing": "In dieser Zeit nicht vermietet",
     "fleet": "Fuhrpark",
     "notSet": "Nicht festgelegt",
     "km": "{km} km",

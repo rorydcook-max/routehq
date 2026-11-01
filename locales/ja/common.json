@@ -2884,6 +2884,14 @@
     "handoverLateBar": "未引き渡し、{days} 日遅れ"
   },
   "vehiclePage": {
+    "yr_title": "1年のようす",
+    "yr_rentals": "レンタル",
+    "yr_upkeep": "整備と書類",
+    "yr_today": "今日",
+    "yr_service": "整備・修理",
+    "yr_paper": "書類の期限",
+    "yr_check": "点検",
+    "yr_nothing": "この期間は貸出なし",
     "fleet": "車両一覧",
     "notSet": "未設定",
     "km": "{km} km",

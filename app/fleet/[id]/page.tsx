@@ -9,6 +9,7 @@ import { logVehicleMaintenance, renewVehicleCompliance } from "@/app/actions/veh
 import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
 import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
 import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
+import { VehicleYear, type YearMark, type YearRental } from "@/app/fleet/[id]/vehicle-year";
 import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
 import { Dot, ElapsedBar, InOutBars, Ring } from "@/components/glance";
@@ -19,7 +20,7 @@ import { partnerQuote } from "@/lib/insurance-partners";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
-import { BackLink, Badge, Card, Pane, ProgressBar } from "@/components/ui";
+import { BackLink, Badge, Card, Pane, ProgressBar, Fold } from "@/components/ui";
 import { VehicleTitle, vehicleName } from "@/components/vehicle-identity";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -390,7 +391,7 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
   const partners = { insurance: partnerQuote("insurance", quoteVehicle), porbor: partnerQuote("porbor", quoteVehicle) };
 
   return (
-    <Pane
+    <Fold
       open={needsLook}
       summary={!saved ? tx.say("cs_none") : `${tx.say("cs_saved", { saved, total: items.length })}${soonest ? ` · ${tx.say("cs_next", { name: soonest.name, date: formatDate(soonest.date, tx) })}` : ""}`}
       title={tx.say("cs_title")}
@@ -423,6 +424,42 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
           );
         })}
       </div>
+    </Fold>
+  );
+}
+
+/** The year at a glance, on the page itself (Rory, 1 Nov 2026): rentals, services, checks and paperwork as one picture. */
+function YearSection({ detail }: { detail: VehicleDetail }) {
+  const tx = useVx();
+  const rentals: YearRental[] = detail.rentals
+    .filter((rental: any) => rental.start_date && !["cancelled"].includes(String(rental.status || "")) && !rental.deleted_at)
+    .map((rental: any) => ({
+      id: String(rental.id),
+      start: String(rental.start_date).slice(0, 10),
+      end: rental.end_date ? String(rental.end_date).slice(0, 10) : null,
+      name: String(rental.customers?.full_name || tx.say("customer")).split(" ")[0],
+      upcoming: rental.status === "booked"
+    }));
+  const marks: YearMark[] = [
+    ...detail.maintenanceEvents
+      .filter((event: any) => event.service_date)
+      .map((event: any) => ({ id: `m-${event.id}`, date: String(event.service_date).slice(0, 10), kind: "service" as const, label: String(event.title || event.description || event.service_type || "") })),
+    ...detail.inspections
+      .filter((inspection: any) => inspection.completed_at || inspection.created_at)
+      .map((inspection: any) => ({ id: `i-${inspection.id}`, date: String(inspection.completed_at || inspection.created_at).slice(0, 10), kind: "check" as const, label: String(inspection.inspection_type || "") })),
+    ...getComplianceItems(detail, tx)
+      .filter((item) => item.date)
+      .map((item) => ({ id: `c-${item.key}`, date: String(item.date).slice(0, 10), kind: "paper" as const, label: tx.say("tl_due", { name: item.name }) }))
+  ];
+  return (
+    <Pane title={tx.say("yr_title")}>
+      <VehicleYear
+        labels={{ rentals: tx.say("yr_rentals"), upkeep: tx.say("yr_upkeep"), today: tx.say("yr_today"), service: tx.say("yr_service"), paper: tx.say("yr_paper"), check: tx.say("yr_check"), nothing: tx.say("yr_nothing") }}
+        locale={tx.locale}
+        marks={marks}
+        rentals={rentals}
+        today={businessToday()}
+      />
     </Pane>
   );
 }
@@ -582,7 +619,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
   const typeName = (type: string) => (tx.has(`mt_${type}`) ? tx.say(`mt_${type}`) : type.replace(/_/g, " "));
 
   return (
-    <Pane
+    <Fold
       id="maintenance"
       summary={compliance.next_service_date ? tx.say("m_summaryNext", { date: formatDate(compliance.next_service_date, tx) }) : tx.say("m_summaryNone")}
       title={tx.say("m_title")}
@@ -666,7 +703,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
           ))
         )}
       </div>
-    </Pane>
+    </Fold>
   );
 }
 
@@ -821,7 +858,7 @@ function RentalHistorySection({ detail }: { detail: VehicleDetail }) {
 function DocumentsSection({ detail }: { detail: VehicleDetail }) {
   const tx = useVx();
   return (
-    <Pane summary={tx.say("d_summary", { count: detail.documents.length })} title={tx.say("d_title")}>
+    <Fold summary={tx.say("d_summary", { count: detail.documents.length })} title={tx.say("d_title")}>
       {detail.documents.length === 0 ? (
         <EmptyState>{tx.say("d_none")}</EmptyState>
       ) : (
@@ -837,7 +874,7 @@ function DocumentsSection({ detail }: { detail: VehicleDetail }) {
           ))}
         </div>
       )}
-    </Pane>
+    </Fold>
   );
 }
 
@@ -910,7 +947,7 @@ function FinanceSection({ detail }: { detail: VehicleDetail }) {
   const f = loanFigures(finance);
 
   return (
-    <Pane summary={f.stillToPay ? `${tx.say("l_balance")} ${money(f.stillToPay)}` : undefined} title={tx.say("l_title")}>
+    <Fold summary={f.stillToPay ? `${tx.say("l_balance")} ${money(f.stillToPay)}` : undefined} title={tx.say("l_title")}>
       <div className="grid grid-cols-2 gap-2.5">
         {finance.lender ? <InfoRow label={tx.say("l_lender")} value={finance.lender} /> : null}
         <InfoRow label={tx.say("l_monthly")} value={money(finance.monthly_payment)} />
@@ -926,7 +963,7 @@ function FinanceSection({ detail }: { detail: VehicleDetail }) {
         ) : null}
         <InfoRow label={tx.say("l_paid")} value={money(totalPaid)} />
       </div>
-    </Pane>
+    </Fold>
   );
 }
 
@@ -1002,9 +1039,9 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
           <div className="grid gap-3">
             <RatesPane detail={detail} />
             <GpsSection detail={detail} />
-            <Pane title={tx.say("notes")}>
+            <Fold title={tx.say("notes")}>
               <VehicleNotesForm notes={vehicle.metadata?.notes || ""} organizationId={organization.id} updatedAt={vehicle.metadata?.notes_updated_at} vehicleId={vehicle.id} />
-            </Pane>
+            </Fold>
           </div>
         </div>
       )
@@ -1052,6 +1089,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
 
         <ActiveRentalCard detail={detail} dueNow={dueNow} />
         <Glance detail={detail} isOwner={isOwner} />
+        <YearSection detail={detail} />
         <PageTabs aliases={{ maintenance: "upkeep", inspections: "checks" }} initial={firstTab} label={tx.say("tab_label")} tabs={tabs} />
       </div>
     </AppShell>

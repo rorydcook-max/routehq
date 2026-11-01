@@ -2884,6 +2884,14 @@
     "handoverLateBar": "未交車，已逾期 {days} 天"
   },
   "vehiclePage": {
+    "yr_title": "全年一覽",
+    "yr_rentals": "租賃",
+    "yr_upkeep": "保養與證件",
+    "yr_today": "今天",
+    "yr_service": "保養或維修",
+    "yr_paper": "證件到期",
+    "yr_check": "檢查",
+    "yr_nothing": "這段時間沒有出租",
     "fleet": "車隊",
     "notSet": "未設定",
     "km": "{km} km",

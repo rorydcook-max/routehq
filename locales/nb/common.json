@@ -2884,6 +2884,14 @@
     "handoverLateBar": "ikke overlevert, {days, plural, one {# dag} other {# dager}} forsinket"
   },
   "vehiclePage": {
+    "yr_title": "Året i korte trekk",
+    "yr_rentals": "Utleier",
+    "yr_upkeep": "Service og papirer",
+    "yr_today": "I dag",
+    "yr_service": "Service eller reparasjon",
+    "yr_paper": "Papirer går ut",
+    "yr_check": "Kontroll",
+    "yr_nothing": "Ikke utleid i denne perioden",
     "fleet": "Flåte",
     "notSet": "Ikke satt",
     "km": "{km} km",

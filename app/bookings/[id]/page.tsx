@@ -734,6 +734,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     {rentGivenBack > 0 ? <p className="font-semibold text-[var(--foreground-secondary)]">{tx.say("givenBackLine", { amount: money(rentGivenBack, rental.currency) })}</p> : null}
                   </>
                 ) : null}
+                {/* The next payment, amount and day, whenever one is still to come (Rory, 1 Nov 2026). */}
+                {!isCancelled && upcomingPaymentGroup[0] ? (
+                  <p className="mt-2 rounded-lg bg-[var(--primary-light)] px-2.5 py-1.5 font-bold text-[var(--primary)]">
+                    {tx.say("nextPaySummary", { amount: money(upcomingPaymentGroup[0].amount, rental.currency), date: formatDate(upcomingPaymentGroup[0].due_date, tx) })}
+                  </p>
+                ) : null}
                 {Number(rental.extras_total || 0) > 0 ? (
                   <p className="mt-1 text-sm font-semibold text-[var(--foreground-secondary)]">
                     {tx.say("extrasPlus", { amount: money(rental.extras_total, rental.currency), names: activeExtrasLines(rental).map((line) => line.name).join(", ") || "-" })}

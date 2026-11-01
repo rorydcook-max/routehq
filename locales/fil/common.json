@@ -2884,6 +2884,14 @@
     "handoverLateBar": "hindi pa naiabot, huli nang {days, plural, one {# araw} other {# araw}}"
   },
   "vehiclePage": {
+    "yr_title": "Ang taon sa isang tingin",
+    "yr_rentals": "Mga rental",
+    "yr_upkeep": "Serbisyo at papeles",
+    "yr_today": "Ngayon",
+    "yr_service": "Serbisyo o ayos",
+    "yr_paper": "Mag-e-expire ang papeles",
+    "yr_check": "Tsek",
+    "yr_nothing": "Hindi narenta sa panahong ito",
     "fleet": "Fleet",
     "notSet": "Hindi pa nakatakda",
     "km": "{km} km",

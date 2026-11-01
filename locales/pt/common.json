@@ -2884,6 +2884,14 @@
     "handoverLateBar": "não entregue, {days, plural, one {# dia} other {# dias}} de atraso"
   },
   "vehiclePage": {
+    "yr_title": "O ano num relance",
+    "yr_rentals": "Aluguéis",
+    "yr_upkeep": "Revisão e documentos",
+    "yr_today": "Hoje",
+    "yr_service": "Revisão ou conserto",
+    "yr_paper": "Documento vence",
+    "yr_check": "Vistoria",
+    "yr_nothing": "Sem aluguel neste período",
     "fleet": "Frota",
     "notSet": "Não definido",
     "km": "{km} km",

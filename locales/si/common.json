@@ -2884,6 +2884,14 @@
     "handoverLateBar": "භාර දී නැත, {days, plural, one {දින #ක් ප්‍රමාදයි} other {දින #ක් ප්‍රමාදයි}}"
   },
   "vehiclePage": {
+    "yr_title": "වසර එක බැල්මකින්",
+    "yr_rentals": "කුලී",
+    "yr_upkeep": "සේවා සහ ලේඛන",
+    "yr_today": "අද",
+    "yr_service": "සේවාව හෝ අලුත්වැඩියාව",
+    "yr_paper": "ලේඛන කල් ඉකුත්වේ",
+    "yr_check": "පරීක්ෂාව",
+    "yr_nothing": "මෙම කාලයේ කුලියට දී නැත",
     "fleet": "වාහන සමූහය",
     "notSet": "සකසා නැත",
     "km": "{km} km",

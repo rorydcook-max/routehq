@@ -2924,6 +2924,14 @@
     "handoverLateBar": "לא נמסר, איחור של {days, plural, one {יום אחד} two {יומיים} other {# ימים}}"
   },
   "vehiclePage": {
+    "yr_title": "השנה במבט אחד",
+    "yr_rentals": "השכרות",
+    "yr_upkeep": "טיפולים ומסמכים",
+    "yr_today": "היום",
+    "yr_service": "טיפול או תיקון",
+    "yr_paper": "מסמך פג תוקף",
+    "yr_check": "בדיקה",
+    "yr_nothing": "לא הושכר בתקופה הזו",
     "fleet": "צי הרכבים",
     "notSet": "לא הוגדר",
     "km": "{km} ק\"מ",

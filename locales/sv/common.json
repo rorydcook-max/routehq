@@ -2884,6 +2884,14 @@
     "handoverLateBar": "inte överlämnad, {days, plural, one {# dag} other {# dagar}} sen"
   },
   "vehiclePage": {
+    "yr_title": "Året i korthet",
+    "yr_rentals": "Uthyrningar",
+    "yr_upkeep": "Service och papper",
+    "yr_today": "I dag",
+    "yr_service": "Service eller reparation",
+    "yr_paper": "Papper går ut",
+    "yr_check": "Kontroll",
+    "yr_nothing": "Inte uthyrd under den här tiden",
     "fleet": "Fordonsflotta",
     "notSet": "Ej angivet",
     "km": "{km} km",

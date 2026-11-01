@@ -2884,6 +2884,14 @@
     "chipBack": "Back"
   },
   "vehiclePage": {
+    "yr_title": "The year at a glance",
+    "yr_rentals": "Rentals",
+    "yr_upkeep": "Service and paperwork",
+    "yr_today": "Today",
+    "yr_service": "Service or repair",
+    "yr_paper": "Paperwork runs out",
+    "yr_check": "Check",
+    "yr_nothing": "Not rented in this time",
     "fleet": "Fleet",
     "notSet": "Not set",
     "km": "{km} km",

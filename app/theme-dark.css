@@ -114,6 +114,8 @@
 @layer theme {
 /* Surfaces written as plain white in the markup take the dark surface. */
 :root[data-theme="dark"] :is(.bg-white, .\!bg-white, .bg-\[\#fff\], .bg-\[\#ffffff\]) { background-color: var(--panel) !important; }
+/* A number plate stays a white plate with black letters, as on the road (Rory, 1 Nov 2026: it vanished in dark mode). */
+:root[data-theme="dark"] .plate-chip.bg-white { background-color: #fff !important; color: #1a1d21 !important; border-color: #1a1d21 !important; }
 :root[data-theme="dark"] :is(.bg-white\/95, .bg-white\/90, .bg-white\/85, .bg-white\/80) { background-color: color-mix(in srgb, var(--panel) 90%, transparent) !important; }
 :root[data-theme="dark"] :is(.bg-white\/70, .bg-white\/60, .bg-white\/50) { background-color: color-mix(in srgb, var(--panel) 70%, transparent) !important; }
 :root[data-theme="dark"] :is(.text-black, .text-\[\#13262b\]) { color: var(--foreground) !important; }

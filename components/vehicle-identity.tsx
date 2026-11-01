@@ -18,7 +18,7 @@ export function PlateChip({ plate, province, size = "sm", className = "" }: { pl
   }
   return (
     <span
-      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-[5px] border-[1.5px] border-[#1a1d21] bg-white px-1.5 py-[3px] text-[12px] font-bold leading-none tracking-[0.06em] text-[#1a1d21] tabular-nums ${className}`}
+      className={`plate-chip inline-flex shrink-0 items-center whitespace-nowrap rounded-[5px] border-[1.5px] border-[#1a1d21] bg-white px-1.5 py-[3px] text-[12px] font-bold leading-none tracking-[0.06em] text-[#1a1d21] tabular-nums ${className}`}
       title={province || undefined}
     >
       {plate}

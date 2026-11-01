@@ -3648,6 +3648,8 @@
     "title": "Sửa đặt xe"
   },
   "settingsPage": {
+    "cc_title": "Cách khách liên hệ với bạn",
+    "cc_hint": "Chạm vào các ứng dụng bạn dùng, rồi thêm số, tên hoặc liên kết cho từng ứng dụng.",
     "title": "Cài đặt",
     "tab_business": "Doanh nghiệp",
     "tab_rentals": "Thuê xe và thanh toán",

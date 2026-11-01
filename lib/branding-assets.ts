@@ -111,13 +111,19 @@ export async function resolveBrandingDisplayUrl(
     expiresIn?: number;
   }
 ) {
-  if (input.canonical) {
-    return createBrandingSignedUrl(supabase, input.canonical, input.expiresIn);
+  // A logo or signature whose file has gone from storage shows as none, rather than taking the whole page down
+  // (1 Nov 2026: "Object not found" broke Settings for a business whose signature file was missing).
+  try {
+    if (input.canonical) {
+      return await createBrandingSignedUrl(supabase, input.canonical, input.expiresIn);
+    }
+    return await resolveBrandingAssetUrl(supabase, input.legacy, {
+      allowExternalUrl: input.allowExternalUrl,
+      expiresIn: input.expiresIn
+    });
+  } catch {
+    return null;
   }
-  return resolveBrandingAssetUrl(supabase, input.legacy, {
-    allowExternalUrl: input.allowExternalUrl,
-    expiresIn: input.expiresIn
-  });
 }
 
 function recordObject(value: unknown): Record<string, unknown> {

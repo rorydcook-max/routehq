@@ -3648,6 +3648,8 @@
     "title": "编辑预订"
   },
   "settingsPage": {
+    "cc_title": "客户如何联系您",
+    "cc_hint": "点选您使用的应用，然后为每个填写号码、名称或链接。",
     "title": "设置",
     "tab_business": "业务",
     "tab_rentals": "租赁与付款",

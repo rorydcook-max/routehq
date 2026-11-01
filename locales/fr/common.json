@@ -3648,6 +3648,8 @@
     "title": "Modifier la réservation"
   },
   "settingsPage": {
+    "cc_title": "Comment les clients vous joignent",
+    "cc_hint": "Touchez les applis que vous utilisez, puis ajoutez numéro, nom ou lien pour chacune.",
     "title": "Paramètres",
     "tab_business": "Entreprise",
     "tab_rentals": "Locations et paiements",

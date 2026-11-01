@@ -3608,6 +3608,8 @@
     "title": "Redigera bokning"
   },
   "settingsPage": {
+    "cc_title": "Så når kunderna dig",
+    "cc_hint": "Tryck på apparna du använder och fyll i nummer, namn eller länk för var och en.",
     "title": "Inställningar",
     "tab_business": "Företag",
     "tab_rentals": "Uthyrning och betalningar",

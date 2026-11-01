@@ -617,7 +617,17 @@ export async function updateContractBrandingSettings(formData: FormData) {
       business_phone: limitedString(formData, "business_phone", 80),
       business_email: businessEmail,
       owner_whatsapp: limitedString(formData, "whatsapp", 80),
-      owner_line_id: limitedString(formData, "line_id", 80)
+      owner_line_id: limitedString(formData, "line_id", 80),
+      // The other apps customers reach the business on (Settings, How customers reach you): only the ones filled in.
+      ...(formData.has("contact_messenger")
+        ? {
+            contact_channels: Object.fromEntries(
+              ["messenger", "instagram", "telegram", "wechat", "kakaotalk", "zalo", "viber"]
+                .map((key) => [key, limitedString(formData, `contact_${key}`, 120)])
+                .filter(([, value]) => Boolean(value))
+            )
+          }
+        : {})
     }
   };
 

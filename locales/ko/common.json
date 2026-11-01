@@ -3608,6 +3608,8 @@
     "title": "예약 수정"
   },
   "settingsPage": {
+    "cc_title": "고객이 연락하는 방법",
+    "cc_hint": "사용하는 앱을 누르고 각각 번호, 이름 또는 링크를 입력하세요.",
     "title": "설정",
     "tab_business": "업체",
     "tab_rentals": "렌탈 및 결제",

@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { updateOwnerSignature } from "@/app/actions/settings";
+import { SignaturePad } from "@/components/signature-pad";
 
 export function SignatureUploadSection({
   authorisedSignatoryName,
@@ -94,6 +95,37 @@ export function SignatureUploadSection({
     fileRef.current?.click();
   }
 
+  // The drawn signature, saved as a PNG the same way an uploaded one is.
+  const [drawn, setDrawn] = useState("");
+  const [padKey, setPadKey] = useState(0);
+  function saveDrawn() {
+    if (!acknowledgementRef.current?.checked) {
+      setMessage({ text: say("sg_tick"), type: "error" });
+      return;
+    }
+    if (!drawn) {
+      setMessage({ text: say("sig_needSignature"), type: "error" });
+      return;
+    }
+    startTransition(async () => {
+      try {
+        const blob = await (await fetch(drawn)).blob();
+        const fd = new FormData();
+        fd.set("signature", new File([blob], "signature.png", { type: "image/png" }));
+        fd.set("signature_authorisation_acknowledged", "true");
+        fd.set("authorised_signatory_name", authorisedSignatoryName || "");
+        fd.set("authorised_signatory_title", authorisedSignatoryTitle || "");
+        await updateOwnerSignature(fd);
+        setMessage({ text: say("sg_saved"), type: "success" });
+        setReplacing(false);
+        setDrawn("");
+        setPadKey((value) => value + 1);
+      } catch {
+        setMessage({ text: say("sg_failed"), type: "error" });
+      }
+    });
+  }
+
   function picked() {
     if (!fileRef.current?.files?.[0]) return;
     handleReplace();
@@ -137,11 +169,28 @@ export function SignatureUploadSection({
           <span>{authorisation("signatureAuthorisation")}</span>
         </label>
       ) : null}
+      {/* Signed with a finger (or the mouse) right here; a photo of a paper signature is the other way (Rory, 1 Nov 2026). */}
+      {(!signatureUrl || replacing) && signatoryReady ? (
+        <div className="stay-light w-full max-w-md">
+          <SignaturePad clearLabel={say("sig_clear")} hint={say("sig_hint")} key={padKey} onChange={setDrawn} />
+        </div>
+      ) : null}
       <div className="flex flex-wrap items-center gap-2">
         <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original disabled={!signatoryReady} onChange={picked} ref={fileRef} tabIndex={-1} type="file" />
-        <button className="primary-action whitespace-nowrap" disabled={isPending || !signatoryReady} onClick={choose} type="button">
-          {isPending ? say("lg_working") : signatureUrl && !replacing ? say("sg_replace") : say("sg_upload")}
-        </button>
+        {!signatureUrl || replacing ? (
+          <>
+            <button className="primary-action whitespace-nowrap" disabled={isPending || !signatoryReady} onClick={saveDrawn} type="button">
+              {isPending ? say("lg_working") : say("sig_save")}
+            </button>
+            <button className="secondary-action whitespace-nowrap" disabled={isPending || !signatoryReady} onClick={choose} type="button">
+              {say("sig_usePhoto")}
+            </button>
+          </>
+        ) : (
+          <button className="primary-action whitespace-nowrap" disabled={isPending || !signatoryReady} onClick={choose} type="button">
+            {say("sg_replace")}
+          </button>
+        )}
         {signatureUrl && replacing ? (
           <button className="secondary-action" disabled={isPending} onClick={() => setReplacing(false)} type="button">
             {say("sg_keep")}

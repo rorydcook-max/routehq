@@ -3608,6 +3608,8 @@
     "title": "I-edit ang booking"
   },
   "settingsPage": {
+    "cc_title": "Paano ka makokontak ng customer",
+    "cc_hint": "I-tap ang mga app na gamit mo, saka ilagay ang numero, pangalan o link sa bawat isa.",
     "title": "Mga Setting",
     "tab_business": "Negosyo",
     "tab_rentals": "Renta at bayad",

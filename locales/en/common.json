@@ -3608,6 +3608,8 @@
     "p_paid": "Paid {date}"
   },
   "settingsPage": {
+    "cc_title": "How customers reach you",
+    "cc_hint": "Tap the apps you use, then add your number, name or link on each.",
     "title": "Settings",
     "tab_business": "Business",
     "tab_rentals": "Rentals and payments",

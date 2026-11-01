@@ -3648,6 +3648,8 @@
     "title": "Edit pemesanan"
   },
   "settingsPage": {
+    "cc_title": "Cara pelanggan menghubungi Anda",
+    "cc_hint": "Ketuk aplikasi yang Anda pakai, lalu isi nomor, nama, atau tautan di masing-masing.",
     "title": "Pengaturan",
     "tab_business": "Usaha",
     "tab_rentals": "Sewa dan pembayaran",

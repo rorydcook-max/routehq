@@ -8,6 +8,7 @@ import { PendingButton } from "@/components/pending-button";
 import { Fold, Pane } from "@/components/ui";
 import { customerLocaleOptions } from "@/lib/i18n/locales";
 import { BrandColourField } from "@/app/settings/brand-colour-field";
+import { ContactChannels } from "@/app/settings/contact-channels";
 
 // Fields take the global 44px height and regular weight; only the radius/border are set here.
 const inputClass =
@@ -30,6 +31,8 @@ export type ContractsBrandingOrganization = {
   business_email: string | null;
   whatsapp: string | null;
   line_id: string | null;
+  /** The other apps customers can reach the business on (settings.contact_channels): messenger, instagram, telegram… */
+  contact_channels?: Record<string, string> | null;
   contract_accent_colour: string | null;
   authorised_signatory_name: string | null;
   authorised_signatory_title: string | null;
@@ -88,17 +91,17 @@ export function ContractsBrandingSection({
                 <input className={inputClass} defaultValue={organization.business_phone || ""} name="business_phone" type="tel" />
               </label>
               <label className="block">
-                <span className={labelClass}>{say("b_whatsapp")}</span>
-                <input className={inputClass} defaultValue={organization.whatsapp || ""} name="whatsapp" />
-              </label>
-              <label className="block">
-                <span className={labelClass}>{say("b_line")}</span>
-                <input className={inputClass} defaultValue={organization.line_id || ""} name="line_id" />
-              </label>
-              <label className="block">
                 <span className={labelClass}>{say("b_email")}</span>
                 <input className={inputClass} defaultValue={organization.business_email || ""} name="business_email" type="email" />
               </label>
+              <ContactChannels
+                inputClass={inputClass}
+                values={{
+                  whatsapp: organization.whatsapp || "",
+                  line_id: organization.line_id || "",
+                  ...Object.fromEntries(Object.entries(organization.contact_channels || {}).map(([key, value]) => [`contact_${key}`, String(value || "")]))
+                }}
+              />
               <label className="block sm:col-span-2">
                 <span className={labelClass}>{say("b_address")}</span>
                 <textarea className={`${inputClass} min-h-20 resize-none py-2`} defaultValue={organization.business_address || ""} name="business_address" rows={2} />

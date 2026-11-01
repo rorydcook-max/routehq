@@ -3608,6 +3608,8 @@
     "title": "Rediger bestilling"
   },
   "settingsPage": {
+    "cc_title": "Slik når kundene deg",
+    "cc_hint": "Trykk på appene du bruker, og legg inn nummer, navn eller lenke på hver.",
     "title": "Innstillinger",
     "tab_business": "Bedrift",
     "tab_rentals": "Utleie og betalinger",

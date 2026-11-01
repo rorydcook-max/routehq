@@ -3608,6 +3608,8 @@
     "title": "Editar reserva"
   },
   "settingsPage": {
+    "cc_title": "Como os clientes falam com você",
+    "cc_hint": "Toque nos apps que você usa e coloque número, nome ou link em cada um.",
     "title": "Configurações",
     "tab_business": "Empresa",
     "tab_rentals": "Aluguéis e pagamentos",

@@ -387,7 +387,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         </p>
           }
           logoDisplayUrl={logoDisplayUrl}
-          organization={organization}
+          organization={{ ...organization, contact_channels: (organization as any).settings?.contact_channels || null }}
           signatureDisplayUrl={signatureDisplayUrl}
           whiteLabel={String(organization.subscription_status || "trial") === "trial" || planById(organization.subscription_tier).whiteLabel}
         />

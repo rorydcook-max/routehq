@@ -3648,6 +3648,8 @@
     "title": "Buchung bearbeiten"
   },
   "settingsPage": {
+    "cc_title": "So erreichen Sie Kunden",
+    "cc_hint": "Tippen Sie auf die Apps, die Sie nutzen, und geben Sie jeweils Nummer, Name oder Link ein.",
     "title": "Einstellungen",
     "tab_business": "Unternehmen",
     "tab_rentals": "Mieten und Zahlungen",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { MoneyInput } from "@/components/money-input";
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { Camera, Check, Copy, ExternalLink, Loader2, ShieldCheck, X } from "lucide-react";
@@ -19,6 +20,8 @@ export function RenewalForm({ vehicleId, organizationId, complianceType, readabl
   const fileInput = useRef<HTMLInputElement>(null);
   const [expiry, setExpiry] = useState("");
   const [cost, setCost] = useState("");
+  // Bumped when the photo fills the cost in, so the money box shows it.
+  const [costStamp, setCostStamp] = useState(0);
   const [notes, setNotes] = useState("");
   const [reading, setReading] = useState(false);
   const [message, setMessage] = useState<{ tone: "ok" | "bad"; text: string } | null>(null);
@@ -38,7 +41,7 @@ export function RenewalForm({ vehicleId, organizationId, complianceType, readabl
         return;
       }
       setExpiry(data.expiryDate);
-      if (data.cost) setCost(String(data.cost));
+      if (data.cost) { setCost(String(data.cost)); setCostStamp((n) => n + 1); }
       if (!notes) setNotes([data.provider, data.policyNumber].filter(Boolean).join(" · "));
       setMessage({ tone: "ok", text: say("rn_readDone") });
     } catch {
@@ -80,7 +83,7 @@ export function RenewalForm({ vehicleId, organizationId, complianceType, readabl
       </label>
       <label className="block">
         <span className={labelClass}>{say("f_cost")}</span>
-        <input className={inputClass} inputMode="decimal" min="0" name="cost" onChange={(event) => setCost(event.target.value)} step="0.01" type="number" value={cost} />
+        <MoneyInput defaultValue={cost} key={costStamp} name="cost" onValueChange={setCost} />
       </label>
       <label className="block sm:col-span-2">
         <span className={labelClass}>{say("f_notes")}</span>

@@ -9,6 +9,7 @@ import { logVehicleMaintenance, renewVehicleCompliance, setVehicleInShop } from 
 import { OpenFoldsOnHash } from "@/components/open-folds-on-hash";
 import { serviceKmLeft } from "@/lib/vehicle-service";
 import { HashLink } from "@/components/hash-link";
+import { MoneyInput } from "@/components/money-input";
 import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
 import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
 import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
@@ -704,7 +705,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
           </label>
           <label className="block">
             <span className={labelClass}>{tx.say("f_cost")}</span>
-            <input className={inputClass} inputMode="decimal" min="0" name="cost" step="0.01" type="number" />
+            <MoneyInput name="cost" />
           </label>
           <label className="block">
             <span className={labelClass}>{tx.say("m_odometer")}</span>

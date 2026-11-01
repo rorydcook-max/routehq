@@ -542,6 +542,24 @@ export async function uploadVehiclePhotos(formData: FormData) {
   const vehicle = await requireVehiclePhotoManagementAccess(supabase, user.id, vehicleId, organizationId);
   const admin = createSupabaseAdminClient() as any;
 
+  // New photos go after the ones already there, in the order they were chosen, so the first photo of a car's first
+  // upload is its main photo (Rory, 1 Nov 2026: photos came out in reverse, the last one chosen becoming main).
+  const { data: existing } = await admin
+    .from("documents")
+    .select("extracted_data")
+    .eq("organization_id", organizationId)
+    .eq("owner_type", "vehicle")
+    .eq("owner_id", vehicleId)
+    .eq("category", "vehicle_photo")
+    .is("deleted_at", null);
+  let nextOrder =
+    ((existing || []) as any[]).reduce((highest, row) => {
+      const order = Number(row.extracted_data?.vehicle_photo_order);
+      return Number.isFinite(order) && row.extracted_data?.vehicle_photo_order !== null ? Math.max(highest, order) : highest;
+    }, -1) + 1;
+  // Older photos without a place (from before places were saved) keep showing first.
+  nextOrder = Math.max(nextOrder, ((existing || []) as any[]).length);
+
   for (const file of files) {
     // An iPhone can send a photo with no type at all; its name still says what it is.
     if (!file.type.startsWith("image/") && !/\.(jpe?g|png|heic|heif|webp)$/i.test(file.name)) {
@@ -570,7 +588,7 @@ export async function uploadVehiclePhotos(formData: FormData) {
       size_bytes: file.size,
       category: "vehicle_photo",
       ocr_status: "not_started",
-      extracted_data: {},
+      extracted_data: { vehicle_photo_order: nextOrder++ },
       uploaded_by: user.id
     });
 

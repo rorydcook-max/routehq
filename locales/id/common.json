@@ -6107,5 +6107,12 @@
     "contractPitch4": "Gratis untuk armada kecil, dan kami pindahkan data lama Anda secara gratis",
     "contractPitchCta": "Mulai gratis",
     "downloadXlsx": "Excel (XLSX), dengan rumus"
+  },
+  "gallery": {
+    "open": "Buka foto",
+    "close": "Tutup",
+    "prev": "Foto sebelumnya",
+    "next": "Foto berikutnya",
+    "more": "{count} foto lagi"
   }
 }

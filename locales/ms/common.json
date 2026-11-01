@@ -6107,5 +6107,12 @@
     "contractPitch4": "Percuma untuk armada kecil, dan kami import rekod sedia ada anda secara percuma",
     "contractPitchCta": "Mula percuma",
     "downloadXlsx": "Excel (XLSX), dengan formula"
+  },
+  "gallery": {
+    "open": "Buka foto",
+    "close": "Tutup",
+    "prev": "Foto sebelumnya",
+    "next": "Foto seterusnya",
+    "more": "{count} lagi foto"
   }
 }

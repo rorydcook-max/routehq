@@ -6107,5 +6107,12 @@
     "contractPitch4": "小規模なフリートは無料。既存の記録も無料で取り込みます",
     "contractPitchCta": "無料で始める",
     "downloadXlsx": "Excel（XLSX）・数式付き"
+  },
+  "gallery": {
+    "open": "写真を開く",
+    "close": "閉じる",
+    "prev": "前の写真",
+    "next": "次の写真",
+    "more": "他 {count} 枚"
   }
 }

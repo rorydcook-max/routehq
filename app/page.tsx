@@ -22,6 +22,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { VehicleArt } from "@/components/vehicle-art";
+import { vehiclePhotoUrls } from "@/lib/vehicle-photos";
 import { Dot, FleetLot, InOutBars, Ring, Spark, TileHead, type LotState, type LotVehicle } from "@/components/glance";
 import { AgendaCalendar } from "@/components/agenda-calendar";
 import { getCalendarEventsBetween, type CalendarEvent } from "@/lib/calendar";
@@ -504,6 +505,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     return <VehicleArt colour={vehicle.color} kind={kindFromCategory(category as any)} model={vehicle.model} size="md" />;
   };
 
+  // Each vehicle's main photo, when it has one, in place of the drawing (Rory, 1 Nov 2026).
+  const lotPhotos: Map<string, string[]> = await vehiclePhotoUrls(supabase, organization.id, 1).catch(() => new Map());
   const lot: LotVehicle[] = vehicles.map((v) => {
     const current = rentals.find((r) => r.vehicleId === v.id && r.status !== "Booked") || null;
     const next = rentals.filter((r) => r.vehicleId === v.id && r.status === "Booked").sort((a, b) => String(a.start).localeCompare(String(b.start)))[0] || null;
@@ -533,10 +536,16 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       id: v.id,
       // Make and model together: a "Mazda 2" as "2" on its own is a number, not a car.
       name: [v.make, v.model].filter(Boolean).join(" ") || v.make,
-      art: <VehicleArt colour={v.color} kind={kindFromCategory(category as any)} model={v.model} size="sm" />,
+      art: lotPhotos.get(v.id)?.[0] ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img alt="" className="block h-11 w-14 rounded-xl object-cover" loading="lazy" src={lotPhotos.get(v.id)![0]} />
+      ) : (
+        <VehicleArt colour={v.color} kind={kindFromCategory(category as any)} model={v.model} size="sm" />
+      ),
       state,
       tip: `${[v.make, v.model].filter(Boolean).join(" ")}: ${tip}`,
-      href: current ? `/bookings/${current.id}` : next ? `/bookings/${next.id}` : `/fleet/${v.id}`
+      // The vehicle's own page (Rory, 1 Nov 2026); its booking is one tap from there.
+      href: `/fleet/${v.id}`
     };
   });
   // Each count opens the page that lists those things, like the counts on Fleet and Bookings.

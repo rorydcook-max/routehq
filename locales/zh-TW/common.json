@@ -6107,5 +6107,12 @@
     "contractPitch4": "小型車隊免費使用，並免費為您匯入現有紀錄",
     "contractPitchCta": "免費開始",
     "downloadXlsx": "Excel（XLSX），含公式"
+  },
+  "gallery": {
+    "open": "開啟照片",
+    "close": "關閉",
+    "prev": "上一張",
+    "next": "下一張",
+    "more": "還有 {count} 張"
   }
 }

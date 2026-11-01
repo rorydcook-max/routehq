@@ -6107,5 +6107,12 @@
     "contractPitch4": "Grátis para frotas pequenas, e importamos seus registros atuais sem custo",
     "contractPitchCta": "Comece grátis",
     "downloadXlsx": "Excel (XLSX), com fórmulas"
+  },
+  "gallery": {
+    "open": "Abrir foto",
+    "close": "Fechar",
+    "prev": "Foto anterior",
+    "next": "Próxima foto",
+    "more": "Mais {count} fotos"
   }
 }

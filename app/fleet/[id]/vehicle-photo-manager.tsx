@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Camera, ImagePlus, Move, Trash2, X } from "lucide-react";
 import { removeVehiclePhoto, reorderVehiclePhotos, uploadVehiclePhotos } from "@/app/actions/vehicles";
 import type { VehicleDetailDocument } from "@/lib/vehicle-detail";
+import { PhotoGallery } from "@/components/photo-gallery";
 
 type VehiclePhotoManagerProps = {
   organizationId: string;
@@ -102,23 +103,35 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
     });
   }
 
+  const photoUrls = orderedPhotos.map((photo) => photo.url).filter(Boolean) as string[];
+
   return (
     <>
+      {primaryPhoto?.url ? (
+        // The main photo large with the next ones as thumbnails; tapping one opens it full screen. Editing is its own button.
+        <PhotoGallery
+          alt={vehicleLabel}
+          overlay={
+            <button
+              aria-label={say("ph_manageAria")}
+              className="absolute bottom-3 right-3 inline-flex min-h-[40px] items-center gap-1.5 rounded-full bg-white px-4 font-bold text-[var(--foreground)] shadow-sm"
+              onClick={() => setIsOpen(true)}
+              type="button"
+            >
+              <Camera size={17} />
+              {say("ph_count", { count: orderedPhotos.length })}
+            </button>
+          }
+          photos={photoUrls}
+        />
+      ) : (
       <button
         aria-label={say("ph_manageAria")}
-        className="group relative flex min-h-[190px] w-full overflow-hidden rounded-2xl bg-[var(--panel-secondary)] text-left focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30"
+        className="group relative flex aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[var(--panel-secondary)] text-left focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30"
         onClick={() => setIsOpen(true)}
         type="button"
       >
-        {primaryPhoto?.url ? (
-          <>
-            <img alt={vehicleLabel} className="absolute inset-0 h-full w-full object-cover" src={primaryPhoto.url} />
-            <span className="absolute bottom-3 right-3 inline-flex min-h-[40px] items-center gap-1.5 rounded-full bg-white px-4 font-bold text-[var(--foreground)] shadow-sm">
-              <Camera size={17} />
-              {say("ph_count", { count: orderedPhotos.length })}
-            </span>
-          </>
-        ) : (
+        {(
           art ? (
             <>
               {/* The drawing sits a little high so the button doesn't cover a wheel. */}
@@ -139,6 +152,7 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
           )
         )}
       </button>
+      )}
 
       {isOpen ? (
         <div aria-modal="true" className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/45 sm:items-center sm:px-4 sm:py-6" role="dialog">

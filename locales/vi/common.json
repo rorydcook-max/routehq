@@ -6107,5 +6107,12 @@
     "contractPitch4": "Miễn phí cho đội xe nhỏ, và chúng tôi chuyển dữ liệu hiện có của bạn miễn phí",
     "contractPitchCta": "Bắt đầu miễn phí",
     "downloadXlsx": "Excel (XLSX), có sẵn công thức"
+  },
+  "gallery": {
+    "open": "Mở ảnh",
+    "close": "Đóng",
+    "prev": "Ảnh trước",
+    "next": "Ảnh tiếp",
+    "more": "Thêm {count} ảnh"
   }
 }

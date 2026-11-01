@@ -6107,5 +6107,12 @@
     "contractPitch4": "소규모 업체는 무료, 기존 기록도 무료로 옮겨 드려요",
     "contractPitchCta": "무료로 시작하기",
     "downloadXlsx": "Excel(XLSX), 수식 포함"
+  },
+  "gallery": {
+    "open": "사진 열기",
+    "close": "닫기",
+    "prev": "이전 사진",
+    "next": "다음 사진",
+    "more": "사진 {count}장 더"
   }
 }

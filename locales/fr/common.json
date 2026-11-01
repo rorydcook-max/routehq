@@ -6107,5 +6107,12 @@
     "contractPitch4": "Gratuit pour les petites flottes, et nous importons gratuitement vos données existantes",
     "contractPitchCta": "Commencer gratuitement",
     "downloadXlsx": "Excel (XLSX), avec formules"
+  },
+  "gallery": {
+    "open": "Ouvrir la photo",
+    "close": "Fermer",
+    "prev": "Photo précédente",
+    "next": "Photo suivante",
+    "more": "{count} photos de plus"
   }
 }

@@ -7,6 +7,7 @@ import { useMemo, useState, useTransition } from "react";
 import { CalendarDays } from "lucide-react";
 import { bookOnline } from "@/app/actions/online-booking";
 import { VehicleArt } from "@/components/vehicle-art";
+import { PhotoGallery } from "@/components/photo-gallery";
 import type { CatalogVehicle } from "@/lib/public-catalog";
 import { clashes } from "@/lib/booking-rules";
 import { daysBetween, headlineRate, minimumStay, planFor } from "@/lib/rental-estimate";
@@ -233,8 +234,25 @@ export function Catalog({
           return (
             <article className={`flex flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-sm ${isOpen ? "sm:col-span-2 lg:col-span-3" : ""}`} key={vehicle.id}>
               <div className={`relative ${isOpen ? "sm:flex sm:items-start sm:gap-5 sm:p-5" : "flex flex-1 flex-col"}`}>
-                {/* Capped at 176px on phones, so three vehicles aren't a long scroll of pictures. */}
-                <div className={`relative aspect-[16/10] max-h-44 w-full bg-[var(--panel-secondary)] sm:max-h-none ${isOpen ? "sm:w-64 sm:shrink-0 sm:overflow-hidden sm:rounded-xl" : ""} ${!free ? "[&>div]:opacity-60 [&>img]:opacity-60" : ""}`}>
+                {/* Opened: the main photo large with the others as thumbnails, any of them full screen with a tap.
+                    Closed: the main photo in the 4:3 shape phone cameras take, so cars aren't cropped to a strip (Rory, 1 Nov 2026). */}
+                {isOpen && vehicle.photoUrls.length > 0 ? (
+                  <div className="relative p-3 pb-0 sm:w-80 sm:shrink-0 sm:p-0">
+                    <PhotoGallery
+                      alt={vehicle.name}
+                      dimmed={!free}
+                      overlay={
+                        !free ? (
+                          <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-[var(--foreground)] shadow-sm">
+                            {openEndedClash ? t("onLongTermRental") : freeFrom ? t("bookedUntil", { date: shortDate(freeFrom, locale) }) : t("takenForDates")}
+                          </span>
+                        ) : null
+                      }
+                      photos={vehicle.photoUrls}
+                    />
+                  </div>
+                ) : (
+                <div className={`relative aspect-[4/3] w-full bg-[var(--panel-secondary)] ${isOpen ? "sm:w-80 sm:shrink-0 sm:overflow-hidden sm:rounded-xl" : ""} ${!free ? "[&>div]:opacity-60 [&>img]:opacity-60" : ""}`}>
                   {vehicle.photoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img alt={vehicle.name} className="h-full w-full object-cover" src={vehicle.photoUrl} />
@@ -250,6 +268,7 @@ export function Catalog({
                     </span>
                   ) : null}
                 </div>
+                )}
                 <div className={`flex min-w-0 flex-1 flex-col ${isOpen ? "p-4 sm:p-0" : "p-4"}`}>
                   <h3 className="text-[17px] font-bold leading-tight text-[var(--foreground)]">{vehicle.name}</h3>
                   {/* Every card has the same lines in the same places (a dash where something is missing), so prices and buttons line up across a row. */}

@@ -6107,5 +6107,12 @@
     "contractPitch4": "Libre para sa maliliit na fleet, at libre naming ililipat ang iyong kasalukuyang record",
     "contractPitchCta": "Magsimula nang libre",
     "downloadXlsx": "Excel (XLSX), may mga formula"
+  },
+  "gallery": {
+    "open": "Buksan ang litrato",
+    "close": "Isara",
+    "prev": "Nakaraang litrato",
+    "next": "Susunod na litrato",
+    "more": "{count} pang litrato"
   }
 }

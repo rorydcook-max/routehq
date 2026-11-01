@@ -6107,5 +6107,12 @@
     "contractPitch4": "Free for small fleets, and we import your existing records for free",
     "contractPitchCta": "Start free",
     "downloadXlsx": "Excel (XLSX), with formulas"
+  },
+  "gallery": {
+    "open": "Open photo",
+    "close": "Close",
+    "prev": "Previous photo",
+    "next": "Next photo",
+    "more": "{count} more photos"
   }
 }

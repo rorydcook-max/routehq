@@ -6107,5 +6107,12 @@
     "contractPitch4": "Gratis för små flottor, och vi importerar dina befintliga uppgifter kostnadsfritt",
     "contractPitchCta": "Börja gratis",
     "downloadXlsx": "Excel (XLSX), med formler"
+  },
+  "gallery": {
+    "open": "Öppna foto",
+    "close": "Stäng",
+    "prev": "Föregående foto",
+    "next": "Nästa foto",
+    "more": "{count} foton till"
   }
 }

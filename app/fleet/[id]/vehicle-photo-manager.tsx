@@ -53,17 +53,62 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
     });
   }
 
-  // Dragging works with a mouse; "Make main photo" is the same thing by tap.
-  function movePhoto(targetPhotoId: string) {
-    if (!draggedPhotoId || draggedPhotoId === targetPhotoId) return;
-    const fromIndex = orderedPhotos.findIndex((photo) => photo.id === draggedPhotoId);
-    const toIndex = orderedPhotos.findIndex((photo) => photo.id === targetPhotoId);
-    if (fromIndex < 0 || toIndex < 0) return;
-    const nextPhotos = [...orderedPhotos];
-    const [movedPhoto] = nextPhotos.splice(fromIndex, 1);
-    nextPhotos.splice(toIndex, 0, movedPhoto);
+  // Dragging by the arrows handle, with a finger or a mouse (pointer events: the browser's own drag-and-drop does
+  // nothing on a phone). The photos move as you go; the new order is saved when you let go.
+  const orderRef = useRef(orderedPhotos);
+  orderRef.current = orderedPhotos;
+  const dragStart = useRef<{ id: string; order: string } | null>(null);
+
+  // The page listens while dragging, not the handle: the handle's tile moves in the page as photos swap places,
+  // and a moved element loses the finger.
+  function startDrag(event: React.PointerEvent<HTMLElement>, photoId: string) {
+    event.preventDefault();
+    const list = event.currentTarget.closest(".overflow-y-auto");
+    dragStart.current = { id: photoId, order: orderRef.current.map((photo) => photo.id).join(",") };
+    setDraggedPhotoId(photoId);
+    const move = (moveEvent: PointerEvent) => {
+      moveEvent.preventDefault();
+      dragOver(moveEvent, list);
+    };
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+      endDrag();
+    };
+    window.addEventListener("pointermove", move, { passive: false });
+    window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+  }
+
+  function dragOver(event: PointerEvent, list: Element | null) {
+    const dragging = dragStart.current;
+    if (!dragging) return;
+    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-photo-id]")?.getAttribute("data-photo-id");
+    if (target && target !== dragging.id) {
+      setOrderedPhotos((current) => {
+        const from = current.findIndex((photo) => photo.id === dragging.id);
+        const to = current.findIndex((photo) => photo.id === target);
+        if (from < 0 || to < 0) return current;
+        const next = [...current];
+        const [moved] = next.splice(from, 1);
+        next.splice(to, 0, moved);
+        return next;
+      });
+    }
+    // Near the top or bottom of the list, it scrolls along.
+    if (list) {
+      const box = list.getBoundingClientRect();
+      if (event.clientY < box.top + 60) list.scrollBy(0, -14);
+      else if (event.clientY > box.bottom - 60) list.scrollBy(0, 14);
+    }
+  }
+
+  function endDrag() {
+    const dragging = dragStart.current;
+    dragStart.current = null;
     setDraggedPhotoId(null);
-    persistPhotoOrder(nextPhotos);
+    if (dragging && orderRef.current.map((photo) => photo.id).join(",") !== dragging.order) persistPhotoOrder(orderRef.current);
   }
 
   function makeMain(photoId: string) {
@@ -192,50 +237,46 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
 
               {message ? <p className="mt-3 rounded-xl bg-[var(--primary-light)] px-4 py-3 font-bold text-[var(--primary)]">{message}</p> : null}
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {/* Two to a row, so most of a car's photos are on screen at once and can be dragged into order with a finger
+                  or the mouse (Rory, 1 Nov 2026: dragging only worked with a mouse). Hold the arrows and move. */}
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {orderedPhotos.map((photo, index) => (
                   <div
-                    className={`overflow-hidden rounded-2xl bg-[var(--panel-secondary)] ${draggedPhotoId === photo.id ? "opacity-60" : ""}`}
-                    draggable
+                    className={`overflow-hidden rounded-2xl bg-[var(--panel-secondary)] transition-opacity ${draggedPhotoId === photo.id ? "opacity-50 ring-2 ring-[var(--primary)]" : ""}`}
+                    data-photo-id={photo.id}
                     key={photo.id}
-                    onDragEnd={() => setDraggedPhotoId(null)}
-                    onDragOver={(event) => event.preventDefault()}
-                    onDragStart={(event) => {
-                      setDraggedPhotoId(photo.id);
-                      event.dataTransfer.effectAllowed = "move";
-                    }}
-                    onDrop={(event) => {
-                      event.preventDefault();
-                      movePhoto(photo.id);
-                    }}
                   >
-                    <div className={`relative ${orderedPhotos.length > 1 ? "cursor-grab active:cursor-grabbing" : ""}`}>
-                      {photo.url ? <img alt="" className="pointer-events-none h-44 w-full object-cover" draggable={false} src={photo.url} /> : <div className="h-44" />}
-                      {/* Shows the photos can be dragged into order. */}
+                    <div className="relative">
+                      {photo.url ? <img alt="" className="pointer-events-none aspect-[4/3] w-full select-none object-cover" draggable={false} src={photo.url} /> : <div className="aspect-[4/3]" />}
+                      {index === 0 ? (
+                        <span className="absolute bottom-2 left-2 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-[var(--foreground)] shadow-sm">{say("ph_main")}</span>
+                      ) : null}
                       {orderedPhotos.length > 1 ? (
-                        <span aria-hidden="true" className="absolute left-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[var(--foreground)] shadow-sm">
-                          <Move size={18} />
+                        <span
+                          aria-label={say("ph_orderHint")}
+                          className="absolute left-2 top-2 flex h-11 w-11 cursor-grab touch-none select-none items-center justify-center rounded-full bg-white/95 text-[var(--foreground)] shadow-sm active:cursor-grabbing"
+                          onPointerDown={(event) => startDrag(event, photo.id)}
+                          role="button"
+                        >
+                          <Move size={20} />
                         </span>
                       ) : null}
-                    </div>
-                    <div className="flex items-center justify-between gap-2 p-3">
-                      {index === 0 ? (
-                        <span className="font-bold text-[var(--foreground)]">{say("ph_main")}</span>
-                      ) : (
-                        <button className="min-h-[44px] rounded-full bg-white px-4 font-bold text-[var(--primary)]" disabled={isPending} onClick={() => makeMain(photo.id)} type="button">
-                          {say("ph_makeMain")}
-                        </button>
-                      )}
-                      <form action={remove}>
+                      <form action={remove} className="absolute right-2 top-2">
                         <input name="vehicleId" type="hidden" value={vehicleId} />
                         <input name="organizationId" type="hidden" value={organizationId} />
                         <input name="documentId" type="hidden" value={photo.id} />
-                        <button className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 font-bold text-[var(--danger)]" disabled={isPending} type="submit">
-                          <Trash2 size={17} />
-                          {say("ph_remove")}
+                        <button aria-label={say("ph_remove")} className="flex h-11 w-11 items-center justify-center rounded-full bg-white/95 text-[var(--danger)] shadow-sm" disabled={isPending} type="submit">
+                          <Trash2 size={18} />
                         </button>
                       </form>
                     </div>
+                    {index > 0 ? (
+                      <button className="block min-h-11 w-full px-2 text-sm font-bold text-[var(--primary)]" disabled={isPending} onClick={() => makeMain(photo.id)} type="button">
+                        {say("ph_makeMain")}
+                      </button>
+                    ) : (
+                      <div className="min-h-11" />
+                    )}
                   </div>
                 ))}
               </div>

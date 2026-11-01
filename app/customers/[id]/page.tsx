@@ -152,7 +152,7 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
   return (
     <section className="card p-4">
       <div className="flex items-start justify-between gap-3">
-        <VehicleArt colour={rental.vehicles?.color} kind={kindFromCategory(rental.vehicles?.vehicle_categories)} model={rental.vehicles?.model} size="sm" />
+        <VehicleArt vehicleId={rental.vehicles?.id || rental.vehicle_id} colour={rental.vehicles?.color} kind={kindFromCategory(rental.vehicles?.vehicle_categories)} model={rental.vehicles?.model} size="sm" />
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-[var(--muted)]">{rental.status === "booked" ? cx.say("r_booked") : cx.say("r_renting")}</p>
           <p className="text-[20px] font-bold leading-tight text-[var(--foreground)]">{vehicleName(rental.vehicles)}</p>

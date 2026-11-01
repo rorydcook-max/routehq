@@ -913,7 +913,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
           <div className="rounded-2xl bg-[var(--panel-secondary)] p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
               <span className="shrink-0 self-start">
-                <VehicleArt colour={(context.vehicle as any).color} kind={kindFromCategory(context.vehicle.vehicle_categories)} model={(context.vehicle as any).model} size="md" />
+                <VehicleArt vehicleId={(context.vehicle as any)?.id} colour={(context.vehicle as any).color} kind={kindFromCategory(context.vehicle.vehicle_categories)} model={(context.vehicle as any).model} size="md" />
               </span>
               <div className="min-w-0">
                 {/* The one vehicle header: name, year, plate chip. */}

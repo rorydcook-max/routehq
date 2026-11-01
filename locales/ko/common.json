@@ -2437,6 +2437,8 @@
     "handoverNotYet": "아직 작성되지 않았어요. 고객이 차량을 인수할 때 상단의 인도 시작을 사용하세요."
   },
   "newBooking": {
+    "docsSelfie": "고객 사진",
+    "createLink": "예약 링크 만들기",
     "missingDocsHere": "서류가 없습니다. 지금 또는 나중에 고객 페이지에서 사진을 추가하세요.",
     "missingDocsAdd": "서류가 없습니다. 지금 사진을 추가하거나 고객이 예약 링크에서 추가합니다.",
     "docsPassport": "여권",

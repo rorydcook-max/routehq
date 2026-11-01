@@ -73,7 +73,16 @@ export function PhoneField({
       <input name={codeName} type="hidden" value={current.phoneCode} />
       <input name={inputName} type="hidden" value={national} />
       {/* The country: a small button showing the flag and code, with the full alphabetical list behind it. */}
-      <div className={`relative flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-lg border border-[var(--border)] bg-white px-3 text-sm text-[var(--foreground)] ${inputClass}`}>
+      {/* Drawn like the fields next to it (their border comes from the global field style, which a div doesn't get). */}
+      <div
+        // Spacing from the field classes only: a class with "rounded" and "border-[var(--border)]" is made borderless
+        // inside cards by the global style (meant for boxes, not fields).
+        className={`relative flex min-h-11 items-center gap-1.5 whitespace-nowrap px-3 text-[var(--foreground)] ${inputClass
+          .split(/\s+/)
+          .filter((token) => /^(m[tbxy]?-|w-)/.test(token))
+          .join(" ")}`}
+        style={{ border: "1.5px solid var(--border-strong)", borderRadius: 12, background: "var(--surface, #fff)", height: 44 }}
+      >
         <span aria-hidden="true">{current.flag}</span>
         <span className="tabular-nums">{current.phoneCode}</span>
         <ChevronDown aria-hidden="true" className="shrink-0 text-[var(--muted)]" size={14} />

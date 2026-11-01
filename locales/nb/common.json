@@ -2437,6 +2437,8 @@
     "handoverNotYet": "Ikke fylt ut ennå. Bruk Start overlevering øverst når kunden henter kjøretøyet."
   },
   "newBooking": {
+    "docsSelfie": "Bilde av kunden",
+    "createLink": "Lag bookinglenke",
     "missingDocsHere": "Dokumenter mangler. Legg til bilder nå eller senere på kundesiden.",
     "missingDocsAdd": "Dokumenter mangler. Legg til bilder nå, eller kunden legger dem til via bookinglenken.",
     "docsPassport": "Pass",

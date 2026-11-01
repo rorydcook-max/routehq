@@ -2,15 +2,16 @@
  * Each vehicle's photos as signed links, in the order set on the vehicle page (the main photo first).
  * `perVehicle` caps how many are signed for each vehicle: 1 for a thumbnail, a handful for a gallery.
  */
-export async function vehiclePhotoUrls(client: any, organizationId: string, perVehicle = 1, expiresIn = 6 * 3600): Promise<Map<string, string[]>> {
-  const { data } = await client
+export async function vehiclePhotoUrls(client: any, organizationId: string, perVehicle = 1, expiresIn = 6 * 3600, onlyVehicleId?: string): Promise<Map<string, string[]>> {
+  let query = client
     .from("documents")
     .select("owner_id, storage_path, extracted_data, created_at")
     .eq("organization_id", organizationId)
     .eq("owner_type", "vehicle")
     .eq("category", "vehicle_photo")
-    .is("deleted_at", null)
-    .order("created_at", { ascending: true });
+    .is("deleted_at", null);
+  if (onlyVehicleId) query = query.eq("owner_id", onlyVehicleId);
+  const { data } = await query.order("created_at", { ascending: true });
 
   const byVehicle = new Map<string, Array<{ path: string; order: number; index: number }>>();
   ((data || []) as any[]).forEach((row, index) => {

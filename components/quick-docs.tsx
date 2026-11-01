@@ -46,11 +46,13 @@ export function QuickDocs({
 
   const buttons = [
     { category: "passport", label: say("docsPassport") },
-    { category: "driver_license", label: say("docsLicence") }
+    { category: "driver_license", label: say("docsLicence") },
+    // The third of the three a complete set needs (as on the booking link): a photo of the customer.
+    { category: "selfie", label: say("docsSelfie") }
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-2 gap-2 [&>label:nth-child(3)]:col-span-2">
       {buttons.map((button) => (
         <label
           className={`pressable inline-flex h-11 cursor-pointer items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-full border-2 px-3 text-[15px] font-bold ${

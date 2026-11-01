@@ -701,20 +701,18 @@ export function BookingForm({
         <div className="grid grid-cols-2 gap-2" role="radiogroup">
           <button
             aria-checked={bookingMode === "booking_link"}
-            className={`pressable flex items-start gap-2.5 rounded-xl border p-3 text-left ${bookingMode === "booking_link" ? "border-[var(--primary)] bg-[var(--primary-light)] ring-1 ring-[var(--primary)]" : "border-[var(--border)] bg-white"}`}
+            className={`pressable flex items-center gap-2.5 rounded-xl border p-3 text-left ${bookingMode === "booking_link" ? "border-[var(--primary)] bg-[var(--primary-light)] ring-1 ring-[var(--primary)]" : "border-[var(--border)] bg-white"}`}
             onClick={() => setBookingMode("booking_link")}
             role="radio"
             type="button"
           >
             <RadioDot on={bookingMode === "booking_link"} />
-            <span className="min-w-0">
-              <span className="block font-semibold text-[var(--foreground)]">{say("newBooking")}</span>
-              <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{say("newBookingBody")}</span>
-            </span>
+            {/* The names say it all (Rory, 1 Nov 2026): no line of explanation under each. */}
+            <span className="min-w-0 font-semibold text-[var(--foreground)]">{say("createLink")}</span>
           </button>
           <button
             aria-checked={bookingMode === "existing_rental"}
-            className={`pressable flex items-start gap-2.5 rounded-xl border p-3 text-left ${bookingMode === "existing_rental" ? "border-[var(--primary)] bg-[var(--primary-light)] ring-1 ring-[var(--primary)]" : "border-[var(--border)] bg-white"}`}
+            className={`pressable flex items-center gap-2.5 rounded-xl border p-3 text-left ${bookingMode === "existing_rental" ? "border-[var(--primary)] bg-[var(--primary-light)] ring-1 ring-[var(--primary)]" : "border-[var(--border)] bg-white"}`}
             onClick={() => {
               setBookingMode("existing_rental");
               setCustomerSkipped(false);
@@ -725,10 +723,7 @@ export function BookingForm({
             type="button"
           >
             <RadioDot on={bookingMode === "existing_rental"} />
-            <span className="min-w-0">
-              <span className="block font-semibold text-[var(--foreground)]">{say("alreadyOut")}</span>
-              <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{say("alreadyOutBody")}</span>
-            </span>
+            <span className="min-w-0 font-semibold text-[var(--foreground)]">{say("alreadyOut")}</span>
           </button>
         </div>
       </div>
@@ -778,8 +773,8 @@ export function BookingForm({
                   type="button"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="shrink-0 lg:hidden"><VehicleArt colour={(vehicle as any).color} kind={kindFromCategory({ code: String(vehicle.category_code || ""), name: "" })} model={vehicle.model} size="sm" /></span>
-                    <span className="hidden shrink-0 lg:block"><VehicleArt colour={(vehicle as any).color} kind={kindFromCategory({ code: String(vehicle.category_code || ""), name: "" })} model={vehicle.model} size="md" /></span>
+                    <span className="shrink-0 lg:hidden"><VehicleArt vehicleId={vehicle.id} colour={(vehicle as any).color} kind={kindFromCategory({ code: String(vehicle.category_code || ""), name: "" })} model={vehicle.model} size="sm" /></span>
+                    <span className="hidden shrink-0 lg:block"><VehicleArt vehicleId={vehicle.id} colour={(vehicle as any).color} kind={kindFromCategory({ code: String(vehicle.category_code || ""), name: "" })} model={vehicle.model} size="md" /></span>
                     {/* Three tight lines: name, plate and price, then where it stands. A list of 13 cars used to be eight screens long. */}
                     <span className="min-w-0 flex-1">
                       <span className="line-clamp-2 block text-[17px] font-bold leading-tight text-[var(--foreground)]">{vehicleTitle(vehicle)}</span>
@@ -1050,18 +1045,20 @@ export function BookingForm({
                 </button>
               </p>
             ) : null}
-            <div className={`mt-3 grid-cols-2 gap-2 ${selectedVehicle?.included_items && !includedOpen ? "hidden" : "grid"}`}>
+            {/* Every option the same tile: one height for the whole grid, box and words centred in it (Rory, 1 Nov 2026). */}
+            <div className={`mt-3 auto-rows-fr grid-cols-2 gap-2 ${selectedVehicle?.included_items && !includedOpen ? "hidden" : "grid"}`}>
               {includedOptions
                 .filter((item) => (isTwoWheeler(selectedVehicle?.category_code) ? !notForTwoWheelers.has(item) : !twoWheelerOnly.has(item)) || includedItems.includes(item))
                 .map((item) => (
                 <label
-                  className="checkbox-label sub-surface min-h-12 font-bold text-[var(--foreground-secondary)]"
+                  className={`flex min-h-[56px] cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2 text-[15px] font-bold leading-tight ${
+                    includedItems.includes(item) ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--foreground)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"
+                  }`}
                   key={item}
-                  style={{ display: "flex", padding: "13px 12px" }}
                 >
                   <input
                     checked={includedItems.includes(item)}
-                    className="flex-shrink-0"
+                    className="!m-0 h-5 w-5 flex-shrink-0"
                     name="includedItem"
                     onChange={(event) => {
                       setIncludedItems((current) => (event.target.checked ? [...current, item] : current.filter((entry) => entry !== item)));
@@ -1344,7 +1341,7 @@ export function BookingForm({
           ) : null}
           {selectedVehicle && startDate ? (
             <div aria-hidden="true" className="mt-3 flex flex-wrap items-center gap-4 rounded-2xl bg-[var(--panel-secondary)] p-4">
-              <VehicleArt colour={(selectedVehicle as any).color} kind={kindFromCategory({ code: String(selectedVehicle.category_code || ""), name: "" })} model={selectedVehicle.model} size="md" />
+              <VehicleArt vehicleId={selectedVehicle.id} colour={(selectedVehicle as any).color} kind={kindFromCategory({ code: String(selectedVehicle.category_code || ""), name: "" })} model={selectedVehicle.model} size="md" />
               <span className="flex items-center gap-2">
                 <DateLeaf date={startDate} locale={locale} />
                 {!openEnded && endDate ? (

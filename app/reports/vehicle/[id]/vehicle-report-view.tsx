@@ -162,7 +162,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
       <div className="grid content-start gap-3 [&>*]:min-w-0">
       <section className="card p-4">
         <div className="flex items-center gap-4">
-          <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="md" />
+          <VehicleArt vehicleId={vehicle.id} colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="md" />
           <div className="min-w-0 flex-1">
             <p className={soft}>{say("profit")}</p>
             <p className={`num text-[34px] leading-tight ${netProfit >= 0 ? "text-[var(--foreground)]" : "text-[var(--warning)]"}`}>{money(netProfit)}</p>

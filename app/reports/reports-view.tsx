@@ -238,7 +238,7 @@ function VehicleTile({ vehicle, comparing, selected, onSelect, href, say }: { ve
   const body = (
     <>
       <span className="flex items-center gap-3">
-        <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="sm" />
+        <VehicleArt vehicleId={vehicle.id} colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="sm" />
         <span className="min-w-0 flex-1">
           <VehicleTitle name={name || vehicle.label} nameClassName="truncate text-[16px] font-semibold text-[var(--foreground)]" plate={name ? vehicle.plate : null} />
         </span>
@@ -288,7 +288,7 @@ function VehicleListRow({ vehicle, best, comparing, selected, onSelect, href, sa
   const share = best > 0 ? Math.min(100, (Math.abs(vehicle.profit) / best) * 100) : 0;
   const body = (
     <>
-      <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="sm" />
+      <VehicleArt vehicleId={vehicle.id} colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="sm" />
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline justify-between gap-3">
           {/* The one vehicle header: the name people know it by, then the plate chip; how busy it was sits underneath. */}

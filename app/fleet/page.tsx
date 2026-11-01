@@ -326,7 +326,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         </td>
                         <td className="py-3 pr-3">
                           <Link className="flex min-w-0 items-center gap-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={href}>
-                            <VehicleArt colour={vehicle.color} kind={group.kind} model={vehicle.model} size="sm" />
+                            <VehicleArt vehicleId={vehicle.id} colour={vehicle.color} kind={group.kind} model={vehicle.model} size="sm" />
                             <span className="min-w-0">
                               {/* The one vehicle header: name, year, plate chip. */}
                               <VehicleTitle name={`${vehicle.make} ${vehicle.model}`} nameClassName="truncate font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)]" plate={vehicle.plate} year={vehicle.year} />
@@ -373,7 +373,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               {group.vehicles.map((vehicle) => (
                 <li key={vehicle.id}>
                   <Link className="flex items-center gap-3 px-4 py-3.5 active:bg-[var(--panel-secondary)]" href={`/fleet/${vehicle.id}`}>
-                    <VehicleArt colour={vehicle.color} kind={group.kind} model={vehicle.model} size="sm" />
+                    <VehicleArt vehicleId={vehicle.id} colour={vehicle.color} kind={group.kind} model={vehicle.model} size="sm" />
                     <div className="min-w-0 flex-1">
                       {/* Name and status share the top line, so a row is three short lines rather than five. */}
                       <div className="flex items-start justify-between gap-2">

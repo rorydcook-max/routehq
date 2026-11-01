@@ -2477,6 +2477,8 @@
     "handoverNotYet": "Noch nicht ausgefüllt. Nutzen Sie oben „Übergabe starten“, wenn der Kunde das Fahrzeug abholt."
   },
   "newBooking": {
+    "docsSelfie": "Foto des Kunden",
+    "createLink": "Buchungslink erstellen",
     "missingDocsHere": "Dokumente fehlen. Fotos jetzt oder später auf der Kundenseite hinzufügen.",
     "missingDocsAdd": "Dokumente fehlen. Fotos jetzt hinzufügen, oder der Kunde lädt sie über den Buchungslink hoch.",
     "docsPassport": "Reisepass",

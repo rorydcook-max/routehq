@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
 import { useTranslations, useLocale } from "next-intl";
-import { Plus, Search, UserRound, X } from "lucide-react";
+import { ChevronLeft, Plus, Search, UserRound, X } from "lucide-react";
 import { createInlineCustomer } from "@/app/actions/customers";
 import { allCountries, countriesSorted, flagForNationality } from "@/lib/customer-options";
 import { initialsOf } from "@/components/glance";
@@ -120,21 +120,32 @@ export function CustomerSelector({
 
       {open ? (
         <div className="fixed inset-0 z-50 bg-[var(--foreground)]/30 sm:absolute sm:inset-auto sm:top-full sm:z-30 sm:mt-2 sm:w-full sm:bg-transparent">
-          <div className="absolute bottom-0 left-0 right-0 max-h-[80vh] overflow-hidden rounded-t-2xl border border-[var(--border)] bg-white shadow-2xl sm:relative sm:max-h-[420px] sm:rounded-lg">
-            <div className="flex items-center justify-between border-b border-[var(--border)] p-3">
-              <p className="font-semibold text-[var(--foreground)]">{say("sel_select")}</p>
+          {/* One scrolling area filling the sheet (Rory, 1 Nov 2026: the add-customer form was squeezed into a small box
+              at the bottom of the screen). dvh, so the sheet shrinks above the phone keyboard rather than under it. */}
+          <div className={`absolute bottom-0 left-0 right-0 flex flex-col overflow-hidden rounded-t-2xl border border-[var(--border)] bg-white shadow-2xl sm:relative sm:rounded-lg ${creating ? "h-[92dvh] sm:h-auto sm:max-h-[640px]" : "max-h-[80dvh] sm:max-h-[420px]"}`}>
+            <div className="flex shrink-0 items-center justify-between border-b border-[var(--border)] p-3">
+              <p className="font-semibold text-[var(--foreground)]">{creating ? say("sel_create") : say("sel_select")}</p>
               <button aria-label={say("closeLabel")} className="rounded-full p-2 text-[var(--muted)]" onClick={() => setOpen(false)} type="button">
                 <X size={18} />
               </button>
             </div>
-            <div className="p-3">
-              <input className={inputClass} onChange={(event) => setSearch(event.target.value)} placeholder={say("search")} value={search} />
-            </div>
-            <div className="max-h-64 overflow-y-auto px-3 pb-3">
-              <button className="mb-2 flex min-h-11 w-full items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-left text-sm font-bold text-[var(--primary)]" onClick={() => setCreating((value) => !value)} type="button">
-                <Plus size={16} />
-                {say("sel_create")}
-              </button>
+            {creating ? null : (
+              <div className="shrink-0 p-3">
+                <input className={inputClass} onChange={(event) => setSearch(event.target.value)} placeholder={say("search")} value={search} />
+              </div>
+            )}
+            <div className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-[max(12px,env(safe-area-inset-bottom))] ${creating ? "pt-3" : ""}`}>
+              {creating ? (
+                <button className="mb-1 flex min-h-11 items-center gap-1 text-sm font-bold text-[var(--primary)]" onClick={() => setCreating(false)} type="button">
+                  <ChevronLeft size={16} />
+                  {say("sel_select")}
+                </button>
+              ) : (
+                <button className="mb-2 flex min-h-11 w-full items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-left text-sm font-bold text-[var(--primary)]" onClick={() => setCreating(true)} type="button">
+                  <Plus size={16} />
+                  {say("sel_create")}
+                </button>
+              )}
 
               {creating ? (
                 <div

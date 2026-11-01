@@ -3,7 +3,7 @@
  * form's "existing rental", and the importer). Marks rent due before
  * "paidBefore" as paid, and records a deposit already held.
  */
-export async function settleExistingRental(supabase: any, input: { rental: any; organizationId: string; userId: string; paidBefore: string | null; depositHeld: number; currency: string; recordMoney?: boolean }) {
+export async function settleExistingRental(supabase: any, input: { rental: any; organizationId: string; userId: string; paidBefore: string | null; depositHeld: number; currency: string; recordMoney?: boolean; upfrontUntil?: string | null }) {
   const { rental, organizationId, userId, paidBefore, depositHeld, currency } = input;
   // False when the rent received is already in Money in & out (an import with a payment sheet): rows are only marked paid.
   const recordMoney = input.recordMoney !== false;
@@ -21,10 +21,13 @@ export async function settleExistingRental(supabase: any, input: { rental: any; 
       .order("due_date", { ascending: true });
     for (const payment of (rows || []).filter((row: any) => !row.voided && row.metadata?.type !== "deposit" && row.metadata?.is_deposit !== true)) {
       const due = String(payment.due_date).slice(0, 10);
+      // Months paid upfront were received on the first day, not month by month (Rory, 1 Nov 2026: the Ranger's
+      // three months, paid on delivery 2 Oct, showed as November income).
+      const paidOn = input.upfrontUntil && startDate && due < input.upfrontUntil ? startDate : due;
       if (!recordMoney) {
         await supabase
           .from("rental_payments")
-          .update({ status: "paid", paid_at: `${due}T00:00:00.000Z`, metadata: { ...(payment.metadata || {}), setup_source: "operator_existing_rental", paid_per_sheet: true } })
+          .update({ status: "paid", paid_at: `${paidOn}T00:00:00.000Z`, metadata: { ...(payment.metadata || {}), setup_source: "operator_existing_rental", paid_per_sheet: true } })
           .eq("id", payment.id);
         continue;
       }
@@ -39,7 +42,7 @@ export async function settleExistingRental(supabase: any, input: { rental: any; 
           type: "rental_income",
           amount: Number(payment.amount || 0),
           currency,
-          transaction_date: due,
+          transaction_date: paidOn,
           notes: "Rent already paid when the rental was recorded",
           metadata: { source: "existing_rental_setup" },
           created_by: userId
@@ -48,7 +51,7 @@ export async function settleExistingRental(supabase: any, input: { rental: any; 
         .single();
       await supabase
         .from("rental_payments")
-        .update({ status: "paid", paid_at: `${due}T00:00:00.000Z`, transaction_id: transaction?.id || null, metadata: { ...(payment.metadata || {}), setup_source: "operator_existing_rental" } })
+        .update({ status: "paid", paid_at: `${paidOn}T00:00:00.000Z`, transaction_id: transaction?.id || null, metadata: { ...(payment.metadata || {}), setup_source: "operator_existing_rental" } })
         .eq("id", payment.id);
     }
   }

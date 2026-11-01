@@ -2477,6 +2477,8 @@
     "handoverNotYet": "尚未填写。客户取车时，请使用顶部的“开始交车”。"
   },
   "newBooking": {
+    "docsSelfie": "客户照片",
+    "createLink": "创建预订链接",
     "missingDocsHere": "缺少证件。现在或稍后在客户页面添加照片。",
     "missingDocsAdd": "缺少证件。现在添加照片，或由客户通过预订链接添加。",
     "docsPassport": "护照",

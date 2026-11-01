@@ -2437,6 +2437,8 @@
     "handoverNotYet": "Inte ifyllt ännu. Använd Starta överlämning högst upp när kunden hämtar fordonet."
   },
   "newBooking": {
+    "docsSelfie": "Foto på kunden",
+    "createLink": "Skapa bokningslänk",
     "missingDocsHere": "Dokument saknas. Lägg till foton nu eller senare på kundsidan.",
     "missingDocsAdd": "Dokument saknas. Lägg till foton nu, eller så lägger kunden till dem via bokningslänken.",
     "docsPassport": "Pass",

@@ -1,4 +1,7 @@
+"use client";
+
 import type { VehicleKind } from "@/lib/vehicle-groups";
+import { useVehiclePhoto } from "@/components/vehicle-photo-store";
 
 /**
  * A picture of the vehicle (Lagoon look, Oct 2026): a simple side-on drawing in
@@ -67,6 +70,7 @@ export function VehicleArt({
   model = "",
   colour,
   photoUrl,
+  vehicleId,
   size = "md",
   className = ""
 }: {
@@ -74,12 +78,16 @@ export function VehicleArt({
   model?: string | null;
   colour?: string | null;
   photoUrl?: string | null;
+  /** With the vehicle's id, its main photo is shown in place of the drawing whenever it has one (Rory, 1 Nov 2026). */
+  vehicleId?: string | null;
   size?: keyof typeof BOX;
   className?: string;
 }) {
-  if (photoUrl) {
+  const storedPhoto = useVehiclePhoto(photoUrl ? null : vehicleId);
+  const photo = photoUrl || storedPhoto;
+  if (photo) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img alt="" className={`${BOX[size]} flex-shrink-0 object-cover ${className}`} src={photoUrl} />;
+    return <img alt="" className={`${BOX[size]} flex-shrink-0 object-cover ${className}`} src={photo} />;
   }
   const known = paintOf(colour);
   const paint = known || "var(--primary)";

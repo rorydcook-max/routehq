@@ -123,7 +123,7 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
             <li className="card p-4" key={row.id}>
               <div className="flex items-start justify-between gap-3">
                 <Link className="group flex min-w-0 items-center gap-3" href={`/fleet/${row.id}`}>
-                  <VehicleArt colour={row.colour} kind={row.kind} model={row.model} size="sm" />
+                  <VehicleArt vehicleId={row.id} colour={row.colour} kind={row.kind} model={row.model} size="sm" />
                   <span className="min-w-0">
                     <VehicleTitle name={row.name} nameClassName="font-semibold text-[var(--foreground)] group-hover:underline" plate={row.plate} year={row.year} />
                     {row.mileage ? <span className="mt-0.5 block text-sm tabular-nums text-[var(--muted)]">{`${row.mileage.toLocaleString("en-US")} km`}</span> : null}

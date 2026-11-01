@@ -72,6 +72,9 @@ export function PhotoViewer({ photos, start, alt, onClose }: { photos: string[];
   const say = useTranslations("gallery");
   const [index, setIndex] = useState(start);
   const touchX = useRef<number | null>(null);
+  const touchY = useRef<number | null>(null);
+  const direction = useRef<"down" | "side" | null>(null);
+  const [dragY, setDragY] = useState(0);
   const go = (step: number) => setIndex((current) => (current + step + photos.length) % photos.length);
 
   useEffect(() => {
@@ -91,20 +94,42 @@ export function PhotoViewer({ photos, start, alt, onClose }: { photos: string[];
   }, []);
 
   const many = photos.length > 1;
+  // Swipe sideways for the next photo; pull down (or up) to close, the photo following the finger (Rory, 1 Nov 2026).
+  const fade = Math.max(0.35, 1 - Math.abs(dragY) / 400);
   return createPortal(
     <div
       aria-modal="true"
-      className="fixed inset-0 z-[80] flex flex-col bg-black text-white"
-      onTouchEnd={(event) => {
-        if (touchX.current === null || !many) return;
-        const moved = event.changedTouches[0].clientX - touchX.current;
-        if (Math.abs(moved) > 40) go(moved < 0 ? 1 : -1);
+      className="fixed inset-0 z-[80] flex touch-none flex-col text-white"
+      onTouchCancel={() => {
         touchX.current = null;
+        setDragY(0);
+      }}
+      onTouchEnd={(event) => {
+        if (touchX.current === null || touchY.current === null) return;
+        const movedX = event.changedTouches[0].clientX - touchX.current;
+        const movedY = event.changedTouches[0].clientY - touchY.current;
+        touchX.current = null;
+        touchY.current = null;
+        if (direction.current === "down") {
+          if (Math.abs(movedY) > 90) onClose();
+          else setDragY(0);
+        } else if (many && Math.abs(movedX) > 40) go(movedX < 0 ? 1 : -1);
+        direction.current = null;
+      }}
+      onTouchMove={(event) => {
+        if (touchX.current === null || touchY.current === null) return;
+        const movedX = event.touches[0].clientX - touchX.current;
+        const movedY = event.touches[0].clientY - touchY.current;
+        if (!direction.current && (Math.abs(movedX) > 8 || Math.abs(movedY) > 8)) direction.current = Math.abs(movedY) > Math.abs(movedX) ? "down" : "side";
+        if (direction.current === "down") setDragY(movedY);
       }}
       onTouchStart={(event) => {
         touchX.current = event.touches[0].clientX;
+        touchY.current = event.touches[0].clientY;
+        direction.current = null;
       }}
       role="dialog"
+      style={{ background: `rgba(0,0,0,${fade})` }}
     >
       <div className="flex items-center justify-between px-4 pb-2 pt-[max(12px,env(safe-area-inset-top))]">
         <span className="num text-[15px] font-semibold text-white/80">{many ? `${index + 1} / ${photos.length}` : ""}</span>
@@ -114,7 +139,14 @@ export function PhotoViewer({ photos, start, alt, onClose }: { photos: string[];
       </div>
       <div className="relative flex min-h-0 flex-1 items-center justify-center px-2 pb-[max(16px,env(safe-area-inset-bottom))]" onClick={(event) => event.target === event.currentTarget && onClose()}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img alt={alt} className="max-h-full max-w-full select-none rounded-lg object-contain" draggable={false} key={photos[index]} src={photos[index]} />
+        <img
+          alt={alt}
+          className={`max-h-full max-w-full select-none rounded-lg object-contain ${dragY === 0 ? "transition-transform duration-200" : ""}`}
+          draggable={false}
+          key={photos[index]}
+          src={photos[index]}
+          style={{ transform: dragY ? `translateY(${dragY}px) scale(${Math.max(0.85, 1 - Math.abs(dragY) / 1500)})` : undefined }}
+        />
         {many ? (
           <>
             <button aria-label={say("prev")} className="absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15" onClick={() => go(-1)} type="button">

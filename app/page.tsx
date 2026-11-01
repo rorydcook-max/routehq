@@ -432,11 +432,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     }
     return null;
   };
+  // Each vehicle's main photo, when it has one, in place of the drawing everywhere on this page (Rory, 1 Nov 2026).
+  const lotPhotos: Map<string, string[]> = await vehiclePhotoUrls(supabase, organization.id, 1, 12 * 3600).catch(() => new Map());
   const artFor = (item: AgendaItem) => {
     const vehicle = vehicleOf(item);
     if (!vehicle) return null;
     const category = categories.find((entry: any) => entry.id === vehicle.categoryId) || null;
-    return <VehicleArt colour={vehicle.color} kind={kindFromCategory(category as any)} model={vehicle.model} size="sm" />;
+    return <VehicleArt colour={vehicle.color} kind={kindFromCategory(category as any)} model={vehicle.model} photoUrl={lotPhotos.get(vehicle.id)?.[0]} size="sm" vehicleId={vehicle.id} />;
   };
 
   // ── The week ahead, for the band: what goes out and comes back each day ──
@@ -502,11 +504,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     const vehicle = vehicleById.get(String(vehicleId || ""));
     if (!vehicle) return null;
     const category = categories.find((entry: any) => entry.id === vehicle.categoryId) || null;
-    return <VehicleArt colour={vehicle.color} kind={kindFromCategory(category as any)} model={vehicle.model} size="md" />;
+    return <VehicleArt colour={vehicle.color} kind={kindFromCategory(category as any)} model={vehicle.model} photoUrl={lotPhotos.get(vehicle.id)?.[0]} size="md" vehicleId={vehicle.id} />;
   };
 
-  // Each vehicle's main photo, when it has one, in place of the drawing (Rory, 1 Nov 2026).
-  const lotPhotos: Map<string, string[]> = await vehiclePhotoUrls(supabase, organization.id, 1).catch(() => new Map());
   const lot: LotVehicle[] = vehicles.map((v) => {
     const current = rentals.find((r) => r.vehicleId === v.id && r.status !== "Booked") || null;
     const next = rentals.filter((r) => r.vehicleId === v.id && r.status === "Booked").sort((a, b) => String(a.start).localeCompare(String(b.start)))[0] || null;
@@ -536,12 +536,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       id: v.id,
       // Make and model together: a "Mazda 2" as "2" on its own is a number, not a car.
       name: [v.make, v.model].filter(Boolean).join(" ") || v.make,
-      art: lotPhotos.get(v.id)?.[0] ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img alt="" className="block h-11 w-14 rounded-xl object-cover" loading="lazy" src={lotPhotos.get(v.id)![0]} />
-      ) : (
-        <VehicleArt colour={v.color} kind={kindFromCategory(category as any)} model={v.model} size="sm" />
-      ),
+      art: <VehicleArt colour={v.color} kind={kindFromCategory(category as any)} model={v.model} photoUrl={lotPhotos.get(v.id)?.[0]} size="sm" vehicleId={v.id} />,
       state,
       tip: `${[v.make, v.model].filter(Boolean).join(" ")}: ${tip}`,
       // The vehicle's own page (Rory, 1 Nov 2026); its booking is one tap from there.

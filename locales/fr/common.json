@@ -2477,6 +2477,8 @@
     "handoverNotYet": "Pas encore rempli. Utilisez « Commencer la remise » en haut quand le client récupère le véhicule."
   },
   "newBooking": {
+    "docsSelfie": "Photo du client",
+    "createLink": "Créer un lien de réservation",
     "missingDocsHere": "Documents manquants. Ajoutez des photos maintenant ou plus tard sur la fiche client.",
     "missingDocsAdd": "Documents manquants. Ajoutez des photos maintenant, ou le client les ajoute via le lien de réservation.",
     "docsPassport": "Passeport",

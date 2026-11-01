@@ -2437,6 +2437,8 @@
     "handoverNotYet": "尚未填寫。客戶取車時，請使用上方的「開始交車」。"
   },
   "newBooking": {
+    "docsSelfie": "客戶照片",
+    "createLink": "建立預訂連結",
     "missingDocsHere": "缺少證件。現在或稍後在客戶頁面新增照片。",
     "missingDocsAdd": "缺少證件。現在新增照片，或由客戶透過預訂連結新增。",
     "docsPassport": "護照",

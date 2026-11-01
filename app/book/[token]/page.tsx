@@ -15,6 +15,7 @@ import { PublicBrand, PublicShell } from "@/components/public-shell";
 import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { vehiclePhotoUrls } from "@/lib/vehicle-photos";
 import { getPortalPayments } from "@/lib/payment-receipts";
 import { bookingRules } from "@/lib/booking-rules";
 import { rentalRateCard } from "@/lib/rental-estimate";
@@ -337,6 +338,11 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 
   const vehicle = detail.vehicle || {};
   const rental = detail.rental || {};
+  // The vehicle's main photo for the renter, when there is one (Rory, 1 Nov 2026: photos everywhere a vehicle is shown).
+  const vehiclePhoto =
+    vehicle.id && rental.organization_id
+      ? ((await vehiclePhotoUrls(createSupabaseAdminClient() as any, String(rental.organization_id), 1, 6 * 3600, String(vehicle.id)).catch(() => new Map())).get(String(vehicle.id))?.[0] as string | undefined) || null
+      : null;
   const bookingData = (detail.bookingLink?.booking_data || {}) as Record<string, unknown>;
   const delivery = deliveryText(rental, bookingData, t, locale);
   const businessName = organization?.name || t("theRentalBusiness");
@@ -380,7 +386,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           {/* One white surface: the vehicle, then the facts as tinted tiles (no grey card nested inside the white one). */}
           <div className="mt-4 flex items-start gap-3">
             <span className="shrink-0">
-              <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.vehicle_categories)} model={vehicle.model} size="sm" />
+              <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.vehicle_categories)} model={vehicle.model} photoUrl={vehiclePhoto} size="sm" />
             </span>
             <div className="min-w-0">
               <h2 className="text-2xl font-semibold">{vehicleTitle(vehicle)}</h2>
@@ -476,7 +482,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             signedContractUrl={executedDownloads?.originalAgreementUrl || detail.signedContractUrl}
             certificateUrl={executedDownloads?.executionCertificateUrl || null}
             token={token}
-            vehicle={vehicle}
+            vehicle={vehiclePhoto ? { ...vehicle, photo_url: vehiclePhoto } : vehicle}
           />
         ) : detail.state === "completed" ? (
           <>

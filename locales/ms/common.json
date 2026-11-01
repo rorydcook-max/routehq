@@ -2477,6 +2477,8 @@
     "handoverNotYet": "Belum diisi. Gunakan Mula serahan di bahagian atas apabila pelanggan mengambil kenderaan."
   },
   "newBooking": {
+    "docsSelfie": "Foto pelanggan",
+    "createLink": "Cipta pautan tempahan",
     "missingDocsHere": "Dokumen tiada. Tambah foto sekarang atau kemudian di halaman pelanggan.",
     "missingDocsAdd": "Dokumen tiada. Tambah foto sekarang, atau pelanggan menambahnya melalui pautan tempahan.",
     "docsPassport": "Pasport",

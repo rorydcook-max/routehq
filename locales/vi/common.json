@@ -2477,6 +2477,8 @@
     "handoverNotYet": "Chưa điền. Dùng nút Bắt đầu giao xe ở phía trên khi khách hàng nhận xe."
   },
   "newBooking": {
+    "docsSelfie": "Ảnh khách hàng",
+    "createLink": "Tạo liên kết đặt xe",
     "missingDocsHere": "Thiếu giấy tờ. Thêm ảnh ngay hoặc sau trên trang khách hàng.",
     "missingDocsAdd": "Thiếu giấy tờ. Thêm ảnh ngay, hoặc khách tự thêm qua liên kết đặt xe.",
     "docsPassport": "Hộ chiếu",

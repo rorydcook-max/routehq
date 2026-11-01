@@ -370,8 +370,8 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
               {/* Phones drop the picture so the customer, vehicle and dates get the whole width (as on the dashboard's Today list). */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-[56px_minmax(0,1fr)] md:grid-cols-[104px_minmax(0,1fr)_auto] md:items-center">
                 <Link aria-label={tx.say("photoAlt", { vehicle: vehicleTitle(booking.vehicles) || tx.say("vehicle") })} className="relative z-10 mt-1 hidden self-start sm:block md:mt-0 md:self-center" href={`/bookings/${booking.id}`}>
-                  <span className="block md:hidden"><VehicleArt colour={(booking.vehicles as any)?.color} kind={kindFromCategory((booking.vehicles as any)?.vehicle_categories)} model={booking.vehicles?.model} photoUrl={photoUrl} size="sm" /></span>
-                  <span className="hidden md:block"><VehicleArt colour={(booking.vehicles as any)?.color} kind={kindFromCategory((booking.vehicles as any)?.vehicle_categories)} model={booking.vehicles?.model} photoUrl={photoUrl} size="md" /></span>
+                  <span className="block md:hidden"><VehicleArt vehicleId={(booking.vehicles as any)?.id || (booking as any).vehicle_id} colour={(booking.vehicles as any)?.color} kind={kindFromCategory((booking.vehicles as any)?.vehicle_categories)} model={booking.vehicles?.model} photoUrl={photoUrl} size="sm" /></span>
+                  <span className="hidden md:block"><VehicleArt vehicleId={(booking.vehicles as any)?.id || (booking as any).vehicle_id} colour={(booking.vehicles as any)?.color} kind={kindFromCategory((booking.vehicles as any)?.vehicle_categories)} model={booking.vehicles?.model} photoUrl={photoUrl} size="md" /></span>
                 </Link>
 
                 <div className="min-w-0 py-0.5">

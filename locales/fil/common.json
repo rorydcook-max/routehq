@@ -2437,6 +2437,8 @@
     "handoverNotYet": "Hindi pa napupunan. Gamitin ang Simulan ang pag-abot sa itaas kapag kinuha ng customer ang sasakyan."
   },
   "newBooking": {
+    "docsSelfie": "Litrato ng customer",
+    "createLink": "Gumawa ng booking link",
     "missingDocsHere": "Kulang ang dokumento. Magdagdag ng litrato ngayon o mamaya sa page ng customer.",
     "missingDocsAdd": "Kulang ang dokumento. Magdagdag ng litrato ngayon, o idaragdag ito ng customer sa booking link.",
     "docsPassport": "Pasaporte",

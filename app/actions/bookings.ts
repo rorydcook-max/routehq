@@ -570,12 +570,14 @@ async function createBookingOrThrow(formData: FormData) {
       let paidBefore = paidMode === "none" ? null : paidMode === "until" && paidUntil ? paidUntil : tomorrow.toISOString().slice(0, 10);
       // Paid several periods upfront (Rory, 1 Nov 2026): those periods are paid too, even the ones still ahead.
       // Two months from 14 Oct covers the rent due 14 Oct and 14 Nov; at the upfront rate when one was agreed.
+      let upfrontUntil: string | null = null;
       if (upfrontPeriods > 0 && paidMode !== "none" && startDate) {
         const covered = new Date(`${startDate}T00:00:00Z`);
         if (pricingModel === "monthly") covered.setUTCMonth(covered.getUTCMonth() + upfrontPeriods);
         else if (pricingModel === "weekly") covered.setUTCDate(covered.getUTCDate() + 7 * upfrontPeriods);
         else covered.setUTCDate(covered.getUTCDate() + upfrontPeriods);
         const coveredUntil = covered.toISOString().slice(0, 10);
+        upfrontUntil = coveredUntil;
         if (!paidBefore || coveredUntil > paidBefore) paidBefore = coveredUntil;
         if (upfrontRate > 0 && upfrontRate !== rentalRate) {
           const { data: coveredRows } = await supabase
@@ -591,7 +593,7 @@ async function createBookingOrThrow(formData: FormData) {
         }
       }
       const depositHeld = String(formData.get("existingDepositHeld") || "") === "true" ? depositAmount : 0;
-      await settleExistingRental(supabase, { rental: { ...rental, vehicle_id: vehicleId, customer_id: customerId, start_date: startDate }, organizationId, userId: user.id, paidBefore, depositHeld, currency }).catch(() => null);
+      await settleExistingRental(supabase, { rental: { ...rental, vehicle_id: vehicleId, customer_id: customerId, start_date: startDate }, organizationId, userId: user.id, paidBefore, depositHeld, currency, upfrontUntil }).catch(() => null);
     }
 
     await recordActivityEvent(supabase, {

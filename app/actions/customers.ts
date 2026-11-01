@@ -458,7 +458,7 @@ export async function uploadCustomerDocumentQuick(formData: FormData): Promise<{
   const organizationId = String(formData.get("organizationId") || "");
   const category = String(formData.get("category") || "");
   const file = formData.get("documentFile");
-  if (!customerId || !organizationId || !["passport", "driver_license"].includes(category)) return { success: false, error: "Choose a document to upload." };
+  if (!customerId || !organizationId || !["passport", "driver_license", "selfie"].includes(category)) return { success: false, error: "Choose a document to upload." };
   if (!(file instanceof File) || file.size === 0) return { success: false, error: "Choose a document to upload." };
 
   try {

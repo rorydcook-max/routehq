@@ -2437,6 +2437,8 @@
     "handoverNotYet": "Not filled in yet. Use Start handover at the top when the customer collects the vehicle."
   },
   "newBooking": {
+    "docsSelfie": "Photo of the customer",
+    "createLink": "Create booking link",
     "missingDocsHere": "Documents missing. Add photos now or later on the customer's page.",
     "missingDocsAdd": "Documents missing. Add photos now, or the customer adds them on the booking link.",
     "docsPassport": "Passport",

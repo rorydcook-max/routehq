@@ -87,7 +87,7 @@ export default async function StartInspectionPage({ params }: { params: Promise<
               return (
                 <li className="rise" key={rental.id} style={{ ["--d" as string]: `${Math.min(index, 8) * 50}ms` } as React.CSSProperties}>
                   <Link className="card pressable flex items-center gap-3.5 p-3" href={`/inspections/${type}/${rental.id}` as Route}>
-                    <VehicleArt colour={rental.vehicles?.color} kind={kindFromCategory(rental.vehicles?.vehicle_categories)} model={rental.vehicles?.model} size="sm" />
+                    <VehicleArt vehicleId={rental.vehicles?.id || rental.vehicle_id} colour={rental.vehicles?.color} kind={kindFromCategory(rental.vehicles?.vehicle_categories)} model={rental.vehicles?.model} size="sm" />
                     <div className="min-w-0 flex-1">
                       <VehicleTitle name={`${rental.vehicles?.make || ""} ${rental.vehicles?.model || ""}`.trim()} nameClassName="truncate text-[17px] font-semibold text-[var(--foreground)]" plate={rental.vehicles?.registration_number} />
                       <p className="mt-0.5 flex items-center gap-2 truncate font-medium text-[var(--foreground-secondary)]">
@@ -111,7 +111,7 @@ export default async function StartInspectionPage({ params }: { params: Promise<
               {waiting.map((rental) => (
                 <li key={rental.id}>
                   <Link className="card pressable flex items-center gap-3.5 p-3" href={`/bookings/${rental.id}` as Route}>
-                    <VehicleArt colour={rental.vehicles?.color} kind={kindFromCategory(rental.vehicles?.vehicle_categories)} model={rental.vehicles?.model} size="sm" />
+                    <VehicleArt vehicleId={rental.vehicles?.id || rental.vehicle_id} colour={rental.vehicles?.color} kind={kindFromCategory(rental.vehicles?.vehicle_categories)} model={rental.vehicles?.model} size="sm" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold text-[var(--foreground)]">
                         {rental.vehicles?.make} {rental.vehicles?.model}

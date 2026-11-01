@@ -6,6 +6,7 @@ import { Camera, ImagePlus, Move, Trash2, X } from "lucide-react";
 import { removeVehiclePhoto, reorderVehiclePhotos, uploadVehiclePhotos } from "@/app/actions/vehicles";
 import type { VehicleDetailDocument } from "@/lib/vehicle-detail";
 import { PhotoGallery } from "@/components/photo-gallery";
+import { refreshVehiclePhotos } from "@/components/vehicle-photo-store";
 
 type VehiclePhotoManagerProps = {
   organizationId: string;
@@ -42,6 +43,7 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
     startTransition(async () => {
       try {
         await reorderVehiclePhotos(formData);
+        refreshVehiclePhotos();
         setMessage(say("ph_orderSaved"));
       } catch {
         setMessage(say("ph_orderFailed"));
@@ -80,6 +82,7 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
     startTransition(async () => {
       try {
         await uploadVehiclePhotos(formData);
+        refreshVehiclePhotos();
         setMessage(say("ph_updated"));
       } catch {
         setMessage(say("ph_uploadFailed"));
@@ -94,6 +97,7 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
     startTransition(async () => {
       try {
         await removeVehiclePhoto(formData);
+        refreshVehiclePhotos();
         const documentId = String(formData.get("documentId") || "");
         setOrderedPhotos((current) => current.filter((photo) => photo.id !== documentId));
         setMessage(say("ph_removed"));

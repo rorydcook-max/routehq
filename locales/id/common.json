@@ -2477,6 +2477,8 @@
     "handoverNotYet": "Belum diisi. Gunakan Mulai serah terima di atas saat pelanggan mengambil kendaraan."
   },
   "newBooking": {
+    "docsSelfie": "Foto pelanggan",
+    "createLink": "Buat tautan pemesanan",
     "missingDocsHere": "Dokumen belum ada. Tambahkan foto sekarang atau nanti di halaman pelanggan.",
     "missingDocsAdd": "Dokumen belum ada. Tambahkan foto sekarang, atau pelanggan menambahkannya lewat tautan pemesanan.",
     "docsPassport": "Paspor",

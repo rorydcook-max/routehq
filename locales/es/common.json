@@ -2437,6 +2437,8 @@
     "handoverNotYet": "Aún sin rellenar. Use Iniciar entrega arriba cuando el cliente recoja el vehículo."
   },
   "newBooking": {
+    "docsSelfie": "Foto del cliente",
+    "createLink": "Crear enlace de reserva",
     "missingDocsHere": "Faltan documentos. Añade fotos ahora o luego en la página del cliente.",
     "missingDocsAdd": "Faltan documentos. Añade fotos ahora, o el cliente las sube con el enlace de reserva.",
     "docsPassport": "Pasaporte",

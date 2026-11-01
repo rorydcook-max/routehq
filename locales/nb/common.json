@@ -3608,6 +3608,12 @@
     "title": "Rediger bestilling"
   },
   "settingsPage": {
+    "rn_title": "Adressen din på Rove",
+    "rn_free": "Ledig",
+    "rn_taken": "Opptatt. {suggestion} er ledig.",
+    "rn_use": "Bruk den",
+    "rn_save": "Lagre adresse",
+    "rn_saved": "Lagret. Gamle lenker virker fortsatt.",
     "cc_title": "Slik når kundene deg",
     "cc_hint": "Trykk på appene du bruker, og legg inn nummer, navn eller lenke på hver.",
     "title": "Innstillinger",

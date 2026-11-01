@@ -3648,6 +3648,12 @@
     "title": "Buchung bearbeiten"
   },
   "settingsPage": {
+    "rn_title": "Ihre Adresse auf Rove",
+    "rn_free": "Verfügbar",
+    "rn_taken": "Vergeben. {suggestion} ist frei.",
+    "rn_use": "Übernehmen",
+    "rn_save": "Adresse speichern",
+    "rn_saved": "Gespeichert. Alte Links funktionieren weiter.",
     "cc_title": "So erreichen Sie Kunden",
     "cc_hint": "Tippen Sie auf die Apps, die Sie nutzen, und geben Sie jeweils Nummer, Name oder Link ein.",
     "title": "Einstellungen",

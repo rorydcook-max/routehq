@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { Copy, ExternalLink, RefreshCw } from "lucide-react";
 import { checkOwnDomain, saveBookingSubdomain, saveOwnDomain } from "@/app/actions/booking-address";
 import { cleanSubdomain, DNS_A_TARGET, DNS_CNAME_TARGET, isApexDomain, typingSubdomain } from "@/lib/booking-address";
+import { RoveNameField } from "@/app/settings/rove-name-field";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -84,7 +85,9 @@ export function BookingAddressPanel({
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <p className="font-semibold text-[var(--foreground)]">{say("ba_routehq")}</p>
+        <p className="font-semibold text-[var(--foreground)]">{say("rn_title")}</p>
+        {/* The name after rove.rent/ is the business's to choose (Rory, 1 Nov 2026). */}
+        <RoveNameField current={pathUrl.replace(/\/$/, "").split("/").pop() || ""} host={pathUrl.replace(/^https?:\/\//, "").replace(/\/[^/]*$/, "")} />
         {addressRow(pathUrl, say("ba_routehqNote"))}
       </div>
 

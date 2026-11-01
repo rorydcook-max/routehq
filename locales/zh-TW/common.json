@@ -3608,6 +3608,12 @@
     "title": "編輯預訂"
   },
   "settingsPage": {
+    "rn_title": "您在 Rove 的網址",
+    "rn_free": "可使用",
+    "rn_taken": "已被使用。{suggestion} 可使用。",
+    "rn_use": "用這個",
+    "rn_save": "儲存網址",
+    "rn_saved": "已儲存。舊連結仍可使用。",
     "cc_title": "客戶如何聯絡您",
     "cc_hint": "點選您使用的應用程式，再為每個填寫號碼、名稱或連結。",
     "title": "設定",

@@ -3648,6 +3648,12 @@
     "title": "编辑预订"
   },
   "settingsPage": {
+    "rn_title": "您在 Rove 的地址",
+    "rn_free": "可用",
+    "rn_taken": "已被使用。{suggestion} 可用。",
+    "rn_use": "用这个",
+    "rn_save": "保存地址",
+    "rn_saved": "已保存。旧链接仍然有效。",
     "cc_title": "客户如何联系您",
     "cc_hint": "点选您使用的应用，然后为每个填写号码、名称或链接。",
     "title": "设置",

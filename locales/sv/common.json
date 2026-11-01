@@ -3608,6 +3608,12 @@
     "title": "Redigera bokning"
   },
   "settingsPage": {
+    "rn_title": "Din adress på Rove",
+    "rn_free": "Ledig",
+    "rn_taken": "Upptagen. {suggestion} är ledig.",
+    "rn_use": "Använd den",
+    "rn_save": "Spara adress",
+    "rn_saved": "Sparad. Gamla länkar fungerar fortfarande.",
     "cc_title": "Så når kunderna dig",
     "cc_hint": "Tryck på apparna du använder och fyll i nummer, namn eller länk för var och en.",
     "title": "Inställningar",

@@ -3648,6 +3648,12 @@
     "title": "Edit tempahan"
   },
   "settingsPage": {
+    "rn_title": "Alamat anda di Rove",
+    "rn_free": "Tersedia",
+    "rn_taken": "Sudah diambil. {suggestion} masih kosong.",
+    "rn_use": "Guna ini",
+    "rn_save": "Simpan alamat",
+    "rn_saved": "Disimpan. Pautan lama masih berfungsi.",
     "cc_title": "Cara pelanggan menghubungi anda",
     "cc_hint": "Ketik aplikasi yang anda guna, kemudian isi nombor, nama atau pautan bagi setiap satu.",
     "title": "Tetapan",

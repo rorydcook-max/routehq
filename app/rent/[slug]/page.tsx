@@ -7,6 +7,8 @@ import { EmbedHeight } from "./embed-height";
 import { getTranslations } from "next-intl/server";
 import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 import { renterUrl } from "@/lib/booking-address";
+import { permanentRedirect } from "next/navigation";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +39,21 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
   const catalog = await getPublicCatalog(slug);
   const t = await getTranslations("customer");
 
-  if (!catalog) return <Notice message={t("catalogNotFoundMessage")} title={t("catalogNotFoundTitle")} />;
+  if (!catalog) {
+    // A business that changed its address: its old links send people to the new one (Rory, 1 Nov 2026).
+    const { data: renamed } = await (createSupabaseAdminClient() as any)
+      .from("organizations")
+      .select("slug")
+      .contains("settings", { previous_slugs: [slug] })
+      .is("deleted_at", null)
+      .limit(1)
+      .maybeSingle();
+    if (renamed?.slug && renamed.slug !== slug) {
+      const rest = new URLSearchParams(Object.entries(query).filter(([, value]) => typeof value === "string") as Array<[string, string]>).toString();
+      permanentRedirect(`/rent/${renamed.slug}${rest ? `?${rest}` : ""}`);
+    }
+    return <Notice message={t("catalogNotFoundMessage")} title={t("catalogNotFoundTitle")} />;
+  }
   if (!catalog.enabled) return <Notice message={t("catalogOffMessage", { business: catalog.name })} title={t("catalogOffTitle")} />;
 
   // The booking box on the business's own website (embed.js): just the booking, sized to fit, on a clear background.

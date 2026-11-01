@@ -3608,6 +3608,12 @@
     "title": "I-edit ang booking"
   },
   "settingsPage": {
+    "rn_title": "Ang address mo sa Rove",
+    "rn_free": "Bakante",
+    "rn_taken": "Kinuha na. Bakante ang {suggestion}.",
+    "rn_use": "Gamitin",
+    "rn_save": "I-save ang address",
+    "rn_saved": "Na-save. Gumagana pa rin ang lumang link.",
     "cc_title": "Paano ka makokontak ng customer",
     "cc_hint": "I-tap ang mga app na gamit mo, saka ilagay ang numero, pangalan o link sa bawat isa.",
     "title": "Mga Setting",

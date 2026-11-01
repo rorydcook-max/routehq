@@ -3608,6 +3608,12 @@
     "title": "Editar reserva"
   },
   "settingsPage": {
+    "rn_title": "Tu dirección en Rove",
+    "rn_free": "Disponible",
+    "rn_taken": "Ocupada. {suggestion} está libre.",
+    "rn_use": "Usarla",
+    "rn_save": "Guardar dirección",
+    "rn_saved": "Guardada. Los enlaces antiguos siguen funcionando.",
     "cc_title": "Cómo te contactan los clientes",
     "cc_hint": "Toca las apps que usas y añade tu número, nombre o enlace en cada una.",
     "title": "Ajustes",

@@ -3648,6 +3648,12 @@
     "title": "Modifier la réservation"
   },
   "settingsPage": {
+    "rn_title": "Votre adresse sur Rove",
+    "rn_free": "Disponible",
+    "rn_taken": "Déjà prise. {suggestion} est libre.",
+    "rn_use": "L'utiliser",
+    "rn_save": "Enregistrer l'adresse",
+    "rn_saved": "Enregistrée. Les anciens liens fonctionnent encore.",
     "cc_title": "Comment les clients vous joignent",
     "cc_hint": "Touchez les applis que vous utilisez, puis ajoutez numéro, nom ou lien pour chacune.",
     "title": "Paramètres",

@@ -3608,6 +3608,12 @@
     "title": "예약 수정"
   },
   "settingsPage": {
+    "rn_title": "Rove 주소",
+    "rn_free": "사용 가능",
+    "rn_taken": "이미 사용 중입니다. {suggestion}은(는) 비어 있습니다.",
+    "rn_use": "이걸로 하기",
+    "rn_save": "주소 저장",
+    "rn_saved": "저장했습니다. 예전 링크도 계속 작동합니다.",
     "cc_title": "고객이 연락하는 방법",
     "cc_hint": "사용하는 앱을 누르고 각각 번호, 이름 또는 링크를 입력하세요.",
     "title": "설정",

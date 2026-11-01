@@ -3648,6 +3648,12 @@
     "title": "Sửa đặt xe"
   },
   "settingsPage": {
+    "rn_title": "Địa chỉ của bạn trên Rove",
+    "rn_free": "Còn trống",
+    "rn_taken": "Đã có người dùng. {suggestion} còn trống.",
+    "rn_use": "Dùng tên này",
+    "rn_save": "Lưu địa chỉ",
+    "rn_saved": "Đã lưu. Liên kết cũ vẫn hoạt động.",
     "cc_title": "Cách khách liên hệ với bạn",
     "cc_hint": "Chạm vào các ứng dụng bạn dùng, rồi thêm số, tên hoặc liên kết cho từng ứng dụng.",
     "title": "Cài đặt",

@@ -3608,6 +3608,12 @@
     "p_paid": "Paid {date}"
   },
   "settingsPage": {
+    "rn_title": "Your address on Rove",
+    "rn_free": "Available",
+    "rn_taken": "Taken. {suggestion} is free.",
+    "rn_use": "Use it",
+    "rn_save": "Save address",
+    "rn_saved": "Saved. Old links still work.",
     "cc_title": "How customers reach you",
     "cc_hint": "Tap the apps you use, then add your number, name or link on each.",
     "title": "Settings",

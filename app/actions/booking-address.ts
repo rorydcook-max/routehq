@@ -128,3 +128,39 @@ export async function checkOwnDomain(): Promise<Result<{ status: string | null }
   refresh(org.slug);
   return { ok: true, status };
 }
+
+/**
+ * The business's address on Rove, rove.rent/<name> (Rory, 1 Nov 2026): a clean name, first come first served.
+ * Taken or kept for RoveHQ: the nearest free one is offered ("samuicar-01").
+ */
+export async function checkRoveName(input: { value: string }): Promise<Result<{ value: string; available: boolean; suggestion: string }>> {
+  const who = await ownerOrg();
+  if ("error" in who) return { ok: false, error: who.error as string };
+  const { org, admin } = who;
+  const value = cleanSubdomain(input.value);
+  if (value.length < 3) return { ok: false, error: await said("Use at least 3 letters or numbers.") };
+  const { data: suggestion } = await admin.rpc("available_org_slug", { p_base: value, p_exclude: org.id });
+  const free = String(suggestion || "");
+  return { ok: true, value, available: free === value, suggestion: free };
+}
+
+export async function saveRoveName(input: { value: string }): Promise<Result<{ value: string }>> {
+  const who = await ownerOrg();
+  if ("error" in who) return { ok: false, error: who.error as string };
+  const { org, admin } = who;
+  const value = cleanSubdomain(input.value);
+  if (value.length < 3) return { ok: false, error: await said("Use at least 3 letters or numbers.") };
+  if (!/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(value)) return { ok: false, error: await said("Use only letters, numbers and dashes.") };
+  if (value === org.slug) return { ok: true, value };
+  const { data: free } = await admin.rpc("available_org_slug", { p_base: value, p_exclude: org.id });
+  if (String(free || "") !== value) return { ok: false, error: await said("Another business already has that address. Try another.") };
+  const { data: current } = await admin.from("organizations").select("settings").eq("id", org.id).maybeSingle();
+  const settings = current?.settings && typeof current.settings === "object" ? current.settings : {};
+  // The old address keeps working: it is remembered, and its page sends people on to the new one.
+  const previous = Array.from(new Set([...(Array.isArray(settings.previous_slugs) ? settings.previous_slugs : []), org.slug].filter((slug: string) => slug && slug !== value)));
+  const { error } = await admin.from("organizations").update({ slug: value, settings: { ...settings, previous_slugs: previous } }).eq("id", org.id);
+  if (error) return { ok: false, error: error.code === "23505" ? await said("Another business already has that address. Try another.") : error.message };
+  refresh(org.slug);
+  refresh(value);
+  return { ok: true, value };
+}

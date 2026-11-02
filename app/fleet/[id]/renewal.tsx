@@ -5,6 +5,7 @@ import { MoneyInput } from "@/components/money-input";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import { monthsCovered } from "@/lib/cost-spread";
+import { dateFormat } from "@/lib/i18n/dates";
 import { Camera, Check, Copy, ExternalLink, Loader2, ShieldCheck, X } from "lucide-react";
 import type { InsurancePartner } from "@/lib/insurance-partners";
 import { renewVehicleCompliance } from "@/app/actions/vehicles";
@@ -50,14 +51,14 @@ export function RenewalForm({
   const [mode, setMode] = useState<"once" | "monthly">("once");
   const amountText = (value: number) => {
     try {
-      return new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 }).format(value);
+      return new Intl.NumberFormat(locale, { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(value);
     } catch {
       return `${currency} ${Math.round(value).toLocaleString("en-US")}`;
     }
   };
   const dateText = (day: string) => {
     try {
-      return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
+      return dateFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
     } catch {
       return day;
     }
@@ -152,7 +153,7 @@ export function RenewalForm({
       ) : null}
       <label className={`block ${paperwork ? "sm:col-span-2" : ""}`}>
         <span className={labelClass}>{say(paperwork && mode === "monthly" ? "f_costMonthly" : "f_cost")}</span>
-        <MoneyInput defaultValue={cost} key={costStamp} name="cost" onValueChange={setCost} />
+        <MoneyInput currency={currency} defaultValue={cost} key={costStamp} name="cost" onValueChange={setCost} />
         {(() => {
           // What it adds to the costs each month, so the owner sees a yearly bill as 1/12 a month.
           const amount = Number(String(cost).replace(/,/g, ""));

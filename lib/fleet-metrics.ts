@@ -101,7 +101,22 @@ export function computeVehicleFigures(input: {
         const start = toDay(String(row.start_date).slice(0, 10));
         const end = row.end_date && String(row.end_date).slice(0, 10) < today ? toDay(String(row.end_date).slice(0, 10)) : todayMs;
         return { start: Math.min(start, todayMs), end };
-      });
+      })
+      // Rented spells from before the bookings were in RoveHQ, worked out from the rent paid (Rory, 2 Nov 2026):
+      // vehicles.metadata.rented_periods = [{ start, end }].
+      .concat(
+        (Array.isArray(vehicle.metadata?.rented_periods) ? vehicle.metadata.rented_periods : [])
+          .filter((period: any) => /^\d{4}-\d{2}-\d{2}/.test(String(period?.start || "")) && /^\d{4}-\d{2}-\d{2}/.test(String(period?.end || "")))
+          .map((period: any) => ({ start: Math.min(toDay(String(period.start).slice(0, 10)), todayMs), end: Math.min(toDay(String(period.end).slice(0, 10)), todayMs) }))
+      )
+      .sort((a, b) => a.start - b.start)
+      // Overlapping spells (a history spell and the booking that carried it on) count once.
+      .reduce((merged: Array<{ start: number; end: number }>, span) => {
+        const last = merged[merged.length - 1];
+        if (last && span.start <= last.end) last.end = Math.max(last.end, span.end);
+        else merged.push({ ...span });
+        return merged;
+      }, []);
 
     const ownedSince = [vehicle.purchase_date, vehicle.created_at]
       .map((value) => String(value || "").slice(0, 10))

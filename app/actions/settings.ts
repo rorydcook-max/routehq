@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { tidyLogo } from "@/lib/logo-tidy";
 import { SIGNATURE_AUTHORISATION_TEXT, SIGNATURE_AUTHORISATION_TEXT_VERSION } from "@/lib/signature-authorisation";
 import { redirect } from "next/navigation";
-import OpenAI from "openai";
+import { researchAvailable, researchJson } from "@/lib/ai-research";
 import { browserSafeAssetUrl, parseLegacyBrandingReference } from "@/lib/branding-assets";
 import { supportedCalendarCodes } from "@/lib/i18n/calendars";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
@@ -1309,9 +1309,8 @@ export async function researchVehicleCatalogSubmission(formData: FormData) {
     throw new Error("Submission ID is required.");
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is required for catalog research.");
+  if (!researchAvailable()) {
+    throw new Error("Catalog research needs an AI provider (ANTHROPIC_API_KEY).");
   }
 
   const { data: submission, error: submissionError } = await supabase
@@ -1324,8 +1323,7 @@ export async function researchVehicleCatalogSubmission(formData: FormData) {
     throw new Error(submissionError?.message || "Catalog submission not found.");
   }
 
-  const client = new OpenAI({ apiKey }) as any;
-  const model = process.env.OPENAI_CATALOG_RESEARCH_MODEL || process.env.OPENAI_TRIM_CATALOG_MODEL || "gpt-4o";
+  const model = process.env.ANTHROPIC_API_KEY ? process.env.ANTHROPIC_RESEARCH_MODEL || "claude-haiku-5-5" : process.env.OPENAI_CATALOG_RESEARCH_MODEL || "gpt-4o";
   const prompt = `You are researching vehicle catalog data for RoveHQ, a Southeast Asia vehicle rental operating system.
 
 Research this user-submitted vehicle catalog suggestion using web search:
@@ -1394,15 +1392,8 @@ Rules:
 - Return raw JSON only. Do not wrap the JSON in markdown fences or add commentary before or after it.`;
 
   try {
-    const response = await client.responses.create({
-      model,
-      tools: [{ type: "web_search" }],
-      tool_choice: "auto",
-      input: prompt
-    });
-
-    const payload = parseJsonObject(response.output_text || "");
-    const sources = collectResponseSources(response);
+    // Claude with web search first, then OpenAI, then Gemini (lib/ai-research.ts).
+    const { data: payload, sources } = await researchJson(prompt);
 
     const { error: updateError } = await supabase
       .from("vehicle_catalog_submissions")

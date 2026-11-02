@@ -29,7 +29,40 @@ function collectSources(response: any): ResearchSource[] {
 }
 
 export function researchAvailable() {
-  return Boolean(process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY);
+  return Boolean(process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY);
+}
+
+/** The look-up through Claude with its web search tool; the pages it searched and cited come back as sources. */
+async function researchJsonClaude(prompt: string): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "x-api-key": process.env.ANTHROPIC_API_KEY || "", "anthropic-version": "2023-06-01", "content-type": "application/json" },
+    body: JSON.stringify({
+      model: process.env.ANTHROPIC_RESEARCH_MODEL || process.env.ANTHROPIC_TEXT_MODEL || "claude-haiku-5-5",
+      max_tokens: 8000,
+      output_config: { effort: "medium" },
+      tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 5 }],
+      system: "Look the answer up on the live web before answering. Finish with one JSON object and nothing after it.",
+      messages: [{ role: "user", content: prompt }]
+    }),
+    signal: AbortSignal.timeout(120_000)
+  });
+  const payload: any = await response.json().catch(() => null);
+  if (!response.ok) throw new Error(`claude ${response.status}: ${String(payload?.error?.message || "").slice(0, 160)}`);
+  const seen = new Map<string, ResearchSource>();
+  const add = (url: unknown, title: unknown) => {
+    if (typeof url !== "string" || !/^https?:\/\//.test(url) || seen.has(url)) return;
+    seen.set(url, { url, title: typeof title === "string" && title ? title : new URL(url).hostname.replace(/^www\./, "") });
+  };
+  let text = "";
+  for (const part of payload?.content || []) {
+    if (part.type === "text") {
+      text += String(part.text || "");
+      for (const citation of part.citations || []) add(citation?.url, citation?.title);
+    }
+    if (part.type === "web_search_tool_result" && Array.isArray(part.content)) for (const hit of part.content) add(hit?.url, hit?.title);
+  }
+  return { data: parseJsonObject(text), sources: Array.from(seen.values()) };
 }
 
 /**
@@ -79,6 +112,15 @@ async function researchJsonGemini(prompt: string): Promise<{ data: Record<string
  * object. Returns the object and the pages it used.
  */
 export async function researchJson(prompt: string): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
+  // Claude first (Rory, 2 Nov 2026: one provider); the others stay as fallbacks.
+  if (process.env.ANTHROPIC_API_KEY) {
+    try {
+      return await researchJsonClaude(prompt);
+    } catch (error) {
+      console.error("[ai-research] claude:", String((error as any)?.message || error).slice(0, 200));
+      if (!process.env.OPENAI_API_KEY && !process.env.GEMINI_API_KEY) throw error;
+    }
+  }
   if (!process.env.OPENAI_API_KEY) return researchJsonGemini(prompt);
   try {
     return await researchJsonOpenAI(prompt);

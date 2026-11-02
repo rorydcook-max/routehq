@@ -32,6 +32,8 @@ function providersFor(personal = true): Provider[] {
   if (process.env.ANTHROPIC_API_KEY) paid.push("anthropic");
   if (process.env.OPENAI_API_KEY) paid.push("openai");
   if (!geminiAllowed) return paid;
+  // Claude first whenever it is set up (Rory, 2 Nov 2026: one provider; Haiku costs less than Gemini).
+  if (process.env.ANTHROPIC_API_KEY) return [...paid, "gemini"];
   return personal ? [...paid, "gemini"] : ["gemini", ...paid];
 }
 
@@ -60,9 +62,10 @@ async function readWithClaude(input: ReadInput) {
       "content-type": "application/json"
     },
     body: JSON.stringify({
-      model: process.env.ANTHROPIC_VISION_MODEL || "claude-sonnet-5",
-      max_tokens: input.maxTokens || 600,
-      temperature: 0,
+      model: process.env.ANTHROPIC_VISION_MODEL || "claude-haiku-5-5",
+      // Thinking counts against max_tokens: room on top of the reply.
+      max_tokens: (input.maxTokens || 600) + 2048,
+      output_config: { effort: process.env.ANTHROPIC_EFFORT || "low" },
       system: `${input.system} Reply with one JSON object and nothing else.`,
       messages: [{ role: "user", content: [file, { type: "text", text: input.prompt }] }]
     })

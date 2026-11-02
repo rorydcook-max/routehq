@@ -3273,7 +3273,16 @@
     "l_monthsLeft": "Meses restantes",
     "l_totalCost": "Total a pagar",
     "l_interest": "Intereses",
-    "l_flatRate": "{rate} % anual, fijo"
+    "l_flatRate": "{rate} % anual, fijo",
+    "hf_mileage": "Kilometraje",
+    "hf_nextService": "Próximo servicio",
+    "hf_deposit": "Depósito",
+    "hf_gearbox": "Caja de cambios",
+    "hf_auto": "Automática",
+    "hf_manual": "Manual",
+    "hf_fuel": "Combustible",
+    "hf_colour": "Color",
+    "hf_body": "Carrocería"
   },
   "customerPage": {
     "back": "Clientes",
@@ -4901,7 +4910,10 @@
     "b_rel_3": "Normal",
     "b_rel_4": "Fiable",
     "b_rel_5": "Muy fiable",
-    "needMore": "Elija marca y modelo e introduzca el precio para continuar."
+    "needMore": "Elija marca y modelo e introduzca el precio para continuar.",
+    "ownRateAged": "Tu {model} del {year} se alquila por {amount} al mes. Teniendo en cuenta la diferencia de antigüedad, este saldría por unos {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# revisión} other {# revisiones}} al año a unos {each}, más {reserve} para neumáticos y imprevistos.",
+    "limitReached": "Has usado las {count} revisiones de vehículos de tu plan este mes. Los vehículos ya revisados se abren al instante. Más revisiones el próximo mes o con un plan superior."
   },
   "importer": {
     "dt_vehicles": "Vehículos",

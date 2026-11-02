@@ -3313,7 +3313,16 @@
     "l_monthsLeft": "Sisa bulan",
     "l_totalCost": "Total yang dibayar",
     "l_interest": "Bunga",
-    "l_flatRate": "{rate}% per tahun, flat"
+    "l_flatRate": "{rate}% per tahun, flat",
+    "hf_mileage": "Jarak tempuh",
+    "hf_nextService": "Servis berikutnya",
+    "hf_deposit": "Deposit",
+    "hf_gearbox": "Transmisi",
+    "hf_auto": "Otomatis",
+    "hf_manual": "Manual",
+    "hf_fuel": "Bahan bakar",
+    "hf_colour": "Warna",
+    "hf_body": "Bodi"
   },
   "customerPage": {
     "back": "Pelanggan",
@@ -4941,7 +4950,10 @@
     "b_rel_3": "Rata-rata",
     "b_rel_4": "Andal",
     "b_rel_5": "Sangat andal",
-    "needMore": "Pilih merek dan model lalu masukkan harga untuk melanjutkan."
+    "needMore": "Pilih merek dan model lalu masukkan harga untuk melanjutkan.",
+    "ownRateAged": "{year} {model} Anda disewakan seharga {amount} sebulan. Mempertimbangkan selisih usianya, yang ini harganya sekitar {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# servis} other {# servis}} setahun dengan biaya sekitar {each}, ditambah {reserve} untuk ban dan biaya tak terduga.",
+    "limitReached": "Anda telah menggunakan {count} pengecekan kendaraan bulan ini sesuai paket Anda. Kendaraan yang sudah pernah dicek tetap bisa langsung dibuka. Pengecekan berikutnya tersedia bulan depan, atau dengan beralih ke paket yang lebih besar."
   },
   "importer": {
     "dt_vehicles": "Kendaraan",

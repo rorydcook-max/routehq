@@ -3273,7 +3273,16 @@
     "l_monthsLeft": "剩餘月數",
     "l_totalCost": "總共支付",
     "l_interest": "利息",
-    "l_flatRate": "年利率 {rate}%（固定）"
+    "l_flatRate": "年利率 {rate}%（固定）",
+    "hf_mileage": "里程數",
+    "hf_nextService": "下次保養",
+    "hf_deposit": "押金",
+    "hf_gearbox": "變速箱",
+    "hf_auto": "自排",
+    "hf_manual": "手排",
+    "hf_fuel": "燃料",
+    "hf_colour": "顏色",
+    "hf_body": "車身"
   },
   "customerPage": {
     "back": "客人",
@@ -4901,7 +4910,10 @@
     "b_rel_3": "普通",
     "b_rel_4": "可靠",
     "b_rel_5": "非常可靠",
-    "needMore": "請選擇品牌和車款並輸入價格以繼續。"
+    "needMore": "請選擇品牌和車款並輸入價格以繼續。",
+    "ownRateAged": "您的 {year} {model} 每月租金為 {amount}。考量車齡差異，這輛車大約會是 {adjusted}。",
+    "b_serviceSplit": "每年 {count, plural, one {# 次保養} other {# 次保養}}，每次約 {each}，另加 {reserve} 作為輪胎及突發狀況的準備金。",
+    "limitReached": "您方案本月的 {count} 次車輛檢查已用完。之前檢查過的車輛仍可直接開啟。下個月可再進行檢查，或升級至更高階的方案。"
   },
   "importer": {
     "dt_vehicles": "車輛",

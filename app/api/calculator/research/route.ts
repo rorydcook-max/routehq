@@ -4,8 +4,11 @@ import { getRequestUser } from "@/lib/supabase/server";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { platformRates } from "@/lib/platform-rates";
-import { businessPlace, languageName, researchAvailable, researchJson, researchJsonSteady } from "@/lib/ai-research";
+import { businessPlace, languageName, researchAvailable, researchJson } from "@/lib/ai-research";
 import { cleanQuotes, rateRanges } from "@/lib/rate-range";
+import { viewerIsPlatformAdmin } from "@/lib/admin";
+import { effectiveLimits } from "@/lib/plans";
+import { businessToday } from "@/lib/business-time";
 
 export const maxDuration = 120;
 
@@ -18,15 +21,46 @@ const SEED_DAYS = 180;
  * The believable local prices found, as lowest, highest and average by the day,
  * week and month. Where enough prices were found, those replace the estimate.
  */
-function settle(data: Record<string, any>) {
+function settle(data: Record<string, any>, category = "car") {
   const quotes = cleanQuotes(data.rent_quotes);
   const rates = rateRanges(quotes);
   const out: Record<string, any> = { ...data, rent_quotes: quotes, rates };
+  // First-year upkeep is worked out, not guessed whole (Rory, 2 Nov 2026: a 25,000 THB guess for a 2022 Yaris; really
+  // 2,000-3,000 a service plus ~5,000 for tyres and surprises): services at a monthly renter's mileage, plus the reserve.
+  const serviceCost = Number(data.service_cost) || 0;
+  if (serviceCost > 0) {
+    const twoWheeler = /scoot|bike|motor/i.test(category);
+    const kmYear = twoWheeler ? 12000 : 20000;
+    const interval = twoWheeler ? 4000 : 10000;
+    out.services_year = Math.ceil(kmYear / interval);
+    out.maintenance_year = Math.round(serviceCost * out.services_year + (Number(data.reserve_year) || 0));
+  }
   for (const period of ["day", "week", "month"] as const) {
     const range = rates[period];
     if (range && range.count >= 4) Object.assign(out, { [`rent_${period}_low`]: range.low, [`rent_${period}_typical`]: range.average, [`rent_${period}_high`]: range.high });
   }
   return out;
+}
+
+/**
+ * The plan's monthly allowance of new look-ups (Rory, 2 Nov 2026: each one costs real money, so a business can't run
+ * up the bill). Saved look-ups are free and never count. Platform admins aren't limited. Counted in
+ * organizations.settings.calculator_lookups as { month: "YYYY-MM", count }.
+ */
+async function takeLookup(store: any, organization: { id: string; subscription_tier?: string | null }) {
+  if (!store) return { ok: true, limit: 0 };
+  if (await viewerIsPlatformAdmin().catch(() => false)) return { ok: true, limit: 0 };
+  const { data: row } = await store.from("organizations").select("settings, custom_limits").eq("id", organization.id).maybeSingle();
+  const limit = effectiveLimits({ subscription_tier: organization.subscription_tier, custom_limits: row?.custom_limits }).comparisonLookups;
+  const month = businessToday().slice(0, 7);
+  const settings = (row?.settings || {}) as Record<string, any>;
+  const used = settings.calculator_lookups?.month === month ? Number(settings.calculator_lookups.count) || 0 : 0;
+  if (used >= limit) return { ok: false, limit };
+  await store
+    .from("organizations")
+    .update({ settings: { ...settings, calculator_lookups: { month, count: used + 1 } } })
+    .eq("id", organization.id);
+  return { ok: true, limit };
 }
 
 /** What a saved look-up is about, from its key, for the quick-check question. */
@@ -49,7 +83,8 @@ function replyShape(o: { country: string; area: string; currency: string; price:
   "insurance_year": number,
   "compulsory_year": number,
   "tax_year": number,
-  "maintenance_year": number,
+  "service_cost": number,
+  "reserve_year": number,
   "maintenance_growth_pct": number,
   "resale_pct_by_year": [10 numbers],
   "rent_fade_from_age": number,
@@ -79,7 +114,9 @@ What each field means:
 - occupancy_long / occupancy_short: % of days in a year it is out on rent when rented by the month / by the day, in this area.
 - insurance_year: comprehensive insurance for a vehicle used for rental, first year.
 - compulsory_year: compulsory government insurance per year (0 if none). tax_year: yearly road or vehicle tax.
-- maintenance_year: servicing, tyres, brakes, battery and ordinary repairs in the first year owned, at rental mileage, given its age now. maintenance_growth_pct: how much more that costs each following year.
+- service_cost: what one routine service with an oil change costs for this model at an ordinary local garage in ${o.area} (not a main dealer's premium price). For a small car in Thailand that is usually 1,500-3,000 THB.
+- reserve_year: what to set aside in the first year for tyres, brakes, a battery and other unexpected items, given its age and mileage now. A vehicle under 5 years old with under 100,000 km needs no repairs in a normal year: allow only wear items (for a small car in Thailand about 3,000-6,000 THB). Older or higher-mileage vehicles need more. Do not include insurance, tax or routine services here.
+- maintenance_growth_pct: how much more servicing and repairs cost each following year as it ages.
 - resale_pct_by_year: what it would sell for after 1, 2, ... 10 years of being owned from today, as a % of the price paid today (${o.price ? `${o.price} ${o.currency}` : "the typical market price"}), allowing for rental mileage of about 25,000 km a year for cars and vans or 12,000 km for two-wheelers.
 - rent_fade_from_age: vehicle age in years from which customers pay less for it. rent_fade_pct: how much less each year from then.
 - max_rental_age: age in years after which rental customers or insurers stop accepting it.
@@ -129,8 +166,8 @@ export async function POST(request: NextRequest) {
   // The same vehicle in the same area gives the same figures each time, so two checks can be compared fairly.
   // The figures do not depend on the reader's language, so every language shares them; only the notes are per language.
   const clean = (value: unknown) => String(value).replace(/[|%_]/g, " ").trim();
-  // v9: adds reliability, known issues, demand, alternatives and value. Older look-ups still seed a quick re-check.
-  const modelKey = ["v9", country, area, category, make, model].map(clean).join("|").toLowerCase();
+  // v10: upkeep as service cost + reserve (v9 guessed it whole). Older look-ups still seed a quick re-check.
+  const modelKey = ["v10", country, area, category, make, model].map(clean).join("|").toLowerCase();
   const cacheKey = [modelKey, year, clean(trim), Math.round(mileage / 20000)].join("|").toLowerCase().slice(0, 300);
 
   let store: any = null;
@@ -146,7 +183,7 @@ export async function POST(request: NextRequest) {
   };
   const asResearch = (data: Record<string, any>) => {
     const notesEn = Array.isArray(data.notes_en) && data.notes_en.length ? data.notes_en : data.notes || [];
-    return settle({ ...data, notes_en: notesEn, notes_by_locale: { [locale]: data.notes || [] }, at_price: price });
+    return settle({ ...data, notes_en: notesEn, notes_by_locale: { [locale]: data.notes || [] }, at_price: price }, category);
   };
 
   // What other RoveHQ businesses really charge for this model replaces the web's guess at rent: it is the truer figure.
@@ -170,7 +207,7 @@ export async function POST(request: NextRequest) {
 
   /** A quick look: the earlier figures are checked against the live web rather than found from nothing. */
   const recheck = async (previous: Record<string, any>, previousVehicle: string) => {
-    const { notes_by_locale: _notes, rates: _rates, at_price: _at, ...figures } = previous || {};
+    const { notes_by_locale: _notes, rates: _rates, at_price: _at, maintenance_year: _upkeep, services_year: _services, ...figures } = previous || {};
     const prompt = `You are a vehicle rental business analyst. A rental operator in ${area}, ${country} is thinking of buying this vehicle to rent out to customers:
 
 - Vehicle: ${vehicle} (${category})
@@ -183,7 +220,7 @@ ${JSON.stringify(figures)}
 Do not start over. With a few quick web searches, check whether these still hold today and for this exact vehicle: local rental prices (small local shops, Facebook Marketplace and groups, classifieds), used adverts for this model and year, insurance and running costs. Keep a figure where it still holds; change it where prices have moved or this year, trim or mileage is different. Keep the earlier rent_quotes that are still advertised and add any new ones you find.
 
 ${shape}`;
-    const { data, sources } = await researchJson(prompt);
+    const { data, sources } = await researchJson(prompt, { maxSearches: 3 });
     return { research: asResearch(data), pages: sources.slice(0, 12) };
   };
 
@@ -205,11 +242,15 @@ ${shape}`;
             }
           });
         }
-        return respond(settle({ ...kept.payload, notes }), kept.sources || [], "saved", kept.created_at);
+        return respond(settle({ ...kept.payload, notes }, category), kept.sources || [], "saved", kept.created_at);
       }
     } catch {
       // Carry on and look it up.
     }
+
+    // Anything past here costs a look-up from the plan's monthly allowance.
+    const allowance = await takeLookup(store, organization).catch(() => ({ ok: true, limit: 0 }));
+    if (!allowance.ok) return NextResponse.json({ research: null, sources: [], limited: true, limit: allowance.limit });
 
     // 2. The same model was looked up for another year, trim or mileage: check those figures rather than starting over.
     try {
@@ -218,7 +259,7 @@ ${shape}`;
         .from("market_research_cache")
         .select("payload, cache_key, created_at")
         // Any earlier version of the saved figures will do as a starting point ("_" matches the version digit).
-        .like("cache_key", `${modelKey.replace(/^v9/, "v_")}|%`)
+        .like("cache_key", `${modelKey.replace(/^v10/, "v%")}|%`)
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(1)
@@ -235,7 +276,8 @@ ${shape}`;
     }
   }
 
-  // 3. Nothing to start from: a full look-up, asked three times so one odd page does not swing it.
+  // 3. Nothing to start from: one full look-up (2 Nov 2026: asking three times cost about $0.19 a vehicle; once is
+  //    enough with Claude, and what it finds is saved for everyone who checks the same vehicle).
   const prompt = `You are a vehicle rental business analyst. A rental operator in ${area}, ${country} is thinking of buying this vehicle to rent out to customers:
 
 - Vehicle: ${vehicle} (${category})
@@ -249,7 +291,7 @@ Use web search to find current, real figures for ${country}, and for ${area} whe
 ${shape}`;
 
   try {
-    const { data, sources } = await researchJsonSteady(prompt);
+    const { data, sources } = await researchJson(prompt, { maxSearches: 5 });
     const research = asResearch(data);
     const pages = sources.slice(0, 12);
     await keep(research, pages);

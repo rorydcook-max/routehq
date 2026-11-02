@@ -3313,7 +3313,16 @@
     "l_monthsLeft": "Số tháng còn lại",
     "l_totalCost": "Tổng số tiền phải trả",
     "l_interest": "Tiền lãi",
-    "l_flatRate": "{rate}%/năm, lãi phẳng"
+    "l_flatRate": "{rate}%/năm, lãi phẳng",
+    "hf_mileage": "Số km đã đi",
+    "hf_nextService": "Bảo dưỡng tiếp theo",
+    "hf_deposit": "Tiền đặt cọc",
+    "hf_gearbox": "Hộp số",
+    "hf_auto": "Tự động",
+    "hf_manual": "Số sàn",
+    "hf_fuel": "Nhiên liệu",
+    "hf_colour": "Màu sắc",
+    "hf_body": "Kiểu thân xe"
   },
   "customerPage": {
     "back": "Khách hàng",
@@ -4941,7 +4950,10 @@
     "b_rel_3": "Trung bình",
     "b_rel_4": "Bền",
     "b_rel_5": "Rất bền",
-    "needMore": "Chọn hãng, mẫu xe và nhập giá để tiếp tục."
+    "needMore": "Chọn hãng, mẫu xe và nhập giá để tiếp tục.",
+    "ownRateAged": "Chiếc {model} {year} của bạn cho thuê với giá {amount} mỗi tháng. Sau khi tính đến chênh lệch năm sản xuất, chiếc này sẽ vào khoảng {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# lần bảo dưỡng} other {# lần bảo dưỡng}} mỗi năm, khoảng {each} mỗi lần, cộng thêm {reserve} cho lốp xe và các chi phí phát sinh.",
+    "limitReached": "Bạn đã dùng hết {count} lượt kiểm tra xe trong tháng này theo gói của mình. Các xe đã kiểm tra trước đó vẫn mở ngay lập tức. Lượt kiểm tra mới sẽ có vào tháng sau, hoặc bạn có thể nâng cấp lên gói lớn hơn."
   },
   "importer": {
     "dt_vehicles": "Xe",

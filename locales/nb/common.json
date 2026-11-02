@@ -3273,7 +3273,16 @@
     "l_monthsLeft": "Måneder igjen",
     "l_totalCost": "Totalt du betaler",
     "l_interest": "Renter",
-    "l_flatRate": "{rate} % i året, flat"
+    "l_flatRate": "{rate} % i året, flat",
+    "hf_mileage": "Kilometerstand",
+    "hf_nextService": "Neste service",
+    "hf_deposit": "Depositum",
+    "hf_gearbox": "Gir",
+    "hf_auto": "Automat",
+    "hf_manual": "Manuell",
+    "hf_fuel": "Drivstoff",
+    "hf_colour": "Farge",
+    "hf_body": "Karosseri"
   },
   "customerPage": {
     "back": "Kunder",
@@ -4901,7 +4910,10 @@
     "b_rel_3": "Middels",
     "b_rel_4": "Pålitelig",
     "b_rel_5": "Svært pålitelig",
-    "needMore": "Velg merke og modell og angi prisen for å fortsette."
+    "needMore": "Velg merke og modell og angi prisen for å fortsette.",
+    "ownRateAged": "Din {year} {model} leies ut for {amount} i måneden. Tatt i betraktning aldersforskjellen, ville denne ligge på omtrent {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# service} other {# tjenester}} i året til ca. {each}, pluss {reserve} til dekk og uforutsette utgifter.",
+    "limitReached": "Du har brukt denne månedens {count} kjøretøykontroller i abonnementet ditt. Kjøretøy sjekket før, åpner seg fortsatt med en gang. Flere kontroller neste måned, eller på en større plan."
   },
   "importer": {
     "dt_vehicles": "Kjøretøy",

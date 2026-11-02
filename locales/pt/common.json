@@ -3273,7 +3273,16 @@
     "l_monthsLeft": "Meses restantes",
     "l_totalCost": "Total a pagar",
     "l_interest": "Juros",
-    "l_flatRate": "{rate}% ao ano, fixo"
+    "l_flatRate": "{rate}% ao ano, fixo",
+    "hf_mileage": "Quilometragem",
+    "hf_nextService": "Próxima revisão",
+    "hf_deposit": "Caução",
+    "hf_gearbox": "Câmbio",
+    "hf_auto": "Automático",
+    "hf_manual": "Manual",
+    "hf_fuel": "Combustível",
+    "hf_colour": "Cor",
+    "hf_body": "Carroceria"
   },
   "customerPage": {
     "back": "Clientes",
@@ -4901,7 +4910,10 @@
     "b_rel_3": "Na média",
     "b_rel_4": "Confiável",
     "b_rel_5": "Muito confiável",
-    "needMore": "Escolha marca e modelo e informe o preço para continuar."
+    "needMore": "Escolha marca e modelo e informe o preço para continuar.",
+    "ownRateAged": "O seu {year} {model} aluga por {amount} por mês. Tendo em conta a diferença de idade, este custaria cerca de {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# revisão} other {# revisões}} por ano a cerca de {each}, mais {reserve} para pneus e imprevistos.",
+    "limitReached": "Já usou as {count} verificações de veículos do seu plano este mês. Os veículos verificados anteriormente continuam a abrir de imediato. Mais verificações no próximo mês, ou num plano maior."
   },
   "importer": {
     "dt_vehicles": "Veículos",

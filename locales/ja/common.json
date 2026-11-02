@@ -3273,7 +3273,16 @@
     "l_monthsLeft": "残りの月数",
     "l_totalCost": "支払総額",
     "l_interest": "利息",
-    "l_flatRate": "年{rate}%（アドオン）"
+    "l_flatRate": "年{rate}%（アドオン）",
+    "hf_mileage": "走行距離",
+    "hf_nextService": "次回点検",
+    "hf_deposit": "デポジット",
+    "hf_gearbox": "変速機",
+    "hf_auto": "オートマチック",
+    "hf_manual": "マニュアル",
+    "hf_fuel": "燃料",
+    "hf_colour": "色",
+    "hf_body": "車体"
   },
   "customerPage": {
     "back": "お客様",
@@ -4901,7 +4910,10 @@
     "b_rel_3": "平均的",
     "b_rel_4": "信頼性が高い",
     "b_rel_5": "非常に信頼性が高い",
-    "needMore": "続けるにはメーカーとモデルを選び、価格を入力してください。"
+    "needMore": "続けるにはメーカーとモデルを選び、価格を入力してください。",
+    "ownRateAged": "あなたの{year}年式{model}は、月額{amount}で貸し出せます。年式の違いを考慮すると、こちらは約{adjusted}になります。",
+    "b_serviceSplit": "年{count, plural, other {#回}}の点検（1回約{each}）、さらにタイヤや予期せぬ出費として{reserve}かかります。",
+    "limitReached": "今月のプランに含まれる車両チェック（{count}回）を使い切りました。過去にチェックした車両は引き続きすぐに確認できます。来月またご利用いただくか、上位プランをご検討ください。"
   },
   "importer": {
     "dt_vehicles": "車両",

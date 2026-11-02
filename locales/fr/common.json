@@ -3313,7 +3313,16 @@
     "l_monthsLeft": "Mois restants",
     "l_totalCost": "Coût total",
     "l_interest": "Intérêts",
-    "l_flatRate": "{rate} % par an, fixe"
+    "l_flatRate": "{rate} % par an, fixe",
+    "hf_mileage": "Kilométrage",
+    "hf_nextService": "Prochain entretien",
+    "hf_deposit": "Caution",
+    "hf_gearbox": "Boîte de vitesses",
+    "hf_auto": "Automatique",
+    "hf_manual": "Manuelle",
+    "hf_fuel": "Carburant",
+    "hf_colour": "Couleur",
+    "hf_body": "Carrosserie"
   },
   "customerPage": {
     "back": "Clients",
@@ -4941,7 +4950,10 @@
     "b_rel_3": "Moyen",
     "b_rel_4": "Fiable",
     "b_rel_5": "Très fiable",
-    "needMore": "Choisissez une marque et un modèle et saisissez le prix pour continuer."
+    "needMore": "Choisissez une marque et un modèle et saisissez le prix pour continuer.",
+    "ownRateAged": "Votre {year} {model} se loue {amount} par mois. Compte tenu de la différence d'âge, celui-ci serait d'environ {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# révision} other {# révisions}} par an à environ {each}, plus {reserve} pour les pneus et les imprévus.",
+    "limitReached": "Vous avez utilisé les {count} vérifications de véhicules de votre forfait ce mois-ci. Les véhicules déjà vérifiés restent accessibles immédiatement. Plus de vérifications le mois prochain, ou passez à un forfait supérieur."
   },
   "importer": {
     "dt_vehicles": "Véhicules",

@@ -3313,7 +3313,16 @@
     "l_monthsLeft": "Baki bulan",
     "l_totalCost": "Jumlah yang dibayar",
     "l_interest": "Faedah",
-    "l_flatRate": "{rate}% setahun, kadar rata"
+    "l_flatRate": "{rate}% setahun, kadar rata",
+    "hf_mileage": "Jarak",
+    "hf_nextService": "Servis seterusnya",
+    "hf_deposit": "Deposit",
+    "hf_gearbox": "Transmisi",
+    "hf_auto": "Automatik",
+    "hf_manual": "Manual",
+    "hf_fuel": "Bahan api",
+    "hf_colour": "Warna",
+    "hf_body": "Badan"
   },
   "customerPage": {
     "back": "Pelanggan",
@@ -4941,7 +4950,10 @@
     "b_rel_3": "Purata",
     "b_rel_4": "Boleh diharap",
     "b_rel_5": "Sangat boleh diharap",
-    "needMore": "Pilih jenama dan model serta masukkan harga untuk teruskan."
+    "needMore": "Pilih jenama dan model serta masukkan harga untuk teruskan.",
+    "ownRateAged": "{year} {model} anda disewakan pada harga {amount} sebulan. Mengambil kira perbezaan usia, yang ini adalah sekitar {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# servis} other {# servis}} setahun pada harga kira-kira {each}, ditambah {reserve} untuk tayar dan kos luar jangka.",
+    "limitReached": "Anda telah menggunakan {count} pemeriksaan kenderaan untuk bulan ini dalam pelan anda. Kenderaan yang diperiksa sebelum ini masih boleh dibuka serta-merta. Pemeriksaan lanjut pada bulan depan, atau tingkatkan pelan anda."
   },
   "importer": {
     "dt_vehicles": "Kenderaan",

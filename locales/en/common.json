@@ -3273,7 +3273,16 @@
     "l_monthsLeft": "Months left",
     "l_totalCost": "Total you pay",
     "l_interest": "Interest",
-    "l_flatRate": "{rate}% a year, flat"
+    "l_flatRate": "{rate}% a year, flat",
+    "hf_mileage": "Mileage",
+    "hf_nextService": "Next service",
+    "hf_deposit": "Deposit",
+    "hf_gearbox": "Gearbox",
+    "hf_auto": "Automatic",
+    "hf_manual": "Manual",
+    "hf_fuel": "Fuel",
+    "hf_colour": "Colour",
+    "hf_body": "Body"
   },
   "customerPage": {
     "back": "Customers",
@@ -4901,7 +4910,10 @@
     "b_rel_3": "Average",
     "b_rel_4": "Reliable",
     "b_rel_5": "Very reliable",
-    "needMore": "Choose a make and model and enter the price to continue."
+    "needMore": "Choose a make and model and enter the price to continue.",
+    "ownRateAged": "Your {year} {model} rents for {amount} a month. Allowing for the age difference, this one would be about {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# service} other {# services}} a year at about {each}, plus {reserve} for tyres and surprises.",
+    "limitReached": "You've used this month's {count} vehicle checks on your plan. Vehicles checked before still open straight away. More checks next month, or on a bigger plan."
   },
   "importer": {
     "dt_vehicles": "Vehicles",

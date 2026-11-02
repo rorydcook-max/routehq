@@ -11,7 +11,7 @@ import type { Assumptions, Outcome, RentStyle, Research, Verdict } from "@/lib/v
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
-export type FleetVehicle = { id: string; make: string; model: string; plate: string; utilization: number; monthlyRate: number };
+export type FleetVehicle = { id: string; make: string; model: string; plate: string; utilization: number; monthlyRate: number; year: number | null; mileage: number | null };
 
 export type SavedCalc = {
   id: string;
@@ -221,6 +221,8 @@ export function CalculatorClient({
   const [trim, setTrim] = useState("");
   /** Tapped "Work it out" before filling enough in: the hint under the button turns red instead of the button just not working. */
   const [triedEarly, setTriedEarly] = useState(false);
+  /** The plan's new look-ups for this month are used up (the number allowed), or null. */
+  const [limitHit, setLimitHit] = useState<number | null>(null);
   const [price, setPrice] = useState(0);
   const [mileage, setMileage] = useState(0);
   const [style, setStyle] = useState<RentStyle>(defaultStyle);
@@ -347,6 +349,12 @@ export function CalculatorClient({
         body: JSON.stringify({ ...next, price, mileage, locale })
       });
       const reply = await response.json();
+      if (reply.limited) {
+        setLimitHit(Number(reply.limit) || 0);
+        setBusy(false);
+        return;
+      }
+      setLimitHit(null);
       found = reply.research || null;
       pages = reply.sources || [];
       where = reply.place || "";
@@ -368,11 +376,24 @@ export function CalculatorClient({
 
   /** The operator's own price for this model beats anything found online: it is what their customers really pay. */
   function ownVehicle(forSubject: Subject) {
-    return fleetVehicles.find((v) => v.monthlyRate > 0 && v.make.toLowerCase() === forSubject.make.toLowerCase() && v.model.toLowerCase() === forSubject.model.toLowerCase());
+    const same = fleetVehicles.filter((v) => v.monthlyRate > 0 && v.make.toLowerCase() === forSubject.make.toLowerCase() && v.model.toLowerCase() === forSubject.model.toLowerCase());
+    // The closest in age: a 2021 tells more about a 2022 than a 2017 does.
+    return same.sort((a, b) => Math.abs((a.year || 0) - forSubject.year) - Math.abs((b.year || 0) - forSubject.year))[0];
+  }
+  /**
+   * Their own rate, moved for the age difference (Rory, 2 Nov 2026: his 2017 Yaris rents for ฿11,000, a 2022 would
+   * be ฿13,000-14,000): about 4.5% a year newer or older, at most 30% either way, to the nearest 500.
+   */
+  function ownRateFor(vehicle: FleetVehicle, forSubject: Subject) {
+    if (!vehicle.year || !forSubject.year || vehicle.year === forSubject.year) return vehicle.monthlyRate;
+    const shift = Math.max(-0.3, Math.min(0.3, (forSubject.year - vehicle.year) * 0.045));
+    return Math.round((vehicle.monthlyRate * (1 + shift)) / 500) * 500;
   }
   function withOwnRate(figures: Assumptions, forSubject: Subject): Assumptions {
     const mine = style === "monthly" ? ownVehicle(forSubject) : undefined;
-    return mine ? { ...figures, rentMonthly: mine.monthlyRate, rentLow: Math.round(mine.monthlyRate * 0.9), rentHigh: Math.round(mine.monthlyRate * 1.1) } : figures;
+    if (!mine) return figures;
+    const rate = ownRateFor(mine, forSubject);
+    return { ...figures, rentMonthly: rate, rentLow: Math.round(rate * 0.9), rentHigh: Math.round(rate * 1.1) };
   }
   /** Changing the rent moves the slow-year and good-year rents with it. */
   function setRent(value: number) {
@@ -616,6 +637,7 @@ export function CalculatorClient({
         </button>
         {!ready && !busy ? <p className={`mt-2 text-center text-sm font-semibold ${triedEarly ? "text-[var(--danger)]" : "text-[var(--muted)]"}`}>{t("needMore")}</p> : null}
         {busy ? <ResearchProgress elapsed={elapsed} say={say} /> : null}
+        {limitHit !== null && !busy ? <p className="mt-3 rounded-xl bg-[var(--panel-secondary)] p-3 text-center text-sm font-semibold text-[var(--foreground)]">{say("limitReached", { count: limitHit })}</p> : null}
       </Card>
 
       {assumptions && outcome && best && subject ? (
@@ -725,11 +747,13 @@ export function CalculatorClient({
                   </p>
                 </div>
               ) : null}
-              {own && own.monthlyRate !== assumptions.rentMonthly ? (
+              {own && ownRateFor(own, subject) !== assumptions.rentMonthly ? (
                 <p className="mt-2 text-sm text-[var(--foreground-secondary)]">
-                  {say("ownRate", { model: subject.model, amount: money(own.monthlyRate) })}{" "}
+                  {own.year && own.year !== subject.year
+                    ? say("ownRateAged", { year: own.year, model: subject.model, amount: money(own.monthlyRate), adjusted: money(ownRateFor(own, subject)) })
+                    : say("ownRate", { model: subject.model, amount: money(own.monthlyRate) })}{" "}
                   {style === "monthly" ? (
-                    <button className="font-semibold text-[var(--primary)] underline" onClick={() => setRent(own.monthlyRate)} type="button">
+                    <button className="font-semibold text-[var(--primary)] underline" onClick={() => setRent(ownRateFor(own, subject))} type="button">
                       {t("useIt")}
                     </button>
                   ) : null}
@@ -759,6 +783,12 @@ export function CalculatorClient({
                 <CostRow label={t("b_costInsurance")} value={money(assumptions.insurance)} />
                 <CostRow label={t("b_costTax")} value={money(assumptions.tax + assumptions.compulsory)} />
                 <CostRow label={say("b_costService", { pct: assumptions.maintenanceGrowthPct })} value={money(assumptions.maintenance)} />
+                {/* How it was worked out, so an owner can see what to change (Rory, 2 Nov 2026). */}
+                {Number((research as any)?.service_cost) > 0 && Number((research as any)?.services_year) > 0 ? (
+                  <p className="text-xs text-[var(--muted)]">
+                    {say("b_serviceSplit", { count: Number((research as any).services_year), each: money(Number((research as any).service_cost)), reserve: money(Number((research as any).reserve_year) || 0) })}
+                  </p>
+                ) : null}
                 {assumptions.otherMonthly > 0 ? <CostRow label={t("other")} value={money(assumptions.otherMonthly * 12)} /> : null}
               </dl>
               <p className="mt-2 font-bold">{say("b_costTotal", { year: about(runningYear), month: about(runningYear / 12) })}</p>

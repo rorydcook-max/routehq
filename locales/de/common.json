@@ -3313,7 +3313,16 @@
     "l_monthsLeft": "Restmonate",
     "l_totalCost": "Gesamtkosten",
     "l_interest": "Zinsen",
-    "l_flatRate": "{rate} % p. a., flat"
+    "l_flatRate": "{rate} % p. a., flat",
+    "hf_mileage": "Kilometerstand",
+    "hf_nextService": "Nächster Service",
+    "hf_deposit": "Kaution",
+    "hf_gearbox": "Getriebe",
+    "hf_auto": "Automatik",
+    "hf_manual": "Schaltung",
+    "hf_fuel": "Kraftstoff",
+    "hf_colour": "Farbe",
+    "hf_body": "Karosserie"
   },
   "customerPage": {
     "back": "Kunden",
@@ -4941,7 +4950,10 @@
     "b_rel_3": "Durchschnittlich",
     "b_rel_4": "Zuverlässig",
     "b_rel_5": "Sehr zuverlässig",
-    "needMore": "Wählen Sie Marke und Modell und geben Sie den Preis ein, um fortzufahren."
+    "needMore": "Wählen Sie Marke und Modell und geben Sie den Preis ein, um fortzufahren.",
+    "ownRateAged": "Dein {year} {model} wird für {amount} im Monat vermietet. Unter Berücksichtigung des Altersunterschieds läge dieser bei etwa {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# Service} other {# Services}} pro Jahr für ca. {each}, plus {reserve} für Reifen und Unvorhergesehenes.",
+    "limitReached": "Du hast die {count} Fahrzeug-Checks deines Tarifs für diesen Monat aufgebraucht. Bereits geprüfte Fahrzeuge lassen sich weiterhin sofort öffnen. Mehr Checks gibt es nächsten Monat oder mit einem größeren Tarif."
   },
   "importer": {
     "dt_vehicles": "Fahrzeuge",

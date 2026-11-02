@@ -33,7 +33,8 @@ export function researchAvailable() {
 }
 
 /** The look-up through Claude with its web search tool; the pages it searched and cited come back as sources. */
-async function researchJsonClaude(prompt: string): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
+/** Each web search costs $0.01 on top of the tokens, so callers cap how many one answer may run. */
+async function researchJsonClaude(prompt: string, maxSearches = 4): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "x-api-key": process.env.ANTHROPIC_API_KEY || "", "anthropic-version": "2023-06-01", "content-type": "application/json" },
@@ -41,7 +42,7 @@ async function researchJsonClaude(prompt: string): Promise<{ data: Record<string
       model: process.env.ANTHROPIC_RESEARCH_MODEL || process.env.ANTHROPIC_TEXT_MODEL || "claude-haiku-5-5",
       max_tokens: 8000,
       output_config: { effort: "medium" },
-      tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 5 }],
+      tools: [{ type: "web_search_20250305", name: "web_search", max_uses: Math.max(1, Math.min(8, maxSearches)) }],
       system: "Look the answer up on the live web before answering. Finish with one JSON object and nothing after it.",
       messages: [{ role: "user", content: prompt }]
     }),
@@ -111,11 +112,11 @@ async function researchJsonGemini(prompt: string): Promise<{ data: Record<string
  * Asks the model to look the answer up on the live web and reply with one JSON
  * object. Returns the object and the pages it used.
  */
-export async function researchJson(prompt: string): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
+export async function researchJson(prompt: string, options: { maxSearches?: number } = {}): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
   // Claude first (Rory, 2 Nov 2026: one provider); the others stay as fallbacks.
   if (process.env.ANTHROPIC_API_KEY) {
     try {
-      return await researchJsonClaude(prompt);
+      return await researchJsonClaude(prompt, options.maxSearches ?? 4);
     } catch (error) {
       console.error("[ai-research] claude:", String((error as any)?.message || error).slice(0, 200));
       if (!process.env.OPENAI_API_KEY && !process.env.GEMINI_API_KEY) throw error;
@@ -167,6 +168,8 @@ const middle = (values: number[]) => {
  * single odd advert or a misread page does not swing the result.
  */
 export async function researchJsonSteady(prompt: string, times = 3): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
+  // With Claude, once: three looks tripled the cost (about $0.19 a vehicle, 2 Nov 2026) for little steadier figures.
+  if (process.env.ANTHROPIC_API_KEY) times = 1;
   const settled = await Promise.allSettled(Array.from({ length: times }, () => researchJson(prompt)));
   const runs = settled.filter((run): run is PromiseFulfilledResult<{ data: Record<string, any>; sources: ResearchSource[] }> => run.status === "fulfilled").map((run) => run.value);
   if (!runs.length) throw (settled[0] as PromiseRejectedResult).reason;

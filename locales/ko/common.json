@@ -3273,7 +3273,16 @@
     "l_monthsLeft": "남은 개월 수",
     "l_totalCost": "총 납부액",
     "l_interest": "이자",
-    "l_flatRate": "연 {rate}%(고정)"
+    "l_flatRate": "연 {rate}%(고정)",
+    "hf_mileage": "주행거리",
+    "hf_nextService": "다음 정비",
+    "hf_deposit": "보증금",
+    "hf_gearbox": "변속기",
+    "hf_auto": "자동",
+    "hf_manual": "수동",
+    "hf_fuel": "연료",
+    "hf_colour": "색상",
+    "hf_body": "차체"
   },
   "customerPage": {
     "back": "고객",
@@ -4901,7 +4910,10 @@
     "b_rel_3": "평균",
     "b_rel_4": "신뢰성 높음",
     "b_rel_5": "매우 높음",
-    "needMore": "계속하려면 제조사와 모델을 선택하고 가격을 입력하세요."
+    "needMore": "계속하려면 제조사와 모델을 선택하고 가격을 입력하세요.",
+    "ownRateAged": "회원님의 {year} {model}은(는) 한 달에 {amount}에 대여됩니다. 연식 차이를 고려하면 이 차량은 약 {adjusted}입니다.",
+    "b_serviceSplit": "연간 {count, plural, one {정비 #회} other {정비 #회}}, 회당 약 {each}, 타이어 및 예비비 {reserve} 별도.",
+    "limitReached": "이번 달 요금제의 차량 점검 {count}회를 모두 사용하셨습니다. 이전에 점검한 차량은 바로 계속 이용하실 수 있습니다. 다음 달에 다시 점검하시거나 더 큰 요금제를 이용해 주세요."
   },
   "importer": {
     "dt_vehicles": "차량",

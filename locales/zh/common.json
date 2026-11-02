@@ -3313,7 +3313,16 @@
     "l_monthsLeft": "剩余月数",
     "l_totalCost": "总共支付",
     "l_interest": "利息",
-    "l_flatRate": "年利率 {rate}%（固定）"
+    "l_flatRate": "年利率 {rate}%（固定）",
+    "hf_mileage": "里程",
+    "hf_nextService": "下次保养",
+    "hf_deposit": "押金",
+    "hf_gearbox": "变速箱",
+    "hf_auto": "自动挡",
+    "hf_manual": "手动挡",
+    "hf_fuel": "燃油",
+    "hf_colour": "颜色",
+    "hf_body": "车身"
   },
   "customerPage": {
     "back": "客户",
@@ -4941,7 +4950,10 @@
     "b_rel_3": "一般",
     "b_rel_4": "可靠",
     "b_rel_5": "非常可靠",
-    "needMore": "请选择品牌和车型并输入价格以继续。"
+    "needMore": "请选择品牌和车型并输入价格以继续。",
+    "ownRateAged": "您的{year}年{model}每月租金为{amount}。考虑到车龄差异，这辆车大约为{adjusted}。",
+    "b_serviceSplit": "每年{count, plural, one {#次保养} other {#次保养}}，每次约{each}，另加{reserve}用于轮胎和意外支出。",
+    "limitReached": "您本月套餐内的{count}次车辆检测已用完。之前检测过的车辆仍可直接打开。下月可再次检测，或升级到更高套餐。"
   },
   "importer": {
     "dt_vehicles": "车辆",

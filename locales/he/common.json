@@ -3313,7 +3313,16 @@
     "l_monthsLeft": "חודשים שנותרו",
     "l_totalCost": "סך הכול לתשלום",
     "l_interest": "ריבית",
-    "l_flatRate": "{rate}% לשנה, קבועה"
+    "l_flatRate": "{rate}% לשנה, קבועה",
+    "hf_mileage": "קילומטראז'",
+    "hf_nextService": "טיפול הבא",
+    "hf_deposit": "פיקדון",
+    "hf_gearbox": "תיבת הילוכים",
+    "hf_auto": "אוטומטית",
+    "hf_manual": "ידנית",
+    "hf_fuel": "דלק",
+    "hf_colour": "צבע",
+    "hf_body": "מרכב"
   },
   "customerPage": {
     "back": "לקוחות",
@@ -4941,7 +4950,10 @@
     "b_rel_3": "ממוצע",
     "b_rel_4": "אמין",
     "b_rel_5": "אמין מאוד",
-    "needMore": "בחרו יצרן ודגם והזינו מחיר כדי להמשיך."
+    "needMore": "בחרו יצרן ודגם והזינו מחיר כדי להמשיך.",
+    "ownRateAged": "ה-{model} משנת {year} שלך מושכרת תמורת {amount} בחודש. בהתחשב בהפרש הגילאים, זו תעלה בסביבות {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# טיפול} other {# טיפולים}} בשנה בכ-{each}, פלוס {reserve} לצמיגים והפתעות.",
+    "limitReached": "ניצלת את {count} בדיקות הרכב החודשיות בתוכנית שלך. רכבים שנבדקו בעבר ייפתחו מיד. בדיקות נוספות יהיו בחודש הבא, או בתוכנית גדולה יותר."
   },
   "importer": {
     "dt_vehicles": "רכבים",

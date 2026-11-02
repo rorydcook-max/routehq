@@ -3273,7 +3273,16 @@
     "l_monthsLeft": "Natitirang buwan",
     "l_totalCost": "Kabuuang babayaran",
     "l_interest": "Interes",
-    "l_flatRate": "{rate}% kada taon, flat"
+    "l_flatRate": "{rate}% kada taon, flat",
+    "hf_mileage": "Mileage",
+    "hf_nextService": "Susunod na serbisyo",
+    "hf_deposit": "Deposito",
+    "hf_gearbox": "Gearbox",
+    "hf_auto": "Awtomatiko",
+    "hf_manual": "Manual",
+    "hf_fuel": "Gasolina",
+    "hf_colour": "Kulay",
+    "hf_body": "Katawan"
   },
   "customerPage": {
     "back": "Mga customer",
@@ -4901,7 +4910,10 @@
     "b_rel_3": "Average",
     "b_rel_4": "Maaasahan",
     "b_rel_5": "Napakaaasahan",
-    "needMore": "Pumili ng brand at modelo at ilagay ang presyo para magpatuloy."
+    "needMore": "Pumili ng brand at modelo at ilagay ang presyo para magpatuloy.",
+    "ownRateAged": "Ang {year} {model} mo ay naipaparenta ng {amount} kada buwan. Dahil sa agwat ng taon, ito ay aabot sa mga {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# serbisyo} other {# serbisyo}} sa isang taon sa halagang {count, plural, one {humigit-kumulang {each}} other {humigit-kumulang {each}}}, dagdag pa ang {reserve} para sa mga gulong at hindi inaasahang gastusin.",
+    "limitReached": "Nagamit mo na ang {count} na pagsusuri ng sasakyan ngayong buwan para sa plan mo. Ang mga sinuri nang sasakyan ay bukas pa rin agad. Mayroon pang karagdagang pagsusuri sa susunod na buwan, o lumipat sa mas malaking plan."
   },
   "importer": {
     "dt_vehicles": "Mga sasakyan",

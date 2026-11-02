@@ -16,7 +16,7 @@ export default async function RentalCalculatorPage() {
   const t = await getTranslations("calc");
 
   const [{ data: vehiclesData }, figures, { data: savedData }] = await Promise.all([
-    supabase.from("vehicles").select("id, make, model, registration_number, monthly_rate").eq("organization_id", organization.id).is("deleted_at", null),
+    supabase.from("vehicles").select("id, make, model, year, mileage, registration_number, monthly_rate").eq("organization_id", organization.id).is("deleted_at", null),
     loadFleetFigures(supabase, organization.id).catch(() => new Map()),
     supabase
       .from("calculator_results")
@@ -32,7 +32,9 @@ export default async function RentalCalculatorPage() {
     model: v.model || "",
     plate: v.registration_number || "",
     utilization: figures.get(v.id)?.utilization12 ?? 0,
-    monthlyRate: Number(v.monthly_rate || 0)
+    monthlyRate: Number(v.monthly_rate || 0),
+    year: Number(v.year) || null,
+    mileage: Number(v.mileage) || null
   }));
 
   // Start from how this business already works: what it rents out, and whether by the month or the day.

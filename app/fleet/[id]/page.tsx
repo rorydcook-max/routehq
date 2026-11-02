@@ -1067,6 +1067,27 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
     .filter(([, value]) => value > 0)
     .map(([key, value]) => tx.say(key, { amount: money(value) }))
     .join(" · ");
+  // The facts beside the photo on desktop: only the ones filled in.
+  const specs = ((vehicle as any).specifications || {}) as Record<string, any>;
+  const compliance = ((vehicle as any).metadata?.compliance || {}) as Record<string, any>;
+  const gearbox = String(specs.transmission || "").trim();
+  const nextService = [
+    compliance.next_service_date ? longDate(String(compliance.next_service_date).slice(0, 10), tx.locale) : "",
+    Number(compliance.next_service_mileage) > 0 ? tx.say("km", { km: Number(compliance.next_service_mileage).toLocaleString("en-US") }) : ""
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const headerFacts = (
+    [
+      [tx.say("hf_mileage"), Number(vehicle.mileage) > 0 ? tx.say("km", { km: Number(vehicle.mileage).toLocaleString("en-US") }) : ""],
+      [tx.say("hf_nextService"), nextService],
+      [tx.say("hf_deposit"), Number((vehicle as any).deposit_amount) > 0 ? money((vehicle as any).deposit_amount) : ""],
+      [tx.say("hf_gearbox"), /^(at|auto)/i.test(gearbox) ? tx.say("hf_auto") : /^(mt|man)/i.test(gearbox) ? tx.say("hf_manual") : gearbox],
+      [tx.say("hf_fuel"), String(specs.fuel_type || "")],
+      [tx.say("hf_colour"), String(vehicle.color || "")],
+      [tx.say("hf_body"), String(specs.body_type || specs.body_class || "")]
+    ] as Array<[string, string]>
+  ).filter(([, value]) => value);
 
   // The tab that opens first is the one that needs a look: paperwork about to run out, then open jobs, then the money.
   const soonestDays = daysUntil(getSoonestCompliance(detail, tx)?.date);
@@ -1152,6 +1173,17 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
                     year={vehicle.year}
                   />
                   {rateLine ? <p className="mt-3 text-[17px] font-semibold tabular-nums text-[var(--foreground)]">{rateLine}</p> : null}
+                  {/* Desktop: the photo is tall, so the vehicle's facts fill the space beside it (Rory, 2 Nov 2026: a big empty gap). */}
+                  {headerFacts.length ? (
+                    <dl className="mt-5 hidden grid-cols-2 gap-x-6 gap-y-3 border-t border-[var(--border)] pt-4 lg:grid xl:grid-cols-3">
+                      {headerFacts.map(([label, value]) => (
+                        <div className="min-w-0" key={label}>
+                          <dt className="text-xs font-semibold text-[var(--muted)]">{label}</dt>
+                          <dd className="mt-0.5 truncate font-semibold text-[var(--foreground)]">{value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
                 </div>
                 <QuickActions rentalId={detail.activeRental?.id || null} status={vehicle.status} vehicleId={vehicle.id} />
               </div>

@@ -3273,7 +3273,16 @@
     "l_monthsLeft": "Månader kvar",
     "l_totalCost": "Totalt att betala",
     "l_interest": "Ränta",
-    "l_flatRate": "{rate} % per år, fast"
+    "l_flatRate": "{rate} % per år, fast",
+    "hf_mileage": "Körsträcka",
+    "hf_nextService": "Nästa service",
+    "hf_deposit": "Depositionsbelopp",
+    "hf_gearbox": "Växellåda",
+    "hf_auto": "Automat",
+    "hf_manual": "Manuell",
+    "hf_fuel": "Bränsle",
+    "hf_colour": "Färg",
+    "hf_body": "Karosseri"
   },
   "customerPage": {
     "back": "Kunder",
@@ -4901,7 +4910,10 @@
     "b_rel_3": "Medel",
     "b_rel_4": "Pålitlig",
     "b_rel_5": "Mycket pålitlig",
-    "needMore": "Välj märke och modell och ange priset för att fortsätta."
+    "needMore": "Välj märke och modell och ange priset för att fortsätta.",
+    "ownRateAged": "Din {year} {model} hyrs ut för {amount} i månaden. Med hänsyn till åldersskillnaden skulle den här ligga på ungefär {adjusted}.",
+    "b_serviceSplit": "{count, plural, one {# service} other {# servicer}} per år à ungefär {each}, plus {reserve} till däck och oväntade utgifter.",
+    "limitReached": "Du har använt månadens {count} fordonskontroller i din plan. Fordon som kontrollerats tidigare öppnas fortfarande direkt. Fler kontroller nästa månad, eller med en större plan."
   },
   "importer": {
     "dt_vehicles": "Fordon",

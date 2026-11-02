@@ -350,12 +350,36 @@ function buildMonthlyData(transactions: any[], from: string, to: string): Monthl
  * Days each vehicle was out with a customer inside the period, counted only up to today:
  * a month four days old has four days to fill. Bookings that have not started, and cancelled ones, do not count.
  */
-export function rentedDays(rentals: any[], from: string, to: string, todayIso: string) {
+export function rentedDays(rentals: any[], from: string, to: string, todayIso: string, vehicles: any[] = []) {
   const dayMs = 86400000;
   const periodEnd = to < todayIso ? to : todayIso;
   const daysInclusive = (a: string, b: string) => Math.round((new Date(`${b}T00:00:00Z`).getTime() - new Date(`${a}T00:00:00Z`).getTime()) / dayMs) + 1;
   const rangeDays = Math.max(1, daysInclusive(from, periodEnd));
-  const byVehicle = new Map<string, { count: number; days: number; rateDays: number }>();
+  const byVehicle = new Map<string, { count: number; days: number; rateDays: number; bookedDays: number }>();
+  // Every spell out, per vehicle: bookings plus rented spells from before the bookings were in RoveHQ
+  // (vehicles.metadata.rented_periods, worked out from rent paid; Rory, 2 Nov 2026). Overlaps count once.
+  const spells = new Map<string, Array<[string, string]>>();
+  const addSpell = (vehicleId: string, start: string, end: string) => {
+    const clipFrom = start > from ? start : from;
+    const clipTo = end < periodEnd ? end : periodEnd;
+    if (clipTo < clipFrom) return false;
+    spells.set(vehicleId, [...(spells.get(vehicleId) || []), [clipFrom, clipTo]]);
+    return true;
+  };
+  for (const vehicle of vehicles) {
+    for (const period of Array.isArray(vehicle?.metadata?.rented_periods) ? vehicle.metadata.rented_periods : []) {
+      const start = String(period?.start || "").slice(0, 10);
+      // A spell's end date is the day the next one starts or the car came back: the last full day is the one before.
+      const endDate = new Date(`${String(period?.end || "").slice(0, 10)}T00:00:00Z`);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || Number.isNaN(endDate.getTime())) continue;
+      endDate.setUTCDate(endDate.getUTCDate() - 1);
+      if (addSpell(vehicle.id, start, endDate.toISOString().slice(0, 10))) {
+        const entry = byVehicle.get(vehicle.id) || { count: 0, days: 0, rateDays: 0, bookedDays: 0 };
+        entry.count += 1;
+        byVehicle.set(vehicle.id, entry);
+      }
+    }
+  }
   for (const rental of rentals) {
     if (!rental.vehicle_id || !["active", "due_soon", "overdue", "extended", "completed"].includes(String(rental.status))) continue;
     const start = String(rental.start_date || "").slice(0, 10);
@@ -368,11 +392,30 @@ export function rentedDays(rentals: any[], from: string, to: string, todayIso: s
     // The agreed rate per day, so a month paid up front doesn't look like a huge daily rate.
     const period = String(rental.billing_interval || rental.pricing_model || "monthly").toLowerCase();
     const perDay = Number(rental.rental_rate || 0) / (period === "daily" ? 1 : period === "weekly" ? 7 : 30);
-    const entry = byVehicle.get(rental.vehicle_id) || { count: 0, days: 0, rateDays: 0 };
+    const entry = byVehicle.get(rental.vehicle_id) || { count: 0, days: 0, rateDays: 0, bookedDays: 0 };
     entry.count += 1;
-    entry.days += days;
     entry.rateDays += perDay * days;
+    entry.bookedDays += days;
     byVehicle.set(rental.vehicle_id, entry);
+    addSpell(rental.vehicle_id, clipFrom, clipTo);
+  }
+  // Days out: the union of every spell, so a history spell and the booking that carried it on aren't added twice.
+  for (const [vehicleId, list] of spells) {
+    const sorted = [...list].sort((a, b) => a[0].localeCompare(b[0]));
+    let days = 0;
+    let current: [string, string] | null = null;
+    for (const [start, end] of sorted) {
+      if (current && start <= current[1]) {
+        if (end > current[1]) current[1] = end;
+      } else {
+        if (current) days += daysInclusive(current[0], current[1]);
+        current = [start, end];
+      }
+    }
+    if (current) days += daysInclusive(current[0], current[1]);
+    const entry = byVehicle.get(vehicleId) || { count: 0, days: 0, rateDays: 0, bookedDays: 0 };
+    entry.days = days;
+    byVehicle.set(vehicleId, entry);
   }
   return { rangeDays, byVehicle };
 }
@@ -465,7 +508,7 @@ export async function getReportsData(
 
     supabase
       .from("vehicles")
-      .select("id, registration_number, make, model, purchase_price, estimated_value, daily_rate, monthly_rate, status, color, vehicle_categories(code, name)")
+      .select("id, registration_number, make, model, purchase_price, estimated_value, daily_rate, monthly_rate, status, color, metadata, vehicle_categories(code, name)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null),
 
@@ -572,7 +615,7 @@ export async function getReportsData(
     .sort((a, b) => b.amount - a.amount);
 
   // Per-vehicle rental counts and utilization
-  const { rangeDays, byVehicle: rented } = rentedDays(rentals, dateRange.from, dateRange.to, businessToday());
+  const { rangeDays, byVehicle: rented } = rentedDays(rentals, dateRange.from, dateRange.to, businessToday(), vehicles);
 
   // Build per-vehicle metrics for vehicles that have transactions
   const vehicleIdsWithTx = new Set([...vIncomeMap.keys(), ...vExpenseMap.keys()]);
@@ -590,7 +633,7 @@ export async function getReportsData(
       const depreciation = Math.max(0, purchasePrice - estimatedValue);
       void depreciation;
       const roi = purchasePrice > 0 ? (profit / purchasePrice) * 100 : 0;
-      const avgDailyRate = rentalDays > 0 ? (rented.get(vehicleId)?.rateDays || 0) / rentalDays : 0;
+      const avgDailyRate = rentalDays > 0 ? (rented.get(vehicleId)?.rateDays || 0) / (rented.get(vehicleId)?.bookedDays || rentalDays) : 0;
       const utilizationRate = Math.min(100, (rentalDays / rangeDays) * 100);
 
       const bd = vExpBreakMap.get(vehicleId) || new Map<string, number>();
@@ -760,7 +803,7 @@ export async function getVehicleReportData(
   const [vehicleResult, txResult, rentalsResult] = await Promise.all([
     supabase
       .from("vehicles")
-      .select("id, registration_number, make, model, year, daily_rate, purchase_price, estimated_value, status, color, vehicle_categories(code, name)")
+      .select("id, registration_number, make, model, year, daily_rate, purchase_price, estimated_value, status, color, metadata, vehicle_categories(code, name)")
       .eq("id", vehicleId)
       .eq("organization_id", organizationId)
       .single(),
@@ -809,7 +852,7 @@ export async function getVehicleReportData(
     }
   }
 
-  const { rangeDays, byVehicle: rented } = rentedDays(rentals, dateRange.from, dateRange.to, businessToday());
+  const { rangeDays, byVehicle: rented } = rentedDays(rentals, dateRange.from, dateRange.to, businessToday(), vehicle ? [vehicle] : []);
   const rentalDays = rented.get(vehicleId)?.days || 0;
   const rentalCount = rented.get(vehicleId)?.count || 0;
   const purchasePrice = Number(vehicle?.purchase_price || 0);
@@ -817,7 +860,7 @@ export async function getVehicleReportData(
   const netProfit = totalRevenue - totalExpenses;
   // Earned back: profit against what was paid, the same figure as on the reports page.
   const roi = purchasePrice > 0 ? (netProfit / purchasePrice) * 100 : 0;
-  const avgDailyRate = rentalDays > 0 ? (rented.get(vehicleId)?.rateDays || 0) / rentalDays : 0;
+  const avgDailyRate = rentalDays > 0 ? (rented.get(vehicleId)?.rateDays || 0) / (rented.get(vehicleId)?.bookedDays || rentalDays) : 0;
   const utilizationRate = Math.min(100, (rentalDays / rangeDays) * 100);
 
   const expensesByType: ExpenseByType[] = [...expensesByTypeMap.entries()]

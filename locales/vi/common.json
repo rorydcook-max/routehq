@@ -2529,7 +2529,11 @@
     "step_bookedWebsite": "Khách đặt trên trang web của bạn",
     "ref_earlyOwed": "Đơn đặt xe này vẫn còn nợ {owed}, nên số tiền ròng là {net}.",
     "earlyOwedBody": "Vẫn còn {owed} phải trả. Trừ các ngày chưa dùng, hoặc giữ nguyên như đã đặt. Khách sẽ được báo số tiền sau khi bạn chọn.",
-    "handoverNotYet": "Chưa điền. Dùng nút Bắt đầu giao xe ở phía trên khi khách hàng nhận xe."
+    "handoverNotYet": "Chưa điền. Dùng nút Bắt đầu giao xe ở phía trên khi khách hàng nhận xe.",
+    "lp_title": "{count, plural, one {Khoản thanh toán này có thuộc đơn đặt xe này không?} other {# khoản thanh toán này có thuộc đơn đặt xe này không?}}",
+    "lp_body": "Khoản thuê {total} cho xe này đã có trong Thu & chi nhưng chưa được liên kết với đơn đặt xe. Bỏ chọn những khoản không thuộc đơn đặt xe này.",
+    "lp_yes": "Có, liên kết",
+    "lp_no": "Không, không thuộc đơn này"
   },
   "newBooking": {
     "docsSelfie": "Ảnh khách hàng",

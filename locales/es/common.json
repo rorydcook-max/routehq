@@ -2489,7 +2489,11 @@
     "track_dueToday": "{amount} vence hoy",
     "step_bookedWebsite": "Reservado por el cliente en vuestra página web",
     "ext_blockMany": "{count} reservas lo impiden",
-    "handoverNotYet": "Aún sin rellenar. Use Iniciar entrega arriba cuando el cliente recoja el vehículo."
+    "handoverNotYet": "Aún sin rellenar. Use Iniciar entrega arriba cuando el cliente recoja el vehículo.",
+    "lp_title": "{count, plural, one {¿Este pago es de esta reserva?} other {¿Estos # pagos son de esta reserva?}}",
+    "lp_body": "El alquiler de {total} de este coche ya aparece en Ingresos y gastos, pero no está vinculado a una reserva. Desmarca los que no sean de esta reserva.",
+    "lp_yes": "Sí, vincularlos",
+    "lp_no": "No, no son de esta reserva"
   },
   "newBooking": {
     "docsSelfie": "Foto del cliente",

@@ -2489,7 +2489,11 @@
     "pc_earlyDays": "Tidlig utlevering: {days, plural, one {# dag} other {# dager}} før booket start",
     "track_dueToday": "{amount} forfaller i dag",
     "step_bookedWebsite": "Booket av kunden på nettsiden din",
-    "handoverNotYet": "Ikke fylt ut ennå. Bruk Start overlevering øverst når kunden henter kjøretøyet."
+    "handoverNotYet": "Ikke fylt ut ennå. Bruk Start overlevering øverst når kunden henter kjøretøyet.",
+    "lp_title": "{count, plural, one {Er denne betalingen fra denne bestillingen?} other {Er disse # betalingene fra denne bestillingen?}}",
+    "lp_body": "Leie på {total} for denne bilen er allerede i Penger inn og ut, men ikke koblet til en bestilling. Fjern haken for alle som ikke er fra denne bestillingen.",
+    "lp_yes": "Ja, koble dem",
+    "lp_no": "Nei, ikke fra denne bestillingen"
   },
   "newBooking": {
     "docsSelfie": "Bilde av kunden",

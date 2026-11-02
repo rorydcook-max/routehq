@@ -2489,7 +2489,11 @@
     "pc_earlyDays": "提前交車：比預訂開始日早 {days} 天",
     "track_dueToday": "今天應付 {amount}",
     "step_bookedWebsite": "客人透過您的網站預訂",
-    "handoverNotYet": "尚未填寫。客戶取車時，請使用上方的「開始交車」。"
+    "handoverNotYet": "尚未填寫。客戶取車時，請使用上方的「開始交車」。",
+    "lp_title": "{count, plural, one {這筆款項是否來自此訂單？} other {這 # 筆款項是否都來自此訂單？}}",
+    "lp_body": "此車輛的 {total} 租金已列於收支記錄中，但尚未連結至訂單。若有非來自此訂單的款項，請取消勾選。",
+    "lp_yes": "是，連結這些款項",
+    "lp_no": "否，並非來自此訂單"
   },
   "newBooking": {
     "docsSelfie": "客戶照片",

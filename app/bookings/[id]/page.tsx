@@ -49,6 +49,8 @@ import { signedReceiptUrls } from "@/lib/payment-receipts";
 import { GeneratePaymentScheduleButton } from "@/app/bookings/[id]/generate-payment-schedule-button";
 import { RentalDocumentsCard } from "@/app/bookings/[id]/rental-documents-card";
 import { PendingAmendmentCard } from "@/app/bookings/[id]/pending-amendment-card";
+import { LoosePaymentsCard } from "@/app/bookings/[id]/loose-payments-card";
+import { loosePaymentsFor } from "@/lib/loose-payments";
 import { businessSignatureOf, getBookingRentalDocuments, renterSignatureOf, type BookingRentalDocument } from "@/lib/booking-rental-documents";
 
 function money(value: unknown, currency = "THB") {
@@ -349,6 +351,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const customer = rental.customers;
   // What other RoveHQ businesses reported about this customer (shared customer history).
   const historySignals = await sharedHistory(supabaseForVehicles, organization.id, customer).catch(() => []);
+  const loosePayments = await loosePaymentsFor(supabaseForVehicles, { id: rental.id, vehicle_id: rental.vehicle_id, start_date: rental.start_date, end_date: rental.end_date, organization_id: organization.id }).catch(() => []);
   // Giving money away (refunds, free early days, unpaid rent taken off) is the owner's or a manager's call.
   const isOwner = canDecideMoney((await getCurrentMembership())?.role);
   // Receipts customers sent stay with their payment; staff open them from the schedule.
@@ -641,6 +644,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </div>
         ) : null}
         <BackLink className="!mb-0" href="/bookings" label={tx.list("title")} />
+        {/* Payments already in Money in & out for this car that may be this booking's: ask before linking (Rory, 2 Nov 2026). */}
+        <LoosePaymentsCard currency={rental.currency || organization.currency || "THB"} payments={loosePayments} rentalId={rental.id} />
 
         <Card>
           <div className="card-section flex flex-col gap-4">

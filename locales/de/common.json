@@ -2529,7 +2529,11 @@
     "pc_earlyDays": "Frühere Übergabe: {days, plural, one {# Tag} other {# Tage}} vor dem gebuchten Start",
     "track_dueToday": "{amount} heute fällig",
     "step_bookedWebsite": "Vom Kunden auf Ihrer Website gebucht",
-    "handoverNotYet": "Noch nicht ausgefüllt. Nutzen Sie oben „Übergabe starten“, wenn der Kunde das Fahrzeug abholt."
+    "handoverNotYet": "Noch nicht ausgefüllt. Nutzen Sie oben „Übergabe starten“, wenn der Kunde das Fahrzeug abholt.",
+    "lp_title": "{count, plural, one {Stammt diese Zahlung von dieser Buchung?} other {Stammen diese # Zahlungen von dieser Buchung?}}",
+    "lp_body": "Die Miete von {total} für dieses Auto ist bereits unter Geld ein und aus erfasst, aber noch keiner Buchung zugeordnet. Entferne den Haken bei allen, die nicht von dieser Buchung stammen.",
+    "lp_yes": "Ja, zuordnen",
+    "lp_no": "Nein, nicht von dieser Buchung"
   },
   "newBooking": {
     "docsSelfie": "Foto des Kunden",

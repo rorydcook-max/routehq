@@ -2489,7 +2489,11 @@
     "pc_earlyDays": "Entrega antecipada: {days, plural, one {# dia} other {# dias}} antes do início reservado",
     "track_dueToday": "{amount} vence hoje",
     "step_bookedWebsite": "Reservado pelo cliente no seu site",
-    "handoverNotYet": "Ainda não preenchido. Use Iniciar entrega no topo quando o cliente retirar o veículo."
+    "handoverNotYet": "Ainda não preenchido. Use Iniciar entrega no topo quando o cliente retirar o veículo.",
+    "lp_title": "{count, plural, one {Este pagamento é desta reserva?} other {Estes # pagamentos são desta reserva?}}",
+    "lp_body": "O aluguel de {total} deste carro já está em Entradas e saídas, mas não vinculado a uma reserva. Desmarque os que não são desta reserva.",
+    "lp_yes": "Sim, vincular",
+    "lp_no": "Não, não são desta reserva"
   },
   "newBooking": {
     "docsSelfie": "Foto do cliente",

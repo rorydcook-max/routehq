@@ -2489,7 +2489,11 @@
     "pc_earlyDays": "Maagang handover: {days, plural, one {# araw} other {# araw}} bago ang naka-book na simula",
     "track_dueToday": "{amount} na babayaran ngayon",
     "step_bookedWebsite": "Nag-book ang customer sa iyong website",
-    "handoverNotYet": "Hindi pa napupunan. Gamitin ang Simulan ang pag-abot sa itaas kapag kinuha ng customer ang sasakyan."
+    "handoverNotYet": "Hindi pa napupunan. Gamitin ang Simulan ang pag-abot sa itaas kapag kinuha ng customer ang sasakyan.",
+    "lp_title": "{count, plural, one {Galing ba sa booking na ito ang bayad na ito?} other {Galing ba sa booking na ito ang # bayad na ito?}}",
+    "lp_body": "Ang renta na {total} para sa sasakyang ito ay nasa Money in & out na pero hindi pa naka-link sa booking. Alisin ang tsek sa mga hindi galing sa booking na ito.",
+    "lp_yes": "Oo, i-link sila",
+    "lp_no": "Hindi, hindi galing sa booking na ito"
   },
   "newBooking": {
     "docsSelfie": "Litrato ng customer",

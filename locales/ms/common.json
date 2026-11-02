@@ -2529,7 +2529,11 @@
     "pc_earlyDays": "Penyerahan awal: {days} hari sebelum tarikh mula yang ditempah",
     "track_dueToday": "{amount} perlu dibayar hari ini",
     "step_bookedWebsite": "Ditempah oleh pelanggan di laman web anda",
-    "handoverNotYet": "Belum diisi. Gunakan Mula serahan di bahagian atas apabila pelanggan mengambil kenderaan."
+    "handoverNotYet": "Belum diisi. Gunakan Mula serahan di bahagian atas apabila pelanggan mengambil kenderaan.",
+    "lp_title": "{count, plural, one {Adakah bayaran ini daripada tempahan ini?} other {Adakah # bayaran ini daripada tempahan ini?}}",
+    "lp_body": "Sewaan {total} untuk kereta ini sudah ada dalam Wang masuk & keluar tetapi tidak dipautkan kepada tempahan. Nyahtanda mana-mana yang bukan daripada tempahan ini.",
+    "lp_yes": "Ya, pautkan",
+    "lp_no": "Tidak, bukan daripada tempahan ini"
   },
   "newBooking": {
     "docsSelfie": "Foto pelanggan",

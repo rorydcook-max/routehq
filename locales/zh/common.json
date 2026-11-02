@@ -2529,7 +2529,11 @@
     "pc_earlyDays": "提前交车：比预定开始时间提前 {days} 天",
     "track_dueToday": "{amount} 今日到期",
     "step_bookedWebsite": "由客户在您的网站上预订",
-    "handoverNotYet": "尚未填写。客户取车时，请使用顶部的“开始交车”。"
+    "handoverNotYet": "尚未填写。客户取车时，请使用顶部的“开始交车”。",
+    "lp_title": "{count, plural, one {这笔付款是否来自此预订？} other {这 # 笔付款是否来自此预订？}}",
+    "lp_body": "此车辆的 {total} 租金已在“收支”中，但尚未关联预订。请取消勾选不属于此预订的款项。",
+    "lp_yes": "是，关联它们",
+    "lp_no": "否，不是此预订的款项"
   },
   "newBooking": {
     "docsSelfie": "客户照片",

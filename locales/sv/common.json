@@ -2489,7 +2489,11 @@
     "pc_earlyDays": "Tidig överlämning: {days, plural, one {# dag} other {# dagar}} före bokad start",
     "track_dueToday": "{amount} förfaller idag",
     "step_bookedWebsite": "Bokad av kunden på din webbplats",
-    "handoverNotYet": "Inte ifyllt ännu. Använd Starta överlämning högst upp när kunden hämtar fordonet."
+    "handoverNotYet": "Inte ifyllt ännu. Använd Starta överlämning högst upp när kunden hämtar fordonet.",
+    "lp_title": "{count, plural, one {Är den här betalningen från den här bokningen?} other {Är dessa # betalningar från den här bokningen?}}",
+    "lp_body": "Hyra på {total} för den här bilen finns redan i Pengar in och ut men är inte kopplad till någon bokning. Avmarkera de som inte är från den här bokningen.",
+    "lp_yes": "Ja, koppla dem",
+    "lp_no": "Nej, inte från den här bokningen"
   },
   "newBooking": {
     "docsSelfie": "Foto på kunden",

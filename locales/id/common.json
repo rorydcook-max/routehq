@@ -2529,7 +2529,11 @@
     "pc_earlyDays": "Serah terima lebih awal: {days} hari sebelum tanggal mulai pemesanan",
     "track_dueToday": "{amount} jatuh tempo hari ini",
     "step_bookedWebsite": "Dipesan pelanggan di situs web Anda",
-    "handoverNotYet": "Belum diisi. Gunakan Mulai serah terima di atas saat pelanggan mengambil kendaraan."
+    "handoverNotYet": "Belum diisi. Gunakan Mulai serah terima di atas saat pelanggan mengambil kendaraan.",
+    "lp_title": "{count, plural, one {Apakah pembayaran ini dari pemesanan ini?} other {Apakah # pembayaran ini dari pemesanan ini?}}",
+    "lp_body": "Sewa sebesar {total} untuk mobil ini sudah ada di Uang masuk & keluar tetapi belum ditautkan ke pemesanan. Hapus centang pada pembayaran yang bukan dari pemesanan ini.",
+    "lp_yes": "Ya, tautkan",
+    "lp_no": "Tidak, bukan dari pemesanan ini"
   },
   "newBooking": {
     "docsSelfie": "Foto pelanggan",

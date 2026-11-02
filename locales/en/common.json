@@ -2489,7 +2489,11 @@
     "pc_earlyDays": "Early handover: {days, plural, one {# day} other {# days}} before the booked start",
     "track_dueToday": "{amount} due today",
     "step_bookedWebsite": "Booked by the customer on your website",
-    "handoverNotYet": "Not filled in yet. Use Start handover at the top when the customer collects the vehicle."
+    "handoverNotYet": "Not filled in yet. Use Start handover at the top when the customer collects the vehicle.",
+    "lp_title": "{count, plural, one {Is this payment from this booking?} other {Are these # payments from this booking?}}",
+    "lp_body": "Rent of {total} for this car is already in Money in & out but not linked to a booking. Untick any that aren't from this booking.",
+    "lp_yes": "Yes, link them",
+    "lp_no": "No, not from this booking"
   },
   "newBooking": {
     "docsSelfie": "Photo of the customer",

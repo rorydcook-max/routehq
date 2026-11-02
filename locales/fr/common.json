@@ -2529,7 +2529,11 @@
     "track_dueToday": "{amount} dus aujourd'hui",
     "step_bookedWebsite": "Réservé par le client sur votre site web",
     "gen_done": "Paiements configurés : {count, plural, one {# paiement à venir ajouté} many {# paiements à venir ajoutés} other {# paiements à venir ajoutés}}",
-    "handoverNotYet": "Pas encore rempli. Utilisez « Commencer la remise » en haut quand le client récupère le véhicule."
+    "handoverNotYet": "Pas encore rempli. Utilisez « Commencer la remise » en haut quand le client récupère le véhicule.",
+    "lp_title": "{count, plural, one {Ce paiement provient-il de cette réservation ?} other {Ces # paiements proviennent-ils de cette réservation ?}}",
+    "lp_body": "Le loyer de {total} pour ce véhicule figure déjà dans Entrées et sorties d'argent, mais n'est pas lié à une réservation. Décochez ceux qui ne proviennent pas de cette réservation.",
+    "lp_yes": "Oui, les lier",
+    "lp_no": "Non, pas de cette réservation"
   },
   "newBooking": {
     "docsSelfie": "Photo du client",

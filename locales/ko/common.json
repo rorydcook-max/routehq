@@ -2489,7 +2489,11 @@
     "pc_earlyDays": "조기 인도: 예약 시작일보다 {days}일 빠름",
     "track_dueToday": "오늘까지 {amount}",
     "step_bookedWebsite": "고객이 업체 웹사이트에서 예약함",
-    "handoverNotYet": "아직 작성되지 않았어요. 고객이 차량을 인수할 때 상단의 인도 시작을 사용하세요."
+    "handoverNotYet": "아직 작성되지 않았어요. 고객이 차량을 인수할 때 상단의 인도 시작을 사용하세요.",
+    "lp_title": "{count, plural, one {이 결제가 이 예약에서 발생한 것인가요?} other {이 결제 #건이 이 예약에서 발생한 것인가요?}}",
+    "lp_body": "이 차량의 대여료 {total}이(가) 이미 Money in & out에 있지만 예약과 연결되어 있지 않습니다. 이 예약에서 발생한 것이 아닌 항목은 체크를 해제하세요.",
+    "lp_yes": "네, 연결할게요",
+    "lp_no": "아니요, 이 예약과 무관해요"
   },
   "newBooking": {
     "docsSelfie": "고객 사진",

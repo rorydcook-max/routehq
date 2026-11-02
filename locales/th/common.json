@@ -1636,7 +1636,8 @@
     "backLabel": "เงินเข้าและออก",
     "recordCost": "บันทึกค่าใช้จ่าย",
     "recordIncome": "บันทึกเงินเข้า",
-    "useThisPayment": "ใช้การชำระเงินนี้"
+    "useThisPayment": "ใช้การชำระเงินนี้",
+    "allCategories": "ทั้งหมด"
   },
   "booking": {
     "open": "ไม่กำหนด",

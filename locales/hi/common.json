@@ -1601,7 +1601,8 @@
     "backLabel": "आने और जाने वाला पैसा",
     "recordCost": "खर्च दर्ज करें",
     "recordIncome": "आने वाला पैसा दर्ज करें",
-    "useThisPayment": "यह भुगतान इस्तेमाल करें"
+    "useThisPayment": "यह भुगतान इस्तेमाल करें",
+    "allCategories": "सभी"
   },
   "booking": {
     "open": "खोलें",

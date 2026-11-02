@@ -1641,7 +1641,8 @@
     "backLabel": "ငွေဝင်နှင့် ငွေထွက်",
     "recordCost": "ကုန်ကျစရိတ် မှတ်ရန်",
     "recordIncome": "ငွေဝင် မှတ်ရန်",
-    "useThisPayment": "ဒီငွေပေးချေမှုကို သုံးရန်"
+    "useThisPayment": "ဒီငွေပေးချေမှုကို သုံးရန်",
+    "allCategories": "အားလုံး"
   },
   "booking": {
     "open": "ဖွင့်ရန်",

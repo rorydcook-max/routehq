@@ -1601,7 +1601,8 @@
     "backLabel": "Entradas e saídas",
     "recordCost": "Registrar um custo",
     "recordIncome": "Registrar entrada de dinheiro",
-    "useThisPayment": "Usar este pagamento"
+    "useThisPayment": "Usar este pagamento",
+    "allCategories": "Todas"
   },
   "booking": {
     "open": "Abrir",

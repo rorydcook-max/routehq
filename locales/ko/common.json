@@ -1601,7 +1601,8 @@
     "backLabel": "입출금",
     "recordCost": "비용 기록",
     "recordIncome": "입금 기록",
-    "useThisPayment": "이 결제 사용"
+    "useThisPayment": "이 결제 사용",
+    "allCategories": "전체"
   },
   "booking": {
     "open": "열기",

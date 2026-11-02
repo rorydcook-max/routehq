@@ -1641,7 +1641,8 @@
     "backLabel": "Uang masuk & keluar",
     "recordCost": "Catat biaya",
     "recordIncome": "Catat uang masuk",
-    "useThisPayment": "Gunakan pembayaran ini"
+    "useThisPayment": "Gunakan pembayaran ini",
+    "allCategories": "Semua"
   },
   "booking": {
     "open": "Buka",

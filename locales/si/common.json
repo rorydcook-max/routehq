@@ -1601,7 +1601,8 @@
     "backLabel": "ලැබුණු සහ ගිය මුදල්",
     "recordCost": "වියදමක් සටහන් කරන්න",
     "recordIncome": "ලැබුණු මුදල් සටහන් කරන්න",
-    "useThisPayment": "මෙම ගෙවීම භාවිත කරන්න"
+    "useThisPayment": "මෙම ගෙවීම භාවිත කරන්න",
+    "allCategories": "සියල්ල"
   },
   "booking": {
     "open": "විවෘත කරන්න",

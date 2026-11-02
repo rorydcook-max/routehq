@@ -1601,7 +1601,8 @@
     "backLabel": "Pengar in och ut",
     "recordCost": "Registrera en kostnad",
     "recordIncome": "Registrera inbetalning",
-    "useThisPayment": "Använd den här betalningen"
+    "useThisPayment": "Använd den här betalningen",
+    "allCategories": "Alla"
   },
   "booking": {
     "open": "Öppen",

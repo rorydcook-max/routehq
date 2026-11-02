@@ -1601,7 +1601,8 @@
     "backBookingLabel": "Booking",
     "useThisPayment": "Use this payment",
     "recordIncome": "Record money in",
-    "recordCost": "Record a cost"
+    "recordCost": "Record a cost",
+    "allCategories": "All"
   },
   "booking": {
     "open": "Open",

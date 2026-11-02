@@ -1641,7 +1641,8 @@
     "backLabel": "Приход и расход",
     "recordCost": "Записать расход",
     "recordIncome": "Записать приход",
-    "useThisPayment": "Использовать этот платёж"
+    "useThisPayment": "Использовать этот платёж",
+    "allCategories": "Все"
   },
   "booking": {
     "open": "Открыть",

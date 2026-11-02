@@ -1601,7 +1601,8 @@
     "backLabel": "入出金",
     "recordCost": "費用を記録",
     "recordIncome": "入金を記録",
-    "useThisPayment": "この支払いを使う"
+    "useThisPayment": "この支払いを使う",
+    "allCategories": "すべて"
   },
   "booking": {
     "open": "開く",

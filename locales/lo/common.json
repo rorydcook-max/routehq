@@ -1601,7 +1601,8 @@
     "backLabel": "ເງິນເຂົ້າ ແລະ ອອກ",
     "recordCost": "ບັນທຶກຄ່າໃຊ້ຈ່າຍ",
     "recordIncome": "ບັນທຶກເງິນເຂົ້າ",
-    "useThisPayment": "ໃຊ້ການຊຳລະເງິນນີ້"
+    "useThisPayment": "ໃຊ້ການຊຳລະເງິນນີ້",
+    "allCategories": "ທັງໝົດ"
   },
   "booking": {
     "open": "ເປີດ",

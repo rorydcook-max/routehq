@@ -1601,7 +1601,8 @@
     "backLabel": "வரவு & செலவு",
     "recordCost": "செலவைப் பதிவுசெய்",
     "recordIncome": "வரவைப் பதிவுசெய்",
-    "useThisPayment": "இந்தக் கட்டணத்தைப் பயன்படுத்து"
+    "useThisPayment": "இந்தக் கட்டணத்தைப் பயன்படுத்து",
+    "allCategories": "அனைத்தும்"
   },
   "booking": {
     "open": "திறந்துள்ளது",

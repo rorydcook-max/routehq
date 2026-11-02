@@ -1601,7 +1601,8 @@
     "backLabel": "Perang pumasok at lumabas",
     "recordCost": "Magtala ng gastos",
     "recordIncome": "Itala ang perang pumasok",
-    "useThisPayment": "Gamitin ang bayad na ito"
+    "useThisPayment": "Gamitin ang bayad na ito",
+    "allCategories": "Lahat"
   },
   "booking": {
     "open": "Buksan",

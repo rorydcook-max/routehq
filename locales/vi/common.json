@@ -1641,7 +1641,8 @@
     "backLabel": "Thu & chi",
     "recordCost": "Ghi một khoản chi",
     "recordIncome": "Ghi tiền vào",
-    "useThisPayment": "Dùng khoản thanh toán này"
+    "useThisPayment": "Dùng khoản thanh toán này",
+    "allCategories": "Tất cả"
   },
   "booking": {
     "open": "Mở",

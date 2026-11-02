@@ -253,6 +253,8 @@ export function TransactionsList({
   const [anchor, setAnchor] = useState(today);
   const [custom, setCustom] = useState({ from: `${today.slice(0, 8)}01`, to: today });
   const [search, setSearch] = useState("");
+  /** Categories ticked in the filter (repairs, insurance…); empty shows everything. */
+  const [categories, setCategories] = useState<Set<string>>(new Set());
   const [phoneSide, setPhoneSide] = useState<"in" | "out">("in");
   const [selecting, setSelecting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -267,12 +269,29 @@ export function TransactionsList({
   const range = useMemo(() => periodRange(mode, anchor, custom), [mode, anchor, custom]);
   const isCurrentPeriod = mode !== "custom" && range.from <= today && today <= range.to;
 
+  // The kinds of entry in this period, for the category filter (Rory, 2 Nov 2026), in alphabetical order with counts.
+  const periodTypes = useMemo(() => {
+    const counts = new Map<string, { label: string; count: number }>();
+    for (const transaction of transactions) {
+      if (hiddenIds.has(transaction.id)) continue;
+      const day = inputDate(transaction.transactionDate);
+      if (day < range.from || day > range.to) continue;
+      const entry = counts.get(transaction.type) || { label: tx.typeName(transaction.type, transaction.typeLabel), count: 0 };
+      entry.count++;
+      counts.set(transaction.type, entry);
+    }
+    return Array.from(counts.entries())
+      .map(([type, entry]) => ({ type, ...entry }))
+      .sort((a, b) => a.label.localeCompare(b.label, tx.locale));
+  }, [hiddenIds, range, transactions, tx]);
+
   const inPeriod = useMemo(() => {
     const needle = search.toLowerCase().trim();
     return transactions.filter((transaction) => {
       if (hiddenIds.has(transaction.id)) return false;
       const day = inputDate(transaction.transactionDate);
       if (day < range.from || day > range.to) return false;
+      if (categories.size && !categories.has(transaction.type)) return false;
       if (!needle) return true;
       return [transaction.typeLabel, transaction.vehicleLabel, transaction.customerName, transaction.notes, transaction.supplier, transaction.displayCode]
         .filter(Boolean)
@@ -280,7 +299,7 @@ export function TransactionsList({
         .toLowerCase()
         .includes(needle);
     });
-  }, [hiddenIds, range, search, transactions]);
+  }, [hiddenIds, range, search, transactions, categories]);
 
   const { income, refunds, expenses, deposits } = useMemo(() => {
     const byDateDesc = (a: TransactionListItem, b: TransactionListItem) => String(b.transactionDate).localeCompare(String(a.transactionDate));
@@ -291,6 +310,13 @@ export function TransactionsList({
       deposits: inPeriod.filter((transaction) => transactionKind(transaction).startsWith("deposit")).sort(byDateDesc)
     };
   }, [inPeriod]);
+
+  // Filtering to costs only (or income only) on a phone: show the side that has them.
+  useEffect(() => {
+    if (!categories.size) return;
+    if (!income.length && expenses.length) setPhoneSide("out");
+    else if (income.length && !expenses.length) setPhoneSide("in");
+  }, [categories, income.length, expenses.length]);
 
   // A refund counts against money in.
   const sum = (items: TransactionListItem[]) => items.reduce((total, transaction) => total + (transactionKind(transaction) === "refund" ? -1 : 1) * Math.abs(transaction.amount), 0);
@@ -649,6 +675,36 @@ export function TransactionsList({
           <span className="hidden lg:inline">{tx.say("exportShort")}</span>
         </a>
       </div>
+
+      {/* Filter by category: tap to show only those; totals above follow (Rory, 2 Nov 2026). */}
+      {periodTypes.length > 1 ? (
+        <div className="chip-row -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+          <button aria-pressed={categories.size === 0} className={`pressable shrink-0 rounded-full border px-3.5 py-2 text-sm font-semibold ${categories.size === 0 ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)]"}`} onClick={() => setCategories(new Set())} type="button">
+            {tx.say("allCategories")}
+          </button>
+          {periodTypes.map((option) => {
+            const on = categories.has(option.type);
+            return (
+              <button
+                aria-pressed={on}
+                className={`pressable shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-sm font-semibold ${on ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)]"}`}
+                key={option.type}
+                onClick={() =>
+                  setCategories((current) => {
+                    const next = new Set(current);
+                    if (next.has(option.type)) next.delete(option.type);
+                    else next.add(option.type);
+                    return next;
+                  })
+                }
+                type="button"
+              >
+                {option.label} · {option.count}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
 
       {/* Phones show one side at a time */}
       <div className="grid grid-cols-2 gap-0.5 rounded-[10px] bg-[var(--panel-secondary)] p-1 lg:hidden">

@@ -1641,7 +1641,8 @@
     "backLabel": "הכנסות והוצאות",
     "recordCost": "רישום הוצאה",
     "recordIncome": "רישום הכנסה",
-    "useThisPayment": "שימוש בתשלום זה"
+    "useThisPayment": "שימוש בתשלום זה",
+    "allCategories": "הכול"
   },
   "booking": {
     "open": "פתח",

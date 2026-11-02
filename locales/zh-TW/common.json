@@ -1601,7 +1601,8 @@
     "backLabel": "收支",
     "recordCost": "記錄支出",
     "recordIncome": "記錄收入",
-    "useThisPayment": "使用此付款"
+    "useThisPayment": "使用此付款",
+    "allCategories": "全部"
   },
   "booking": {
     "open": "開啟",

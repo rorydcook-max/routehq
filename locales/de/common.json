@@ -1641,7 +1641,8 @@
     "backLabel": "Ein- & Ausgaben",
     "recordCost": "Ausgabe erfassen",
     "recordIncome": "Einnahme erfassen",
-    "useThisPayment": "Diese Zahlung verwenden"
+    "useThisPayment": "Diese Zahlung verwenden",
+    "allCategories": "Alle"
   },
   "booking": {
     "open": "Öffnen",

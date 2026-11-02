@@ -111,7 +111,7 @@ function getComplianceItems(detail: VehicleDetail, tx: Vx) {
   // The paperwork the business's country asks for (local names after the plain one), then upkeep.
   const twoWheeler = isTwoWheeler(kindFromCategory(detail.category));
   const age = vehicleAgeOf(vehicle);
-  const items: Array<{ key: string; name: string; date: any; cost: any; monthly?: boolean; paperwork?: boolean; icon: typeof ShieldCheck }> = paperworkFor(detail.country)
+  const items: Array<{ key: string; name: string; date: any; cost: any; monthly?: boolean; paperwork?: boolean; inspection?: string; icon: typeof ShieldCheck }> = paperworkFor(detail.country)
     .filter((item) => paperApplies(item, age, twoWheeler, compliance[paperField(item.key)]))
     .map((item) => {
       const field = paperField(item.key);
@@ -122,6 +122,8 @@ function getComplianceItems(detail: VehicleDetail, tx: Vx) {
         cost: lastCost(item.key, field),
         monthly: Boolean(compliance[`${field}_monthly`]),
         paperwork: true,
+        // Thailand: an older vehicle's inspection is done with the road tax; its cost is asked for in the same renewal.
+        inspection: item.inspectionWith && (age === null || age > (twoWheeler ? item.inspectionWith.bike : item.inspectionWith.car)) ? item.inspectionWith.local : undefined,
         icon: ShieldCheck
       };
     });
@@ -470,6 +472,7 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
                   complianceType={item.key}
                   currency={detail.currency || "THB"}
                   currentExpiry={item.date ? String(item.date).slice(0, 10) : null}
+                  inspection={item.inspection}
                   organizationId={organizationId}
                   paperwork={Boolean(item.paperwork)}
                   readable={Boolean(item.paperwork)}

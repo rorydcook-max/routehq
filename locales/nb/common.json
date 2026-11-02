@@ -1603,7 +1603,14 @@
     "recordIncome": "Registrer innbetaling",
     "useThisPayment": "Bruk denne betalingen",
     "allCategories": "Alle",
-    "shareOf": "Andel {index} av {count} · {amount} betalt {date}"
+    "shareOf": "Andel {index} av {count} · {amount} betalt {date}",
+    "coverTitle": "Hva det dekker",
+    "coverWhich": "Hvilket kjøretøydokument?",
+    "coverNotCar": "Ikke et kjøretøydokument",
+    "coverFrom": "Dekker fra",
+    "coverTo": "Dekker til",
+    "coverHint": "Betalt for ett år eller mer? Legg inn datoene, så telles en andel hver måned.",
+    "coverUpdateCar": "Sett også kjøretøyets {name} til å utløpe {date}"
   },
   "booking": {
     "open": "Åpen",
@@ -3304,7 +3311,9 @@
     "f_costMonthly": "Kostnad per måned",
     "f_spreadHint": "Regnes som {amount} i måneden over {months} måneder i kostnadene dine.",
     "f_monthlyHint": "{amount} legges til kostnadene dine hver måned frem til {date}.",
-    "cs_monthly": "{amount} i måneden"
+    "cs_monthly": "{amount} i måneden",
+    "f_inspectionCost": "Kontrollkostnad ({name})",
+    "f_inspectionHint": "Eldre kjøretøy kontrolleres når veiavgiften fornyes (biler over 7 år, motorsykler over 5). La stå tomt om det ikke trengs."
   },
   "customerPage": {
     "back": "Kunder",
@@ -6330,7 +6339,19 @@
     "canTalk": "Lytt: trykk på mikrofonen og si det på ditt eget språk.",
     "canRentals": "Legg til hvem som leier nå, med neste betalingsdatoer, depositum og automatiske påminnelser.",
     "canNote": "Ingenting lagres før du trykker Legg til. Samtalene dine beholdes her, slik at du kan fortsette senere.",
-    "noChats": "Samtalene dine vises her."
+    "noChats": "Samtalene dine vises her.",
+    "paperTitle": "{count, plural, one {# fornyelse klar} other {# fornyelser klare}}",
+    "paper_tax": "Veiavgift",
+    "paper_porbor": "Lovpålagt forsikring",
+    "paper_insurance": "Forsikring",
+    "paper_inspection": "Kontroll",
+    "paperUntil": "til {date}",
+    "paperInspection": "kontroll {price}",
+    "paperSave": "{count, plural, one {Lagre # fornyelse} other {Lagre # fornyelser}}",
+    "paperSaved": "{count, plural, one {Lagret: kjøretøyets dato og kostnad er oppdatert.} other {Lagret # fornyelser, med datoer og kostnader.}}",
+    "paperFailed": "Kunne ikke lagre: {names}",
+    "sugPaper": "Bilde av en polise eller avgiftskvittering",
+    "canPaper": "Send et bilde av en forsikringspolise eller avgiftskvittering: kjøretøyets datoer og kostnad fylles inn."
   },
   "setupRequest": {
     "title": "Vi ordner det for deg",

@@ -24,8 +24,11 @@ export function RenewalForm({
   paperwork = false,
   currentExpiry = null,
   today = "",
-  currency = "THB"
+  currency = "THB",
+  inspection
 }: {
+  /** An inspection done with this renewal (Thailand's ตรอ. with road tax): its local name; its cost is asked for too. */
+  inspection?: string;
   vehicleId: string;
   organizationId: string;
   complianceType: string;
@@ -165,6 +168,13 @@ export function RenewalForm({
           return months >= 2 ? <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{say("f_spreadHint", { amount: amountText(amount / months), months })}</span> : null;
         })()}
       </label>
+      {inspection ? (
+        <label className="block sm:col-span-2">
+          <span className={labelClass}>{say("f_inspectionCost", { name: inspection })}</span>
+          <MoneyInput currency={currency} name="inspectionCost" />
+          <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{say("f_inspectionHint")}</span>
+        </label>
+      ) : null}
       <label className="block sm:col-span-2">
         <span className={labelClass}>{say("f_notes")}</span>
         <input className={inputClass} name="notes" onChange={(event) => setNotes(event.target.value)} value={notes} />

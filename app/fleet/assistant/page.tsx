@@ -1,7 +1,7 @@
 import type { Route } from "next";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Camera, FileSpreadsheet, KeyRound, MessageSquare, Mic, Plus } from "lucide-react";
+import { Camera, FileSpreadsheet, KeyRound, MessageSquare, Mic, Plus, ShieldCheck } from "lucide-react";
 import { listAssistantConversations, loadAssistantConversation } from "@/app/actions/fleet-assistant";
 import { AppShell } from "@/components/app-shell";
 import { FleetAssistant } from "@/components/fleet-assistant";
@@ -31,7 +31,8 @@ export default async function FleetAssistantPage({ searchParams }: { searchParam
     { icon: FileSpreadsheet, text: t("canSheet") },
     { icon: Camera, text: t("canPhoto") },
     { icon: Mic, text: t("canTalk") },
-    { icon: KeyRound, text: t("canRentals") }
+    { icon: KeyRound, text: t("canRentals") },
+    { icon: ShieldCheck, text: t("canPaper") }
   ];
 
   return (

@@ -1603,7 +1603,14 @@
     "recordIncome": "입금 기록",
     "useThisPayment": "이 결제 사용",
     "allCategories": "전체",
-    "shareOf": "{count}개 중 {index}번째 몫 · {date}에 {amount} 지불"
+    "shareOf": "{count}개 중 {index}번째 몫 · {date}에 {amount} 지불",
+    "coverTitle": "보장 기간",
+    "coverWhich": "차량의 어떤 서류인가요?",
+    "coverNotCar": "차량 서류 아님",
+    "coverFrom": "보장 시작",
+    "coverTo": "보장 종료",
+    "coverHint": "1년 이상 한 번에 냈나요? 날짜를 넣으면 매달 나눠서 계산돼요.",
+    "coverUpdateCar": "차량의 {name} 만료일도 {date}로 바꾸기"
   },
   "booking": {
     "open": "열기",
@@ -3304,7 +3311,9 @@
     "f_costMonthly": "월 비용",
     "f_spreadHint": "{months}개월 동안 매달 {amount}씩 비용으로 계산돼요.",
     "f_monthlyHint": "{date}까지 매달 {amount}이 비용에 추가돼요.",
-    "cs_monthly": "월 {amount}"
+    "cs_monthly": "월 {amount}",
+    "f_inspectionCost": "검사 비용 ({name})",
+    "f_inspectionHint": "오래된 차량은 자동차세 갱신 때 검사해요 (자동차 7년 초과, 오토바이 5년 초과). 필요 없으면 비워 두세요."
   },
   "customerPage": {
     "back": "고객",
@@ -6330,7 +6339,19 @@
     "canTalk": "듣기: 마이크를 누르고 편한 언어로 말하세요.",
     "canRentals": "현재 대여 중인 사람을 다음 결제일, 보증금, 자동 알림과 함께 추가할 수 있습니다.",
     "canNote": "추가를 누르기 전까지는 아무것도 저장되지 않습니다. 대화 내용은 여기에 보관되어 나중에 이어서 할 수 있습니다.",
-    "noChats": "대화 내역이 여기에 표시됩니다."
+    "noChats": "대화 내역이 여기에 표시됩니다.",
+    "paperTitle": "{count, plural, other {갱신 #건 준비됨}}",
+    "paper_tax": "자동차세",
+    "paper_porbor": "의무보험",
+    "paper_insurance": "보험",
+    "paper_inspection": "검사",
+    "paperUntil": "{date}까지",
+    "paperInspection": "검사 {price}",
+    "paperSave": "{count, plural, other {갱신 #건 저장}}",
+    "paperSaved": "{count, plural, other {저장됨: 갱신 #건의 날짜와 비용이 업데이트됐어요.}}",
+    "paperFailed": "저장하지 못했어요: {names}",
+    "sugPaper": "보험증권이나 세금 영수증 사진",
+    "canPaper": "보험증권이나 세금 영수증 사진을 보내면 차량의 날짜와 비용이 채워져요."
   },
   "setupRequest": {
     "title": "저희가 대신 세팅해 드립니다",

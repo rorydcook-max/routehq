@@ -1603,7 +1603,14 @@
     "recordIncome": "記錄收入",
     "useThisPayment": "使用此付款",
     "allCategories": "全部",
-    "shareOf": "第 {index}/{count} 份 · {date} 支付 {amount}"
+    "shareOf": "第 {index}/{count} 份 · {date} 支付 {amount}",
+    "coverTitle": "保障期間",
+    "coverWhich": "是車輛的哪份文件？",
+    "coverNotCar": "不是車輛文件",
+    "coverFrom": "開始日期",
+    "coverTo": "結束日期",
+    "coverHint": "一次付了一年或更久？填上日期，每月會按比例計入。",
+    "coverUpdateCar": "同時把車輛的{name}到期日改為 {date}"
   },
   "booking": {
     "open": "開啟",
@@ -3304,7 +3311,9 @@
     "f_costMonthly": "每月費用",
     "f_spreadHint": "在你的成本中以每月 {amount} 計算，共 {months} 個月。",
     "f_monthlyHint": "到 {date} 為止，每月在成本中加入 {amount}。",
-    "cs_monthly": "每月 {amount}"
+    "cs_monthly": "每月 {amount}",
+    "f_inspectionCost": "驗車費用（{name}）",
+    "f_inspectionHint": "較舊的車輛在續繳牌照稅時驗車（汽車超過 7 年，機車超過 5 年）。不需要就留空。"
   },
   "customerPage": {
     "back": "客人",
@@ -6330,7 +6339,19 @@
     "canTalk": "語音輸入：點按麥克風，用你習慣的語言說出來即可。",
     "canRentals": "新增目前的承租人，並設定下次付款日、押金和自動提醒。",
     "canNote": "在你點按「新增」之前，任何內容都不會儲存。你的對話會保留在這裡，方便你之後繼續。",
-    "noChats": "你的對話會列在這裡。"
+    "noChats": "你的對話會列在這裡。",
+    "paperTitle": "{count, plural, other {# 項續期待儲存}}",
+    "paper_tax": "牌照稅",
+    "paper_porbor": "強制險",
+    "paper_insurance": "保險",
+    "paper_inspection": "驗車",
+    "paperUntil": "至 {date}",
+    "paperInspection": "驗車 {price}",
+    "paperSave": "{count, plural, other {儲存 # 項續期}}",
+    "paperSaved": "{count, plural, other {已儲存 # 項續期，日期和費用已更新。}}",
+    "paperFailed": "無法儲存：{names}",
+    "sugPaper": "保單或稅單照片",
+    "canPaper": "傳一張保單或稅單照片：車輛的日期和費用會自動填好。"
   },
   "setupRequest": {
     "title": "我們來幫您設定",

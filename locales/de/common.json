@@ -1643,7 +1643,14 @@
     "recordIncome": "Einnahme erfassen",
     "useThisPayment": "Diese Zahlung verwenden",
     "allCategories": "Alle",
-    "shareOf": "Anteil {index} von {count} · {amount} bezahlt am {date}"
+    "shareOf": "Anteil {index} von {count} · {amount} bezahlt am {date}",
+    "coverTitle": "Was es abdeckt",
+    "coverWhich": "Welches Fahrzeugdokument?",
+    "coverNotCar": "Kein Fahrzeugdokument",
+    "coverFrom": "Gültig ab",
+    "coverTo": "Gültig bis",
+    "coverHint": "Für ein Jahr oder länger bezahlt? Gib die Daten ein, dann wird jeden Monat ein Anteil gezählt.",
+    "coverUpdateCar": "Auch {name} des Fahrzeugs auf Ablauf am {date} setzen"
   },
   "booking": {
     "open": "Öffnen",
@@ -3344,7 +3351,9 @@
     "f_costMonthly": "Kosten pro Monat",
     "f_spreadHint": "Wird mit {amount} pro Monat über {months} Monate in deinen Kosten gezählt.",
     "f_monthlyHint": "{amount} kommen bis {date} jeden Monat zu deinen Kosten hinzu.",
-    "cs_monthly": "{amount} pro Monat"
+    "cs_monthly": "{amount} pro Monat",
+    "f_inspectionCost": "Prüfungskosten ({name})",
+    "f_inspectionHint": "Ältere Fahrzeuge werden bei der Verlängerung der Kfz-Steuer geprüft (Autos über 7 Jahre, Motorräder über 5). Leer lassen, wenn nicht nötig."
   },
   "customerPage": {
     "back": "Kunden",
@@ -6330,7 +6339,19 @@
     "canTalk": "Hör zu: Tippe auf das Mikrofon und sag es in deiner eigenen Sprache.",
     "canRentals": "Füge hinzu, wer jetzt mietet, mit nächsten Zahlungsterminen, Kautionen und automatischen Erinnerungen.",
     "canNote": "Nichts wird gespeichert, bis du auf Hinzufügen tippst. Deine Chats bleiben hier erhalten, damit du später weitermachen kannst.",
-    "noChats": "Deine Chats werden hier aufgelistet."
+    "noChats": "Deine Chats werden hier aufgelistet.",
+    "paperTitle": "{count, plural, one {# Verlängerung bereit} other {# Verlängerungen bereit}}",
+    "paper_tax": "Kfz-Steuer",
+    "paper_porbor": "Pflichtversicherung",
+    "paper_insurance": "Versicherung",
+    "paper_inspection": "Prüfung",
+    "paperUntil": "bis {date}",
+    "paperInspection": "Prüfung {price}",
+    "paperSave": "{count, plural, one {# Verlängerung speichern} other {# Verlängerungen speichern}}",
+    "paperSaved": "{count, plural, one {Gespeichert: Datum und Kosten des Fahrzeugs sind aktualisiert.} other {Gespeichert: # Verlängerungen mit Daten und Kosten.}}",
+    "paperFailed": "Nicht gespeichert: {names}",
+    "sugPaper": "Foto einer Police oder Steuerquittung",
+    "canPaper": "Schick ein Foto einer Versicherungspolice oder Steuerquittung: Daten und Kosten des Fahrzeugs werden ausgefüllt."
   },
   "setupRequest": {
     "title": "Wir richten es für dich ein",

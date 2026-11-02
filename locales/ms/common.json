@@ -1643,7 +1643,14 @@
     "recordIncome": "Rekod wang masuk",
     "useThisPayment": "Guna bayaran ini",
     "allCategories": "Semua",
-    "shareOf": "Bahagian {index} daripada {count} · {amount} dibayar {date}"
+    "shareOf": "Bahagian {index} daripada {count} · {amount} dibayar {date}",
+    "coverTitle": "Apa yang dilindungi",
+    "coverWhich": "Dokumen kenderaan yang mana?",
+    "coverNotCar": "Bukan dokumen kenderaan",
+    "coverFrom": "Dilindungi dari",
+    "coverTo": "Dilindungi hingga",
+    "coverHint": "Dibayar untuk setahun atau lebih? Masukkan tarikh dan sebahagian dikira setiap bulan.",
+    "coverUpdateCar": "Tetapkan juga {name} kenderaan tamat pada {date}"
   },
   "booking": {
     "open": "Buka",
@@ -3344,7 +3351,9 @@
     "f_costMonthly": "Kos sebulan",
     "f_spreadHint": "Dikira {amount} sebulan selama {months} bulan dalam kos anda.",
     "f_monthlyHint": "{amount} ditambah ke kos anda setiap bulan hingga {date}.",
-    "cs_monthly": "{amount} sebulan"
+    "cs_monthly": "{amount} sebulan",
+    "f_inspectionCost": "Kos pemeriksaan ({name})",
+    "f_inspectionHint": "Kenderaan lama diperiksa semasa cukai jalan diperbaharui (kereta lebih 7 tahun, motosikal lebih 5). Biarkan kosong jika tidak perlu."
   },
   "customerPage": {
     "back": "Pelanggan",
@@ -6330,7 +6339,19 @@
     "canTalk": "Dengar: ketik ikon mikrofon dan sebutnya dalam bahasa anda sendiri.",
     "canRentals": "Tambah siapa yang sedang menyewa, dengan tarikh bayaran seterusnya, deposit dan peringatan automatik.",
     "canNote": "Tiada apa-apa disimpan sehingga anda ketik Tambah. Sembang anda disimpan di sini supaya anda boleh sambung kemudian.",
-    "noChats": "Sembang anda akan disenaraikan di sini."
+    "noChats": "Sembang anda akan disenaraikan di sini.",
+    "paperTitle": "{count, plural, other {# pembaharuan sedia}}",
+    "paper_tax": "Cukai jalan",
+    "paper_porbor": "Insurans wajib",
+    "paper_insurance": "Insurans",
+    "paper_inspection": "Pemeriksaan",
+    "paperUntil": "hingga {date}",
+    "paperInspection": "pemeriksaan {price}",
+    "paperSave": "{count, plural, other {Simpan # pembaharuan}}",
+    "paperSaved": "{count, plural, one {Disimpan: tarikh dan kos kenderaan dikemas kini.} other {Disimpan # pembaharuan, dengan tarikh dan kos.}}",
+    "paperFailed": "Tidak dapat disimpan: {names}",
+    "sugPaper": "Foto polisi atau resit cukai",
+    "canPaper": "Hantar foto polisi insurans atau resit cukai: tarikh dan kos kenderaan diisi."
   },
   "setupRequest": {
     "title": "Kami akan sediakannya untuk anda",

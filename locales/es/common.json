@@ -1603,7 +1603,14 @@
     "recordIncome": "Registrar entrada de dinero",
     "useThisPayment": "Usar este pago",
     "allCategories": "Todas",
-    "shareOf": "Parte {index} de {count} · {amount} pagado el {date}"
+    "shareOf": "Parte {index} de {count} · {amount} pagado el {date}",
+    "coverTitle": "Qué cubre",
+    "coverWhich": "¿Qué documento del vehículo?",
+    "coverNotCar": "No es un documento del vehículo",
+    "coverFrom": "Cubre desde",
+    "coverTo": "Cubre hasta",
+    "coverHint": "¿Pagado por un año o más? Añade las fechas y se contará una parte cada mes.",
+    "coverUpdateCar": "Poner también {name} del vehículo con vencimiento el {date}"
   },
   "booking": {
     "open": "Abierto",
@@ -3304,7 +3311,9 @@
     "f_costMonthly": "Coste mensual",
     "f_spreadHint": "Se cuenta como {amount} al mes durante {months} meses en tus gastos.",
     "f_monthlyHint": "Se suman {amount} a tus gastos cada mes hasta el {date}.",
-    "cs_monthly": "{amount} al mes"
+    "cs_monthly": "{amount} al mes",
+    "f_inspectionCost": "Coste de la inspección ({name})",
+    "f_inspectionHint": "Los vehículos más antiguos se inspeccionan al renovar el impuesto (coches de más de 7 años, motos de más de 5). Déjalo vacío si no hace falta."
   },
   "customerPage": {
     "back": "Clientes",
@@ -6330,7 +6339,19 @@
     "canTalk": "Escucha: toca el micrófono y dilo en tu propio idioma.",
     "canRentals": "Añade quién está alquilando ahora, con las próximas fechas de pago, depósitos y recordatorios automáticos.",
     "canNote": "Nada se guarda hasta que toques Añadir. Tus chats se conservan aquí para que puedas continuar más tarde.",
-    "noChats": "Tus chats aparecerán aquí."
+    "noChats": "Tus chats aparecerán aquí.",
+    "paperTitle": "{count, plural, one {# renovación lista} other {# renovaciones listas}}",
+    "paper_tax": "Impuesto de circulación",
+    "paper_porbor": "Seguro obligatorio",
+    "paper_insurance": "Seguro",
+    "paper_inspection": "Inspección",
+    "paperUntil": "hasta el {date}",
+    "paperInspection": "inspección {price}",
+    "paperSave": "{count, plural, one {Guardar # renovación} other {Guardar # renovaciones}}",
+    "paperSaved": "{count, plural, one {Guardado: la fecha y el coste del vehículo están al día.} other {Guardadas # renovaciones, con fechas y costes.}}",
+    "paperFailed": "No se pudo guardar: {names}",
+    "sugPaper": "Foto de una póliza o recibo del impuesto",
+    "canPaper": "Envía una foto de una póliza de seguro o recibo del impuesto: se rellenan las fechas y el coste del vehículo."
   },
   "setupRequest": {
     "title": "Te lo configuramos",

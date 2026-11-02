@@ -1603,7 +1603,14 @@
     "recordIncome": "入金を記録",
     "useThisPayment": "この支払いを使う",
     "allCategories": "すべて",
-    "shareOf": "{count}回中{index}回目の按分 · {date}に{amount}支払い"
+    "shareOf": "{count}回中{index}回目の按分 · {date}に{amount}支払い",
+    "coverTitle": "対象期間",
+    "coverWhich": "どの車両書類？",
+    "coverNotCar": "車両書類ではない",
+    "coverFrom": "開始日",
+    "coverTo": "終了日",
+    "coverHint": "1年分以上をまとめて支払った場合は、日付を入れると毎月按分されます。",
+    "coverUpdateCar": "車両の{name}の期限も{date}に更新する"
   },
   "booking": {
     "open": "開く",
@@ -3304,7 +3311,9 @@
     "f_costMonthly": "月額",
     "f_spreadHint": "{months}か月にわたり月{amount}として費用に計上されます。",
     "f_monthlyHint": "{date}まで毎月{amount}が費用に加算されます。",
-    "cs_monthly": "月{amount}"
+    "cs_monthly": "月{amount}",
+    "f_inspectionCost": "検査費用（{name}）",
+    "f_inspectionHint": "古い車両は税の更新時に検査します（車は7年超、バイクは5年超）。不要なら空欄のままで。"
   },
   "customerPage": {
     "back": "お客様",
@@ -6330,7 +6339,19 @@
     "canTalk": "音声: マイクをタップして、普段使っている言語で話しかけてください。",
     "canRentals": "現在貸し出し中の方を、次回支払日、デポジット、自動リマインダーと一緒に追加できます。",
     "canNote": "「追加」をタップするまでは何も保存されません。チャットはここに残るので、後から続けられます。",
-    "noChats": "チャットはここに一覧表示されます。"
+    "noChats": "チャットはここに一覧表示されます。",
+    "paperTitle": "{count, plural, other {更新 #件 準備完了}}",
+    "paper_tax": "自動車税",
+    "paper_porbor": "強制保険",
+    "paper_insurance": "保険",
+    "paper_inspection": "検査",
+    "paperUntil": "{date}まで",
+    "paperInspection": "検査 {price}",
+    "paperSave": "{count, plural, other {#件の更新を保存}}",
+    "paperSaved": "{count, plural, other {保存しました：#件の期限と費用を更新しました。}}",
+    "paperFailed": "保存できませんでした：{names}",
+    "sugPaper": "保険証券や税の領収書の写真",
+    "canPaper": "保険証券や税の領収書の写真を送ると、車両の期限と費用が入力されます。"
   },
   "setupRequest": {
     "title": "こちらで設定代行します",

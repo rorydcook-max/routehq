@@ -1643,7 +1643,14 @@
     "recordIncome": "Ghi tiền vào",
     "useThisPayment": "Dùng khoản thanh toán này",
     "allCategories": "Tất cả",
-    "shareOf": "Phần {index}/{count} · đã trả {amount} ngày {date}"
+    "shareOf": "Phần {index}/{count} · đã trả {amount} ngày {date}",
+    "coverTitle": "Thời hạn áp dụng",
+    "coverWhich": "Giấy tờ nào của xe?",
+    "coverNotCar": "Không phải giấy tờ xe",
+    "coverFrom": "Áp dụng từ",
+    "coverTo": "Áp dụng đến",
+    "coverHint": "Trả cho một năm trở lên? Thêm ngày để chia đều vào mỗi tháng.",
+    "coverUpdateCar": "Đặt luôn {name} của xe hết hạn ngày {date}"
   },
   "booking": {
     "open": "Mở",
@@ -3344,7 +3351,9 @@
     "f_costMonthly": "Chi phí mỗi tháng",
     "f_spreadHint": "Tính {amount} mỗi tháng trong {months} tháng vào chi phí của bạn.",
     "f_monthlyHint": "Cộng {amount} vào chi phí mỗi tháng đến {date}.",
-    "cs_monthly": "{amount} mỗi tháng"
+    "cs_monthly": "{amount} mỗi tháng",
+    "f_inspectionCost": "Phí kiểm định ({name})",
+    "f_inspectionHint": "Xe cũ được kiểm định khi gia hạn thuế (ô tô trên 7 năm, xe máy trên 5 năm). Để trống nếu không cần."
   },
   "customerPage": {
     "back": "Khách hàng",
@@ -6330,7 +6339,19 @@
     "canTalk": "Nghe: nhấn biểu tượng micro và nói bằng ngôn ngữ của bạn.",
     "canRentals": "Thêm người đang thuê xe, kèm ngày thanh toán tiếp theo, tiền đặt cọc và nhắc nhở tự động.",
     "canNote": "Chưa có gì được lưu cho đến khi bạn nhấn Thêm. Cuộc trò chuyện của bạn được giữ lại tại đây để bạn tiếp tục sau.",
-    "noChats": "Các cuộc trò chuyện của bạn sẽ hiển thị ở đây."
+    "noChats": "Các cuộc trò chuyện của bạn sẽ hiển thị ở đây.",
+    "paperTitle": "{count, plural, other {# lần gia hạn sẵn sàng}}",
+    "paper_tax": "Phí đường bộ",
+    "paper_porbor": "Bảo hiểm bắt buộc",
+    "paper_insurance": "Bảo hiểm",
+    "paper_inspection": "Kiểm định",
+    "paperUntil": "đến {date}",
+    "paperInspection": "kiểm định {price}",
+    "paperSave": "{count, plural, other {Lưu # lần gia hạn}}",
+    "paperSaved": "{count, plural, other {Đã lưu # lần gia hạn, kèm ngày và chi phí.}}",
+    "paperFailed": "Không lưu được: {names}",
+    "sugPaper": "Ảnh hợp đồng bảo hiểm hoặc biên lai thuế",
+    "canPaper": "Gửi ảnh hợp đồng bảo hiểm hoặc biên lai thuế: ngày và chi phí của xe sẽ được điền sẵn."
   },
   "setupRequest": {
     "title": "Chúng tôi sẽ cài đặt giúp bạn",

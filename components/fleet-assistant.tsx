@@ -9,13 +9,14 @@ import {
   askFleetAssistant,
   saveAssistantConversation,
   type AssistantTurn,
+  type DraftPaperwork,
   type DraftRental,
   type DraftVehicle,
   type SavedConversation
 } from "@/app/actions/fleet-assistant";
 import Link from "next/link";
 import type { Route } from "next";
-import { uploadVehiclePhotos } from "@/app/actions/vehicles";
+import { renewVehicleCompliance, uploadVehiclePhotos } from "@/app/actions/vehicles";
 import { compressImage } from "@/lib/direct-upload-client";
 
 type Photo = { file: File; url: string };
@@ -71,6 +72,9 @@ export function FleetAssistant({
   );
   const [rentals, setRentals] = useState<DraftRental[]>(initial?.rentals || []);
   const [addingRentals, setAddingRentals] = useState(false);
+  // Renewed paperwork read from photos of policies and tax receipts (Rory, 2 Nov 2026): saved as renewals on Save.
+  const [paperwork, setPaperwork] = useState<DraftPaperwork[]>([]);
+  const [savingPapers, setSavingPapers] = useState(false);
   const [draft, setDraft] = useState<DraftVehicle[]>(initial?.draft || []);
   // Every chat is kept (Rory, 2 Nov 2026: a reload lost it): saved a moment after anything changes.
   const conversationId = useRef<string | null>(initial?.id || null);
@@ -138,7 +142,7 @@ export function FleetAssistant({
     setThinking(true);
     // The model sees smaller copies; the full photos are kept for the vehicles.
     const images = await Promise.all(sending.map(async (photo) => toDataUrl(await compressImage(photo.file, 1024, 0.7).catch(() => photo.file)))).catch(() => [] as string[]);
-    const result = await askFleetAssistant({ turns: nextTurns, images, photosBefore: photos.length, draft, rentals, locale }).catch(() => ({ ok: false as const, error: "failed" }));
+    const result = await askFleetAssistant({ turns: nextTurns, images, photosBefore: photos.length, draft, rentals, paperwork, locale }).catch(() => ({ ok: false as const, error: "failed" }));
     setPhotos((list) => [...list, ...sending]);
     setThinking(false);
     if (!result.ok) {
@@ -150,6 +154,42 @@ export function FleetAssistant({
     setShownTurns((list) => [...list, { role: "assistant", text: result.reply }]);
     setDraft(withoutAdded(result.draft));
     setRentals(result.rentals);
+    setPaperwork(result.paperwork || []);
+  }
+
+  /** Each renewal saved the same way as from the car page: new date, the cost, and the photo kept with the car's files. */
+  async function savePaperwork() {
+    if (!paperwork.length || savingPapers) return;
+    setSavingPapers(true);
+    const failed: string[] = [];
+    const done: DraftPaperwork[] = [];
+    for (const item of paperwork) {
+      const form = new FormData();
+      form.set("vehicleId", item.vehicleId);
+      form.set("organizationId", organizationId);
+      form.set("complianceType", item.kind);
+      form.set("newExpiryDate", item.coverTo);
+      if (item.coverFrom) form.set("coverStart", item.coverFrom);
+      if (item.cost) form.set("cost", String(item.cost));
+      form.set("paymentMode", item.monthly ? "monthly" : "once");
+      if (item.note) form.set("notes", item.note);
+      if (item.inspectionCost) form.set("inspectionCost", String(item.inspectionCost));
+      const photo = item.photo ? photos[item.photo - 1] : null;
+      if (photo) form.append("documentFile", photo.file, photo.file.name || "document.jpg");
+      try {
+        await renewVehicleCompliance(form);
+        done.push(item);
+      } catch {
+        failed.push(item.vehicleName || item.kind);
+      }
+    }
+    setSavingPapers(false);
+    setPaperwork((list) => list.filter((item) => !done.includes(item)));
+    if (done.length) {
+      setShownTurns((list) => [...list, { role: "assistant", text: t("paperSaved", { count: done.length }) }]);
+      setTurns((list) => [...list, { role: "assistant", text: `Saved ${done.length} paperwork renewal(s); they are done, do not list them again.` }]);
+    }
+    if (failed.length) setShownTurns((list) => [...list, { role: "assistant", text: t("paperFailed", { names: failed.join(", ") }) }]);
   }
 
   // Vehicles already added stay out of the list, even if the model repeats them from earlier in the chat.
@@ -244,7 +284,7 @@ export function FleetAssistant({
   const suggestions: Array<{ label: string; text?: string; photo?: boolean }> = [
     { label: t("sugSheet"), text: t("sugSheetText") },
     { label: t("sugPhoto"), photo: true },
-    ...(hasVehicles ? [{ label: t("sugRenting"), text: t("sugRentingText") }] : []),
+    ...(hasVehicles ? [{ label: t("sugRenting"), text: t("sugRentingText") }, { label: t("sugPaper"), photo: true }] : []),
     { label: t("sugTell"), text: t("sugTellText") }
   ];
 
@@ -386,6 +426,46 @@ export function FleetAssistant({
           <button className="primary-action pressable mt-3 w-full justify-center" disabled={addingRentals} onClick={() => void addRentals()} type="button">
             {addingRentals ? <Loader2 className="animate-spin" size={18} /> : null}
             {addingRentals ? t("adding") : t("addRentals", { count: rentals.length })}
+          </button>
+        </div>
+      ) : null}
+
+      {paperwork.length ? (
+        <div className="border-t border-[var(--border)] px-3 py-3">
+          <p className="px-1 text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]">{t("paperTitle", { count: paperwork.length })}</p>
+          <ul className="mt-2 space-y-1.5">
+            {paperwork.map((item, index) => (
+              <li className="flex items-center gap-2.5 rounded-xl bg-[var(--panel-secondary)] px-3 py-2" key={index}>
+                {item.photo && photos[item.photo - 1] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" src={photos[item.photo - 1].url} />
+                ) : (
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--panel)] text-[var(--muted)]">
+                    <Check size={16} />
+                  </span>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold text-[var(--foreground)]">{t(`paper_${item.kind}` as never)} · {item.vehicleName || t("unnamed")}</p>
+                  <p className="truncate text-[13px] text-[var(--muted)]">
+                    {[
+                      t("paperUntil", { date: new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${item.coverTo}T00:00:00Z`)) }),
+                      item.cost ? (item.monthly ? t("perMonth", { price: money(item.cost) }) : money(item.cost)) : "",
+                      item.inspectionCost ? t("paperInspection", { price: money(item.inspectionCost) }) : "",
+                      item.note || ""
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                </div>
+                <button aria-label={t("remove")} className="pressable flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--muted)]" onClick={() => setPaperwork((list) => list.filter((_, i) => i !== index))} type="button">
+                  <X size={16} />
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button className="primary-action pressable mt-3 w-full justify-center" disabled={savingPapers} onClick={() => void savePaperwork()} type="button">
+            {savingPapers ? <Loader2 className="animate-spin" size={18} /> : null}
+            {savingPapers ? t("adding") : t("paperSave", { count: paperwork.length })}
           </button>
         </div>
       ) : null}

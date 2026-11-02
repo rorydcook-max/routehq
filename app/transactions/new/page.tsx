@@ -39,6 +39,7 @@ export default async function NewTransactionPage({
         </div>
 
         <TransactionForm
+          country={String((organization as any).country_code || (organization as any).settings?.main_location?.country || "")}
           defaultCustomerId={params.customerId || ""}
           defaultRentalId={params.rentalId || ""}
           startAsCost={params.cost === "1"}

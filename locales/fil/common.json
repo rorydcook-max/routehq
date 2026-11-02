@@ -1603,7 +1603,14 @@
     "recordIncome": "Itala ang perang pumasok",
     "useThisPayment": "Gamitin ang bayad na ito",
     "allCategories": "Lahat",
-    "shareOf": "Bahagi {index} ng {count} · {amount} binayaran noong {date}"
+    "shareOf": "Bahagi {index} ng {count} · {amount} binayaran noong {date}",
+    "coverTitle": "Saklaw nito",
+    "coverWhich": "Aling papeles ng sasakyan?",
+    "coverNotCar": "Hindi papeles ng sasakyan",
+    "coverFrom": "Saklaw mula",
+    "coverTo": "Saklaw hanggang",
+    "coverHint": "Binayaran para sa isang taon o higit pa? Ilagay ang mga petsa at bibilangin ang bahagi bawat buwan.",
+    "coverUpdateCar": "Itakda rin ang {name} ng sasakyan na mag-expire sa {date}"
   },
   "booking": {
     "open": "Buksan",
@@ -3304,7 +3311,9 @@
     "f_costMonthly": "Gastos kada buwan",
     "f_spreadHint": "Binibilang na {amount} kada buwan sa loob ng {months} buwan sa iyong gastos.",
     "f_monthlyHint": "{amount} ang idadagdag sa iyong gastos bawat buwan hanggang {date}.",
-    "cs_monthly": "{amount} kada buwan"
+    "cs_monthly": "{amount} kada buwan",
+    "f_inspectionCost": "Gastos sa inspeksyon ({name})",
+    "f_inspectionHint": "Ang mas lumang sasakyan ay iniinspeksyon kapag nire-renew ang road tax (kotse na lampas 7 taon, motor na lampas 5). Iwanang blangko kung hindi kailangan."
   },
   "customerPage": {
     "back": "Mga customer",
@@ -6330,7 +6339,19 @@
     "canTalk": "Makinig: pindutin ang mikropono at sabihin ito sa sarili mong wika.",
     "canRentals": "Magdagdag ng kasalukuyang nangungupahan, kasama ang petsa ng susunod na bayad, deposito at awtomatikong paalala.",
     "canNote": "Walang nase-save hanggang pindutin mo ang Add. Nananatili rito ang iyong mga chat para maipagpatuloy mo ito sa susunod.",
-    "noChats": "Ilalista dito ang iyong mga chat."
+    "noChats": "Ilalista dito ang iyong mga chat.",
+    "paperTitle": "{count, plural, one {# renewal na handa} other {# renewal na handa}}",
+    "paper_tax": "Road tax",
+    "paper_porbor": "Compulsory insurance",
+    "paper_insurance": "Insurance",
+    "paper_inspection": "Inspeksyon",
+    "paperUntil": "hanggang {date}",
+    "paperInspection": "inspeksyon {price}",
+    "paperSave": "{count, plural, one {I-save ang # renewal} other {I-save ang # renewal}}",
+    "paperSaved": "{count, plural, one {Na-save: na-update ang petsa at gastos ng sasakyan.} other {Na-save ang # renewal, kasama ang mga petsa at gastos.}}",
+    "paperFailed": "Hindi na-save: {names}",
+    "sugPaper": "Larawan ng policy o resibo ng tax",
+    "canPaper": "Magpadala ng larawan ng insurance policy o resibo ng tax: mapupunan ang mga petsa at gastos ng sasakyan."
   },
   "setupRequest": {
     "title": "Kami na ang maglalagay para sa iyo",

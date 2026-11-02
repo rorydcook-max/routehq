@@ -1643,7 +1643,14 @@
     "recordIncome": "רישום הכנסה",
     "useThisPayment": "שימוש בתשלום זה",
     "allCategories": "הכול",
-    "shareOf": "חלק {index} מתוך {count} · שולמו {amount} ב-{date}"
+    "shareOf": "חלק {index} מתוך {count} · שולמו {amount} ב-{date}",
+    "coverTitle": "מה זה מכסה",
+    "coverWhich": "איזה מסמך של הרכב?",
+    "coverNotCar": "לא מסמך של הרכב",
+    "coverFrom": "מכסה מ-",
+    "coverTo": "מכסה עד",
+    "coverHint": "שולם לשנה או יותר? הוסיפו תאריכים וחלק ייספר בכל חודש.",
+    "coverUpdateCar": "לעדכן גם את {name} של הרכב לפוג ב-{date}"
   },
   "booking": {
     "open": "פתח",
@@ -3344,7 +3351,9 @@
     "f_costMonthly": "עלות לחודש",
     "f_spreadHint": "נספר כ-{amount} לחודש במשך {months} חודשים בהוצאות שלך.",
     "f_monthlyHint": "{amount} יתווספו להוצאות שלך כל חודש עד {date}.",
-    "cs_monthly": "{amount} לחודש"
+    "cs_monthly": "{amount} לחודש",
+    "f_inspectionCost": "עלות הבדיקה ({name})",
+    "f_inspectionHint": "רכבים ישנים נבדקים בחידוש האגרה (מכוניות מעל 7 שנים, אופנועים מעל 5). השאירו ריק אם לא צריך."
   },
   "customerPage": {
     "back": "לקוחות",
@@ -6330,7 +6339,19 @@
     "canTalk": "להקשיב: הקש על המיקרופון ואמור את הדבר בשפה שלך.",
     "canRentals": "להוסיף מי שוכר כרגע, עם תאריכי תשלום הבא, פיקדונות ותזכורות אוטומטיות.",
     "canNote": "שום דבר לא נשמר עד שתלחץ על הוספה. השיחות שלך נשמרות כאן כדי שתוכל להמשיך מאוחר יותר.",
-    "noChats": "השיחות שלך יופיעו כאן."
+    "noChats": "השיחות שלך יופיעו כאן.",
+    "paperTitle": "{count, plural, one {חידוש # מוכן} other {# חידושים מוכנים}}",
+    "paper_tax": "אגרת רכב",
+    "paper_porbor": "ביטוח חובה",
+    "paper_insurance": "ביטוח",
+    "paper_inspection": "בדיקה",
+    "paperUntil": "עד {date}",
+    "paperInspection": "בדיקה {price}",
+    "paperSave": "{count, plural, one {שמירת חידוש #} other {שמירת # חידושים}}",
+    "paperSaved": "{count, plural, one {נשמר: התאריך והעלות של הרכב עודכנו.} other {נשמרו # חידושים, עם תאריכים ועלויות.}}",
+    "paperFailed": "לא נשמר: {names}",
+    "sugPaper": "תמונה של פוליסה או קבלת אגרה",
+    "canPaper": "שלחו תמונה של פוליסת ביטוח או קבלת אגרה: התאריכים והעלות של הרכב יתמלאו."
   },
   "setupRequest": {
     "title": "אנחנו נגדיר את זה בשבילך",

@@ -1603,7 +1603,14 @@
     "recordIncome": "Record money in",
     "recordCost": "Record a cost",
     "allCategories": "All",
-    "shareOf": "Share {index} of {count} · {amount} paid {date}"
+    "shareOf": "Share {index} of {count} · {amount} paid {date}",
+    "coverTitle": "What it covers",
+    "coverWhich": "Which of the car's papers?",
+    "coverNotCar": "Not the car's papers",
+    "coverFrom": "Covers from",
+    "coverTo": "Covers until",
+    "coverHint": "Paid for a year or more? Add the dates and it counts a share each month.",
+    "coverUpdateCar": "Also set the car's {name} to run out on {date}"
   },
   "booking": {
     "open": "Open",
@@ -3304,7 +3311,9 @@
     "f_costMonthly": "Cost per month",
     "f_spreadHint": "Counted as {amount} a month over {months} months in your costs.",
     "f_monthlyHint": "{amount} added to your costs every month until {date}.",
-    "cs_monthly": "{amount} a month"
+    "cs_monthly": "{amount} a month",
+    "f_inspectionCost": "Inspection cost ({name})",
+    "f_inspectionHint": "Older vehicles are inspected when the road tax is renewed (cars over 7 years, bikes over 5). Leave empty if not needed."
   },
   "customerPage": {
     "back": "Customers",
@@ -6330,7 +6339,19 @@
     "canTalk": "Listen: tap the microphone and say it in your own language.",
     "canRentals": "Add who's renting now, with next payment dates, deposits and automatic reminders.",
     "canNote": "Nothing is saved until you tap Add. Your chats are kept here so you can carry on later.",
-    "noChats": "Your chats will be listed here."
+    "noChats": "Your chats will be listed here.",
+    "paperTitle": "{count, plural, one {# renewal ready} other {# renewals ready}}",
+    "paper_tax": "Road tax",
+    "paper_porbor": "Compulsory insurance",
+    "paper_insurance": "Insurance",
+    "paper_inspection": "Inspection",
+    "paperUntil": "until {date}",
+    "paperInspection": "inspection {price}",
+    "paperSave": "{count, plural, one {Save # renewal} other {Save # renewals}}",
+    "paperSaved": "{count, plural, one {Saved: the car's date and cost are updated.} other {Saved: # renewals, with their dates and costs.}}",
+    "paperFailed": "Couldn't save: {names}",
+    "sugPaper": "Photo of a policy or tax receipt",
+    "canPaper": "Send a photo of an insurance policy or tax receipt: the car's dates and the cost are filled in."
   },
   "setupRequest": {
     "title": "We'll set it up for you",

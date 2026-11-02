@@ -11,6 +11,8 @@ import { smallReceipt } from "@/components/receipt-attach";
 import { takePendingReceipt } from "@/components/receipt-handoff";
 import { Card } from "@/components/ui";
 import { TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
+import { paperworkFor } from "@/lib/country-paperwork";
+import { monthsCovered } from "@/lib/cost-spread";
 import type { MatchResult } from "@/lib/transaction-matching";
 import type { TransactionFormOptions, TransactionFormPrefill } from "@/lib/transactions";
 
@@ -21,7 +23,22 @@ const BILLABLE: string[] = ["repair", "maintenance", "servicing", "fine", "fuel"
 /** Letters and digits only, so "กข-1234" on a receipt finds "กข 1234" in the fleet. */
 const plateKey = (value: string | null | undefined) => String(value || "").toUpperCase().replace(/[^\p{L}\p{N}]/gu, "");
 
-type ReadReceipt = { isReceipt: boolean; amount: number | null; date: string | null; paidTo: string | null; costType: string | null; plate: string | null; odometer: number | null; reference: string | null; summary: string | null; confidence: number; savedBefore?: string | null };
+type ReadReceipt = {
+  isReceipt: boolean;
+  amount: number | null;
+  date: string | null;
+  paidTo: string | null;
+  costType: string | null;
+  plate: string | null;
+  odometer: number | null;
+  reference: string | null;
+  summary: string | null;
+  paperwork?: string | null;
+  coverFrom?: string | null;
+  coverTo?: string | null;
+  confidence: number;
+  savedBefore?: string | null;
+};
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2.5 text-[15px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
@@ -35,8 +52,11 @@ export function TransactionForm({
   prefill = null,
   waiting = [],
   startAsCost = false,
-  startAsFine = false
+  startAsFine = false,
+  country = ""
 }: {
+  /** The business's country: which paperwork a policy or tax payment can renew. */
+  country?: string;
   organizationId: string;
   options: TransactionFormOptions;
   defaultVehicleId?: string;
@@ -192,6 +212,13 @@ export function TransactionForm({
   const [readError, setReadError] = useState("");
   const [read, setRead] = useState<ReadReceipt | null>(null);
   const [receiptPreview, setReceiptPreview] = useState("");
+  // Insurance, tax or an inspection: the stretch it covers (counted a share per month) and which of the car's papers
+  // it renews, so the car's date moves too (Rory, 2 Nov 2026).
+  const paperWords = useTranslations("vehiclePage");
+  const [paperKind, setPaperKind] = useState("");
+  const [coverFrom, setCoverFrom] = useState("");
+  const [coverTo, setCoverTo] = useState("");
+  const [updatePaperwork, setUpdatePaperwork] = useState(true);
   const receiptInput = useRef<HTMLInputElement>(null);
   const snapInput = useRef<HTMLInputElement>(null);
   useEffect(() => () => { if (receiptPreview) URL.revokeObjectURL(receiptPreview); }, [receiptPreview]);
@@ -247,6 +274,13 @@ export function TransactionForm({
       if (found.odometer) setMileage(String(found.odometer));
       if (found.paidTo || found.odometer) setMoreOpen(true);
       if (found.summary && !notes) setNotes(found.summary);
+      // A policy, tax receipt or inspection certificate: what it renews and the days it covers.
+      if (found.paperwork && !linkedTaskId) {
+        setType(found.paperwork === "tax" ? "tax" : found.paperwork === "inspection" ? "other" : "insurance");
+        setPaperKind(found.paperwork === "inspection" && !paperworkFor(country).some((item) => item.key === "inspection") ? "" : found.paperwork);
+      }
+      if (found.coverFrom) setCoverFrom(found.coverFrom);
+      if (found.coverTo) setCoverTo(found.coverTo);
       const plate = plateKey(found.plate).match(/\d?\p{L}{1,3}\d{1,4}/u)?.[0];
       const vehicle = plate ? options.vehicles.find((entry) => plateKey(entry.label).startsWith(plate) || plateKey(entry.label).includes(plate)) : null;
       if (vehicle) setVehicleId(vehicle.id);
@@ -523,6 +557,55 @@ export function TransactionForm({
               <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{say("sv_hint")}</p>
             </div>
           ) : null}
+
+          {/* Insurance, tax or an inspection: the days it covers (a share counted each month) and the car's paper it renews. */}
+          {(() => {
+            const kinds = paperworkFor(country).filter((item) => item.costType === type);
+            if (isMoneyIn || !(type === "insurance" || type === "tax" || (type === "other" && (kinds.length > 0 || coverFrom || coverTo)))) return null;
+            const onCar = Boolean(vehicleId) && !noVehicle;
+            const kind = kinds.find((item) => item.key === paperKind) || (kinds.length === 1 && onCar ? kinds[0] : null);
+            const kindName = (item: (typeof kinds)[number]) => (item.local ? `${paperWords(item.nameKey as never)} (${item.local})` : paperWords(item.nameKey as never));
+            const total = Number(amount || 0);
+            const months = coverFrom && coverTo && coverTo > coverFrom ? monthsCovered({ from: coverFrom, to: coverTo }) : 0;
+            return (
+              <div className="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:col-span-2 sm:grid-cols-2">
+                <p className="text-[14px] font-semibold text-[var(--foreground)] sm:col-span-2">{say("coverTitle")}</p>
+                {onCar && kinds.length > 1 ? (
+                  <label className="block sm:col-span-2">
+                    <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("coverWhich")}</span>
+                    <select className={inputClass} onChange={(event) => setPaperKind(event.target.value)} value={kind?.key || ""}>
+                      <option value="">{say("coverNotCar")}</option>
+                      {kinds.map((item) => (
+                        <option key={item.key} value={item.key}>
+                          {kindName(item)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null}
+                <input name="paperKind" type="hidden" value={onCar && kind ? kind.key : ""} />
+                <label className="block">
+                  <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("coverFrom")}</span>
+                  <input className={inputClass} name="coverFrom" onChange={(event) => setCoverFrom(event.target.value)} type="date" value={coverFrom} />
+                </label>
+                <label className="block">
+                  <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("coverTo")}</span>
+                  <input className={inputClass} name="coverTo" onChange={(event) => setCoverTo(event.target.value)} type="date" value={coverTo} />
+                </label>
+                {months >= 2 && total > 0 ? (
+                  <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{paperWords("f_spreadHint", { amount: `฿${Math.round(total / months).toLocaleString("en-US")}`, months })}</p>
+                ) : (
+                  <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{say("coverHint")}</p>
+                )}
+                {onCar && kind && coverTo ? (
+                  <label className="flex items-start gap-3 text-[14px] font-semibold text-[var(--foreground)] sm:col-span-2">
+                    <input checked={updatePaperwork} className="mt-0.5 h-5 w-5 shrink-0" name="updatePaperwork" onChange={(event) => setUpdatePaperwork(event.target.checked)} type="checkbox" value="true" />
+                    {say("coverUpdateCar", { name: kindName(kind), date: shortDate(coverTo, locale) })}
+                  </label>
+                ) : null}
+              </div>
+            );
+          })()}
 
           {!isMoneyIn && BILLABLE.includes(type) && rentalsForVehicle.length > 0 ? (
             <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:col-span-2">

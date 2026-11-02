@@ -1643,7 +1643,14 @@
     "recordIncome": "记录收入",
     "useThisPayment": "使用此付款",
     "allCategories": "全部",
-    "shareOf": "第 {index}/{count} 份 · {date} 支付 {amount}"
+    "shareOf": "第 {index}/{count} 份 · {date} 支付 {amount}",
+    "coverTitle": "保障期间",
+    "coverWhich": "是车辆的哪份证件？",
+    "coverNotCar": "不是车辆证件",
+    "coverFrom": "开始日期",
+    "coverTo": "结束日期",
+    "coverHint": "一次付了一年或更久？填上日期，每月会按比例计入。",
+    "coverUpdateCar": "同时把车辆的{name}到期日改为 {date}"
   },
   "booking": {
     "open": "开放",
@@ -3344,7 +3351,9 @@
     "f_costMonthly": "每月费用",
     "f_spreadHint": "在你的成本中按每月 {amount} 计算，共 {months} 个月。",
     "f_monthlyHint": "到 {date} 为止，每月在成本中加入 {amount}。",
-    "cs_monthly": "每月 {amount}"
+    "cs_monthly": "每月 {amount}",
+    "f_inspectionCost": "年检费用（{name}）",
+    "f_inspectionHint": "较旧的车辆在续缴车辆税时年检（汽车超过 7 年，摩托车超过 5 年）。不需要就留空。"
   },
   "customerPage": {
     "back": "客户",
@@ -6330,7 +6339,19 @@
     "canTalk": "语音输入：点击麦克风，用您的母语说出来即可。",
     "canRentals": "添加当前租客、下次付款日期、押金，并设置自动提醒。",
     "canNote": "点击“添加”前不会保存任何内容。您的聊天记录会保留在这里，方便您稍后继续。",
-    "noChats": "您的聊天记录将显示在这里。"
+    "noChats": "您的聊天记录将显示在这里。",
+    "paperTitle": "{count, plural, other {# 项续期待保存}}",
+    "paper_tax": "车辆税",
+    "paper_porbor": "强制保险",
+    "paper_insurance": "保险",
+    "paper_inspection": "年检",
+    "paperUntil": "至 {date}",
+    "paperInspection": "年检 {price}",
+    "paperSave": "{count, plural, other {保存 # 项续期}}",
+    "paperSaved": "{count, plural, other {已保存 # 项续期，日期和费用已更新。}}",
+    "paperFailed": "无法保存：{names}",
+    "sugPaper": "保单或税单照片",
+    "canPaper": "发一张保单或税单照片：车辆的日期和费用会自动填好。"
   },
   "setupRequest": {
     "title": "我们来帮您设置",

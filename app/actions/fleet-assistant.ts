@@ -12,6 +12,7 @@ import { ensureOnboardingChecklist, markOnboardingStep } from "@/lib/onboarding"
 import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { googleSheetToSpreadsheetInput, parseSpreadsheetFile } from "@/lib/import/spreadsheet";
+import { paperworkFor } from "@/lib/country-paperwork";
 
 /**
  * The fleet assistant (Rory, 2 Nov 2026): an owner tells it about their vehicles in their own words, by typing,
@@ -80,6 +81,50 @@ export type DraftRental = {
 
 const isoDay = (value: unknown) => (/^\d{4}-\d{2}-\d{2}$/.test(String(value || "")) ? String(value) : null);
 
+/**
+ * Paperwork renewed, from a photo of the policy, tax receipt or certificate, or from what they say (Rory, 2 Nov 2026):
+ * the car's new date and what it cost, recorded the same way as renewing from the car page.
+ */
+export type DraftPaperwork = {
+  vehicleId: string;
+  /** tax, porbor (compulsory insurance), insurance or inspection. */
+  kind: string;
+  coverFrom?: string | null;
+  coverTo: string;
+  cost?: number | null;
+  /** Paid every month rather than once for the whole cover. */
+  monthly?: boolean;
+  /** Insurer or office, policy number: kept as the renewal's note. */
+  note?: string;
+  /** Which photo (1 = the first) is the document; it is kept with the car's files. */
+  photo?: number | null;
+  /** Thailand: the inspection (ตรอ.) paid with the road tax. */
+  inspectionCost?: number | null;
+  /** For showing: the vehicle's name and plate. */
+  vehicleName?: string;
+};
+
+/** A Thai Buddhist year (2569) read off a document, as the Gregorian year. */
+const gregorian = (day: string | null) => (day && Number(day.slice(0, 4)) > 2400 ? `${Number(day.slice(0, 4)) - 543}${day.slice(4)}` : day);
+
+function cleanPaperwork(items: unknown, vehicleIds: Set<string>): DraftPaperwork[] {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((item: any) => ({
+      vehicleId: String(item?.vehicleId || ""),
+      kind: String(item?.kind || ""),
+      coverFrom: gregorian(isoDay(item?.coverFrom)),
+      coverTo: gregorian(isoDay(item?.coverTo)) || "",
+      cost: Number(item?.cost) > 0 ? Math.round(Number(item.cost) * 100) / 100 : null,
+      monthly: item?.monthly === true,
+      note: String(item?.note || "").trim().slice(0, 120) || undefined,
+      photo: Number.isInteger(Number(item?.photo)) && Number(item.photo) > 0 ? Number(item.photo) : null,
+      inspectionCost: item?.kind === "tax" && Number(item?.inspectionCost) > 0 ? Number(item.inspectionCost) : null
+    }))
+    .filter((item) => vehicleIds.has(item.vehicleId) && ["tax", "porbor", "insurance", "inspection"].includes(item.kind) && item.coverTo)
+    .slice(0, 40);
+}
+
 function cleanRentals(rentals: unknown, vehicleIds: Set<string>): DraftRental[] {
   if (!Array.isArray(rentals)) return [];
   return rentals
@@ -106,24 +151,32 @@ export async function askFleetAssistant(input: {
   photosBefore: number;
   draft: DraftVehicle[];
   rentals?: DraftRental[];
+  paperwork?: DraftPaperwork[];
   locale: string;
-}): Promise<{ ok: true; reply: string; draft: DraftVehicle[]; rentals: DraftRental[] } | { ok: false; error: string }> {
+}): Promise<{ ok: true; reply: string; draft: DraftVehicle[]; rentals: DraftRental[]; paperwork: DraftPaperwork[] } | { ok: false; error: string }> {
   if (!aiTextConfigured()) return { ok: false, error: "unavailable" };
   const organization = await getDefaultOrganization();
   const supabase = (await createSupabaseServerClient()) as any;
   const [categories, { data: fleet }, { data: running }] = await Promise.all([
     getVehicleCategories(organization.id).catch(() => []),
-    supabase.from("vehicles").select("id, make, model, registration_number, color").eq("organization_id", organization.id).is("deleted_at", null).order("created_at").limit(120),
+    supabase.from("vehicles").select("id, make, model, registration_number, color, year, compliance:metadata->compliance").eq("organization_id", organization.id).is("deleted_at", null).order("created_at").limit(120),
     supabase.from("rentals").select("vehicle_id").eq("organization_id", organization.id).is("deleted_at", null).in("status", ["active", "due_soon", "overdue", "extended"])
   ]);
   const rentedNow = new Set(((running || []) as Array<{ vehicle_id: string }>).map((row) => row.vehicle_id));
   const fleetList = ((fleet || []) as any[]).map((row) => ({ id: row.id, name: [row.make, row.model, row.color, row.registration_number].filter(Boolean).join(" "), rentedInRoveHQ: rentedNow.has(row.id) }));
+  // Each vehicle's paperwork dates now, for matching a policy or tax receipt to the right car and spotting a renewal.
+  const papers = paperworkFor((organization as any).country_code || (organization as any).settings?.main_location?.country);
+  const paperDates = ((fleet || []) as any[]).map((row) => ({
+    id: row.id,
+    year: row.year || null,
+    ...Object.fromEntries(papers.map((item) => [item.key, row.compliance?.[`${item.key}_expiry_date`] || null]))
+  }));
   const kinds = categories.map((category) => category.code).join(", ") || "car, scooter, motorcycle";
   const language = supportedLocaleOptions.find((option) => option.code === input.locale)?.english || "English";
   const currency = organization.currency || "THB";
 
   const system = [
-    "You help the owner of a small vehicle rental business get their business into RoveHQ: first their vehicles, then who is renting them right now.",
+    "You help the owner of a small vehicle rental business get their business into RoveHQ: first their vehicles, then who is renting them right now. You also record renewed paperwork (insurance, road tax, inspection) from photos of the documents.",
     `Reply in ${language}, in one or two short, friendly sentences. Plain words, no lists, no markdown. Today is ${businessToday()}.`,
     "VEHICLES: from what they type, say or send (photos of registration books, of the vehicles, of price lists or spreadsheets), keep a list of new vehicles.",
     `Each vehicle: kind (one of: ${kinds}), make, model, and if known: variant, year, plate (exactly as written; never invent one), colour, and rental prices in ${currency} per day, week or month.`,
@@ -137,7 +190,11 @@ export async function askFleetAssistant(input: {
     "Then ask if they want RoveHQ to remind each customer automatically before the rent is due (or before the return); set remind true unless they say no.",
     "When several identical vehicles match and they haven't said which, don't ask: pick one not already rented and say which (by plate if it has one).",
     "A rental's vehicleId must be one of the ids listed. Never put a vehicle in rentals that is only in the new-vehicle list; ask them to tap Add first. Nothing is saved until they tap the Add button under the list, so never say you have added or recorded anything; say it's ready to add. Ask one short question at a time.",
-    'Return JSON only, exactly this shape: {"reply": "...", "vehicles": [{"kind": "car", "make": "Toyota", "model": "Yaris", "variant": "", "year": 2021, "plate": "", "colour": "white", "dailyRate": null, "weeklyRate": null, "monthlyRate": 15000, "photos": []}], "rentals": [{"vehicleId": "<id>", "customerName": "John Smith", "customerPhone": "+66812345678", "startDate": "2026-10-05", "endDate": null, "rate": 15000, "ratePeriod": "month", "nextPaymentDate": "2026-11-05", "depositHeld": 10000, "remind": true}]}. Always return both whole lists so far, updated (an empty list when there are none).'
+    `PAPERWORK: a photo of an insurance policy, cover note, compulsory insurance certificate, road tax receipt or tax disc, or inspection certificate (or them telling you they renewed one) is a renewal for a vehicle already in the fleet, never a new vehicle. The kinds for this business: ${papers.map((item) => `${item.key} = ${item.key === "porbor" ? "compulsory insurance" : item.key === "insurance" ? "voluntary insurance" : item.key === "tax" ? "road tax or registration" : "vehicle inspection"}${item.local ? ` (${item.local})` : ""}`).join("; ")}.`,
+    "For each one: vehicleId (match the plate printed on it to the fleet list; if no plate matches, ask which vehicle), kind, coverFrom and coverTo (the first and last day it is valid, YYYY-MM-DD Gregorian: Thai documents use Buddhist years, subtract 543), cost (the total paid, or the monthly amount if it is paid monthly), monthly (true only if it says it is paid in monthly instalments), note (insurer and policy number, a few words), photo (the number of the photo it is in). Never invent a date or amount; ask for what isn't printed.",
+    "Thailand: the inspection (ตรอ.) is done with the road tax for cars over 7 years and bikes over 5, so an inspection receipt there is part of the tax renewal: put its cost in inspectionCost on the tax entry, not a separate entry. Tell them to tap Save to update the car's dates and record the cost.",
+    `Paperwork dates now, by vehicle id: ${JSON.stringify(paperDates)}`,
+    'Return JSON only, exactly this shape: {"reply": "...", "vehicles": [{"kind": "car", "make": "Toyota", "model": "Yaris", "variant": "", "year": 2021, "plate": "", "colour": "white", "dailyRate": null, "weeklyRate": null, "monthlyRate": 15000, "photos": []}], "rentals": [{"vehicleId": "<id>", "customerName": "John Smith", "customerPhone": "+66812345678", "startDate": "2026-10-05", "endDate": null, "rate": 15000, "ratePeriod": "month", "nextPaymentDate": "2026-11-05", "depositHeld": 10000, "remind": true}], "paperwork": [{"vehicleId": "<id>", "kind": "insurance", "coverFrom": "2026-03-15", "coverTo": "2027-03-14", "cost": 12000, "monthly": false, "note": "Viriyah 12345", "photo": 1}]}. Always return all three whole lists so far, updated (an empty list when there are none).'
   ].join(" ");
 
   const images = input.images.filter((url) => /^data:image\/(jpeg|png|webp);base64,/.test(url)).slice(0, MAX_IMAGES_PER_TURN);
@@ -151,7 +208,8 @@ export async function askFleetAssistant(input: {
     images.length ? `(${images.map((_, index) => `Photo ${input.photosBefore + index + 1}`).join(", ")} attached.)` : "",
     `Vehicles already in the fleet (never put these in the draft again): ${JSON.stringify(fleetList)}`,
     `New vehicles so far: ${JSON.stringify(input.draft)}`,
-    `Rentals so far: ${JSON.stringify(input.rentals || [])}`
+    `Rentals so far: ${JSON.stringify(input.rentals || [])}`,
+    `Paperwork so far: ${JSON.stringify((input.paperwork || []).map(({ vehicleName, ...item }) => item))}`
   ]
     .filter(Boolean)
     .join("\n");
@@ -186,7 +244,8 @@ export async function askFleetAssistant(input: {
       draft: clean(parsed.vehicles ?? input.draft),
       rentals: cleanRentals(parsed.rentals ?? input.rentals ?? [], ids)
         .filter((rental) => !rentedNow.has(rental.vehicleId))
-        .map((rental) => ({ ...rental, vehicleName: fleetList.find((vehicle) => vehicle.id === rental.vehicleId)?.name || "" }))
+        .map((rental) => ({ ...rental, vehicleName: fleetList.find((vehicle) => vehicle.id === rental.vehicleId)?.name || "" })),
+      paperwork: cleanPaperwork(parsed.paperwork ?? input.paperwork ?? [], ids).map((item) => ({ ...item, vehicleName: fleetList.find((vehicle) => vehicle.id === item.vehicleId)?.name || "" }))
     };
   } catch (error) {
     console.warn("[fleet-assistant]", error instanceof Error ? error.message.slice(0, 200) : error);

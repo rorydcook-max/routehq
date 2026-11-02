@@ -22,6 +22,13 @@ export type ReadReceipt = {
   reference: string | null;
   /** A few words on what was bought or paid for. */
   summary: string | null;
+  /**
+   * A policy, tax receipt or inspection certificate: which paperwork it renews (porbor = compulsory insurance),
+   * and the stretch it covers, so the cost is spread and the car's date moves (Rory, 2 Nov 2026).
+   */
+  paperwork: "porbor" | "insurance" | "tax" | "inspection" | null;
+  coverFrom: string | null;
+  coverTo: string | null;
   confidence: number;
 };
 
@@ -32,7 +39,10 @@ const SYSTEM =
   "paid_to (the shop, garage, insurer or person who received the money), paid_by (on a transfer slip, the sender's name; otherwise null), " +
   "cost_type (one of fuel, repair, servicing, maintenance, insurance, tax, fine, accessories, finance, other: fuel for petrol/diesel/gas stations, servicing for scheduled services and oil changes, repair for fixing damage or faults, maintenance for tyres, batteries, washing, parts; insurance for policies including compulsory พ.ร.บ.; tax for road/vehicle tax; fine for traffic fines; accessories for car seats, phone holders and the like; finance for loan or lease instalments), " +
   "plate (a Thai or foreign number plate printed on it, else null), odometer (an odometer/mileage figure printed on it, integer, else null), reference (receipt number or bank transaction reference, else null), " +
-  "summary (at most 8 words on what was paid for), confidence (0 to 1). Never guess or invent a number: use null when you can't read it.";
+  "summary (at most 8 words on what was paid for), " +
+  "paperwork (only for vehicle paperwork: porbor for compulsory insurance such as Thai พ.ร.บ., CTPL or third-party cover required by law; insurance for voluntary/comprehensive policies such as ประกันชั้น 1/2/3; tax for road tax, vehicle tax or registration renewal such as ป้ายภาษี; inspection for an inspection certificate such as ตรอ.; else null), " +
+  "cover_from and cover_to (for paperwork: the first and last day the cover or tax is valid, yyyy-mm-dd Gregorian, Buddhist years minus 543; null when not printed). " +
+  "An insurance policy schedule, cover note or tax receipt showing what was paid counts as a receipt. confidence (0 to 1). Never guess or invent a number or date: use null when you can't read it.";
 
 function cleanText(value: unknown, max = 120) {
   const text = typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
@@ -53,6 +63,19 @@ export function receiptDate(value: unknown, today = new Date()) {
   return days > 3 || days < -800 ? null : iso;
 }
 
+/** A cover date: up to about a year back (entered late) and three years ahead. */
+function coverDate(value: unknown, today = new Date()) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  let year = Number(match[1]);
+  if (year > 2400) year -= 543;
+  const iso = `${year}-${match[2]}-${match[3]}`;
+  const time = Date.parse(`${iso}T00:00:00Z`);
+  if (Number.isNaN(time)) return null;
+  const days = (time - today.getTime()) / 86_400_000;
+  return days < -800 || days > 1200 ? null : iso;
+}
+
 export function tidyReceipt(raw: Record<string, unknown>): ReadReceipt {
   const amountValue = typeof raw.amount === "number" ? raw.amount : Number(String(raw.amount ?? "").replace(/[^\d.]/g, ""));
   const amount = Number.isFinite(amountValue) && amountValue > 0 && amountValue < 10_000_000 ? Math.round(amountValue * 100) / 100 : null;
@@ -69,6 +92,9 @@ export function tidyReceipt(raw: Record<string, unknown>): ReadReceipt {
     odometer: Number.isInteger(odometerValue) && odometerValue > 0 && odometerValue < 2_000_000 ? odometerValue : null,
     reference: cleanText(raw.reference, 60),
     summary: cleanText(raw.summary, 80),
+    paperwork: ["porbor", "insurance", "tax", "inspection"].includes(String(raw.paperwork)) ? (raw.paperwork as ReadReceipt["paperwork"]) : null,
+    coverFrom: coverDate(raw.cover_from),
+    coverTo: coverDate(raw.cover_to),
     confidence: typeof raw.confidence === "number" ? Math.max(0, Math.min(1, raw.confidence)) : 0.5
   };
 }
@@ -83,7 +109,7 @@ export async function readReceipt(bytes: Buffer, mediaType: string, personal = f
     prompt: "Read this receipt or payment slip.",
     bytes,
     mediaType: mediaType || "image/jpeg",
-    maxTokens: 500,
+    maxTokens: 700,
     personal
   });
   return tidyReceipt(raw);

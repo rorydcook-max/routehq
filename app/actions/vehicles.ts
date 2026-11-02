@@ -12,7 +12,7 @@ import { costTypeForService, recordService } from "@/lib/vehicle-service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loanFromForm } from "@/lib/vehicle-loan";
 import { removeStoredFiles } from "@/lib/supabase/remove-stored-files";
-import { paperCostType } from "@/lib/country-paperwork";
+import { paperCostType, paperworkFor } from "@/lib/country-paperwork";
 import { monthsCovered } from "@/lib/cost-spread";
 import { postDueComplianceInstalments } from "@/lib/compliance-billing";
 
@@ -923,6 +923,27 @@ export async function renewVehicleCompliance(formData: FormData) {
       if (transactionError) {
         throw new Error(transactionError.message);
       }
+    }
+  }
+
+  // Thailand: an older vehicle's inspection (ตรอ.) is done with the road tax, so its cost comes in the same renewal.
+  const inspectionCost = complianceType === "tax" ? optionalNumberFromForm(formData, "inspectionCost") : null;
+  if (inspectionCost !== null && inspectionCost > 0) {
+    const local = paperworkFor(organization?.country_code).find((item) => item.key === "tax")?.inspectionWith?.local || null;
+    const spread = monthsCovered({ from: coverStart, to: newExpiryDate }) >= 2 ? { from: coverStart, to: newExpiryDate } : undefined;
+    const { error: inspectionError } = await supabase.from("transactions").insert({
+      organization_id: organizationId,
+      vehicle_id: vehicleId,
+      type: "other",
+      amount: inspectionCost,
+      currency,
+      transaction_date: coverStart < today ? coverStart : today,
+      supplier: local,
+      metadata: { source: "compliance_renewal", compliance_type: "inspection", compliance_event_id: complianceEvent.id, ...(spread ? { spread } : {}) },
+      created_by: user.id
+    });
+    if (inspectionError) {
+      throw new Error(inspectionError.message);
     }
   }
 

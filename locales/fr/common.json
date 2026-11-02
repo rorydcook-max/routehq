@@ -1643,7 +1643,14 @@
     "recordIncome": "Enregistrer une entrée",
     "useThisPayment": "Utiliser ce paiement",
     "allCategories": "Toutes",
-    "shareOf": "Part {index} sur {count} · {amount} payé le {date}"
+    "shareOf": "Part {index} sur {count} · {amount} payé le {date}",
+    "coverTitle": "Ce que ça couvre",
+    "coverWhich": "Quel document du véhicule ?",
+    "coverNotCar": "Pas un document du véhicule",
+    "coverFrom": "Couvre du",
+    "coverTo": "Couvre jusqu'au",
+    "coverHint": "Payé pour un an ou plus ? Ajoutez les dates et une part sera comptée chaque mois.",
+    "coverUpdateCar": "Mettre aussi {name} du véhicule à échéance le {date}"
   },
   "booking": {
     "open": "Ouvert",
@@ -3344,7 +3351,9 @@
     "f_costMonthly": "Coût mensuel",
     "f_spreadHint": "Compté {amount} par mois sur {months} mois dans vos dépenses.",
     "f_monthlyHint": "{amount} ajoutés à vos dépenses chaque mois jusqu'au {date}.",
-    "cs_monthly": "{amount} par mois"
+    "cs_monthly": "{amount} par mois",
+    "f_inspectionCost": "Coût du contrôle ({name})",
+    "f_inspectionHint": "Les véhicules plus anciens sont contrôlés au renouvellement de la taxe (voitures de plus de 7 ans, motos de plus de 5). Laissez vide si inutile."
   },
   "customerPage": {
     "back": "Clients",
@@ -6330,7 +6339,19 @@
     "canTalk": "Écouter : appuyez sur le microphone et dites-le dans votre langue.",
     "canRentals": "Ajouter qui loue en ce moment, avec les dates des prochains paiements, les cautions et les rappels automatiques.",
     "canNote": "Rien n'est enregistré tant que vous n'appuyez pas sur Ajouter. Vos discussions sont conservées ici pour que vous puissiez les reprendre plus tard.",
-    "noChats": "Vos discussions apparaîtront ici."
+    "noChats": "Vos discussions apparaîtront ici.",
+    "paperTitle": "{count, plural, one {# renouvellement prêt} other {# renouvellements prêts}}",
+    "paper_tax": "Taxe routière",
+    "paper_porbor": "Assurance obligatoire",
+    "paper_insurance": "Assurance",
+    "paper_inspection": "Contrôle",
+    "paperUntil": "jusqu'au {date}",
+    "paperInspection": "contrôle {price}",
+    "paperSave": "{count, plural, one {Enregistrer # renouvellement} other {Enregistrer # renouvellements}}",
+    "paperSaved": "{count, plural, one {Enregistré : la date et le coût du véhicule sont à jour.} other {# renouvellements enregistrés, avec dates et coûts.}}",
+    "paperFailed": "Échec de l'enregistrement : {names}",
+    "sugPaper": "Photo d'une police ou d'un reçu de taxe",
+    "canPaper": "Envoyez une photo d'une police d'assurance ou d'un reçu de taxe : les dates et le coût du véhicule sont remplis."
   },
   "setupRequest": {
     "title": "On s'occupe de la configuration pour vous",

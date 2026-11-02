@@ -1643,7 +1643,14 @@
     "recordIncome": "Catat uang masuk",
     "useThisPayment": "Gunakan pembayaran ini",
     "allCategories": "Semua",
-    "shareOf": "Bagian {index} dari {count} · {amount} dibayar {date}"
+    "shareOf": "Bagian {index} dari {count} · {amount} dibayar {date}",
+    "coverTitle": "Yang ditanggung",
+    "coverWhich": "Dokumen kendaraan yang mana?",
+    "coverNotCar": "Bukan dokumen kendaraan",
+    "coverFrom": "Berlaku dari",
+    "coverTo": "Berlaku sampai",
+    "coverHint": "Dibayar untuk setahun atau lebih? Isi tanggalnya, lalu dihitung sebagian setiap bulan.",
+    "coverUpdateCar": "Atur juga {name} kendaraan berakhir pada {date}"
   },
   "booking": {
     "open": "Buka",
@@ -3344,7 +3351,9 @@
     "f_costMonthly": "Biaya per bulan",
     "f_spreadHint": "Dihitung {amount} per bulan selama {months} bulan di biaya Anda.",
     "f_monthlyHint": "{amount} ditambahkan ke biaya Anda setiap bulan sampai {date}.",
-    "cs_monthly": "{amount} per bulan"
+    "cs_monthly": "{amount} per bulan",
+    "f_inspectionCost": "Biaya uji ({name})",
+    "f_inspectionHint": "Kendaraan lama diuji saat pajak diperpanjang (mobil lebih dari 7 tahun, motor lebih dari 5). Kosongkan jika tidak perlu."
   },
   "customerPage": {
     "back": "Pelanggan",
@@ -6330,7 +6339,19 @@
     "canTalk": "Dengarkan: ketuk ikon mikrofon dan ucapkan dalam bahasa Anda sendiri.",
     "canRentals": "Tambahkan siapa yang sedang menyewa, beserta tanggal pembayaran berikutnya, deposit, dan pengingat otomatis.",
     "canNote": "Tidak ada yang disimpan sampai Anda mengetuk Tambah. Obrolan Anda disimpan di sini agar bisa dilanjutkan nanti.",
-    "noChats": "Obrolan Anda akan ditampilkan di sini."
+    "noChats": "Obrolan Anda akan ditampilkan di sini.",
+    "paperTitle": "{count, plural, one {# perpanjangan siap} other {# perpanjangan siap}}",
+    "paper_tax": "Pajak kendaraan",
+    "paper_porbor": "Asuransi wajib",
+    "paper_insurance": "Asuransi",
+    "paper_inspection": "Uji kendaraan",
+    "paperUntil": "sampai {date}",
+    "paperInspection": "uji {price}",
+    "paperSave": "{count, plural, one {Simpan # perpanjangan} other {Simpan # perpanjangan}}",
+    "paperSaved": "{count, plural, one {Tersimpan: tanggal dan biaya kendaraan diperbarui.} other {Tersimpan # perpanjangan, dengan tanggal dan biaya.}}",
+    "paperFailed": "Gagal disimpan: {names}",
+    "sugPaper": "Foto polis atau bukti pajak",
+    "canPaper": "Kirim foto polis asuransi atau bukti pajak: tanggal dan biaya kendaraan akan terisi."
   },
   "setupRequest": {
     "title": "Kami yang akan aturkan untuk Anda",

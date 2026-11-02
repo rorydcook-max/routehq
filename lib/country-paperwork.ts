@@ -20,16 +20,19 @@ export type PaperItem = {
   minAge?: { car: number; bike: number };
   /** The money entry a renewal of it is recorded as. */
   costType: "tax" | "insurance" | "other";
+  /** An inspection done at the same time as this renewal, for vehicles older than these ages: its cost is asked for here. */
+  inspectionWith?: { local: string; car: number; bike: number };
 };
 
 const INSURANCE: PaperItem = { key: "insurance", nameKey: "c_insurance", costType: "insurance" };
 
 const BY_COUNTRY: Record<string, PaperItem[]> = {
+  // Thailand's inspection (ตรอ.) is done when the road tax is renewed, for cars over 7 years and motorbikes over 5:
+  // no date of its own, its cost goes in with the road tax renewal (Rory, 2 Nov 2026).
   TH: [
-    { key: "tax", nameKey: "c_tax", costType: "tax" },
+    { key: "tax", nameKey: "c_tax", costType: "tax", inspectionWith: { local: "ตรอ.", car: 7, bike: 5 } },
     { key: "porbor", nameKey: "c_porbor", costType: "insurance" },
-    INSURANCE,
-    { key: "inspection", nameKey: "c_inspection", local: "ตรอ.", minAge: { car: 7, bike: 5 }, costType: "other" }
+    INSURANCE
   ],
   MY: [
     { key: "tax", nameKey: "c_tax", local: "LKM", costType: "tax" },

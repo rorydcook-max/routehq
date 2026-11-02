@@ -1603,7 +1603,14 @@
     "recordIncome": "Registrera inbetalning",
     "useThisPayment": "Använd den här betalningen",
     "allCategories": "Alla",
-    "shareOf": "Del {index} av {count} · {amount} betalt {date}"
+    "shareOf": "Del {index} av {count} · {amount} betalt {date}",
+    "coverTitle": "Vad det täcker",
+    "coverWhich": "Vilket fordonsdokument?",
+    "coverNotCar": "Inte ett fordonsdokument",
+    "coverFrom": "Gäller från",
+    "coverTo": "Gäller till",
+    "coverHint": "Betalat för ett år eller mer? Lägg till datumen så räknas en andel varje månad.",
+    "coverUpdateCar": "Ställ även in fordonets {name} att gå ut {date}"
   },
   "booking": {
     "open": "Öppen",
@@ -3304,7 +3311,9 @@
     "f_costMonthly": "Kostnad per månad",
     "f_spreadHint": "Räknas som {amount} i månaden under {months} månader i dina kostnader.",
     "f_monthlyHint": "{amount} läggs till dina kostnader varje månad till {date}.",
-    "cs_monthly": "{amount} i månaden"
+    "cs_monthly": "{amount} i månaden",
+    "f_inspectionCost": "Besiktningskostnad ({name})",
+    "f_inspectionHint": "Äldre fordon besiktas när fordonsskatten förnyas (bilar över 7 år, motorcyklar över 5). Lämna tomt om det inte behövs."
   },
   "customerPage": {
     "back": "Kunder",
@@ -6330,7 +6339,19 @@
     "canTalk": "Lyssna: tryck på mikrofonen och säg det på ditt eget språk.",
     "canRentals": "Lägg till vem som hyr just nu, med nästa betalningsdatum, depositioner och automatiska påminnelser.",
     "canNote": "Inget sparas förrän du trycker på Lägg till. Dina chattar sparas här så att du kan fortsätta senare.",
-    "noChats": "Dina chattar visas här."
+    "noChats": "Dina chattar visas här.",
+    "paperTitle": "{count, plural, one {# förnyelse klar} other {# förnyelser klara}}",
+    "paper_tax": "Fordonsskatt",
+    "paper_porbor": "Obligatorisk försäkring",
+    "paper_insurance": "Försäkring",
+    "paper_inspection": "Besiktning",
+    "paperUntil": "till {date}",
+    "paperInspection": "besiktning {price}",
+    "paperSave": "{count, plural, one {Spara # förnyelse} other {Spara # förnyelser}}",
+    "paperSaved": "{count, plural, one {Sparat: fordonets datum och kostnad är uppdaterade.} other {Sparade # förnyelser, med datum och kostnader.}}",
+    "paperFailed": "Kunde inte spara: {names}",
+    "sugPaper": "Foto på en försäkring eller skattekvitto",
+    "canPaper": "Skicka ett foto på ett försäkringsbrev eller skattekvitto: fordonets datum och kostnad fylls i."
   },
   "setupRequest": {
     "title": "Vi ordnar det åt dig",

@@ -21,6 +21,8 @@ import { buildPaymentReminderMessage, sendLineMessage } from "@/services/messagi
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { findMatchingOutstandingItems } from "@/lib/transaction-matching";
 import { recordService, SERVICE_COST_TYPES } from "@/lib/vehicle-service";
+import { monthsCovered } from "@/lib/cost-spread";
+import { recordPaperworkDate } from "@/lib/paperwork-renewal";
 
 function optionalString(formData: FormData, key: string) {
   return String(formData.get(key) || "").trim() || null;
@@ -575,6 +577,18 @@ export async function createTransaction(formData: FormData) {
     receiptDocumentId = document.id;
   }
 
+  // Insurance, tax or an inspection paid for a stretch: counted a share in each month it covers, and (when asked)
+  // the car's date for it moves to the new expiry (Rory, 2 Nov 2026).
+  const paperCost = ["insurance", "tax", "other"].includes(type);
+  const coverFrom = paperCost ? optionalString(formData, "coverFrom") : null;
+  const coverTo = paperCost ? optionalString(formData, "coverTo") : null;
+  const paperKind = paperCost ? optionalString(formData, "paperKind") : null;
+  const spread = coverFrom && coverTo && coverTo > coverFrom && monthsCovered({ from: coverFrom, to: coverTo }) >= 2 ? { from: coverFrom, to: coverTo } : null;
+  const costMetadata: Record<string, unknown> = {
+    ...(spread ? { spread } : {}),
+    ...(paperKind ? { compliance_type: paperKind } : {})
+  };
+
   const { data, error } = await supabase
     .from("transactions")
     .insert({
@@ -590,6 +604,7 @@ export async function createTransaction(formData: FormData) {
       mileage: numberField(formData, "mileage"),
       notes: optionalString(formData, "notes"),
       receipt_document_id: receiptDocumentId,
+      ...(Object.keys(costMetadata).length ? { metadata: costMetadata } : {}),
       ...(type === "deposit_received" && rentalId ? { is_deposit: true, deposit_rental_id: rentalId } : {}),
       created_by: user.id
     })
@@ -598,6 +613,13 @@ export async function createTransaction(formData: FormData) {
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  if (vehicleId && paperKind && coverTo && String(formData.get("updatePaperwork") || "") === "true") {
+    const eventId = await recordPaperworkDate(supabase, { organizationId, vehicleId, kind: paperKind, from: coverFrom, until: coverTo, cost: amount, userId: user.id });
+    if (eventId) {
+      await supabase.from("transactions").update({ metadata: { ...costMetadata, compliance_event_id: eventId } }).eq("id", data.id).eq("organization_id", organizationId);
+    }
   }
 
   // Servicing or a repair on a car is also work on the car: it goes in the car's service history and moves its next/last service,
@@ -764,6 +786,9 @@ type TransactionCorrection = {
   description?: string | null;
   type: string;
   vehicleId?: string | null;
+  /** Insurance or tax paid for a stretch: both days, or both empty to stop spreading it. Left out: unchanged. */
+  coverFrom?: string | null;
+  coverTo?: string | null;
 };
 
 async function ensureTransactionMembership(supabase: any, organizationId: string, userId: string) {
@@ -864,6 +889,16 @@ export async function updateTransaction(transactionId: string, fields: Transacti
       }
     ]
   };
+  // The stretch a yearly payment covers: changed, set or cleared from the edit form.
+  if (fields.coverFrom !== undefined || fields.coverTo !== undefined) {
+    const from = dateOnly(fields.coverFrom);
+    const to = dateOnly(fields.coverTo);
+    if (["insurance", "tax", "other"].includes(type) && /^\d{4}-\d{2}-\d{2}$/.test(from) && /^\d{4}-\d{2}-\d{2}$/.test(to) && to > from && monthsCovered({ from, to }) >= 2) {
+      (metadata as Record<string, unknown>).spread = { from, to };
+    } else {
+      delete (metadata as Record<string, unknown>).spread;
+    }
+  }
 
   const { error: updateError } = await supabase
     .from("transactions")

@@ -84,6 +84,10 @@ function TransactionEditForm({
   const [type, setType] = useState(transaction.type);
   const [notes, setNotes] = useState(transaction.notes || "");
   const [vehicleLabel, setVehicleLabel] = useState(vehicleLabelFromId(vehicles, transaction.vehicleId, transaction.vehicleLabel));
+  // Insurance or tax paid for a stretch: the days it covers, so it counts a share per month.
+  const [coverFrom, setCoverFrom] = useState(transaction.spread?.from || "");
+  const [coverTo, setCoverTo] = useState(transaction.spread?.to || "");
+  const coverShown = type === "insurance" || type === "tax" || Boolean(transaction.spread);
 
   const datalistId = `transaction-vehicle-${transaction.id}`;
 
@@ -97,7 +101,8 @@ function TransactionEditForm({
           date,
           description: notes,
           type,
-          vehicleId: selectedVehicle?.id || transaction.vehicleId
+          vehicleId: selectedVehicle?.id || transaction.vehicleId,
+          ...(coverShown ? { coverFrom, coverTo } : {})
         });
         onSaved(tx.say("updated"));
       } catch (caught) {
@@ -157,6 +162,19 @@ function TransactionEditForm({
           {tx.say("f_notes")}
           <input className="mt-1 w-full" onChange={(event) => setNotes(event.target.value)} value={notes} />
         </label>
+        {coverShown ? (
+          <>
+            <label>
+              {tx.say("coverFrom")}
+              <input className="mt-1 w-full" onChange={(event) => setCoverFrom(event.target.value)} type="date" value={coverFrom} />
+            </label>
+            <label>
+              {tx.say("coverTo")}
+              <input className="mt-1 w-full" onChange={(event) => setCoverTo(event.target.value)} type="date" value={coverTo} />
+            </label>
+            <p className="self-end pb-2 text-[13px] font-medium text-[var(--muted)]">{tx.say("coverHint")}</p>
+          </>
+        ) : null}
       </div>
       <ReceiptAttach receiptDocumentId={transaction.receiptDocumentId} transactionId={transaction.id} />
       {error ? <p className="mt-2 rounded-xl bg-[var(--danger-light)] px-3 py-2 text-[14px] font-semibold text-[var(--danger)]">{error}</p> : null}

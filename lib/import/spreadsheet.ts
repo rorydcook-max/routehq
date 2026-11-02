@@ -76,7 +76,7 @@ export async function googleSheetToSpreadsheetInput(url: string): Promise<Spread
   }
 
   const exportUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=xlsx`;
-  const response = await fetch(exportUrl);
+  const response = await fetch(exportUrl, { cache: "no-store", redirect: "follow", headers: { "User-Agent": "Mozilla/5.0 (compatible; RoveHQ/1.0)" } });
 
   if (!response.ok) {
     throw new Error("Unable to fetch this Google Sheet. Make sure it is shared publicly or set to anyone with the link can view.");
@@ -313,8 +313,10 @@ export async function parseSpreadsheetFile(file: SpreadsheetInput): Promise<Pars
 
   let xlsx: any;
   try {
-    const dynamicImport = new Function("specifier", "return import(specifier)") as (specifier: string) => Promise<any>;
-    xlsx = await dynamicImport("xlsx");
+    // A plain import, so the package is bundled for the server (2 Nov 2026: the hidden import left it out on Vercel,
+    // and every Excel file and Google Sheet failed there while working locally).
+    const loaded: any = await import("xlsx");
+    xlsx = loaded?.read ? loaded : loaded.default;
   } catch {
     throw new Error("The xlsx package is required for Excel imports. Run npm install xlsx, then restart the app.");
   }

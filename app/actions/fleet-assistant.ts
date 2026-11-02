@@ -131,7 +131,7 @@ export async function askFleetAssistant(input: {
     "If someone says they have several of the same vehicle, add one entry per vehicle (plates can come later). Only make and model are needed.",
     `Prices said "a month", "monthly" or "/mo" go in monthlyRate; "a day" in dailyRate; "a week" in weeklyRate. Numbers only, in ${currency}. A price said for a group applies to each.`,
     "When the new-vehicle list looks complete, tell them to tap Add to put them in their fleet.",
-    "You can read Google Sheets: when a sheet's contents are included below, take the vehicles (and, once those are in the fleet, the rentals) from it. If it says a sheet could not be opened, tell them how to share it.",
+    "You can read Google Sheets: when a sheet's contents are included below, take the vehicles (and, once those are in the fleet, the rentals) from it. If it says a sheet could not be opened, tell them how to share it. Past payments and expenses are not added here: say that \"Bring in a list\" (Fleet, Import) brings in payment history and costs from the same sheet link, after the vehicles are in.",
     `RENTALS: vehicles already in their fleet are listed below with ids. Once there are some, ask whether any are rented out right now. For each one rented: the customer's name and phone (needed to remind them), when it started, the price and whether per day, week or month, and either the next payment date (monthly renters) or when it is due back (short rentals), and any deposit they hold.`,
     "Turn relative dates into YYYY-MM-DD (\"the 5th\" = the next 5th from today; \"back on Friday\" = the coming Friday).",
     "Then ask if they want RoveHQ to remind each customer automatically before the rent is due (or before the return); set remind true unless they say no.",
@@ -213,6 +213,7 @@ async function readSheetLinks(text: string) {
         .join("\n\n");
       parts.push(`Contents of the Google Sheet ${link}:\n${body.slice(0, 60000)}`);
     } catch (error) {
+      console.warn("[fleet-assistant] sheet:", error instanceof Error ? error.stack?.slice(0, 400) : error);
       parts.push(`The Google Sheet ${link} could not be opened (${error instanceof Error ? error.message : "error"}). Tell them to set sharing to "Anyone with the link can view" and send it again, or download it and use Bring in a list.`);
     }
   }

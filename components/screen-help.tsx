@@ -23,7 +23,7 @@ export function ScreenHelp({ variant = "sidebar" }: { variant?: "sidebar" | "ico
 
   if (variant === "icon") {
     return (
-      <button aria-label={t("helpForPage")} className="pressable flex h-9 w-9 items-center justify-center rounded-full bg-white text-[var(--foreground-secondary)] shadow-sm" onClick={() => void open()} title={t("helpForPage")} type="button">
+      <button aria-label={t("helpForPage")} className="pressable flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-strong)] bg-white text-[var(--foreground-secondary)] shadow-sm" onClick={() => void open()} title={t("helpForPage")} type="button">
         <CircleHelp size={18} />
       </button>
     );

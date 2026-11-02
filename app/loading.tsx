@@ -1,10 +1,19 @@
+import { headers } from "next/headers";
 import { AppShell } from "@/components/app-shell";
 
 /**
  * Shown the moment a page is opened, while its figures load: the page's usual shape (title, counts,
  * four tiles, a list) in soft grey that breathes, so the screen answers the tap at once.
  */
-export default function Loading() {
+export default async function Loading() {
+  // The website and customer pages have no staff app: drawing its sidebar there flashed an empty app frame and,
+  // with none of the staff words sent to those pages, logged "MISSING_MESSAGE: nav" on every visit.
+  try {
+    const requestHeaders = await headers();
+    if (requestHeaders.get("x-routehq-site-page") || requestHeaders.get("x-routehq-customer-page")) return <div aria-busy="true" className="min-h-screen" />;
+  } catch {
+    // No request to read: the staff skeleton below.
+  }
   return (
     <AppShell>
       <div aria-busy="true" aria-live="polite" className="space-y-4">

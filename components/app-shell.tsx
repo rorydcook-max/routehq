@@ -552,7 +552,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
         </div>
       ) : null}
 
-      <FastActionSheet open={fastActionOpen} onClose={() => setFastActionOpen(false)} />
+      <FastActionSheet canImport={shell.role === "owner"} open={fastActionOpen} onClose={() => setFastActionOpen(false)} />
       <Toaster />
     </div>
   );

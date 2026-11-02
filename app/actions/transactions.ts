@@ -7,6 +7,7 @@ import { getTransactionFormOptions } from "@/lib/transactions";
 import { chargeRenter } from "@/lib/charges";
 import { extrasIncomeTag } from "@/lib/extras";
 import { niceMoney } from "@/lib/nice-money";
+import { currencySymbol } from "@/components/currency-symbol";
 import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -95,7 +96,7 @@ export async function generateReceipt(input: GenerateReceiptInput) {
 
   const { data: organization, error: organizationError } = await supabase
     .from("organizations")
-    .select("id, name, settings, logo_url, business_logo_storage_path, receipt_prefix, receipt_footer_text")
+    .select("id, name, currency, settings, logo_url, business_logo_storage_path, receipt_prefix, receipt_footer_text")
     .eq("id", organizationId)
     .maybeSingle();
 
@@ -142,7 +143,7 @@ export async function generateReceipt(input: GenerateReceiptInput) {
   </div>
   <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 12px; text-align: center; margin-bottom: 20px;">
     <p style="font-size: 11px; color: #16a34a; margin: 0; font-weight: 600; letter-spacing: 0.08em;">PAID / ชำระแล้ว</p>
-    <p style="font-size: 28px; font-weight: 700; color: #16a34a; margin: 4px 0;">฿${formatReceiptAmount(amount)}</p>
+    <p style="font-size: 28px; font-weight: 700; color: #16a34a; margin: 4px 0;">${currencySymbol(organization.currency)}${formatReceiptAmount(amount)}</p>
     <p style="font-size: 12px; color: #16a34a; margin: 0;">${escapeHtml(formatReceiptMethod(input.paymentMethod))}</p>
   </div>
   <div style="margin-bottom: 16px;">
@@ -215,7 +216,7 @@ export async function generateReceipt(input: GenerateReceiptInput) {
     rental_id: input.rentalId,
     event_type: "receipt_generated",
     title: `Receipt generated: ${receiptNumber}`,
-    detail: `Receipt for ${formatReceiptAmount(amount)} THB generated.`
+    detail: `Receipt for ${formatReceiptAmount(amount)} ${organization.currency || "THB"} generated.`
   });
 
   revalidatePath("/");
@@ -589,6 +590,9 @@ export async function createTransaction(formData: FormData) {
     ...(paperKind ? { compliance_type: paperKind } : {})
   };
 
+  // Saved in the business's own money, not always baht.
+  const { data: organization } = await supabase.from("organizations").select("currency").eq("id", organizationId).maybeSingle();
+
   const { data, error } = await supabase
     .from("transactions")
     .insert({
@@ -598,7 +602,7 @@ export async function createTransaction(formData: FormData) {
       customer_id: customerId,
       type,
       amount,
-      currency: "THB",
+      currency: organization?.currency || "THB",
       transaction_date: transactionDate,
       supplier: optionalString(formData, "supplier"),
       mileage: numberField(formData, "mileage"),
@@ -1098,14 +1102,20 @@ export async function bulkDeleteTransactions(ids: string[]) {
 }
 
 
+/**
+ * What happened, as a code rather than a sentence, so the button can say it in the reader's language.
+ * `via` names the chat it went on (LINE, Telegram, or "email").
+ */
+export type PaymentReminderCode = "signed_out" | "not_found" | "nothing_owed" | "sent_chat" | "sent_line" | "whatsapp" | "no_channel";
+
 export async function sendPaymentReminder(
   rentalId: string
-): Promise<{ success: boolean; whatsappUrl?: string; message?: string }> {
+): Promise<{ success: boolean; whatsappUrl?: string; code: PaymentReminderCode; via?: string }> {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
   } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Not authenticated." };
+  if (!user) return { success: false, code: "signed_out" };
 
   // Fetch rental, customer, vehicle, org in parallel
   const { data: rental } = await supabase
@@ -1116,7 +1126,7 @@ export async function sendPaymentReminder(
     .eq("id", rentalId)
     .maybeSingle();
 
-  if (!rental) return { success: false, message: "Rental not found." };
+  if (!rental) return { success: false, code: "not_found" };
 
   const admin = createSupabaseAdminClient() as any;
   const { data: org } = await admin
@@ -1125,7 +1135,7 @@ export async function sendPaymentReminder(
     .eq("id", rental.organization_id)
     .maybeSingle();
 
-  if (!org) return { success: false, message: "Organization not found." };
+  if (!org) return { success: false, code: "not_found" };
 
   const customer = rental.customers;
   const vehicle = rental.vehicles;
@@ -1142,7 +1152,7 @@ export async function sendPaymentReminder(
   const today = businessToday();
   const dueNow = open.filter((payment: any) => String(payment.due_date || "") <= today);
   const reminderRows = dueNow.length ? dueNow : open.slice(0, 1);
-  if (!reminderRows.length) return { success: false, message: "Nothing is owed on this rental." };
+  if (!reminderRows.length) return { success: false, code: "nothing_owed" };
   const balanceDue = reminderRows.reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
   const firstDue = String(reminderRows[0].due_date || "");
   const dueDateLabel = firstDue
@@ -1168,7 +1178,7 @@ export async function sendPaymentReminder(
     say(!firstDue ? "paymentReminderNoDate" : firstDue < today ? "paymentReminderWas" : "paymentReminderIs", { amount: money(balanceDue), vehicle: vehicle ? vLabel : vehicleName, date: firstDue ? date(firstDue) : "" }),
     { sentBy: user.id }
   );
-  if (viaChat.sent) return { success: true, message: `Reminder sent on ${viaChat.via}` };
+  if (viaChat.sent) return { success: true, code: "sent_chat", via: viaChat.via };
 
   let lineSent = false;
   if (customer?.line_id) {
@@ -1198,7 +1208,7 @@ export async function sendPaymentReminder(
     const digits = String(customer.whatsapp_number).replace(/\D/g, "");
     const normalized = digits.startsWith("66") ? digits : digits.startsWith("0") ? `66${digits.slice(1)}` : digits;
     const text = encodeURIComponent(
-      `Hi ${customer.full_name ?? ""},\n\nPayment reminder for ${vLabel}:\nAmount due: ฿${balanceDue.toLocaleString("en-US")}\nDue: ${dueDateLabel}${org.promptpay_id ? `\n\nPromptPay: ${org.promptpay_id}` : ""}\n\nThank you 🙏`
+      `Hi ${customer.full_name ?? ""},\n\nPayment reminder for ${vLabel}:\nAmount due: ${currencySymbol(rental.currency)}${balanceDue.toLocaleString("en-US")}\nDue: ${dueDateLabel}${org.promptpay_id ? `\n\nPromptPay: ${org.promptpay_id}` : ""}\n\nThank you 🙏`
     );
     whatsappUrl = `https://wa.me/${normalized}?text=${text}`;
   }
@@ -1206,6 +1216,6 @@ export async function sendPaymentReminder(
   return {
     success: lineSent || Boolean(whatsappUrl),
     whatsappUrl,
-    message: lineSent ? "Reminder sent via LINE" : whatsappUrl ? "Opening WhatsApp with reminder message" : "No contact channel available"
+    code: lineSent ? "sent_line" : whatsappUrl ? "whatsapp" : "no_channel"
   };
 }

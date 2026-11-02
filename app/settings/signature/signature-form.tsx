@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 import { updateOwnerSignature } from "@/app/actions/settings";
 import { SignaturePad } from "@/components/signature-pad";
+import { InfoTip } from "@/components/info-tip";
 
 type Say = (key: string, values?: Record<string, string>) => string;
 
@@ -111,9 +112,10 @@ export function SignatureForm({
   return (
     <section className="card space-y-4 p-4">
       <label className="block">
-        <span className={labelClass}>{say("sig_name")}</span>
+        <span className={labelClass}>
+          {say("sig_name")} <InfoTip label={say("sig_name")} text={say("sig_nameHelp")} />
+        </span>
         <input autoComplete="name" className="mt-1 w-full" maxLength={160} onChange={(event) => setName(event.target.value)} value={name} />
-        <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("sig_nameHelp")}</span>
       </label>
       <label className="block">
         <span className={labelClass}>{say("sig_title")}</span>

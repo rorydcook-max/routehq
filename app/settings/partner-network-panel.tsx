@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { savePartnerNetwork } from "@/app/actions/partners";
 import { SwitchField } from "@/components/switch-field";
+import { InfoTip } from "@/components/info-tip";
 type PartnerNetworkSettings = { enabled: boolean; reach: "town" | "region" | "country"; blocked: string[] };
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -35,7 +36,11 @@ export function PartnerNetworkPanel({ initial, pct }: { initial: PartnerNetworkS
         checked={enabled}
         description={say("pn_body", { pct })}
         disabled={isPending}
-        label={say("pn_switch")}
+        label={
+          <>
+            {say("pn_switch")} <InfoTip label={say("pn_switch")} text={say("pn_bodyTip")} />
+          </>
+        }
         onChange={(event) => {
           setEnabled(event.target.checked);
           save({ enabled: event.target.checked, reach });

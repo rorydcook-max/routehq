@@ -835,9 +835,20 @@ export async function completePublicBooking(formData: FormData) {
         message: countersigned.message,
         blockingIssues: countersigned.blockingIssues
       });
-      throw new Error(
-        "Your details and documents have been saved, but the rental agreement could not be prepared for signing. The rental company has been notified - please contact them to complete your booking."
-      );
+      // Usually the business hasn't saved its signature yet. Tell them, and give the customer a real
+      // message: a thrown error reaches the browser as a bare "Minified React error".
+      notifyOperator(
+        organizationId,
+        countersigned.reason === "not_eligible"
+          ? "✍️ A customer filled in their booking link but can't sign yet. Add your signature in Settings, then send them the link again."
+          : "✍️ A customer filled in their booking link but the agreement couldn't be prepared. Open the booking to check.",
+        "portal_action",
+        countersigned.reason === "not_eligible" ? "/settings/signature" : `/bookings/${bookingLink.rental_id}`
+      ).catch(() => null);
+      return {
+        success: false,
+        error: await said("Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.")
+      } as const;
     }
     // The customer must read the exact text they sign. If this is the review
     // step, or their details changed the agreement since they opened it, send

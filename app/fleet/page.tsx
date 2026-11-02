@@ -12,6 +12,7 @@ import { PlateChip, VehicleTitle } from "@/components/vehicle-identity";
 import { Dot, Ring, TileHead } from "@/components/glance";
 import { CalendarClock } from "lucide-react";
 import { getCurrentUserEmail } from "@/lib/auth/session";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { FleetBulkActions } from "@/app/fleet/fleet-actions";
 import { QuickPrice } from "@/app/fleet/quick-price";
@@ -80,6 +81,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const filter: FleetFilter | null = show === "out" || show === "free" || show === "attention" ? show : null;
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
+  // Profit, importing and the bulk archive/delete are the owner's; teammates see the fleet without them.
+  const membership = await getCurrentMembership();
+  const isOwner = membership?.role === "owner";
   const [{ vehicles }, categories, customPlan] = await Promise.all([getDashboardData(), getVehicleCategories(organization.id), getCustomPlan(organization.id)]);
   // The counts at the top are filters: tap "4 out earning" to see just those.
   const matches = (vehicle: (typeof vehicles)[number]) =>
@@ -133,11 +137,13 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
           <div className="flex items-center justify-between gap-3 sm:flex-wrap">
             <h1 className="text-[32px] leading-tight text-[var(--foreground)]">{t("title")}</h1>
             <div className="flex shrink-0 gap-2">
-              {/* Phones: importing is in the + sheet, so the header keeps just a round add button beside the title. */}
-              <Link className="pressable hidden min-h-11 items-center gap-2 rounded-full bg-[var(--panel)] px-4 font-bold text-[var(--foreground)] shadow-[var(--shadow-card)] sm:inline-flex" href="/fleet/import">
-                <FileSpreadsheet size={16} />
-                {t("import")}
-              </Link>
+              {/* Phones: importing is in the + sheet, so the header keeps just a round add button beside the title. Only the owner can import. */}
+              {isOwner ? (
+                <Link className="pressable hidden min-h-11 items-center gap-2 rounded-full bg-[var(--panel)] px-4 font-bold text-[var(--foreground)] shadow-[var(--shadow-card)] sm:inline-flex" href="/fleet/import">
+                  <FileSpreadsheet size={16} />
+                  {t("import")}
+                </Link>
+              ) : null}
               {/* The assistant: vehicles or who's renting now, by typing, talking or photos (Rory, 2 Nov 2026). */}
               {/* An outline and the brand colour on the icon: on the dark theme a panel-coloured circle disappeared into the band (Rory, 2 Nov 2026). */}
               <Link aria-label={t("assistant")} className="pressable inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--panel)] font-bold text-[var(--foreground)] shadow-[var(--shadow-card)] sm:px-4" href={"/fleet/assistant" as Route}>
@@ -284,7 +290,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
         </div>
       ) : null}
 
-      <FleetBulkActions archiveAction={bulkArchiveVehicles} deleteAction={bulkDeleteVehicles} organizationId={organization.id} />
+      {/* Archive and delete are both owner-only, so teammates get no bulk bar (and no tick boxes below). */}
+      {isOwner ? <FleetBulkActions archiveAction={bulkArchiveVehicles} deleteAction={bulkDeleteVehicles} organizationId={organization.id} /> : null}
 
       {filter && groups.length === 0 ? (
         <div className="card flex flex-wrap items-center justify-between gap-3 p-5">
@@ -313,14 +320,15 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <table className="w-full table-fixed text-left text-sm">
                 <thead>
                   <tr className="whitespace-nowrap border-b border-[var(--border)] text-[13px] font-semibold text-[var(--muted)]">
-                    <th className="w-10 py-2.5 pl-4 pr-2"><span className="sr-only">{t("select")}</span></th>
-                    <th className="py-2.5 pr-3">{t("th_vehicle")}</th>
+                    {isOwner ? <th className="w-10 py-2.5 pl-4 pr-2"><span className="sr-only">{t("select")}</span></th> : null}
+                    <th className={`py-2.5 pr-3 ${isOwner ? "" : "pl-4"}`}>{t("th_vehicle")}</th>
                     {/* Status fits "Free until 8 Nov" on one line; paperwork gets the room for its chip, so rows stay one or two lines tall. */}
                     <th className="w-[148px] px-3 py-2.5">{t("th_status")}</th>
                     <th className="w-[116px] px-3 py-2.5">{t("th_rate")}</th>
                     <th className="w-[140px] px-3 py-2.5 xl:w-[160px]">{t("th_onRent")}</th>
                     <th className="w-[190px] px-3 py-2.5 xl:w-[230px]">{t("th_paperwork")}</th>
-                    <th className="hidden w-[120px] py-2.5 pl-3 pr-5 text-right xl:table-cell">{t("th_profit")}</th>
+                    {/* Profit is the owner's alone. */}
+                    {isOwner ? <th className="hidden w-[120px] py-2.5 pl-3 pr-5 text-right xl:table-cell">{t("th_profit")}</th> : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -328,10 +336,12 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                     const href = `/fleet/${vehicle.id}` as const;
                     return (
                       <tr className="group border-b border-[var(--border)] last:border-0 hover:bg-[var(--panel-secondary)]" key={vehicle.id}>
-                        <td className="py-3 pl-4 pr-2">
-                          <input aria-label={t("selectAria", { vehicle: `${vehicle.make} ${vehicle.model}` })} className="flex-shrink-0" form="fleetBulkForm" name="vehicleIds" type="checkbox" value={vehicle.id} />
-                        </td>
-                        <td className="py-3 pr-3">
+                        {isOwner ? (
+                          <td className="py-3 pl-4 pr-2">
+                            <input aria-label={t("selectAria", { vehicle: `${vehicle.make} ${vehicle.model}` })} className="flex-shrink-0" form="fleetBulkForm" name="vehicleIds" type="checkbox" value={vehicle.id} />
+                          </td>
+                        ) : null}
+                        <td className={`py-3 pr-3 ${isOwner ? "" : "pl-4"}`}>
                           <Link className="flex min-w-0 items-center gap-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={href}>
                             <VehicleArt vehicleId={vehicle.id} colour={vehicle.color} kind={group.kind} model={vehicle.model} size="sm" />
                             <span className="min-w-0">
@@ -366,9 +376,11 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         <td className="px-3 py-3">
                           <ComplianceBadge addHref={`/fleet/${vehicle.id}/edit`} attention={vehicle.complianceAttentionCount} item={vehicle.complianceNext} />
                         </td>
-                        <td className="hidden py-3 pl-3 pr-5 text-right xl:table-cell">
-                          <span className={`font-semibold tabular-nums ${vehicle.profit < 0 ? "text-[var(--danger)]" : ""}`}>{money(vehicle.profit)}</span>
-                        </td>
+                        {isOwner ? (
+                          <td className="hidden py-3 pl-3 pr-5 text-right xl:table-cell">
+                            <span className={`font-semibold tabular-nums ${vehicle.profit < 0 ? "text-[var(--danger)]" : ""}`}>{money(vehicle.profit)}</span>
+                          </td>
+                        ) : null}
                       </tr>
                     );
                   })}

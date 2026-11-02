@@ -9,6 +9,7 @@ import { updateCustomer, uploadCustomerDocument } from "@/app/actions/customers"
 import { CustomerNotesForm } from "@/app/customers/[id]/customer-notes-form";
 import { DoNotRent } from "@/app/customers/[id]/do-not-rent";
 import { ReportToOthers } from "@/app/customers/[id]/report-to-others";
+import { currencySymbol } from "@/components/currency-symbol";
 import { SharedHistory } from "@/components/shared-history";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { sharedHistory } from "@/lib/customer-history";
@@ -570,7 +571,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           {/* The two quiet controls side by side on one line, evenly spaced (they stacked with uneven gaps). */}
           <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
             <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="control" reason={null} />
-            <ReportToOthers canReport={["owner", "manager"].includes(String(membership?.role || ""))} customerId={customer.id} rentals={reportableRentals} reports={ownReports} />
+            <ReportToOthers currency={currencySymbol(organization.currency)} canReport={["owner", "manager"].includes(String(membership?.role || ""))} customerId={customer.id} rentals={reportableRentals} reports={ownReports} />
           </div>
         </Card>
 

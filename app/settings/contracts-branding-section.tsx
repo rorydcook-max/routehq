@@ -6,9 +6,9 @@ import { LogoUploadSection } from "@/app/settings/logo-upload-section";
 import { SignatureUploadSection } from "@/app/settings/signature-upload-section";
 import { PendingButton } from "@/components/pending-button";
 import { Fold, Pane } from "@/components/ui";
-import { customerLocaleOptions } from "@/lib/i18n/locales";
 import { BrandColourField } from "@/app/settings/brand-colour-field";
 import { ContactChannels } from "@/app/settings/contact-channels";
+import { InfoTip } from "@/components/info-tip";
 
 // Fields take the global 44px height and regular weight; only the radius/border are set here.
 const inputClass =
@@ -127,16 +127,8 @@ export function ContractsBrandingSection({
                   <span className={labelClass}>{say("b_signerTitle")}</span>
                   <input className={inputClass} defaultValue={organization.authorised_signatory_title || ""} name="authorised_signatory_title" />
                 </label>
-                <label className="block">
-                  <span className={labelClass}>{say("b_language")}</span>
-                  <select className={inputClass} defaultValue={organization.default_contract_locale || organization.default_locale || "en"} name="default_contract_locale">
-                    {customerLocaleOptions.map((option) => (
-                      <option key={option.code} value={option.code}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                {/* "Language of agreements" was here: the platform agreement is always English + Thai, so the choice did nothing.
+                    The column (default_contract_locale) stays for when the agreement can follow it. */}
                 <label className="block sm:col-span-2">
                   <span className={labelClass}>{say("b_footer")}</span>
                   <input className={inputClass} defaultValue={organization.contract_footer_text || ""} name="contract_footer_text" />
@@ -158,7 +150,9 @@ export function ContractsBrandingSection({
             on a white-label plan, in the app itself. The logo saves as soon as it is chosen; the colour
             and the "Powered by" choice belong to the business details form and save with it. */}
         <section className="card p-4">
-          <h2 className="card-title">{say("b_brandTitle")}</h2>
+          <h2 className="card-title">
+            {say("b_brandTitle")} <InfoTip label={say("b_brandTitle")} text={say("b_brandTip")} />
+          </h2>
           <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{whiteLabel ? say("b_brandBodyApp") : say("b_brandBody")}</p>
           <div className="mt-3 space-y-4">
             <LogoUploadSection logoUrl={logoDisplayUrl} orgName={tradingName} />

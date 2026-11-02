@@ -171,5 +171,6 @@
   "{} is empty.": "{} ist leer.",
   "{} is larger than {} MB.": "{} ist größer als {} MB.",
   "{}. Please choose a longer stay or another vehicle.": "{}. Bitte wählen Sie eine längere Mietdauer oder ein anderes Fahrzeug.",
-  "Your own booking address comes with the Pro plan and above.": "Eine eigene Buchungsadresse gibt es ab dem Pro-Tarif."
+  "Your own booking address comes with the Pro plan and above.": "Eine eigene Buchungsadresse gibt es ab dem Pro-Tarif.",
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "Ihre Angaben sind gespeichert. Der Vertrag ist noch nicht bereit zum Unterschreiben. Wir haben den Vermieter informiert, er meldet sich bei Ihnen."
 }

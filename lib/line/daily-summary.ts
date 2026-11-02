@@ -1,6 +1,7 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { lineFlex, lineText, sendLinePushMessage, type LineMessage } from "@/lib/providers/messaging/line";
+import { paperworkFor } from "@/lib/country-paperwork";
 
 const THB = (n: number) =>
   new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(n);
@@ -45,6 +46,7 @@ const WORDS = {
     tax: "Road tax (ต่อภาษี)",
     porbor: "Compulsory insurance (พรบ)",
     insurance: "Full insurance",
+    inspection: "Inspection",
     service: "Service"
   },
   th: {
@@ -68,6 +70,7 @@ const WORDS = {
     tax: "ต่อภาษีรถ",
     porbor: "พรบ",
     insurance: "ประกันภัย",
+    inspection: "ตรวจสภาพรถ",
     service: "เข้าศูนย์ตามระยะ"
   }
 };
@@ -92,16 +95,18 @@ export type SummaryData = {
   paymentsExpectedToday: any[];
   urgentCompliance: Array<{ vehicle: string; item: ComplianceItem; expiry: string }>;
   monthRevenue: number;
+  /** The local name of the inspection in the business's country ("PUSPAKOM", "KIR"), shown after its label. */
+  inspectionLocal?: string;
 };
 
-type ComplianceItem = "tax" | "porbor" | "insurance" | "service";
+type ComplianceItem = "tax" | "porbor" | "insurance" | "inspection" | "service";
 
 export async function fetchSummaryData(organizationId: string): Promise<SummaryData | null> {
   const supabase = createSupabaseAdminClient() as any;
 
   const { data: org } = await supabase
     .from("organizations")
-    .select("id, name, trading_name, settings, timezone, currency, line_user_id, default_locale")
+    .select("id, name, trading_name, settings, timezone, currency, country_code, line_user_id, default_locale")
     .eq("id", organizationId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -193,6 +198,8 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
       { key: "tax_expiry_date", item: "tax" },
       { key: "porbor_expiry_date", item: "porbor" },
       { key: "insurance_expiry_date", item: "insurance" },
+      // Inspection has its own date outside Thailand (lib/country-paperwork.ts).
+      { key: "inspection_expiry_date", item: "inspection" },
       { key: "next_service_date", item: "service" }
     ];
     for (const { key, item } of checks) {
@@ -221,7 +228,8 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
     overdueRentals,
     paymentsExpectedToday,
     urgentCompliance,
-    monthRevenue
+    monthRevenue,
+    inspectionLocal: paperworkFor(org.country_code || org.settings?.main_location?.country).find((item) => item.key === "inspection")?.local
   };
 }
 
@@ -244,7 +252,7 @@ export function buildDailySummaryMessages(data: SummaryData): LineMessage[] {
     bubbles.push(buildPaymentsBubble(w, data.paymentsExpectedToday));
   }
   if (ns.daily_compliance !== false && data.urgentCompliance.length > 0) {
-    bubbles.push(buildComplianceBubble(w, loc, data.urgentCompliance));
+    bubbles.push(buildComplianceBubble(w, loc, data.urgentCompliance, data.inspectionLocal));
   }
   if (ns.daily_revenue !== false) {
     bubbles.push(buildRevenueBubble(w, data.monthRevenue));
@@ -354,14 +362,15 @@ function buildPaymentsBubble(w: Words, payments: any[]) {
   return card(rows);
 }
 
-function buildComplianceBubble(w: Words, loc: SummaryLocale, items: SummaryData["urgentCompliance"]) {
+function buildComplianceBubble(w: Words, loc: SummaryLocale, items: SummaryData["urgentCompliance"], inspectionLocal?: string) {
   const rows: any[] = [{ type: "text", text: w.compliance(items.length), weight: "bold", size: "sm", color: "#dc2626" }];
   for (const c of items.slice(0, 5)) {
+    const label = c.item === "inspection" && inspectionLocal ? `${w.inspection} (${inspectionLocal})` : w[c.item];
     rows.push({
       type: "box",
       layout: "vertical",
       contents: [
-        { type: "text", text: w[c.item], size: "xs", weight: "bold", color: "#172026" },
+        { type: "text", text: label, size: "xs", weight: "bold", color: "#172026" },
         { type: "text", text: `${c.vehicle} · ${w.expires(formatDate(c.expiry, loc))}`, size: "xs", color: "#667085", wrap: true }
       ],
       margin: "sm"

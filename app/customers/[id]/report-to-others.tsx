@@ -27,7 +27,7 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
  * about the customer. A report carries the business's name and its own account of what happened, so other businesses
  * can judge it; it can be marked settled when the customer puts it right, or withdrawn if it was a mistake.
  */
-export function ReportToOthers({ customerId, reports, rentals, canReport }: { customerId: string; reports: OwnReport[]; rentals: ReportableRental[]; canReport: boolean }) {
+export function ReportToOthers({ customerId, reports, rentals, canReport, currency = "฿" }: { currency?: string; customerId: string; reports: OwnReport[]; rentals: ReportableRental[]; canReport: boolean }) {
   const t = useTranslations("history") as unknown as Say;
   const locale = useLocale();
   const [open, setOpen] = useState(false);
@@ -158,7 +158,7 @@ export function ReportToOthers({ customerId, reports, rentals, canReport }: { cu
               </select>
             </label>
             <label className="block">
-              <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("amount")}</span>
+              <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("amount", { currency })}</span>
               <input className="mt-1 w-full" inputMode="numeric" onChange={(event) => setAmount(event.target.value)} placeholder="0" value={amount} />
             </label>
             <label className="block">

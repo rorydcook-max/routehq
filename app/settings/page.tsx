@@ -5,6 +5,8 @@ import { alertSettings } from "@/lib/alerts";
 import { isTelegramConfigured } from "@/lib/telegram";
 import { CalendarFeedCard, EmailAlertsCard, IntegrationCard, TelegramCard } from "@/app/settings/integrations-panel";
 import { SwitchField } from "@/components/switch-field";
+import { InfoTip } from "@/components/info-tip";
+import { currencySymbol } from "@/components/currency-symbol";
 import { effectiveLimits, fleetMix, fleetText, planById } from "@/lib/plans";
 import { getCustomPlan } from "@/lib/custom-plan";
 import { SettingsTabs } from "@/app/settings/settings-tabs";
@@ -326,6 +328,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   // Friendly names for the currency and time zone line; anything else is shown as stored.
   const currencyName = organization.currency === "THB" ? say("currencyThb") : organization.currency;
   const zoneName = organization.timezone === "Asia/Bangkok" ? say("zoneBangkok") : organization.timezone.replace("_", " ");
+  const money = currencySymbol(organization.currency);
 
   return (
     <AppShell
@@ -463,10 +466,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </Fold>
             <Fold
               id="usual-deposit"
-              summary={publicBookingSettings(organization.settings).deposit > 0 ? say("ud_summary", { amount: `฿${publicBookingSettings(organization.settings).deposit.toLocaleString("en-US")}` }) : say("ud_none")}
+              summary={publicBookingSettings(organization.settings).deposit > 0 ? say("ud_summary", { amount: `${money}${publicBookingSettings(organization.settings).deposit.toLocaleString("en-US")}` }) : say("ud_none")}
               title={say("ud_title")}
             >
               <UsualDepositPanel
+                currency={money}
                 deposit={publicBookingSettings(organization.settings).deposit}
                 enabled={publicBookingSettings(organization.settings).enabled}
                 holdHours={bookingRules(organization.settings).holdHours}
@@ -537,11 +541,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               summary={extrasFrom(organization.settings).length ? extrasFrom(organization.settings).map((extra) => extra.name).join(", ") : say("extra_none")}
               title={say("extra_title")}
             >
-              <ExtrasPanel currencySymbol={(organization.currency || "THB") === "THB" ? "฿" : organization.currency || ""} initial={extrasFrom(organization.settings)} />
+              <ExtrasPanel currencySymbol={money} initial={extrasFrom(organization.settings)} />
             </Fold>
             <Fold id="travel" summary={travelSummary} title={say("travel_title")}>
               <p className="font-medium text-[var(--foreground-secondary)]">{say("travel_body")}</p>
-              <TravelPolicyForm organizationId={organization.id} settings={travelPolicySettings} />
+              <TravelPolicyForm currency={money} organizationId={organization.id} settings={travelPolicySettings} />
             </Fold>
             {/* Booking rules (holds and notice) sit with the other rules, not under "Booking online". */}
             <Fold id="holds" summary={say("hold_summary", { hours: bookingRules(organization.settings).holdHours })} title={say("hold_title")}>
@@ -553,6 +557,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <h2 className={groupHeading}>{say("grp_online")}</h2>
           <Fold id="booking-page" summary={publicBookingSettings(organization.settings).enabled ? stateLine("st_bookOn", true) : stateLine("st_bookOff", false)} title={say("book_title")}>
             <PublicBookingPanel
+              currency={money}
               enabled={publicBookingSettings(organization.settings).enabled}
               deposit={publicBookingSettings(organization.settings).deposit}
                   offer={publicBookingSettings(organization.settings).offer}
@@ -676,7 +681,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   className="pt-3"
                   defaultChecked={organization.line_daily_summary_enabled ?? true}
                   description={say("line_dailyBody")}
-                  label={say("line_daily")}
+                  label={
+                    <>
+                      {say("line_daily")} <InfoTip label={say("line_daily")} text={say("line_dailyTip")} />
+                    </>
+                  }
                   name="line_daily_summary_enabled"
                   value="on"
                 />

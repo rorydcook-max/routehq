@@ -12,7 +12,7 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
  * bookings the owner makes and on online ones. It used to sit inside the
  * online booking settings, out of reach for a business with that switched off.
  */
-export function UsualDepositPanel({ deposit, enabled, holdHours, offer }: { deposit: number; enabled: boolean; holdHours: number; offer: string }) {
+export function UsualDepositPanel({ currency = "฿", deposit, enabled, holdHours, offer }: { currency?: string; deposit: number; enabled: boolean; holdHours: number; offer: string }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const router = useRouter();
   const [value, setValue] = useState(deposit > 0 ? String(deposit) : "");
@@ -34,7 +34,7 @@ export function UsualDepositPanel({ deposit, enabled, holdHours, offer }: { depo
     <div className="space-y-2">
       <p className="font-medium text-[var(--foreground-secondary)]">{say("ud_body")}</p>
       <label className="block sm:max-w-xs">
-        <span className="font-semibold text-[var(--foreground)]">{say("ud_label")}</span>
+        <span className="font-semibold text-[var(--foreground)]">{say("ud_label", { currency })}</span>
         <input
           className="mt-1 block w-full"
           disabled={isPending}

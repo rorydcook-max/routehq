@@ -171,5 +171,6 @@
   "{} is empty.": "{} está vacío.",
   "{} is larger than {} MB.": "{} supera los {} MB.",
   "{}. Please choose a longer stay or another vehicle.": "{}. Elija una estancia más larga u otro vehículo.",
-  "Your own booking address comes with the Pro plan and above.": "Su propia dirección de reservas viene con el plan Pro y superiores."
+  "Your own booking address comes with the Pro plan and above.": "Su propia dirección de reservas viene con el plan Pro y superiores.",
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "Tus datos están guardados. El contrato aún no está listo para firmar. Hemos avisado a la empresa de alquiler y se pondrán en contacto contigo."
 }

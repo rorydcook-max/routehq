@@ -12,6 +12,7 @@ import { PendingButton } from "@/components/pending-button";
 import { QuickPhotos } from "@/app/fleet/new/quick-photos";
 import { BackLink, Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { defaultCalendarForLocale } from "@/lib/i18n/calendars";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
@@ -30,6 +31,7 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
   const quick = query.quick === "1" || fromSetup;
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
+  const isOwner = (await getCurrentMembership())?.role === "owner";
   const say = (await getTranslations("vehicleForm")) as unknown as Say;
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -76,9 +78,12 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
           <BackLink href={fromSetup ? "/onboarding" : "/fleet"} label={fromSetup ? say("backSetup") : say("backFleet")} />
           <div className="flex items-start justify-between gap-3">
             <h1 className="page-title">{say("addTitle")}</h1>
-            <Link className="secondary-action pressable shrink-0" href="/fleet/import">
-              {say("import")}
-            </Link>
+            {/* Only the owner can import a list; the import page turns teammates away. */}
+            {isOwner ? (
+              <Link className="secondary-action pressable shrink-0" href="/fleet/import">
+                {say("import")}
+              </Link>
+            ) : null}
           </div>
           <p className="page-subtitle page-subtitle-keep mt-1">{quick ? say("quickSubtitle") : say("addSubtitle")}</p>
         </div>

@@ -11,7 +11,8 @@ import type { LucideIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate, shortDate } from "@/lib/i18n/dates";
 import { extrasFor, priceExtras, seasonalRate, type Extra, type Season } from "@/lib/price-rules";
-import { ArrowRight, CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPlus, UserRound, X, Search } from "lucide-react";
+import { ArrowRight, CalendarDays, Car, CheckCircle2, Copy, Info, MapPin, Send, UserPlus, UserRound, X, Search } from "lucide-react";
+import { InfoTip } from "@/components/info-tip";
 import { DateLeaf } from "@/components/glance";
 import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
@@ -1205,7 +1206,7 @@ export function BookingForm({
           </div>
           {deliveryMethod === "tbd" ? (
             <div className="mt-3 flex items-start gap-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm leading-6 text-[var(--warning)]">
-              <span aria-label={say("information")} title={say("del_tbd")}>ⓘ</span>
+              <Info aria-hidden="true" className="mt-1 shrink-0" size={16} />
               <p>{say("tbdBody")}</p>
             </div>
           ) : deliveryMethod === "delivery" ? (
@@ -1228,7 +1229,7 @@ export function BookingForm({
               <div className="sm:col-span-2">
                 <div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium text-[var(--foreground-secondary)]">
                   <label htmlFor="delivery-datetime">{say("deliveryDateTime")}</label>
-                  <span className="cursor-help text-[var(--muted)]" title={say("timeTooltip")}>ⓘ</span>
+                  <InfoTip label={say("deliveryDateTime")} text={say("timeTooltip")} />
                 </div>
                 {/* Outlined until pressed: solid, it read as already chosen while the field below sat empty. */}
                 <button className={`pressable mb-2 min-h-10 rounded-full border px-4 py-2 text-[13px] font-bold ${deliveryDateTime ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--primary)] bg-white text-[var(--primary)]"}`} onClick={setHandoverNow} type="button">
@@ -1243,7 +1244,7 @@ export function BookingForm({
               <label className="block sm:col-span-2">
                 <span className="inline-flex items-center gap-2 text-[11px] font-medium text-[var(--foreground-secondary)]">
                   {say("collectionAddress")}
-                  <span className="cursor-help text-[var(--muted)]" title={say("locationTooltip")}>ⓘ</span>
+                  <InfoTip label={say("collectionAddress")} text={say("locationTooltip")} />
                 </span>
                 <input className={inputClass} onChange={(event) => setCollectionAddress(event.target.value)} placeholder={say("collectionPlaceholder")} value={collectionAddress} />
                 <p className="mt-2 text-xs font-semibold text-[var(--muted)]">{say("collectionHelper")}</p>
@@ -1251,7 +1252,7 @@ export function BookingForm({
               <div className="sm:col-span-2">
                 <div className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-[var(--foreground-secondary)]">
                   <label htmlFor="collection-datetime">{say("collectionTime")}</label>
-                  <span className="cursor-help text-[var(--muted)]" title={say("timeTooltip")}>ⓘ</span>
+                  <InfoTip label={say("collectionTime")} text={say("timeTooltip")} />
                 </div>
                 <button className={`pressable mb-2 min-h-10 rounded-full border px-4 py-2 text-[13px] font-bold ${collectionTime ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--primary)] bg-white text-[var(--primary)]"}`} onClick={setHandoverNow} type="button">
                   {startsLater ? say("onStartDay") : say("now")}
@@ -1773,7 +1774,7 @@ function GooglePlaceInput({
     <div className="block sm:col-span-2">
       <span className="inline-flex items-center gap-2 text-[11px] font-medium text-[var(--foreground-secondary)]">
         {label}
-        <span className="cursor-help text-[var(--muted)]" title={tooltip}>ⓘ</span>
+        <InfoTip label={label} text={tooltip} />
       </span>
       <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
         <input

@@ -171,5 +171,6 @@
   "{} is empty.": "{} пуст.",
   "{} is larger than {} MB.": "{} больше {} МБ.",
   "{}. Please choose a longer stay or another vehicle.": "{}. Выберите более длительный срок или другой транспорт.",
-  "Your own booking address comes with the Pro plan and above.": "Собственный адрес бронирования доступен на тарифе Pro и выше."
+  "Your own booking address comes with the Pro plan and above.": "Собственный адрес бронирования доступен на тарифе Pro и выше.",
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "Ваши данные сохранены. Договор пока не готов к подписанию. Мы сообщили прокатной компании, они с вами свяжутся."
 }

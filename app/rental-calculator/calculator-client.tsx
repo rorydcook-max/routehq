@@ -704,10 +704,13 @@ export function CalculatorClient({
               <div className="mt-3 rounded-xl border border-[var(--border)] p-3">
                 <Num
                   hint={
-                    platform
-                      ? say(platform.scope === "area" ? "platformArea" : "platformCountry", { count: platform.businesses, model: subject.model })
-                      : own && style === "monthly" && own.monthlyRate === assumptions.rentMonthly
-                        ? say("rentFromOwn", { model: subject.model })
+                    // The note says where the figure came from: the business's own rate replaces the other businesses' figure.
+                    own && style === "monthly" && ownRateFor(own, subject) === assumptions.rentMonthly
+                      ? own.year && own.year !== subject.year && own.monthlyRate !== assumptions.rentMonthly
+                        ? say("rentFromOwnAged", { year: own.year, model: subject.model, amount: money(own.monthlyRate) })
+                        : say("rentFromOwn", { model: subject.model })
+                      : platform
+                        ? say(platform.scope === "area" ? "platformArea" : "platformCountry", { count: platform.businesses, model: subject.model })
                         : research
                           ? sources.length === 0 && research.confidence === "low"
                             ? t("rentFromKnowledge")

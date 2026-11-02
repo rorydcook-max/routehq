@@ -171,5 +171,6 @@
   "{} is empty.": "{} खाली है।",
   "{} is larger than {} MB.": "{} का साइज़ {} MB से ज़्यादा है।",
   "{}. Please choose a longer stay or another vehicle.": "{}। कृपया लंबा समय या कोई दूसरा वाहन चुनें।",
-  "Your own booking address comes with the Pro plan and above.": "आपका अपना बुकिंग पता Pro प्लान और उससे ऊपर के साथ मिलता है।"
+  "Your own booking address comes with the Pro plan and above.": "आपका अपना बुकिंग पता Pro प्लान और उससे ऊपर के साथ मिलता है।",
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "आपकी जानकारी सेव हो गई है। एग्रीमेंट अभी साइन करने के लिए तैयार नहीं है। हमने रेंटल कंपनी को बता दिया है, वे आपसे संपर्क करेंगे।"
 }

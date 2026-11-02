@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { saveCustomerMessages, saveReminderKinds } from "@/app/actions/online-booking";
 import { SwitchField } from "@/components/switch-field";
+import { InfoTip } from "@/components/info-tip";
 
 const KINDS = ["handover", "return", "rent_due", "rent_late", "vehicle_due", "signature"];
 
@@ -42,7 +43,7 @@ export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, of
 
   return (
     <div>
-      <SwitchField checked={on} description={<span className="measure block">{say("cm_body")}</span>} disabled={isPending} label={say("cm_title")} onChange={(event) => change(event.target.checked)} />
+      <SwitchField checked={on} description={<span className="measure block">{say("cm_body")}</span>} disabled={isPending} label={<>{say("cm_title")} <InfoTip label={say("cm_title")} text={say("cm_bodyTip")} /></>} onChange={(event) => change(event.target.checked)} />
       {/* Lined up with the switch's label and description, with the way to fix it right there. */}
       {on && !hasChannel ? (
         <div className="mt-3 rounded-2xl bg-[var(--warning-light)] px-4 py-3 sm:ms-[54px]">

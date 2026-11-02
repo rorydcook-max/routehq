@@ -405,21 +405,136 @@ export async function commitPreview(context: CommitContext, preview: ImportPrevi
     }
     money.push({ row: transaction.row, record: moneyRecord(transaction, vehicleId) });
   }
+  const rentWritten: RentPaid[] = [];
+  const noteRent = (record: Record<string, unknown>) => {
+    const amount = Number(record.amount || 0);
+    if (record.type === "rental_income" && record.vehicle_id && amount > 0) rentWritten.push({ vehicleId: String(record.vehicle_id), date: String(record.transaction_date).slice(0, 10), amount });
+  };
   for (let at = 0; at < money.length; at += 200) {
     const group = money.slice(at, at + 200);
     const { error } = await context.supabase.from("transactions").insert(group.map((item) => item.record));
     if (!error) {
       result.counts.transactions += group.length;
+      for (const item of group) noteRent(item.record);
       continue;
     }
     for (const item of group) {
       const { error: rowError } = await context.supabase.from("transactions").insert(item.record);
       if (rowError) result.failed.push(`row ${item.row}: ${rowError.message}`);
-      else result.counts.transactions += 1;
+      else {
+        result.counts.transactions += 1;
+        noteRent(item.record);
+      }
     }
   }
 
+  // 5. Rent paid with no booking behind it still says the vehicle was out: kept as rented spells for Reports and fleet figures.
+  await recordRentedPeriods(context, rentWritten).catch((error) => {
+    result.failed.push(`rented spells: ${error instanceof Error ? error.message : String(error)}`);
+  });
+
   return result;
+}
+
+type RentPaid = { vehicleId: string; date: string; amount: number };
+/** A stretch of days: start included, end not (the day it came back or the next spell starts), as vehicles.metadata.rented_periods. */
+type Span = { start: string; end: string };
+
+function addDaysTo(day: string, days: number) {
+  const date = new Date(`${day}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function addMonthsTo(day: string, months: number) {
+  const date = new Date(`${day}T00:00:00Z`);
+  const wanted = date.getUTCDate();
+  date.setUTCDate(1);
+  date.setUTCMonth(date.getUTCMonth() + months);
+  const lastDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+  date.setUTCDate(Math.min(wanted, lastDay));
+  return date.toISOString().slice(0, 10);
+}
+
+/**
+ * The stretch one rent payment paid for, from the vehicle's rates: a payment near a month's rent (or a few months')
+ * covers that many months, near a week's rent that many weeks, otherwise days at the daily rate. With no rates, a month.
+ */
+function rentCover(date: string, amount: number, rates: { daily: number; weekly: number; monthly: number }) {
+  const clamp = (value: number, max: number) => Math.min(max, Math.max(1, Math.round(value)));
+  if (rates.monthly > 0 && amount >= rates.monthly * 0.75) return addMonthsTo(date, clamp(amount / rates.monthly, 12));
+  if (rates.weekly > 0 && amount >= rates.weekly * 0.75) return addDaysTo(date, 7 * clamp(amount / rates.weekly, 8));
+  if (rates.daily > 0) return addDaysTo(date, clamp(amount / rates.daily, 31));
+  if (rates.monthly > 0) return addDaysTo(date, clamp((30 * amount) / rates.monthly, 31));
+  return addMonthsTo(date, 1);
+}
+
+function mergeSpans(spans: Span[]) {
+  const merged: Span[] = [];
+  for (const span of [...spans].filter((item) => item.end > item.start).sort((a, b) => a.start.localeCompare(b.start))) {
+    const last = merged[merged.length - 1];
+    if (last && span.start <= last.end) {
+      if (span.end > last.end) last.end = span.end;
+    } else merged.push({ ...span });
+  }
+  return merged;
+}
+
+/** The parts of `spans` that none of `taken` covers. */
+function subtractSpans(spans: Span[], taken: Span[]) {
+  let left = mergeSpans(spans);
+  for (const cut of mergeSpans(taken)) {
+    left = left.flatMap((span) => {
+      if (cut.end <= span.start || cut.start >= span.end) return [span];
+      const pieces: Span[] = [];
+      if (cut.start > span.start) pieces.push({ start: span.start, end: cut.start });
+      if (cut.end < span.end) pieces.push({ start: cut.end, end: span.end });
+      return pieces;
+    });
+  }
+  return left;
+}
+
+/**
+ * Rent paid for a vehicle on days no booking covers is history from before the bookings were in RoveHQ: each payment
+ * becomes the stretch it paid for, merged, minus the vehicle's bookings and the spells it already has, and is added to
+ * vehicles.metadata.rented_periods (read by lib/reports.ts and lib/fleet-metrics.ts). Each added spell carries the
+ * batch id so an undo takes it back.
+ */
+async function recordRentedPeriods(context: CommitContext, payments: RentPaid[]) {
+  if (!payments.length) return;
+  const { supabase, organizationId } = context;
+  const ids = [...new Set(payments.map((payment) => payment.vehicleId))];
+  const tomorrow = businessToday(1);
+  const [{ data: vehicles, error: vehiclesError }, { data: rentals, error: rentalsError }] = await Promise.all([
+    supabase.from("vehicles").select("id, metadata, daily_rate, weekly_rate, monthly_rate").eq("organization_id", organizationId).in("id", ids),
+    supabase.from("rentals").select("vehicle_id, start_date, end_date").eq("organization_id", organizationId).in("vehicle_id", ids).is("deleted_at", null).neq("status", "cancelled")
+  ]);
+  if (vehiclesError || rentalsError) throw new Error((vehiclesError || rentalsError).message);
+  for (const vehicle of (vehicles || []) as Array<{ id: string; metadata: any; daily_rate: unknown; weekly_rate: unknown; monthly_rate: unknown }>) {
+    const rates = { daily: Number(vehicle.daily_rate) || 0, weekly: Number(vehicle.weekly_rate) || 0, monthly: Number(vehicle.monthly_rate) || 0 };
+    const paid = payments
+      .filter((payment) => payment.vehicleId === vehicle.id && /^\d{4}-\d{2}-\d{2}$/.test(payment.date) && payment.date < tomorrow)
+      .map((payment) => {
+        const end = rentCover(payment.date, payment.amount, rates);
+        // Rent paid ahead is not a spell yet: only days up to today count.
+        return { start: payment.date, end: end < tomorrow ? end : tomorrow };
+      });
+    // A booking's end day is its last day out, so its stretch ends the day after; one with no end runs on.
+    const booked = ((rentals || []) as Array<{ vehicle_id: string; start_date: string | null; end_date: string | null }>)
+      .filter((rental) => rental.vehicle_id === vehicle.id && rental.start_date)
+      .map((rental) => ({ start: String(rental.start_date).slice(0, 10), end: rental.end_date ? addDaysTo(String(rental.end_date).slice(0, 10), 1) : "9999-12-31" }));
+    const metadata = vehicle.metadata && typeof vehicle.metadata === "object" ? vehicle.metadata : {};
+    const existing: any[] = Array.isArray(metadata.rented_periods) ? metadata.rented_periods : [];
+    const existingSpans = existing
+      .map((period) => ({ start: String(period?.start || "").slice(0, 10), end: String(period?.end || "").slice(0, 10) }))
+      .filter((span) => /^\d{4}-\d{2}-\d{2}$/.test(span.start) && /^\d{4}-\d{2}-\d{2}$/.test(span.end));
+    const added = subtractSpans(paid, [...booked, ...existingSpans]).map((span) => ({ ...span, import_batch_id: context.batchId }));
+    if (!added.length) continue;
+    const rentedPeriods = [...existing, ...added].sort((a, b) => String(a?.start || "").localeCompare(String(b?.start || "")));
+    const { error } = await supabase.from("vehicles").update({ metadata: { ...metadata, rented_periods: rentedPeriods } }).eq("id", vehicle.id).eq("organization_id", organizationId);
+    if (error) throw new Error(error.message);
+  }
 }
 
 /**
@@ -432,6 +547,18 @@ export async function undoBatch(supabase: any, organizationId: string, batchId: 
   const { data: rentals } = await supabase.from("rentals").select("id, vehicle_id").eq("organization_id", organizationId).eq("import_batch_id", batchId).is("deleted_at", null);
   for (const rental of rentals || []) {
     await supabase.from("vehicles").update({ status: "available", availability_status: "available_now", current_rental_id: null, current_customer_id: null }).eq("id", rental.vehicle_id).eq("current_rental_id", rental.id);
+  }
+  // Rented spells this import added to vehicles that stay (lib/import/commit.ts recordRentedPeriods).
+  const { data: withSpells } = await supabase
+    .from("vehicles")
+    .select("id, metadata")
+    .eq("organization_id", organizationId)
+    .not("metadata->rented_periods", "is", null);
+  for (const vehicle of (withSpells || []) as Array<{ id: string; metadata: any }>) {
+    const periods: any[] = Array.isArray(vehicle.metadata?.rented_periods) ? vehicle.metadata.rented_periods : [];
+    const kept = periods.filter((period) => period?.import_batch_id !== batchId);
+    if (kept.length === periods.length) continue;
+    await supabase.from("vehicles").update({ metadata: { ...vehicle.metadata, rented_periods: kept } }).eq("id", vehicle.id).eq("organization_id", organizationId);
   }
   for (const table of ["tasks", "transactions", "rental_payments", "rentals", "customers", "vehicles"]) {
     await supabase.from(table).update({ deleted_at: gone }).eq("organization_id", organizationId).eq("import_batch_id", batchId).is("deleted_at", null);

@@ -5,6 +5,7 @@ import type { FormEvent, ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { updatePaymentSettings } from "@/app/actions/settings";
 import { SwitchField } from "@/components/switch-field";
+import { InfoTip } from "@/components/info-tip";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
@@ -88,9 +89,10 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
         <MethodCard checked={enabledMethods.includes("promptpay")} description={say("pm_promptpayBody")} label={say("pm_promptpayName")} name="promptpay" onToggle={toggleMethod}>
           <div className="mt-3 grid gap-3">
             <label className="block">
-              <span className={labelClass}>{say("pm_ppId")}</span>
+              <span className={labelClass}>
+                {say("pm_ppId")} <InfoTip label={say("pm_ppId")} text={say("pm_ppIdHelp")} />
+              </span>
               <input className="mt-1 w-full" defaultValue={settings.promptpay_id || ""} inputMode="numeric" name="promptpay_id" placeholder={say("pm_ppIdPh")} />
-              <span className={helpClass}>{say("pm_ppIdHelp")}</span>
             </label>
             <div>
               <p className={labelClass}>{say("pm_qr")}</p>

@@ -21,7 +21,7 @@ Everything here is in **Settings**, **Business**, unless it says otherwise. Cust
 
 ## Agreement details
 
-Tap **Agreement details** for **Legal name**, **Registration or tax number**, **Who signs for the business**, **Their job title**, **Language of agreements** and a **Line at the bottom of agreements**. Tap **Save**.
+Tap **Agreement details** for **Legal name**, **Registration or tax number**, **Who signs for the business**, **Their job title** and a **Line at the bottom of agreements**. Tap **Save**.
 
 To change the agreement terms, tap **Edit agreement terms**. See [Rental agreements](/docs/rental-agreements).
 

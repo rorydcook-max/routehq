@@ -171,5 +171,6 @@
   "{} is empty.": "{} 是空的。",
   "{} is larger than {} MB.": "{} 大於 {} MB。",
   "{}. Please choose a longer stay or another vehicle.": "{}。請選擇較長的租期或其他車輛。",
-  "Your own booking address comes with the Pro plan and above.": "Pro 以上方案才提供專屬預約網址。"
+  "Your own booking address comes with the Pro plan and above.": "Pro 以上方案才提供專屬預約網址。",
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "您的資料已儲存。合約暫時還無法簽署。我們已通知租車公司，他們會與您聯絡。"
 }

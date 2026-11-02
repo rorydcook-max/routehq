@@ -12,7 +12,7 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
  * Switch for the public booking page, the link to share, the deposit online
  * bookings ask for, and how long a customer has to start their booking form.
  */
-export function PublicBookingPanel({ slug, link: shareLink, enabled, holdHours, deposit, offer = "both_monthly", pricedVehicles, totalVehicles }: { slug: string; link?: string; enabled: boolean; holdHours: number; deposit: number; offer?: string; pricedVehicles: number; totalVehicles: number }) {
+export function PublicBookingPanel({ slug, link: shareLink, enabled, holdHours, deposit, offer = "both_monthly", pricedVehicles, totalVehicles, currency = "฿" }: { slug: string; link?: string; currency?: string; enabled: boolean; holdHours: number; deposit: number; offer?: string; pricedVehicles: number; totalVehicles: number }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const [on, setOn] = useState(enabled);
   const [hours, setHours] = useState(holdHours);
@@ -119,7 +119,7 @@ export function PublicBookingPanel({ slug, link: shareLink, enabled, holdHours, 
             </select>
           </label>
 
-          <p className="font-medium text-[var(--foreground-secondary)]">{deposit > 0 ? say("pb_depositIs", { amount: `฿${deposit.toLocaleString("en-US")}` }) : say("pb_depositNone")}</p>
+          <p className="font-medium text-[var(--foreground-secondary)]">{deposit > 0 ? say("pb_depositIs", { amount: `${currency}${deposit.toLocaleString("en-US")}` }) : say("pb_depositNone")}</p>
         </>
       ) : null}
       {failed ? <p className="font-bold text-[var(--danger)]">{say("saveFailed")}</p> : null}

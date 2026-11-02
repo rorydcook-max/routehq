@@ -997,6 +997,10 @@ export async function logVehicleMaintenance(formData: FormData) {
     ? await attachVehicleDocument({ supabase, file: receiptFile, organizationId, vehicleId, userId: user.id, category: "maintenance_receipt" })
     : null;
 
+  // The cost is in the business's own money, not always baht.
+  const { data: organization } = await supabase.from("organizations").select("currency").eq("id", organizationId).maybeSingle();
+  const currency = organization?.currency || "THB";
+
   // What it cost is a money entry like any other, so it's in Money in & out and the reports.
   let transactionId: string | null = null;
   if (cost && cost > 0) {
@@ -1007,7 +1011,7 @@ export async function logVehicleMaintenance(formData: FormData) {
         vehicle_id: vehicleId,
         type: costTypeForService(eventType),
         amount: cost,
-        currency: "THB",
+        currency,
         transaction_date: serviceDate,
         supplier,
         mileage,
@@ -1047,7 +1051,7 @@ export async function logVehicleMaintenance(formData: FormData) {
     vehicle_id: vehicleId,
     event_type: "maintenance_completed",
     title: "Maintenance logged",
-    detail: `${eventType} completed${oilChanged && eventType !== "oil_change" ? " with an oil change" : ""}${cost ? `, cost THB ${cost}` : ""}.`
+    detail: `${eventType} completed${oilChanged && eventType !== "oil_change" ? " with an oil change" : ""}${cost ? `, cost ${currency} ${cost}` : ""}.`
   });
 
   revalidatePath("/");
@@ -1222,6 +1226,12 @@ export async function bulkArchiveVehicles(formData: FormData) {
 
   if (!organizationId || vehicleIds.length === 0) {
     throw new Error("Select at least one vehicle.");
+  }
+
+  // Archiving takes vehicles out of the business, like deleting, so only the owner can do it from the list.
+  const membership = await getCurrentMembership();
+  if (!membership || membership.organizationId !== organizationId || membership.role !== "owner") {
+    redirect("/fleet?notice=vehicle-owner-only");
   }
 
   const { error } = await supabase

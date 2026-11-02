@@ -16,6 +16,7 @@ function dayInMonth(date: string, locale: string) {
 }
 import { getDefaultOrganization } from "@/lib/organization";
 import { buildStatements, type VehicleStatement } from "@/lib/owner-statements";
+import { inRangeWithShares } from "@/lib/cost-spread";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PrintButton } from "./print-button";
 
@@ -45,18 +46,39 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
     .eq("organization_id", organization.id)
     .is("deleted_at", null);
   const owned = (vehicles || []).filter((vehicle: any) => vehicle.metadata?.partner?.name);
-  const { data: transactions } = owned.length
-    ? await supabase
-        .from("transactions")
-        .select("vehicle_id, type, amount, is_deposit, voided, transaction_date, notes, metadata")
-        .eq("organization_id", organization.id)
-        .is("deleted_at", null)
-        .in("vehicle_id", owned.map((vehicle: any) => vehicle.id))
-        .gte("transaction_date", from)
-        .lt("transaction_date", to)
-    : { data: [] };
+  const ownedIds = owned.map((vehicle: any) => vehicle.id);
+  const columns = "id, vehicle_id, type, amount, is_deposit, voided, transaction_date, notes, metadata";
+  const lastDay = new Date(Date.parse(`${to}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+  const [paidResult, spreadResult] = owned.length
+    ? await Promise.all([
+        supabase
+          .from("transactions")
+          .select(columns)
+          .eq("organization_id", organization.id)
+          .is("deleted_at", null)
+          .in("vehicle_id", ownedIds)
+          .gte("transaction_date", from)
+          .lt("transaction_date", to),
+        // Yearly insurance or tax paid in another month still counts its monthly share here, as in Reports.
+        supabase
+          .from("transactions")
+          .select(columns)
+          .eq("organization_id", organization.id)
+          .is("deleted_at", null)
+          .in("vehicle_id", ownedIds)
+          .not("metadata->spread", "is", null)
+          .lte("metadata->spread->>from", lastDay)
+          .gte("metadata->spread->>to", from)
+      ])
+    : [{ data: [] }, { data: [] }];
+  const transactions: any[] = inRangeWithShares(paidResult.data || [], spreadResult.data || [], from, lastDay);
 
-  const statements = buildStatements(owned, transactions || [], (type) => (money.has(`type_${type}`) ? money(`type_${type}`) : type));
+  const statements = buildStatements(
+    owned,
+    transactions,
+    (type) => (money.has(`type_${type}`) ? money(`type_${type}`) : type),
+    (label, index, count) => say("sharePart", { label, n: index + 1, count })
+  );
   const byOwner = new Map<string, VehicleStatement[]>();
   for (const statement of statements) byOwner.set(statement.partner.name, [...(byOwner.get(statement.partner.name) || []), statement]);
   const currency = organization.currency || "THB";

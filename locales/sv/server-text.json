@@ -171,5 +171,6 @@
   "{} is empty.": "{} är tom.",
   "{} is larger than {} MB.": "{} är större än {} MB.",
   "{}. Please choose a longer stay or another vehicle.": "{}. Välj en längre vistelse eller ett annat fordon.",
-  "Your own booking address comes with the Pro plan and above.": "En egen bokningsadress ingår i Pro och högre."
+  "Your own booking address comes with the Pro plan and above.": "En egen bokningsadress ingår i Pro och högre.",
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "Dina uppgifter är sparade. Avtalet är inte klart att skriva under än. Vi har meddelat uthyrningsfirman och de hör av sig till dig."
 }

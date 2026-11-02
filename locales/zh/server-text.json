@@ -171,5 +171,6 @@
   "{} is empty.": "{}为空。",
   "{} is larger than {} MB.": "{}大于 {} MB。",
   "{}. Please choose a longer stay or another vehicle.": "{}。请选择更长的租期或其他车辆。",
-  "Your own booking address comes with the Pro plan and above.": "自有预订网址需成长版及以上套餐。"
+  "Your own booking address comes with the Pro plan and above.": "自有预订网址需成长版及以上套餐。",
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "您的信息已保存。协议暂时还不能签署。我们已通知租车公司，他们会与您联系。"
 }

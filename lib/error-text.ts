@@ -6,5 +6,5 @@
  */
 export function shownError(error: unknown, fallback: string): string {
   const message = error instanceof Error ? error.message : "";
-  return !message || /Server Components render|omitted in production|digest property/i.test(message) ? fallback : message;
+  return !message || /Server Components render|omitted in production|digest property|Minified React error/i.test(message) ? fallback : message;
 }

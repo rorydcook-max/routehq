@@ -33,9 +33,14 @@ export type VehicleStatement = {
 /** Works out each partner-owned vehicle's month from its money in and out. */
 export function buildStatements(
   vehicles: Array<{ id: string; make: string; model: string; registration_number: string | null; metadata: unknown }>,
-  transactions: Array<{ vehicle_id: string | null; type: string; amount: unknown; is_deposit?: boolean | null; voided?: boolean | null; transaction_date: string; notes?: string | null; metadata?: unknown }>,
-  typeLabel: (type: string) => string
+  transactions: Array<{ vehicle_id: string | null; type: string; amount: unknown; is_deposit?: boolean | null; voided?: boolean | null; transaction_date: string; notes?: string | null; metadata?: unknown; shareOf?: { index: number; count: number } }>,
+  typeLabel: (type: string) => string,
+  /** The label of one month's share of a spread payment ("Insurance, part 3 of 12"). */
+  shareLabel?: (label: string, index: number, count: number) => string
 ): VehicleStatement[] {
+  // Yearly insurance or tax arrives as monthly shares (lib/cost-spread inRangeWithShares), each with shareOf.
+  const labelOf = (row: { type: string; shareOf?: { index: number; count: number } }) =>
+    row.shareOf && shareLabel ? shareLabel(typeLabel(row.type), row.shareOf.index, row.shareOf.count) : typeLabel(row.type);
   const result: VehicleStatement[] = [];
   for (const vehicle of vehicles) {
     const partner = partnerOf(vehicle.metadata);
@@ -65,7 +70,7 @@ export function buildStatements(
         lines.push({ date: row.transaction_date, label: typeLabel(row.type), amount: forOwner, kind: "in", extrasLeftOut: extras || undefined });
       } else if (isExpenseTransaction({ isDeposit: row.is_deposit, type: row.type })) {
         costs += amount;
-        lines.push({ date: row.transaction_date, label: typeLabel(row.type), amount, kind: "out" });
+        lines.push({ date: row.transaction_date, label: labelOf(row), amount, kind: "out" });
       }
     }
     const profit = income - costs;

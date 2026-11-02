@@ -292,5 +292,6 @@
   "This vehicle is still out on another rental. Return it first or pick another vehicle.": "รถคันนี้ยังอยู่ในการเช่าอื่น รับคืนก่อนหรือเลือกรถคันอื่น",
   "{} is empty.": "{} ว่างเปล่า",
   "{} is larger than {} MB.": "{} มีขนาดเกิน {} MB",
-  "Your own booking address comes with the Pro plan and above.": "ที่อยู่หน้าจองของคุณเองมีในแพ็กเกจ Pro ขึ้นไป"
+  "Your own booking address comes with the Pro plan and above.": "ที่อยู่หน้าจองของคุณเองมีในแพ็กเกจ Pro ขึ้นไป",
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "บันทึกข้อมูลของคุณแล้ว สัญญายังไม่พร้อมให้เซ็น เราแจ้งร้านเช่าแล้ว ทางร้านจะติดต่อคุณกลับ"
 }

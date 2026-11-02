@@ -575,8 +575,11 @@ export async function updateContractBrandingSettings(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const { user, organizationId } = await requireActiveOrganizationMembership(supabase);
 
+  // The agreement language is no longer on the form (the platform agreement is always English + Thai):
+  // keep what is saved unless a value is sent.
+  const sentContractLocale = formData.has("default_contract_locale");
   const defaultContractLocale = String(formData.get("default_contract_locale") || "en").trim();
-  if (!supportedLocales.has(defaultContractLocale)) {
+  if (sentContractLocale && !supportedLocales.has(defaultContractLocale)) {
     throw new Error("Unsupported default contract locale.");
   }
 
@@ -610,7 +613,7 @@ export async function updateContractBrandingSettings(formData: FormData) {
     contract_accent_colour: accentColour,
     contract_footer_text: footerText,
     powered_by_routehq_enabled: String(formData.get("powered_by_routehq_enabled") || "") === "true",
-    default_contract_locale: defaultContractLocale,
+    ...(sentContractLocale ? { default_contract_locale: defaultContractLocale } : {}),
     default_contract_template_id: limitedString(formData, "default_contract_template_id", 80),
     authorised_signatory_name: limitedString(formData, "authorised_signatory_name", 160),
     authorised_signatory_title: limitedString(formData, "authorised_signatory_title", 160),

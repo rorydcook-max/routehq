@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { InfoTip } from "@/components/info-tip";
 import { saveBookingRules } from "@/app/actions/online-booking";
 import { END_NOTICE_OPTIONS, EXTEND_NOTICE_OPTIONS, GAP_DAY_OPTIONS, HOLD_HOUR_OPTIONS, LEAD_HOUR_OPTIONS, type BookingRules } from "@/lib/booking-rules";
 
@@ -43,7 +44,9 @@ export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
     <div className="grid gap-4 sm:grid-cols-2">
       {rows.map((row) => (
         <label className="block" key={row.key}>
-          <span className="font-semibold text-[var(--foreground)]">{row.label}</span>
+          <span className="font-semibold text-[var(--foreground)]">
+            {row.label} <InfoTip label={row.label} text={row.help} />
+          </span>
           <select className="mt-1 block w-full" disabled={isPending} onChange={(event) => change(row.key, Number(event.target.value))} value={values[row.key]}>
             {row.options.map((option) => (
               <option key={option} value={option}>
@@ -51,7 +54,6 @@ export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
               </option>
             ))}
           </select>
-          <span className="mt-1 block font-medium text-[var(--muted)]">{row.help}</span>
         </label>
       ))}
       {failed ? <p className="font-bold text-[var(--danger)] sm:col-span-2">{say("saveFailed")}</p> : null}

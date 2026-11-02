@@ -6,6 +6,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { saveExtras, saveSeasons } from "@/app/actions/price-rules";
 import type { Extra, Season } from "@/lib/price-rules";
 import { dateFormat } from "@/lib/i18n/dates";
+import { InfoTip } from "@/components/info-tip";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const field = "mt-1 w-full";
@@ -72,7 +73,9 @@ export function SeasonsPanel({ initial }: { initial: Season[] }) {
             <DayMonth label={say("season_from")} onChange={(value) => change(row.id, { from: value })} value={row.from} />
             <DayMonth label={say("season_to")} onChange={(value) => change(row.id, { to: value })} value={row.to} />
             <label className="block">
-              <span className={small}>{say("season_pct")}</span>
+              <span className={small}>
+                {say("season_pct")} <InfoTip label={say("season_pct")} text={say("season_pctTip")} />
+              </span>
               <input className={field} inputMode="numeric" onChange={(event) => change(row.id, { pct: Number(event.target.value.replace(/[^\d-]/g, "")) || 0 })} value={row.pct ? String(row.pct) : ""} />
             </label>
             <button aria-label={say("remove")} className="flex min-h-10 items-center justify-center text-[var(--muted)] hover:text-[var(--danger)]" onClick={() => { save.clear(); setRows((list) => list.filter((item) => item.id !== row.id)); }} type="button">
@@ -81,7 +84,7 @@ export function SeasonsPanel({ initial }: { initial: Season[] }) {
           </div>
           <label className="mt-2 flex items-center gap-2 text-sm font-medium text-[var(--foreground-secondary)]">
             <input checked={row.monthly} onChange={(event) => change(row.id, { monthly: event.target.checked })} type="checkbox" />
-            {say("season_monthly")}
+            {say("season_monthly")} <InfoTip label={say("season_monthly")} text={say("season_monthlyTip")} />
           </label>
         </div>
       ))}
@@ -109,7 +112,9 @@ export function ExtrasPanel({ initial, currencySymbol }: { initial: Extra[]; cur
   };
   return (
     <div className="space-y-3">
-      <p className="font-medium text-[var(--foreground-secondary)]">{say("extra_body")}</p>
+      <p className="font-medium text-[var(--foreground-secondary)]">
+        {say("extra_body")} <InfoTip label={say("extra_title")} text={say("extra_bodyTip")} />
+      </p>
       {rows.map((row) => (
         <div className="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:grid-cols-[1.4fr_0.8fr_1fr_1fr_auto] sm:items-end" key={row.id}>
           <label className="block">

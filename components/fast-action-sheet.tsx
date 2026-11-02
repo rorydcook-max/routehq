@@ -26,8 +26,10 @@ const lessOften: Action[] = [
   { key: "importVehicles", href: "/fleet/import", icon: UploadCloud }
 ];
 
-export function FastActionSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function FastActionSheet({ open, onClose, canImport = false }: { open: boolean; onClose: () => void; canImport?: boolean }) {
   const t = useTranslations("shell");
+  // Only the owner can import (the import page turns teammates away), so teammates aren't offered it.
+  const lessOftenShown = canImport ? lessOften : lessOften.filter((action) => action.key !== "importVehicles");
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
@@ -82,7 +84,7 @@ export function FastActionSheet({ open, onClose }: { open: boolean; onClose: () 
         {/* Two groups, each one rounded list like an iPhone settings group. */}
         <div className="sheet-group grid">{everyday.map(row)}</div>
         <p className="mb-1.5 mt-4 px-1 font-semibold text-[var(--muted)]">{t("quickLessOften")}</p>
-        <div className="sheet-group grid">{lessOften.map(row)}</div>
+        <div className="sheet-group grid">{lessOftenShown.map(row)}</div>
       </div>
     </div>
   );

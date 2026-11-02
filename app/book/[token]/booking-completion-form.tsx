@@ -875,6 +875,15 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         }
         setSubmittedName(String(formData.get("fullName") || "").trim());
         const result = await completePublicBooking(formData);
+        if ("error" in result && result.error) {
+          // Their details are saved but they can't sign yet (the business has more to do).
+          form.querySelectorAll<HTMLInputElement>('input[type="file"]').forEach((input) => {
+            input.value = "";
+          });
+          setError(String(result.error));
+          router.refresh();
+          return;
+        }
         if ("needsReview" in result && result.needsReview) {
           // Documents are saved now; don't send the same files again.
           form.querySelectorAll<HTMLInputElement>('input[type="file"]').forEach((input) => {

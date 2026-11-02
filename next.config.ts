@@ -10,7 +10,9 @@ const nextConfig: NextConfig = {
   // The website's guides and free resources are Markdown read at run time (lib/site/content.ts), and the downloads
   // are served from outside public/ through a signed link (app/api/download/[slug]): ship them with the server.
   outputFileTracingIncludes: {
-    "/**": ["./content/**/*"],
+    // Chrome's compressed files are read from disk at run time, so tracing doesn't see them. Without this, making any
+    // agreement or receipt PDF fails on Vercel ("input directory .../@sparticuz/chromium/bin does not exist").
+    "/**": ["./content/**/*", "./node_modules/@sparticuz/chromium/bin/**"],
     "/api/download/**": ["./downloads/**/*"]
   },
   // Headless Chrome for PDFs: loaded from node_modules at runtime, not bundled.

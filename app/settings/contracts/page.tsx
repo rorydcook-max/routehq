@@ -9,10 +9,10 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { feeOn, getTravelPolicySettings } from "@/lib/travel-policy";
 import { AgreementTerms } from "./agreement-terms";
+import { currencySymbol } from "@/components/currency-symbol";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
-const BAHT = "฿";
 
 export default async function ContractSettingsPage() {
   const [userEmail, defaultOrganization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
@@ -25,7 +25,8 @@ export default async function ContractSettingsPage() {
   await markOnboardingStep(supabase, organization.id, "contract_template");
 
   const policy = getTravelPolicySettings(organization.settings);
-  const amount = (value: number) => `${BAHT}${Math.round(Number(value) || 0).toLocaleString("en-US")}`;
+  const money = currencySymbol(organization.currency);
+  const amount = (value: number) => `${money}${Math.round(Number(value) || 0).toLocaleString("en-US")}`;
   // A fee switched off in Settings shows as such, the way the agreement leaves it out.
   const off = say("tp_offShort");
   const numbers = [

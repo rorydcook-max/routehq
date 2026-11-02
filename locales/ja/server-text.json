@@ -171,5 +171,6 @@
   "{} is empty.": "{}が空です。",
   "{} is larger than {} MB.": "{}は{} MBを超えています。",
   "{}. Please choose a longer stay or another vehicle.": "{}。より長い滞在期間か別の車両を選んでください。",
-  "Your own booking address comes with the Pro plan and above.": "独自の予約アドレスはグロースプラン以上で利用できます。"
+  "Your own booking address comes with the Pro plan and above.": "独自の予約アドレスはグロースプラン以上で利用できます。",
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "お客様の情報は保存されました。契約書はまだ署名できる状態ではありません。レンタル会社に連絡しましたので、折り返しご連絡があります。"
 }

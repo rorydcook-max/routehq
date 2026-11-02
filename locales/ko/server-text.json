@@ -171,5 +171,6 @@
   "{} is empty.": "{}이(가) 비어 있어요.",
   "{} is larger than {} MB.": "{}이(가) {} MB보다 커요.",
   "{}. Please choose a longer stay or another vehicle.": "{}. 더 긴 기간이나 다른 차량을 선택해 주세요.",
-  "Your own booking address comes with the Pro plan and above.": "나만의 예약 주소는 그로스 요금제 이상에서 제공돼요."
+  "Your own booking address comes with the Pro plan and above.": "나만의 예약 주소는 그로스 요금제 이상에서 제공돼요.",
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "정보가 저장됐어요. 계약서는 아직 서명할 수 없어요. 렌탈 업체에 알렸으니 곧 연락이 갈 거예요."
 }

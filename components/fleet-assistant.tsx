@@ -18,6 +18,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { renewVehicleCompliance, uploadVehiclePhotos } from "@/app/actions/vehicles";
 import { compressImage } from "@/lib/direct-upload-client";
+import { dateFormat } from "@/lib/i18n/dates";
 
 type Photo = { file: File; url: string };
 
@@ -448,7 +449,7 @@ export function FleetAssistant({
                   <p className="truncate font-semibold text-[var(--foreground)]">{t(`paper_${item.kind}` as never)} · {item.vehicleName || t("unnamed")}</p>
                   <p className="truncate text-[13px] text-[var(--muted)]">
                     {[
-                      t("paperUntil", { date: new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${item.coverTo}T00:00:00Z`)) }),
+                      t("paperUntil", { date: dateFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${item.coverTo}T00:00:00Z`)) }),
                       item.cost ? (item.monthly ? t("perMonth", { price: money(item.cost) }) : money(item.cost)) : "",
                       item.inspectionCost ? t("paperInspection", { price: money(item.inspectionCost) }) : "",
                       item.note || ""

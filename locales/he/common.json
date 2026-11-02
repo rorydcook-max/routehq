@@ -1642,7 +1642,8 @@
     "recordCost": "רישום הוצאה",
     "recordIncome": "רישום הכנסה",
     "useThisPayment": "שימוש בתשלום זה",
-    "allCategories": "הכול"
+    "allCategories": "הכול",
+    "shareOf": "חלק {index} מתוך {count} · שולמו {amount} ב-{date}"
   },
   "booking": {
     "open": "פתח",
@@ -3332,7 +3333,18 @@
     "hf_seats": "מושבים",
     "hf_engine": "מנוע",
     "hf_bought": "נרכש ב-",
-    "hf_worth": "שווי נוכחי"
+    "hf_worth": "שווי נוכחי",
+    "c_registration": "רישום / אגרת רכב",
+    "c_compulsory": "ביטוח חובה",
+    "c_inspection": "טסט לרכב",
+    "f_coverStarts": "תחילת הכיסוי",
+    "f_howPaid": "איך משלמים?",
+    "f_paidOnce": "בתשלום אחד",
+    "f_paidMonthly": "כל חודש",
+    "f_costMonthly": "עלות לחודש",
+    "f_spreadHint": "נספר כ-{amount} לחודש במשך {months} חודשים בהוצאות שלך.",
+    "f_monthlyHint": "{amount} יתווספו להוצאות שלך כל חודש עד {date}.",
+    "cs_monthly": "{amount} לחודש"
   },
   "customerPage": {
     "back": "לקוחות",

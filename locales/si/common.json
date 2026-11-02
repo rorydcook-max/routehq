@@ -1602,7 +1602,8 @@
     "recordCost": "වියදමක් සටහන් කරන්න",
     "recordIncome": "ලැබුණු මුදල් සටහන් කරන්න",
     "useThisPayment": "මෙම ගෙවීම භාවිත කරන්න",
-    "allCategories": "සියල්ල"
+    "allCategories": "සියල්ල",
+    "shareOf": "{count} න් කොටස {index} · {date} දින {amount} ගෙවා ඇත"
   },
   "booking": {
     "open": "විවෘත කරන්න",
@@ -3292,7 +3293,18 @@
     "hf_seats": "ආසන",
     "hf_engine": "එන්ජිම",
     "hf_bought": "මිලදී ගත්තේ",
-    "hf_worth": "දැනට වටිනාකම"
+    "hf_worth": "දැනට වටිනාකම",
+    "c_registration": "ලියාපදිංචිය / මාර්ග බද්ද",
+    "c_compulsory": "අනිවාර්ය රක්ෂණය",
+    "c_inspection": "වාහන පරීක්ෂාව",
+    "f_coverStarts": "ආවරණය ආරම්භය",
+    "f_howPaid": "ගෙවන්නේ කෙසේද?",
+    "f_paidOnce": "එකවර",
+    "f_paidMonthly": "සෑම මසකම",
+    "f_costMonthly": "මාසික වියදම",
+    "f_spreadHint": "මාස {months}ක් පුරා මසකට {amount} ලෙස ඔබේ වියදම්වලට ගණන් වේ.",
+    "f_monthlyHint": "{date} දක්වා සෑම මසකම {amount} ඔබේ වියදම්වලට එකතු වේ.",
+    "cs_monthly": "මසකට {amount}"
   },
   "customerPage": {
     "back": "පාරිභෝගිකයින්",

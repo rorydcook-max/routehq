@@ -1642,7 +1642,8 @@
     "recordCost": "Ausgabe erfassen",
     "recordIncome": "Einnahme erfassen",
     "useThisPayment": "Diese Zahlung verwenden",
-    "allCategories": "Alle"
+    "allCategories": "Alle",
+    "shareOf": "Anteil {index} von {count} · {amount} bezahlt am {date}"
   },
   "booking": {
     "open": "Öffnen",
@@ -3332,7 +3333,18 @@
     "hf_seats": "Sitze",
     "hf_engine": "Motor",
     "hf_bought": "Gekauft für",
-    "hf_worth": "Aktueller Wert"
+    "hf_worth": "Aktueller Wert",
+    "c_registration": "Zulassung / Kfz-Steuer",
+    "c_compulsory": "Pflichtversicherung",
+    "c_inspection": "Fahrzeugprüfung",
+    "f_coverStarts": "Deckung ab",
+    "f_howPaid": "Wie wird bezahlt?",
+    "f_paidOnce": "Auf einmal",
+    "f_paidMonthly": "Monatlich",
+    "f_costMonthly": "Kosten pro Monat",
+    "f_spreadHint": "Wird mit {amount} pro Monat über {months} Monate in deinen Kosten gezählt.",
+    "f_monthlyHint": "{amount} kommen bis {date} jeden Monat zu deinen Kosten hinzu.",
+    "cs_monthly": "{amount} pro Monat"
   },
   "customerPage": {
     "back": "Kunden",

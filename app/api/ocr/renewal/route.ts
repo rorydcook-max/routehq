@@ -32,9 +32,9 @@ export async function POST(request: Request) {
 
     const raw = await readFileAsJson({
       system:
-        "You read Thai vehicle paperwork after a renewal: compulsory insurance (พ.ร.บ., Por Ror Bor) certificates, voluntary insurance policies (ประกันภัยรถยนต์ ชั้น 1/2/3), road tax receipts and tax discs (ป้ายภาษี / เครื่องหมายแสดงการเสียภาษี). " +
-        "Return JSON with: kind (porbor, insurance, tax, or null when it is none of these), expiry_date (when the cover or tax runs out, yyyy-mm-dd Gregorian; Thai documents often use the Buddhist year, subtract 543; null if not readable), " +
-        "cost (the total paid in baht including stamp duty and VAT, number, or null), provider (insurer or office name, or null), policy_number (or null), plate (number plate on it, or null), confidence (0 to 1). Never guess a date or number.",
+        "You read vehicle paperwork after a renewal, mostly from Southeast Asia: compulsory insurance (Thai พ.ร.บ. / Por Ror Bor, CTPL, SWDKLLJ, third-party), voluntary insurance policies (ประกันภัยรถยนต์ ชั้น 1/2/3, comprehensive), road tax or registration receipts and tax discs (ป้ายภาษี, LKM, STNK/PKB, LTO), and inspection certificates (ตรอ., PUSPAKOM, KIR, đăng kiểm, emission test). " +
+        "Return JSON with: kind (porbor for compulsory insurance, insurance, tax, inspection, or null when it is none of these), start_date (when the cover or period starts, yyyy-mm-dd Gregorian, or null), expiry_date (when the cover or tax runs out, yyyy-mm-dd Gregorian; Thai documents often use the Buddhist year, subtract 543; null if not readable), " +
+        "cost (the total paid including stamp duty and VAT, number, or null), provider (insurer or office name, or null), policy_number (or null), plate (number plate on it, or null), confidence (0 to 1). Never guess a date or number.",
       prompt: `Read this document.${expected ? ` It should be: ${expected}.` : ""}`,
       bytes: Buffer.from(await file.arrayBuffer()),
       mediaType: file.type || "image/jpeg",
@@ -43,7 +43,8 @@ export async function POST(request: Request) {
     });
     const cost = Number(raw.cost);
     return NextResponse.json({
-      kind: ["porbor", "insurance", "tax"].includes(String(raw.kind)) ? String(raw.kind) : null,
+      kind: ["porbor", "insurance", "tax", "inspection"].includes(String(raw.kind)) ? String(raw.kind) : null,
+      startDate: paperExpiry(raw.start_date),
       expiryDate: paperExpiry(raw.expiry_date),
       cost: Number.isFinite(cost) && cost > 0 && cost < 1_000_000 ? Math.round(cost * 100) / 100 : null,
       provider: typeof raw.provider === "string" ? raw.provider.slice(0, 80) : null,

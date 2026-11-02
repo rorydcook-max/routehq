@@ -1642,7 +1642,8 @@
     "recordCost": "Catat biaya",
     "recordIncome": "Catat uang masuk",
     "useThisPayment": "Gunakan pembayaran ini",
-    "allCategories": "Semua"
+    "allCategories": "Semua",
+    "shareOf": "Bagian {index} dari {count} · {amount} dibayar {date}"
   },
   "booking": {
     "open": "Buka",
@@ -3332,7 +3333,18 @@
     "hf_seats": "Kursi",
     "hf_engine": "Mesin",
     "hf_bought": "Dibeli seharga",
-    "hf_worth": "Nilai sekarang"
+    "hf_worth": "Nilai sekarang",
+    "c_registration": "Registrasi / pajak kendaraan",
+    "c_compulsory": "Asuransi wajib",
+    "c_inspection": "Uji kendaraan",
+    "f_coverStarts": "Mulai perlindungan",
+    "f_howPaid": "Bagaimana dibayar?",
+    "f_paidOnce": "Sekaligus",
+    "f_paidMonthly": "Setiap bulan",
+    "f_costMonthly": "Biaya per bulan",
+    "f_spreadHint": "Dihitung {amount} per bulan selama {months} bulan di biaya Anda.",
+    "f_monthlyHint": "{amount} ditambahkan ke biaya Anda setiap bulan sampai {date}.",
+    "cs_monthly": "{amount} per bulan"
   },
   "customerPage": {
     "back": "Pelanggan",

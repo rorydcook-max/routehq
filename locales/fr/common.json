@@ -1642,7 +1642,8 @@
     "recordCost": "Enregistrer une dépense",
     "recordIncome": "Enregistrer une entrée",
     "useThisPayment": "Utiliser ce paiement",
-    "allCategories": "Toutes"
+    "allCategories": "Toutes",
+    "shareOf": "Part {index} sur {count} · {amount} payé le {date}"
   },
   "booking": {
     "open": "Ouvert",
@@ -3332,7 +3333,18 @@
     "hf_seats": "Places",
     "hf_engine": "Moteur",
     "hf_bought": "Acheté pour",
-    "hf_worth": "Valeur actuelle"
+    "hf_worth": "Valeur actuelle",
+    "c_registration": "Immatriculation / taxe routière",
+    "c_compulsory": "Assurance obligatoire",
+    "c_inspection": "Contrôle technique",
+    "f_coverStarts": "Début de la couverture",
+    "f_howPaid": "Comment est-ce payé ?",
+    "f_paidOnce": "En une fois",
+    "f_paidMonthly": "Chaque mois",
+    "f_costMonthly": "Coût mensuel",
+    "f_spreadHint": "Compté {amount} par mois sur {months} mois dans vos dépenses.",
+    "f_monthlyHint": "{amount} ajoutés à vos dépenses chaque mois jusqu'au {date}.",
+    "cs_monthly": "{amount} par mois"
   },
   "customerPage": {
     "back": "Clients",

@@ -1642,7 +1642,8 @@
     "recordCost": "ကုန်ကျစရိတ် မှတ်ရန်",
     "recordIncome": "ငွေဝင် မှတ်ရန်",
     "useThisPayment": "ဒီငွေပေးချေမှုကို သုံးရန်",
-    "allCategories": "အားလုံး"
+    "allCategories": "အားလုံး",
+    "shareOf": "{count} ခုထဲမှ အပိုင်း {index} · {date} တွင် {amount} ပေးခဲ့"
   },
   "booking": {
     "open": "ဖွင့်ရန်",
@@ -3332,7 +3333,18 @@
     "hf_seats": "ထိုင်ခုံများ",
     "hf_engine": "အင်ဂျင်",
     "hf_bought": "ဝယ်ယူသည့်စျေးနှုန်း",
-    "hf_worth": "ယခုတန်ဖိုး"
+    "hf_worth": "ယခုတန်ဖိုး",
+    "c_registration": "မှတ်ပုံတင် / ယာဉ်အခွန်",
+    "c_compulsory": "မဖြစ်မနေ အာမခံ",
+    "c_inspection": "ယာဉ်စစ်ဆေးမှု",
+    "f_coverStarts": "အကာအကွယ် စတင်ရက်",
+    "f_howPaid": "ဘယ်လို ပေးချေသလဲ?",
+    "f_paidOnce": "တစ်ကြိမ်တည်း",
+    "f_paidMonthly": "လစဉ်",
+    "f_costMonthly": "တစ်လ ကုန်ကျစရိတ်",
+    "f_spreadHint": "{months} လကြာ တစ်လလျှင် {amount} အဖြစ် သင့်ကုန်ကျစရိတ်တွင် တွက်ပါမည်။",
+    "f_monthlyHint": "{date} အထိ လစဉ် {amount} ကို သင့်ကုန်ကျစရိတ်တွင် ထည့်ပါမည်။",
+    "cs_monthly": "တစ်လ {amount}"
   },
   "customerPage": {
     "back": "ဖောက်သည်များ",

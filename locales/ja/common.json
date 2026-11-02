@@ -1602,7 +1602,8 @@
     "recordCost": "費用を記録",
     "recordIncome": "入金を記録",
     "useThisPayment": "この支払いを使う",
-    "allCategories": "すべて"
+    "allCategories": "すべて",
+    "shareOf": "{count}回中{index}回目の按分 · {date}に{amount}支払い"
   },
   "booking": {
     "open": "開く",
@@ -3292,7 +3293,18 @@
     "hf_seats": "座席数",
     "hf_engine": "エンジン",
     "hf_bought": "購入価格",
-    "hf_worth": "現在の価値"
+    "hf_worth": "現在の価値",
+    "c_registration": "登録 / 自動車税",
+    "c_compulsory": "強制保険",
+    "c_inspection": "車両検査",
+    "f_coverStarts": "補償開始日",
+    "f_howPaid": "支払い方法は？",
+    "f_paidOnce": "一括",
+    "f_paidMonthly": "毎月",
+    "f_costMonthly": "月額",
+    "f_spreadHint": "{months}か月にわたり月{amount}として費用に計上されます。",
+    "f_monthlyHint": "{date}まで毎月{amount}が費用に加算されます。",
+    "cs_monthly": "月{amount}"
   },
   "customerPage": {
     "back": "お客様",

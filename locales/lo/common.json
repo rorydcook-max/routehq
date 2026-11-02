@@ -1602,7 +1602,8 @@
     "recordCost": "ບັນທຶກຄ່າໃຊ້ຈ່າຍ",
     "recordIncome": "ບັນທຶກເງິນເຂົ້າ",
     "useThisPayment": "ໃຊ້ການຊຳລະເງິນນີ້",
-    "allCategories": "ທັງໝົດ"
+    "allCategories": "ທັງໝົດ",
+    "shareOf": "ສ່ວນທີ {index} ຈາກ {count} · ຈ່າຍ {amount} ວັນທີ {date}"
   },
   "booking": {
     "open": "ເປີດ",
@@ -3292,7 +3293,18 @@
     "hf_seats": "ທີ່ນັ່ງ",
     "hf_engine": "ເຄື່ອງຈັກ",
     "hf_bought": "ຊື້ໃນລາຄາ",
-    "hf_worth": "ມູນຄ່າປະຈຸບັນ"
+    "hf_worth": "ມູນຄ່າປະຈຸບັນ",
+    "c_registration": "ທະບຽນ / ພາສີລົດ",
+    "c_compulsory": "ປະກັນໄພພາກບັງຄັບ",
+    "c_inspection": "ກວດກາສະພາບລົດ",
+    "f_coverStarts": "ເລີ່ມຄຸ້ມຄອງ",
+    "f_howPaid": "ຈ່າຍແບບໃດ?",
+    "f_paidOnce": "ຈ່າຍເທື່ອດຽວ",
+    "f_paidMonthly": "ທຸກເດືອນ",
+    "f_costMonthly": "ຄ່າໃຊ້ຈ່າຍຕໍ່ເດືອນ",
+    "f_spreadHint": "ນັບເປັນ {amount} ຕໍ່ເດືອນ ຕະຫຼອດ {months} ເດືອນ ໃນຄ່າໃຊ້ຈ່າຍຂອງທ່ານ.",
+    "f_monthlyHint": "ເພີ່ມ {amount} ໃນຄ່າໃຊ້ຈ່າຍທຸກເດືອນ ຈົນຮອດ {date}.",
+    "cs_monthly": "{amount} ຕໍ່ເດືອນ"
   },
   "customerPage": {
     "back": "ລູກຄ້າ",

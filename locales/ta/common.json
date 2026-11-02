@@ -1602,7 +1602,8 @@
     "recordCost": "செலவைப் பதிவுசெய்",
     "recordIncome": "வரவைப் பதிவுசெய்",
     "useThisPayment": "இந்தக் கட்டணத்தைப் பயன்படுத்து",
-    "allCategories": "அனைத்தும்"
+    "allCategories": "அனைத்தும்",
+    "shareOf": "{count} இல் பங்கு {index} · {date} அன்று {amount} செலுத்தப்பட்டது"
   },
   "booking": {
     "open": "திறந்துள்ளது",
@@ -3292,7 +3293,18 @@
     "hf_seats": "இருக்கைகள்",
     "hf_engine": "எஞ்சின்",
     "hf_bought": "வாங்கிய விலை",
-    "hf_worth": "தற்போதைய மதிப்பு"
+    "hf_worth": "தற்போதைய மதிப்பு",
+    "c_registration": "பதிவு / சாலை வரி",
+    "c_compulsory": "கட்டாய காப்பீடு",
+    "c_inspection": "வாகன ஆய்வு",
+    "f_coverStarts": "காப்பு தொடக்கம்",
+    "f_howPaid": "எப்படி செலுத்தப்படுகிறது?",
+    "f_paidOnce": "ஒரே தடவையில்",
+    "f_paidMonthly": "ஒவ்வொரு மாதமும்",
+    "f_costMonthly": "மாதச் செலவு",
+    "f_spreadHint": "{months} மாதங்களுக்கு மாதம் {amount} என உங்கள் செலவுகளில் கணக்கிடப்படும்.",
+    "f_monthlyHint": "{date} வரை ஒவ்வொரு மாதமும் {amount} உங்கள் செலவுகளில் சேர்க்கப்படும்.",
+    "cs_monthly": "மாதம் {amount}"
   },
   "customerPage": {
     "back": "வாடிக்கையாளர்கள்",

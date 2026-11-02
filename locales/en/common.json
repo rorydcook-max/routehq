@@ -1602,7 +1602,8 @@
     "useThisPayment": "Use this payment",
     "recordIncome": "Record money in",
     "recordCost": "Record a cost",
-    "allCategories": "All"
+    "allCategories": "All",
+    "shareOf": "Share {index} of {count} · {amount} paid {date}"
   },
   "booking": {
     "open": "Open",
@@ -3292,7 +3293,18 @@
     "hf_seats": "Seats",
     "hf_engine": "Engine",
     "hf_bought": "Bought for",
-    "hf_worth": "Worth now"
+    "hf_worth": "Worth now",
+    "c_registration": "Registration / road tax",
+    "c_compulsory": "Compulsory insurance",
+    "c_inspection": "Vehicle inspection",
+    "f_coverStarts": "Cover starts",
+    "f_howPaid": "How is it paid?",
+    "f_paidOnce": "All at once",
+    "f_paidMonthly": "Every month",
+    "f_costMonthly": "Cost per month",
+    "f_spreadHint": "Counted as {amount} a month over {months} months in your costs.",
+    "f_monthlyHint": "{amount} added to your costs every month until {date}.",
+    "cs_monthly": "{amount} a month"
   },
   "customerPage": {
     "back": "Customers",

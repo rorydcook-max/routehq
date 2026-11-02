@@ -1602,7 +1602,8 @@
     "recordCost": "Registrar um custo",
     "recordIncome": "Registrar entrada de dinheiro",
     "useThisPayment": "Usar este pagamento",
-    "allCategories": "Todas"
+    "allCategories": "Todas",
+    "shareOf": "Parte {index} de {count} · {amount} pago em {date}"
   },
   "booking": {
     "open": "Abrir",
@@ -3292,7 +3293,18 @@
     "hf_seats": "Assentos",
     "hf_engine": "Motor",
     "hf_bought": "Comprado por",
-    "hf_worth": "Valor atual"
+    "hf_worth": "Valor atual",
+    "c_registration": "Licenciamento / IPVA",
+    "c_compulsory": "Seguro obrigatório",
+    "c_inspection": "Vistoria do veículo",
+    "f_coverStarts": "Início da cobertura",
+    "f_howPaid": "Como é pago?",
+    "f_paidOnce": "De uma vez",
+    "f_paidMonthly": "Todo mês",
+    "f_costMonthly": "Custo por mês",
+    "f_spreadHint": "Contado como {amount} por mês durante {months} meses nos seus custos.",
+    "f_monthlyHint": "{amount} somados aos seus custos todo mês até {date}.",
+    "cs_monthly": "{amount} por mês"
   },
   "customerPage": {
     "back": "Clientes",

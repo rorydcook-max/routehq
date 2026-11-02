@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loadFleetFigures } from "@/lib/fleet-metrics";
 import { getTaskList, type TaskListItem } from "@/lib/tasks";
 import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
+import { withShares } from "@/lib/cost-spread";
 
 /** The rental that matters now: the one the car is out on, else the soonest booking. */
 export function rentalHappeningNow<T extends { status?: string | null; start_date?: string | null }>(rentals: T[] | null | undefined): T | null {
@@ -23,6 +24,9 @@ export type VehicleDetailDocument = {
 };
 
 export type VehicleDetail = {
+  /** The business's country and currency, set by the page: which paperwork applies, and money shown in it. */
+  country?: string;
+  currency?: string;
   vehicle: any;
   category: { id: string; code: string; name: string } | null;
   activeRental: any | null;
@@ -164,7 +168,8 @@ function calculateFinancials(vehicle: any, transactions: any[]) {
     estimatedValue,
     depreciation,
     roi: purchasePrice > 0 ? (lifetimeProfit / purchasePrice) * 100 : 0,
-    monthlyChart: buildMonthlyChart(transactions)
+    // A year's insurance or tax shows as a share in each month it covers, not all in the month it was paid.
+    monthlyChart: buildMonthlyChart(withShares(transactions))
   };
 }
 

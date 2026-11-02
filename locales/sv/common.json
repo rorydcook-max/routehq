@@ -1602,7 +1602,8 @@
     "recordCost": "Registrera en kostnad",
     "recordIncome": "Registrera inbetalning",
     "useThisPayment": "Använd den här betalningen",
-    "allCategories": "Alla"
+    "allCategories": "Alla",
+    "shareOf": "Del {index} av {count} · {amount} betalt {date}"
   },
   "booking": {
     "open": "Öppen",
@@ -3292,7 +3293,18 @@
     "hf_seats": "Säten",
     "hf_engine": "Motor",
     "hf_bought": "Köpt för",
-    "hf_worth": "Värde nu"
+    "hf_worth": "Värde nu",
+    "c_registration": "Registrering / fordonsskatt",
+    "c_compulsory": "Obligatorisk försäkring",
+    "c_inspection": "Besiktning",
+    "f_coverStarts": "Gäller från",
+    "f_howPaid": "Hur betalas det?",
+    "f_paidOnce": "Allt på en gång",
+    "f_paidMonthly": "Varje månad",
+    "f_costMonthly": "Kostnad per månad",
+    "f_spreadHint": "Räknas som {amount} i månaden under {months} månader i dina kostnader.",
+    "f_monthlyHint": "{amount} läggs till dina kostnader varje månad till {date}.",
+    "cs_monthly": "{amount} i månaden"
   },
   "customerPage": {
     "back": "Kunder",

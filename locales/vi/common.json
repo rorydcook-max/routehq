@@ -1642,7 +1642,8 @@
     "recordCost": "Ghi một khoản chi",
     "recordIncome": "Ghi tiền vào",
     "useThisPayment": "Dùng khoản thanh toán này",
-    "allCategories": "Tất cả"
+    "allCategories": "Tất cả",
+    "shareOf": "Phần {index}/{count} · đã trả {amount} ngày {date}"
   },
   "booking": {
     "open": "Mở",
@@ -3332,7 +3333,18 @@
     "hf_seats": "Chỗ ngồi",
     "hf_engine": "Động cơ",
     "hf_bought": "Giá mua",
-    "hf_worth": "Giá trị hiện tại"
+    "hf_worth": "Giá trị hiện tại",
+    "c_registration": "Đăng ký / phí đường bộ",
+    "c_compulsory": "Bảo hiểm bắt buộc",
+    "c_inspection": "Đăng kiểm xe",
+    "f_coverStarts": "Bắt đầu bảo hiểm",
+    "f_howPaid": "Thanh toán thế nào?",
+    "f_paidOnce": "Một lần",
+    "f_paidMonthly": "Hằng tháng",
+    "f_costMonthly": "Chi phí mỗi tháng",
+    "f_spreadHint": "Tính {amount} mỗi tháng trong {months} tháng vào chi phí của bạn.",
+    "f_monthlyHint": "Cộng {amount} vào chi phí mỗi tháng đến {date}.",
+    "cs_monthly": "{amount} mỗi tháng"
   },
   "customerPage": {
     "back": "Khách hàng",

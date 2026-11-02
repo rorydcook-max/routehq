@@ -8,6 +8,7 @@ import { alertLateReturns } from "@/lib/late-returns";
 import { syncAllVehicleStatuses } from "@/lib/vehicle-status";
 import { refreshAllRenters } from "@/lib/renters";
 import { sendTrialNudges } from "@/lib/trial-nudges";
+import { postDueComplianceInstalments } from "@/lib/compliance-billing";
 
 // Business-time dates: a UTC date would flag rent as overdue a day early for runs before 07:00 in Thailand.
 const dateOnly = (offsetDays = 0) => businessToday(offsetDays);
@@ -41,6 +42,8 @@ export async function GET(req: NextRequest) {
   await refreshAllRenters(supabase).catch(() => 0);
   // New businesses that stalled in their first week: one nudge towards their next step on day 1, 3 and 7.
   const trialNudges = await sendTrialNudges(supabase).catch(() => 0);
+  // Insurance or tax paid every month: this month's instalment is added as a cost on its day, until the cover runs out.
+  const complianceInstalments = await postDueComplianceInstalments(supabase).catch(() => 0);
 
   const scheduledResult = await supabase
     .from("rental_payments")
@@ -123,6 +126,7 @@ export async function GET(req: NextRequest) {
     holdsReleased,
     lateReturnAlerts,
     customerReminders,
-    trialNudges
+    trialNudges,
+    complianceInstalments
   });
 }

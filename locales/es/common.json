@@ -1602,7 +1602,8 @@
     "recordCost": "Registrar un gasto",
     "recordIncome": "Registrar entrada de dinero",
     "useThisPayment": "Usar este pago",
-    "allCategories": "Todas"
+    "allCategories": "Todas",
+    "shareOf": "Parte {index} de {count} · {amount} pagado el {date}"
   },
   "booking": {
     "open": "Abierto",
@@ -3292,7 +3293,18 @@
     "hf_seats": "Asientos",
     "hf_engine": "Motor",
     "hf_bought": "Comprado por",
-    "hf_worth": "Valor actual"
+    "hf_worth": "Valor actual",
+    "c_registration": "Matrícula / impuesto de circulación",
+    "c_compulsory": "Seguro obligatorio",
+    "c_inspection": "Inspección del vehículo",
+    "f_coverStarts": "Inicio de la cobertura",
+    "f_howPaid": "¿Cómo se paga?",
+    "f_paidOnce": "De una vez",
+    "f_paidMonthly": "Cada mes",
+    "f_costMonthly": "Coste mensual",
+    "f_spreadHint": "Se cuenta como {amount} al mes durante {months} meses en tus gastos.",
+    "f_monthlyHint": "Se suman {amount} a tus gastos cada mes hasta el {date}.",
+    "cs_monthly": "{amount} al mes"
   },
   "customerPage": {
     "back": "Clientes",

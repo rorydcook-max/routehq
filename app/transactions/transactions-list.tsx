@@ -23,6 +23,10 @@ function useTx(): Tx {
 import { bulkDeleteTransactions, deleteTransaction, updateTransaction } from "@/app/actions/transactions";
 import { isIncomeTransactionType, TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import type { TransactionListItem } from "@/lib/transactions";
+import { withShares } from "@/lib/cost-spread";
+
+/** The real entry behind a row: a month's share of a yearly payment is edited and deleted as that payment. */
+const baseId = (transaction: TransactionListItem) => transaction.shareOf?.id || transaction.id;
 
 type VehicleOption = { id: string; label: string };
 type TransactionKind = "income" | "refund" | "expense" | "deposit_received" | "deposit_refunded";
@@ -269,11 +273,18 @@ export function TransactionsList({
   const range = useMemo(() => periodRange(mode, anchor, custom), [mode, anchor, custom]);
   const isCurrentPeriod = mode !== "custom" && range.from <= today && today <= range.to;
 
+  // By month, year or a chosen stretch, a payment for a year of insurance or tax counts its share in each month it
+  // covers (1/12 a month for a yearly one); by day or week the real payments show (Rory, 2 Nov 2026).
+  const shown = useMemo(
+    () => (mode === "day" || mode === "week" ? transactions : (withShares(transactions, { date: "transactionDate" }) as TransactionListItem[])),
+    [mode, transactions]
+  );
+
   // The kinds of entry in this period, for the category filter (Rory, 2 Nov 2026), in alphabetical order with counts.
   const periodTypes = useMemo(() => {
     const counts = new Map<string, { label: string; count: number }>();
-    for (const transaction of transactions) {
-      if (hiddenIds.has(transaction.id)) continue;
+    for (const transaction of shown) {
+      if (hiddenIds.has(baseId(transaction))) continue;
       const day = inputDate(transaction.transactionDate);
       if (day < range.from || day > range.to) continue;
       const entry = counts.get(transaction.type) || { label: tx.typeName(transaction.type, transaction.typeLabel), count: 0 };
@@ -283,12 +294,12 @@ export function TransactionsList({
     return Array.from(counts.entries())
       .map(([type, entry]) => ({ type, ...entry }))
       .sort((a, b) => a.label.localeCompare(b.label, tx.locale));
-  }, [hiddenIds, range, transactions, tx]);
+  }, [hiddenIds, range, shown, tx]);
 
   const inPeriod = useMemo(() => {
     const needle = search.toLowerCase().trim();
-    return transactions.filter((transaction) => {
-      if (hiddenIds.has(transaction.id)) return false;
+    return shown.filter((transaction) => {
+      if (hiddenIds.has(baseId(transaction))) return false;
       const day = inputDate(transaction.transactionDate);
       if (day < range.from || day > range.to) return false;
       if (categories.size && !categories.has(transaction.type)) return false;
@@ -299,7 +310,7 @@ export function TransactionsList({
         .toLowerCase()
         .includes(needle);
     });
-  }, [hiddenIds, range, search, transactions, categories]);
+  }, [hiddenIds, range, search, shown, categories]);
 
   const { income, refunds, expenses, deposits } = useMemo(() => {
     const byDateDesc = (a: TransactionListItem, b: TransactionListItem) => String(b.transactionDate).localeCompare(String(a.transactionDate));
@@ -423,8 +434,14 @@ export function TransactionsList({
   function renderRow(transaction: TransactionListItem) {
     const kind = transactionKind(transaction);
     const amount = amountPresentation(transaction);
-    const deleting = deletingIds.has(transaction.id);
-    const selected = selectedIds.has(transaction.id);
+    const realId = baseId(transaction);
+    const deleting = deletingIds.has(realId);
+    const selected = selectedIds.has(realId);
+    // A month's share of a yearly payment says what was paid and when; opening it edits that payment.
+    const share = transaction.shareOf;
+    const shareLine = share
+      ? tx.say("shareOf", { amount: money(share.amount, transaction.currency), date: dayHeading(share.date, today, tx), index: share.index + 1, count: share.count })
+      : "";
     // One line under the title. Money in: who and which vehicle. Money out: the vehicle and what it was for; the plate stays on the vehicle page.
     const vehicleName = transaction.vehicleId ? transaction.vehicleName || transaction.vehicleLabel : tx.say("businessCost");
     // A refund or a cost billed to a customer is about a booking: who, and what for, come first.
@@ -441,14 +458,14 @@ export function TransactionsList({
               aria-label={tx.say("selectAria", { name: tx.typeName(transaction.type, transaction.typeLabel) })}
               checked={selected}
               className="flex-shrink-0"
-              onChange={() => toggleSelected(transaction.id)}
+              onChange={() => toggleSelected(realId)}
               type="checkbox"
             />
           ) : null}
           <div
             className="min-w-0 flex-1 cursor-pointer"
             onClick={() => {
-              if (selecting) return toggleSelected(transaction.id);
+              if (selecting) return toggleSelected(realId);
               setEditingId(editingId === transaction.id ? null : transaction.id);
               setConfirmDeleteId(null);
             }}
@@ -477,6 +494,7 @@ export function TransactionsList({
               </p>
             ) : null}
             {note ? <p className="mt-0.5 line-clamp-2 text-[14px] font-medium text-[var(--muted)]">{note}</p> : null}
+            {shareLine ? <p className="mt-0.5 text-[14px] font-medium text-[var(--muted)]">{shareLine}</p> : null}
           </div>
           <p className={`flex-shrink-0 text-[17px] font-semibold tabular-nums ${amount.className}`}>
             {amount.prefix}
@@ -491,7 +509,7 @@ export function TransactionsList({
               setEditingId(null);
               showToast(message);
             }}
-            transaction={transaction}
+            transaction={share ? share.original : transaction}
             vehicles={vehicles}
           />
         ) : null}
@@ -499,7 +517,7 @@ export function TransactionsList({
         {editingId === transaction.id && confirmDeleteId !== transaction.id ? (
           <button
             className="pressable mt-2 inline-flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-3 font-bold text-[var(--danger)]"
-            onClick={() => handleDelete(transaction.id)}
+            onClick={() => handleDelete(realId)}
             type="button"
           >
             <Trash2 size={16} />
@@ -518,7 +536,7 @@ export function TransactionsList({
               <button
                 className="pressable min-h-10 whitespace-nowrap rounded-full bg-[var(--danger)] px-4 text-sm font-bold text-white"
                 disabled={isPending}
-                onClick={() => handleDelete(transaction.id)}
+                onClick={() => handleDelete(realId)}
                 type="button"
               >
                 {tx.say("delete")}

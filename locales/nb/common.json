@@ -1602,7 +1602,8 @@
     "recordCost": "Registrer en kostnad",
     "recordIncome": "Registrer innbetaling",
     "useThisPayment": "Bruk denne betalingen",
-    "allCategories": "Alle"
+    "allCategories": "Alle",
+    "shareOf": "Andel {index} av {count} · {amount} betalt {date}"
   },
   "booking": {
     "open": "Åpen",
@@ -3292,7 +3293,18 @@
     "hf_seats": "Seter",
     "hf_engine": "Motor",
     "hf_bought": "Kjøpt for",
-    "hf_worth": "Verdi nå"
+    "hf_worth": "Verdi nå",
+    "c_registration": "Registrering / veiavgift",
+    "c_compulsory": "Lovpålagt forsikring",
+    "c_inspection": "EU-kontroll",
+    "f_coverStarts": "Dekning fra",
+    "f_howPaid": "Hvordan betales det?",
+    "f_paidOnce": "Alt på én gang",
+    "f_paidMonthly": "Hver måned",
+    "f_costMonthly": "Kostnad per måned",
+    "f_spreadHint": "Regnes som {amount} i måneden over {months} måneder i kostnadene dine.",
+    "f_monthlyHint": "{amount} legges til kostnadene dine hver måned frem til {date}.",
+    "cs_monthly": "{amount} i måneden"
   },
   "customerPage": {
     "back": "Kunder",

@@ -1642,7 +1642,8 @@
     "recordCost": "Rekod kos",
     "recordIncome": "Rekod wang masuk",
     "useThisPayment": "Guna bayaran ini",
-    "allCategories": "Semua"
+    "allCategories": "Semua",
+    "shareOf": "Bahagian {index} daripada {count} · {amount} dibayar {date}"
   },
   "booking": {
     "open": "Buka",
@@ -3332,7 +3333,18 @@
     "hf_seats": "Tempat duduk",
     "hf_engine": "Enjin",
     "hf_bought": "Dibeli pada",
-    "hf_worth": "Nilai sekarang"
+    "hf_worth": "Nilai sekarang",
+    "c_registration": "Pendaftaran / cukai jalan",
+    "c_compulsory": "Insurans wajib",
+    "c_inspection": "Pemeriksaan kenderaan",
+    "f_coverStarts": "Perlindungan bermula",
+    "f_howPaid": "Bagaimana dibayar?",
+    "f_paidOnce": "Sekali gus",
+    "f_paidMonthly": "Setiap bulan",
+    "f_costMonthly": "Kos sebulan",
+    "f_spreadHint": "Dikira {amount} sebulan selama {months} bulan dalam kos anda.",
+    "f_monthlyHint": "{amount} ditambah ke kos anda setiap bulan hingga {date}.",
+    "cs_monthly": "{amount} sebulan"
   },
   "customerPage": {
     "back": "Pelanggan",

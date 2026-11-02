@@ -1637,7 +1637,8 @@
     "recordCost": "บันทึกค่าใช้จ่าย",
     "recordIncome": "บันทึกเงินเข้า",
     "useThisPayment": "ใช้การชำระเงินนี้",
-    "allCategories": "ทั้งหมด"
+    "allCategories": "ทั้งหมด",
+    "shareOf": "ส่วนที่ {index} จาก {count} · จ่าย {amount} เมื่อ {date}"
   },
   "booking": {
     "open": "ไม่กำหนด",
@@ -3327,7 +3328,18 @@
     "hf_seats": "ที่นั่ง",
     "hf_engine": "เครื่องยนต์",
     "hf_bought": "ซื้อมาในราคา",
-    "hf_worth": "มูลค่าปัจจุบัน"
+    "hf_worth": "มูลค่าปัจจุบัน",
+    "c_registration": "ทะเบียน / ภาษีรถ",
+    "c_compulsory": "ประกันภัยภาคบังคับ",
+    "c_inspection": "ตรวจสภาพรถ",
+    "f_coverStarts": "เริ่มคุ้มครอง",
+    "f_howPaid": "จ่ายแบบไหน?",
+    "f_paidOnce": "จ่ายครั้งเดียว",
+    "f_paidMonthly": "จ่ายรายเดือน",
+    "f_costMonthly": "ค่าใช้จ่ายต่อเดือน",
+    "f_spreadHint": "นับเป็นค่าใช้จ่าย {amount} ต่อเดือน ตลอด {months} เดือน",
+    "f_monthlyHint": "เพิ่ม {amount} ในค่าใช้จ่ายทุกเดือน จนถึง {date}",
+    "cs_monthly": "{amount} ต่อเดือน"
   },
   "customerPage": {
     "back": "ลูกค้า",

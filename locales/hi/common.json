@@ -1602,7 +1602,8 @@
     "recordCost": "खर्च दर्ज करें",
     "recordIncome": "आने वाला पैसा दर्ज करें",
     "useThisPayment": "यह भुगतान इस्तेमाल करें",
-    "allCategories": "सभी"
+    "allCategories": "सभी",
+    "shareOf": "{count} में से हिस्सा {index} · {amount} {date} को चुकाया"
   },
   "booking": {
     "open": "खोलें",
@@ -3292,7 +3293,18 @@
     "hf_seats": "सीटें",
     "hf_engine": "इंजन",
     "hf_bought": "खरीदा गया मूल्य",
-    "hf_worth": "अभी का मूल्य"
+    "hf_worth": "अभी का मूल्य",
+    "c_registration": "पंजीकरण / रोड टैक्स",
+    "c_compulsory": "अनिवार्य बीमा",
+    "c_inspection": "वाहन जांच",
+    "f_coverStarts": "कवर शुरू",
+    "f_howPaid": "भुगतान कैसे होता है?",
+    "f_paidOnce": "एक बार में",
+    "f_paidMonthly": "हर महीने",
+    "f_costMonthly": "प्रति माह लागत",
+    "f_spreadHint": "आपकी लागत में {months} महीनों तक {amount} प्रति माह गिना जाएगा।",
+    "f_monthlyHint": "{date} तक हर महीने आपकी लागत में {amount} जोड़े जाएंगे।",
+    "cs_monthly": "{amount} प्रति माह"
   },
   "customerPage": {
     "back": "ग्राहक",

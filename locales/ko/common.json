@@ -1602,7 +1602,8 @@
     "recordCost": "비용 기록",
     "recordIncome": "입금 기록",
     "useThisPayment": "이 결제 사용",
-    "allCategories": "전체"
+    "allCategories": "전체",
+    "shareOf": "{count}개 중 {index}번째 몫 · {date}에 {amount} 지불"
   },
   "booking": {
     "open": "열기",
@@ -3292,7 +3293,18 @@
     "hf_seats": "좌석",
     "hf_engine": "엔진",
     "hf_bought": "구입가",
-    "hf_worth": "현재 가치"
+    "hf_worth": "현재 가치",
+    "c_registration": "등록 / 자동차세",
+    "c_compulsory": "의무보험",
+    "c_inspection": "차량 검사",
+    "f_coverStarts": "보장 시작일",
+    "f_howPaid": "어떻게 내나요?",
+    "f_paidOnce": "한 번에",
+    "f_paidMonthly": "매달",
+    "f_costMonthly": "월 비용",
+    "f_spreadHint": "{months}개월 동안 매달 {amount}씩 비용으로 계산돼요.",
+    "f_monthlyHint": "{date}까지 매달 {amount}이 비용에 추가돼요.",
+    "cs_monthly": "월 {amount}"
   },
   "customerPage": {
     "back": "고객",

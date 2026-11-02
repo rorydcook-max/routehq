@@ -22,6 +22,7 @@ import { PageTabs, type PageTab } from "@/components/page-tabs";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
 import { RenewalForm, RenewalHelp } from "./renewal";
 import { partnerQuote } from "@/lib/insurance-partners";
+import { countryCode, paperApplies, paperField, paperworkFor } from "@/lib/country-paperwork";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
@@ -107,17 +108,37 @@ function getComplianceItems(detail: VehicleDetail, tx: Vx) {
   const lastCost = (type: string, field: string) =>
     compliance[`${field}_last_cost`] || finance[`${field}_last_cost`] || complianceEvents.find((event) => event.compliance_type === type)?.cost || null;
 
-  const items = [
-    { key: "tax", name: tx.say("c_tax"), date: compliance.tax_expiry_date, cost: lastCost("tax", "tax_expiry_date"), icon: ShieldCheck },
-    { key: "porbor", name: tx.say("c_porbor"), date: compliance.porbor_expiry_date, cost: lastCost("porbor", "porbor_expiry_date"), icon: ShieldCheck },
-    { key: "insurance", name: tx.say("c_insurance"), date: compliance.insurance_expiry_date, cost: lastCost("insurance", "insurance_expiry_date"), icon: ShieldCheck },
+  // The paperwork the business's country asks for (local names after the plain one), then upkeep.
+  const twoWheeler = isTwoWheeler(kindFromCategory(detail.category));
+  const age = vehicleAgeOf(vehicle);
+  const items: Array<{ key: string; name: string; date: any; cost: any; monthly?: boolean; paperwork?: boolean; icon: typeof ShieldCheck }> = paperworkFor(detail.country)
+    .filter((item) => paperApplies(item, age, twoWheeler, compliance[paperField(item.key)]))
+    .map((item) => {
+      const field = paperField(item.key);
+      return {
+        key: item.key,
+        name: item.local ? `${tx.say(item.nameKey)} (${item.local})` : tx.say(item.nameKey),
+        date: compliance[field],
+        cost: lastCost(item.key, field),
+        monthly: Boolean(compliance[`${field}_monthly`]),
+        paperwork: true,
+        icon: ShieldCheck
+      };
+    });
+  items.push(
     { key: "service", name: tx.say("c_service"), date: compliance.next_service_date, cost: lastCost("service", "next_service_date"), icon: Wrench },
     { key: "oil", name: tx.say("c_oil"), date: compliance.oil_change_due_date, cost: lastCost("oil", "oil_change_due_date"), icon: Fuel }
-  ];
+  );
   if (hasLoan(finance)) {
     items.push({ key: "finance", name: tx.say("c_finance"), date: loanFigures(finance).endDate || finance.end_date, cost: finance.monthly_payment || lastCost("finance", "end_date"), icon: Banknote });
   }
   return items;
+}
+
+/** Whole years since the vehicle was built (Thai Buddhist years accepted); null when the year isn't saved. */
+function vehicleAgeOf(vehicle: any) {
+  const builtYear = Number(vehicle.year || 0) > 2400 ? Number(vehicle.year) - 543 : Number(vehicle.year || 0);
+  return builtYear > 1950 ? Number(businessToday().slice(0, 4)) - builtYear : null;
 }
 
 function getSoonestCompliance(detail: VehicleDetail, tx: Vx) {
@@ -399,7 +420,9 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
   // For "how to renew": the vehicle's age decides online road tax or an inspection first; Por Ror Bor's date decides the order.
   const vehicle = detail.vehicle;
   const builtYear = Number(vehicle.year || 0) > 2400 ? Number(vehicle.year) - 543 : Number(vehicle.year || 0);
-  const vehicleAge = builtYear > 1950 ? Number(businessToday().slice(0, 4)) - builtYear : null;
+  const vehicleAge = vehicleAgeOf(vehicle);
+  // The renewal steps, DLT link and Por Ror Bor order are Thailand's.
+  const thai = countryCode(detail.country) === "TH" || !detail.country;
   const twoWheeler = isTwoWheeler(kindFromCategory(detail.category));
   const porborDaysLeft = daysUntil(vehicle.metadata?.compliance?.porbor_expiry_date);
   const specs = (vehicle.specifications || {}) as Record<string, unknown>;
@@ -434,16 +457,25 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
                     {item.date ? <span className={`font-bold ${toneText[state.tone]}`}>{state.label}</span> : null}
                   </div>
                   <p className="font-medium text-[var(--foreground-secondary)]">
-                    {item.date ? `${tx.say(state.tone === "red" && (daysUntil(item.date) ?? 0) < 0 ? "cs_ranOut" : "cs_runsOut", { date: formatDate(item.date, tx) })}${item.cost ? ` · ${tx.say("cs_lastCost", { amount: money(item.cost) })}` : ""}` : tx.say("cs_noDate")}
+                    {item.date ? `${tx.say(state.tone === "red" && (daysUntil(item.date) ?? 0) < 0 ? "cs_ranOut" : "cs_runsOut", { date: formatDate(item.date, tx) })}${item.cost ? ` · ${tx.say(item.monthly ? "cs_monthly" : "cs_lastCost", { amount: money(item.cost) })}` : ""}` : tx.say("cs_noDate")}
                   </p>
                 </div>
               </div>
-              {(item.key === "tax" || item.key === "porbor" || item.key === "insurance") && item.date && (daysUntil(item.date) ?? 999) <= 90 ? (
+              {thai && (item.key === "tax" || item.key === "porbor" || item.key === "insurance") && item.date && (daysUntil(item.date) ?? 999) <= 90 ? (
                 <RenewalHelp details={paperDetails} kind={item.key} partner={item.key === "tax" ? null : partners[item.key]} porborDaysLeft={porborDaysLeft} twoWheeler={twoWheeler} vehicleAge={vehicleAge} />
               ) : null}
               <details className="mt-2.5">
                 <summary className="cursor-pointer font-bold text-[var(--primary)]">{item.date ? tx.say("cs_renewed") : tx.say("cs_addDate")}</summary>
-                <RenewalForm complianceType={item.key} organizationId={organizationId} readable={item.key === "tax" || item.key === "porbor" || item.key === "insurance"} vehicleId={detail.vehicle.id} />
+                <RenewalForm
+                  complianceType={item.key}
+                  currency={detail.currency || "THB"}
+                  currentExpiry={item.date ? String(item.date).slice(0, 10) : null}
+                  organizationId={organizationId}
+                  paperwork={Boolean(item.paperwork)}
+                  readable={Boolean(item.paperwork)}
+                  today={businessToday()}
+                  vehicleId={detail.vehicle.id}
+                />
               </details>
             </div>
           );
@@ -1054,6 +1086,8 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
     );
   }
 
+  detail.country = String((organization as any).country_code || (organization as any).settings?.main_location?.country || "");
+  detail.currency = organization.currency || "THB";
   const { vehicle } = detail;
   const status = String(vehicle.status || "").toLowerCase();
   const statusTone = status === "rented" ? "blue" : status === "available" ? "green" : status === "reserved" || status === "maintenance" ? "amber" : "neutral";

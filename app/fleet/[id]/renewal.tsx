@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { MoneyInput } from "@/components/money-input";
 import { createPortal } from "react-dom";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { monthsCovered } from "@/lib/cost-spread";
 import { Camera, Check, Copy, ExternalLink, Loader2, ShieldCheck, X } from "lucide-react";
 import type { InsurancePartner } from "@/lib/insurance-partners";
 import { renewVehicleCompliance } from "@/app/actions/vehicles";
@@ -14,11 +15,53 @@ const inputClass = "mt-1 w-full";
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
 /** Renewed it: a photo of the new certificate, policy or tax receipt fills the date and cost in; the photo is kept. */
-export function RenewalForm({ vehicleId, organizationId, complianceType, readable }: { vehicleId: string; organizationId: string; complianceType: string; readable: boolean }) {
+export function RenewalForm({
+  vehicleId,
+  organizationId,
+  complianceType,
+  readable,
+  paperwork = false,
+  currentExpiry = null,
+  today = "",
+  currency = "THB"
+}: {
+  vehicleId: string;
+  organizationId: string;
+  complianceType: string;
+  readable: boolean;
+  /** Tax, insurance, inspection: a cost, paid once for the cover or every month. */
+  paperwork?: boolean;
+  /** The date saved now: a renewal's cover usually starts the day the old one runs out. */
+  currentExpiry?: string | null;
+  today?: string;
+  currency?: string;
+}) {
   const t = useTranslations("vehiclePage");
   const say = t as unknown as Say;
+  const locale = useLocale();
   const fileInput = useRef<HTMLInputElement>(null);
   const [expiry, setExpiry] = useState("");
+  // The old date when it is recent or still ahead (renewing on time), else today (catching up on a lapsed one).
+  const [coverStart, setCoverStart] = useState(() => {
+    const old = String(currentExpiry || "").slice(0, 10);
+    const recent = today ? new Date(Date.parse(`${today}T00:00:00Z`) - 60 * 86_400_000).toISOString().slice(0, 10) : "";
+    return old && old >= recent ? old : today;
+  });
+  const [mode, setMode] = useState<"once" | "monthly">("once");
+  const amountText = (value: number) => {
+    try {
+      return new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 }).format(value);
+    } catch {
+      return `${currency} ${Math.round(value).toLocaleString("en-US")}`;
+    }
+  };
+  const dateText = (day: string) => {
+    try {
+      return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
+    } catch {
+      return day;
+    }
+  };
   const [cost, setCost] = useState("");
   // Bumped when the photo fills the cost in, so the money box shows it.
   const [costStamp, setCostStamp] = useState(0);
@@ -41,6 +84,7 @@ export function RenewalForm({ vehicleId, organizationId, complianceType, readabl
         return;
       }
       setExpiry(data.expiryDate);
+      if (paperwork && data.startDate && data.startDate < data.expiryDate) setCoverStart(data.startDate);
       if (data.cost) { setCost(String(data.cost)); setCostStamp((n) => n + 1); }
       if (!notes) setNotes([data.provider, data.policyNumber].filter(Boolean).join(" · "));
       setMessage({ tone: "ok", text: say("rn_readDone") });
@@ -77,13 +121,48 @@ export function RenewalForm({ vehicleId, organizationId, complianceType, readabl
         ) : null}
         {message ? <span className={`mt-1 block text-[14px] font-semibold ${message.tone === "ok" ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>{message.text}</span> : null}
       </label>
+      {paperwork ? (
+        <label className="block">
+          <span className={labelClass}>{say("f_coverStarts")}</span>
+          <input className={inputClass} name="coverStart" onChange={(event) => setCoverStart(event.target.value)} type="date" value={coverStart} />
+        </label>
+      ) : null}
       <label className="block">
         <span className={labelClass}>{say("f_runsOutOn")}</span>
         <input className={inputClass} name="newExpiryDate" onChange={(event) => setExpiry(event.target.value)} required type="date" value={expiry} />
       </label>
-      <label className="block">
-        <span className={labelClass}>{say("f_cost")}</span>
+      {paperwork ? (
+        <fieldset className="block sm:col-span-2">
+          <legend className={labelClass}>{say("f_howPaid")}</legend>
+          <input name="paymentMode" type="hidden" value={mode} />
+          <div className="mt-1 grid grid-cols-2 gap-2">
+            {(["once", "monthly"] as const).map((option) => (
+              <button
+                aria-pressed={mode === option}
+                className={`pressable min-h-11 rounded-xl border px-3 text-[15px] font-bold ${mode === option ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                key={option}
+                onClick={() => setMode(option)}
+                type="button"
+              >
+                {say(option === "once" ? "f_paidOnce" : "f_paidMonthly")}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
+      <label className={`block ${paperwork ? "sm:col-span-2" : ""}`}>
+        <span className={labelClass}>{say(paperwork && mode === "monthly" ? "f_costMonthly" : "f_cost")}</span>
         <MoneyInput defaultValue={cost} key={costStamp} name="cost" onValueChange={setCost} />
+        {(() => {
+          // What it adds to the costs each month, so the owner sees a yearly bill as 1/12 a month.
+          const amount = Number(String(cost).replace(/,/g, ""));
+          if (!paperwork || !(amount > 0) || !expiry) return null;
+          if (mode === "monthly") return <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{say("f_monthlyHint", { amount: amountText(amount), date: dateText(expiry) })}</span>;
+          const from = coverStart || today;
+          if (!from || expiry <= from) return null;
+          const months = monthsCovered({ from, to: expiry });
+          return months >= 2 ? <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{say("f_spreadHint", { amount: amountText(amount / months), months })}</span> : null;
+        })()}
       </label>
       <label className="block sm:col-span-2">
         <span className={labelClass}>{say("f_notes")}</span>

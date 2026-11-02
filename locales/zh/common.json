@@ -1642,7 +1642,8 @@
     "recordCost": "记录支出",
     "recordIncome": "记录收入",
     "useThisPayment": "使用此付款",
-    "allCategories": "全部"
+    "allCategories": "全部",
+    "shareOf": "第 {index}/{count} 份 · {date} 支付 {amount}"
   },
   "booking": {
     "open": "开放",
@@ -3332,7 +3333,18 @@
     "hf_seats": "座位数",
     "hf_engine": "发动机",
     "hf_bought": "购入价格",
-    "hf_worth": "当前价值"
+    "hf_worth": "当前价值",
+    "c_registration": "登记 / 车辆税",
+    "c_compulsory": "强制保险",
+    "c_inspection": "车辆年检",
+    "f_coverStarts": "保障开始",
+    "f_howPaid": "怎么付款？",
+    "f_paidOnce": "一次付清",
+    "f_paidMonthly": "每月",
+    "f_costMonthly": "每月费用",
+    "f_spreadHint": "在你的成本中按每月 {amount} 计算，共 {months} 个月。",
+    "f_monthlyHint": "到 {date} 为止，每月在成本中加入 {amount}。",
+    "cs_monthly": "每月 {amount}"
   },
   "customerPage": {
     "back": "客户",

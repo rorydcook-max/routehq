@@ -1642,7 +1642,8 @@
     "recordCost": "Записать расход",
     "recordIncome": "Записать приход",
     "useThisPayment": "Использовать этот платёж",
-    "allCategories": "Все"
+    "allCategories": "Все",
+    "shareOf": "Доля {index} из {count} · {amount} оплачено {date}"
   },
   "booking": {
     "open": "Открыть",
@@ -3332,7 +3333,18 @@
     "hf_seats": "Места",
     "hf_engine": "Двигатель",
     "hf_bought": "Куплено за",
-    "hf_worth": "Текущая стоимость"
+    "hf_worth": "Текущая стоимость",
+    "c_registration": "Регистрация / транспортный налог",
+    "c_compulsory": "Обязательная страховка",
+    "c_inspection": "Техосмотр",
+    "f_coverStarts": "Начало покрытия",
+    "f_howPaid": "Как оплачивается?",
+    "f_paidOnce": "Сразу",
+    "f_paidMonthly": "Каждый месяц",
+    "f_costMonthly": "В месяц",
+    "f_spreadHint": "Учитывается как {amount} в месяц в течение {months} мес. в ваших расходах.",
+    "f_monthlyHint": "{amount} добавляется к расходам каждый месяц до {date}.",
+    "cs_monthly": "{amount} в месяц"
   },
   "customerPage": {
     "back": "Клиенты",

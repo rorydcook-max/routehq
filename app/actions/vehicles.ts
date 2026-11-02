@@ -12,6 +12,9 @@ import { costTypeForService, recordService } from "@/lib/vehicle-service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loanFromForm } from "@/lib/vehicle-loan";
 import { removeStoredFiles } from "@/lib/supabase/remove-stored-files";
+import { paperCostType } from "@/lib/country-paperwork";
+import { monthsCovered } from "@/lib/cost-spread";
+import { postDueComplianceInstalments } from "@/lib/compliance-billing";
 
 function numberFromForm(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").replace(/,/g, "").trim();
@@ -203,6 +206,7 @@ const complianceFieldMap: Record<
   tax: { label: "Vehicle tax", section: "compliance", field: "tax_expiry_date" },
   porbor: { label: "Compulsory insurance", section: "compliance", field: "porbor_expiry_date" },
   insurance: { label: "Voluntary insurance", section: "compliance", field: "insurance_expiry_date" },
+  inspection: { label: "Vehicle inspection", section: "compliance", field: "inspection_expiry_date" },
   service: { label: "Service due", section: "compliance", field: "next_service_date" },
   oil: { label: "Oil change", section: "compliance", field: "oil_change_due_date" },
   finance: { label: "Finance end date", section: "finance", field: "end_date" }
@@ -831,8 +835,19 @@ export async function renewVehicleCompliance(formData: FormData) {
     [config.field]: newExpiryDate
   };
 
+  // Paperwork (tax, insurance, inspection) is a cost: paid once for the whole cover, or every month (Rory, 2 Nov 2026).
+  const isPaperwork = ["tax", "porbor", "insurance", "inspection"].includes(complianceType);
+  const today = businessToday();
+  const coverStartInput = optionalStringFromForm(formData, "coverStart");
+  const coverStart = isPaperwork && coverStartInput && coverStartInput < newExpiryDate ? coverStartInput : today;
+  const paidMonthly = isPaperwork && String(formData.get("paymentMode") || "") === "monthly" && cost !== null && cost > 0;
+  const { data: organization } = await supabase.from("organizations").select("country_code, currency").eq("id", organizationId).maybeSingle();
+  const currency = organization?.currency || "THB";
+  const costType = paperCostType(organization?.country_code, complianceType);
+
   if (cost !== null) {
     nextSection[`${config.field}_last_cost`] = cost;
+    nextSection[`${config.field}_monthly`] = paidMonthly || undefined;
   }
 
   const documentFile = formData.get("documentFile");
@@ -847,28 +862,13 @@ export async function renewVehicleCompliance(formData: FormData) {
       })
     : null;
 
-  const { error: updateError } = await supabase
-    .from("vehicles")
-    .update({
-      metadata: {
-        ...metadata,
-        [config.section]: nextSection
-      }
-    })
-    .eq("id", vehicleId)
-    .eq("organization_id", organizationId);
-
-  if (updateError) {
-    throw new Error(updateError.message);
-  }
-
   const { data: complianceEvent, error: complianceError } = await supabase
     .from("compliance_events")
     .insert({
       organization_id: organizationId,
       vehicle_id: vehicleId,
       compliance_type: complianceType,
-      effective_date: businessToday(),
+      effective_date: isPaperwork ? coverStart : today,
       expiry_date: newExpiryDate,
       cost,
       notes: [notes, documentId ? `Document: ${documentId}` : ""].filter(Boolean).join("\n") || null,
@@ -881,6 +881,51 @@ export async function renewVehicleCompliance(formData: FormData) {
     throw new Error(complianceError.message);
   }
 
+  // A monthly plan replaces any earlier one for the same paperwork; paying once ends it.
+  const plans = { ...(metadata.compliance_plans || {}) };
+  if (isPaperwork && cost !== null) delete plans[complianceType];
+  if (paidMonthly) {
+    plans[complianceType] = { amount: cost, currency, type: costType, start: coverStart, next: coverStart, until: newExpiryDate, eventId: complianceEvent.id };
+  }
+  const nextMetadata: Record<string, any> = { ...metadata, [config.section]: nextSection };
+  if (Object.keys(plans).length) nextMetadata.compliance_plans = plans;
+  else delete nextMetadata.compliance_plans;
+
+  const { error: updateError } = await supabase
+    .from("vehicles")
+    .update({ metadata: nextMetadata })
+    .eq("id", vehicleId)
+    .eq("organization_id", organizationId);
+
+  if (updateError) {
+    throw new Error(updateError.message);
+  }
+
+  if (isPaperwork && cost !== null && cost > 0) {
+    if (paidMonthly) {
+      // The instalments already due (the first, or several when entered late); the daily run adds the rest.
+      await postDueComplianceInstalments(supabase, { vehicleId, organizationId });
+    } else {
+      // Paid on the day the cover starts, or today when it starts later. Counted a share per month it covers.
+      const spread = monthsCovered({ from: coverStart, to: newExpiryDate }) >= 2 ? { from: coverStart, to: newExpiryDate } : undefined;
+      const { error: transactionError } = await supabase.from("transactions").insert({
+        organization_id: organizationId,
+        vehicle_id: vehicleId,
+        type: costType,
+        amount: cost,
+        currency,
+        transaction_date: coverStart < today ? coverStart : today,
+        notes: notes || null,
+        receipt_document_id: documentId,
+        metadata: { source: "compliance_renewal", compliance_type: complianceType, compliance_event_id: complianceEvent.id, ...(spread ? { spread } : {}) },
+        created_by: user.id
+      });
+      if (transactionError) {
+        throw new Error(transactionError.message);
+      }
+    }
+  }
+
   await recordActivityEvent(supabase, {
     organization_id: organizationId,
     actor_id: user.id,
@@ -889,11 +934,13 @@ export async function renewVehicleCompliance(formData: FormData) {
     vehicle_id: vehicleId,
     event_type: "compliance_renewed",
     title: `${config.label} renewed`,
-    detail: `New expiry date: ${newExpiryDate}${cost ? `, cost THB ${cost}` : ""}.`
+    detail: `New expiry date: ${newExpiryDate}${cost ? `, cost ${currency} ${cost}${paidMonthly ? " a month" : ""}` : ""}.`
   });
 
   revalidatePath("/");
   revalidatePath("/fleet");
+  revalidatePath("/transactions");
+  revalidatePath("/reports");
   revalidatePath(`/fleet/${vehicleId}`);
 }
 

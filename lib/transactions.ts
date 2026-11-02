@@ -52,6 +52,10 @@ export type TransactionListItem = {
   extrasRefund: boolean;
   /** The photo of the receipt, when one was added. */
   receiptDocumentId: string | null;
+  /** Paid once for a stretch (a year's insurance): counted a share per month it covers. */
+  spread?: { from: string; to: string } | null;
+  /** Set on a month's share of a spread payment (made by the list): the real entry it comes from. */
+  shareOf?: { id: string; amount: number; date: string; index: number; count: number; original: TransactionListItem };
 };
 
 export type TransactionFormOptions = {
@@ -110,7 +114,8 @@ export async function getTransactionList(organizationId: string): Promise<Transa
     voided: Boolean(row.voided || row.metadata?.voided),
     extrasAmount: Number(row.metadata?.extras_amount || 0),
     extrasRefund: row.metadata?.refund_of === "extras",
-    receiptDocumentId: row.receipt_document_id || null
+    receiptDocumentId: row.receipt_document_id || null,
+    spread: row.metadata?.spread || null
   }));
 }
 

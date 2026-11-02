@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRawDepositTransaction, isRefundTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 import { businessToday, businessNow } from "@/lib/business-time";
 import { isHandedOver } from "@/lib/rental-balances";
+import { inRangeWithShares } from "@/lib/cost-spread";
 
 export type DatePreset = "this_month" | "last_month" | "last_3_months" | "last_6_months" | "this_year" | "last_year" | "custom";
 
@@ -486,12 +487,11 @@ export async function getReportsData(
 
   const supabase = (await createSupabaseServerClient()) as any;
 
-  const [txResult, prevTxResult, vehiclesResult, rentalsResult, outstandingResult, depositsHeldResult] = await Promise.all([
+  const txColumns = "*, vehicles!transactions_vehicle_id_fkey(registration_number, make, model, purchase_price, estimated_value), customers!transactions_customer_id_fkey(full_name)";
+  const [txResult, prevTxResult, vehiclesResult, rentalsResult, outstandingResult, depositsHeldResult, spreadResult] = await Promise.all([
     supabase
       .from("transactions")
-      .select(
-        "*, vehicles!transactions_vehicle_id_fkey(registration_number, make, model, purchase_price, estimated_value), customers!transactions_customer_id_fkey(full_name)"
-      )
+      .select(txColumns)
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .gte("transaction_date", dateRange.from)
@@ -536,10 +536,23 @@ export async function getReportsData(
       // Held at any stage (booked, on rent, late, finished but not settled),
       // the same count as the dashboard. This used to look at "active" only.
       .eq("deposit_status", "received")
-      .gt("deposit_held", 0)
+      .gt("deposit_held", 0),
+
+    // Insurance or tax paid once for a stretch that covers part of this period or the one before, whenever it was paid.
+    supabase
+      .from("transactions")
+      .select(txColumns)
+      .eq("organization_id", organizationId)
+      .is("deleted_at", null)
+      .not("metadata->spread", "is", null)
+      .lte("metadata->spread->>from", dateRange.to)
+      .gte("metadata->spread->>to", prevPeriod.from < dateRange.from ? prevPeriod.from : dateRange.from)
   ]);
 
-  const transactions: any[] = txResult.data || [];
+  // A yearly payment counts its monthly share in each month it covers (Rory, 2 Nov 2026).
+  const spreadRows: any[] = spreadResult.data || [];
+  const transactions: any[] = inRangeWithShares(txResult.data || [], spreadRows, dateRange.from, dateRange.to);
+  prevTxResult.data = inRangeWithShares(prevTxResult.data || [], spreadRows, prevPeriod.from, prevPeriod.to);
   const prevTransactions: any[] = prevTxResult.data || [];
   const vehicles: any[] = vehiclesResult.data || [];
   const rentals: any[] = rentalsResult.data || [];
@@ -800,7 +813,7 @@ export async function getVehicleReportData(
   const dateRange = resolveDateRange(preset, resolvedFrom, resolvedTo);
   const supabase = (await createSupabaseServerClient()) as any;
 
-  const [vehicleResult, txResult, rentalsResult] = await Promise.all([
+  const [vehicleResult, txResult, rentalsResult, spreadResult] = await Promise.all([
     supabase
       .from("vehicles")
       .select("id, registration_number, make, model, year, daily_rate, purchase_price, estimated_value, status, color, metadata, vehicle_categories(code, name)")
@@ -827,11 +840,22 @@ export async function getVehicleReportData(
       .neq("status", "cancelled")
       .lte("start_date", dateRange.to)
       .or(`end_date.is.null,end_date.gte.${dateRange.from}`)
-      .order("start_date", { ascending: false })
+      .order("start_date", { ascending: false }),
+
+    supabase
+      .from("transactions")
+      .select("*")
+      .eq("organization_id", organizationId)
+      .eq("vehicle_id", vehicleId)
+      .is("deleted_at", null)
+      .not("metadata->spread", "is", null)
+      .lte("metadata->spread->>from", dateRange.to)
+      .gte("metadata->spread->>to", dateRange.from)
   ]);
 
   const vehicle = vehicleResult.data;
-  const transactions: any[] = txResult.data || [];
+  // A yearly payment counts its monthly share in each month it covers.
+  const transactions: any[] = inRangeWithShares(txResult.data || [], spreadResult.data || [], dateRange.from, dateRange.to);
   const rentals: any[] = rentalsResult.data || [];
 
   let totalRevenue = 0;

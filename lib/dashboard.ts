@@ -86,6 +86,16 @@ export async function getDashboardData(): Promise<DashboardData> {
   const organization = await getDefaultOrganization();
 
   const organizationId = organization.id;
+  // Overdue = unpaid payments whose due date has passed; asked for alongside everything else rather than after it.
+  const latePaymentsQuery = supabase
+    .from("rental_payments")
+    .select("rental_id, amount, due_date, status, metadata, voided, rentals!inner(status)")
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .in("status", ["scheduled", "pending", "overdue"])
+    .in("rentals.status", HANDED_OVER_STATUSES)
+    .lte("due_date", businessToday())
+    .then((result: any) => result);
   const [vehiclesResult, customersResult, rentalsResult, transactionsResult, remindersResult, eventsResult] = await Promise.all([
     supabase.from("vehicles").select("*").eq("organization_id", organizationId).is("deleted_at", null).order("created_at", { ascending: true }),
     supabase.from("customers").select("*").eq("organization_id", organizationId).is("deleted_at", null).order("created_at", { ascending: true }),
@@ -123,15 +133,8 @@ export async function getDashboardData(): Promise<DashboardData> {
 
   // Overdue = unpaid payments whose due date has passed. A rental's whole
   // remaining balance (future rent, an extension due next month) is not overdue.
-  const { data: latePayments } = await supabase
-    .from("rental_payments")
-    .select("rental_id, amount, due_date, status, metadata, voided, rentals!inner(status)")
-    .eq("organization_id", organizationId)
-    .is("deleted_at", null)
-    .in("status", ["scheduled", "pending", "overdue"])
-    // Nothing is owed on a booking that was never handed over.
-    .in("rentals.status", HANDED_OVER_STATUSES)
-    .lte("due_date", businessToday());
+  // Nothing is owed on a booking that was never handed over (the query above asks only for handed-over ones).
+  const { data: latePayments } = await latePaymentsQuery;
   const overdueByRental = new Map<string, { amount: number; since: string }>();
   // Due today is not late yet, but it is today's work: kept apart so the Today list can say so.
   const dueTodayByRental = new Map<string, number>();

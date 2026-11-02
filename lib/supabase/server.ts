@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import type { User } from "@supabase/supabase-js";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import type { Database } from "@/lib/supabase/database.types";
@@ -31,10 +32,21 @@ export async function createSupabaseServerClient() {
  * (the page itself, the business lookup, the role check); each one used to be
  * its own trip to the sign-in service.
  */
-export const getRequestUser = cache(async () => {
+export const getRequestUser = cache(async (): Promise<User | null> => {
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-  return user;
+  // Read from the signed sign-in token and checked against the service's published key, here, rather than a trip to
+  // the sign-in service on every page (Rory, 2 Nov 2026: pages felt slow). Same person, same details.
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims as Record<string, any> | undefined;
+  if (!claims?.sub) return null;
+  return {
+    id: String(claims.sub),
+    email: claims.email,
+    phone: claims.phone,
+    aud: claims.aud,
+    role: claims.role,
+    user_metadata: claims.user_metadata || {},
+    app_metadata: claims.app_metadata || {},
+    created_at: ""
+  } as unknown as User;
 });

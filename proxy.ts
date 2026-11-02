@@ -272,9 +272,10 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  // Checked on this server against the sign-in service's published key, not with a trip to it on every page and every
+  // link the app loads ahead (Rory, 2 Nov 2026: moving between pages felt slow). An expired session is still refreshed.
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const user = claimsData?.claims?.sub ? { id: String(claimsData.claims.sub) } : null;
 
   // Signed out at "/": the website (on rovehq.app, a visit to rovehq.io's home). Signed in: the dashboard, as always.
   if (!user && pathname === "/" && isAppHost(requestHost) && !isLocalUrl(siteOriginUrl)) {
@@ -314,6 +315,20 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // Passed every check below a moment ago (set up, paid up, which business, what role): trust that for a few minutes
+  // instead of asking the database twice more on every page and every link loaded ahead.
+  const activeOrgCookie = request.cookies.get(ACTIVE_ORGANIZATION_COOKIE)?.value || "";
+  const gateRole = user && !isOnboardingAllowedRoute ? await readGate(request.cookies.get(GATE_COOKIE)?.value, user.id, activeOrgCookie) : null;
+  if (user && gateRole) {
+    if (isOwnerOnlyPath(pathname) && gateRole !== "owner") {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/";
+      redirectUrl.search = "?notice=owner-only";
+      return NextResponse.redirect(redirectUrl);
+    }
+    return response;
+  }
+
   if (user && !isOnboardingAllowedRoute) {
     const { data: membership, closed } = await loadActiveMembership(
       supabase,
@@ -342,16 +357,7 @@ export async function proxy(request: NextRequest) {
     // enforce this too; this just keeps teammates off pages they cannot use.
     // A teammate runs the day: bookings, vehicles, customers, payments. How the business is doing (reports, what a
     // vehicle would earn) and bringing in a whole fleet from a file are the owner's.
-    const isOwnerOnlyRoute =
-      pathname === "/settings" ||
-      pathname.startsWith("/settings/") ||
-      pathname === "/invite" ||
-      pathname === "/reports" ||
-      pathname.startsWith("/reports/") ||
-      pathname === "/rental-calculator" ||
-      pathname === "/import" ||
-      pathname.startsWith("/fleet/import");
-    if (isOwnerOnlyRoute && membership.role !== "owner") {
+    if (isOwnerOnlyPath(pathname) && membership.role !== "owner") {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/";
       redirectUrl.search = "?notice=owner-only";
@@ -392,10 +398,73 @@ export async function proxy(request: NextRequest) {
           return NextResponse.redirect(new URL("/subscription-required", request.url));
         }
       }
+
+      // All clear: remembered for a few minutes (see readGate).
+      // Only when the payment checks actually ran (pages like the subscription screen skip them).
+      if (organization && membership.role && !isSubscriptionAllowedRoute) {
+        response.cookies.set(GATE_COOKIE, await writeGate(user.id, activeOrgCookie, String(membership.role)), {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: request.nextUrl.protocol === "https:",
+          path: "/",
+          maxAge: GATE_SECONDS
+        });
+      }
     }
   }
 
   return response;
+}
+
+// ── The few-minutes pass (Rory, 2 Nov 2026: pages felt slow) ───────────────────────────────────────────────────
+// A signed note of who passed the checks, for which business and with what role. Signed with a server-only secret,
+// so it can't be made up or edited; tied to the person and the business chosen, so signing out or switching business ends it.
+const GATE_COOKIE = "rhq_gate";
+const GATE_SECONDS = 300;
+
+/** Settings, the team, reports and bringing in a fleet from a file are the owner's. */
+function isOwnerOnlyPath(pathname: string) {
+  return (
+    pathname === "/settings" ||
+    pathname.startsWith("/settings/") ||
+    pathname === "/invite" ||
+    pathname === "/reports" ||
+    pathname.startsWith("/reports/") ||
+    pathname === "/rental-calculator" ||
+    pathname === "/import" ||
+    pathname.startsWith("/fleet/import")
+  );
+}
+
+async function gateSignature(payload: string) {
+  const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+  if (!secret) return "";
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const signed = new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload)));
+  return Array.from(signed, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function writeGate(userId: string, organizationCookie: string, role: string) {
+  const payload = [userId, organizationCookie, role, Math.floor(Date.now() / 1000) + GATE_SECONDS].join("|");
+  return `${Buffer.from(payload).toString("base64url")}.${await gateSignature(payload)}`;
+}
+
+/** The role, when the note is genuine, still fresh and for this person and business; otherwise null and the full checks run. */
+async function readGate(value: string | undefined, userId: string, organizationCookie: string) {
+  if (!value) return null;
+  const [encoded, signature] = value.split(".");
+  if (!encoded || !signature) return null;
+  let payload = "";
+  try {
+    payload = Buffer.from(encoded, "base64url").toString();
+  } catch {
+    return null;
+  }
+  const expected = await gateSignature(payload);
+  if (!expected || expected !== signature) return null;
+  const [gateUser, gateOrganization, role, expires] = payload.split("|");
+  if (gateUser !== userId || gateOrganization !== organizationCookie || !role || Number(expires) < Date.now() / 1000) return null;
+  return role;
 }
 
 export const config = {

@@ -106,79 +106,95 @@ function PanelLink({ href, children }: { href: string; children: ReactNode }) {
 export default async function Home({ searchParams }: { searchParams?: Promise<{ notice?: string }> }) {
   const notice = (searchParams ? await searchParams : {}).notice;
   // A teammate sees the day's work and what customers owe, not how the business is doing or its set-up.
-  const membership = await getCurrentMembership();
+  // Who is asking and for which business: everything below needs these.
+  const [membership, homeOrg] = await Promise.all([getCurrentMembership(), getDefaultOrganization()]);
   const isOwner = membership?.role === "owner";
   // Refunds and free days are the owner's or a manager's call: a teammate's day does not list them.
   const canDecide = canDecideMoney(membership?.role);
   // Holds that ran out without a signature give their dates back before anything is counted.
-  await getDefaultOrganization().then((org) => releaseExpiredHolds(createSupabaseAdminClient(), org.id)).catch(() => null);
-  const endingHolds = await getDefaultOrganization().then((org) => holdsEndingSoon(createSupabaseAdminClient(), org.id)).catch(() => []);
-  const [userEmail, organization, dashboardData, supabase, t, c, locale] = await Promise.all([
+  await releaseExpiredHolds(createSupabaseAdminClient(), homeOrg.id).catch(() => null);
+  const supabase = await createSupabaseServerClient();
+  const db = supabase as any;
+  const weekEndForCounts = businessToday(7);
+  const todayForCounts = businessToday();
+  // Everything the page shows, asked for at once rather than one after another (Rory, 2 Nov 2026: pages felt slow;
+  // the dashboard waited on about ten round trips in a row).
+  const [
+    endingHolds,
+    userEmail,
+    organization,
+    dashboardData,
+    t,
+    c,
+    locale,
+    todo,
+    bookingsT,
+    [onboardingStatus, categories],
+    [receiptsWaiting, taskList, unsentResult],
+    [channelsResult, chatsResult, unreadResult, onRentCount, startingCount, owingCount]
+  ] = await Promise.all([
+    holdsEndingSoon(createSupabaseAdminClient(), homeOrg.id).catch(() => []),
     getCurrentUserEmail(),
     getDefaultOrganization(),
     getDashboardData(),
-    createSupabaseServerClient(),
     getTranslations("dashboard"),
     getTranslations("common"),
-    getLocale()
+    getLocale(),
+    getTranslations("todo"),
+    getTranslations("bookings"),
+    Promise.all([getOnboardingStatus(supabase as any, homeOrg.id), getVehicleCategories(homeOrg.id)]),
+    Promise.all([
+      getReceiptsWaiting(homeOrg.id),
+      getTaskList(homeOrg.id).catch(() => []),
+      // Customer messages the app wrote but could not deliver itself: the owner sends them in a tap.
+      db
+        .from("communication_log")
+        .select("id, rental_id, metadata, customers(full_name)")
+        .eq("organisation_id", homeOrg.id)
+        .eq("type", "automated_reminder")
+        .in("status", ["pending", "failed"])
+        .not("rental_id", "is", null)
+        .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString())
+        .order("created_at", { ascending: false })
+        .limit(50)
+        .then((result: any) => ({ ...result, data: (result?.data || []).filter((row: any) => !row.metadata?.superseded) }), () => ({ data: [] }))
+    ]),
+    // Messages and bookings at a glance (Rory, 31 Oct 2026): the latest chats with what's new, and the three booking
+    // counts the Bookings page leads with (same rules, same links).
+    Promise.all([
+      db.from("messaging_channels").select("id", { count: "exact", head: true }).eq("organization_id", homeOrg.id).neq("status", "disconnected"),
+      db
+        .from("conversations")
+        .select("id, display_name, unread_count, last_message_at, last_message_preview, last_message_direction")
+        .eq("organization_id", homeOrg.id)
+        .eq("status", "open")
+        .order("last_message_at", { ascending: false, nullsFirst: false })
+        .limit(3),
+      db.from("conversations").select("unread_count").eq("organization_id", homeOrg.id).eq("status", "open").gt("unread_count", 0),
+      db.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", homeOrg.id).is("deleted_at", null).in("status", ["active", "due_soon", "overdue", "extended"]),
+      db.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", homeOrg.id).is("deleted_at", null).eq("status", "booked").gte("start_date", todayForCounts).lte("start_date", weekEndForCounts),
+      // Unpaid = money due now, as on Bookings (Rory, 1 Nov 2026): the stored balance also counts rent not due yet,
+      // so an open-ended rental paid to date showed as unpaid here and not there.
+      db
+        .from("rentals")
+        .select("id")
+        .eq("organization_id", homeOrg.id)
+        .is("deleted_at", null)
+        .neq("status", "cancelled")
+        .gt("balance_due", 0)
+        .then(async (result: any) => {
+          const ids = ((result?.data || []) as Array<{ id: string }>).map((row) => row.id);
+          if (!ids.length) return { count: 0 };
+          const dueNow = await amountDueNowByRental(db, ids).catch(() => new Map<string, number>());
+          return { count: ids.filter((id) => Number(dueNow.get(id) || 0) > 0).length };
+        })
+    ])
   ]);
-  const todo = await getTranslations("todo");
   // Jobs the app raises are saved as English sentences; the kinds it knows are named in the reader's language, as on To do.
   const jobName = (action: string | null | undefined, title?: string | null) => jobNameFor(todo as never, action, title);
   const shortDate = (value: string) => shortDateIn(value, locale);
   const dayLabel = (value: string) => dayOfWeekDate(value, locale);
-  const [onboardingStatus, categories] = await Promise.all([getOnboardingStatus(supabase as any, organization.id), getVehicleCategories(organization.id)]);
   const { metrics, reminders, rentals, transactions, vehicles } = dashboardData;
-  const [receiptsWaiting, taskList, unsentResult] = await Promise.all([
-    getReceiptsWaiting(organization.id),
-    getTaskList(organization.id).catch(() => []),
-    // Customer messages the app wrote but could not deliver itself: the owner sends them in a tap.
-    (supabase as any)
-      .from("communication_log")
-      .select("id, rental_id, metadata, customers(full_name)")
-      .eq("organisation_id", organization.id)
-      .eq("type", "automated_reminder")
-      .in("status", ["pending", "failed"])
-      .not("rental_id", "is", null)
-      .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString())
-      .order("created_at", { ascending: false })
-      .limit(50)
-      .then((result: any) => ({ ...result, data: (result?.data || []).filter((row: any) => !row.metadata?.superseded) }), () => ({ data: [] }))
-  ]);
-  // Messages and bookings at a glance (Rory, 31 Oct 2026): the latest chats with what's new, and the three booking
-  // counts the Bookings page leads with (same rules, same links).
-  const bookingsT = await getTranslations("bookings");
-  const weekEndForCounts = businessToday(7);
-  const todayForCounts = businessToday();
-  const db = supabase as any;
-  const [channelsResult, chatsResult, unreadResult, onRentCount, startingCount, owingCount] = await Promise.all([
-    db.from("messaging_channels").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).neq("status", "disconnected"),
-    db
-      .from("conversations")
-      .select("id, display_name, unread_count, last_message_at, last_message_preview, last_message_direction")
-      .eq("organization_id", organization.id)
-      .eq("status", "open")
-      .order("last_message_at", { ascending: false, nullsFirst: false })
-      .limit(3),
-    db.from("conversations").select("unread_count").eq("organization_id", organization.id).eq("status", "open").gt("unread_count", 0),
-    db.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).is("deleted_at", null).in("status", ["active", "due_soon", "overdue", "extended"]),
-    db.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).is("deleted_at", null).eq("status", "booked").gte("start_date", todayForCounts).lte("start_date", weekEndForCounts),
-    // Unpaid = money due now, as on Bookings (Rory, 1 Nov 2026): the stored balance also counts rent not due yet,
-    // so an open-ended rental paid to date showed as unpaid here and not there.
-    db
-      .from("rentals")
-      .select("id")
-      .eq("organization_id", organization.id)
-      .is("deleted_at", null)
-      .neq("status", "cancelled")
-      .gt("balance_due", 0)
-      .then(async (result: any) => {
-        const ids = ((result?.data || []) as Array<{ id: string }>).map((row) => row.id);
-        if (!ids.length) return { count: 0 };
-        const dueNow = await amountDueNowByRental(db, ids).catch(() => new Map<string, number>());
-        return { count: ids.filter((id) => Number(dueNow.get(id) || 0) > 0).length };
-      })
-  ]);
   const hasChatChannel = (channelsResult?.count || 0) > 0;
   const latestChats = ((chatsResult?.data || []) as Array<{ id: string; display_name: string | null; unread_count: number | null; last_message_at: string | null; last_message_preview: string | null; last_message_direction: string | null }>).filter((chat) => chat.last_message_at);
   const unreadTotal = ((unreadResult?.data || []) as Array<{ unread_count: number | null }>).reduce((sum, row) => sum + Number(row.unread_count || 0), 0);
@@ -452,7 +468,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     return null;
   };
   // Each vehicle's main photo, when it has one, in place of the drawing everywhere on this page (Rory, 1 Nov 2026).
-  const lotPhotos: Map<string, string[]> = await vehiclePhotoUrls(supabase, organization.id, 1, 12 * 3600).catch(() => new Map());
+  // Photos and the calendar are fetched together.
+  const calendarFrom = `${addDays(`${today.slice(0, 7)}-01`, -1).slice(0, 7)}-01`;
+  const calendarTo = addDays(`${addDays(`${addDays(`${today.slice(0, 7)}-01`, 62).slice(0, 7)}-01`, 32).slice(0, 7)}-01`, -1);
+  const [lotPhotos, calendarEvents]: [Map<string, string[]>, CalendarEvent[]] = await Promise.all([
+    vehiclePhotoUrls(supabase, organization.id, 1, 12 * 3600).catch(() => new Map<string, string[]>()),
+    getCalendarEventsBetween(organization.id, calendarFrom, calendarTo).catch(() => [] as CalendarEvent[])
+  ]);
   const artFor = (item: AgendaItem) => {
     const vehicle = vehicleOf(item);
     if (!vehicle) return null;
@@ -475,9 +497,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   // ── The calendar: what happens each day (handovers, returns, payments, renewals, jobs), a week by default ──
   // The whole name: the tiles have two lines, and a first name alone ("from Test") reads as a cut-off.
   const firstName = (name: string | null | undefined) => String(name || "").trim() || t("walkIn");
-  const calendarFrom = `${addDays(`${today.slice(0, 7)}-01`, -1).slice(0, 7)}-01`;
-  const calendarTo = addDays(`${addDays(`${addDays(`${today.slice(0, 7)}-01`, 62).slice(0, 7)}-01`, 32).slice(0, 7)}-01`, -1);
-  const calendarEvents: CalendarEvent[] = await getCalendarEventsBetween(organization.id, calendarFrom, calendarTo).catch(() => []);
+
   calendarEvents.push(
     ...taskCalendarEvents(taskList, {
       from: calendarFrom,

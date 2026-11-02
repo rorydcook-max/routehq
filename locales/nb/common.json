@@ -1094,7 +1094,9 @@
     "setup_current_rentals": "Legg til hvem som leier nå",
     "setup_reminders": "Slå på automatiske påminnelser",
     "setup_booking_page": "Del bestillingssiden din",
-    "setupShared": "Lenke kopiert. Del den på Facebook-siden din, Google Maps og LINE."
+    "setupShared": "Lenke kopiert. Del den på Facebook-siden din, Google Maps og LINE.",
+    "quick_askAssistant": "Fortell assistenten",
+    "quick_askAssistant_hint": "Legg til kjøretøy eller pågående utleie via chat, stemme eller bilder"
   },
   "todo": {
     "eyebrow": "Å gjøre",
@@ -2816,7 +2818,8 @@
     "qp_month": "per måned",
     "qp_save": "Lagre",
     "qp_cancel": "Avbryt",
-    "qp_failed": "Kunne ikke lagre prisen. Prøv igjen."
+    "qp_failed": "Kunne ikke lagre prisen. Prøv igjen.",
+    "assistant": "Assistent"
   },
   "customers": {
     "sel_nationality": "Nasjonalitet",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "Koble til en chat-app slik at påminnelser går automatisk til kundene, og legg til hvordan de betaler deg.",
     "rentalsFailed": "Kunne ikke legge til: {names}. Sjekk dem og prøv igjen.",
     "linkChats": "Koble til LINE eller WhatsApp",
-    "linkPayments": "Legg til betalingsdetaljer"
+    "linkPayments": "Legg til betalingsdetaljer",
+    "pageTitle": "Assistent",
+    "pageSubtitle": "Legg til kjøretøy eller hvem som leier nå. Skriv, snakk eller send bilder, og sjekk listen før noe lagres.",
+    "pageBack": "Flåte",
+    "helloAny": "Hei! Fortell meg om kjøretøy som skal legges til, eller hvem som leier nå. Du kan skrive, snakke eller sende bilder."
   },
   "setupRequest": {
     "title": "Vi ordner det for deg",

@@ -1094,7 +1094,9 @@
     "setup_current_rentals": "Add who's renting now",
     "setup_reminders": "Turn on automatic reminders",
     "setup_booking_page": "Share your booking page",
-    "setupShared": "Link copied. Put it on your Facebook page, Google Maps and LINE."
+    "setupShared": "Link copied. Put it on your Facebook page, Google Maps and LINE.",
+    "quick_askAssistant": "Tell the assistant",
+    "quick_askAssistant_hint": "Add vehicles or current rentals by chat, voice or photos"
   },
   "todo": {
     "eyebrow": "To do",
@@ -2816,7 +2818,8 @@
     "qp_month": "per month",
     "qp_save": "Save",
     "qp_cancel": "Cancel",
-    "qp_failed": "Couldn't save the price. Try again."
+    "qp_failed": "Couldn't save the price. Try again.",
+    "assistant": "Assistant"
   },
   "customers": {
     "sel_nationality": "Nationality",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "Connect a chat app so reminders go to customers by themselves, and add how they pay you.",
     "rentalsFailed": "Couldn't add: {names}. Check them and try again.",
     "linkChats": "Connect LINE or WhatsApp",
-    "linkPayments": "Add payment details"
+    "linkPayments": "Add payment details",
+    "pageTitle": "Assistant",
+    "pageSubtitle": "Add vehicles or who's renting now. Type, talk or send photos, and check the list before anything is saved.",
+    "pageBack": "Fleet",
+    "helloAny": "Hi! Tell me about vehicles to add, or who's renting one now. You can type, talk or send photos."
   },
   "setupRequest": {
     "title": "We'll set it up for you",

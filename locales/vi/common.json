@@ -1134,7 +1134,9 @@
     "setup_current_rentals": "Thêm khách đang thuê xe",
     "setup_reminders": "Bật nhắc nhở tự động",
     "setup_booking_page": "Chia sẻ trang đặt xe",
-    "setupShared": "Đã sao chép liên kết. Hãy dán lên trang Facebook, Google Maps và LINE của bạn."
+    "setupShared": "Đã sao chép liên kết. Hãy dán lên trang Facebook, Google Maps và LINE của bạn.",
+    "quick_askAssistant": "Nói với trợ lý",
+    "quick_askAssistant_hint": "Thêm xe hoặc hợp đồng đang thuê bằng chat, giọng nói hoặc ảnh"
   },
   "todo": {
     "eyebrow": "Việc cần làm",
@@ -2856,7 +2858,8 @@
     "qp_month": "mỗi tháng",
     "qp_save": "Lưu",
     "qp_cancel": "Hủy",
-    "qp_failed": "Không lưu được giá. Hãy thử lại."
+    "qp_failed": "Không lưu được giá. Hãy thử lại.",
+    "assistant": "Trợ lý"
   },
   "customers": {
     "sel_nationality": "Quốc tịch",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "Kết nối ứng dụng chat để tự động gửi nhắc nhở cho khách, và thêm phương thức nhận thanh toán.",
     "rentalsFailed": "Không thể thêm: {names}. Vui lòng kiểm tra lại và thử nhé.",
     "linkChats": "Kết nối LINE hoặc WhatsApp",
-    "linkPayments": "Thêm thông tin thanh toán"
+    "linkPayments": "Thêm thông tin thanh toán",
+    "pageTitle": "Trợ lý",
+    "pageSubtitle": "Thêm xe hoặc người đang thuê. Gõ, nói hoặc gửi ảnh, rồi kiểm tra danh sách trước khi lưu.",
+    "pageBack": "Đội xe",
+    "helloAny": "Xin chào! Hãy cho tôi biết xe cần thêm, hoặc ai đang thuê xe. Bạn có thể gõ, nói hoặc gửi ảnh."
   },
   "setupRequest": {
     "title": "Chúng tôi sẽ cài đặt giúp bạn",

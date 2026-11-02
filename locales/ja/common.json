@@ -1094,7 +1094,9 @@
     "setup_current_rentals": "現在の貸出状況を追加",
     "setup_reminders": "自動リマインドをオンにする",
     "setup_booking_page": "予約ページをシェアする",
-    "setupShared": "リンクをコピーしました。Facebookページ、Googleマップ、LINEに貼り付けてください。"
+    "setupShared": "リンクをコピーしました。Facebookページ、Googleマップ、LINEに貼り付けてください。",
+    "quick_askAssistant": "アシスタントに頼む",
+    "quick_askAssistant_hint": "チャット、音声、写真で車両や貸出情報を追加"
   },
   "todo": {
     "eyebrow": "やること",
@@ -2816,7 +2818,8 @@
     "qp_month": "1か月あたり",
     "qp_save": "保存",
     "qp_cancel": "キャンセル",
-    "qp_failed": "料金を保存できませんでした。もう一度お試しください。"
+    "qp_failed": "料金を保存できませんでした。もう一度お試しください。",
+    "assistant": "アシスタント"
   },
   "customers": {
     "sel_nationality": "国籍",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "チャットアプリを連携して顧客に自動でリマインドを送り、支払い方法を追加しましょう。",
     "rentalsFailed": "追加できませんでした：{names}。内容を確認して再度お試しください。",
     "linkChats": "LINEまたはWhatsAppを連携",
-    "linkPayments": "支払い情報を追加"
+    "linkPayments": "支払い情報を追加",
+    "pageTitle": "アシスタント",
+    "pageSubtitle": "車両の追加や貸出中の登録ができます。入力、音声、写真送信でOK。保存前にリストを確認できます。",
+    "pageBack": "車両一覧",
+    "helloAny": "こんにちは！車両の追加や、現在の貸出状況について教えてください。文字入力、音声、写真の送信が使えます。"
   },
   "setupRequest": {
     "title": "こちらで設定代行します",

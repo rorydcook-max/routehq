@@ -1134,7 +1134,9 @@
     "setup_current_rentals": "Ajouter les locations en cours",
     "setup_reminders": "Activer les rappels automatiques",
     "setup_booking_page": "Partager votre page de réservation",
-    "setupShared": "Lien copié. Partagez-le sur votre page Facebook, Google Maps et LINE."
+    "setupShared": "Lien copié. Partagez-le sur votre page Facebook, Google Maps et LINE.",
+    "quick_askAssistant": "Parler à l'assistant",
+    "quick_askAssistant_hint": "Ajoutez des véhicules ou des locations en cours par chat, voix ou photos"
   },
   "todo": {
     "eyebrow": "À faire",
@@ -2856,7 +2858,8 @@
     "qp_month": "par mois",
     "qp_save": "Enregistrer",
     "qp_cancel": "Annuler",
-    "qp_failed": "Impossible d'enregistrer le prix. Réessayez."
+    "qp_failed": "Impossible d'enregistrer le prix. Réessayez.",
+    "assistant": "Assistant"
   },
   "customers": {
     "sel_nationality": "Nationalité",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "Connectez une application de messagerie pour envoyer les rappels automatiquement, et ajoutez vos modes de paiement.",
     "rentalsFailed": "Échec de l'ajout : {names}. Vérifiez et réessayez.",
     "linkChats": "Connecter LINE ou WhatsApp",
-    "linkPayments": "Ajouter les détails de paiement"
+    "linkPayments": "Ajouter les détails de paiement",
+    "pageTitle": "Assistant",
+    "pageSubtitle": "Ajoutez des véhicules ou indiquez qui loue. Écrivez, parlez ou envoyez des photos, et vérifiez la liste avant d'enregistrer.",
+    "pageBack": "Flotte",
+    "helloAny": "Salut ! Dites-moi quels véhicules ajouter ou qui en loue un. Vous pouvez écrire, parler ou envoyer des photos."
   },
   "setupRequest": {
     "title": "On s'occupe de la configuration pour vous",

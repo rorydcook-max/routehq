@@ -1094,7 +1094,9 @@
     "setup_current_rentals": "Lägg till vem som hyr nu",
     "setup_reminders": "Aktivera automatiska påminnelser",
     "setup_booking_page": "Dela din bokningssida",
-    "setupShared": "Länk kopierad. Lägg upp den på din Facebook-sida, Google Maps och LINE."
+    "setupShared": "Länk kopierad. Lägg upp den på din Facebook-sida, Google Maps och LINE.",
+    "quick_askAssistant": "Berätta för assistenten",
+    "quick_askAssistant_hint": "Lägg till fordon eller pågående hyror via chatt, röst eller foton"
   },
   "todo": {
     "eyebrow": "Att göra",
@@ -2816,7 +2818,8 @@
     "qp_month": "per månad",
     "qp_save": "Spara",
     "qp_cancel": "Avbryt",
-    "qp_failed": "Det gick inte att spara priset. Försök igen."
+    "qp_failed": "Det gick inte att spara priset. Försök igen.",
+    "assistant": "Assistent"
   },
   "customers": {
     "sel_nationality": "Nationalitet",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "Koppla en chattapp så att påminnelser skickas till kunderna automatiskt, och lägg till hur de betalar dig.",
     "rentalsFailed": "Kunde inte lägga till: {names}. Kontrollera dem och försök igen.",
     "linkChats": "Koppla LINE eller WhatsApp",
-    "linkPayments": "Lägg till betalningsuppgifter"
+    "linkPayments": "Lägg till betalningsuppgifter",
+    "pageTitle": "Assistent",
+    "pageSubtitle": "Lägg till fordon eller vem som hyr nu. Skriv, prata eller skicka foton, och kontrollera listan innan något sparas.",
+    "pageBack": "Fordon",
+    "helloAny": "Hej! Berätta vilka fordon som ska läggas till, eller vem som hyr ett just nu. Du kan skriva, prata eller skicka foton."
   },
   "setupRequest": {
     "title": "Vi ordnar det åt dig",

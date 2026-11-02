@@ -1094,7 +1094,9 @@
     "setup_current_rentals": "Idagdag ang mga umuupa ngayon",
     "setup_reminders": "I-on ang kusang paalala",
     "setup_booking_page": "I-share ang booking page mo",
-    "setupShared": "Na-copy na ang link. Ilagay ito sa iyong Facebook page, Google Maps at LINE."
+    "setupShared": "Na-copy na ang link. Ilagay ito sa iyong Facebook page, Google Maps at LINE.",
+    "quick_askAssistant": "Sabihin sa katulong",
+    "quick_askAssistant_hint": "Magdagdag ng sasakyan o kasalukuyang paupa sa pamamagitan ng chat, boses o litrato"
   },
   "todo": {
     "eyebrow": "Gagawin",
@@ -2816,7 +2818,8 @@
     "qp_month": "kada buwan",
     "qp_save": "I-save",
     "qp_cancel": "Kanselahin",
-    "qp_failed": "Hindi na-save ang presyo. Subukan ulit."
+    "qp_failed": "Hindi na-save ang presyo. Subukan ulit.",
+    "assistant": "Katulong"
   },
   "customers": {
     "sel_nationality": "Nasyonalidad",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "Mag-konek ng chat app para kusang mapadalhan ng paalala ang mga customer, at idagdag kung paano sila nagbabayad.",
     "rentalsFailed": "Hindi naidagdag: {names}. Tingnan at subukan ulit.",
     "linkChats": "I-konek ang LINE o WhatsApp",
-    "linkPayments": "Magdagdag ng detalye ng bayad"
+    "linkPayments": "Magdagdag ng detalye ng bayad",
+    "pageTitle": "Katulong",
+    "pageSubtitle": "Magdagdag ng sasakyan o kung sino ang nagpapaupa ngayon. I-type, magsalita o magpadala ng litrato, at tingnan ang listahan bago i-save.",
+    "pageBack": "Sasakyan",
+    "helloAny": "Kamusta! Sabihin sa akin ang tungkol sa mga idadagdag na sasakyan, o kung sino ang nagpapaupa ngayon. Pwede kang mag-type, magsalita o magpadala ng litrato."
   },
   "setupRequest": {
     "title": "Kami na ang maglalagay para sa iyo",

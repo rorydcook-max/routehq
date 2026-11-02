@@ -1094,7 +1094,9 @@
     "setup_current_rentals": "현재 대여 중인 고객 추가",
     "setup_reminders": "자동 알림 켜기",
     "setup_booking_page": "예약 페이지 공유",
-    "setupShared": "링크가 복사되었습니다. 페이스북 페이지, 구글 맵, LINE에 공유해 보세요."
+    "setupShared": "링크가 복사되었습니다. 페이스북 페이지, 구글 맵, LINE에 공유해 보세요.",
+    "quick_askAssistant": "어시스턴트에게 말하기",
+    "quick_askAssistant_hint": "채팅, 음성, 사진으로 차량이나 대여 내역을 추가하세요"
   },
   "todo": {
     "eyebrow": "할 일",
@@ -2816,7 +2818,8 @@
     "qp_month": "1개월",
     "qp_save": "저장",
     "qp_cancel": "취소",
-    "qp_failed": "요금을 저장하지 못했어요. 다시 시도해 주세요."
+    "qp_failed": "요금을 저장하지 못했어요. 다시 시도해 주세요.",
+    "assistant": "어시스턴트"
   },
   "customers": {
     "sel_nationality": "국적",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "채팅 앱을 연결하여 고객에게 자동으로 알림이 가도록 하고, 결제 수단을 추가하세요.",
     "rentalsFailed": "추가하지 못했습니다: {names}. 내용을 확인하고 다시 시도해 주세요.",
     "linkChats": "LINE 또는 WhatsApp 연결",
-    "linkPayments": "결제 정보 추가"
+    "linkPayments": "결제 정보 추가",
+    "pageTitle": "어시스턴트",
+    "pageSubtitle": "차량을 추가하거나 대여 중인 고객을 입력하세요. 텍스트, 음성, 사진으로 입력하고 저장 전에 목록을 확인할 수 있어요.",
+    "pageBack": "차량 목록",
+    "helloAny": "안녕하세요! 추가할 차량이나 현재 대여 중인 건에 대해 말씀해 주세요. 텍스트, 음성, 사진 모두 가능합니다."
   },
   "setupRequest": {
     "title": "저희가 대신 세팅해 드립니다",

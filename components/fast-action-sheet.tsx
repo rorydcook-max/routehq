@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Car, CarFront, ClipboardCheck, ReceiptText, RotateCcw, UploadCloud, UserPlus, X } from "lucide-react";
+import { Camera, Car, CarFront, ClipboardCheck, ReceiptText, RotateCcw, Sparkles, UploadCloud, UserPlus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { Route } from "next";
@@ -21,6 +21,8 @@ const everyday: Action[] = [
 const lessOften: Action[] = [
   { key: "addCustomer", href: "/customers/new" as Route, icon: UserPlus },
   { key: "addVehicle", href: "/fleet/new", icon: Car },
+  // Vehicles or who's renting now, by typing, talking or photos (Rory, 2 Nov 2026).
+  { key: "askAssistant", href: "/fleet/assistant" as Route, icon: Sparkles },
   { key: "importVehicles", href: "/fleet/import", icon: UploadCloud }
 ];
 

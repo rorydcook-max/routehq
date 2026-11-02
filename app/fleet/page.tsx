@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
-import { FileSpreadsheet, Plus } from "lucide-react";
+import type { Route } from "next";
+import { FileSpreadsheet, Plus, Sparkles } from "lucide-react";
 import { bulkArchiveVehicles, bulkDeleteVehicles, setVehicleRate } from "@/app/actions/vehicles";
 import { AppShell } from "@/components/app-shell";
 import { Badge, EmptyState } from "@/components/ui";
@@ -136,6 +137,11 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <Link className="pressable hidden min-h-11 items-center gap-2 rounded-full bg-[var(--panel)] px-4 font-bold text-[var(--foreground)] shadow-[var(--shadow-card)] sm:inline-flex" href="/fleet/import">
                 <FileSpreadsheet size={16} />
                 {t("import")}
+              </Link>
+              {/* The assistant: vehicles or who's renting now, by typing, talking or photos (Rory, 2 Nov 2026). */}
+              <Link aria-label={t("assistant")} className="pressable inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-[var(--panel)] font-bold text-[var(--foreground)] shadow-[var(--shadow-card)] sm:px-4" href={"/fleet/assistant" as Route}>
+                <Sparkles size={16} />
+                <span className="hidden sm:inline">{t("assistant")}</span>
               </Link>
               <Link aria-label={t("addVehicle")} className="band-action pressable inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-[var(--band-action)] font-bold text-[var(--band-action-ink)] sm:px-4" href="/fleet/new">
                 <Plus size={16} />

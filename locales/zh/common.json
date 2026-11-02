@@ -1134,7 +1134,9 @@
     "setup_current_rentals": "添加当前的租赁",
     "setup_reminders": "开启自动提醒",
     "setup_booking_page": "分享您的预订页面",
-    "setupShared": "链接已复制。请将其发布到您的 Facebook 页面、Google 地图和 LINE 上。"
+    "setupShared": "链接已复制。请将其发布到您的 Facebook 页面、Google 地图和 LINE 上。",
+    "quick_askAssistant": "告诉助手",
+    "quick_askAssistant_hint": "通过聊天、语音或照片添加车辆或当前租赁"
   },
   "todo": {
     "eyebrow": "待办",
@@ -2856,7 +2858,8 @@
     "qp_month": "每月",
     "qp_save": "保存",
     "qp_cancel": "取消",
-    "qp_failed": "价格保存失败，请重试。"
+    "qp_failed": "价格保存失败，请重试。",
+    "assistant": "助手"
   },
   "customers": {
     "sel_nationality": "国籍",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "连接聊天应用以便自动向客户发送提醒，并添加您的收款方式。",
     "rentalsFailed": "无法添加：{names}。请检查后重试。",
     "linkChats": "连接 LINE 或 WhatsApp",
-    "linkPayments": "添加付款详情"
+    "linkPayments": "添加付款详情",
+    "pageTitle": "助手",
+    "pageSubtitle": "添加车辆或当前租车的人。可以打字、说话或发照片，保存前先核对清单。",
+    "pageBack": "车队",
+    "helloAny": "你好！告诉我要添加哪些车辆，或者现在谁在租车。可以打字、说话或发照片。"
   },
   "setupRequest": {
     "title": "我们来帮您设置",

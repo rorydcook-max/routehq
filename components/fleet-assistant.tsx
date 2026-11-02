@@ -30,12 +30,25 @@ function toDataUrl(file: File) {
  * Add vehicles by talking to an assistant (Rory, 2 Nov 2026): type, speak or send photos; it keeps a list; one tap adds them,
  * photos included. Nothing is saved until Add is tapped.
  */
-export function FleetAssistant({ organizationId, currency = "THB", onAdded, hasVehicles = false }: { organizationId: string; currency?: string; onAdded?: (count: number) => void; hasVehicles?: boolean }) {
+export function FleetAssistant({
+  organizationId,
+  currency = "THB",
+  onAdded,
+  hasVehicles = false,
+  greeting
+}: {
+  organizationId: string;
+  currency?: string;
+  onAdded?: (count: number) => void;
+  hasVehicles?: boolean;
+  /** The first line, when the place it opens from needs a different one (Fleet: vehicles or rentals). */
+  greeting?: string;
+}) {
   const t = useTranslations("fleetAssistant");
   const locale = useLocale();
   const [turns, setTurns] = useState<AssistantTurn[]>([]);
   // Vehicles already in: the first question is who is renting them (Rory, 2 Nov 2026).
-  const [shownTurns, setShownTurns] = useState<Array<AssistantTurn & { photos?: string[]; links?: boolean }>>([{ role: "assistant", text: hasVehicles ? t("askRented") : t("hello") }]);
+  const [shownTurns, setShownTurns] = useState<Array<AssistantTurn & { photos?: string[]; links?: boolean }>>([{ role: "assistant", text: greeting || (hasVehicles ? t("askRented") : t("hello")) }]);
   const [rentals, setRentals] = useState<DraftRental[]>([]);
   const [addingRentals, setAddingRentals] = useState(false);
   const [draft, setDraft] = useState<DraftVehicle[]>([]);

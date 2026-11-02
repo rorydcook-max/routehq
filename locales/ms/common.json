@@ -1134,7 +1134,9 @@
     "setup_current_rentals": "Tambah siapa yang sedang menyewa",
     "setup_reminders": "Pasang peringatan automatik",
     "setup_booking_page": "Kongsi halaman tempahan anda",
-    "setupShared": "Pautan disalin. Letakkan pada halaman Facebook, Google Maps dan LINE anda."
+    "setupShared": "Pautan disalin. Letakkan pada halaman Facebook, Google Maps dan LINE anda.",
+    "quick_askAssistant": "Beritahu pembantu",
+    "quick_askAssistant_hint": "Tambah kenderaan atau sewaan semasa melalui sembang, suara atau foto"
   },
   "todo": {
     "eyebrow": "Tugasan",
@@ -2856,7 +2858,8 @@
     "qp_month": "sebulan",
     "qp_save": "Simpan",
     "qp_cancel": "Batal",
-    "qp_failed": "Harga tidak dapat disimpan. Cuba lagi."
+    "qp_failed": "Harga tidak dapat disimpan. Cuba lagi.",
+    "assistant": "Pembantu"
   },
   "customers": {
     "sel_nationality": "Kewarganegaraan",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "Sambungkan aplikasi sembang supaya peringatan dihantar sendiri kepada pelanggan, dan tambah cara mereka bayar.",
     "rentalsFailed": "Gagal menambah: {names}. Semak semula dan cuba lagi.",
     "linkChats": "Sambungkan LINE atau WhatsApp",
-    "linkPayments": "Tambah butiran pembayaran"
+    "linkPayments": "Tambah butiran pembayaran",
+    "pageTitle": "Pembantu",
+    "pageSubtitle": "Tambah kenderaan atau siapa yang sewa sekarang. Taip, cakap atau hantar foto, dan semak senarai sebelum apa-apa disimpan.",
+    "pageBack": "Armada",
+    "helloAny": "Hai! Beritahu saya tentang kenderaan untuk ditambah, atau siapa yang sedang menyewa. Anda boleh taip, bercakap atau hantar foto."
   },
   "setupRequest": {
     "title": "Kami akan sediakannya untuk anda",

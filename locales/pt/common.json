@@ -1094,7 +1094,9 @@
     "setup_current_rentals": "Adicionar aluguéis atuais",
     "setup_reminders": "Ativar lembretes automáticos",
     "setup_booking_page": "Partilhar página de reservas",
-    "setupShared": "Link copiado. Coloque-o no Facebook, Google Maps e LINE."
+    "setupShared": "Link copiado. Coloque-o no Facebook, Google Maps e LINE.",
+    "quick_askAssistant": "Falar com o assistente",
+    "quick_askAssistant_hint": "Adicione veículos ou aluguéis atuais por chat, voz ou fotos"
   },
   "todo": {
     "eyebrow": "A fazer",
@@ -2816,7 +2818,8 @@
     "qp_month": "por mês",
     "qp_save": "Salvar",
     "qp_cancel": "Cancelar",
-    "qp_failed": "Não foi possível salvar o preço. Tente de novo."
+    "qp_failed": "Não foi possível salvar o preço. Tente de novo.",
+    "assistant": "Assistente"
   },
   "customers": {
     "sel_nationality": "Nacionalidade",
@@ -6272,7 +6275,11 @@
     "rentalsReminders": "Ligue um chat para enviar lembretes automáticos aos clientes e adicione como eles pagam.",
     "rentalsFailed": "Não foi possível adicionar: {names}. Verifique e tente de novo.",
     "linkChats": "Ligar LINE ou WhatsApp",
-    "linkPayments": "Adicionar dados de pagamento"
+    "linkPayments": "Adicionar dados de pagamento",
+    "pageTitle": "Assistente",
+    "pageSubtitle": "Adicione veículos ou quem está alugando agora. Digite, fale ou envie fotos, e verifique a lista antes de salvar.",
+    "pageBack": "Frota",
+    "helloAny": "Olá! Conte-me sobre veículos para adicionar ou quem está alugando um agora. Você pode digitar, falar ou enviar fotos."
   },
   "setupRequest": {
     "title": "Nós configuramos por si",

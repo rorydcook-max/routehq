@@ -15,17 +15,31 @@ const CURRENCY_INFO: Record<string, { symbol: string; locale: string }> = {
   EUR: { symbol: "€", locale: "de-DE" },
 };
 
-function formatAmount(digits: string, locale: string): string {
-  if (!digits) return "";
-  const n = parseInt(digits, 10);
-  return isNaN(n) ? "" : new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(n);
+/** Currencies with no smaller unit in everyday use. Everything else takes two decimals (satang, cents). */
+const NO_DECIMALS = new Set(["IDR", "VND"]);
+
+/** What was typed, cleaned to a plain number string: digits, and one point with up to two decimals ("1200.5"). */
+function cleanAmount(typed: string, decimals: number): string {
+  const kept = typed.replace(/[^0-9.]/g, "");
+  if (!decimals) return kept.replace(/\./g, "");
+  const point = kept.indexOf(".");
+  if (point === -1) return kept;
+  return `${kept.slice(0, point)}.${kept.slice(point + 1).replace(/\./g, "").slice(0, decimals)}`;
+}
+
+/** Thousands separated as you type, the decimals left exactly as typed ("1,200.5" stays "1,200.5" while typing). */
+function formatAmount(raw: string): string {
+  if (!raw) return "";
+  const [whole, fraction] = raw.split(".");
+  const grouped = whole ? Number(whole).toLocaleString("en-US") : "0";
+  return fraction !== undefined ? `${grouped}.${fraction}` : grouped;
 }
 
 /**
  * A currency-prefixed monetary input for server-rendered forms.
  * Uses a single visible text input with an absolutely-positioned symbol overlay.
- * A hidden input carries the raw digit value so the server action receives
- * a plain number string (no formatting), regardless of locale.
+ * A hidden input carries the plain number ("1200.50") so the server action receives
+ * no formatting, regardless of locale. Satang and cents can be typed (Rory, 2 Nov 2026).
  */
 export function MoneyInput({
   name,
@@ -38,37 +52,42 @@ export function MoneyInput({
   defaultValue?: string | number;
   currency?: string;
   required?: boolean;
-  /** Told the plain digits each time the amount changes. */
-  onValueChange?: (digits: string) => void;
+  /** Told the plain amount ("1200.5") each time it changes. */
+  onValueChange?: (amount: string) => void;
 }) {
   const info = CURRENCY_INFO[currency] ?? CURRENCY_INFO["THB"];
-  // "1200.50" must start as 1,201, not 120,050: round first, then keep the digits.
+  const decimals = NO_DECIMALS.has(currency) ? 0 : 2;
+  // A saved amount starts as it is: 1200.5 shows 1,200.50, a whole 1200 shows 1,200.
   const startNumber = Number(String(defaultValue ?? "").replace(/,/g, ""));
-  const initialDigits = String(defaultValue ?? "").trim() !== "" && Number.isFinite(startNumber) ? String(Math.round(startNumber)).replace(/[^0-9]/g, "") : String(defaultValue ?? "").replace(/[^0-9]/g, "");
-  const [raw, setRaw] = useState(initialDigits);
-  const [display, setDisplay] = useState(formatAmount(initialDigits, info.locale));
-
+  const initial =
+    String(defaultValue ?? "").trim() !== "" && Number.isFinite(startNumber)
+      ? decimals && !Number.isInteger(startNumber)
+        ? startNumber.toFixed(decimals)
+        : String(Math.round(startNumber))
+      : "";
+  const [raw, setRaw] = useState(initial);
+  const [display, setDisplay] = useState(formatAmount(initial));
   return (
     <div className="relative mt-1">
       {/* Symbol overlay — always visible, never editable */}
       <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 select-none text-sm font-medium text-[var(--foreground-secondary)]">
         {info.symbol}
       </span>
-      {/* Hidden input: carries raw digits — this is what the server action reads */}
+      {/* Hidden input: carries the plain amount — this is what the server action reads */}
       <input type="hidden" name={name} value={raw} />
       {/* Visible formatted input: no name so it is not submitted */}
       <input
         className="input-with-leading-symbol font-mono-data w-full rounded-xl border border-[var(--border-strong)] bg-white py-3 pr-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-        inputMode="numeric"
+        inputMode={decimals ? "decimal" : "numeric"}
         placeholder="0"
         required={required}
         type="text"
         value={display}
         onChange={(e) => {
-          const digits = e.target.value.replace(/[^0-9]/g, "");
-          setRaw(digits);
-          onValueChange?.(digits);
-          setDisplay(formatAmount(digits, info.locale));
+          const amount = cleanAmount(e.target.value, decimals);
+          setRaw(amount);
+          onValueChange?.(amount);
+          setDisplay(formatAmount(amount));
         }}
       />
     </div>

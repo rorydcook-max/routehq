@@ -862,9 +862,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             <AgendaCalendar carryLate={false} covers={{ from: calendarFrom, to: calendarTo }} defaultView="week" events={calendarEvents} storageKey="routehq.dashboard.calendar" today={today} />
           </section>
 
-          {/* Phones: the car park comes after the week. Computers have it in the side column. */}
+          {/* Phones: the car park comes after the week. Computers: under Today, so a quiet day doesn't leave a big gap beside a long side column (Rory, 2 Nov 2026). */}
           {lot.length > 0 ? (
-            <div className="order-6 lg:hidden">
+            <div className="order-6 lg:order-3">
               <FleetLot compact action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>} labels={lotLabels} title={t("yourFleet")} vehicles={lot} />
             </div>
           ) : null}
@@ -904,7 +904,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               ))}
             </div>
           ) : null}
-          {lot.length > 0 ? <FleetLot compact action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>} labels={lotLabels} title={t("yourFleet")} vehicles={lot} /> : null}
         </aside>
       </div>
 

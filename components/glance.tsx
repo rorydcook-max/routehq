@@ -236,7 +236,7 @@ export function FleetLot({ vehicles, labels, title, action, compact = false }: {
           </span>
         ))}
       </p>
-      <ul className={`mt-4 grid gap-x-2 gap-y-3 ${compact ? "grid-cols-3" : "grid-cols-4 sm:grid-cols-6 xl:grid-cols-8"}`}>
+      <ul className={`mt-4 grid gap-x-2 gap-y-3 ${compact ? "grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7" : "grid-cols-4 sm:grid-cols-6 xl:grid-cols-8"}`}>
         {sorted.map((vehicle, index) => (
           <li className="rise" key={vehicle.id} style={{ ["--d" as string]: `${200 + index * 35}ms` } as CSSProperties}>
             <Link aria-label={vehicle.tip} className="lot-spot group relative flex flex-col items-center gap-1.5 rounded-2xl p-1.5 outline-none transition hover:bg-[var(--panel-secondary)] focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]" data-tip={vehicle.tip} href={vehicle.href as Route}>

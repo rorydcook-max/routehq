@@ -637,7 +637,7 @@ function UtilizationSection({ detail }: { detail: VehicleDetail }) {
   );
 }
 
-function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail; organizationId: string }) {
+function MaintenanceSection({ detail, organizationId, currency }: { detail: VehicleDetail; organizationId: string; currency: string }) {
   const tx = useVx();
   const compliance = detail.vehicle.metadata?.compliance || {};
   const typeName = (type: string) => (tx.has(`mt_${type}`) ? tx.say(`mt_${type}`) : type.replace(/_/g, " "));
@@ -705,7 +705,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
           </label>
           <label className="block">
             <span className={labelClass}>{tx.say("f_cost")}</span>
-            <MoneyInput name="cost" />
+            <MoneyInput currency={currency} name="cost" />
           </label>
           <label className="block">
             <span className={labelClass}>{tx.say("m_odometer")}</span>
@@ -1083,7 +1083,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
         <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
           <ComplianceSection detail={detail} organizationId={organization.id} />
           <div className="grid gap-3">
-            <MaintenanceSection detail={detail} organizationId={organization.id} />
+            <MaintenanceSection currency={organization.currency || "THB"} detail={detail} organizationId={organization.id} />
             <DocumentsSection detail={detail} />
             <FinanceSection detail={detail} />
           </div>

@@ -6298,7 +6298,21 @@
     "helloAny": "你好！告诉我要添加哪些车辆，或者现在谁在租车。可以打字、说话或发照片。",
     "newChat": "新建对话",
     "earlierChats": "历史对话",
-    "untitledChat": "对话"
+    "untitledChat": "对话",
+    "sugSheet": "读取我的谷歌表格",
+    "sugSheetText": "这是我车辆的谷歌表格：",
+    "sugPhoto": "发送蓝皮书照片",
+    "sugRenting": "告诉我现在谁在租车",
+    "sugRentingText": "我的一辆车目前租给了 ",
+    "sugTell": "描述我的车辆",
+    "sugTellText": "我有 ",
+    "canTitle": "助手能做什么",
+    "canSheet": "读取车辆或租赁的谷歌表格。请将其设置为“知道链接的任何人均可查看”，然后粘贴链接。",
+    "canPhoto": "识别蓝皮书照片、车辆实物照片或价目表。",
+    "canTalk": "语音输入：点击麦克风，用您的母语说出来即可。",
+    "canRentals": "添加当前租客、下次付款日期、押金，并设置自动提醒。",
+    "canNote": "点击“添加”前不会保存任何内容。您的聊天记录会保留在这里，方便您稍后继续。",
+    "noChats": "您的聊天记录将显示在这里。"
   },
   "setupRequest": {
     "title": "我们来帮您设置",

@@ -46,8 +46,11 @@ export function FleetAssistant({
   hasVehicles = false,
   greeting,
   initial,
-  rememberInUrl = false
+  rememberInUrl = false,
+  tall = false
 }: {
+  /** On its own page: the chat fills the height of the screen. */
+  tall?: boolean;
   organizationId: string;
   currency?: string;
   onAdded?: (count: number) => void;
@@ -101,6 +104,7 @@ export function FleetAssistant({
   const [speechOk, setSpeechOk] = useState(false);
   const recognition = useRef<any>(null);
   const picker = useRef<HTMLInputElement>(null);
+  const input = useRef<HTMLTextAreaElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -237,6 +241,12 @@ export function FleetAssistant({
   const when = (iso?: string | null) => (iso ? new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`)) : "");
   const per = (rental: DraftRental) => (rental.rate ? t(rental.ratePeriod === "day" ? "perDay" : rental.ratePeriod === "week" ? "perWeek" : "perMonth", { price: money(rental.rate) }) : "");
   const readyCount = draft.filter((vehicle) => vehicle.make && vehicle.model).length;
+  const suggestions: Array<{ label: string; text?: string; photo?: boolean }> = [
+    { label: t("sugSheet"), text: t("sugSheetText") },
+    { label: t("sugPhoto"), photo: true },
+    ...(hasVehicles ? [{ label: t("sugRenting"), text: t("sugRentingText") }] : []),
+    { label: t("sugTell"), text: t("sugTellText") }
+  ];
 
   return (
     <div className="flex flex-col rounded-2xl border border-[var(--border)] bg-[var(--panel)]">
@@ -250,7 +260,7 @@ export function FleetAssistant({
         </div>
       </div>
 
-      <div className="max-h-[46vh] min-h-[180px] space-y-2 overflow-y-auto px-3 py-3">
+      <div className={`space-y-2 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4 ${tall ? "min-h-[300px] lg:h-[calc(100vh-380px)] lg:min-h-[360px] max-h-[60vh] lg:max-h-none" : "max-h-[46vh] min-h-[180px]"}`}>
         {shownTurns.map((turn, index) => (
           <div className={`flex ${turn.role === "user" ? "justify-end" : "justify-start"}`} key={index}>
             <div className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-[15px] leading-snug ${turn.role === "user" ? "bg-[var(--primary)] text-white" : "bg-[var(--panel-secondary)] text-[var(--foreground)]"}`}>
@@ -276,6 +286,34 @@ export function FleetAssistant({
             </div>
           </div>
         ))}
+        {/* Ways to start, before anything is sent (Rory, 2 Nov 2026): a tap fills the box, or opens the camera. */}
+        {!thinking && !shownTurns.some((turn) => turn.role === "user") ? (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {suggestions.map((suggestion) => (
+              <button
+                className="pressable rounded-full border border-[var(--border)] bg-[var(--panel)] px-3.5 py-2 text-left text-sm font-semibold text-[var(--primary)]"
+                key={suggestion.label}
+                onClick={() => {
+                  if (suggestion.photo) {
+                    picker.current?.click();
+                    return;
+                  }
+                  setText(suggestion.text || "");
+                  window.setTimeout(() => {
+                    const box = input.current;
+                    if (box) {
+                      box.focus();
+                      box.setSelectionRange(box.value.length, box.value.length);
+                    }
+                  }, 0);
+                }}
+                type="button"
+              >
+                {suggestion.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
         {thinking ? (
           <div className="flex justify-start">
             <div className="flex items-center gap-2 rounded-2xl bg-[var(--panel-secondary)] px-3.5 py-2 text-[15px] text-[var(--muted)]">
@@ -352,7 +390,7 @@ export function FleetAssistant({
         </div>
       ) : null}
 
-      <div className="border-t border-[var(--border)] p-2.5">
+      <div className="border-t border-[var(--border)] p-3 sm:p-4">
         {pending.length ? (
           <div className="mb-2 flex gap-1.5 px-1">
             {pending.map((photo) => (
@@ -378,17 +416,18 @@ export function FleetAssistant({
           ref={picker}
           type="file"
         />
-        <div className="flex items-end gap-1.5">
-          <button aria-label={t("addPhoto")} className="pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--panel-secondary)] text-[var(--primary)]" disabled={pending.length >= 4} onClick={() => picker.current?.click()} type="button">
+        <div className="flex items-end gap-2">
+          <button aria-label={t("addPhoto")} className="pressable flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--panel-secondary)] text-[var(--primary)]" disabled={pending.length >= 4} onClick={() => picker.current?.click()} type="button">
             <Camera size={19} />
           </button>
           {speechOk ? (
-            <button aria-label={listening ? t("stopTalking") : t("talk")} aria-pressed={listening} className={`pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${listening ? "bg-[var(--danger)] text-white" : "bg-[var(--panel-secondary)] text-[var(--primary)]"}`} onClick={toggleMic} type="button">
+            <button aria-label={listening ? t("stopTalking") : t("talk")} aria-pressed={listening} className={`pressable flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${listening ? "bg-[var(--danger)] text-white" : "bg-[var(--panel-secondary)] text-[var(--primary)]"}`} onClick={toggleMic} type="button">
               {listening ? <Square size={16} /> : <Mic size={19} />}
             </button>
           ) : null}
           <textarea
-            className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl px-3 py-2.5 text-[15px]"
+            className="max-h-40 min-h-12 flex-1 resize-none rounded-2xl !px-4 !py-3 text-[15px] leading-snug"
+            ref={input}
             onChange={(event) => setText(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
@@ -400,7 +439,7 @@ export function FleetAssistant({
             rows={1}
             value={text}
           />
-          <button aria-label={t("send")} className="pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-white disabled:opacity-50" disabled={thinking || (!text.trim() && !pending.length)} onClick={() => void send()} type="button">
+          <button aria-label={t("send")} className="pressable flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-white disabled:opacity-50" disabled={thinking || (!text.trim() && !pending.length)} onClick={() => void send()} type="button">
             <Send size={18} />
           </button>
         </div>

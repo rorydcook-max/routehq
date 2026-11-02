@@ -6298,7 +6298,21 @@
     "helloAny": "Salut ! Dites-moi quels véhicules ajouter ou qui en loue un. Vous pouvez écrire, parler ou envoyer des photos.",
     "newChat": "Nouvelle conversation",
     "earlierChats": "Conversations précédentes",
-    "untitledChat": "Conversation"
+    "untitledChat": "Conversation",
+    "sugSheet": "Lire ma feuille Google",
+    "sugSheetText": "Voici la feuille Google avec mes véhicules : ",
+    "sugPhoto": "Envoyer une photo de carte grise",
+    "sugRenting": "Dis-moi qui loue en ce moment",
+    "sugRentingText": "Un de mes véhicules est loué à ",
+    "sugTell": "Décrire mes véhicules",
+    "sugTellText": "J'ai ",
+    "canTitle": "Ce que l'assistant peut faire",
+    "canSheet": "Lire une feuille Google de vos véhicules ou locations. Partagez-la en mode « Toute personne disposant du lien peut consulter » et collez le lien.",
+    "canPhoto": "Lire les photos de cartes grises, des véhicules eux-mêmes ou d'une grille tarifaire.",
+    "canTalk": "Écouter : appuyez sur le microphone et dites-le dans votre langue.",
+    "canRentals": "Ajouter qui loue en ce moment, avec les dates des prochains paiements, les cautions et les rappels automatiques.",
+    "canNote": "Rien n'est enregistré tant que vous n'appuyez pas sur Ajouter. Vos discussions sont conservées ici pour que vous puissiez les reprendre plus tard.",
+    "noChats": "Vos discussions apparaîtront ici."
   },
   "setupRequest": {
     "title": "On s'occupe de la configuration pour vous",

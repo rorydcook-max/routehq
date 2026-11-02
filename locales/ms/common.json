@@ -6298,7 +6298,21 @@
     "helloAny": "Hai! Beritahu saya tentang kenderaan untuk ditambah, atau siapa yang sedang menyewa. Anda boleh taip, bercakap atau hantar foto.",
     "newChat": "Sembang baharu",
     "earlierChats": "Sembang terdahulu",
-    "untitledChat": "Sembang"
+    "untitledChat": "Sembang",
+    "sugSheet": "Baca Google Sheet saya",
+    "sugSheetText": "Ini Google Sheet dengan kenderaan saya: ",
+    "sugPhoto": "Hantar gambar buku biru",
+    "sugRenting": "Beritahu saya siapa yang sedang menyewa",
+    "sugRentingText": "Salah satu kenderaan saya disewa kepada ",
+    "sugTell": "Terangkan kenderaan saya",
+    "sugTellText": "Saya ada ",
+    "canTitle": "Perkara yang boleh dilakukan pembantu",
+    "canSheet": "Baca Google Sheet tentang kenderaan atau sewaan anda. Kongsikannya sebagai \"Sesiapa yang ada pautan boleh lihat\" dan tampal pautannya.",
+    "canPhoto": "Baca gambar buku biru, kenderaan itu sendiri atau senarai harga.",
+    "canTalk": "Dengar: ketik ikon mikrofon dan sebutnya dalam bahasa anda sendiri.",
+    "canRentals": "Tambah siapa yang sedang menyewa, dengan tarikh bayaran seterusnya, deposit dan peringatan automatik.",
+    "canNote": "Tiada apa-apa disimpan sehingga anda ketik Tambah. Sembang anda disimpan di sini supaya anda boleh sambung kemudian.",
+    "noChats": "Sembang anda akan disenaraikan di sini."
   },
   "setupRequest": {
     "title": "Kami akan sediakannya untuk anda",

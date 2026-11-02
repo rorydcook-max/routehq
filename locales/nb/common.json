@@ -6298,7 +6298,21 @@
     "helloAny": "Hei! Fortell meg om kjøretøy som skal legges til, eller hvem som leier nå. Du kan skrive, snakke eller sende bilder.",
     "newChat": "Ny samtale",
     "earlierChats": "Tidligere samtaler",
-    "untitledChat": "Samtale"
+    "untitledChat": "Samtale",
+    "sugSheet": "Les Google-regnearket mitt",
+    "sugSheetText": "Her er Google-regnearket med kjøretøyene mine: ",
+    "sugPhoto": "Send et bilde av blå bok",
+    "sugRenting": "Fortell meg hvem som leier nå",
+    "sugRentingText": "Et av kjøretøyene mine er utleid til ",
+    "sugTell": "Beskriv kjøretøyene mine",
+    "sugTellText": "Jeg har ",
+    "canTitle": "Hva assistenten kan gjøre",
+    "canSheet": "Les et Google-regneark med kjøretøyene eller utleiene dine. Del det med \"Alle med lenken kan se\" og lim inn lenken.",
+    "canPhoto": "Les bilder av blå bøker, selve kjøretøyene eller en prisliste.",
+    "canTalk": "Lytt: trykk på mikrofonen og si det på ditt eget språk.",
+    "canRentals": "Legg til hvem som leier nå, med neste betalingsdatoer, depositum og automatiske påminnelser.",
+    "canNote": "Ingenting lagres før du trykker Legg til. Samtalene dine beholdes her, slik at du kan fortsette senere.",
+    "noChats": "Samtalene dine vises her."
   },
   "setupRequest": {
     "title": "Vi ordner det for deg",

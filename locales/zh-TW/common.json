@@ -6298,7 +6298,21 @@
     "helloAny": "你好！告訴我要新增哪些車輛，或現在誰在租車。可以打字、說話或傳照片。",
     "newChat": "新對話",
     "earlierChats": "較早的對話",
-    "untitledChat": "對話"
+    "untitledChat": "對話",
+    "sugSheet": "讀取我的 Google 試算表",
+    "sugSheetText": "這是我的車輛 Google 試算表：",
+    "sugPhoto": "傳送藍皮書照片",
+    "sugRenting": "告訴我目前有誰在租車",
+    "sugRentingText": "我有一輛車目前出租給 ",
+    "sugTell": "描述我的車輛",
+    "sugTellText": "我有 ",
+    "canTitle": "助理能做什麼",
+    "canSheet": "讀取你的車輛或租賃 Google 試算表。請將權限設為「知道連結的任何人都可以檢視」，再貼上連結。",
+    "canPhoto": "讀取藍皮書、車輛本身或價目表的照片。",
+    "canTalk": "語音輸入：點按麥克風，用你習慣的語言說出來即可。",
+    "canRentals": "新增目前的承租人，並設定下次付款日、押金和自動提醒。",
+    "canNote": "在你點按「新增」之前，任何內容都不會儲存。你的對話會保留在這裡，方便你之後繼續。",
+    "noChats": "你的對話會列在這裡。"
   },
   "setupRequest": {
     "title": "我們來幫您設定",

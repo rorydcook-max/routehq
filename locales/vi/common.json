@@ -6298,7 +6298,21 @@
     "helloAny": "Xin chào! Hãy cho tôi biết xe cần thêm, hoặc ai đang thuê xe. Bạn có thể gõ, nói hoặc gửi ảnh.",
     "newChat": "Cuộc trò chuyện mới",
     "earlierChats": "Cuộc trò chuyện trước",
-    "untitledChat": "Trò chuyện"
+    "untitledChat": "Trò chuyện",
+    "sugSheet": "Đọc Google Sheet của tôi",
+    "sugSheetText": "Đây là Google Sheet có danh sách xe của tôi: ",
+    "sugPhoto": "Gửi ảnh cà vẹt xe",
+    "sugRenting": "Cho biết ai đang thuê xe",
+    "sugRentingText": "Một trong các xe của tôi đang được cho thuê cho ",
+    "sugTell": "Mô tả các xe của tôi",
+    "sugTellText": "Tôi có ",
+    "canTitle": "Trợ lý có thể làm gì",
+    "canSheet": "Đọc Google Sheet về xe hoặc hợp đồng thuê của bạn. Chia sẻ ở chế độ \"Bất kỳ ai có liên kết đều có thể xem\" và dán liên kết vào.",
+    "canPhoto": "Đọc ảnh cà vẹt xe, ảnh chính xe hoặc bảng giá.",
+    "canTalk": "Nghe: nhấn biểu tượng micro và nói bằng ngôn ngữ của bạn.",
+    "canRentals": "Thêm người đang thuê xe, kèm ngày thanh toán tiếp theo, tiền đặt cọc và nhắc nhở tự động.",
+    "canNote": "Chưa có gì được lưu cho đến khi bạn nhấn Thêm. Cuộc trò chuyện của bạn được giữ lại tại đây để bạn tiếp tục sau.",
+    "noChats": "Các cuộc trò chuyện của bạn sẽ hiển thị ở đây."
   },
   "setupRequest": {
     "title": "Chúng tôi sẽ cài đặt giúp bạn",

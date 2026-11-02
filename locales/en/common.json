@@ -6298,7 +6298,21 @@
     "helloAny": "Hi! Tell me about vehicles to add, or who's renting one now. You can type, talk or send photos.",
     "newChat": "New chat",
     "earlierChats": "Earlier chats",
-    "untitledChat": "Chat"
+    "untitledChat": "Chat",
+    "sugSheet": "Read my Google Sheet",
+    "sugSheetText": "Here's the Google Sheet with my vehicles: ",
+    "sugPhoto": "Send a blue book photo",
+    "sugRenting": "Tell you who's renting now",
+    "sugRentingText": "One of my vehicles is rented to ",
+    "sugTell": "Describe my vehicles",
+    "sugTellText": "I have ",
+    "canTitle": "What the assistant can do",
+    "canSheet": "Read a Google Sheet of your vehicles or rentals. Share it as \"Anyone with the link can view\" and paste the link.",
+    "canPhoto": "Read photos of blue books, the vehicles themselves or a price list.",
+    "canTalk": "Listen: tap the microphone and say it in your own language.",
+    "canRentals": "Add who's renting now, with next payment dates, deposits and automatic reminders.",
+    "canNote": "Nothing is saved until you tap Add. Your chats are kept here so you can carry on later.",
+    "noChats": "Your chats will be listed here."
   },
   "setupRequest": {
     "title": "We'll set it up for you",

@@ -6298,7 +6298,21 @@
     "helloAny": "Halo! Beritahu saya kendaraan yang ingin ditambahkan, atau siapa yang sedang menyewa. Anda bisa mengetik, ngobrol, atau kirim foto.",
     "newChat": "Obrolan baru",
     "earlierChats": "Obrolan sebelumnya",
-    "untitledChat": "Obrolan"
+    "untitledChat": "Obrolan",
+    "sugSheet": "Baca Google Sheet saya",
+    "sugSheetText": "Ini Google Sheet dengan kendaraan saya: ",
+    "sugPhoto": "Kirim foto buku biru",
+    "sugRenting": "Beri tahu siapa yang sedang menyewa",
+    "sugRentingText": "Salah satu kendaraan saya sedang disewa oleh ",
+    "sugTell": "Jelaskan kendaraan saya",
+    "sugTellText": "Saya punya ",
+    "canTitle": "Yang bisa dilakukan asisten",
+    "canSheet": "Baca Google Sheet berisi kendaraan atau penyewaan Anda. Bagikan dengan pengaturan \"Siapa pun yang memiliki tautan dapat melihat\" lalu tempel tautannya.",
+    "canPhoto": "Baca foto buku biru, kendaraan itu sendiri, atau daftar harga.",
+    "canTalk": "Dengarkan: ketuk ikon mikrofon dan ucapkan dalam bahasa Anda sendiri.",
+    "canRentals": "Tambahkan siapa yang sedang menyewa, beserta tanggal pembayaran berikutnya, deposit, dan pengingat otomatis.",
+    "canNote": "Tidak ada yang disimpan sampai Anda mengetuk Tambah. Obrolan Anda disimpan di sini agar bisa dilanjutkan nanti.",
+    "noChats": "Obrolan Anda akan ditampilkan di sini."
   },
   "setupRequest": {
     "title": "Kami yang akan aturkan untuk Anda",

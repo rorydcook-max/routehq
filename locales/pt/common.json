@@ -6298,7 +6298,21 @@
     "helloAny": "Olá! Conte-me sobre veículos para adicionar ou quem está alugando um agora. Você pode digitar, falar ou enviar fotos.",
     "newChat": "Nova conversa",
     "earlierChats": "Conversas anteriores",
-    "untitledChat": "Conversa"
+    "untitledChat": "Conversa",
+    "sugSheet": "Ler minha planilha do Google",
+    "sugSheetText": "Aqui está a planilha do Google com meus veículos: ",
+    "sugPhoto": "Enviar foto do documento do veículo",
+    "sugRenting": "Dizer quem está alugando agora",
+    "sugRentingText": "Um dos meus veículos está alugado para ",
+    "sugTell": "Descrever meus veículos",
+    "sugTellText": "Eu tenho ",
+    "canTitle": "O que o assistente pode fazer",
+    "canSheet": "Ler uma planilha do Google com seus veículos ou aluguéis. Compartilhe como \"Qualquer pessoa com o link pode ver\" e cole o link.",
+    "canPhoto": "Ler fotos de documentos do veículo, dos próprios veículos ou de uma tabela de preços.",
+    "canTalk": "Ouvir: toque no microfone e fale no seu idioma.",
+    "canRentals": "Adicione quem está alugando agora, com as próximas datas de pagamento, cauções e lembretes automáticos.",
+    "canNote": "Nada é salvo até você tocar em Adicionar. Seus chats ficam guardados aqui para você continuar depois.",
+    "noChats": "Seus chats aparecerão aqui."
   },
   "setupRequest": {
     "title": "Nós configuramos por si",

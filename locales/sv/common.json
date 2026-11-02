@@ -6298,7 +6298,21 @@
     "helloAny": "Hej! Berätta vilka fordon som ska läggas till, eller vem som hyr ett just nu. Du kan skriva, prata eller skicka foton.",
     "newChat": "Ny chatt",
     "earlierChats": "Tidigare chattar",
-    "untitledChat": "Chatt"
+    "untitledChat": "Chatt",
+    "sugSheet": "Läs mitt Google-kalkylblad",
+    "sugSheetText": "Här är Google-kalkylbladet med mina fordon: ",
+    "sugPhoto": "Skicka ett foto av blå boken",
+    "sugRenting": "Berätta vem som hyr just nu",
+    "sugRentingText": "Ett av mina fordon är uthyrt till ",
+    "sugTell": "Beskriv mina fordon",
+    "sugTellText": "Jag har ",
+    "canTitle": "Vad assistenten kan göra",
+    "canSheet": "Läs ett Google-kalkylblad med dina fordon eller uthyrningar. Dela det med \"Alla med länken kan visa\" och klistra in länken.",
+    "canPhoto": "Läs foton av blå böcker, fordonen själva eller en prislista.",
+    "canTalk": "Lyssna: tryck på mikrofonen och säg det på ditt eget språk.",
+    "canRentals": "Lägg till vem som hyr just nu, med nästa betalningsdatum, depositioner och automatiska påminnelser.",
+    "canNote": "Inget sparas förrän du trycker på Lägg till. Dina chattar sparas här så att du kan fortsätta senare.",
+    "noChats": "Dina chattar visas här."
   },
   "setupRequest": {
     "title": "Vi ordnar det åt dig",

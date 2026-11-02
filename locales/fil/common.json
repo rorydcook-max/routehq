@@ -6298,7 +6298,21 @@
     "helloAny": "Kamusta! Sabihin sa akin ang tungkol sa mga idadagdag na sasakyan, o kung sino ang nagpapaupa ngayon. Pwede kang mag-type, magsalita o magpadala ng litrato.",
     "newChat": "Bagong chat",
     "earlierChats": "Mga naunang chat",
-    "untitledChat": "Chat"
+    "untitledChat": "Chat",
+    "sugSheet": "Basahin ang aking Google Sheet",
+    "sugSheetText": "Narito ang Google Sheet na may aking mga sasakyan: ",
+    "sugPhoto": "Magpadala ng larawan ng blue book",
+    "sugRenting": "Sabihin kung sino ang nangungupahan ngayon",
+    "sugRentingText": "Isa sa mga sasakyan ko ay nirentahan kay ",
+    "sugTell": "Ilarawan ang aking mga sasakyan",
+    "sugTellText": "Mayroon akong ",
+    "canTitle": "Ano ang kaya ng assistant",
+    "canSheet": "Basahin ang Google Sheet ng iyong mga sasakyan o rental. I-share ito bilang \"Anyone with the link can view\" at i-paste ang link.",
+    "canPhoto": "Basahin ang mga larawan ng blue book, ng mga mismong sasakyan, o ng listahan ng presyo.",
+    "canTalk": "Makinig: pindutin ang mikropono at sabihin ito sa sarili mong wika.",
+    "canRentals": "Magdagdag ng kasalukuyang nangungupahan, kasama ang petsa ng susunod na bayad, deposito at awtomatikong paalala.",
+    "canNote": "Walang nase-save hanggang pindutin mo ang Add. Nananatili rito ang iyong mga chat para maipagpatuloy mo ito sa susunod.",
+    "noChats": "Ilalista dito ang iyong mga chat."
   },
   "setupRequest": {
     "title": "Kami na ang maglalagay para sa iyo",

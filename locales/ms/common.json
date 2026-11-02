@@ -1059,7 +1059,8 @@
     "plans_starter": "Starter",
     "plans_growth": "Growth",
     "plans_pro": "Pro",
-    "plans_business": "Business"
+    "plans_business": "Business",
+    "showMore": "Tunjuk {count} lagi ({left} tinggal)"
   },
   "shell": {
     "quick_uploadReceipt": "Muat naik resit",

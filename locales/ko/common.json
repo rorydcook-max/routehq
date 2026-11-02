@@ -1019,7 +1019,8 @@
     "plans_starter": "Starter",
     "plans_growth": "Growth",
     "plans_pro": "Pro",
-    "plans_business": "Business"
+    "plans_business": "Business",
+    "showMore": "{count}개 더 보기 ({left}개 남음)"
   },
   "shell": {
     "quick_uploadReceipt": "영수증 올리기",

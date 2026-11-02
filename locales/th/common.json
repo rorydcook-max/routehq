@@ -1054,7 +1054,8 @@
     "plans_starter": "Starter",
     "plans_growth": "Growth",
     "plans_pro": "Pro",
-    "plans_business": "Business"
+    "plans_business": "Business",
+    "showMore": "แสดงเพิ่มอีก {count} รายการ (เหลือ {left})"
   },
   "shell": {
     "quick_uploadReceipt": "อัปโหลดใบเสร็จ",

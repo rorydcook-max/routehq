@@ -7,6 +7,7 @@ import { ArrowRight, Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, Map
 import { createVehicleTask } from "@/app/actions/tasks";
 import { logVehicleMaintenance, renewVehicleCompliance, setVehicleInShop } from "@/app/actions/vehicles";
 import { OpenFoldsOnHash } from "@/components/open-folds-on-hash";
+import { ShowMoreList } from "@/components/show-more-list";
 import { serviceKmLeft } from "@/lib/vehicle-service";
 import { HashLink } from "@/components/hash-link";
 import { MoneyInput } from "@/components/money-input";
@@ -837,13 +838,14 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
 
   return (
     <Part title={tx.say("x_title")}>
-      <div className="space-y-2">
-        {detail.transactions.length === 0 ? (
-          <EmptyState action={<Link className="font-bold text-[var(--primary)]" href={detailUrl("/transactions/new", detail.vehicle.id)}>{tx.say("x_first")}</Link>}>
-            {tx.say("x_none")}
-          </EmptyState>
-        ) : (
-          detail.transactions.map((transaction) => {
+      {detail.transactions.length === 0 ? (
+        <EmptyState action={<Link className="font-bold text-[var(--primary)]" href={detailUrl("/transactions/new", detail.vehicle.id)}>{tx.say("x_first")}</Link>}>
+          {tx.say("x_none")}
+        </EmptyState>
+      ) : (
+        // Eight at first, ten more each tap: a car's whole history scrolled forever on a phone (Rory, 2 Nov 2026).
+        <ShowMoreList className="space-y-2">
+          {detail.transactions.map((transaction) => {
             const expense = expenseTypes.has(transaction.type);
             // A deposit taken or handed back is not income or a cost: shown plainly, without a plus or minus.
             const held = transaction.type === "deposit_received" || transaction.type === "deposit_refunded";
@@ -869,9 +871,9 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
                 </div>
               </div>
             );
-          })
-        )}
-      </div>
+          })}
+        </ShowMoreList>
+      )}
     </Part>
   );
 }

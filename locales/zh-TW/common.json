@@ -1019,7 +1019,8 @@
     "plans_starter": "Starter",
     "plans_growth": "Growth",
     "plans_pro": "Pro",
-    "plans_business": "Business"
+    "plans_business": "Business",
+    "showMore": "再顯示 {count} 項（剩餘 {left} 項）"
   },
   "shell": {
     "quick_uploadReceipt": "上傳收據",

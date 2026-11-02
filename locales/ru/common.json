@@ -1059,7 +1059,8 @@
     "plans_starter": "Starter",
     "plans_growth": "Growth",
     "plans_pro": "Pro",
-    "plans_business": "Business"
+    "plans_business": "Business",
+    "showMore": "Показать ещё {count} ({left} осталось)"
   },
   "shell": {
     "quick_uploadReceipt": "Загрузить чек",

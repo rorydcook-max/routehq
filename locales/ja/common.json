@@ -1019,7 +1019,8 @@
     "plans_starter": "Starter",
     "plans_growth": "Growth",
     "plans_pro": "Pro",
-    "plans_business": "Business"
+    "plans_business": "Business",
+    "showMore": "あと{count}件を表示（残り{left}件）"
   },
   "shell": {
     "quick_uploadReceipt": "レシートをアップロード",

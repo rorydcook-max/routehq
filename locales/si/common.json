@@ -1019,7 +1019,8 @@
     "plans_starter": "Starter",
     "plans_growth": "Growth",
     "plans_pro": "Pro",
-    "plans_business": "Business"
+    "plans_business": "Business",
+    "showMore": "තව {count} ක් පෙන්වන්න ({left} ඉතිරියි)"
   },
   "shell": {
     "quick_uploadReceipt": "රිසිට්පතක් උඩුගත කරන්න",

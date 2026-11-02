@@ -1019,7 +1019,8 @@
     "plans_business": "Business",
     "countOut": "{count} வெளியே",
     "countFree": "{count} காலியாக",
-    "countBookedOrShop": "{count} முன்பதிவில் / பழுதுபார்ப்பில்"
+    "countBookedOrShop": "{count} முன்பதிவில் / பழுதுபார்ப்பில்",
+    "showMore": "மேலும் {count} காட்டு ({left} மீதம்)"
   },
   "shell": {
     "quick_uploadReceipt": "ரசீதைப் பதிவேற்று",

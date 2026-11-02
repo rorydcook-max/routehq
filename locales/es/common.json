@@ -1019,7 +1019,8 @@
     "plans_starter": "Starter",
     "plans_growth": "Growth",
     "plans_pro": "Pro",
-    "plans_business": "Business"
+    "plans_business": "Business",
+    "showMore": "Mostrar {count} más ({left} restantes)"
   },
   "shell": {
     "quick_uploadReceipt": "Subir un recibo",

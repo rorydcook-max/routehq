@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { viewerIsPlatformAdmin } from "@/lib/admin";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { said } from "@/lib/i18n/server-text";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -8,7 +9,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export async function ownBatch(batchId: string) {
   const membership = await getCurrentMembership();
   if (!membership) return { error: NextResponse.json({ error: await said("Please sign in first.") }, { status: 401 }) };
-  if (membership.role !== "owner") return { error: NextResponse.json({ error: await said("Only the business owner can import data.") }, { status: 403 }) };
+  if (membership.role !== "owner" && !(await viewerIsPlatformAdmin())) return { error: NextResponse.json({ error: await said("Only the business owner can import data.") }, { status: 403 }) };
   const organization = await getDefaultOrganization();
   if (organization.id !== membership.organizationId) {
     return { error: NextResponse.json({ error: await said("Switch to the business you want to import into and try again.") }, { status: 409 }) };

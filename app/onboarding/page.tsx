@@ -9,7 +9,7 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
-export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ preview?: string; step?: string; added?: string }> }) {
+export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ preview?: string; step?: string; added?: string; rentals?: string }> }) {
   // On a developer's machine only: /onboarding?preview=2 shows a step of the wizard for an account that has already finished it. Never on the live site.
   const previewStep = process.env.NODE_ENV === "development" ? Number((await searchParams).preview || 0) : 0;
   await getCurrentUserEmail();
@@ -67,7 +67,8 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const defaultCountry = COUNTRY_NAMES[countryCode] || "Thailand";
   const names = (vehicles || []).map((row: any) => [row.make, row.model, row.registration_number].filter(Boolean).join(" "));
   const initialStep = previewStep === 1 || previewStep === 2 ? previewStep : profileDone ? 2 : 1;
-  return <OnboardingWizard defaultCountry={defaultCountry} initialStep={initialStep as 1 | 2} organization={organizationDetail} vehicles={names} />;
+  const openAssistant = (await searchParams).rentals === "1";
+  return <OnboardingWizard defaultCountry={defaultCountry} openAssistant={openAssistant} initialStep={initialStep as 1 | 2} organization={organizationDetail} vehicles={names} />;
 }
 
 const COUNTRY_NAMES: Record<string, string> = {

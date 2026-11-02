@@ -1090,7 +1090,11 @@
     "setupEmailSent": "已傳送。請開啟收件匣中的連結。",
     "setupEmailFailed": "傳送失敗。請稍後再試。",
     "setupPrev": "上一步",
-    "setupNext": "下一步"
+    "setupNext": "下一步",
+    "setup_current_rentals": "新增目前租車的客戶",
+    "setup_reminders": "開啟自動提醒",
+    "setup_booking_page": "分享您的預約頁面",
+    "setupShared": "已複製連結。請將它貼到您的 Facebook 粉絲專頁、Google 地圖和 LINE。"
   },
   "todo": {
     "eyebrow": "待辦",
@@ -6227,7 +6231,9 @@
     "optListBody": "車輛資料都在試算表中嗎？一次全部匯入。",
     "toDashboard": "前往我的控制台",
     "later": "稍後再新增車輛",
-    "laterHint": "「新增您的車輛」將會保留在您的控制台上。"
+    "laterHint": "「新增您的車輛」將會保留在您的控制台上。",
+    "optHelp": "傳送記錄給我們，我們幫您設定",
+    "optHelpBody": "筆記本照片、試算表或聊天紀錄。我們幫您全部匯入。"
   },
   "fleetAssistant": {
     "title": "車隊小幫手",
@@ -6252,6 +6258,35 @@
     "stopTalking": "停止",
     "listening": "聆聽中…",
     "placeholder": "請告訴我您的車輛資訊…",
-    "send": "傳送"
+    "send": "傳送",
+    "askRented": "現在有車子出租中嗎？告訴我誰租了哪輛車、租金多少，以及下次付款時間（或還車時間）。",
+    "rentalsTitle": "{count, plural, one {目前有 # 筆出租中} other {目前有 # 筆出租中}}",
+    "nextPay": "下次付款 {date}",
+    "dueBack": "還車 {date}",
+    "deposit": "已收押金 {price}",
+    "perWeek": "{price}/週",
+    "remindRent": "在租金到期前提醒客戶",
+    "remindReturn": "在還車期限前提醒客戶",
+    "addRentals": "{count, plural, one {新增 # 筆租賃} other {新增 # 筆租賃}}",
+    "rentalsAdded": "{count, plural, one {完成：已加入 # 筆租賃。您會在儀表板上看到到期項目。} other {完成：已加入 # 筆租賃。您會在儀表板上看到到期項目。}}",
+    "rentalsReminders": "連結聊天應用程式以便自動發送提醒給客戶，並設定您的收款方式。",
+    "rentalsFailed": "無法新增：{names}。請檢查後再試一次。",
+    "linkChats": "連結 LINE 或 WhatsApp",
+    "linkPayments": "新增付款資訊"
+  },
+  "setupRequest": {
+    "title": "我們來幫您設定",
+    "body": "傳送您的筆記本、白板照片、試算表或對話記錄截圖，以及任何我們需要知道的事。我們會將您的車輛、客戶和現有租賃資料匯入，完成後會通知您。",
+    "addFiles": "新增照片或檔案",
+    "addMore": "新增更多",
+    "remove": "移除",
+    "notSent": "未傳送",
+    "noteLabel": "有什麼需要我們知道的嗎？",
+    "notePlaceholder": "例如：Yaris 正在 John 那裡租到 12 月，他每個月 5 號付款。",
+    "send": "傳送至 RoveHQ",
+    "sentTitle": "收到，謝謝！",
+    "sentBody": "我們會幫您設定好並通知您，通常需要一個工作天。在此之前您都可以正常使用 RoveHQ。",
+    "failed": "傳送失敗，請再試一次。",
+    "tooBig": "{name} 太大了。請傳送照片或較小的檔案。"
   }
 }

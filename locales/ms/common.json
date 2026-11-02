@@ -1130,7 +1130,11 @@
     "setupEmailSent": "Dihantar. Buka pautan dalam emel anda.",
     "setupEmailFailed": "Gagal menghantar. Cuba lagi sebentar lagi.",
     "setupPrev": "Langkah sebelumnya",
-    "setupNext": "Langkah seterusnya"
+    "setupNext": "Langkah seterusnya",
+    "setup_current_rentals": "Tambah siapa yang sedang menyewa",
+    "setup_reminders": "Pasang peringatan automatik",
+    "setup_booking_page": "Kongsi halaman tempahan anda",
+    "setupShared": "Pautan disalin. Letakkan pada halaman Facebook, Google Maps dan LINE anda."
   },
   "todo": {
     "eyebrow": "Tugasan",
@@ -6227,7 +6231,9 @@
     "optListBody": "Ada senarai kenderaan dalam helaian hamparan? Tambah semuanya sekaligus.",
     "toDashboard": "Pergi ke papan pemuka saya",
     "later": "Saya akan tambah kenderaan kemudian",
-    "laterHint": "\"Tambah kenderaan anda\" akan menunggu di papan pemuka anda."
+    "laterHint": "\"Tambah kenderaan anda\" akan menunggu di papan pemuka anda.",
+    "optHelp": "Hantar rekod anda, kami akan uruskannya",
+    "optHelpBody": "Gambar buku nota, helaian e-sijil atau sembang anda. Kami masukkan semuanya untuk anda."
   },
   "fleetAssistant": {
     "title": "Pembantu armada",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Berhenti",
     "listening": "Mendengar...",
     "placeholder": "Beritahu saya tentang kenderaan anda...",
-    "send": "Hantar"
+    "send": "Hantar",
+    "askRented": "Ada kenderaan yang sedang disewa sekarang? Beritahu saya siapa yang sewa, bayaran berapa, dan bila bayaran seterusnya (atau bila perlu dipulangkan).",
+    "rentalsTitle": "{count, plural, one {# sewaan sedang aktif} other {# sewaan sedang aktif}}",
+    "nextPay": "bayaran seterusnya {date}",
+    "dueBack": "pulang {date}",
+    "deposit": "deposit {price} dipegang",
+    "perWeek": "{price}/minggu",
+    "remindRent": "Ingatkan pelanggan sebelum sewaan perlu dibayar",
+    "remindReturn": "Ingatkan pelanggan sebelum perlu dipulangkan",
+    "addRentals": "{count, plural, one {Tambah # sewaan} other {Tambah # sewaan}}",
+    "rentalsAdded": "{count, plural, one {Selesai: # sewaan dimasukkan. Anda akan lihat apa yang perlu dibayar pada papan pemuka anda.} other {Selesai: # sewaan dimasukkan. Anda akan lihat apa yang perlu dibayar pada papan pemuka anda.}}",
+    "rentalsReminders": "Sambungkan aplikasi sembang supaya peringatan dihantar sendiri kepada pelanggan, dan tambah cara mereka bayar.",
+    "rentalsFailed": "Gagal menambah: {names}. Semak semula dan cuba lagi.",
+    "linkChats": "Sambungkan LINE atau WhatsApp",
+    "linkPayments": "Tambah butiran pembayaran"
+  },
+  "setupRequest": {
+    "title": "Kami akan sediakannya untuk anda",
+    "body": "Hantar gambar buku nota atau papan putih anda, fail Excel, atau eksport sembang, berserta apa-apa yang perlu kami tahu. Kami akan masukkan kenderaan, pelanggan dan sewaan semasa anda dan beritahu apabila siap.",
+    "addFiles": "Tambah gambar atau fail",
+    "addMore": "Tambah lagi",
+    "remove": "Buang",
+    "notSent": "Tidak dihantar",
+    "noteLabel": "Ada apa-apa yang patut kami tahu?",
+    "notePlaceholder": "Contoh: Yaris dipinjam oleh John hingga Disember, dia bayar pada 5 hb.",
+    "send": "Hantar ke RoveHQ",
+    "sentTitle": "Terima kasih, sudah terima!",
+    "sentBody": "Kami akan sediakan semuanya dan maklumkan kepada anda, biasanya dalam masa satu hari bekerja. Anda boleh guna RoveHQ sementara itu.",
+    "failed": "Gagal dihantar. Cuba lagi.",
+    "tooBig": "{name} terlalu besar. Hantar foto atau fail yang lebih kecil."
   }
 }

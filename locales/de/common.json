@@ -1130,7 +1130,11 @@
     "setupEmailSent": "Gesendet. Öffne den Link in deinem Posteingang.",
     "setupEmailFailed": "Senden fehlgeschlagen. Versuche es in einer Minute nochmal.",
     "setupPrev": "Vorherige Schritte",
-    "setupNext": "Nächste Schritte"
+    "setupNext": "Nächste Schritte",
+    "setup_current_rentals": "Aktuelle Vermietungen eintragen",
+    "setup_reminders": "Automatische Erinnerungen einschalten",
+    "setup_booking_page": "Buchungsseite teilen",
+    "setupShared": "Link kopiert. Füge ihn auf deiner Facebook-Seite, bei Google Maps und LINE ein."
   },
   "todo": {
     "eyebrow": "Zu erledigen",
@@ -6227,7 +6231,9 @@
     "optListBody": "Hast du eine Tabelle? Füge alle Fahrzeuge auf einmal hinzu.",
     "toDashboard": "Zum Dashboard",
     "later": "Fahrzeuge später hinzufügen",
-    "laterHint": "„Fahrzeuge hinzufügen“ wartet auf deinem Dashboard auf dich."
+    "laterHint": "„Fahrzeuge hinzufügen“ wartet auf deinem Dashboard auf dich.",
+    "optHelp": "Schick uns deine Unterlagen, wir richten es ein",
+    "optHelpBody": "Fotos von deinem Notizbuch, einer Tabelle oder Chats. Wir übertragen alles für dich."
   },
   "fleetAssistant": {
     "title": "Flotten-Assistent",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Stopp",
     "listening": "Ich höre zu…",
     "placeholder": "Erzähl mir von deinen Fahrzeugen…",
-    "send": "Senden"
+    "send": "Senden",
+    "askRented": "Sind gerade Fahrzeuge vermietet? Sag mir, wer welches hat, was sie zahlen und wann die nächste Zahlung fällig ist (oder wann es zurückkommt).",
+    "rentalsTitle": "{count, plural, one {# Vermietung läuft gerade} other {# Vermietungen laufen gerade}}",
+    "nextPay": "nächste Zahlung am {date}",
+    "dueBack": "zurück am {date}",
+    "deposit": "{price} Kaution hinterlegt",
+    "perWeek": "{price}/Woche",
+    "remindRent": "Kunden vor fälliger Miete erinnern",
+    "remindReturn": "Kunden vor Rückgabe erinnern",
+    "addRentals": "{count, plural, one {# Vermietung hinzufügen} other {# Vermietungen hinzufügen}}",
+    "rentalsAdded": "{count, plural, one {Fertig: # Vermietung ist drin. Du siehst auf deinem Dashboard, was fällig ist.} other {Fertig: # Vermietungen sind drin. Du siehst auf deinem Dashboard, was fällig ist.}}",
+    "rentalsReminders": "Chat-App verbinden, damit Erinnerungen automatisch an Kunden gehen, und Zahlungsart hinzufügen.",
+    "rentalsFailed": "Konnte nicht hinzugefügt werden: {names}. Prüfe sie und versuche es noch einmal.",
+    "linkChats": "LINE oder WhatsApp verbinden",
+    "linkPayments": "Zahlungsdetails hinzufügen"
+  },
+  "setupRequest": {
+    "title": "Wir richten es für dich ein",
+    "body": "Schick uns Fotos von deinem Notizbuch oder Whiteboard, deiner Tabelle oder Chat-Verläufen sowie alles, was wir wissen sollten. Wir tragen deine Fahrzeuge, Kunden und laufenden Vermietungen ein und sagen dir Bescheid, wenn es fertig ist.",
+    "addFiles": "Fotos oder Dateien hinzufügen",
+    "addMore": "Mehr hinzufügen",
+    "remove": "Entfernen",
+    "notSent": "Nicht gesendet",
+    "noteLabel": "Gibt es noch etwas zu wissen?",
+    "notePlaceholder": "Zum Beispiel: Der Yaris ist bis Dezember bei John, er zahlt am 5.",
+    "send": "An RoveHQ senden",
+    "sentTitle": "Danke, ist angekommen!",
+    "sentBody": "Wir richten alles ein und geben dir Bescheid, normalerweise innerhalb eines Werktags. Du kannst RoveHQ in der Zwischenzeit weiter nutzen.",
+    "failed": "Das hat nicht geklappt. Versuche es noch einmal.",
+    "tooBig": "{name} ist zu groß. Sende ein Foto oder eine kleinere Datei."
   }
 }

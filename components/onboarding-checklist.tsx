@@ -4,8 +4,8 @@ import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { Route } from "next";
-import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Mail, X } from "lucide-react";
-import { dismissChecklist } from "@/app/actions/onboarding";
+import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Mail, Share2, X } from "lucide-react";
+import { dismissChecklist, markBookingPageShared } from "@/app/actions/onboarding";
 import { sendEmailCheck } from "@/app/actions/auth";
 
 type ChecklistItem = {
@@ -26,7 +26,8 @@ export function OnboardingChecklist({
   items,
   organizationId,
   totalCount,
-  firstBookingTaken = false
+  firstBookingTaken = false,
+  bookingUrl = ""
 }: {
   completedCount: number;
   items: ChecklistItem[];
@@ -34,12 +35,15 @@ export function OnboardingChecklist({
   totalCount: number;
   /** Once a booking exists the card is about finishing off, not about getting ready. */
   firstBookingTaken?: boolean;
+  /** Their booking page (rove.rent/their-name), for "Share your booking page". */
+  bookingUrl?: string;
 }) {
   const t = useTranslations("shell");
   const [hidden, setHidden] = useState(false);
   const [page, setPage] = useState(0);
   const [emailSent, setEmailSent] = useState<"" | "sent" | "failed">("");
   const [sending, startSending] = useTransition();
+  const [shared, setShared] = useState(false);
   const allComplete = completedCount === totalCount;
   const progress = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
   const remaining = items.filter((item) => !item.completed);
@@ -95,6 +99,35 @@ export function OnboardingChecklist({
           const badge = (
             <span className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full text-[12px] font-bold ${isNext ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border)] text-[var(--foreground-secondary)]"}`}>{number}</span>
           );
+          // Copies the link (or opens the phone's share sheet), ready for their Facebook page, Google Maps listing or LINE profile.
+          if (item.step === "booking_page" && bookingUrl) {
+            return (
+              <li key={item.step}>
+                <button
+                  aria-current={isNext ? "step" : undefined}
+                  className={rowClass(isNext)}
+                  onClick={async () => {
+                    try {
+                      if (navigator.share) await navigator.share({ url: bookingUrl });
+                      else await navigator.clipboard.writeText(bookingUrl);
+                    } catch {
+                      await navigator.clipboard?.writeText(bookingUrl).catch(() => null);
+                    }
+                    setShared(true);
+                    void markBookingPageShared(organizationId).catch(() => null);
+                  }}
+                  type="button"
+                >
+                  {badge}
+                  <span className="min-w-0 flex-1">
+                    {label(item)}
+                    <span className="block truncate text-[14px] font-medium text-[var(--foreground-secondary)]">{shared ? t("setupShared") : bookingUrl.replace(/^https?:\/\//, "")}</span>
+                  </span>
+                  <Share2 className="shrink-0" size={18} />
+                </button>
+              </li>
+            );
+          }
           if (item.step === "verify_email") {
             return (
               <li key={item.step}>

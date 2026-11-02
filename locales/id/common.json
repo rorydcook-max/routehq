@@ -1130,7 +1130,11 @@
     "setupEmailSent": "Terkirim. Buka tautan di kotak masuk Anda.",
     "setupEmailFailed": "Gagal mengirim. Coba lagi sebentar lagi.",
     "setupPrev": "Langkah sebelumnya",
-    "setupNext": "Langkah berikutnya"
+    "setupNext": "Langkah berikutnya",
+    "setup_current_rentals": "Tambah yang sedang menyewa",
+    "setup_reminders": "Aktifkan pengingat otomatis",
+    "setup_booking_page": "Bagikan halaman pemesanan Anda",
+    "setupShared": "Tautan disalin. Tempel di halaman Facebook, Google Maps, dan LINE Anda."
   },
   "todo": {
     "eyebrow": "Tugas",
@@ -6227,7 +6231,9 @@
     "optListBody": "Punya daftar kendaraan di spreadsheet? Tambahkan semuanya sekaligus.",
     "toDashboard": "Buka dasbor saya",
     "later": "Saya akan tambahkan nanti",
-    "laterHint": "\"Tambahkan kendaraan Anda\" akan menunggu di dasbor Anda."
+    "laterHint": "\"Tambahkan kendaraan Anda\" akan menunggu di dasbor Anda.",
+    "optHelp": "Kirim catatan Anda, kami yang akan aturkan",
+    "optHelpBody": "Foto buku catatan, spreadsheet, atau chat. Kami masukkan semuanya untuk Anda."
   },
   "fleetAssistant": {
     "title": "Asisten armada",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Berhenti",
     "listening": "Mendengarkan…",
     "placeholder": "Ceritakan tentang kendaraan Anda…",
-    "send": "Kirim"
+    "send": "Kirim",
+    "askRented": "Apakah ada kendaraan yang sedang disewakan sekarang? Beritahu saya siapa yang meminjam, biaya sewanya, dan kapan pembayaran berikutnya (atau tanggal pengembaliannya).",
+    "rentalsTitle": "{count, plural, one {# sewa aktif saat ini} other {# sewa aktif saat ini}}",
+    "nextPay": "bayar berikutnya {date}",
+    "dueBack": "kembali {date}",
+    "deposit": "deposit {price}",
+    "perWeek": "{price}/minggu",
+    "remindRent": "Ingatkan pelanggan sebelum jatuh tempo sewa",
+    "remindReturn": "Ingatkan pelanggan sebelum batas waktu pengembalian",
+    "addRentals": "{count, plural, one {Tambah # sewa} other {Tambah # sewa}}",
+    "rentalsAdded": "{count, plural, one {Selesai: # sewa telah dimasukkan. Anda dapat melihat jadwal penagihan di dasbor.} other {Selesai: # sewa telah dimasukkan. Anda dapat melihat jadwal penagihan di dasbor.}}",
+    "rentalsReminders": "Sambungkan aplikasi chat agar pengingat terkirim otomatis ke pelanggan, dan tambahkan metode pembayaran Anda.",
+    "rentalsFailed": "Gagal menambahkan: {names}. Periksa kembali dan coba lagi.",
+    "linkChats": "Sambungkan LINE atau WhatsApp",
+    "linkPayments": "Tambah info pembayaran"
+  },
+  "setupRequest": {
+    "title": "Kami yang akan aturkan untuk Anda",
+    "body": "Kirim foto buku catatan atau papan tulis, spreadsheet, atau riwayat chat, serta hal penting lainnya. Kami akan memasukkan kendaraan, pelanggan, dan data sewa Anda, lalu memberi tahu saat semuanya siap.",
+    "addFiles": "Tambah foto atau file",
+    "addMore": "Tambah lagi",
+    "remove": "Hapus",
+    "notSent": "Belum dikirim",
+    "noteLabel": "Ada hal lain yang perlu kami tahu?",
+    "notePlaceholder": "Contoh: Yaris dipinjam John sampai Desember, dia bayar tiap tanggal 5.",
+    "send": "Kirim ke RoveHQ",
+    "sentTitle": "Baik, terima kasih!",
+    "sentBody": "Kami akan menyiapkan semuanya dan memberi tahu Anda, biasanya dalam waktu satu hari kerja. Anda bisa menggunakan RoveHQ sambil menunggu.",
+    "failed": "Gagal mengirim. Coba lagi.",
+    "tooBig": "{name} terlalu besar. Kirim foto atau file yang lebih kecil."
   }
 }

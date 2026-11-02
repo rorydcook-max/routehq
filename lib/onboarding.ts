@@ -1,13 +1,18 @@
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
 export const onboardingSteps = [
-  // In the order a new business needs them: what must be in place to take a booking first, the rest after.
+  // In the order that makes RoveHQ worth coming back to (Rory, 2 Nov 2026): the business in first (vehicles, then who is
+  // renting them now, so money due and returns show at once), reminders that send themselves, the booking page out in
+  // the world, then what online bookings need, then the rest.
   { step: "business_profile", label: "Business profile complete", href: "/onboarding" },
-  // Only for accounts that came straight in without checking their email first (Rory, 2 Nov 2026).
-  { step: "verify_email", label: "Verify your email", href: "#verify-email" },
   { step: "first_vehicle", label: "Add your vehicles", href: "/onboarding?step=2" },
-  // Without this the customer is stopped at the last step of their booking link.
+  { step: "current_rentals", label: "Add who's renting now", href: "/onboarding?step=2&rentals=1" },
+  { step: "reminders", label: "Turn on automatic reminders", href: "/settings?tab=messaging" },
+  { step: "booking_page", label: "Share your booking page", href: "#booking-page" },
+  // Without these the customer is stopped at the last step of their booking link.
   { step: "signature", label: "Add your signature", href: "/settings/signature" },
   { step: "payment_methods", label: "Say how customers pay you", href: "/settings?tab=rentals#payment-methods" },
+  // Only for accounts that came straight in without checking their email first.
+  { step: "verify_email", label: "Verify your email", href: "#verify-email" },
   { step: "first_booking", label: "First booking created", href: "/bookings/new" },
   { step: "contract_template", label: "Contract template reviewed", href: "/settings/contracts" },
   { step: "line_connected", label: "LINE notifications connected", href: "/settings?tab=notifications" },
@@ -54,13 +59,14 @@ export async function ensureOnboardingChecklist(supabase: any, organizationId: s
 }
 
 export async function getOnboardingStatus(supabase: any, organizationId: string, options: { emailPending?: boolean } = {}) {
-  const [orgResult, checklistResult, vehicleResult, customerResult, rentalResult, memberResult] = await Promise.all([
+  const [orgResult, checklistResult, vehicleResult, customerResult, rentalResult, memberResult, channelResult] = await Promise.all([
     supabase.from("organizations").select("*").eq("id", organizationId).is("deleted_at", null).maybeSingle(),
     supabase.from("onboarding_checklist").select("step, completed, completed_at").eq("organization_id", organizationId),
     supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).is("deleted_at", null),
     supabase.from("customers").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).is("deleted_at", null),
     supabase.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).is("deleted_at", null),
-    supabase.from("organization_members").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).eq("is_active", true)
+    supabase.from("organization_members").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).eq("is_active", true),
+    supabase.from("messaging_channels").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).neq("status", "disconnected")
   ]);
 
   const error = [orgResult, checklistResult, vehicleResult, customerResult, rentalResult, memberResult].find((result: any) => result.error)?.error;
@@ -80,6 +86,10 @@ export async function getOnboardingStatus(supabase: any, organizationId: string,
     business_profile: Boolean(organization.name && settings.location),
     verify_email: !options.emailPending,
     first_vehicle: vehicleCount >= 1,
+    current_rentals: rentalCount >= 1,
+    // Reminders send themselves once a chat app (LINE, Telegram, WhatsApp...) is connected.
+    reminders: (channelResult?.count || 0) > 0,
+    booking_page: false,
     signature: orgResult.data ? onlineSigningGaps(orgResult.data).length === 0 : false,
     payment_methods: Boolean(organization.promptpay_id || organization.promptpay_qr_url || organization.bank_account_number || organization.wise_link || organization.revolut_link),
     first_booking: rentalCount >= 1,

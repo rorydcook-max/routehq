@@ -1090,7 +1090,11 @@
     "setupEmailSent": "Sent. Open the link in your inbox.",
     "setupEmailFailed": "That didn't send. Try again in a minute.",
     "setupPrev": "Previous steps",
-    "setupNext": "Next steps"
+    "setupNext": "Next steps",
+    "setup_current_rentals": "Add who's renting now",
+    "setup_reminders": "Turn on automatic reminders",
+    "setup_booking_page": "Share your booking page",
+    "setupShared": "Link copied. Put it on your Facebook page, Google Maps and LINE."
   },
   "todo": {
     "eyebrow": "To do",
@@ -6227,7 +6231,9 @@
     "optListBody": "Have your vehicles in a spreadsheet? Add them all at once.",
     "toDashboard": "Go to my dashboard",
     "later": "I'll add vehicles later",
-    "laterHint": "\"Add your vehicles\" will be waiting on your dashboard."
+    "laterHint": "\"Add your vehicles\" will be waiting on your dashboard.",
+    "optHelp": "Send us your records, we'll set it up",
+    "optHelpBody": "Photos of your notebook, a spreadsheet or chats. We bring it all in for you."
   },
   "fleetAssistant": {
     "title": "Fleet assistant",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Stop",
     "listening": "Listening…",
     "placeholder": "Tell me about your vehicles…",
-    "send": "Send"
+    "send": "Send",
+    "askRented": "Are any of your vehicles rented out right now? Tell me who has which one, what they pay, and when the next payment is (or when it's due back).",
+    "rentalsTitle": "{count, plural, one {# rental running now} other {# rentals running now}}",
+    "nextPay": "next payment {date}",
+    "dueBack": "back {date}",
+    "deposit": "{price} deposit held",
+    "perWeek": "{price}/week",
+    "remindRent": "Remind the customer before rent is due",
+    "remindReturn": "Remind the customer before it's due back",
+    "addRentals": "{count, plural, one {Add # rental} other {Add # rentals}}",
+    "rentalsAdded": "{count, plural, one {Done: # rental is in. You'll see what's due on your dashboard.} other {Done: # rentals are in. You'll see what's due on your dashboard.}}",
+    "rentalsReminders": "Connect a chat app so reminders go to customers by themselves, and add how they pay you.",
+    "rentalsFailed": "Couldn't add: {names}. Check them and try again.",
+    "linkChats": "Connect LINE or WhatsApp",
+    "linkPayments": "Add payment details"
+  },
+  "setupRequest": {
+    "title": "We'll set it up for you",
+    "body": "Send photos of your notebook or whiteboard, your spreadsheet, or chat exports, plus anything we should know. We'll bring your vehicles, customers and current rentals in and let you know when it's ready.",
+    "addFiles": "Add photos or files",
+    "addMore": "Add more",
+    "remove": "Remove",
+    "notSent": "Not sent",
+    "noteLabel": "Anything we should know?",
+    "notePlaceholder": "For example: the Yaris is with John until December, he pays on the 5th.",
+    "send": "Send to RoveHQ",
+    "sentTitle": "Got it, thanks!",
+    "sentBody": "We'll set everything up and let you know, usually within one working day. You can use RoveHQ in the meantime.",
+    "failed": "That didn't send. Try again.",
+    "tooBig": "{name} is too big. Send a photo or a smaller file."
   }
 }

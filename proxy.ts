@@ -305,9 +305,12 @@ export async function proxy(request: NextRequest) {
   }
 
   // The importer is open during first-time setup (so the checks below are skipped for it), but it stays the owner's.
-  if (user && (pathname === "/import" || pathname.startsWith("/fleet/import"))) {
+  // RoveHQ support, viewing a business that asked "set it up for you", brings records in with the same importer (2 Nov 2026).
+  const importPath = pathname === "/import" || pathname.startsWith("/fleet/import");
+  if (user && importPath) {
     const { data: membership } = await loadActiveMembership(supabase, user.id, request.cookies.get(ACTIVE_ORGANIZATION_COOKIE)?.value || null);
-    if (membership && membership.role !== "owner") {
+    const { data: platformAdmin } = membership && membership.role !== "owner" ? await (supabase as any).rpc("is_platform_admin") : { data: null };
+    if (membership && membership.role !== "owner" && !platformAdmin) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/";
       redirectUrl.search = "?notice=owner-only";
@@ -320,7 +323,7 @@ export async function proxy(request: NextRequest) {
   const activeOrgCookie = request.cookies.get(ACTIVE_ORGANIZATION_COOKIE)?.value || "";
   const gateRole = user && !isOnboardingAllowedRoute ? await readGate(request.cookies.get(GATE_COOKIE)?.value, user.id, activeOrgCookie) : null;
   if (user && gateRole) {
-    if (isOwnerOnlyPath(pathname) && gateRole !== "owner") {
+    if (isOwnerOnlyPath(pathname) && gateRole !== "owner" && !importPath) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/";
       redirectUrl.search = "?notice=owner-only";
@@ -357,7 +360,7 @@ export async function proxy(request: NextRequest) {
     // enforce this too; this just keeps teammates off pages they cannot use.
     // A teammate runs the day: bookings, vehicles, customers, payments. How the business is doing (reports, what a
     // vehicle would earn) and bringing in a whole fleet from a file are the owner's.
-    if (isOwnerOnlyPath(pathname) && membership.role !== "owner") {
+    if (isOwnerOnlyPath(pathname) && membership.role !== "owner" && !importPath) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/";
       redirectUrl.search = "?notice=owner-only";

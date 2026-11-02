@@ -1090,7 +1090,11 @@
     "setupEmailSent": "Skickat. Öppna länken i din inkorg.",
     "setupEmailFailed": "Det skickades inte. Försök igen om en minut.",
     "setupPrev": "Föregående steg",
-    "setupNext": "Nästa steg"
+    "setupNext": "Nästa steg",
+    "setup_current_rentals": "Lägg till vem som hyr nu",
+    "setup_reminders": "Aktivera automatiska påminnelser",
+    "setup_booking_page": "Dela din bokningssida",
+    "setupShared": "Länk kopierad. Lägg upp den på din Facebook-sida, Google Maps och LINE."
   },
   "todo": {
     "eyebrow": "Att göra",
@@ -6227,7 +6231,9 @@
     "optListBody": "Har du dina fordon i ett kalkylblad? Lägg till alla på en gång.",
     "toDashboard": "Gå till min instrumentpanel",
     "later": "Jag lägger till fordon senare",
-    "laterHint": "\"Lägg till dina fordon\" kommer att vänta på din instrumentpanel."
+    "laterHint": "\"Lägg till dina fordon\" kommer att vänta på din instrumentpanel.",
+    "optHelp": "Skicka dina anteckningar till oss, så ordnar vi det",
+    "optHelpBody": "Foton på din anteckningsbok, ett kalkylblad eller chattar. Vi lägger in allt åt dig."
   },
   "fleetAssistant": {
     "title": "Fordonshjälp",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Stopp",
     "listening": "Lyssnar…",
     "placeholder": "Berätta om dina fordon…",
-    "send": "Skicka"
+    "send": "Skicka",
+    "askRented": "Är några av dina fordon uthyrda just nu? Berätta vem som har vilket, vad de betalar och när nästa betalning är (eller när den ska lämnas tillbaka).",
+    "rentalsTitle": "{count, plural, one {# uthyrning pågår nu} other {# uthyrningar pågår nu}}",
+    "nextPay": "nästa betalning {date}",
+    "dueBack": "tillbaka {date}",
+    "deposit": "{price} i deposition",
+    "perWeek": "{price}/vecka",
+    "remindRent": "Påminn kunden innan hyran ska betalas",
+    "remindReturn": "Påminn kunden innan den ska lämnas tillbaka",
+    "addRentals": "{count, plural, one {Lägg till # uthyrning} other {Lägg till # uthyrningar}}",
+    "rentalsAdded": "{count, plural, one {Klart: # uthyrning har lagts till. Du ser vad som förfaller på din instrumentpanel.} other {Klart: # uthyrningar har lagts till. Du ser vad som förfaller på din instrumentpanel.}}",
+    "rentalsReminders": "Koppla en chattapp så att påminnelser skickas till kunderna automatiskt, och lägg till hur de betalar dig.",
+    "rentalsFailed": "Kunde inte lägga till: {names}. Kontrollera dem och försök igen.",
+    "linkChats": "Koppla LINE eller WhatsApp",
+    "linkPayments": "Lägg till betalningsuppgifter"
+  },
+  "setupRequest": {
+    "title": "Vi ordnar det åt dig",
+    "body": "Skicka foton på din anteckningsbok eller whiteboard, ditt kalkylblad eller chattexporter, samt allt annat vi bör veta. Vi lägger till dina fordon, kunder och pågående uthyrningar och meddelar dig när det är klart.",
+    "addFiles": "Lägg till foton eller filer",
+    "addMore": "Lägg till fler",
+    "remove": "Ta bort",
+    "notSent": "Inte skickat",
+    "noteLabel": "Något vi bör veta?",
+    "notePlaceholder": "Till exempel: Yaris är hos John till december, han betalar den 5:e.",
+    "send": "Skicka till RoveHQ",
+    "sentTitle": "Tack, vi har mottagit det!",
+    "sentBody": "Vi ställer in allt och meddelar dig, oftast inom en arbetsdag. Du kan använda RoveHQ så länge.",
+    "failed": "Det skickades inte. Försök igen.",
+    "tooBig": "{name} är för stor. Skicka ett foto eller en mindre fil."
   }
 }

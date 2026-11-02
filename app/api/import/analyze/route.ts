@@ -1,4 +1,5 @@
 import { said } from "@/lib/i18n/server-text";
+import { viewerIsPlatformAdmin } from "@/lib/admin";
 import { aiTextConfigured } from "@/lib/ai-chat";
 import { NextResponse } from "next/server";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
   // Importing creates vehicles, customers and money records for the whole business.
   const membership = await getCurrentMembership();
   if (!membership) return NextResponse.json({ error: await said("Please sign in first.") }, { status: 401 });
-  if (membership.role !== "owner") return NextResponse.json({ error: await said("Only the business owner can import data.") }, { status: 403 });
+  if (membership.role !== "owner" && !(await viewerIsPlatformAdmin())) return NextResponse.json({ error: await said("Only the business owner can import data.") }, { status: 403 });
 
   const formData = await request.formData();
   const file = formData.get("file");

@@ -1130,7 +1130,11 @@
     "setupEmailSent": "已发送。请查收邮件并点击链接。",
     "setupEmailFailed": "发送失败。请稍后再试。",
     "setupPrev": "上一步",
-    "setupNext": "下一步"
+    "setupNext": "下一步",
+    "setup_current_rentals": "添加当前的租赁",
+    "setup_reminders": "开启自动提醒",
+    "setup_booking_page": "分享您的预订页面",
+    "setupShared": "链接已复制。请将其发布到您的 Facebook 页面、Google 地图和 LINE 上。"
   },
   "todo": {
     "eyebrow": "待办",
@@ -6227,7 +6231,9 @@
     "optListBody": "已有电子表格？可一次性全部导入。",
     "toDashboard": "前往控制面板",
     "later": "以后再添加车辆",
-    "laterHint": "“添加您的车辆”功能将保留在您的控制面板中。"
+    "laterHint": "“添加您的车辆”功能将保留在您的控制面板中。",
+    "optHelp": "将记录发给我们，我们来帮您设置",
+    "optHelpBody": "您的记事本照片、电子表格或聊天记录。我们为您导入所有内容。"
   },
   "fleetAssistant": {
     "title": "车队助手",
@@ -6252,6 +6258,35 @@
     "stopTalking": "停止",
     "listening": "正在聆听…",
     "placeholder": "告诉我你的车辆信息…",
-    "send": "发送"
+    "send": "发送",
+    "askRented": "现在有车租出去了吗？告诉我谁租了哪辆车、租金多少、下次付款时间是什么时候（或者什么时候归还）。",
+    "rentalsTitle": "{count, plural, other {当前有 # 笔租赁进行中}}",
+    "nextPay": "下次付款 {date}",
+    "dueBack": "归还日期 {date}",
+    "deposit": "已扣押金 {price}",
+    "perWeek": "{price}/周",
+    "remindRent": "在租金到期前提醒客户",
+    "remindReturn": "在车辆到期前提醒客户",
+    "addRentals": "{count, plural, other {添加 # 笔租赁}}",
+    "rentalsAdded": "{count, plural, other {完成：已录入 # 笔租赁。您将在仪表盘上看到到期提醒。}}",
+    "rentalsReminders": "连接聊天应用以便自动向客户发送提醒，并添加您的收款方式。",
+    "rentalsFailed": "无法添加：{names}。请检查后重试。",
+    "linkChats": "连接 LINE 或 WhatsApp",
+    "linkPayments": "添加付款详情"
+  },
+  "setupRequest": {
+    "title": "我们来帮您设置",
+    "body": "发送您的记事本或白板照片、电子表格、聊天记录，以及任何我们需要了解的信息。我们将为您导入车辆、客户和当前租赁信息，准备就绪后会通知您。",
+    "addFiles": "添加照片或文件",
+    "addMore": "添加更多",
+    "remove": "移除",
+    "notSent": "未发送",
+    "noteLabel": "还有什么需要我们了解的吗？",
+    "notePlaceholder": "例如：Yaris 租给了 John，直到 12 月，他在每月 5 号付款。",
+    "send": "发送给 RoveHQ",
+    "sentTitle": "收到，谢谢！",
+    "sentBody": "我们将为您设置好并通知您，通常在一个工作日内完成。在此期间您可以正常使用 RoveHQ。",
+    "failed": "发送失败，请重试。",
+    "tooBig": "{name} 文件太大。请发送照片或更小的文件。"
   }
 }

@@ -3,7 +3,9 @@
 import { Camera, Check, Loader2, Mic, Send, Sparkles, Square, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { addAssistantVehicles, askFleetAssistant, type AssistantTurn, type DraftVehicle } from "@/app/actions/fleet-assistant";
+import { addAssistantRentals, addAssistantVehicles, askFleetAssistant, type AssistantTurn, type DraftRental, type DraftVehicle } from "@/app/actions/fleet-assistant";
+import Link from "next/link";
+import type { Route } from "next";
 import { uploadVehiclePhotos } from "@/app/actions/vehicles";
 import { compressImage } from "@/lib/direct-upload-client";
 
@@ -28,11 +30,14 @@ function toDataUrl(file: File) {
  * Add vehicles by talking to an assistant (Rory, 2 Nov 2026): type, speak or send photos; it keeps a list; one tap adds them,
  * photos included. Nothing is saved until Add is tapped.
  */
-export function FleetAssistant({ organizationId, currency = "THB", onAdded }: { organizationId: string; currency?: string; onAdded?: (count: number) => void }) {
+export function FleetAssistant({ organizationId, currency = "THB", onAdded, hasVehicles = false }: { organizationId: string; currency?: string; onAdded?: (count: number) => void; hasVehicles?: boolean }) {
   const t = useTranslations("fleetAssistant");
   const locale = useLocale();
   const [turns, setTurns] = useState<AssistantTurn[]>([]);
-  const [shownTurns, setShownTurns] = useState<Array<AssistantTurn & { photos?: string[] }>>([{ role: "assistant", text: t("hello") }]);
+  // Vehicles already in: the first question is who is renting them (Rory, 2 Nov 2026).
+  const [shownTurns, setShownTurns] = useState<Array<AssistantTurn & { photos?: string[]; links?: boolean }>>([{ role: "assistant", text: hasVehicles ? t("askRented") : t("hello") }]);
+  const [rentals, setRentals] = useState<DraftRental[]>([]);
+  const [addingRentals, setAddingRentals] = useState(false);
   const [draft, setDraft] = useState<DraftVehicle[]>([]);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [pending, setPending] = useState<Photo[]>([]);
@@ -76,7 +81,7 @@ export function FleetAssistant({ organizationId, currency = "THB", onAdded }: { 
     setThinking(true);
     // The model sees smaller copies; the full photos are kept for the vehicles.
     const images = await Promise.all(sending.map(async (photo) => toDataUrl(await compressImage(photo.file, 1024, 0.7).catch(() => photo.file)))).catch(() => [] as string[]);
-    const result = await askFleetAssistant({ turns: nextTurns, images, photosBefore: photos.length, draft, locale }).catch(() => ({ ok: false as const, error: "failed" }));
+    const result = await askFleetAssistant({ turns: nextTurns, images, photosBefore: photos.length, draft, rentals, locale }).catch(() => ({ ok: false as const, error: "failed" }));
     setPhotos((list) => [...list, ...sending]);
     setThinking(false);
     if (!result.ok) {
@@ -86,7 +91,21 @@ export function FleetAssistant({ organizationId, currency = "THB", onAdded }: { 
     }
     setTurns([...nextTurns, { role: "assistant", text: result.reply }]);
     setShownTurns((list) => [...list, { role: "assistant", text: result.reply }]);
-    setDraft(result.draft);
+    setDraft(withoutAdded(result.draft));
+    setRentals(result.rentals);
+  }
+
+  // Vehicles already added stay out of the list, even if the model repeats them from earlier in the chat.
+  const addedKeys = useRef<string[]>([]);
+  const vehicleKey = (vehicle: DraftVehicle) => [vehicle.make, vehicle.model, vehicle.year, vehicle.plate].map((part) => String(part ?? "").trim().toLowerCase()).join("|");
+  function withoutAdded(list: DraftVehicle[]) {
+    const left = [...addedKeys.current];
+    return list.filter((vehicle) => {
+      const at = left.indexOf(vehicleKey(vehicle));
+      if (at === -1) return true;
+      left.splice(at, 1);
+      return false;
+    });
   }
 
   function toggleMic() {
@@ -134,13 +153,36 @@ export function FleetAssistant({ organizationId, currency = "THB", onAdded }: { 
     setAdding(false);
     const count = result.ids.length;
     if (count) {
-      setDraft((list) => list.filter((vehicle) => !ready.includes(vehicle)));
-      setShownTurns((list) => [...list, { role: "assistant", text: t("added", { count }) }]);
+      const done = ready.slice(0, count);
+      addedKeys.current.push(...done.map(vehicleKey));
+      setDraft((list) => list.filter((vehicle) => !done.includes(vehicle)));
+      // Straight on to the next question: who has them now.
+      setShownTurns((list) => [...list, { role: "assistant", text: `${t("added", { count })} ${t("askRented")}` }]);
+      const names = done.map((vehicle) => [vehicle.year, vehicle.make, vehicle.model, vehicle.plate].filter(Boolean).join(" ")).join(", ");
+      setTurns((list) => [...list, { role: "assistant", text: `Added to the fleet: ${names}. These are done, do not list them again. ${t("askRented")}` }]);
       onAdded?.(count);
     }
     if (!result.ok) setShownTurns((list) => [...list, { role: "assistant", text: t("addFailed") }]);
   }
 
+  async function addRentals() {
+    if (!rentals.length || addingRentals) return;
+    setAddingRentals(true);
+    const result = await addAssistantRentals(rentals).catch(() => ({ ok: false, added: 0, failed: ["failed"] }));
+    setAddingRentals(false);
+    if (result.added) {
+      const reminding = rentals.filter((rental) => rental.remind !== false).length;
+      setRentals([]);
+      // The next hook: reminders send themselves once a chat app is connected; customers pay faster with payment details set.
+      setShownTurns((list) => [...list, { role: "assistant", text: t("rentalsAdded", { count: result.added }) + (reminding ? ` ${t("rentalsReminders")}` : ""), links: true }]);
+      setTurns((list) => [...list, { role: "assistant", text: t("rentalsAdded", { count: result.added }) }]);
+      onAdded?.(0);
+    }
+    if (result.failed.length) setShownTurns((list) => [...list, { role: "assistant", text: t("rentalsFailed", { names: result.failed.join(", ") }) }]);
+  }
+
+  const when = (iso?: string | null) => (iso ? new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`)) : "");
+  const per = (rental: DraftRental) => (rental.rate ? t(rental.ratePeriod === "day" ? "perDay" : rental.ratePeriod === "week" ? "perWeek" : "perMonth", { price: money(rental.rate) }) : "");
   const readyCount = draft.filter((vehicle) => vehicle.make && vehicle.model).length;
 
   return (
@@ -168,6 +210,16 @@ export function FleetAssistant({ organizationId, currency = "THB", onAdded }: { 
                 </div>
               ) : null}
               {turn.text}
+              {turn.links ? (
+                <span className="mt-2 flex flex-wrap gap-1.5">
+                  <Link className="rounded-full bg-[var(--panel)] px-3 py-1 text-[13px] font-bold text-[var(--primary)]" href={"/settings?tab=messaging" as Route}>
+                    {t("linkChats")}
+                  </Link>
+                  <Link className="rounded-full bg-[var(--panel)] px-3 py-1 text-[13px] font-bold text-[var(--primary)]" href={"/settings?tab=rentals#payment-methods" as Route}>
+                    {t("linkPayments")}
+                  </Link>
+                </span>
+              ) : null}
             </div>
           </div>
         ))}
@@ -211,6 +263,38 @@ export function FleetAssistant({ organizationId, currency = "THB", onAdded }: { 
           <button className="primary-action pressable mt-3 w-full justify-center" disabled={!readyCount || adding} onClick={() => void addAll()} type="button">
             {adding ? <Loader2 className="animate-spin" size={18} /> : null}
             {adding ? t("adding") : t("addButton", { count: readyCount })}
+          </button>
+        </div>
+      ) : null}
+
+      {rentals.length ? (
+        <div className="border-t border-[var(--border)] px-3 py-3">
+          <p className="px-1 text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]">{t("rentalsTitle", { count: rentals.length })}</p>
+          <ul className="mt-2 space-y-1.5">
+            {rentals.map((rental, index) => (
+              <li className="rounded-xl bg-[var(--panel-secondary)] px-3 py-2" key={index}>
+                <div className="flex items-start gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold text-[var(--foreground)]">{rental.customerName} · {rental.vehicleName || t("unnamed")}</p>
+                    <p className="text-[13px] text-[var(--muted)]">
+                      {[per(rental), rental.nextPaymentDate ? t("nextPay", { date: when(rental.nextPaymentDate) }) : rental.endDate ? t("dueBack", { date: when(rental.endDate) }) : "", rental.depositHeld ? t("deposit", { price: money(rental.depositHeld) }) : ""].filter(Boolean).join(" · ") || t("noDetails")}
+                    </p>
+                  </div>
+                  <button aria-label={t("remove")} className="pressable flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--muted)]" onClick={() => setRentals((list) => list.filter((_, i) => i !== index))} type="button">
+                    <X size={16} />
+                  </button>
+                </div>
+                {/* Reminders for this customer: on unless the owner says no. */}
+                <label className="mt-1.5 flex items-center gap-2 text-[13px] font-semibold text-[var(--foreground-secondary)]">
+                  <input checked={rental.remind !== false} className="h-4 w-4" onChange={(event) => setRentals((list) => list.map((entry, i) => (i === index ? { ...entry, remind: event.target.checked } : entry)))} type="checkbox" />
+                  {rental.endDate && !rental.nextPaymentDate ? t("remindReturn") : t("remindRent")}
+                </label>
+              </li>
+            ))}
+          </ul>
+          <button className="primary-action pressable mt-3 w-full justify-center" disabled={addingRentals} onClick={() => void addRentals()} type="button">
+            {addingRentals ? <Loader2 className="animate-spin" size={18} /> : null}
+            {addingRentals ? t("adding") : t("addRentals", { count: rentals.length })}
           </button>
         </div>
       ) : null}

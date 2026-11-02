@@ -1130,7 +1130,11 @@
     "setupEmailSent": "Đã gửi. Mở liên kết trong hộp thư đến của bạn nhé.",
     "setupEmailFailed": "Chưa gửi được. Thử lại sau một phút.",
     "setupPrev": "Các bước trước",
-    "setupNext": "Các bước tiếp theo"
+    "setupNext": "Các bước tiếp theo",
+    "setup_current_rentals": "Thêm khách đang thuê xe",
+    "setup_reminders": "Bật nhắc nhở tự động",
+    "setup_booking_page": "Chia sẻ trang đặt xe",
+    "setupShared": "Đã sao chép liên kết. Hãy dán lên trang Facebook, Google Maps và LINE của bạn."
   },
   "todo": {
     "eyebrow": "Việc cần làm",
@@ -6227,7 +6231,9 @@
     "optListBody": "Bạn có sẵn danh sách trên bảng tính? Thêm tất cả cùng lúc.",
     "toDashboard": "Đến trang quản lý của tôi",
     "later": "Để sau hãng thêm xe",
-    "laterHint": "Mục \"Thêm xe của bạn\" sẽ chờ sẵn ở trang quản lý."
+    "laterHint": "Mục \"Thêm xe của bạn\" sẽ chờ sẵn ở trang quản lý.",
+    "optHelp": "Gửi sổ sách cho chúng tôi, chúng tôi sẽ cài đặt hộ",
+    "optHelpBody": "Chụp ảnh sổ tay, file Excel hoặc đoạn chat. Chúng tôi sẽ nhập liệu tất cả giúp bạn."
   },
   "fleetAssistant": {
     "title": "Trợ lý đội xe",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Dừng",
     "listening": "Đang nghe…",
     "placeholder": "Kể cho tôi nghe về xe của bạn…",
-    "send": "Gửi"
+    "send": "Gửi",
+    "askRented": "Có xe nào đang cho thuê không? Cho tôi biết ai đang thuê xe nào, giá thuê bao nhiêu và kỳ thanh toán tiếp theo (hoặc thời hạn trả xe).",
+    "rentalsTitle": "{count, plural, one {# xe đang cho thuê} other {# xe đang cho thuê}}",
+    "nextPay": "thanh toán tiếp theo {date}",
+    "dueBack": "trả xe {date}",
+    "deposit": "giữ cọc {price}",
+    "perWeek": "{price}/tuần",
+    "remindRent": "Nhắc khách trước kỳ hạn thanh toán",
+    "remindReturn": "Nhắc khách trước hạn trả xe",
+    "addRentals": "{count, plural, one {Thêm # xe thuê} other {Thêm # xe thuê}}",
+    "rentalsAdded": "{count, plural, one {Xong: Đã thêm # xe thuê. Bạn sẽ thấy khoản đến hạn trên trang chính.} other {Xong: Đã thêm # xe thuê. Bạn sẽ thấy các khoản đến hạn trên trang chính.}}",
+    "rentalsReminders": "Kết nối ứng dụng chat để tự động gửi nhắc nhở cho khách, và thêm phương thức nhận thanh toán.",
+    "rentalsFailed": "Không thể thêm: {names}. Vui lòng kiểm tra lại và thử nhé.",
+    "linkChats": "Kết nối LINE hoặc WhatsApp",
+    "linkPayments": "Thêm thông tin thanh toán"
+  },
+  "setupRequest": {
+    "title": "Chúng tôi sẽ cài đặt giúp bạn",
+    "body": "Gửi ảnh chụp sổ tay hoặc bảng trắng, file Excel hoặc lịch sử chat, kèm theo bất kỳ lưu ý gì. Chúng tôi sẽ thêm xe, khách hàng và danh sách đang thuê, rồi báo cho bạn khi hoàn tất.",
+    "addFiles": "Thêm ảnh hoặc file",
+    "addMore": "Thêm nữa",
+    "remove": "Xóa",
+    "notSent": "Chưa gửi",
+    "noteLabel": "Có gì cần lưu ý không?",
+    "notePlaceholder": "Ví dụ: xe Yaris đang cho John thuê đến tháng 12, trả tiền vào ngày mùng 5.",
+    "send": "Gửi cho RoveHQ",
+    "sentTitle": "Đã nhận, cảm ơn bạn!",
+    "sentBody": "Chúng tôi sẽ cài đặt mọi thứ và thông báo cho bạn, thường trong vòng một ngày làm việc. Bạn có thể sử dụng RoveHQ trong lúc chờ đợi.",
+    "failed": "Gửi không thành công. Hãy thử lại nhé.",
+    "tooBig": "{name} quá lớn. Vui lòng gửi ảnh hoặc file nhỏ hơn."
   }
 }

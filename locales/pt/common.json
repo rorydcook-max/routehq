@@ -1090,7 +1090,11 @@
     "setupEmailSent": "Enviado. Abra o link no seu e-mail.",
     "setupEmailFailed": "Não foi possível enviar. Tente novamente daqui a pouco.",
     "setupPrev": "Passos anteriores",
-    "setupNext": "Próximos passos"
+    "setupNext": "Próximos passos",
+    "setup_current_rentals": "Adicionar aluguéis atuais",
+    "setup_reminders": "Ativar lembretes automáticos",
+    "setup_booking_page": "Partilhar página de reservas",
+    "setupShared": "Link copiado. Coloque-o no Facebook, Google Maps e LINE."
   },
   "todo": {
     "eyebrow": "A fazer",
@@ -6227,7 +6231,9 @@
     "optListBody": "Tem os veículos numa folha de cálculo? Adicione-os todos de uma vez.",
     "toDashboard": "Ir para o meu painel",
     "later": "Adicionar veículos mais tarde",
-    "laterHint": "\"Adicionar veículos\" ficará disponível no seu painel."
+    "laterHint": "\"Adicionar veículos\" ficará disponível no seu painel.",
+    "optHelp": "Envie os seus registos, nós configuramos",
+    "optHelpBody": "Fotos do seu caderno, folha de cálculo ou chats. Nós tratamos de tudo por si."
   },
   "fleetAssistant": {
     "title": "Assistente de frota",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Parar",
     "listening": "A ouvir...",
     "placeholder": "Conte-me sobre os seus veículos...",
-    "send": "Enviar"
+    "send": "Enviar",
+    "askRented": "Tem algum veículo alugado agora? Diga-me quem está com qual, quanto pagam e quando é o próximo pagamento (ou a devolução).",
+    "rentalsTitle": "{count, plural, one {# aluguel ativo} other {# aluguéis ativos}}",
+    "nextPay": "próximo pagamento {date}",
+    "dueBack": "devolução {date}",
+    "deposit": "{price} de caução",
+    "perWeek": "{price}/semana",
+    "remindRent": "Lembrar o cliente antes do vencimento",
+    "remindReturn": "Lembrar o cliente antes da devolução",
+    "addRentals": "{count, plural, one {Adicionar # aluguel} other {Adicionar # aluguéis}}",
+    "rentalsAdded": "{count, plural, one {Pronto: # aluguel adicionado. Verá o que se vence no painel.} other {Pronto: # aluguéis adicionados. Verá o que se vence no painel.}}",
+    "rentalsReminders": "Ligue um chat para enviar lembretes automáticos aos clientes e adicione como eles pagam.",
+    "rentalsFailed": "Não foi possível adicionar: {names}. Verifique e tente de novo.",
+    "linkChats": "Ligar LINE ou WhatsApp",
+    "linkPayments": "Adicionar dados de pagamento"
+  },
+  "setupRequest": {
+    "title": "Nós configuramos por si",
+    "body": "Envie fotos do caderno ou quadro, folha de cálculo ou chats, mais qualquer detalhe importante. Nós registamos os veículos, clientes e aluguéis atuais e avisamos quando estiver pronto.",
+    "addFiles": "Adicionar fotos ou ficheiros",
+    "addMore": "Adicionar mais",
+    "remove": "Remover",
+    "notSent": "Não enviado",
+    "noteLabel": "Algo mais a saber?",
+    "notePlaceholder": "Por exemplo: o Yaris está com o João até dezembro, paga dia 5.",
+    "send": "Enviar para RoveHQ",
+    "sentTitle": "Recebido, obrigado!",
+    "sentBody": "Vamos configurar tudo e avisamos, normalmente num dia útil. Pode usar o RoveHQ entretanto.",
+    "failed": "Não foi enviado. Tente de novo.",
+    "tooBig": "{name} é demasiado grande. Envie uma foto ou um ficheiro mais pequeno."
   }
 }

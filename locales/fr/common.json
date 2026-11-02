@@ -1130,7 +1130,11 @@
     "setupEmailSent": "Envoyé. Ouvrez le lien dans votre boîte de réception.",
     "setupEmailFailed": "L'envoi a échoué. Réessayez dans une minute.",
     "setupPrev": "Étapes précédentes",
-    "setupNext": "Étapes suivantes"
+    "setupNext": "Étapes suivantes",
+    "setup_current_rentals": "Ajouter les locations en cours",
+    "setup_reminders": "Activer les rappels automatiques",
+    "setup_booking_page": "Partager votre page de réservation",
+    "setupShared": "Lien copié. Partagez-le sur votre page Facebook, Google Maps et LINE."
   },
   "todo": {
     "eyebrow": "À faire",
@@ -6227,7 +6231,9 @@
     "optListBody": "Vos véhicules sont dans un tableur ? Ajoutez-les tous d'un coup.",
     "toDashboard": "Aller au tableau de bord",
     "later": "J'ajouterai mes véhicules plus tard",
-    "laterHint": "Le bouton « Ajoutez vos véhicules » vous attendra sur votre tableau de bord."
+    "laterHint": "Le bouton « Ajoutez vos véhicules » vous attendra sur votre tableau de bord.",
+    "optHelp": "Envoyez-nous vos registres, on s'occupe de tout configurer",
+    "optHelpBody": "Photos de votre carnet, tableur ou discussions. On importe tout pour vous."
   },
   "fleetAssistant": {
     "title": "Assistant de flotte",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Arrêter",
     "listening": "Écoute en cours…",
     "placeholder": "Parlez-moi de vos véhicules…",
-    "send": "Envoyer"
+    "send": "Envoyer",
+    "askRented": "Est-ce que certains de vos véhicules sont loués en ce moment ? Dites-moi qui a quoi, combien ils paient et quand est le prochain paiement (ou le retour).",
+    "rentalsTitle": "{count, plural, one {# location en cours} other {# locations en cours}}",
+    "nextPay": "prochain paiement le {date}",
+    "dueBack": "retour le {date}",
+    "deposit": "caution de {price} conservée",
+    "perWeek": "{price}/semaine",
+    "remindRent": "Rappeler au client avant l'échéance du loyer",
+    "remindReturn": "Rappeler au client avant la date de retour",
+    "addRentals": "{count, plural, one {Ajouter # location} other {Ajouter # locations}}",
+    "rentalsAdded": "{count, plural, one {C'est fait : # location enregistrée. Vous verrez les échéances sur votre tableau de bord.} other {C'est fait : # locations enregistrées. Vous verrez les échéances sur votre tableau de bord.}}",
+    "rentalsReminders": "Connectez une application de messagerie pour envoyer les rappels automatiquement, et ajoutez vos modes de paiement.",
+    "rentalsFailed": "Échec de l'ajout : {names}. Vérifiez et réessayez.",
+    "linkChats": "Connecter LINE ou WhatsApp",
+    "linkPayments": "Ajouter les détails de paiement"
+  },
+  "setupRequest": {
+    "title": "On s'occupe de la configuration pour vous",
+    "body": "Envoyez des photos de votre carnet ou tableau blanc, de votre tableur ou de vos historiques de chat, ainsi que toute info utile. Nous importerons vos véhicules, clients et locations en cours, et vous avertirons quand tout sera prêt.",
+    "addFiles": "Ajouter des photos ou des fichiers",
+    "addMore": "Ajouter plus",
+    "remove": "Supprimer",
+    "notSent": "Non envoyé",
+    "noteLabel": "Des choses à savoir ?",
+    "notePlaceholder": "Par exemple : la Yaris est louée à Jean jusqu'en décembre, il paie le 5.",
+    "send": "Envoyer à RoveHQ",
+    "sentTitle": "Bien reçu, merci !",
+    "sentBody": "Nous configurons tout et vous tenons informé, généralement sous un jour ouvré. Vous pouvez utiliser RoveHQ en attendant.",
+    "failed": "L'envoi a échoué. Réessayez.",
+    "tooBig": "{name} est trop volumineux. Envoyez une photo ou un fichier plus petit."
   }
 }

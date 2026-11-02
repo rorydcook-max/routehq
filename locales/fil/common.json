@@ -1090,7 +1090,11 @@
     "setupEmailSent": "Naipadala na. Buksan ang link sa iyong inbox.",
     "setupEmailFailed": "Hindi naipadala iyon. Subukan ulit maya-maya.",
     "setupPrev": "Mga nakaraang hakbang",
-    "setupNext": "Mga susunod na hakbang"
+    "setupNext": "Mga susunod na hakbang",
+    "setup_current_rentals": "Idagdag ang mga umuupa ngayon",
+    "setup_reminders": "I-on ang kusang paalala",
+    "setup_booking_page": "I-share ang booking page mo",
+    "setupShared": "Na-copy na ang link. Ilagay ito sa iyong Facebook page, Google Maps at LINE."
   },
   "todo": {
     "eyebrow": "Gagawin",
@@ -6227,7 +6231,9 @@
     "optListBody": "Nasa spreadsheet ba ang iyong mga sasakyan? Idagdag silang lahat nang sabay-sabay.",
     "toDashboard": "Pumunta sa aking dashboard",
     "later": "Magdadagdag ako mamaya",
-    "laterHint": "Maghihintay ang \"Idagdag ang iyong mga sasakyan\" sa iyong dashboard."
+    "laterHint": "Maghihintay ang \"Idagdag ang iyong mga sasakyan\" sa iyong dashboard.",
+    "optHelp": "Ipadala sa amin ang records mo, kami na ang maglalagay",
+    "optHelpBody": "Mga litrato ng kuwaderno mo, spreadsheet, o chat. Kami na ang magpapasok niyan para sa iyo."
   },
   "fleetAssistant": {
     "title": "Fleet assistant",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Itigil",
     "listening": "Nakikinig…",
     "placeholder": "Sabihin sa akin ang tungkol sa iyong mga sasakyan…",
-    "send": "Ipadala"
+    "send": "Ipadala",
+    "askRented": "May nakaupa bang mga sasakyan mo ngayon? Sabihin sa akin kung sino ang umupa, magkano ang bayad, at kailan ang susunod na bayaran (o kailan ibabalik).",
+    "rentalsTitle": "{count, plural, one {# paupa ngayon} other {# paupa ngayon}}",
+    "nextPay": "susunod na bayad {date}",
+    "dueBack": "ibalik {date}",
+    "deposit": "may hawak na {price} deposit",
+    "perWeek": "{price}/linggo",
+    "remindRent": "Paalalahanan ang customer bago ang bayaran",
+    "remindReturn": "Paalalahanan ang customer bago ang isauli",
+    "addRentals": "{count, plural, one {Magdagdag ng # paupa} other {Magdagdag ng # paupa}}",
+    "rentalsAdded": "{count, plural, one {Tapos na: Nailagay na ang # paupa. Makita mo sa dashboard ang mga dapat bayaran.} other {Tapos na: Nailagay na ang # paupa. Makita mo sa dashboard ang mga dapat bayaran.}}",
+    "rentalsReminders": "Mag-konek ng chat app para kusang mapadalhan ng paalala ang mga customer, at idagdag kung paano sila nagbabayad.",
+    "rentalsFailed": "Hindi naidagdag: {names}. Tingnan at subukan ulit.",
+    "linkChats": "I-konek ang LINE o WhatsApp",
+    "linkPayments": "Magdagdag ng detalye ng bayad"
+  },
+  "setupRequest": {
+    "title": "Kami na ang maglalagay para sa iyo",
+    "body": "Magpadala ng litrato ng iyong kuwaderno o whiteboard, spreadsheet, o chat exports, at iba pang dapat naming malaman. Kami na ang maglalagay ng mga sasakyan, customer, at kasalukuyang paupa, at sasabihin namin sa iyo kapag tapos na.",
+    "addFiles": "Magdagdag ng litrato o file",
+    "addMore": "Magdagdag pa",
+    "remove": "Alisin",
+    "notSent": "Hindi naipadala",
+    "noteLabel": "May gusto ka bang ipaalam?",
+    "notePlaceholder": "Halimbawa: Kay John ang Yaris hanggang December, tuwing ika-5 siya nagbabayad.",
+    "send": "Ipadala sa RoveHQ",
+    "sentTitle": "Nakatanggap na kami, salamat!",
+    "sentBody": "Aayusin namin ang lahat at sasabihin sa iyo, kadalasan sa loob ng isang araw ng trabaho. Pwede mong gamitin ang RoveHQ habang naghihintay.",
+    "failed": "Hindi naipadala. Subukan ulit.",
+    "tooBig": "Masyadong malaki ang {name}. Magpadala ng litrato o mas maliit na file."
   }
 }

@@ -1090,7 +1090,11 @@
     "setupEmailSent": "Enviado. Abre el enlace en tu bandeja de entrada.",
     "setupEmailFailed": "No se pudo enviar. Inténtalo en un minuto.",
     "setupPrev": "Pasos anteriores",
-    "setupNext": "Siguientes pasos"
+    "setupNext": "Siguientes pasos",
+    "setup_current_rentals": "Añadir alquileres actuales",
+    "setup_reminders": "Activar recordatorios automáticos",
+    "setup_booking_page": "Compartir página de reservas",
+    "setupShared": "Enlace copiado. Pégalo en tu página de Facebook, Google Maps y LINE."
   },
   "todo": {
     "eyebrow": "Pendientes",
@@ -6227,7 +6231,9 @@
     "optListBody": "¿Tienes tus vehículos en un Excel? Añádelos todos a la vez.",
     "toDashboard": "Ir a mi panel",
     "later": "Añadiré los vehículos más tarde",
-    "laterHint": "La opción \"Añade tus vehículos\" te esperará en tu panel."
+    "laterHint": "La opción \"Añade tus vehículos\" te esperará en tu panel.",
+    "optHelp": "Envíanos tus registros y lo configuramos",
+    "optHelpBody": "Fotos de tu libreta, una hoja de cálculo o chats. Nosotros lo pasamos todo por ti."
   },
   "fleetAssistant": {
     "title": "Asistente de flota",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Parar",
     "listening": "Escuchando...",
     "placeholder": "Cuéntame sobre tus vehículos...",
-    "send": "Enviar"
+    "send": "Enviar",
+    "askRented": "¿Tienes algún vehículo alquilado ahora mismo? Dime quién tiene cuál, cuánto pagan y cuándo es el próximo pago (o cuándo se devuelve).",
+    "rentalsTitle": "{count, plural, one {# alquiler activo ahora} other {# alquileres activos ahora}}",
+    "nextPay": "próximo pago el {date}",
+    "dueBack": "devuelve el {date}",
+    "deposit": "{price} de depósito retenido",
+    "perWeek": "{price}/semana",
+    "remindRent": "Recordar al cliente antes de que venza el alquiler",
+    "remindReturn": "Recordar al cliente antes de la devolución",
+    "addRentals": "{count, plural, one {Añadir # alquiler} other {Añadir # alquileres}}",
+    "rentalsAdded": "{count, plural, one {Listo: # alquiler añadido. Verás los vencimientos en tu panel.} other {Listo: # alquileres añadidos. Verás los vencimientos en tu panel.}}",
+    "rentalsReminders": "Conecta una aplicación de chat para que los recordatorios se envíen solos y añade cómo te pagan.",
+    "rentalsFailed": "No se pudo añadir: {names}. Revísalos e inténtalo de nuevo.",
+    "linkChats": "Conectar LINE o WhatsApp",
+    "linkPayments": "Añadir detalles de pago"
+  },
+  "setupRequest": {
+    "title": "Te lo configuramos",
+    "body": "Envía fotos de tu libreta o pizarra, tu hoja de cálculo o chats, junto con cualquier detalle importante. Subiremos tus vehículos, clientes y alquileres actuales, y te avisaremos cuando esté listo.",
+    "addFiles": "Añadir fotos o archivos",
+    "addMore": "Añadir más",
+    "remove": "Eliminar",
+    "notSent": "No enviado",
+    "noteLabel": "¿Algo que debamos saber?",
+    "notePlaceholder": "Por ejemplo: el Yaris lo tiene Juan hasta diciembre, paga los días 5.",
+    "send": "Enviar a RoveHQ",
+    "sentTitle": "¡Recibido, gracias!",
+    "sentBody": "Configuraremos todo y te avisaremos, normalmente en un día laborable. Mientras tanto, puedes usar RoveHQ.",
+    "failed": "No se pudo enviar. Inténtalo de nuevo.",
+    "tooBig": "{name} es demasiado grande. Envía una foto o un archivo más pequeño."
   }
 }

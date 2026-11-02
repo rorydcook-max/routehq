@@ -1090,7 +1090,11 @@
     "setupEmailSent": "Sendt. Åpne lenken i innboksen din.",
     "setupEmailFailed": "Den ble ikke sendt. Prøv igjen om et minutt.",
     "setupPrev": "Forrige steg",
-    "setupNext": "Neste steg"
+    "setupNext": "Neste steg",
+    "setup_current_rentals": "Legg til hvem som leier nå",
+    "setup_reminders": "Slå på automatiske påminnelser",
+    "setup_booking_page": "Del bestillingssiden din",
+    "setupShared": "Lenke kopiert. Del den på Facebook-siden din, Google Maps og LINE."
   },
   "todo": {
     "eyebrow": "Å gjøre",
@@ -6227,7 +6231,9 @@
     "optListBody": "Har du kjøretøyene dine i et regneark? Legg dem til på en gang.",
     "toDashboard": "Gå til oversikten min",
     "later": "Jeg legger til kjøretøy senere",
-    "laterHint": "\"Legg til kjøretøyene dine\" vil vente på deg i oversikten."
+    "laterHint": "\"Legg til kjøretøyene dine\" vil vente på deg i oversikten.",
+    "optHelp": "Send oss listene dine, så ordner vi resten",
+    "optHelpBody": "Bilder av notatboken din, et regneark eller chatter. Vi legger alt inn for deg."
   },
   "fleetAssistant": {
     "title": "Flåteassistent",
@@ -6252,6 +6258,35 @@
     "stopTalking": "Stopp",
     "listening": "Lytter…",
     "placeholder": "Fortell meg om kjøretøyene dine…",
-    "send": "Send"
+    "send": "Send",
+    "askRented": "Er noen av kjøretøyene dine utleid akkurat nå? Fortell meg hvem som har hva, hva de betaler, og når neste betaling er (eller når den skal leveres tilbake).",
+    "rentalsTitle": "{count, plural, one {# utleie på vei nå} other {# utleier på vei nå}}",
+    "nextPay": "neste betaling {date}",
+    "dueBack": "tilbake {date}",
+    "deposit": "{price} i depositum holdt tilbake",
+    "perWeek": "{price}/uke",
+    "remindRent": "Påminn kunden før leien forfaller",
+    "remindReturn": "Påminn kunden før den skal leveres tilbake",
+    "addRentals": "{count, plural, one {Legg til # utleie} other {Legg til # utleier}}",
+    "rentalsAdded": "{count, plural, one {Ferdig: # utleie er lagt inn. Du ser hva som forfaller på oversikten din.} other {Ferdig: # utleier er lagt inn. Du ser hva som forfaller på oversikten din.}}",
+    "rentalsReminders": "Koble til en chat-app slik at påminnelser går automatisk til kundene, og legg til hvordan de betaler deg.",
+    "rentalsFailed": "Kunne ikke legge til: {names}. Sjekk dem og prøv igjen.",
+    "linkChats": "Koble til LINE eller WhatsApp",
+    "linkPayments": "Legg til betalingsdetaljer"
+  },
+  "setupRequest": {
+    "title": "Vi ordner det for deg",
+    "body": "Send bilder av notatboken eller tavlen din, regnearket eller chateksporten din, pluss alt annet vi bør vite. Vi legger inn kjøretøy, kunder og pågående utleier, og gir deg beskjed når alt er klart.",
+    "addFiles": "Legg til bilder eller filer",
+    "addMore": "Legg til flere",
+    "remove": "Fjern",
+    "notSent": "Ikke sendt",
+    "noteLabel": "Noe annet vi bør vite?",
+    "notePlaceholder": "For eksempel: Yaris-en er hos John til desember, han betaler den 5.",
+    "send": "Send til RoveHQ",
+    "sentTitle": "Takk, mottatt!",
+    "sentBody": "Vi setter alt opp og gir deg beskjed, vanligvis innen én virkedag. Du kan bruke RoveHQ i mellomtiden.",
+    "failed": "Det ble ikke sendt. Prøv igjen.",
+    "tooBig": "{name} er for stor. Send et bilde eller en mindre fil."
   }
 }

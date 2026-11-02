@@ -5,6 +5,11 @@ import { insertVehicle } from "@/app/actions/vehicles";
 import { createChatCompletion, aiTextConfigured } from "@/lib/ai-chat";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
+import { businessToday } from "@/lib/business-time";
+import { settleExistingRental } from "@/lib/existing-rental";
+import { activateRental } from "@/lib/rental-activation";
+import { ensureOnboardingChecklist, markOnboardingStep } from "@/lib/onboarding";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
  * The fleet assistant (Rory, 2 Nov 2026): an owner tells it about their vehicles in their own words, by typing,
@@ -51,31 +56,84 @@ function clean(draft: unknown): DraftVehicle[] {
     .slice(0, 60);
 }
 
+/** A rental already running when the business starts with RoveHQ (Rory, 2 Nov 2026): who has which vehicle, what they pay, when next. */
+export type DraftRental = {
+  /** One of the business's vehicles (an id from the list the assistant was given). */
+  vehicleId: string;
+  customerName: string;
+  customerPhone?: string;
+  startDate?: string | null;
+  /** When it is due back; empty for open-ended (monthly) rentals. */
+  endDate?: string | null;
+  rate?: number | null;
+  ratePeriod?: "day" | "week" | "month";
+  /** The next rent payment, when they pay as they go. */
+  nextPaymentDate?: string | null;
+  depositHeld?: number | null;
+  /** Send the customer the automatic rent-due and return reminders. */
+  remind?: boolean;
+  /** For showing: the vehicle's name and plate. */
+  vehicleName?: string;
+};
+
+const isoDay = (value: unknown) => (/^\d{4}-\d{2}-\d{2}$/.test(String(value || "")) ? String(value) : null);
+
+function cleanRentals(rentals: unknown, vehicleIds: Set<string>): DraftRental[] {
+  if (!Array.isArray(rentals)) return [];
+  return rentals
+    .map((item: any) => ({
+      vehicleId: String(item?.vehicleId || ""),
+      customerName: String(item?.customerName || "").trim().slice(0, 80),
+      customerPhone: String(item?.customerPhone || "").trim().slice(0, 30) || undefined,
+      startDate: isoDay(item?.startDate),
+      endDate: isoDay(item?.endDate),
+      rate: Number(item?.rate) > 0 ? Number(item.rate) : null,
+      ratePeriod: (["day", "week", "month"].includes(item?.ratePeriod) ? item.ratePeriod : "month") as "day" | "week" | "month",
+      nextPaymentDate: isoDay(item?.nextPaymentDate),
+      depositHeld: Number(item?.depositHeld) > 0 ? Number(item.depositHeld) : null,
+      remind: item?.remind !== false
+    }))
+    .filter((item) => vehicleIds.has(item.vehicleId) && item.customerName)
+    .slice(0, 60);
+}
+
 export async function askFleetAssistant(input: {
   turns: AssistantTurn[];
   /** Photos sent with this message, small JPEG data URLs, numbered after the ones sent before. */
   images: string[];
   photosBefore: number;
   draft: DraftVehicle[];
+  rentals?: DraftRental[];
   locale: string;
-}): Promise<{ ok: true; reply: string; draft: DraftVehicle[] } | { ok: false; error: string }> {
+}): Promise<{ ok: true; reply: string; draft: DraftVehicle[]; rentals: DraftRental[] } | { ok: false; error: string }> {
   if (!aiTextConfigured()) return { ok: false, error: "unavailable" };
   const organization = await getDefaultOrganization();
-  const categories = await getVehicleCategories(organization.id).catch(() => []);
+  const supabase = (await createSupabaseServerClient()) as any;
+  const [categories, { data: fleet }, { data: running }] = await Promise.all([
+    getVehicleCategories(organization.id).catch(() => []),
+    supabase.from("vehicles").select("id, make, model, registration_number, color").eq("organization_id", organization.id).is("deleted_at", null).order("created_at").limit(120),
+    supabase.from("rentals").select("vehicle_id").eq("organization_id", organization.id).is("deleted_at", null).in("status", ["active", "due_soon", "overdue", "extended"])
+  ]);
+  const rentedNow = new Set(((running || []) as Array<{ vehicle_id: string }>).map((row) => row.vehicle_id));
+  const fleetList = ((fleet || []) as any[]).map((row) => ({ id: row.id, name: [row.make, row.model, row.color, row.registration_number].filter(Boolean).join(" "), rentedInRoveHQ: rentedNow.has(row.id) }));
   const kinds = categories.map((category) => category.code).join(", ") || "car, scooter, motorcycle";
   const language = supportedLocaleOptions.find((option) => option.code === input.locale)?.english || "English";
   const currency = organization.currency || "THB";
 
   const system = [
-    "You help the owner of a small vehicle rental business add their vehicles to RoveHQ.",
-    `Reply in ${language}, in one or two short, friendly sentences. Plain words, no lists, no markdown.`,
-    "From what they type, say or send (photos of registration books, of the vehicles, of price lists or spreadsheets), keep a list of their vehicles.",
+    "You help the owner of a small vehicle rental business get their business into RoveHQ: first their vehicles, then who is renting them right now.",
+    `Reply in ${language}, in one or two short, friendly sentences. Plain words, no lists, no markdown. Today is ${businessToday()}.`,
+    "VEHICLES: from what they type, say or send (photos of registration books, of the vehicles, of price lists or spreadsheets), keep a list of new vehicles.",
     `Each vehicle: kind (one of: ${kinds}), make, model, and if known: variant, year, plate (exactly as written; never invent one), colour, and rental prices in ${currency} per day, week or month.`,
     "Photos are numbered in the order they were sent (Photo 1, Photo 2...). Put the numbers of the photos that show a vehicle in its photos list. A registration book photo belongs to the vehicle it describes.",
-    "If someone says they have several of the same car, add one entry per vehicle (plates can come later).",
-    "Only make and model are needed. When something important is unclear, ask one short question. When the list looks complete, say they can tap Add to put them in their fleet.",
-    `Prices said "a month", "monthly" or "/mo" go in monthlyRate; "a day" or "daily" in dailyRate; "a week" in weeklyRate. Numbers only, in ${currency}. A price said for a group ("two scooters at 3000 a month") applies to each of them.`,
-    'Return JSON only, exactly this shape: {"reply": "...", "vehicles": [{"kind": "car", "make": "Toyota", "model": "Yaris", "variant": "", "year": 2021, "plate": "", "colour": "white", "dailyRate": null, "weeklyRate": null, "monthlyRate": 15000, "photos": []}]}. Always return the whole list so far, updated.'
+    "If someone says they have several of the same vehicle, add one entry per vehicle (plates can come later). Only make and model are needed.",
+    `Prices said "a month", "monthly" or "/mo" go in monthlyRate; "a day" in dailyRate; "a week" in weeklyRate. Numbers only, in ${currency}. A price said for a group applies to each.`,
+    "When the new-vehicle list looks complete, tell them to tap Add to put them in their fleet.",
+    `RENTALS: vehicles already in their fleet are listed below with ids. Once there are some, ask whether any are rented out right now. For each one rented: the customer's name and phone (needed to remind them), when it started, the price and whether per day, week or month, and either the next payment date (monthly renters) or when it is due back (short rentals), and any deposit they hold.`,
+    "Turn relative dates into YYYY-MM-DD (\"the 5th\" = the next 5th from today; \"back on Friday\" = the coming Friday).",
+    "Then ask if they want RoveHQ to remind each customer automatically before the rent is due (or before the return); set remind true unless they say no.",
+    "A rental's vehicleId must be one of the ids listed. Never put a vehicle in rentals that is only in the new-vehicle list; ask them to tap Add first. Nothing is saved until they tap the Add button under the list, so never say you have added or recorded anything; say it's ready to add. Ask one short question at a time.",
+    'Return JSON only, exactly this shape: {"reply": "...", "vehicles": [{"kind": "car", "make": "Toyota", "model": "Yaris", "variant": "", "year": 2021, "plate": "", "colour": "white", "dailyRate": null, "weeklyRate": null, "monthlyRate": 15000, "photos": []}], "rentals": [{"vehicleId": "<id>", "customerName": "John Smith", "customerPhone": "+66812345678", "startDate": "2026-10-05", "endDate": null, "rate": 15000, "ratePeriod": "month", "nextPaymentDate": "2026-11-05", "depositHeld": 10000, "remind": true}]}. Always return both whole lists so far, updated (an empty list when there are none).'
   ].join(" ");
 
   const images = input.images.filter((url) => /^data:image\/(jpeg|png|webp);base64,/.test(url)).slice(0, MAX_IMAGES_PER_TURN);
@@ -84,7 +142,9 @@ export async function askFleetAssistant(input: {
   const lastText = [
     last?.text || "",
     images.length ? `(${images.map((_, index) => `Photo ${input.photosBefore + index + 1}`).join(", ")} attached.)` : "",
-    `Current list: ${JSON.stringify(input.draft)}`
+    `Vehicles already in the fleet (never put these in the draft again): ${JSON.stringify(fleetList)}`,
+    `New vehicles so far: ${JSON.stringify(input.draft)}`,
+    `Rentals so far: ${JSON.stringify(input.rentals || [])}`
   ]
     .filter(Boolean)
     .join("\n");
@@ -95,7 +155,7 @@ export async function askFleetAssistant(input: {
         model: process.env.OPENAI_ASSISTANT_MODEL || "gpt-4o-mini",
         response_format: { type: "json_object" },
         temperature: 0.2,
-        max_tokens: 1800,
+        max_tokens: 2400,
         messages: [
           { role: "system", content: system },
           ...history.map((turn) => ({ role: turn.role, content: turn.text }) as const),
@@ -111,11 +171,151 @@ export async function askFleetAssistant(input: {
     const start = text.indexOf("{");
     const end = text.lastIndexOf("}");
     const parsed = start >= 0 && end > start ? JSON.parse(text.slice(start, end + 1)) : {};
-    return { ok: true, reply: String(parsed.reply || "").slice(0, 600), draft: clean(parsed.vehicles ?? input.draft) };
+    const ids = new Set(fleetList.map((vehicle) => vehicle.id));
+    return {
+      ok: true,
+      reply: String(parsed.reply || "").slice(0, 600),
+      draft: clean(parsed.vehicles ?? input.draft),
+      rentals: cleanRentals(parsed.rentals ?? input.rentals ?? [], ids)
+        .filter((rental) => !rentedNow.has(rental.vehicleId))
+        .map((rental) => ({ ...rental, vehicleName: fleetList.find((vehicle) => vehicle.id === rental.vehicleId)?.name || "" }))
+    };
   } catch (error) {
     console.warn("[fleet-assistant]", error instanceof Error ? error.message.slice(0, 200) : error);
     return { ok: false, error: "failed" };
   }
+}
+
+function addPeriod(iso: string, period: "day" | "week" | "month", times: number) {
+  const date = new Date(`${iso}T00:00:00Z`);
+  if (period === "month") date.setUTCMonth(date.getUTCMonth() + times);
+  else date.setUTCDate(date.getUTCDate() + (period === "week" ? 7 : 1) * times);
+  return date.toISOString().slice(0, 10);
+}
+
+/**
+ * Records the rentals already running, the same way as an existing rental entered by hand: the rent schedule starts at
+ * the next payment (earlier rent is settled), a deposit already held is recorded, the vehicle shows as out, and the
+ * customer gets the automatic reminders unless the owner said no. The dashboard then has money due and returns to show.
+ */
+export async function addAssistantRentals(rentals: DraftRental[]): Promise<{ ok: boolean; added: number; failed: string[] }> {
+  const organization = await getDefaultOrganization();
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, added: 0, failed: ["signed out"] };
+  const { data: fleet } = await supabase.from("vehicles").select("id").eq("organization_id", organization.id).is("deleted_at", null);
+  const ids = new Set(((fleet || []) as Array<{ id: string }>).map((row) => row.id));
+  const currency = organization.currency || "THB";
+  const today = businessToday();
+  const failed: string[] = [];
+  let added = 0;
+
+  for (const rental of cleanRentals(rentals, ids)) {
+    const period = rental.ratePeriod || "month";
+    const pricing = period === "day" ? "daily" : period === "week" ? "weekly" : "monthly";
+    // When it started, if they didn't say: one period before the next payment, else today.
+    const startDate = rental.startDate || (rental.nextPaymentDate ? addPeriod(rental.nextPaymentDate, period, -1) : today);
+    const customerId = await findOrCreateCustomer(supabase, organization.id, user.id, rental.customerName, rental.customerPhone || "");
+    if (!customerId) {
+      failed.push(rental.customerName);
+      continue;
+    }
+    const { data: created, error } = await supabase
+      .from("rentals")
+      .insert({
+        organization_id: organization.id,
+        customer_id: customerId,
+        vehicle_id: rental.vehicleId,
+        start_date: startDate,
+        end_date: rental.endDate || null,
+        is_indefinite: !rental.endDate,
+        pricing_model: pricing,
+        billing_interval: pricing,
+        recurring_billing: period === "month" && !rental.endDate,
+        rental_rate: rental.rate || 0,
+        deposit_amount: rental.depositHeld || 0,
+        currency,
+        status: startDate > today ? "booked" : "active",
+        entered_by_operator: true,
+        customer_reminders: rental.remind !== false,
+        created_by: user.id
+      })
+      .select("id")
+      .single();
+    if (error || !created) {
+      failed.push(`${rental.customerName}: ${/no_double_booking|exclusion/.test(error?.message || "") ? "already rented for these dates" : error?.message || "not saved"}`);
+      continue;
+    }
+    added += 1;
+    if (startDate <= today) {
+      await supabase
+        .from("vehicles")
+        .update({ status: "rented", availability_status: "rented", current_rental_id: created.id, current_customer_id: customerId })
+        .eq("id", rental.vehicleId)
+        .eq("organization_id", organization.id);
+      if (rental.rate) {
+        // Rent up to the next payment is treated as settled: the schedule starts there. A short rental with a return
+        // date and no payment to come is paid in full.
+        const billFrom = rental.nextPaymentDate || (rental.endDate ? null : addPeriod(startDate, period, 1));
+        await activateRental(created.id, supabase, { billFrom }).catch(() => null);
+        const paidBefore = rental.endDate && !rental.nextPaymentDate ? addPeriod(rental.endDate, "day", 1) : null;
+        await settleExistingRental(supabase, {
+          rental: { id: created.id, vehicle_id: rental.vehicleId, customer_id: customerId, start_date: startDate },
+          organizationId: organization.id,
+          userId: user.id,
+          paidBefore,
+          depositHeld: rental.depositHeld || 0,
+          currency,
+          recordMoney: false
+        }).catch(() => null);
+      } else if (rental.depositHeld) {
+        await settleExistingRental(supabase, {
+          rental: { id: created.id, vehicle_id: rental.vehicleId, customer_id: customerId, start_date: startDate },
+          organizationId: organization.id,
+          userId: user.id,
+          paidBefore: null,
+          depositHeld: rental.depositHeld,
+          currency,
+          recordMoney: false
+        }).catch(() => null);
+      }
+    }
+  }
+  if (added) {
+    await ensureOnboardingChecklist(supabase, organization.id);
+    await markOnboardingStep(supabase, organization.id, "current_rentals");
+  }
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath("/fleet");
+  return { ok: failed.length === 0, added, failed };
+}
+
+/** The same person already in the business (by phone, then name), or a new customer. */
+async function findOrCreateCustomer(supabase: any, organizationId: string, userId: string, name: string, phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length >= 6) {
+    const { data } = await supabase.from("customers").select("id, phone").eq("organization_id", organizationId).is("deleted_at", null).ilike("phone", `%${digits.slice(-8)}%`).limit(1).maybeSingle();
+    if (data?.id) return data.id as string;
+  }
+  const { data: byName } = await supabase
+    .from("customers")
+    .select("id")
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .ilike("full_name", name.replace(/[\\%_]/g, (character) => `\\${character}`))
+    .limit(1)
+    .maybeSingle();
+  if (byName?.id) return byName.id as string;
+  const international = digits ? (phone.trim().startsWith("+") ? `+${digits}` : digits.startsWith("0") ? `+66${digits.slice(1)}` : `+${digits}`) : null;
+  const { data: created } = await supabase
+    .from("customers")
+    .insert({ organization_id: organizationId, full_name: name, phone: international, created_by: userId })
+    .select("id")
+    .single();
+  return (created?.id as string) || null;
 }
 
 /** Adds the vehicles the owner confirmed. Returns each new vehicle's id, in the same order, for its photos to follow. */

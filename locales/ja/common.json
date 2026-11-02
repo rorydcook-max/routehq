@@ -1090,7 +1090,11 @@
     "setupEmailSent": "送信しました。受信箱のリンクを開いてください。",
     "setupEmailFailed": "送信できませんでした。しばらくしてからもう一度お試しください。",
     "setupPrev": "前のステップ",
-    "setupNext": "次のステップ"
+    "setupNext": "次のステップ",
+    "setup_current_rentals": "現在の貸出状況を追加",
+    "setup_reminders": "自動リマインドをオンにする",
+    "setup_booking_page": "予約ページをシェアする",
+    "setupShared": "リンクをコピーしました。Facebookページ、Googleマップ、LINEに貼り付けてください。"
   },
   "todo": {
     "eyebrow": "やること",
@@ -6227,7 +6231,9 @@
     "optListBody": "スプレッドシートに車両データがありますか？まとめて追加できます。",
     "toDashboard": "ダッシュボードへ移動",
     "later": "車両は後で追加する",
-    "laterHint": "「車両を追加する」はダッシュボードに表示されます。"
+    "laterHint": "「車両を追加する」はダッシュボードに表示されます。",
+    "optHelp": "記録を送っていただければ、こちらで設定します",
+    "optHelpBody": "ノートの写真、スプレッドシート、チャットなどをお送りいただければ、すべてこちらで取り込みます。"
   },
   "fleetAssistant": {
     "title": "フリートアシスタント",
@@ -6252,6 +6258,35 @@
     "stopTalking": "停止",
     "listening": "聞いています…",
     "placeholder": "車両について教えてください…",
-    "send": "送信"
+    "send": "送信",
+    "askRented": "今貸し出し中の車両はありますか？誰がどの車両を借りていて、いくら支払い、次回の支払いはいつか（または返却日はいつか）教えてください。",
+    "rentalsTitle": "{count, plural, one {現在 #件の貸出中} other {現在 #件の貸出中}}",
+    "nextPay": "次回支払い {date}",
+    "dueBack": "返却日 {date}",
+    "deposit": "預かり金 {price}",
+    "perWeek": "{price}/週",
+    "remindRent": "支払期日前に顧客にリマインドする",
+    "remindReturn": "返却期限前に顧客にリマインドする",
+    "addRentals": "{count, plural, one {#件の貸出を追加} other {#件の貸出を追加}}",
+    "rentalsAdded": "{count, plural, one {完了しました：#件の貸出を追加しました。ダッシュボードで期限を確認できます。} other {完了しました：#件の貸出を追加しました。ダッシュボードで期限を確認できます。}}",
+    "rentalsReminders": "チャットアプリを連携して顧客に自動でリマインドを送り、支払い方法を追加しましょう。",
+    "rentalsFailed": "追加できませんでした：{names}。内容を確認して再度お試しください。",
+    "linkChats": "LINEまたはWhatsAppを連携",
+    "linkPayments": "支払い情報を追加"
+  },
+  "setupRequest": {
+    "title": "こちらで設定代行します",
+    "body": "ノートやホワイトボードの写真、スプレッドシート、チャットの履歴、その他必要な情報をお送りください。車両、顧客、現在の貸出情報を登録し、準備ができたらお知らせします。",
+    "addFiles": "写真やファイルを追加",
+    "addMore": "さらに追加",
+    "remove": "削除",
+    "notSent": "送信されていません",
+    "noteLabel": "何か特記事項はありますか？",
+    "notePlaceholder": "例：Yarisは12月までジョンさんに貸し出しており、支払いは毎月5日です。",
+    "send": "RoveHQに送信",
+    "sentTitle": "承知いたしました！",
+    "sentBody": "設定を行いますので、通常1営業日以内に完了次第ご連絡します。その間もRoveHQをご利用いただけます。",
+    "failed": "送信できませんでした。もう一度お試しください。",
+    "tooBig": "{name}のファイルサイズが大きすぎます。写真または小さめのファイルをお送りください。"
   }
 }

@@ -337,6 +337,9 @@ export async function tellRentalCustomer(
  * every day and each reminder still goes out a single time.
  */
 export async function remindRentalCustomerOnce(admin: any, rentalId: string, key: string, build: (context: RentalMessageContext) => string, options: { withLink?: boolean } = {}): Promise<boolean> {
+  // The owner said no reminders for this customer (asked when a running rental is added through the fleet assistant).
+  const { data: switchRow } = await admin.from("rentals").select("customer_reminders").eq("id", rentalId).maybeSingle();
+  if (switchRow && switchRow.customer_reminders === false) return false;
   // Claim the reminder first: the table's primary key lets only one run through, even if two start together.
   const { error: claimed } = await admin.from("customer_reminders").insert({ rental_id: rentalId, reminder_key: key });
   if (claimed) return false;

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { bookingAddress } from "@/lib/booking-address";
 import { getRequestUser } from "@/lib/supabase/server";
 import { emailCheckPending } from "@/lib/email-check";
 import type { Route } from "next";
@@ -861,7 +862,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       {/* A business that has not taken a booking yet needs its next step more than it needs empty numbers. */}
       {isOwner && !onboardingStatus.hidden && onboardingStatus.counts.rentals === 0 ? (
         <div className="mb-4">
-          <OnboardingChecklist completedCount={onboardingStatus.completedCount} items={onboardingStatus.items} organizationId={organization.id} totalCount={onboardingStatus.totalCount} />
+          <OnboardingChecklist bookingUrl={bookingAddress(organization as any).url} completedCount={onboardingStatus.completedCount} items={onboardingStatus.items} organizationId={organization.id} totalCount={onboardingStatus.totalCount} />
         </div>
       ) : null}
 
@@ -941,6 +942,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         {onboardingStatus.counts.vehicles > 0 ? <PushToggle variant="prompt" /> : null}
         {isOwner && !onboardingStatus.hidden && onboardingStatus.counts.rentals > 0 ? (
           <OnboardingChecklist
+            bookingUrl={bookingAddress(organization as any).url}
             firstBookingTaken
             completedCount={onboardingStatus.completedCount}
             items={onboardingStatus.items}

@@ -1090,7 +1090,11 @@
     "setupEmailSent": "보냈습니다. 받은편지함의 링크를 열어주세요.",
     "setupEmailFailed": "전송되지 않았어요. 잠시 후 다시 시도해 주세요.",
     "setupPrev": "이전 단계",
-    "setupNext": "다음 단계"
+    "setupNext": "다음 단계",
+    "setup_current_rentals": "현재 대여 중인 고객 추가",
+    "setup_reminders": "자동 알림 켜기",
+    "setup_booking_page": "예약 페이지 공유",
+    "setupShared": "링크가 복사되었습니다. 페이스북 페이지, 구글 맵, LINE에 공유해 보세요."
   },
   "todo": {
     "eyebrow": "할 일",
@@ -6227,7 +6231,9 @@
     "optListBody": "스프레드시트에 차량 목록이 있으신가요? 한 번에 등록해 보세요.",
     "toDashboard": "대시보드로 가기",
     "later": "나중에 차량 추가하기",
-    "laterHint": "\"차량 등록하기\"는 대시보드에 그대로 남아있어요."
+    "laterHint": "\"차량 등록하기\"는 대시보드에 그대로 남아있어요.",
+    "optHelp": "기록을 보내주시면 저희가 세팅해 드립니다",
+    "optHelpBody": "장부 사진, 스프레드시트, 채팅 내역 등을 보내주시면 모두 등록해 드립니다."
   },
   "fleetAssistant": {
     "title": "차량 관리 어시스턴트",
@@ -6252,6 +6258,35 @@
     "stopTalking": "중지",
     "listening": "듣는 중…",
     "placeholder": "차량에 대해 알려주세요…",
-    "send": "보내기"
+    "send": "보내기",
+    "askRented": "지금 대여중인 차량이 있나요? 누가 어떤 차량을 빌렸는지, 얼마를 내는지, 다음 납부일(또는 반납일)은 언제인지 알려주세요.",
+    "rentalsTitle": "{count, plural, one {현재 대여 #대 진행 중} other {현재 대여 #대 진행 중}}",
+    "nextPay": "다음 납부일 {date}",
+    "dueBack": "반납일 {date}",
+    "deposit": "보증금 {price} 보유 중",
+    "perWeek": "{price}/주",
+    "remindRent": "임대료 납부일 전에 고객에게 알림 보내기",
+    "remindReturn": "반납일 전에 고객에게 알림 보내기",
+    "addRentals": "{count, plural, one {대여 #건 추가} other {대여 #건 추가}}",
+    "rentalsAdded": "{count, plural, one {완료: 대여 #건이 등록되었습니다. 대시보드에서 납부 일정을 확인할 수 있습니다.} other {완료: 대여 #건이 등록되었습니다. 대시보드에서 납부 일정을 확인할 수 있습니다.}}",
+    "rentalsReminders": "채팅 앱을 연결하여 고객에게 자동으로 알림이 가도록 하고, 결제 수단을 추가하세요.",
+    "rentalsFailed": "추가하지 못했습니다: {names}. 내용을 확인하고 다시 시도해 주세요.",
+    "linkChats": "LINE 또는 WhatsApp 연결",
+    "linkPayments": "결제 정보 추가"
+  },
+  "setupRequest": {
+    "title": "저희가 대신 세팅해 드립니다",
+    "body": "장부나 화이트보드 사진, 스프레드시트, 채팅 내역 및 참고할 만한 내용을 보내주세요. 차량, 고객, 현재 대여 정보를 등록한 후 준비가 완료되면 알려드립니다.",
+    "addFiles": "사진 또는 파일 추가",
+    "addMore": "추가하기",
+    "remove": "삭제",
+    "notSent": "전송되지 않음",
+    "noteLabel": "참고할 사항이 있나요?",
+    "notePlaceholder": "예: Yaris는 12월까지 John이 대여 중이며, 매월 5일에 납부합니다.",
+    "send": "RoveHQ로 전송",
+    "sentTitle": "접수되었습니다. 감사합니다!",
+    "sentBody": "모든 설정을 완료한 후 알려드리겠습니다(보통 영업일 기준 1일 소요). 그동안 RoveHQ를 먼저 사용해 보실 수 있습니다.",
+    "failed": "전송에 실패했습니다. 다시 시도해 주세요.",
+    "tooBig": "{name} 파일이 너무 큽니다. 사진이나 더 작은 파일을 보내주세요."
   }
 }

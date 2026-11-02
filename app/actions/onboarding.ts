@@ -228,3 +228,11 @@ export async function getOnboardingStatus(organizationId: string) {
   const { supabase } = await requireUser();
   return getOnboardingStatusForOrg(supabase, organizationId);
 }
+
+/** "Share your booking page" on the Get ready list: ticked when they copy or share the link. */
+export async function markBookingPageShared(organizationId: string) {
+  const { supabase } = await requireUser();
+  await ensureOnboardingChecklist(supabase, organizationId);
+  await markOnboardingStep(supabase, organizationId, "booking_page");
+  revalidatePath("/");
+}

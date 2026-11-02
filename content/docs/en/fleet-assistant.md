@@ -6,6 +6,8 @@ order: 4
 appPath: "/fleet/assistant"
 related: ["add-a-vehicle", "import-a-spreadsheet", "rentals-already-running", "paperwork-and-renewals"]
 updated: 2026-11-02
+video: "help-fleet-assistant.mp4"
+poster: "help-fleet-assistant.jpg"
 faq:
   - q: "It says it can't open my Google Sheet."
     a: "Set the sheet's sharing to Anyone with the link can view and send the link again. Or download it and use Import on the Fleet page."

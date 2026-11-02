@@ -6,6 +6,8 @@ order: 3
 appPath: "/fleet/new"
 related: ["fleet-assistant", "import-a-spreadsheet", "vehicle-page", "vehicle-loans"]
 updated: 2026-11-02
+video: "help-add-a-vehicle.mp4"
+poster: "help-add-a-vehicle.jpg"
 faq:
   - q: "Do I have to set a price?"
     a: "No, but a vehicle with no price doesn't show on your online booking page, and you'll be asked for a price when you book it."

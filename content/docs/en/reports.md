@@ -6,6 +6,8 @@ order: 8
 appPath: "/reports"
 related: ["vehicle-report", "money-in-and-out", "fleet-value", "owner-statements"]
 updated: 2026-11-02
+video: "help-reports.mp4"
+poster: "help-reports.jpg"
 faq:
   - q: "Why is % rented high for a car with few bookings in RoveHQ?"
     a: "It also counts rented spells from before your bookings were in RoveHQ, if your history was brought in. Overlapping days count once."

@@ -6,6 +6,8 @@ order: 1
 appPath: "/bookings/new"
 related: ["rentals-already-running", "deposits", "rental-agreements", "online-booking-page"]
 updated: 2026-11-02
+video: "help-create-a-booking.mp4"
+poster: "help-create-a-booking.jpg"
 faq:
   - q: "Do I need the customer's details first?"
     a: "No. Tap Skip for now and the customer fills in their own details, ID photos and signature on the link."

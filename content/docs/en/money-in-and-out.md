@@ -6,6 +6,8 @@ order: 3
 appPath: "/transactions"
 related: ["record-a-payment", "add-a-cost", "reports", "insurance-and-tax-costs"]
 updated: 2026-11-02
+video: "help-money-in-and-out.mp4"
+poster: "help-money-in-and-out.jpg"
 faq:
   - q: "Why does my insurance show as a small amount each month?"
     a: "A cost that covers several months is split into a share per month. Switch to Day or Week to see the real payment on the day you paid."

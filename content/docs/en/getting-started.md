@@ -6,6 +6,8 @@ order: 1
 appPath: "/"
 related: ["setup-checklist", "add-a-vehicle", "fleet-assistant", "invite-your-team"]
 updated: 2026-11-02
+video: "help-tour.mp4"
+poster: "help-tour.jpg"
 faq:
   - q: "Why can't my staff see Settings or Reports?"
     a: "Settings, Reports and Buying a vehicle are owner-only. Managers and teammates don't see them in the menu."

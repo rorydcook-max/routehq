@@ -6,6 +6,8 @@ order: 1
 appPath: "/transactions/new"
 related: ["money-in-and-out", "payment-reminders-and-methods", "link-payments-to-a-booking", "deposits"]
 updated: 2026-11-02
+video: "help-record-a-payment.mp4"
+poster: "help-record-a-payment.jpg"
 faq:
   - q: "Does a deposit count as income?"
     a: "No. It shows under Deposits, not in money in. It only becomes income if you keep it."

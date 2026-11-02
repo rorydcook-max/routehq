@@ -6,6 +6,8 @@ order: 2
 appPath: "/fleet"
 related: ["vehicle-page", "insurance-and-tax-costs", "notifications", "documents"]
 updated: 2026-11-02
+video: "help-paperwork-and-renewals.mp4"
+poster: "help-paperwork-and-renewals.jpg"
 faq:
   - q: "I pay my insurance monthly. How do I record that?"
     a: "Choose Every month under How is it paid? and enter the Cost per month. RoveHQ adds it to your costs each month until the cover ends."

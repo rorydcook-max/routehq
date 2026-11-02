@@ -6,6 +6,8 @@ order: 2
 appPath: "/transactions/new?cost=1"
 related: ["money-in-and-out", "insurance-and-tax-costs", "charge-a-renter", "service-and-maintenance"]
 updated: 2026-11-02
+video: "help-add-a-cost.mp4"
+poster: "help-add-a-cost.jpg"
 ---
 
 ## From a receipt photo (fastest)

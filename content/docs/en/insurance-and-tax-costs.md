@@ -6,6 +6,8 @@ order: 6
 appPath: "/transactions/new?cost=1"
 related: ["paperwork-and-renewals", "add-a-cost", "money-in-and-out", "reports"]
 updated: 2026-11-02
+video: "help-insurance-and-tax-costs.mp4"
+poster: "help-insurance-and-tax-costs.jpg"
 faq:
   - q: "How are the months counted?"
     a: "The way you pay: 15 March to 14 March next year is 12 months, so a ฿12,000 policy counts ฿1,000 a month."

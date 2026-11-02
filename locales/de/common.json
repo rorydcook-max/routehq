@@ -465,6 +465,9 @@
     "language": "Sprache"
   },
   "customer": {
+    "cur_also": "Preise auch anzeigen in",
+    "cur_off": "Nicht anzeigen",
+    "cur_note": "Ungefähr, zum heutigen Kurs. Sie zahlen in {currency}.",
     "theRentalBusiness": "der Vermieter",
     "contactBusiness": "Vermieter kontaktieren",
     "contactNamed": "{business} kontaktieren",

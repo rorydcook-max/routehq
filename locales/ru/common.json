@@ -465,6 +465,9 @@
     "language": "Язык"
   },
   "customer": {
+    "cur_also": "Также показывать цены в",
+    "cur_off": "Не показывать",
+    "cur_note": "Примерно, по сегодняшнему курсу. Оплата в {currency}.",
     "theRentalBusiness": "прокатная компания",
     "contactBusiness": "Связаться с прокатом",
     "contactNamed": "Связаться с {business}",

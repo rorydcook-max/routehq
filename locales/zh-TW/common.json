@@ -465,6 +465,9 @@
     "language": "語言"
   },
   "customer": {
+    "cur_also": "同時顯示價格為",
+    "cur_off": "不顯示",
+    "cur_note": "依今日匯率估算。您以{currency}付款。",
     "theRentalBusiness": "租車業者",
     "contactBusiness": "聯絡租車業者",
     "contactNamed": "聯絡 {business}",

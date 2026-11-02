@@ -4,7 +4,8 @@ import { PublicBrand, PublicShell, publicCard } from "@/components/public-shell"
 import { getPublicCatalog } from "@/lib/public-catalog";
 import { Catalog } from "./catalog";
 import { EmbedHeight } from "./embed-height";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { ratesFrom, visitorCurrency } from "@/lib/visitor-currency";
 import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 import { renterUrl } from "@/lib/booking-address";
 import { permanentRedirect } from "next/navigation";
@@ -56,6 +57,9 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
   }
   if (!catalog.enabled) return <Notice message={t("catalogOffMessage", { business: catalog.name })} title={t("catalogOffTitle")} />;
 
+  // Prices are the business's; beside them, roughly what that is in the renter's own currency.
+  const [rates, visitor] = await Promise.all([ratesFrom(catalog.currency), visitorCurrency(await getLocale())]);
+
   // The booking box on the business's own website (embed.js): just the booking, sized to fit, on a clear background.
   const embedded = query.embed === "1";
   if (embedded) {
@@ -71,6 +75,8 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
           </div>
           <Catalog
             currency={catalog.currency}
+            rates={rates}
+            visitorCurrency={visitor}
             offer={catalog.offer}
             deposit={catalog.deposit}
             holdHours={catalog.holdHours}
@@ -100,6 +106,8 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
         <h1 className="sr-only">{catalog.name}</h1>
         <Catalog
           currency={catalog.currency}
+          rates={rates}
+          visitorCurrency={visitor}
           offer={catalog.offer}
           deposit={catalog.deposit}
           holdHours={catalog.holdHours}

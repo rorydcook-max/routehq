@@ -465,6 +465,9 @@
     "language": "Bahasa"
   },
   "customer": {
+    "cur_also": "Tampilkan juga harga dalam",
+    "cur_off": "Jangan tampilkan",
+    "cur_note": "Perkiraan, kurs hari ini. Anda membayar dalam {currency}.",
     "theRentalBusiness": "pihak rental",
     "contactBusiness": "Hubungi pihak rental",
     "contactNamed": "Hubungi {business}",

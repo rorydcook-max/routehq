@@ -465,6 +465,9 @@
     "language": "语言"
   },
   "customer": {
+    "cur_also": "同时显示价格为",
+    "cur_off": "不显示",
+    "cur_note": "按今日汇率估算。您以{currency}付款。",
     "theRentalBusiness": "租车行",
     "contactBusiness": "联系租车行",
     "contactNamed": "联系 {business}",

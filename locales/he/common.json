@@ -465,6 +465,9 @@
     "language": "שפה"
   },
   "customer": {
+    "cur_also": "להציג מחירים גם ב-",
+    "cur_off": "לא להציג",
+    "cur_note": "בקירוב, לפי השער של היום. התשלום ב-{currency}.",
     "theRentalBusiness": "חברת ההשכרה",
     "contactBusiness": "יצירת קשר עם חברת ההשכרה",
     "contactNamed": "יצירת קשר עם {business}",

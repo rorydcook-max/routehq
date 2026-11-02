@@ -465,6 +465,9 @@
     "language": "ພາສາ"
   },
   "customer": {
+    "cur_also": "ສະແດງລາຄາເປັນສະກຸນເງິນ",
+    "cur_off": "ບໍ່ສະແດງ",
+    "cur_note": "ໂດຍປະມານຕາມອັດຕາມື້ນີ້. ຈ່າຍເປັນ {currency}.",
     "theRentalBusiness": "ຮ້ານເຊົ່າລົດ",
     "contactBusiness": "ຕິດຕໍ່ຮ້ານເຊົ່າລົດ",
     "contactNamed": "ຕິດຕໍ່ {business}",

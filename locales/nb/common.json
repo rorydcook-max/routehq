@@ -465,6 +465,9 @@
     "language": "Språk"
   },
   "customer": {
+    "cur_also": "Vis også priser i",
+    "cur_off": "Ikke vis",
+    "cur_note": "Omtrentlig, etter dagens kurs. Du betaler i {currency}.",
     "theRentalBusiness": "utleiebedriften",
     "contactBusiness": "Kontakt utleiebedriften",
     "contactNamed": "Kontakt {business}",

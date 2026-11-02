@@ -465,6 +465,9 @@
     "language": "भाषा"
   },
   "customer": {
+    "cur_also": "कीमतें इसमें भी दिखाएं",
+    "cur_off": "न दिखाएं",
+    "cur_note": "अनुमानित, आज की दर पर। भुगतान {currency} में होगा।",
     "theRentalBusiness": "रेंटल बिज़नेस",
     "contactBusiness": "रेंटल बिज़नेस से संपर्क करें",
     "contactNamed": "{business} से संपर्क करें",

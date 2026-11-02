@@ -465,6 +465,9 @@
     "language": "Bahasa"
   },
   "customer": {
+    "cur_also": "Tunjukkan juga harga dalam",
+    "cur_off": "Jangan tunjuk",
+    "cur_note": "Anggaran, pada kadar hari ini. Anda membayar dalam {currency}.",
     "theRentalBusiness": "syarikat sewa",
     "contactBusiness": "Hubungi syarikat sewa",
     "contactNamed": "Hubungi {business}",

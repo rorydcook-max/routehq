@@ -465,6 +465,9 @@
     "language": "Wika"
   },
   "customer": {
+    "cur_also": "Ipakita rin ang presyo sa",
+    "cur_off": "Huwag ipakita",
+    "cur_note": "Tantiya, sa palitan ngayon. Magbabayad ka sa {currency}.",
     "theRentalBusiness": "ang negosyo sa pagpapaupa",
     "contactBusiness": "Makipag-ugnayan sa negosyo sa pagpapaupa",
     "contactNamed": "Makipag-ugnayan kay {business}",

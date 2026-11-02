@@ -465,6 +465,9 @@
     "language": "Idioma"
   },
   "customer": {
+    "cur_also": "Mostrar también precios en",
+    "cur_off": "No mostrar",
+    "cur_note": "Aproximado, al cambio de hoy. Pagas en {currency}.",
     "theRentalBusiness": "el negocio de alquiler",
     "contactBusiness": "Contactar con el negocio de alquiler",
     "contactNamed": "Contactar con {business}",

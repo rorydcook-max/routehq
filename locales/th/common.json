@@ -474,6 +474,9 @@
     "language": "ภาษา"
   },
   "customer": {
+    "cur_also": "แสดงราคาเป็นสกุลเงิน",
+    "cur_off": "ไม่แสดง",
+    "cur_note": "โดยประมาณตามอัตราวันนี้ ชำระเงินเป็น {currency}",
     "theRentalBusiness": "ร้านเช่ารถ",
     "contactBusiness": "ติดต่อร้านเช่ารถ",
     "contactNamed": "ติดต่อ {business}",

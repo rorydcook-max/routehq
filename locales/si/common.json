@@ -465,6 +465,9 @@
     "language": "භාෂාව"
   },
   "customer": {
+    "cur_also": "මිල ගණන් මෙම මුදලින්ද පෙන්වන්න",
+    "cur_off": "පෙන්වන්න එපා",
+    "cur_note": "අද අනුපාතයට ආසන්න වශයෙන්. ඔබ ගෙවන්නේ {currency} වලින්.",
     "theRentalBusiness": "කුලී ව්‍යාපාරය",
     "contactBusiness": "කුලී ව්‍යාපාරය අමතන්න",
     "contactNamed": "{business} අමතන්න",

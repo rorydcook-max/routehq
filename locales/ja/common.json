@@ -465,6 +465,9 @@
     "language": "言語"
   },
   "customer": {
+    "cur_also": "価格をこの通貨でも表示",
+    "cur_off": "表示しない",
+    "cur_note": "本日のレートでの概算です。お支払いは{currency}です。",
     "returningAsk": "以前ご利用いただいたことがありますか？",
     "returningHow": "前回お使いの電話番号と生年月日を入力してください。書類がお手元にある場合、再提出は不要です。",
     "returningPhone": "電話番号",

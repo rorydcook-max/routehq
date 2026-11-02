@@ -465,6 +465,9 @@
     "language": "Langue"
   },
   "customer": {
+    "cur_also": "Afficher aussi les prix en",
+    "cur_off": "Ne pas afficher",
+    "cur_note": "Approximatif, au taux du jour. Vous payez en {currency}.",
     "theRentalBusiness": "le loueur",
     "contactBusiness": "Contacter le loueur",
     "contactNamed": "Contacter {business}",

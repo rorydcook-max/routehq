@@ -3,7 +3,7 @@
 import { customerDate } from "@/lib/i18n/customer-dates";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { CalendarDays } from "lucide-react";
 import { bookOnline } from "@/app/actions/online-booking";
 import { VehicleArt } from "@/components/vehicle-art";
@@ -44,8 +44,14 @@ export function Catalog({
   initialEnd,
   initialVehicleId,
   source,
-  embedded = false
+  embedded = false,
+  rates = {},
+  visitorCurrency = null
 }: {
+  /** One unit of the business's currency in other currencies, for the "about" price beside each one. */
+  rates?: Record<string, number>;
+  /** The renter's likely currency (from their country or language); they can change it. */
+  visitorCurrency?: string | null;
   /** Shown in the booking box on the business's own website (embed.js). */
   embedded?: boolean;
   slug: string;
@@ -81,6 +87,37 @@ export function Catalog({
   const [continueHref, setContinueHref] = useState<string | null>(null);
 
   const money = (value: number) => (currency === "THB" ? `฿${Math.round(value).toLocaleString("en-US")}` : `${currency} ${Math.round(value).toLocaleString("en-US")}`);
+  // Beside each price, roughly what it is in the renter's own currency (Rory, 2 Nov 2026). They pay in the business's currency;
+  // this is a guide. Their pick is remembered on this device.
+  const otherCodes = Object.keys(rates).sort();
+  const [shownCurrency, setShownCurrency] = useState<string>(() => (visitorCurrency && rates[visitorCurrency] ? visitorCurrency : ""));
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("rove.currency");
+      if (saved !== null && (saved === "" || rates[saved])) setShownCurrency(saved);
+    } catch {
+      // Private browsing: the guess from their country stands.
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const pickCurrency = (code: string) => {
+    setShownCurrency(code);
+    try {
+      window.localStorage.setItem("rove.currency", code);
+    } catch {
+      // Not remembered; still shown for this visit.
+    }
+  };
+  const approx = (value: number) => {
+    const rate = shownCurrency ? rates[shownCurrency] : 0;
+    if (!rate || !value) return "";
+    const converted = value * rate;
+    try {
+      return `≈ ${new Intl.NumberFormat(locale, { style: "currency", currency: shownCurrency, maximumFractionDigits: converted >= 100 ? 0 : 2 }).format(converted)}`;
+    } catch {
+      return `≈ ${shownCurrency} ${Math.round(converted).toLocaleString("en-US")}`;
+    }
+  };
   const end = longTerm ? null : endDate || null;
   const datesReady = !!startDate && (longTerm || (!!endDate && endDate > startDate));
   const days = end ? daysBetween(startDate, end) : null;
@@ -182,6 +219,21 @@ export function Catalog({
             </label>
           )}
         </div>
+        {/* Prices are in the business's currency; the renter can also see roughly what that is in theirs (Rory, 2 Nov 2026). */}
+        {otherCodes.length > 0 ? (
+          <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-[var(--border)] pt-3 text-sm text-[var(--muted)]">
+            <label className="flex items-center gap-2 font-semibold text-[var(--foreground-secondary)]">
+              {t("cur_also")}
+              <select className="min-h-9 rounded-lg border border-[var(--border)] bg-white px-2 text-sm text-[var(--foreground)]" onChange={(event) => pickCurrency(event.target.value)} value={shownCurrency}>
+                <option value="">{t("cur_off")}</option>
+                {otherCodes.map((code) => (
+                  <option key={code} value={code}>{code}</option>
+                ))}
+              </select>
+            </label>
+            {shownCurrency ? <span>{t("cur_note", { currency: currency === "THB" ? "฿ (THB)" : currency })}</span> : null}
+          </div>
+        ) : null}
       </section>
 
       {datesReady && vehicles.length > 0 && freeCount === 0 ? (
@@ -277,6 +329,7 @@ export function Catalog({
                     <p className="mt-3 flex flex-wrap items-baseline gap-x-1.5">
                       <span className="text-[22px] font-bold leading-none text-[var(--foreground)]">{money(headline.amount)}</span>
                       {unit ? <span className="text-sm font-semibold text-[var(--muted)]">{unit}</span> : null}
+                      {approx(headline.amount) ? <span className="text-sm font-semibold text-[var(--foreground-secondary)]">· {approx(headline.amount)}</span> : null}
                     </p>
                   ) : null}
                   <p className="mt-1 min-h-5 text-sm text-[var(--muted)]">{otherRates.length ? otherRates.join(" · ") : " "}</p>
@@ -286,6 +339,7 @@ export function Catalog({
                     <p className="mt-1 text-sm font-semibold text-[var(--primary)]">
                       {money(stayTotal)} = {wholePeriods} × {t(plan.pricingModel === "daily" ? "perDay" : plan.pricingModel === "weekly" ? "perWeek" : "perMonth", { rate: money(plan.rate) })}
                       {lastPart !== null ? ` + ${money(lastPart)}` : ""}
+                      {approx(stayTotal) ? <span className="font-medium text-[var(--foreground-secondary)]"> ({approx(stayTotal)})</span> : null}
                     </p>
                   ) : null}
                   {free && plan && season?.pct && !tooShort ? (

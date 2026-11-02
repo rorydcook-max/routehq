@@ -465,6 +465,9 @@
     "language": "Ngôn ngữ"
   },
   "customer": {
+    "cur_also": "Hiển thị thêm giá bằng",
+    "cur_off": "Không hiển thị",
+    "cur_note": "Ước tính theo tỷ giá hôm nay. Bạn thanh toán bằng {currency}.",
     "theRentalBusiness": "bên cho thuê",
     "contactBusiness": "Liên hệ bên cho thuê",
     "contactNamed": "Liên hệ {business}",

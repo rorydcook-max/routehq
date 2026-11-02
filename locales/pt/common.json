@@ -465,6 +465,9 @@
     "showOriginal": "Mostrar original"
   },
   "customer": {
+    "cur_also": "Mostrar também preços em",
+    "cur_off": "Não mostrar",
+    "cur_note": "Aproximado, à cotação de hoje. Você paga em {currency}.",
     "theRentalBusiness": "a locadora",
     "contactBusiness": "Fale com a locadora",
     "contactNamed": "Fale com {business}",

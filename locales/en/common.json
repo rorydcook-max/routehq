@@ -465,6 +465,9 @@
     "showOriginal": "Show original"
   },
   "customer": {
+    "cur_also": "Also show prices in",
+    "cur_off": "Don't show",
+    "cur_note": "Approximate, at today's rate. You pay in {currency}.",
     "theRentalBusiness": "the rental business",
     "contactBusiness": "Contact the rental business",
     "contactNamed": "Contact {business}",

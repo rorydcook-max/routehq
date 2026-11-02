@@ -465,6 +465,9 @@
     "language": "언어"
   },
   "customer": {
+    "cur_also": "가격을 이 통화로도 표시",
+    "cur_off": "표시 안 함",
+    "cur_note": "오늘 환율 기준 대략적인 금액이에요. 결제는 {currency}로 해요.",
     "theRentalBusiness": "렌터카 업체",
     "contactBusiness": "렌터카 업체에 문의하기",
     "contactNamed": "{business}에 문의하기",

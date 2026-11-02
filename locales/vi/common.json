@@ -6295,7 +6295,10 @@
     "pageTitle": "Trợ lý",
     "pageSubtitle": "Thêm xe hoặc người đang thuê. Gõ, nói hoặc gửi ảnh, rồi kiểm tra danh sách trước khi lưu.",
     "pageBack": "Đội xe",
-    "helloAny": "Xin chào! Hãy cho tôi biết xe cần thêm, hoặc ai đang thuê xe. Bạn có thể gõ, nói hoặc gửi ảnh."
+    "helloAny": "Xin chào! Hãy cho tôi biết xe cần thêm, hoặc ai đang thuê xe. Bạn có thể gõ, nói hoặc gửi ảnh.",
+    "newChat": "Cuộc trò chuyện mới",
+    "earlierChats": "Cuộc trò chuyện trước",
+    "untitledChat": "Trò chuyện"
   },
   "setupRequest": {
     "title": "Chúng tôi sẽ cài đặt giúp bạn",

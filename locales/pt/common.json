@@ -6295,7 +6295,10 @@
     "pageTitle": "Assistente",
     "pageSubtitle": "Adicione veículos ou quem está alugando agora. Digite, fale ou envie fotos, e verifique a lista antes de salvar.",
     "pageBack": "Frota",
-    "helloAny": "Olá! Conte-me sobre veículos para adicionar ou quem está alugando um agora. Você pode digitar, falar ou enviar fotos."
+    "helloAny": "Olá! Conte-me sobre veículos para adicionar ou quem está alugando um agora. Você pode digitar, falar ou enviar fotos.",
+    "newChat": "Nova conversa",
+    "earlierChats": "Conversas anteriores",
+    "untitledChat": "Conversa"
   },
   "setupRequest": {
     "title": "Nós configuramos por si",

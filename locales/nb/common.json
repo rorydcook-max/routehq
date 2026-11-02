@@ -6295,7 +6295,10 @@
     "pageTitle": "Assistent",
     "pageSubtitle": "Legg til kjøretøy eller hvem som leier nå. Skriv, snakk eller send bilder, og sjekk listen før noe lagres.",
     "pageBack": "Flåte",
-    "helloAny": "Hei! Fortell meg om kjøretøy som skal legges til, eller hvem som leier nå. Du kan skrive, snakke eller sende bilder."
+    "helloAny": "Hei! Fortell meg om kjøretøy som skal legges til, eller hvem som leier nå. Du kan skrive, snakke eller sende bilder.",
+    "newChat": "Ny samtale",
+    "earlierChats": "Tidligere samtaler",
+    "untitledChat": "Samtale"
   },
   "setupRequest": {
     "title": "Vi ordner det for deg",

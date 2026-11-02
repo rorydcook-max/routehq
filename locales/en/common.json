@@ -6295,7 +6295,10 @@
     "pageTitle": "Assistant",
     "pageSubtitle": "Add vehicles or who's renting now. Type, talk or send photos, and check the list before anything is saved.",
     "pageBack": "Fleet",
-    "helloAny": "Hi! Tell me about vehicles to add, or who's renting one now. You can type, talk or send photos."
+    "helloAny": "Hi! Tell me about vehicles to add, or who's renting one now. You can type, talk or send photos.",
+    "newChat": "New chat",
+    "earlierChats": "Earlier chats",
+    "untitledChat": "Chat"
   },
   "setupRequest": {
     "title": "We'll set it up for you",

@@ -6295,7 +6295,10 @@
     "pageTitle": "助理",
     "pageSubtitle": "新增車輛或目前租車的人。可以打字、說話或傳照片，儲存前先核對清單。",
     "pageBack": "車隊",
-    "helloAny": "你好！告訴我要新增哪些車輛，或現在誰在租車。可以打字、說話或傳照片。"
+    "helloAny": "你好！告訴我要新增哪些車輛，或現在誰在租車。可以打字、說話或傳照片。",
+    "newChat": "新對話",
+    "earlierChats": "較早的對話",
+    "untitledChat": "對話"
   },
   "setupRequest": {
     "title": "我們來幫您設定",

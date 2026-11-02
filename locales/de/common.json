@@ -6295,7 +6295,10 @@
     "pageTitle": "Assistent",
     "pageSubtitle": "Fahrzeuge hinzufügen oder sehen, wer gerade mietet. Tippen, sprechen oder Fotos senden und die Liste vor dem Speichern prüfen.",
     "pageBack": "Fahrpark",
-    "helloAny": "Hallo! Erzähl mir von Fahrzeugen, die du hinzufügen möchtest, oder wer gerade eines mietet. Du kannst tippen, sprechen oder Fotos senden."
+    "helloAny": "Hallo! Erzähl mir von Fahrzeugen, die du hinzufügen möchtest, oder wer gerade eines mietet. Du kannst tippen, sprechen oder Fotos senden.",
+    "newChat": "Neuer Chat",
+    "earlierChats": "Frühere Chats",
+    "untitledChat": "Chat"
   },
   "setupRequest": {
     "title": "Wir richten es für dich ein",

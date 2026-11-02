@@ -6295,7 +6295,10 @@
     "pageTitle": "助手",
     "pageSubtitle": "添加车辆或当前租车的人。可以打字、说话或发照片，保存前先核对清单。",
     "pageBack": "车队",
-    "helloAny": "你好！告诉我要添加哪些车辆，或者现在谁在租车。可以打字、说话或发照片。"
+    "helloAny": "你好！告诉我要添加哪些车辆，或者现在谁在租车。可以打字、说话或发照片。",
+    "newChat": "新建对话",
+    "earlierChats": "历史对话",
+    "untitledChat": "对话"
   },
   "setupRequest": {
     "title": "我们来帮您设置",

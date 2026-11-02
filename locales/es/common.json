@@ -6295,7 +6295,10 @@
     "pageTitle": "Asistente",
     "pageSubtitle": "Agrega vehículos o quién alquila ahora. Escribe, habla o envía fotos, y revisa la lista antes de guardar.",
     "pageBack": "Flota",
-    "helloAny": "¡Hola! Dime qué vehículos agregar o quién alquila uno ahora. Puedes escribir, hablar o enviar fotos."
+    "helloAny": "¡Hola! Dime qué vehículos agregar o quién alquila uno ahora. Puedes escribir, hablar o enviar fotos.",
+    "newChat": "Nueva conversación",
+    "earlierChats": "Conversaciones anteriores",
+    "untitledChat": "Chat"
   },
   "setupRequest": {
     "title": "Te lo configuramos",

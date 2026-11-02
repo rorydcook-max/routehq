@@ -6295,7 +6295,10 @@
     "pageTitle": "Asisten",
     "pageSubtitle": "Tambah kendaraan atau info penyewa saat ini. Ketik, ngobrol, atau kirim foto, lalu periksa daftarnya sebelum disimpan.",
     "pageBack": "Armada",
-    "helloAny": "Halo! Beritahu saya kendaraan yang ingin ditambahkan, atau siapa yang sedang menyewa. Anda bisa mengetik, ngobrol, atau kirim foto."
+    "helloAny": "Halo! Beritahu saya kendaraan yang ingin ditambahkan, atau siapa yang sedang menyewa. Anda bisa mengetik, ngobrol, atau kirim foto.",
+    "newChat": "Obrolan baru",
+    "earlierChats": "Obrolan sebelumnya",
+    "untitledChat": "Obrolan"
   },
   "setupRequest": {
     "title": "Kami yang akan aturkan untuk Anda",

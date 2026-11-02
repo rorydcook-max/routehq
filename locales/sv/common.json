@@ -6295,7 +6295,10 @@
     "pageTitle": "Assistent",
     "pageSubtitle": "Lägg till fordon eller vem som hyr nu. Skriv, prata eller skicka foton, och kontrollera listan innan något sparas.",
     "pageBack": "Fordon",
-    "helloAny": "Hej! Berätta vilka fordon som ska läggas till, eller vem som hyr ett just nu. Du kan skriva, prata eller skicka foton."
+    "helloAny": "Hej! Berätta vilka fordon som ska läggas till, eller vem som hyr ett just nu. Du kan skriva, prata eller skicka foton.",
+    "newChat": "Ny chatt",
+    "earlierChats": "Tidigare chattar",
+    "untitledChat": "Chatt"
   },
   "setupRequest": {
     "title": "Vi ordnar det åt dig",

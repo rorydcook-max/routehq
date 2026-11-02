@@ -6295,7 +6295,10 @@
     "pageTitle": "Katulong",
     "pageSubtitle": "Magdagdag ng sasakyan o kung sino ang nagpapaupa ngayon. I-type, magsalita o magpadala ng litrato, at tingnan ang listahan bago i-save.",
     "pageBack": "Sasakyan",
-    "helloAny": "Kamusta! Sabihin sa akin ang tungkol sa mga idadagdag na sasakyan, o kung sino ang nagpapaupa ngayon. Pwede kang mag-type, magsalita o magpadala ng litrato."
+    "helloAny": "Kamusta! Sabihin sa akin ang tungkol sa mga idadagdag na sasakyan, o kung sino ang nagpapaupa ngayon. Pwede kang mag-type, magsalita o magpadala ng litrato.",
+    "newChat": "Bagong chat",
+    "earlierChats": "Mga naunang chat",
+    "untitledChat": "Chat"
   },
   "setupRequest": {
     "title": "Kami na ang maglalagay para sa iyo",

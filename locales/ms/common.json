@@ -6295,7 +6295,10 @@
     "pageTitle": "Pembantu",
     "pageSubtitle": "Tambah kenderaan atau siapa yang sewa sekarang. Taip, cakap atau hantar foto, dan semak senarai sebelum apa-apa disimpan.",
     "pageBack": "Armada",
-    "helloAny": "Hai! Beritahu saya tentang kenderaan untuk ditambah, atau siapa yang sedang menyewa. Anda boleh taip, bercakap atau hantar foto."
+    "helloAny": "Hai! Beritahu saya tentang kenderaan untuk ditambah, atau siapa yang sedang menyewa. Anda boleh taip, bercakap atau hantar foto.",
+    "newChat": "Sembang baharu",
+    "earlierChats": "Sembang terdahulu",
+    "untitledChat": "Sembang"
   },
   "setupRequest": {
     "title": "Kami akan sediakannya untuk anda",

@@ -3,7 +3,16 @@
 import { Camera, Check, Loader2, Mic, Send, Sparkles, Square, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { addAssistantRentals, addAssistantVehicles, askFleetAssistant, type AssistantTurn, type DraftRental, type DraftVehicle } from "@/app/actions/fleet-assistant";
+import {
+  addAssistantRentals,
+  addAssistantVehicles,
+  askFleetAssistant,
+  saveAssistantConversation,
+  type AssistantTurn,
+  type DraftRental,
+  type DraftVehicle,
+  type SavedConversation
+} from "@/app/actions/fleet-assistant";
 import Link from "next/link";
 import type { Route } from "next";
 import { uploadVehiclePhotos } from "@/app/actions/vehicles";
@@ -35,7 +44,9 @@ export function FleetAssistant({
   currency = "THB",
   onAdded,
   hasVehicles = false,
-  greeting
+  greeting,
+  initial,
+  rememberInUrl = false
 }: {
   organizationId: string;
   currency?: string;
@@ -43,15 +54,44 @@ export function FleetAssistant({
   hasVehicles?: boolean;
   /** The first line, when the place it opens from needs a different one (Fleet: vehicles or rentals). */
   greeting?: string;
+  /** An earlier chat to carry on with. */
+  initial?: SavedConversation | null;
+  /** Put the chat's id in the address (?c=), so a reload opens the same chat. */
+  rememberInUrl?: boolean;
 }) {
   const t = useTranslations("fleetAssistant");
   const locale = useLocale();
-  const [turns, setTurns] = useState<AssistantTurn[]>([]);
+  const [turns, setTurns] = useState<AssistantTurn[]>(initial?.turns || []);
   // Vehicles already in: the first question is who is renting them (Rory, 2 Nov 2026).
-  const [shownTurns, setShownTurns] = useState<Array<AssistantTurn & { photos?: string[]; links?: boolean }>>([{ role: "assistant", text: greeting || (hasVehicles ? t("askRented") : t("hello")) }]);
-  const [rentals, setRentals] = useState<DraftRental[]>([]);
+  const [shownTurns, setShownTurns] = useState<Array<AssistantTurn & { photos?: string[]; links?: boolean }>>(
+    initial?.shown?.length ? initial.shown : [{ role: "assistant", text: greeting || (hasVehicles ? t("askRented") : t("hello")) }]
+  );
+  const [rentals, setRentals] = useState<DraftRental[]>(initial?.rentals || []);
   const [addingRentals, setAddingRentals] = useState(false);
-  const [draft, setDraft] = useState<DraftVehicle[]>([]);
+  const [draft, setDraft] = useState<DraftVehicle[]>(initial?.draft || []);
+  // Every chat is kept (Rory, 2 Nov 2026: a reload lost it): saved a moment after anything changes.
+  const conversationId = useRef<string | null>(initial?.id || null);
+  useEffect(() => {
+    if (!shownTurns.some((turn) => turn.role === "user")) return;
+    const timer = window.setTimeout(async () => {
+      const saved = await saveAssistantConversation({
+        id: conversationId.current,
+        shown: shownTurns.map(({ role, text, links }) => ({ role, text, links })),
+        turns,
+        draft,
+        rentals
+      }).catch(() => ({ id: null }));
+      if (saved.id && saved.id !== conversationId.current) {
+        conversationId.current = saved.id;
+        if (rememberInUrl) {
+          const url = new URL(window.location.href);
+          url.searchParams.set("c", saved.id);
+          window.history.replaceState(window.history.state, "", url.toString());
+        }
+      }
+    }, 600);
+    return () => window.clearTimeout(timer);
+  }, [shownTurns, turns, draft, rentals, rememberInUrl]);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [pending, setPending] = useState<Photo[]>([]);
   const [text, setText] = useState("");

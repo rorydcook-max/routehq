@@ -6295,7 +6295,10 @@
     "pageTitle": "Assistant",
     "pageSubtitle": "Ajoutez des véhicules ou indiquez qui loue. Écrivez, parlez ou envoyez des photos, et vérifiez la liste avant d'enregistrer.",
     "pageBack": "Flotte",
-    "helloAny": "Salut ! Dites-moi quels véhicules ajouter ou qui en loue un. Vous pouvez écrire, parler ou envoyer des photos."
+    "helloAny": "Salut ! Dites-moi quels véhicules ajouter ou qui en loue un. Vous pouvez écrire, parler ou envoyer des photos.",
+    "newChat": "Nouvelle conversation",
+    "earlierChats": "Conversations précédentes",
+    "untitledChat": "Conversation"
   },
   "setupRequest": {
     "title": "On s'occupe de la configuration pour vous",

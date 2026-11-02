@@ -9,7 +9,9 @@ import { businessToday } from "@/lib/business-time";
 import { settleExistingRental } from "@/lib/existing-rental";
 import { activateRental } from "@/lib/rental-activation";
 import { ensureOnboardingChecklist, markOnboardingStep } from "@/lib/onboarding";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { googleSheetToSpreadsheetInput, parseSpreadsheetFile } from "@/lib/import/spreadsheet";
 
 /**
  * The fleet assistant (Rory, 2 Nov 2026): an owner tells it about their vehicles in their own words, by typing,
@@ -129,6 +131,7 @@ export async function askFleetAssistant(input: {
     "If someone says they have several of the same vehicle, add one entry per vehicle (plates can come later). Only make and model are needed.",
     `Prices said "a month", "monthly" or "/mo" go in monthlyRate; "a day" in dailyRate; "a week" in weeklyRate. Numbers only, in ${currency}. A price said for a group applies to each.`,
     "When the new-vehicle list looks complete, tell them to tap Add to put them in their fleet.",
+    "You can read Google Sheets: when a sheet's contents are included below, take the vehicles (and, once those are in the fleet, the rentals) from it. If it says a sheet could not be opened, tell them how to share it.",
     `RENTALS: vehicles already in their fleet are listed below with ids. Once there are some, ask whether any are rented out right now. For each one rented: the customer's name and phone (needed to remind them), when it started, the price and whether per day, week or month, and either the next payment date (monthly renters) or when it is due back (short rentals), and any deposit they hold.`,
     "Turn relative dates into YYYY-MM-DD (\"the 5th\" = the next 5th from today; \"back on Friday\" = the coming Friday).",
     "Then ask if they want RoveHQ to remind each customer automatically before the rent is due (or before the return); set remind true unless they say no.",
@@ -140,8 +143,11 @@ export async function askFleetAssistant(input: {
   const images = input.images.filter((url) => /^data:image\/(jpeg|png|webp);base64,/.test(url)).slice(0, MAX_IMAGES_PER_TURN);
   const history = input.turns.slice(-16);
   const last = history.pop();
+  // Google Sheets links in the message are opened and read (Rory, 2 Nov 2026: it said it couldn't read them).
+  const sheets = await readSheetLinks(last?.text || "");
   const lastText = [
     last?.text || "",
+    sheets,
     images.length ? `(${images.map((_, index) => `Photo ${input.photosBefore + index + 1}`).join(", ")} attached.)` : "",
     `Vehicles already in the fleet (never put these in the draft again): ${JSON.stringify(fleetList)}`,
     `New vehicles so far: ${JSON.stringify(input.draft)}`,
@@ -156,7 +162,8 @@ export async function askFleetAssistant(input: {
         model: process.env.OPENAI_ASSISTANT_MODEL || "gpt-4o-mini",
         response_format: { type: "json_object" },
         temperature: 0.2,
-        max_tokens: 2400,
+        // A whole spreadsheet of vehicles and rentals comes back as one list: room for it.
+        max_tokens: sheets ? 12000 : 3000,
         messages: [
           { role: "system", content: system },
           ...history.map((turn) => ({ role: turn.role, content: turn.text }) as const),
@@ -166,7 +173,7 @@ export async function askFleetAssistant(input: {
           }
         ]
       },
-      { timeout: 45_000 }
+      { timeout: sheets ? 110_000 : 45_000 }
     );
     const text = String(completion.choices?.[0]?.message?.content || "");
     const start = text.indexOf("{");
@@ -185,6 +192,31 @@ export async function askFleetAssistant(input: {
     console.warn("[fleet-assistant]", error instanceof Error ? error.message.slice(0, 200) : error);
     return { ok: false, error: "failed" };
   }
+}
+
+/**
+ * The contents of any Google Sheets links in a message, every tab as rows of "heading: value", for the model to read.
+ * A sheet that can't be opened says so, so the assistant can tell the owner how to share it.
+ */
+async function readSheetLinks(text: string) {
+  const links = Array.from(new Set(text.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+[^\s)]*/g) || [])).slice(0, 3);
+  if (!links.length) return "";
+  const parts: string[] = [];
+  for (const link of links) {
+    try {
+      const tabs = await parseSpreadsheetFile(await googleSheetToSpreadsheetInput(link));
+      const body = tabs
+        .map((tab) => {
+          const rows = tab.rows.slice(0, 300).map((row) => tab.headers.map((header) => (row[header] ? `${header}: ${row[header]}` : "")).filter(Boolean).join(" | "));
+          return `Tab "${tab.sheetName}" (${tab.rows.length} rows):\n${rows.join("\n")}`;
+        })
+        .join("\n\n");
+      parts.push(`Contents of the Google Sheet ${link}:\n${body.slice(0, 60000)}`);
+    } catch (error) {
+      parts.push(`The Google Sheet ${link} could not be opened (${error instanceof Error ? error.message : "error"}). Tell them to set sharing to "Anyone with the link can view" and send it again, or download it and use Bring in a list.`);
+    }
+  }
+  return parts.join("\n\n");
 }
 
 function addPeriod(iso: string, period: "day" | "week" | "month", times: number) {
@@ -351,4 +383,62 @@ export async function addAssistantVehicles(draft: DraftVehicle[]): Promise<{ ok:
   revalidatePath("/fleet");
   revalidatePath("/");
   return { ok: true, ids };
+}
+
+export type ShownTurn = AssistantTurn & { links?: boolean };
+export type SavedConversation = { id: string; title: string; shown: ShownTurn[]; turns: AssistantTurn[]; draft: DraftVehicle[]; rentals: DraftRental[]; updatedAt: string };
+
+/**
+ * Keeps an assistant chat (Rory, 2 Nov 2026: a reload lost the conversation, and earlier chats couldn't be found).
+ * Text only: photos aren't kept. Returns the chat's id, made on the first save.
+ */
+export async function saveAssistantConversation(input: { id?: string | null; shown: ShownTurn[]; turns: AssistantTurn[]; draft: DraftVehicle[]; rentals: DraftRental[] }): Promise<{ id: string | null }> {
+  const [organization, user] = await Promise.all([getDefaultOrganization(), getRequestUser()]);
+  if (!user) return { id: null };
+  const admin = createSupabaseAdminClient() as any;
+  const shown = (input.shown || []).slice(-200).map((turn) => ({ role: turn.role === "user" ? "user" : "assistant", text: String(turn.text || "").slice(0, 4000), ...(turn.links ? { links: true } : {}) }));
+  const firstUser = shown.find((turn) => turn.role === "user")?.text || "";
+  const row = {
+    organization_id: organization.id,
+    user_id: user.id,
+    kind: "fleet",
+    title: firstUser.replace(/\s+/g, " ").slice(0, 80) || null,
+    shown,
+    turns: (input.turns || []).slice(-40).map((turn) => ({ role: turn.role, text: String(turn.text || "").slice(0, 8000) })),
+    draft: clean(input.draft),
+    rentals: Array.isArray(input.rentals) ? input.rentals.slice(0, 60) : [],
+    updated_at: new Date().toISOString()
+  };
+  if (input.id) {
+    const { data } = await admin.from("assistant_conversations").update(row).eq("id", input.id).eq("organization_id", organization.id).eq("user_id", user.id).select("id").maybeSingle();
+    if (data?.id) return { id: data.id };
+  }
+  const { data } = await admin.from("assistant_conversations").insert(row).select("id").single();
+  return { id: data?.id || null };
+}
+
+/** The person's recent assistant chats in this business, newest first. */
+export async function listAssistantConversations(limit = 20): Promise<Array<{ id: string; title: string; updatedAt: string }>> {
+  const [organization, user] = await Promise.all([getDefaultOrganization(), getRequestUser()]);
+  if (!user) return [];
+  const admin = createSupabaseAdminClient() as any;
+  const { data } = await admin
+    .from("assistant_conversations")
+    .select("id, title, updated_at")
+    .eq("organization_id", organization.id)
+    .eq("user_id", user.id)
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+  return ((data || []) as any[]).map((row) => ({ id: row.id, title: row.title || "", updatedAt: row.updated_at }));
+}
+
+/** One of the person's chats, to carry on with. */
+export async function loadAssistantConversation(id: string): Promise<SavedConversation | null> {
+  if (!/^[0-9a-f-]{36}$/i.test(id || "")) return null;
+  const [organization, user] = await Promise.all([getDefaultOrganization(), getRequestUser()]);
+  if (!user) return null;
+  const admin = createSupabaseAdminClient() as any;
+  const { data } = await admin.from("assistant_conversations").select("*").eq("id", id).eq("organization_id", organization.id).eq("user_id", user.id).maybeSingle();
+  if (!data) return null;
+  return { id: data.id, title: data.title || "", shown: data.shown || [], turns: data.turns || [], draft: data.draft || [], rentals: data.rentals || [], updatedAt: data.updated_at };
 }

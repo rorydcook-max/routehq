@@ -3282,7 +3282,11 @@
     "hf_manual": "අතින්",
     "hf_fuel": "ඉන්ධන",
     "hf_colour": "වර්ණය",
-    "hf_body": "වාහන සිරුර"
+    "hf_body": "වාහන සිරුර",
+    "hf_seats": "ආසන",
+    "hf_engine": "එන්ජිම",
+    "hf_bought": "මිලදී ගත්තේ",
+    "hf_worth": "දැනට වටිනාකම"
   },
   "customerPage": {
     "back": "පාරිභෝගිකයින්",

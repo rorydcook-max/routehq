@@ -3282,7 +3282,11 @@
     "hf_manual": "수동",
     "hf_fuel": "연료",
     "hf_colour": "색상",
-    "hf_body": "차체"
+    "hf_body": "차체",
+    "hf_seats": "좌석",
+    "hf_engine": "엔진",
+    "hf_bought": "구입가",
+    "hf_worth": "현재 가치"
   },
   "customerPage": {
     "back": "고객",

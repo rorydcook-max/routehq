@@ -3282,7 +3282,11 @@
     "hf_manual": "Manual",
     "hf_fuel": "Combustível",
     "hf_colour": "Cor",
-    "hf_body": "Carroceria"
+    "hf_body": "Carroceria",
+    "hf_seats": "Assentos",
+    "hf_engine": "Motor",
+    "hf_bought": "Comprado por",
+    "hf_worth": "Valor atual"
   },
   "customerPage": {
     "back": "Clientes",

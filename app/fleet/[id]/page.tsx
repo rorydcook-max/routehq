@@ -1085,7 +1085,12 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
       [tx.say("hf_gearbox"), /^(at|auto)/i.test(gearbox) ? tx.say("hf_auto") : /^(mt|man)/i.test(gearbox) ? tx.say("hf_manual") : gearbox],
       [tx.say("hf_fuel"), String(specs.fuel_type || "")],
       [tx.say("hf_colour"), String(vehicle.color || "")],
-      [tx.say("hf_body"), String(specs.body_type || specs.body_class || "")]
+      [tx.say("hf_body"), String(specs.body_type || specs.body_class || "")],
+      [tx.say("hf_seats"), Number(specs.seating_capacity || specs.seats) > 0 ? String(specs.seating_capacity || specs.seats) : ""],
+      [tx.say("hf_engine"), Number(specs.engine_cc) > 0 ? `${Number(specs.engine_cc).toLocaleString("en-US")} cc` : ""],
+      // What it cost and what it's worth: the owner's figures, never shown to staff.
+      [tx.say("hf_bought"), isOwner && Number(vehicle.purchase_price) > 0 ? [money(vehicle.purchase_price), vehicle.purchase_date ? dateFormat(tx.locale, { month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${String(vehicle.purchase_date).slice(0, 10)}T00:00:00Z`)) : ""].filter(Boolean).join(" · ") : ""],
+      [tx.say("hf_worth"), isOwner && Number((vehicle as any).estimated_value) > 0 ? money((vehicle as any).estimated_value) : ""]
     ] as Array<[string, string]>
   ).filter(([, value]) => value);
 
@@ -1140,7 +1145,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
         <Card>
           <div className="card-section">
             {/* The photo takes about two fifths; the name, plate and actions get the room. */}
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.8fr)_minmax(340px,1.2fr)] lg:items-stretch">
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.7fr)_minmax(340px,1.3fr)] lg:items-stretch">
               <VehiclePhotoManager art={<VehicleArt colour={vehicle.color} kind={kindFromCategory(detail.category)} model={vehicle.model} size="xl" />} organizationId={organization.id} photos={detail.photos} vehicleId={vehicle.id} vehicleLabel={[vehicle.make, vehicle.model].filter(Boolean).join(" ")} />
               <div className="flex min-w-0 flex-col justify-between gap-4">
                 <div className="min-w-0">

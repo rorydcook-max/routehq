@@ -3322,7 +3322,11 @@
     "hf_manual": "ידנית",
     "hf_fuel": "דלק",
     "hf_colour": "צבע",
-    "hf_body": "מרכב"
+    "hf_body": "מרכב",
+    "hf_seats": "מושבים",
+    "hf_engine": "מנוע",
+    "hf_bought": "נרכש ב-",
+    "hf_worth": "שווי נוכחי"
   },
   "customerPage": {
     "back": "לקוחות",

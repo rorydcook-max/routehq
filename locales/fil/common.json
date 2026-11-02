@@ -3282,7 +3282,11 @@
     "hf_manual": "Manual",
     "hf_fuel": "Gasolina",
     "hf_colour": "Kulay",
-    "hf_body": "Katawan"
+    "hf_body": "Katawan",
+    "hf_seats": "Upuan",
+    "hf_engine": "Makina",
+    "hf_bought": "Binili sa halagang",
+    "hf_worth": "Halaga ngayon"
   },
   "customerPage": {
     "back": "Mga customer",

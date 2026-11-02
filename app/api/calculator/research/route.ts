@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
     let platform = null;
     try {
       platform = store
-        ? await platformRates(store, { make, model, country, region: String(organization.settings?.main_location?.region || ""), excludeOrganizationId: organization.id })
+        ? await platformRates(store, { make, model, country, region: String(organization.settings?.main_location?.region || ""), excludeOrganizationId: organization.id, year, mileage, trim })
         : null;
     } catch {
       platform = null;

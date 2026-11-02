@@ -3282,7 +3282,11 @@
     "hf_manual": "Manuell",
     "hf_fuel": "Drivstoff",
     "hf_colour": "Farge",
-    "hf_body": "Karosseri"
+    "hf_body": "Karosseri",
+    "hf_seats": "Seter",
+    "hf_engine": "Motor",
+    "hf_bought": "Kjøpt for",
+    "hf_worth": "Verdi nå"
   },
   "customerPage": {
     "back": "Kunder",

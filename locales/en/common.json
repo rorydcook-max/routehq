@@ -3282,7 +3282,11 @@
     "hf_manual": "Manual",
     "hf_fuel": "Fuel",
     "hf_colour": "Colour",
-    "hf_body": "Body"
+    "hf_body": "Body",
+    "hf_seats": "Seats",
+    "hf_engine": "Engine",
+    "hf_bought": "Bought for",
+    "hf_worth": "Worth now"
   },
   "customerPage": {
     "back": "Customers",

@@ -3322,7 +3322,11 @@
     "hf_manual": "Schaltung",
     "hf_fuel": "Kraftstoff",
     "hf_colour": "Farbe",
-    "hf_body": "Karosserie"
+    "hf_body": "Karosserie",
+    "hf_seats": "Sitze",
+    "hf_engine": "Motor",
+    "hf_bought": "Gekauft für",
+    "hf_worth": "Aktueller Wert"
   },
   "customerPage": {
     "back": "Kunden",

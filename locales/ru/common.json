@@ -3322,7 +3322,11 @@
     "hf_manual": "Механика",
     "hf_fuel": "Топливо",
     "hf_colour": "Цвет",
-    "hf_body": "Кузов"
+    "hf_body": "Кузов",
+    "hf_seats": "Места",
+    "hf_engine": "Двигатель",
+    "hf_bought": "Куплено за",
+    "hf_worth": "Текущая стоимость"
   },
   "customerPage": {
     "back": "Клиенты",

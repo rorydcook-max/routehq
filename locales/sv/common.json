@@ -3282,7 +3282,11 @@
     "hf_manual": "Manuell",
     "hf_fuel": "Bränsle",
     "hf_colour": "Färg",
-    "hf_body": "Karosseri"
+    "hf_body": "Karosseri",
+    "hf_seats": "Säten",
+    "hf_engine": "Motor",
+    "hf_bought": "Köpt för",
+    "hf_worth": "Värde nu"
   },
   "customerPage": {
     "back": "Kunder",

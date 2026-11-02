@@ -3282,7 +3282,11 @@
     "hf_manual": "マニュアル",
     "hf_fuel": "燃料",
     "hf_colour": "色",
-    "hf_body": "車体"
+    "hf_body": "車体",
+    "hf_seats": "座席数",
+    "hf_engine": "エンジン",
+    "hf_bought": "購入価格",
+    "hf_worth": "現在の価値"
   },
   "customerPage": {
     "back": "お客様",

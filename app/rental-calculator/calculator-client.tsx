@@ -7,6 +7,7 @@ import type { VehicleMake, VehicleModel, VehicleTrim } from "@/lib/vehicle-catal
 import { Card, Fold } from "@/components/ui";
 import { longDate, numberLocale } from "@/lib/i18n/dates";
 import { buildAssumptions, evaluate, flatResaleCurve, yearlyLossPct } from "@/lib/vehicle-investment";
+import { rentForAge } from "@/lib/rent-age";
 import type { Assumptions, Outcome, RentStyle, Research, Verdict } from "@/lib/vehicle-investment";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -386,8 +387,7 @@ export function CalculatorClient({
    */
   function ownRateFor(vehicle: FleetVehicle, forSubject: Subject) {
     if (!vehicle.year || !forSubject.year || vehicle.year === forSubject.year) return vehicle.monthlyRate;
-    const shift = Math.max(-0.3, Math.min(0.3, (forSubject.year - vehicle.year) * 0.045));
-    return Math.round((vehicle.monthlyRate * (1 + shift)) / 500) * 500;
+    return rentForAge(vehicle.monthlyRate, { year: vehicle.year, mileage: vehicle.mileage }, { year: forSubject.year, mileage: mileage || null }, 500);
   }
   function withOwnRate(figures: Assumptions, forSubject: Subject): Assumptions {
     const mine = style === "monthly" ? ownVehicle(forSubject) : undefined;

@@ -3322,7 +3322,11 @@
     "hf_manual": "Số sàn",
     "hf_fuel": "Nhiên liệu",
     "hf_colour": "Màu sắc",
-    "hf_body": "Kiểu thân xe"
+    "hf_body": "Kiểu thân xe",
+    "hf_seats": "Chỗ ngồi",
+    "hf_engine": "Động cơ",
+    "hf_bought": "Giá mua",
+    "hf_worth": "Giá trị hiện tại"
   },
   "customerPage": {
     "back": "Khách hàng",

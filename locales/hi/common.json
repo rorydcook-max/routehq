@@ -3282,7 +3282,11 @@
     "hf_manual": "मैनुअल",
     "hf_fuel": "ईंधन",
     "hf_colour": "रंग",
-    "hf_body": "बॉडी"
+    "hf_body": "बॉडी",
+    "hf_seats": "सीटें",
+    "hf_engine": "इंजन",
+    "hf_bought": "खरीदा गया मूल्य",
+    "hf_worth": "अभी का मूल्य"
   },
   "customerPage": {
     "back": "ग्राहक",

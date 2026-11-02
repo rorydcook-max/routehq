@@ -3322,7 +3322,11 @@
     "hf_manual": "Manual",
     "hf_fuel": "Bahan bakar",
     "hf_colour": "Warna",
-    "hf_body": "Bodi"
+    "hf_body": "Bodi",
+    "hf_seats": "Kursi",
+    "hf_engine": "Mesin",
+    "hf_bought": "Dibeli seharga",
+    "hf_worth": "Nilai sekarang"
   },
   "customerPage": {
     "back": "Pelanggan",

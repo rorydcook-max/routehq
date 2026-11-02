@@ -3317,7 +3317,11 @@
     "hf_manual": "ธรรมดา",
     "hf_fuel": "เชื้อเพลิง",
     "hf_colour": "สี",
-    "hf_body": "ตัวถัง"
+    "hf_body": "ตัวถัง",
+    "hf_seats": "ที่นั่ง",
+    "hf_engine": "เครื่องยนต์",
+    "hf_bought": "ซื้อมาในราคา",
+    "hf_worth": "มูลค่าปัจจุบัน"
   },
   "customerPage": {
     "back": "ลูกค้า",

@@ -3282,7 +3282,11 @@
     "hf_manual": "手排",
     "hf_fuel": "燃料",
     "hf_colour": "顏色",
-    "hf_body": "車身"
+    "hf_body": "車身",
+    "hf_seats": "座位數",
+    "hf_engine": "引擎",
+    "hf_bought": "購入價格",
+    "hf_worth": "目前價值"
   },
   "customerPage": {
     "back": "客人",

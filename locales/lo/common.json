@@ -3282,7 +3282,11 @@
     "hf_manual": "ທຳມະດາ",
     "hf_fuel": "ນໍ້າມັນ",
     "hf_colour": "ສີ",
-    "hf_body": "ໂຄງຕົວລົດ"
+    "hf_body": "ໂຄງຕົວລົດ",
+    "hf_seats": "ທີ່ນັ່ງ",
+    "hf_engine": "ເຄື່ອງຈັກ",
+    "hf_bought": "ຊື້ໃນລາຄາ",
+    "hf_worth": "ມູນຄ່າປະຈຸບັນ"
   },
   "customerPage": {
     "back": "ລູກຄ້າ",

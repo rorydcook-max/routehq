@@ -3322,7 +3322,11 @@
     "hf_manual": "手动挡",
     "hf_fuel": "燃油",
     "hf_colour": "颜色",
-    "hf_body": "车身"
+    "hf_body": "车身",
+    "hf_seats": "座位数",
+    "hf_engine": "发动机",
+    "hf_bought": "购入价格",
+    "hf_worth": "当前价值"
   },
   "customerPage": {
     "back": "客户",

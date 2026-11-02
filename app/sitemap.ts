@@ -4,6 +4,7 @@ import type { MetadataRoute } from "next";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { allGuideSlugs, allResourceSlugs, getGuide, getResource, GUIDE_CATEGORIES, guideLocales, listGuides, resourceLocales } from "@/lib/site/content";
 import { DEFAULT_SITE_LOCALE, hreflangFor } from "@/lib/site/locale-path";
+import { listDocs } from "@/lib/site/docs";
 import { siteUrl } from "@/lib/site/seo";
 
 /**
@@ -40,6 +41,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const updated = locales.map((locale) => getGuide(locale, slug)?.updated || "").sort().pop() || built.toISOString().slice(0, 10);
     add(`/guides/${slug}`, locales, updated, 0.7);
   }
+  // The help centre: English for now (every language's address shows it, with the English one as canonical).
+  add("/docs", ["en"], built, 0.7);
+  for (const doc of listDocs("en")) add(`/docs/${doc.slug}`, ["en"], doc.updated || built.toISOString().slice(0, 10), 0.6);
   for (const slug of allResourceSlugs()) {
     const locales = resourceLocales(slug);
     let lastModified: Date | string = built;

@@ -39,6 +39,7 @@ import { useInitialShellBrand } from "@/components/shell-brand-provider";
 import { FastActionSheet } from "@/components/fast-action-sheet";
 import { PendingButton } from "@/components/pending-button";
 import { TrialBanner } from "@/components/trial-banner";
+import { ScreenHelp } from "@/components/screen-help";
 
 type NavKey =
   | "dashboard"
@@ -171,6 +172,16 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
       cancelled = true;
     };
   }, []);
+  // Scrolling the page with the mouse wheel while an amount box has the cursor changed the amount (3200 became
+  // 3199.94 when recording a cost, 2 Nov 2026): the box lets go of the cursor first, so the wheel scrolls the page.
+  useEffect(() => {
+    const onWheel = () => {
+      const active = document.activeElement;
+      if (active instanceof HTMLInputElement && active.type === "number") active.blur();
+    };
+    document.addEventListener("wheel", onWheel, { passive: true, capture: true });
+    return () => document.removeEventListener("wheel", onWheel, { capture: true });
+  }, []);
   const brand = shell.brand;
   // Their name in text if the logo file is missing or slow: never an empty box where the brand should be.
   const brandName = brand?.name ? <span className="truncate text-[1.1rem] font-black leading-none tracking-[-0.02em] text-[var(--foreground)]">{brand.name}</span> : null;
@@ -296,7 +307,10 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
             </div>
           ) : null}
         </nav>
-        <div className="mt-2 flex gap-1 border-t border-[var(--sidebar-border)] pt-2">
+        <div className="mt-2 border-t border-[var(--sidebar-border)] pt-1.5">
+          <ScreenHelp />
+        </div>
+        <div className="mt-1 flex gap-1">
           {visibleFootItems.map((item) => sideLink(item, true))}
         </div>
         {isTeammate ? null : (
@@ -364,7 +378,10 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                 <RouteHqLogo className="h-7 w-auto" showDescriptor={false} tone="light" />
               )}
             </Link>
-            <span className="ml-auto">{!isTeammate ? <AskBox variant="icon" /> : null}</span>
+            <span className="ml-auto flex items-center gap-2">
+              <ScreenHelp variant="icon" />
+              {!isTeammate ? <AskBox variant="icon" /> : null}
+            </span>
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization}>
                 <select

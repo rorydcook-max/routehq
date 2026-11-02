@@ -21,6 +21,7 @@ export async function SiteFooter() {
       links: [
         { href: SITE_LINKS.guides, label: m("navGuides") },
         { href: SITE_LINKS.resources, label: m("navResources") },
+        { href: SITE_LINKS.docs, label: m("docsEyebrow") },
         { href: SITE_LINKS.faq, label: m("navFaq") }
       ]
     },

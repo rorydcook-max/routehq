@@ -39,6 +39,16 @@ const GUIDE_TOPICS = new Set(["starting", "legal", "operations", "money", "marke
 function missingSiteContent(path: string, locale: string) {
   const topic = path.match(/^\/guides\/category\/([^/]+)$/);
   if (topic) return !GUIDE_TOPICS.has(topic[1]);
+  // Help articles are written in English first; every language shows the English one until it is translated.
+  const doc = path.match(/^\/docs\/([^/]+)$/);
+  if (doc) {
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(doc[1])) return true;
+    try {
+      return !existsSync(join(process.cwd(), "content", "docs", "en", `${doc[1]}.md`));
+    } catch {
+      return false;
+    }
+  }
   const item = path.match(/^\/(guides|resources)\/([^/]+)$/);
   if (!item) return false;
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item[2])) return true;
@@ -51,7 +61,7 @@ function missingSiteContent(path: string, locale: string) {
 
 /** The app's and website's own top-level pages: on rove.rent these still go to RoveHQ, never read as a business's name. */
 const APP_TOP_LEVEL = new Set(
-  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,faq,guides,home,pricing,resources,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko".split(",")
+  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,docs,faq,guides,home,pricing,resources,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko".split(",")
 );
 
 /** Search engines and link previews: never sent to a language by their Accept-Language (they index each address as it is). */

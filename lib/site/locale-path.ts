@@ -29,7 +29,9 @@ export function isSitePath(path: string) {
     path === "/guides" ||
     path.startsWith("/guides/") ||
     path === "/resources" ||
-    path.startsWith("/resources/")
+    path.startsWith("/resources/") ||
+    path === "/docs" ||
+    path.startsWith("/docs/")
   );
 }
 

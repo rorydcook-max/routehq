@@ -6,6 +6,8 @@ import { AppShell } from "@/components/app-shell";
 import { PageBand } from "@/components/page-band";
 import { HelpPreference } from "@/components/help/help-actions";
 import { HelpCompose } from "@/components/help/help-compose";
+import { HelpGuides } from "@/components/help/help-guides";
+import { DOC_CATEGORIES, docSearchIndex, listDocs } from "@/lib/site/docs";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -38,6 +40,8 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
   // The time too, so two conversations on the same day with the same subject can be told apart.
   const time = (iso: string) => new Intl.DateTimeFormat("en-GB", { timeZone: BANGKOK, hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   const hasDirect = Boolean(contacts.whatsappUrl || contacts.lineUrl || contacts.email);
+  // The how-to guides (the help centre's articles), searchable here before writing to us.
+  const guides = docSearchIndex("en").map((entry) => ({ ...entry, video: Boolean(listDocs("en").find((doc) => doc.slug === entry.slug)?.video) }));
 
   return (
     <AppShell hero={<PageBand keepSubtitle subtitle={t("subtitle")} title={t("title")} />} userEmail={userEmail}>
@@ -51,6 +55,16 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
             <span className="ml-auto rounded-full bg-[var(--primary)] px-2.5 py-0.5 text-[14px] font-bold text-white">{waiting}</span>
             <ChevronRight size={18} />
           </Link>
+        ) : null}
+
+        {guides.length ? (
+          <section className="card p-5" id="guides">
+            <h2 className="card-title">{t("guidesTitle")}</h2>
+            <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("guidesBody")}</p>
+            <div className="mt-3">
+              <HelpGuides categories={[...DOC_CATEGORIES]} guides={guides} />
+            </div>
+          </section>
         ) : null}
 
         <section className="card p-5" id="write">

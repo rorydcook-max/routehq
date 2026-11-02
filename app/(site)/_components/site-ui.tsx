@@ -61,6 +61,7 @@ export const SITE_LINKS = {
   contact: "/contact",
   guides: "/guides",
   resources: "/resources",
+  docs: "/docs",
   // No link to the renters' booking site (/rent): it is moving to its own consumer brand, and this site speaks to rental businesses.
   signIn: "/login",
   signUp: "/signup"

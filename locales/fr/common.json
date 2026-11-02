@@ -157,7 +157,9 @@
     "msgConnect": "Connectez LINE ou Telegram et les messages des clients s'afficheront ici.",
     "msgConnectBtn": "Connecter",
     "bkTitle": "Réservations",
-    "bkAll": "Toutes les réservations"
+    "bkAll": "Toutes les réservations",
+    "emailVerified": "E-mail vérifié. Merci !",
+    "emailLinkOld": "Ce lien a expiré. Appuyez sur « Vérifiez votre e-mail » pour en recevoir un nouveau."
   },
   "settings": {
     "contractsBranding": {
@@ -1087,7 +1089,7 @@
     "setupHide": "Masquer",
     "setupComplete": "<b>Configuration terminée.</b> RoveHQ est prêt pour votre activité quotidienne.",
     "setup_business_profile": "Compléter le profil de votre entreprise",
-    "setup_first_vehicle": "Ajouter votre premier véhicule",
+    "setup_first_vehicle": "Ajoutez vos véhicules",
     "setup_all_vehicles": "Ajouter tous vos véhicules",
     "setup_first_customer": "Ajouter votre premier client",
     "setup_first_booking": "Enregistrer votre première réservation",
@@ -1122,7 +1124,13 @@
     "setupTitleLater": "Terminer la configuration",
     "setup_payment_methods": "Indiquer comment vos clients vous payent",
     "copy": "Copier",
-    "trialLeftShort": "Essai : {days, plural, one {# jour restant} many {# jours restants} other {# jours restants}}"
+    "trialLeftShort": "Essai : {days, plural, one {# jour restant} many {# jours restants} other {# jours restants}}",
+    "setup_verify_email": "Vérifiez votre e-mail",
+    "setupEmailHint": "Appuyez ici et nous vous enverrons un lien.",
+    "setupEmailSent": "Envoyé. Ouvrez le lien dans votre boîte de réception.",
+    "setupEmailFailed": "L'envoi a échoué. Réessayez dans une minute.",
+    "setupPrev": "Étapes précédentes",
+    "setupNext": "Étapes suivantes"
   },
   "todo": {
     "eyebrow": "À faire",
@@ -3620,7 +3628,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "carnet d'immatriculation",
     "regDoc_KH": "carte d'immatriculation",
-    "regDoc_default": "certificat d'immatriculation"
+    "regDoc_default": "certificat d'immatriculation",
+    "qp_title": "Photos",
+    "qp_main": "Principale",
+    "qp_remove": "Supprimer la photo",
+    "qp_add": "Ajouter",
+    "backSetup": "Configuration",
+    "quickSubtitle": "Juste l'essentiel. Seuls le type, la marque et le modèle sont requis.",
+    "quickLater": "Les dates de contrôle technique et d'assurance, le kilométrage, le prêt et plus encore pourront être ajoutés plus tard dans Flotte."
   },
   "bookingEdit": {
     "crumbBookings": "Réservations",
@@ -4733,7 +4748,8 @@
     "showPassword": "Afficher",
     "hidePassword": "Masquer",
     "continueFree": "Continuer avec la formule Free",
-    "continueFreeError": "Impossible de passer à l'offre Free. Veuillez réessayer."
+    "continueFreeError": "Impossible de passer à l'offre Free. Veuillez réessayer.",
+    "signUpExists": "Un compte existe déjà avec cet e-mail. Connectez-vous ou réinitialisez votre mot de passe."
   },
   "calc": {
     "title": "Acheter un véhicule",
@@ -6185,5 +6201,57 @@
     "prev": "Photo précédente",
     "next": "Photo suivante",
     "more": "{count} photos de plus"
+  },
+  "onboarding": {
+    "title": "Configurer RoveHQ",
+    "stepOf": "Étape {step} sur {total}",
+    "welcome": "Bienvenue, {name}",
+    "welcomeBody": "Deux petites étapes et vous y êtes.",
+    "language": "Langue",
+    "phone": "Numéro de téléphone pour les clients",
+    "phoneHint": "Facultatif. Il figurera sur vos contrats et votre page de réservation.",
+    "country": "Pays",
+    "town": "Ville ou secteur",
+    "needTown": "Indiquez dans quelle ville ou quel secteur vous vous trouvez.",
+    "saveFailed": "L'enregistrement a échoué. Vérifiez votre connexion et réessayez.",
+    "continue": "Continuer",
+    "vehiclesTitle": "Ajoutez vos véhicules",
+    "vehiclesBody": "Choisissez la méthode la plus rapide pour vous. Vous pourrez en ajouter d'autres plus tard.",
+    "vehiclesAdded": "{count, plural, one {# véhicule ajouté} other {# véhicules ajoutés}}",
+    "vehiclesAddedBody": "Ajoutez-en d'autres maintenant ou accédez à votre tableau de bord.",
+    "optAssistant": "Parler à notre assistant",
+    "optAssistantBody": "Écrivez, parlez ou envoyez des photos de vos véhicules ou cartes grises. Il s'occupe de tout remplir.",
+    "optForm": "Remplir un court formulaire",
+    "optFormBody": "Un véhicule à la fois : type, marque, modèle, photos et tarifs.",
+    "optList": "Importer une liste",
+    "optListBody": "Vos véhicules sont dans un tableur ? Ajoutez-les tous d'un coup.",
+    "toDashboard": "Aller au tableau de bord",
+    "later": "J'ajouterai mes véhicules plus tard",
+    "laterHint": "Le bouton « Ajoutez vos véhicules » vous attendra sur votre tableau de bord."
+  },
+  "fleetAssistant": {
+    "title": "Assistant de flotte",
+    "subtitle": "Écrivez, parlez ou envoyez des photos",
+    "hello": "Salut ! Parlez-moi de vos véhicules, par exemple : « trois scooters Honda Click à 3 000 par mois et une Toyota Yaris blanche ». Vous pouvez aussi envoyer des photos des véhicules ou des cartes grises.",
+    "photosOnly": "(photos)",
+    "unavailable": "L'assistant n'est pas disponible pour le moment. Utilisez le formulaire à la place.",
+    "failed": "Désolé, je n'ai pas pu lire ça. Réessayez ou utilisez le formulaire.",
+    "thinking": "Lecture en cours…",
+    "listTitle": "{count, plural, one {# véhicule pour l'instant} other {# véhicules pour l'instant}}",
+    "unnamed": "Véhicule",
+    "perMonth": "{price}/mois",
+    "perDay": "{price}/jour",
+    "noDetails": "La plaque et les tarifs pourront être ajoutés plus tard",
+    "remove": "Supprimer",
+    "adding": "Ajout en cours…",
+    "addButton": "{count, plural, one {Ajouter # véhicule à ma flotte} other {Ajouter # véhicules à ma flotte}}",
+    "added": "{count, plural, one {Terminé : # véhicule est dans votre flotte.} other {Terminé : # véhicules sont dans votre flotte.}}",
+    "addFailed": "Certains véhicules n'ont pas pu être ajoutés. Vérifiez-les et réessayez.",
+    "addPhoto": "Ajouter des photos",
+    "talk": "Parler",
+    "stopTalking": "Arrêter",
+    "listening": "Écoute en cours…",
+    "placeholder": "Parlez-moi de vos véhicules…",
+    "send": "Envoyer"
   }
 }

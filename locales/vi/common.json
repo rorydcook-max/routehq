@@ -157,7 +157,9 @@
     "msgConnect": "Kết nối LINE hoặc Telegram để tin nhắn của khách hiện ở đây.",
     "msgConnectBtn": "Kết nối",
     "bkTitle": "Đặt xe",
-    "bkAll": "Tất cả đặt xe"
+    "bkAll": "Tất cả đặt xe",
+    "emailVerified": "Đã xác thực email. Cảm ơn bạn!",
+    "emailLinkOld": "Liên kết đó đã hết hạn. Chạm vào \"Xác thực email\" để lấy liên kết mới."
   },
   "settings": {
     "contractsBranding": {
@@ -1087,7 +1089,7 @@
     "setupHide": "Ẩn",
     "setupComplete": "<b>Đã hoàn tất cài đặt.</b> RoveHQ đã sẵn sàng cho công việc hàng ngày.",
     "setup_business_profile": "Hoàn thiện hồ sơ doanh nghiệp",
-    "setup_first_vehicle": "Thêm chiếc xe đầu tiên",
+    "setup_first_vehicle": "Thêm xe của bạn",
     "setup_all_vehicles": "Thêm tất cả xe của bạn",
     "setup_first_customer": "Thêm khách hàng đầu tiên",
     "setup_first_booking": "Nhận lượt đặt xe đầu tiên",
@@ -1122,7 +1124,13 @@
     "setupTitleLater": "Hoàn tất cài đặt",
     "setup_payment_methods": "Thiết lập phương thức thanh toán của khách",
     "copy": "Sao chép",
-    "trialLeftShort": "Dùng thử: còn {days} ngày"
+    "trialLeftShort": "Dùng thử: còn {days} ngày",
+    "setup_verify_email": "Xác thực email",
+    "setupEmailHint": "Chạm để chúng tôi gửi liên kết cho bạn.",
+    "setupEmailSent": "Đã gửi. Mở liên kết trong hộp thư đến của bạn nhé.",
+    "setupEmailFailed": "Chưa gửi được. Thử lại sau một phút.",
+    "setupPrev": "Các bước trước",
+    "setupNext": "Các bước tiếp theo"
   },
   "todo": {
     "eyebrow": "Việc cần làm",
@@ -3620,7 +3628,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "sổ đăng ký xe",
     "regDoc_KH": "thẻ đăng ký xe",
-    "regDoc_default": "giấy tờ đăng ký xe"
+    "regDoc_default": "giấy tờ đăng ký xe",
+    "qp_title": "Ảnh",
+    "qp_main": "Chính",
+    "qp_remove": "Xóa ảnh",
+    "qp_add": "Thêm",
+    "backSetup": "Thiết lập",
+    "quickSubtitle": "Chỉ các thông tin cơ bản. Chỉ cần loại xe, hãng và dòng xe.",
+    "quickLater": "Ngày đóng thuế, bảo hiểm, số km, khoản vay và thông tin khác có thể thêm sau ở phần Đội xe."
   },
   "bookingEdit": {
     "crumbBookings": "Đặt xe",
@@ -4733,7 +4748,8 @@
     "showPassword": "Hiện",
     "hidePassword": "Ẩn",
     "continueFree": "Tiếp tục với gói Free",
-    "continueFreeError": "Không thể chuyển sang gói Miễn phí. Hãy thử lại."
+    "continueFreeError": "Không thể chuyển sang gói Miễn phí. Hãy thử lại.",
+    "signUpExists": "Đã có tài khoản dùng email này. Hãy đăng nhập hoặc đặt lại mật khẩu."
   },
   "calc": {
     "title": "Mua xe",
@@ -6185,5 +6201,57 @@
     "prev": "Ảnh trước",
     "next": "Ảnh tiếp",
     "more": "Thêm {count} ảnh"
+  },
+  "onboarding": {
+    "title": "Thiết lập RoveHQ",
+    "stepOf": "Bước {step} trên {total}",
+    "welcome": "Chào mừng, {name}",
+    "welcomeBody": "Chỉ hai bước nhanh là xong.",
+    "language": "Ngôn ngữ",
+    "phone": "Số điện thoại khách có thể gọi",
+    "phoneHint": "Không bắt buộc. Sẽ hiển thị trên hợp đồng và trang đặt xe.",
+    "country": "Quốc gia",
+    "town": "Quận/Huyện hoặc khu vực",
+    "needTown": "Cho biết bạn đang ở quận/huyện hoặc khu vực nào.",
+    "saveFailed": "Chưa lưu được. Kiểm tra kết nối rồi thử lại nhé.",
+    "continue": "Tiếp tục",
+    "vehiclesTitle": "Thêm xe của bạn",
+    "vehiclesBody": "Chọn cách nhanh nhất cho bạn. Bạn có thể thêm xe bất cứ lúc nào.",
+    "vehiclesAdded": "{count, plural, other {Đã thêm # xe}}",
+    "vehiclesAddedBody": "Thêm xe nữa hoặc chuyển đến trang quản lý.",
+    "optAssistant": "Nói với trợ lý của chúng tôi",
+    "optAssistantBody": "Nhắn tin, nói chuyện hoặc gửi ảnh xe hoặc giấy đăng ký. Trợ lý sẽ điền giúp bạn.",
+    "optForm": "Điền biểu mẫu ngắn",
+    "optFormBody": "Thêm từng xe: loại xe, hãng, dòng xe, ảnh và giá.",
+    "optList": "Nhập từ danh sách",
+    "optListBody": "Bạn có sẵn danh sách trên bảng tính? Thêm tất cả cùng lúc.",
+    "toDashboard": "Đến trang quản lý của tôi",
+    "later": "Để sau hãng thêm xe",
+    "laterHint": "Mục \"Thêm xe của bạn\" sẽ chờ sẵn ở trang quản lý."
+  },
+  "fleetAssistant": {
+    "title": "Trợ lý đội xe",
+    "subtitle": "Nhắn tin, nói chuyện hoặc gửi ảnh",
+    "hello": "Xin chào! Hãy kể cho tôi nghe về xe của bạn, ví dụ \"ba xe tay ga Honda Click giá 3.000 một tháng và một Toyota Yaris trắng\". Bạn cũng có thể gửi ảnh xe hoặc giấy đăng ký xe.",
+    "photosOnly": "(ảnh)",
+    "unavailable": "Trợ lý hiện không dùng được. Hãy dùng biểu mẫu ngắn thay thế.",
+    "failed": "Xin lỗi, tôi không đọc được. Hãy thử lại hoặc dùng biểu mẫu ngắn.",
+    "thinking": "Đang đọc…",
+    "listTitle": "{count, plural, other {Đã có # xe}}",
+    "unnamed": "Xe",
+    "perMonth": "{price}/tháng",
+    "perDay": "{price}/ngày",
+    "noDetails": "Biển số và giá có thể bổ sung sau",
+    "remove": "Xóa",
+    "adding": "Đang thêm…",
+    "addButton": "{count, plural, other {Thêm # xe vào đội xe}}",
+    "added": "{count, plural, other {Xong: đã thêm # xe vào đội xe của bạn.}}",
+    "addFailed": "Không thể thêm một số xe. Hãy kiểm tra lại và thử nhé.",
+    "addPhoto": "Thêm ảnh",
+    "talk": "Nói",
+    "stopTalking": "Dừng",
+    "listening": "Đang nghe…",
+    "placeholder": "Kể cho tôi nghe về xe của bạn…",
+    "send": "Gửi"
   }
 }

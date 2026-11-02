@@ -157,7 +157,9 @@
     "msgConnect": "Koble til LINE eller Telegram, så vises kundemeldinger her.",
     "msgConnectBtn": "Koble til",
     "bkTitle": "Bestillinger",
-    "bkAll": "Alle bestillinger"
+    "bkAll": "Alle bestillinger",
+    "emailVerified": "E-post bekreftet. Takk!",
+    "emailLinkOld": "Den lenken har utløpt. Trykk på \"Bekreft e-postadressen din\" for å få en ny."
   },
   "vehicles": {
     "addVehicle": "Legg til kjøretøy",
@@ -1047,7 +1049,7 @@
     "setupHide": "Skjul",
     "setupComplete": "<b>Oppsett fullført.</b> RoveHQ er klart for daglig bruk.",
     "setup_business_profile": "Fullfør bedriftsprofilen",
-    "setup_first_vehicle": "Legg til ditt første kjøretøy",
+    "setup_first_vehicle": "Legg til kjøretøyene dine",
     "setup_all_vehicles": "Legg til alle kjøretøyene dine",
     "setup_first_customer": "Legg til din første kunde",
     "setup_first_booking": "Ta imot din første bestilling",
@@ -1082,7 +1084,13 @@
     "setupTitleLater": "Fullfør oppsettet",
     "setup_payment_methods": "Angi hvordan kundene betaler deg",
     "copy": "Kopier",
-    "trialLeftShort": "Prøveperiode: {days, plural, one {# dag} other {# dager}} igjen"
+    "trialLeftShort": "Prøveperiode: {days, plural, one {# dag} other {# dager}} igjen",
+    "setup_verify_email": "Bekreft e-postadressen din",
+    "setupEmailHint": "Trykk her, så sender vi deg en lenke.",
+    "setupEmailSent": "Sendt. Åpne lenken i innboksen din.",
+    "setupEmailFailed": "Den ble ikke sendt. Prøv igjen om et minutt.",
+    "setupPrev": "Forrige steg",
+    "setupNext": "Neste steg"
   },
   "todo": {
     "eyebrow": "Å gjøre",
@@ -3580,7 +3588,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "registreringsboken",
     "regDoc_KH": "registreringskortet",
-    "regDoc_default": "vognkortet"
+    "regDoc_default": "vognkortet",
+    "qp_title": "Bilder",
+    "qp_main": "Hoved",
+    "qp_remove": "Fjern bilde",
+    "qp_add": "Legg til",
+    "backSetup": "Oppsett",
+    "quickSubtitle": "Bare det essensielle. Kun type, merke og modell er nødvendig.",
+    "quickLater": "Avgift- og forsikringsdatoer, kilometerstand, lån og mer kan legges til senere under Flåte."
   },
   "bookingEdit": {
     "crumbBookings": "Bestillinger",
@@ -4693,7 +4708,8 @@
     "showPassword": "Vis",
     "hidePassword": "Skjul",
     "continueFree": "Fortsett med Free-abonnementet",
-    "continueFreeError": "Kunne ikke bytte til Gratis-planen. Prøv igjen."
+    "continueFreeError": "Kunne ikke bytte til Gratis-planen. Prøv igjen.",
+    "signUpExists": "Det finnes allerede en konto med denne e-posten. Logg inn i stedet, eller tilbakestill passordet."
   },
   "calc": {
     "title": "Kjøpe et kjøretøy",
@@ -6185,5 +6201,57 @@
     "prev": "Forrige bilde",
     "next": "Neste bilde",
     "more": "{count} bilder til"
+  },
+  "onboarding": {
+    "title": "Sett opp RoveHQ",
+    "stepOf": "Steg {step} av {total}",
+    "welcome": "Velkommen, {name}",
+    "welcomeBody": "To raske steg, så er du i gang.",
+    "language": "Språk",
+    "phone": "Telefonnummer kunder kan ringe",
+    "phoneHint": "Valgfritt. Det vises på avtalene og bestillingssiden din.",
+    "country": "Land",
+    "town": "Sted eller område",
+    "needTown": "Fortell hvilken by eller område du er i.",
+    "saveFailed": "Det ble ikke lagret. Sjekk tilkoblingen din og prøv igjen.",
+    "continue": "Fortsett",
+    "vehiclesTitle": "Legg til kjøretøyene dine",
+    "vehiclesBody": "Velg det som er raskest for deg. Du kan legge til flere når som helst.",
+    "vehiclesAdded": "{count, plural, one {# kjøretøy lagt til} other {# kjøretøy lagt til}}",
+    "vehiclesAddedBody": "Legg til flere nå, eller gå videre til oversikten din.",
+    "optAssistant": "Fortell assistenten vår",
+    "optAssistantBody": "Skriv, snakk eller send bilder av kjøretøyene eller vognkortene dine. Alt fylles ut automatisk.",
+    "optForm": "Fyll ut et kort skjema",
+    "optFormBody": "Ett kjøretøy om gangen: type, merke, modell, bilder og priser.",
+    "optList": "Ta med en liste",
+    "optListBody": "Har du kjøretøyene dine i et regneark? Legg dem til på en gang.",
+    "toDashboard": "Gå til oversikten min",
+    "later": "Jeg legger til kjøretøy senere",
+    "laterHint": "\"Legg til kjøretøyene dine\" vil vente på deg i oversikten."
+  },
+  "fleetAssistant": {
+    "title": "Flåteassistent",
+    "subtitle": "Skriv, snakk eller send bilder",
+    "hello": "Hei! Fortell meg om kjøretøyene dine, for eksempel \"tre Honda Click-scootere til 3 000 i måneden og en hvit Toyota Yaris\". Du kan også sende bilder av kjøretøyene eller vognkortene deres.",
+    "photosOnly": "(bilder)",
+    "unavailable": "Assistenten er utilgjengelig akkurat nå. Bruk det korte skjemaet i stedet.",
+    "failed": "Beklager, det forsto jeg ikke. Prøv igjen, eller bruk det korte skjemaet.",
+    "thinking": "Leser…",
+    "listTitle": "{count, plural, one {# kjøretøy hittil} other {# kjøretøy hittil}}",
+    "unnamed": "Kjøretøy",
+    "perMonth": "{price}/måned",
+    "perDay": "{price}/dag",
+    "noDetails": "Skiltnummer og priser kan tas senere",
+    "remove": "Fjern",
+    "adding": "Legger til…",
+    "addButton": "{count, plural, one {Legg til # kjøretøy i flåten} other {Legg til # kjøretøy i flåten}}",
+    "added": "{count, plural, one {Ferdig: # kjøretøy er i flåten din.} other {Ferdig: # kjøretøy er i flåten din.}}",
+    "addFailed": "Noen kjøretøy kunne ikke legges til. Sjekk dem og prøv igjen.",
+    "addPhoto": "Legg til bilder",
+    "talk": "Snakk",
+    "stopTalking": "Stopp",
+    "listening": "Lytter…",
+    "placeholder": "Fortell meg om kjøretøyene dine…",
+    "send": "Send"
   }
 }

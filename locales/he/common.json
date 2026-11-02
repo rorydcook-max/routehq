@@ -157,7 +157,9 @@
     "msgConnect": "חברו את LINE או Telegram והודעות הלקוחות יופיעו כאן.",
     "msgConnectBtn": "חיבור",
     "bkTitle": "הזמנות",
-    "bkAll": "כל ההזמנות"
+    "bkAll": "כל ההזמנות",
+    "emailVerified": "האימייל אומת. תודה!",
+    "emailLinkOld": "הלינק פג תוקף. לחץ על \"אימות אימייל\" כדי לקבל לינק חדש."
   },
   "vehicles": {
     "addVehicle": "הוספת רכב",
@@ -1087,7 +1089,7 @@
     "setupHide": "הסתר",
     "setupComplete": "<b>ההגדרה הושלמה.</b> RoveHQ מוכן לעבודה היומיומית.",
     "setup_business_profile": "השלם את פרופיל העסק",
-    "setup_first_vehicle": "הוסף את הרכב הראשון שלך",
+    "setup_first_vehicle": "הוספת רכבים",
     "setup_all_vehicles": "הוסף את כל הרכבים שלך",
     "setup_first_customer": "הוסף את הלקוח הראשון שלך",
     "setup_first_booking": "קבל את ההזמנה הראשונה שלך",
@@ -1122,7 +1124,13 @@
     "setupTitleLater": "סיים את ההגדרה",
     "setup_payment_methods": "ציין איך לקוחות משלמים לך",
     "copy": "העתק",
-    "trialLeftShort": "ניסיון: {days, plural, one {נותר יום אחד} two {נותרו יומיים} other {נותרו # ימים}}"
+    "trialLeftShort": "ניסיון: {days, plural, one {נותר יום אחד} two {נותרו יומיים} other {נותרו # ימים}}",
+    "setup_verify_email": "אימות אימייל",
+    "setupEmailHint": "לחיצה כאן ותקבל מאיתנו לינק.",
+    "setupEmailSent": "נשלח. יש ללחוץ על הלינק בתיבת הדואר שלך.",
+    "setupEmailFailed": "השליחה נכשלה. כדאי לנסות שוב בעוד דקה.",
+    "setupPrev": "שלבים קודמים",
+    "setupNext": "שלבים הבאים"
   },
   "todo": {
     "eyebrow": "משימות",
@@ -3620,7 +3628,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "ספר הרישום",
     "regDoc_KH": "כרטיס הרישום",
-    "regDoc_default": "מסמך רישום הרכב"
+    "regDoc_default": "מסמך רישום הרכב",
+    "qp_title": "תמונות",
+    "qp_main": "ראשית",
+    "qp_remove": "הסרת תמונה",
+    "qp_add": "הוספה",
+    "backSetup": "הגדרה",
+    "quickSubtitle": "רק הבסיס. צריך רק סוג, יצרן ודגם.",
+    "quickLater": "תאריכי טסט וביטוח, קילומטראז', הלוואות ועוד ניתן להוסיף בהמשך דרך ניהול הצי."
   },
   "bookingEdit": {
     "crumbBookings": "הזמנות",
@@ -4733,7 +4748,8 @@
     "showPassword": "הצגה",
     "hidePassword": "הסתרה",
     "continueFree": "המשך בתוכנית Free",
-    "continueFreeError": "לא ניתן לעבור לתוכנית Free. נסו שוב."
+    "continueFreeError": "לא ניתן לעבור לתוכנית Free. נסו שוב.",
+    "signUpExists": "כבר קיים חשבון עם האימייל הזה. כדאי להתחבר, או לאפס את הסיסמה."
   },
   "calc": {
     "title": "קניית רכב",
@@ -6185,5 +6201,57 @@
     "prev": "התמונה הקודמת",
     "next": "התמונה הבאה",
     "more": "עוד {count} תמונות"
+  },
+  "onboarding": {
+    "title": "הגדרת RoveHQ",
+    "stepOf": "שלב {step} מתוך {total}",
+    "welcome": "ברוך הבא, {name}",
+    "welcomeBody": "שני שלבים קצרים ואנחנו בפנים.",
+    "language": "שפה",
+    "phone": "מספר טלפון ליצירת קשר",
+    "phoneHint": "אופציונלי. המספר יופיע בחוזים ובדף ההזמנות.",
+    "country": "מדינה",
+    "town": "עיר או אזור",
+    "needTown": "ציין באיזו עיר או אזור העסק נמצא.",
+    "saveFailed": "השמירה נכשלה. כדאי לבדוק את החיבור ולנסות שוב.",
+    "continue": "המשך",
+    "vehiclesTitle": "הוספת רכבים",
+    "vehiclesBody": "בחר בדרך הנוחה לך ביותר. תמיד אפשר להוסיף עוד בהמשך.",
+    "vehiclesAdded": "{count, plural, one {רכב אחד נוסף} other {# רכבים נוספו}}",
+    "vehiclesAddedBody": "אפשר להוסיף עוד עכשיו, או להמשיך ללוח הבקרה.",
+    "optAssistant": "לדבר עם העוזר שלנו",
+    "optAssistantBody": "אפשר להקליד, לדבר או לשלוח צילומים של הרכבים או הרישיונות. הוא כבר ימלא הכל.",
+    "optForm": "מילוי טופס קצר",
+    "optFormBody": "רכב אחד בכל פעם: סוג, יצרן, דגם, תמונות ומחירים.",
+    "optList": "ייבוא מרשימה",
+    "optListBody": "יש לך רשימת רכבים באקסל? אפשר להוסיף את כולם בבת אחת.",
+    "toDashboard": "מעבר ללוח הבקרה",
+    "later": "אוסיף רכבים מאוחר יותר",
+    "laterHint": "האפשרות \"הוספת רכבים\" תחכה לך בלוח הבקרה."
+  },
+  "fleetAssistant": {
+    "title": "עוזר הצי",
+    "subtitle": "הקלדה, דיבור או שליחת תמונות",
+    "hello": "היי! אפשר לספר לי על הרכבים שלך, למשל: \"שלושה קטנועי Honda Click ב-3,000 לחודש ו-Toyota Yaris לבנה\". אפשר גם לשלוח צילומים של הרכבים או של רישיונות הרכב.",
+    "photosOnly": "(תמונות)",
+    "unavailable": "העוזר לא זמין כרגע. כדאי להשתמש בטופס הקצר.",
+    "failed": "סליחה, לא הצלחתי לקרוא את זה. כדאי לנסות שוב או להשתמש בטופס הקצר.",
+    "thinking": "קורא…",
+    "listTitle": "{count, plural, one {רכב אחד עד כה} other {# רכבים עד כה}}",
+    "unnamed": "רכב",
+    "perMonth": "{price}/לחודש",
+    "perDay": "{price}/ליום",
+    "noDetails": "לוחית רישוי ומחירים אפשר להוסיף אחר כך",
+    "remove": "הסרה",
+    "adding": "מוסיף…",
+    "addButton": "{count, plural, one {הוספת הרכב לצי שלי} other {הוספת # הרכבים לצי שלי}}",
+    "added": "{count, plural, one {בוצע: רכב אחד נוסף לצי שלך.} other {בוצע: # רכבים נוספו לצי שלך.}}",
+    "addFailed": "חלק מהרכבים לא נוספו. כדאי לבדוק אותם ולנסות שוב.",
+    "addPhoto": "הוספת תמונות",
+    "talk": "דיבור",
+    "stopTalking": "עצור",
+    "listening": "מקישב…",
+    "placeholder": "ספר לי על הרכבים שלך…",
+    "send": "שליחה"
   }
 }

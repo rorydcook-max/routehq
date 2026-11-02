@@ -157,7 +157,9 @@
     "msgConnect": "連接 LINE 或 Telegram 後，客戶訊息會顯示在這裡。",
     "msgConnectBtn": "連接",
     "bkTitle": "預訂",
-    "bkAll": "全部預訂"
+    "bkAll": "全部預訂",
+    "emailVerified": "電子郵件已驗證。謝謝！",
+    "emailLinkOld": "該連結已失效。請點擊「驗證您的電子郵件」以取得新連結。"
   },
   "vehicles": {
     "addVehicle": "新增車輛",
@@ -1047,7 +1049,7 @@
     "setupHide": "隱藏",
     "setupComplete": "<b>設定完成。</b>RoveHQ 已可投入日常使用。",
     "setup_business_profile": "完成您的商家資料",
-    "setup_first_vehicle": "新增第一台車輛",
+    "setup_first_vehicle": "新增您的車輛",
     "setup_all_vehicles": "新增所有車輛",
     "setup_first_customer": "新增第一位客人",
     "setup_first_booking": "接下第一筆預訂",
@@ -1082,7 +1084,13 @@
     "setupTitleLater": "完成設定",
     "setup_payment_methods": "設定客人的付款方式",
     "copy": "複製",
-    "trialLeftShort": "試用：剩餘 {days} 天"
+    "trialLeftShort": "試用：剩餘 {days} 天",
+    "setup_verify_email": "驗證您的電子郵件",
+    "setupEmailHint": "點擊後我們將寄送連結給您。",
+    "setupEmailSent": "已傳送。請開啟收件匣中的連結。",
+    "setupEmailFailed": "傳送失敗。請稍後再試。",
+    "setupPrev": "上一步",
+    "setupNext": "下一步"
   },
   "todo": {
     "eyebrow": "待辦",
@@ -3580,7 +3588,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "車輛登記簿",
     "regDoc_KH": "車輛登記卡",
-    "regDoc_default": "車輛登記文件"
+    "regDoc_default": "車輛登記文件",
+    "qp_title": "相片",
+    "qp_main": "主要",
+    "qp_remove": "移除相片",
+    "qp_add": "新增",
+    "backSetup": "設定",
+    "quickSubtitle": "只需基本資料。只需要車型、廠牌和型號。",
+    "quickLater": "稅金與保險日期、里程數、貸款等資訊之後可從車隊中新增。"
   },
   "bookingEdit": {
     "crumbBookings": "預約",
@@ -4693,7 +4708,8 @@
     "showPassword": "顯示",
     "hidePassword": "隱藏",
     "continueFree": "繼續使用 Free 方案",
-    "continueFreeError": "無法切換到免費方案，請再試一次。"
+    "continueFreeError": "無法切換到免費方案，請再試一次。",
+    "signUpExists": "此電子郵件已有帳戶。請直接登入或重設密碼。"
   },
   "calc": {
     "title": "購買車輛",
@@ -6185,5 +6201,57 @@
     "prev": "上一張",
     "next": "下一張",
     "more": "還有 {count} 張"
+  },
+  "onboarding": {
+    "title": "設定 RoveHQ",
+    "stepOf": "第 {step} 步，共 {total} 步",
+    "welcome": "歡迎，{name}",
+    "welcomeBody": "只需兩個簡單步驟即可完成。",
+    "language": "語言",
+    "phone": "客戶可撥打的電話號碼",
+    "phoneHint": "選填。將顯示在您的合約和預約頁面上。",
+    "country": "國家",
+    "town": "城鎮或地區",
+    "needTown": "請告知您所在的城鎮或地區。",
+    "saveFailed": "儲存失敗。請檢查連線後再試一次。",
+    "continue": "繼續",
+    "vehiclesTitle": "新增您的車輛",
+    "vehiclesBody": "選擇最快的方式。您可以隨時新增更多車輛。",
+    "vehiclesAdded": "{count, plural, other {已新增 {count} 台車輛}}",
+    "vehiclesAddedBody": "立即新增更多，或前往您的控制台。",
+    "optAssistant": "告訴我們的小幫手",
+    "optAssistantBody": "輸入文字、語音或傳送車輛及行照相片，系統會自動填妥所有資料。",
+    "optForm": "填寫簡短表單",
+    "optFormBody": "逐一新增：車型、廠牌、型號、相片與價格。",
+    "optList": "匯入清單",
+    "optListBody": "車輛資料都在試算表中嗎？一次全部匯入。",
+    "toDashboard": "前往我的控制台",
+    "later": "稍後再新增車輛",
+    "laterHint": "「新增您的車輛」將會保留在您的控制台上。"
+  },
+  "fleetAssistant": {
+    "title": "車隊小幫手",
+    "subtitle": "打字、說話或傳送相片",
+    "hello": "嗨！請告訴我您的車輛資訊，例如「三台 Honda Click 機車，每月 3,000，以及一台白色 Toyota Yaris」。您也可以傳送車輛或行照的相片。",
+    "photosOnly": "（相片）",
+    "unavailable": "小幫手目前無法使用。請改用簡短表單。",
+    "failed": "抱歉，我讀取不到。請再試一次，或改用簡短表單。",
+    "thinking": "讀取中…",
+    "listTitle": "{count, plural, other {目前已新增 {count} 台車輛}}",
+    "unnamed": "車輛",
+    "perMonth": "{price}/月",
+    "perDay": "{price}/天",
+    "noDetails": "車牌與價格之後再補也可以",
+    "remove": "移除",
+    "adding": "新增中…",
+    "addButton": "{count, plural, other {將 {count} 台車輛加入我的車隊}}",
+    "added": "{count, plural, other {完成：已將 {count} 台車輛加入您的車隊。}}",
+    "addFailed": "部分車輛無法新增。請檢查後再試一次。",
+    "addPhoto": "新增相片",
+    "talk": "語音",
+    "stopTalking": "停止",
+    "listening": "聆聽中…",
+    "placeholder": "請告訴我您的車輛資訊…",
+    "send": "傳送"
   }
 }

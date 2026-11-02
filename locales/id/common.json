@@ -157,7 +157,9 @@
     "msgConnect": "Hubungkan LINE atau Telegram dan pesan pelanggan akan muncul di sini.",
     "msgConnectBtn": "Hubungkan",
     "bkTitle": "Pemesanan",
-    "bkAll": "Semua pemesanan"
+    "bkAll": "Semua pemesanan",
+    "emailVerified": "Email terverifikasi. Terima kasih!",
+    "emailLinkOld": "Tautan tersebut sudah kedaluwarsa. Ketuk \"Verifikasi email Anda\" untuk mendapatkan yang baru."
   },
   "settings": {
     "contractsBranding": {
@@ -1087,7 +1089,7 @@
     "setupHide": "Sembunyikan",
     "setupComplete": "<b>Pengaturan selesai.</b> RoveHQ siap untuk operasional harian.",
     "setup_business_profile": "Lengkapi profil bisnis Anda",
-    "setup_first_vehicle": "Tambahkan kendaraan pertama Anda",
+    "setup_first_vehicle": "Tambahkan kendaraan Anda",
     "setup_all_vehicles": "Tambahkan semua kendaraan Anda",
     "setup_first_customer": "Tambahkan pelanggan pertama Anda",
     "setup_first_booking": "Terima pemesanan pertama Anda",
@@ -1122,7 +1124,13 @@
     "setupTitleLater": "Selesaikan pengaturan",
     "setup_payment_methods": "Tentukan cara pembayaran pelanggan",
     "copy": "Salin",
-    "trialLeftShort": "Uji coba: tersisa {days} hari"
+    "trialLeftShort": "Uji coba: tersisa {days} hari",
+    "setup_verify_email": "Verifikasi email Anda",
+    "setupEmailHint": "Ketuk untuk mengirim tautan ke email Anda.",
+    "setupEmailSent": "Terkirim. Buka tautan di kotak masuk Anda.",
+    "setupEmailFailed": "Gagal mengirim. Coba lagi sebentar lagi.",
+    "setupPrev": "Langkah sebelumnya",
+    "setupNext": "Langkah berikutnya"
   },
   "todo": {
     "eyebrow": "Tugas",
@@ -3620,7 +3628,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "buku registrasi",
     "regDoc_KH": "kartu registrasi",
-    "regDoc_default": "dokumen registrasi kendaraan"
+    "regDoc_default": "dokumen registrasi kendaraan",
+    "qp_title": "Foto",
+    "qp_main": "Utama",
+    "qp_remove": "Hapus foto",
+    "qp_add": "Tambah",
+    "backSetup": "Pengaturan",
+    "quickSubtitle": "Yang dasar saja. Hanya jenis, merek, dan model yang wajib.",
+    "quickLater": "Tanggal pajak & asuransi, kilometer, cicilan, dan lainnya bisa ditambahkan nanti di menu Armada."
   },
   "bookingEdit": {
     "crumbBookings": "Pemesanan",
@@ -4733,7 +4748,8 @@
     "showPassword": "Tampilkan",
     "hidePassword": "Sembunyikan",
     "continueFree": "Lanjutkan dengan paket Free",
-    "continueFreeError": "Tidak dapat beralih ke paket Gratis. Coba lagi."
+    "continueFreeError": "Tidak dapat beralih ke paket Gratis. Coba lagi.",
+    "signUpExists": "Sudah ada akun dengan email ini. Silakan masuk atau atur ulang kata sandi Anda."
   },
   "calc": {
     "title": "Membeli kendaraan",
@@ -6185,5 +6201,57 @@
     "prev": "Foto sebelumnya",
     "next": "Foto berikutnya",
     "more": "{count} foto lagi"
+  },
+  "onboarding": {
+    "title": "Atur RoveHQ",
+    "stepOf": "Langkah {step} dari {total}",
+    "welcome": "Selamat datang, {name}",
+    "welcomeBody": "Dua langkah mudah dan Anda siap.",
+    "language": "Bahasa",
+    "phone": "Nomor telepon yang bisa dihubungi pelanggan",
+    "phoneHint": "Opsional. Ini akan dicantumkan di perjanjian dan halaman pemesanan Anda.",
+    "country": "Negara",
+    "town": "Kota atau area",
+    "needTown": "Sebutkan kota atau area tempat usaha Anda.",
+    "saveFailed": "Gagal menyimpan. Periksa koneksi Anda dan coba lagi.",
+    "continue": "Lanjutkan",
+    "vehiclesTitle": "Tambahkan kendaraan Anda",
+    "vehiclesBody": "Pilih cara yang paling cepat bagi Anda. Anda bisa menambahkannya kapan saja.",
+    "vehiclesAdded": "{count, plural, one {# kendaraan ditambahkan} other {# kendaraan ditambahkan}}",
+    "vehiclesAddedBody": "Tambah lagi sekarang, ataulanjutkan ke dasbor Anda.",
+    "optAssistant": "Beri tahu asisten kami",
+    "optAssistantBody": "Ketik, bicara, atau kirim foto kendaraan atau STNK Anda. Semuanya akan terisi otomatis.",
+    "optForm": "Isi formulir singkat",
+    "optFormBody": "Satu per satu: ketik jenis, merek, model, foto, dan harga.",
+    "optList": "Impor daftar",
+    "optListBody": "Punya daftar kendaraan di spreadsheet? Tambahkan semuanya sekaligus.",
+    "toDashboard": "Buka dasbor saya",
+    "later": "Saya akan tambahkan nanti",
+    "laterHint": "\"Tambahkan kendaraan Anda\" akan menunggu di dasbor Anda."
+  },
+  "fleetAssistant": {
+    "title": "Asisten armada",
+    "subtitle": "Ketik, bicara, atau kirim foto",
+    "hello": "Halo! Ceritakan tentang kendaraan Anda, misalnya \"tiga skuter Honda Click seharga 3.000 sebulan dan satu Toyota Yaris putih\". Anda juga bisa mengirim foto kendaraan atau STNK.",
+    "photosOnly": "(foto)",
+    "unavailable": "Asisten sedang tidak aktif. Gunakan formulir singkat saja.",
+    "failed": "Maaf, saya tidak dapat membacanya. Coba lagi atau gunakan formulir singkat.",
+    "thinking": "Membaca…",
+    "listTitle": "{count, plural, one {# kendaraan sejauh ini} other {# kendaraan sejauh ini}}",
+    "unnamed": "Kendaraan",
+    "perMonth": "{price}/bulan",
+    "perDay": "{price}/hari",
+    "noDetails": "Nomor plat dan harga bisa menyusul",
+    "remove": "Hapus",
+    "adding": "Menambahkan…",
+    "addButton": "{count, plural, one {Tambah # kendaraan ke armada} other {Tambah # kendaraan ke armada}}",
+    "added": "{count, plural, one {Selesai: # kendaraan sudah masuk armada Anda.} other {Selesai: # kendaraan sudah masuk armada Anda.}}",
+    "addFailed": "Beberapa kendaraan gagal ditambahkan. Periksa kembali dan coba lagi.",
+    "addPhoto": "Tambah foto",
+    "talk": "Bicara",
+    "stopTalking": "Berhenti",
+    "listening": "Mendengarkan…",
+    "placeholder": "Ceritakan tentang kendaraan Anda…",
+    "send": "Kirim"
   }
 }

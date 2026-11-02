@@ -157,7 +157,9 @@
     "msgConnect": "Sambungkan LINE atau Telegram dan mesej pelanggan akan muncul di sini.",
     "msgConnectBtn": "Sambung",
     "bkTitle": "Tempahan",
-    "bkAll": "Semua tempahan"
+    "bkAll": "Semua tempahan",
+    "emailVerified": "Emel disahkan. Terima kasih!",
+    "emailLinkOld": "Pautan itu telah tamat tempoh. Tekan \"Sahkan emel anda\" untuk mendapatkan yang baharu."
   },
   "settings": {
     "contractsBranding": {
@@ -1087,7 +1089,7 @@
     "setupHide": "Sembunyi",
     "setupComplete": "<b>Persediaan selesai.</b> RoveHQ sedia untuk kerja harian.",
     "setup_business_profile": "Lengkapkan profil perniagaan anda",
-    "setup_first_vehicle": "Tambah kenderaan pertama anda",
+    "setup_first_vehicle": "Tambah kenderaan anda",
     "setup_all_vehicles": "Tambah semua kenderaan anda",
     "setup_first_customer": "Tambah pelanggan pertama anda",
     "setup_first_booking": "Ambil tempahan pertama anda",
@@ -1122,7 +1124,13 @@
     "setupTitleLater": "Selesaikan persediaan",
     "setup_payment_methods": "Nyatakan cara pelanggan membayar anda",
     "copy": "Salin",
-    "trialLeftShort": "Percubaan: {days} hari lagi"
+    "trialLeftShort": "Percubaan: {days} hari lagi",
+    "setup_verify_email": "Sahkan emel anda",
+    "setupEmailHint": "Tekan dan kami akan hantar pautan kepada anda.",
+    "setupEmailSent": "Dihantar. Buka pautan dalam emel anda.",
+    "setupEmailFailed": "Gagal menghantar. Cuba lagi sebentar lagi.",
+    "setupPrev": "Langkah sebelumnya",
+    "setupNext": "Langkah seterusnya"
   },
   "todo": {
     "eyebrow": "Tugasan",
@@ -3620,7 +3628,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "buku pendaftaran",
     "regDoc_KH": "kad pendaftaran",
-    "regDoc_default": "dokumen pendaftaran kenderaan"
+    "regDoc_default": "dokumen pendaftaran kenderaan",
+    "qp_title": "Foto",
+    "qp_main": "Utama",
+    "qp_remove": "Buang foto",
+    "qp_add": "Tambah",
+    "backSetup": "Persediaan",
+    "quickSubtitle": "Asas sahaja. Hanya jenis, jenama dan model diperlukan.",
+    "quickLater": "Tarikh cukai dan insurans, perbatuan, pinjaman dan banyak lagi boleh ditambah kemudian dari Armada."
   },
   "bookingEdit": {
     "crumbBookings": "Tempahan",
@@ -4733,7 +4748,8 @@
     "showPassword": "Tunjuk",
     "hidePassword": "Sembunyi",
     "continueFree": "Teruskan dengan pelan Free",
-    "continueFreeError": "Tidak dapat bertukar ke pelan Percuma. Cuba lagi."
+    "continueFreeError": "Tidak dapat bertukar ke pelan Percuma. Cuba lagi.",
+    "signUpExists": "Emel ini sudah berdaftar. Sila log masuk atau tetapkan semula kata laluan anda."
   },
   "calc": {
     "title": "Membeli kenderaan",
@@ -6185,5 +6201,57 @@
     "prev": "Foto sebelumnya",
     "next": "Foto seterusnya",
     "more": "{count} lagi foto"
+  },
+  "onboarding": {
+    "title": "Sediakan RoveHQ",
+    "stepOf": "Langkah {step} daripada {total}",
+    "welcome": "Selamat datang, {name}",
+    "welcomeBody": "Dua langkah mudah sahaja dan anda sudah siap.",
+    "language": "Bahasa",
+    "phone": "Nombor telefon pelanggan boleh hubungi",
+    "phoneHint": "Pilihan. Ia akan dipaparkan pada perjanjian dan halaman tempahan anda.",
+    "country": "Negara",
+    "town": "Bandar atau kawasan",
+    "needTown": "Nyatakan bandar atau kawasan anda.",
+    "saveFailed": "Gagal menyimpan. Semak sambungan anda dan cuba lagi.",
+    "continue": "Teruskan",
+    "vehiclesTitle": "Tambah kenderaan anda",
+    "vehiclesBody": "Pilih mana yang paling cepat untuk anda. Anda boleh tambah lagi pada bila-bila masa.",
+    "vehiclesAdded": "{count, plural, one {# kenderaan ditambah} other {# kenderaan ditambah}}",
+    "vehiclesAddedBody": "Tambah lagi sekarang, atau teruskan ke papan pemuka anda.",
+    "optAssistant": "Beritahu pembantu kami",
+    "optAssistantBody": "Taip, bercakap atau hantar foto kenderaan atau geran anda. Semuanya akan diisi.",
+    "optForm": "Isi borang ringkas",
+    "optFormBody": "Satu kenderaan pada satu masa: jenis, jenama, model, foto dan harga.",
+    "optList": "Masukkan senarai",
+    "optListBody": "Ada senarai kenderaan dalam helaian hamparan? Tambah semuanya sekaligus.",
+    "toDashboard": "Pergi ke papan pemuka saya",
+    "later": "Saya akan tambah kenderaan kemudian",
+    "laterHint": "\"Tambah kenderaan anda\" akan menunggu di papan pemuka anda."
+  },
+  "fleetAssistant": {
+    "title": "Pembantu armada",
+    "subtitle": "Taip, cakap atau hantar foto",
+    "hello": "Hai! Beritahu saya tentang kenderaan anda, contohnya \"tiga skuter Honda Click pada harga 3,000 sebulan dan Toyota Yaris putih\". Anda juga boleh menghantar foto kenderaan atau geran mereka.",
+    "photosOnly": "(foto)",
+    "unavailable": "Pembantu tidak tersedia sekarang. Gunakan borang ringkas sebagai ganti.",
+    "failed": "Maaf, saya tidak dapat membaca itu. Cuba lagi, atau gunakan borang ringkas.",
+    "thinking": "Membaea...",
+    "listTitle": "{count, plural, one {# kenderaan setakat ini} other {# kenderaan setakat ini}}",
+    "unnamed": "Kenderaan",
+    "perMonth": "{price}/bulan",
+    "perDay": "{price}/hari",
+    "noDetails": "Nombor plat dan harga boleh dimasukkan kemudian",
+    "remove": "Buang",
+    "adding": "Menambah...",
+    "addButton": "{count, plural, one {Tambah # kenderaan ke armada saya} other {Tambah # kenderaan ke armada saya}}",
+    "added": "{count, plural, one {Selesai: # kenderaan berada dalam armada anda.} other {Selesai: # kenderaan berada dalam armada anda.}}",
+    "addFailed": "Beberapa kenderaan tidak dapat ditambah. Semak dan cuba lagi.",
+    "addPhoto": "Tambah foto",
+    "talk": "Cakap",
+    "stopTalking": "Berhenti",
+    "listening": "Mendengar...",
+    "placeholder": "Beritahu saya tentang kenderaan anda...",
+    "send": "Hantar"
   }
 }

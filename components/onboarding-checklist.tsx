@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { Route } from "next";
-import { CheckCircle2, ChevronRight, X } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Mail, X } from "lucide-react";
 import { dismissChecklist } from "@/app/actions/onboarding";
+import { sendEmailCheck } from "@/app/actions/auth";
 
 type ChecklistItem = {
   step: string;
@@ -14,9 +15,11 @@ type ChecklistItem = {
   completed: boolean;
 };
 
+const PAGE = 3;
+
 /**
- * What a new business still has to do, in the order it matters, as one
- * numbered list with the next step highlighted.
+ * What a new business still has to do, three steps at a time (Rory, 2 Nov 2026): finish one and the next moves in,
+ * or flick to the next three. "Verify your email" sends the link right here.
  */
 export function OnboardingChecklist({
   completedCount,
@@ -34,9 +37,14 @@ export function OnboardingChecklist({
 }) {
   const t = useTranslations("shell");
   const [hidden, setHidden] = useState(false);
+  const [page, setPage] = useState(0);
+  const [emailSent, setEmailSent] = useState<"" | "sent" | "failed">("");
+  const [sending, startSending] = useTransition();
   const allComplete = completedCount === totalCount;
   const progress = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
   const remaining = items.filter((item) => !item.completed);
+  const pages = Math.max(1, Math.ceil(remaining.length / PAGE));
+  const shown = remaining.slice(page * PAGE, page * PAGE + PAGE);
   const label = (item: ChecklistItem) => (t.has(`setup_${item.step}`) ? t(`setup_${item.step}`) : item.label);
 
   useEffect(() => {
@@ -44,6 +52,9 @@ export function OnboardingChecklist({
     const timeout = window.setTimeout(() => setHidden(true), 2400);
     return () => window.clearTimeout(timeout);
   }, [allComplete]);
+  useEffect(() => {
+    if (page > pages - 1) setPage(pages - 1);
+  }, [page, pages]);
 
   if (hidden) return null;
 
@@ -57,6 +68,8 @@ export function OnboardingChecklist({
   }
 
   const next = remaining[0];
+  const rowClass = (isNext: boolean) =>
+    `pressable flex min-h-12 w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left font-semibold ${isNext ? "bg-[var(--primary-light)] text-[var(--primary)]" : "text-[var(--foreground)] hover:bg-[var(--panel-secondary)]"}`;
 
   return (
     <section className="card p-4">
@@ -73,44 +86,68 @@ export function OnboardingChecklist({
         </form>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
-        <div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${Math.max(progress, 4)}%` }} />
+        <div className="h-full rounded-full bg-[var(--primary)] transition-[width] duration-500" style={{ width: `${Math.max(progress, 4)}%` }} />
       </div>
-      {/* One list, one pattern: the steps left, the next one highlighted. Done steps are counted in the bar above. */}
       <ol className="mt-3 space-y-1">
-        {remaining.map((item, index) => {
-          // Numbered 1, 2, 3 among the steps left: a done step in the middle no longer leaves a gap (3, 4, 5, 7).
+        {shown.map((item, index) => {
           const isNext = item === next;
+          const number = page * PAGE + index + 1;
+          const badge = (
+            <span className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full text-[12px] font-bold ${isNext ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border)] text-[var(--foreground-secondary)]"}`}>{number}</span>
+          );
+          if (item.step === "verify_email") {
+            return (
+              <li key={item.step}>
+                <button
+                  aria-current={isNext ? "step" : undefined}
+                  className={rowClass(isNext)}
+                  disabled={sending || emailSent === "sent"}
+                  onClick={() =>
+                    startSending(async () => {
+                      const result = await sendEmailCheck().catch(() => ({ ok: false }));
+                      setEmailSent(result.ok ? "sent" : "failed");
+                    })
+                  }
+                  type="button"
+                >
+                  {badge}
+                  <span className="min-w-0 flex-1">
+                    {label(item)}
+                    <span className="block text-[14px] font-medium text-[var(--foreground-secondary)]">
+                      {emailSent === "sent" ? t("setupEmailSent") : emailSent === "failed" ? t("setupEmailFailed") : t("setupEmailHint")}
+                    </span>
+                  </span>
+                  {sending ? <Loader2 className="shrink-0 animate-spin" size={18} /> : <Mail className="shrink-0" size={18} />}
+                </button>
+              </li>
+            );
+          }
           return (
             <li key={item.step}>
-              <Link
-                aria-current={isNext ? "step" : undefined}
-                className={`pressable flex min-h-11 items-center gap-3 rounded-xl px-2.5 py-1.5 font-semibold ${
-                  isNext
-                    ? "bg-[var(--primary-light)] text-[var(--primary)]"
-                    : item.completed
-                      ? "text-[var(--muted)]"
-                      : "text-[var(--foreground)] hover:bg-[var(--panel-secondary)]"
-                }`}
-                href={item.href as Route}
-              >
-                {item.completed ? (
-                  <CheckCircle2 className="shrink-0 text-[var(--success)]" size={22} />
-                ) : (
-                  <span
-                    className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full text-[12px] font-bold ${
-                      isNext ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border)] text-[var(--foreground-secondary)]"
-                    }`}
-                  >
-                    {index + 1}
-                  </span>
-                )}
-                <span className={`min-w-0 flex-1 ${item.completed ? "line-through decoration-[var(--border)]" : ""}`}>{label(item)}</span>
-                {item.completed ? null : <ChevronRight className={`shrink-0 ${isNext ? "" : "text-[var(--muted)]"}`} size={18} />}
+              <Link aria-current={isNext ? "step" : undefined} className={rowClass(isNext)} href={item.href as Route}>
+                {badge}
+                <span className="min-w-0 flex-1">{label(item)}</span>
+                <ChevronRight className={`shrink-0 ${isNext ? "" : "text-[var(--muted)]"}`} size={18} />
               </Link>
             </li>
           );
         })}
       </ol>
+      {pages > 1 ? (
+        <div className="mt-2 flex items-center justify-between">
+          <button aria-label={t("setupPrev")} className="pressable flex h-10 w-10 items-center justify-center rounded-full text-[var(--foreground-secondary)] disabled:opacity-30" disabled={page === 0} onClick={() => setPage((value) => value - 1)} type="button">
+            <ChevronLeft size={20} />
+          </button>
+          <div aria-hidden="true" className="flex gap-1.5">
+            {Array.from({ length: pages }, (_, index) => (
+              <span className={`h-2 w-2 rounded-full ${index === page ? "bg-[var(--primary)]" : "bg-[var(--border-strong)]"}`} key={index} />
+            ))}
+          </div>
+          <button aria-label={t("setupNext")} className="pressable flex h-10 w-10 items-center justify-center rounded-full text-[var(--foreground-secondary)] disabled:opacity-30" disabled={page >= pages - 1} onClick={() => setPage((value) => value + 1)} type="button">
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 }

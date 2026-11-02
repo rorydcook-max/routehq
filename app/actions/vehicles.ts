@@ -208,7 +208,27 @@ const complianceFieldMap: Record<
   finance: { label: "Finance end date", section: "finance", field: "end_date" }
 };
 
+/**
+ * The Add vehicle form. Photos chosen on the short form (setup) come along, already made small on the phone.
+ * From setup it goes back to setup; otherwise to the fleet.
+ */
 export async function createVehicle(formData: FormData) {
+  const created = await insertVehicle(formData);
+  const photos = formData.getAll("vehiclePhotos").filter((item): item is File => item instanceof File && item.size > 0);
+  if (photos.length) {
+    const photoForm = new FormData();
+    photoForm.set("vehicleId", created.id);
+    photoForm.set("organizationId", created.organizationId);
+    for (const photo of photos) photoForm.append("vehiclePhotos", photo, photo.name || "photo.jpg");
+    // A photo that fails must not lose the vehicle just added; it can be added again from the car's page.
+    await uploadVehiclePhotos(photoForm).catch((error) => console.warn("photos on new vehicle:", error instanceof Error ? error.message : error));
+  }
+  if (String(formData.get("returnTo") || "") === "onboarding") redirect("/onboarding?added=1");
+  redirect("/fleet");
+}
+
+/** Adds one vehicle from form fields and returns it. Shared by the Add vehicle form and the fleet assistant. */
+export async function insertVehicle(formData: FormData): Promise<{ id: string; organizationId: string; label: string }> {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -364,7 +384,7 @@ export async function createVehicle(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/fleet");
-  redirect("/fleet");
+  return { id: data.id, organizationId, label: [data.make, data.model, data.registration_number].filter(Boolean).join(" ") };
 }
 
 export async function updateVehicle(formData: FormData) {

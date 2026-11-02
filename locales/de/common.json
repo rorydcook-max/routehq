@@ -157,7 +157,9 @@
     "msgConnect": "Verbinden Sie LINE oder Telegram, dann erscheinen Kundennachrichten hier.",
     "msgConnectBtn": "Verbinden",
     "bkTitle": "Buchungen",
-    "bkAll": "Alle Buchungen"
+    "bkAll": "Alle Buchungen",
+    "emailVerified": "E-Mail bestätigt. Danke!",
+    "emailLinkOld": "Dieser Link ist abgelaufen. Tippe auf „E-Mail bestätigen“, um einen neuen zu erhalten."
   },
   "vehicles": {
     "addVehicle": "Fahrzeug hinzufügen",
@@ -1087,7 +1089,7 @@
     "setupHide": "Ausblenden",
     "setupComplete": "<b>Einrichtung abgeschlossen.</b> RoveHQ ist bereit für den Alltag.",
     "setup_business_profile": "Firmenprofil vervollständigen",
-    "setup_first_vehicle": "Erstes Fahrzeug hinzufügen",
+    "setup_first_vehicle": "Fahrzeuge hinzufügen",
     "setup_all_vehicles": "Alle Fahrzeuge hinzufügen",
     "setup_first_customer": "Ersten Kunden hinzufügen",
     "setup_first_booking": "Erste Buchung annehmen",
@@ -1122,7 +1124,13 @@
     "setupTitleLater": "Einrichtung abschließen",
     "setup_payment_methods": "Angeben, wie Kunden Sie bezahlen",
     "copy": "Kopieren",
-    "trialLeftShort": "Testphase: noch {days, plural, one {# Tag} other {# Tage}}"
+    "trialLeftShort": "Testphase: noch {days, plural, one {# Tag} other {# Tage}}",
+    "setup_verify_email": "E-Mail bestätigen",
+    "setupEmailHint": "Tippe hier, um einen Link zu erhalten.",
+    "setupEmailSent": "Gesendet. Öffne den Link in deinem Posteingang.",
+    "setupEmailFailed": "Senden fehlgeschlagen. Versuche es in einer Minute nochmal.",
+    "setupPrev": "Vorherige Schritte",
+    "setupNext": "Nächste Schritte"
   },
   "todo": {
     "eyebrow": "Zu erledigen",
@@ -3620,7 +3628,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "Zulassungsbuch",
     "regDoc_KH": "Zulassungskarte",
-    "regDoc_default": "Zulassungsdokument"
+    "regDoc_default": "Zulassungsdokument",
+    "qp_title": "Fotos",
+    "qp_main": "Hauptfoto",
+    "qp_remove": "Foto entfernen",
+    "qp_add": "Hinzufügen",
+    "backSetup": "Einrichtung",
+    "quickSubtitle": "Nur das Wichtigste. Typ, Marke und Modell reichen aus.",
+    "quickLater": "Steuer- und Versicherungstermine, Kilometerstand, Kredite und mehr unter „Flotte“."
   },
   "bookingEdit": {
     "crumbBookings": "Buchungen",
@@ -4733,7 +4748,8 @@
     "showPassword": "Anzeigen",
     "hidePassword": "Verbergen",
     "continueFree": "Mit dem Free-Tarif fortfahren",
-    "continueFreeError": "Wechsel zum Free-Tarif fehlgeschlagen. Bitte erneut versuchen."
+    "continueFreeError": "Wechsel zum Free-Tarif fehlgeschlagen. Bitte erneut versuchen.",
+    "signUpExists": "Es gibt bereits ein Konto mit dieser E-Mail. Melde dich stattdessen an oder setze dein Passwort zurück."
   },
   "calc": {
     "title": "Fahrzeugkauf",
@@ -6185,5 +6201,57 @@
     "prev": "Vorheriges Foto",
     "next": "Nächstes Foto",
     "more": "{count} weitere Fotos"
+  },
+  "onboarding": {
+    "title": "RoveHQ einrichten",
+    "stepOf": "Schritt {step} von {total}",
+    "welcome": "Willkommen, {name}",
+    "welcomeBody": "Nur zwei kurze Schritte und es geht los.",
+    "language": "Sprache",
+    "phone": "Telefonnummer für Kunden",
+    "phoneHint": "Optional. Sie erscheint auf Verträgen und deiner Buchungsseite.",
+    "country": "Land",
+    "town": "Stadt oder Gebiet",
+    "needTown": "Gib an, in welcher Stadt oder Gegend du bist.",
+    "saveFailed": "Speichern fehlgeschlagen. Prüfe deine Verbindung und versuche es nochmal.",
+    "continue": "Weiter",
+    "vehiclesTitle": "Fahrzeuge hinzufügen",
+    "vehiclesBody": "Wähle den schnellsten Weg. Du kannst jederzeit weitere hinzufügen.",
+    "vehiclesAdded": "{count, plural, one {# Fahrzeug hinzugefügt} other {# Fahrzeuge hinzugefügt}}",
+    "vehiclesAddedBody": "Füge jetzt weitere hinzu oder gehe direkt zu deinem Dashboard.",
+    "optAssistant": "Unserem Assistenten sagen",
+    "optAssistantBody": "Schreibe, sprich oder sende Fotos deiner Fahrzeuge oder Fahrzeugscheine. Er füllt alles aus.",
+    "optForm": "Kurzes Formular ausfüllen",
+    "optFormBody": "Ein Fahrzeug nach dem anderen: Typ, Marke, Modell, Fotos und Preise.",
+    "optList": "Liste importieren",
+    "optListBody": "Hast du eine Tabelle? Füge alle Fahrzeuge auf einmal hinzu.",
+    "toDashboard": "Zum Dashboard",
+    "later": "Fahrzeuge später hinzufügen",
+    "laterHint": "„Fahrzeuge hinzufügen“ wartet auf deinem Dashboard auf dich."
+  },
+  "fleetAssistant": {
+    "title": "Flotten-Assistent",
+    "subtitle": "Schreiben, sprechen oder Fotos senden",
+    "hello": "Hi! Erzähl mir von deinen Fahrzeugen, zum Beispiel „drei Honda Click Roller für 3.000 im Monat und ein weißer Toyota Yaris“. Du kannst auch Fotos der Fahrzeuge oder Fahrzeugscheine schicken.",
+    "photosOnly": "(Fotos)",
+    "unavailable": "Der Assistent ist gerade nicht verfügbar. Nutze bitte das Formular.",
+    "failed": "Entschuldigung, das konnte ich nicht lesen. Versuche es nochmal oder nutze das Formular.",
+    "thinking": "Lese…",
+    "listTitle": "{count, plural, one {# Fahrzeug bisher} other {# Fahrzeuge bisher}}",
+    "unnamed": "Fahrzeug",
+    "perMonth": "{price}/Monat",
+    "perDay": "{price}/Tag",
+    "noDetails": "Kennzeichen und Preise können später nachgetragen werden",
+    "remove": "Entfernen",
+    "adding": "Wird hinzugefügt…",
+    "addButton": "{count, plural, one {# Fahrzeug zur Flotte hinzufügen} other {# Fahrzeuge zur Flotte hinzufügen}}",
+    "added": "{count, plural, one {Fertig: # Fahrzeug ist in deiner Flotte.} other {Fertig: # Fahrzeuge sind in deiner Flotte.}}",
+    "addFailed": "Einige Fahrzeuge konnten nicht hinzugefügt werden. Prüfe sie und versuche es nochmal.",
+    "addPhoto": "Fotos hinzufügen",
+    "talk": "Sprechen",
+    "stopTalking": "Stopp",
+    "listening": "Ich höre zu…",
+    "placeholder": "Erzähl mir von deinen Fahrzeugen…",
+    "send": "Senden"
   }
 }

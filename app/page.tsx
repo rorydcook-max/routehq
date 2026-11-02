@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { getRequestUser } from "@/lib/supabase/server";
+import { emailCheckPending } from "@/lib/email-check";
 import type { Route } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -107,7 +109,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const notice = (searchParams ? await searchParams : {}).notice;
   // A teammate sees the day's work and what customers owe, not how the business is doing or its set-up.
   // Who is asking and for which business: everything below needs these.
-  const [membership, homeOrg] = await Promise.all([getCurrentMembership(), getDefaultOrganization()]);
+  const [membership, homeOrg, signedInUser] = await Promise.all([getCurrentMembership(), getDefaultOrganization(), getRequestUser()]);
+  // Came straight in at sign-up without checking their email yet: "Verify your email" is on their Get ready list.
+  const emailPending = emailCheckPending(signedInUser);
   const isOwner = membership?.role === "owner";
   // Refunds and free days are the owner's or a manager's call: a teammate's day does not list them.
   const canDecide = canDecideMoney(membership?.role);
@@ -142,7 +146,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     getLocale(),
     getTranslations("todo"),
     getTranslations("bookings"),
-    Promise.all([getOnboardingStatus(supabase as any, homeOrg.id), getVehicleCategories(homeOrg.id)]),
+    Promise.all([getOnboardingStatus(supabase as any, homeOrg.id, { emailPending }), getVehicleCategories(homeOrg.id)]),
     Promise.all([
       getReceiptsWaiting(homeOrg.id),
       getTaskList(homeOrg.id).catch(() => []),
@@ -848,6 +852,11 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       {notice === "owner-only" ? (
         <p className="mb-4 rounded-[var(--radius)] border border-[var(--warning-line)] bg-[var(--warning-light)] px-4 py-3 font-semibold text-[var(--warning)]">{t("ownerOnly")}</p>
       ) : null}
+      {notice === "email-verified" || notice === "email-link-old" ? (
+        <p className={`mb-4 rounded-[var(--radius)] px-4 py-3 font-semibold ${notice === "email-verified" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--warning-light)] text-[var(--warning)]"}`}>
+          {t(notice === "email-verified" ? "emailVerified" : "emailLinkOld")}
+        </p>
+      ) : null}
 
       {/* A business that has not taken a booking yet needs its next step more than it needs empty numbers. */}
       {isOwner && !onboardingStatus.hidden && onboardingStatus.counts.rentals === 0 ? (
@@ -928,7 +937,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       </div>
 
       <div className="mt-6 space-y-4">
-        <PushToggle variant="prompt" />
+        {/* A brand-new business sees its next steps first; phone alerts are offered once it has a vehicle. */}
+        {onboardingStatus.counts.vehicles > 0 ? <PushToggle variant="prompt" /> : null}
         {isOwner && !onboardingStatus.hidden && onboardingStatus.counts.rentals > 0 ? (
           <OnboardingChecklist
             firstBookingTaken

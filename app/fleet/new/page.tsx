@@ -9,6 +9,7 @@ import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
+import { QuickPhotos } from "@/app/fleet/new/quick-photos";
 import { BackLink, Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { ensureDefaultBranch } from "@/lib/branches";
@@ -22,7 +23,11 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 const inputClass = "mt-1 w-full";
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
-export default async function NewVehiclePage() {
+export default async function NewVehiclePage({ searchParams }: { searchParams?: Promise<{ quick?: string; from?: string }> }) {
+  // The short form (setup, Rory 2 Nov 2026): what the car is, photos and prices; the rest later from Fleet.
+  const query = (await searchParams) || {};
+  const fromSetup = query.from === "onboarding";
+  const quick = query.quick === "1" || fromSetup;
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
   const say = (await getTranslations("vehicleForm")) as unknown as Say;
@@ -68,24 +73,34 @@ export default async function NewVehiclePage() {
     <AppShell userEmail={userEmail}>
       <div className="page-form">
         <div className="page-hero mb-4">
-          <BackLink href="/fleet" label={say("backFleet")} />
+          <BackLink href={fromSetup ? "/onboarding" : "/fleet"} label={fromSetup ? say("backSetup") : say("backFleet")} />
           <div className="flex items-start justify-between gap-3">
             <h1 className="page-title">{say("addTitle")}</h1>
             <Link className="secondary-action pressable shrink-0" href="/fleet/import">
               {say("import")}
             </Link>
           </div>
-          <p className="page-subtitle page-subtitle-keep mt-1">{say("addSubtitle")}</p>
+          <p className="page-subtitle page-subtitle-keep mt-1">{quick ? say("quickSubtitle") : say("addSubtitle")}</p>
         </div>
 
         <form action={createVehicle} className="space-y-3">
           <input name="organizationId" type="hidden" value={organization.id} />
+          {fromSetup ? <input name="returnTo" type="hidden" value="onboarding" /> : null}
 
           <VehicleIdentityFields categories={categories} country={(organization as any).country_code} initialMakes={vehicleMakes || []} inputClass={inputClass} />
 
+          {quick ? (
+            <section className="card p-4">
+              <QuickPhotos />
+            </section>
+          ) : null}
+
           <RatesFields currency={currency} usualDeposit={Number(organizationSettings?.settings?.public_booking?.deposit || 0)} />
 
-          {/* Everything below can wait: one tap away, filled in any time. */}
+          {quick ? <p className="px-1 font-medium text-[var(--foreground-secondary)]">{say("quickLater")}</p> : null}
+
+          {/* Everything below can wait: one tap away, filled in any time. The short form leaves it out altogether. */}
+          {quick ? null : (<>
           <Fold summary={say("datesSummary")} title={say("datesTitle")}>
             <ComplianceFields calendar={preferredCalendar} inputClass={inputClass} preferredLocale={preferredLocale} />
           </Fold>
@@ -140,9 +155,10 @@ export default async function NewVehiclePage() {
           <Fold summary={say("loanSummary")} title={say("loanTitle")}>
             <LoanFields currency={currency} />
           </Fold>
+          </>)}
 
           <div className="sticky-actions sticky z-10 -mx-1 flex gap-2 bg-[var(--background)] px-1 py-3 sm:justify-end [&>*:last-child]:flex-1 sm:[&>*:last-child]:flex-none">
-            <Link className="secondary-action pressable justify-center" href="/fleet">
+            <Link className="secondary-action pressable justify-center" href={fromSetup ? "/onboarding" : "/fleet"}>
               {say("cancel")}
             </Link>
             <PendingButton className="primary-action justify-center" pendingLabel={say("saving")} type="submit">

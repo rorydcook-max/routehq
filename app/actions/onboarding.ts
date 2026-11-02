@@ -40,10 +40,11 @@ export async function saveBusinessProfile(formData: FormData) {
   const name = requiredString(formData, "businessName");
   const location = requiredString(formData, "location");
   const country = requiredString(formData, "country");
-  const region = requiredString(formData, "region");
+  // Setup asks only where they are (Rory, 2 Nov 2026): the province may be unknown, and fleet type and size are no longer asked.
+  const region = optionalString(formData, "region") || "";
   const town = requiredString(formData, "town");
-  const fleetType = requiredString(formData, "fleetType");
-  const fleetSize = requiredString(formData, "fleetSize");
+  const fleetType = optionalString(formData, "fleetType");
+  const fleetSize = optionalString(formData, "fleetSize");
   const language = requiredString(formData, "language");
   const businessPhone = String(formData.get("businessPhone") || "").trim().slice(0, 80);
   const currency = optionalString(formData, "currency") || "THB";
@@ -67,6 +68,9 @@ export async function saveBusinessProfile(formData: FormData) {
       // Asked for in setup because it goes on the agreement and the customer's booking link.
       ...(businessPhone ? { business_phone: businessPhone } : {}),
       default_locale: language,
+      // Setup is done once this is saved: vehicles are added any time, and nobody is sent back to setup (Rory, 2 Nov 2026).
+      onboarding_completed: true,
+      onboarding_completed_at: new Date().toISOString(),
       currency,
       supported_currencies: Array.from(new Set([currency, "THB", "USD"])),
       settings: {
@@ -79,8 +83,8 @@ export async function saveBusinessProfile(formData: FormData) {
           town,
           label: location
         },
-        fleet_type: fleetType,
-        fleet_size: fleetSize,
+        ...(fleetType ? { fleet_type: fleetType } : {}),
+        ...(fleetSize ? { fleet_size: fleetSize } : {}),
         preferred_currency: currency,
         primary_language: language,
         business_profile_completed_at: new Date().toISOString()
@@ -136,8 +140,8 @@ export async function saveBusinessProfile(formData: FormData) {
     detail: `${name} onboarding profile saved.`
   });
 
+  // Not "/onboarding": re-drawing it now would send them on to the dashboard (setup counts as done), skipping the vehicles step.
   revalidatePath("/");
-  revalidatePath("/onboarding");
 }
 
 export async function skipFirstVehicle(formData: FormData) {

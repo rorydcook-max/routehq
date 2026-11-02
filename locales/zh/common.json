@@ -157,7 +157,9 @@
     "msgConnect": "连接 LINE 或 Telegram 后，客户消息会显示在这里。",
     "msgConnectBtn": "连接",
     "bkTitle": "预订",
-    "bkAll": "全部预订"
+    "bkAll": "全部预订",
+    "emailVerified": "邮箱已验证，谢谢！",
+    "emailLinkOld": "该链接已失效。请点击“验证您的邮箱”获取新链接。"
   },
   "settings": {
     "contractsBranding": {
@@ -1087,7 +1089,7 @@
     "setupHide": "隐藏",
     "setupComplete": "<b>设置完成。</b>RoveHQ 已准备好开展日常工作。",
     "setup_business_profile": "完善您的商家资料",
-    "setup_first_vehicle": "添加您的第一辆车",
+    "setup_first_vehicle": "添加您的车辆",
     "setup_all_vehicles": "添加所有车辆",
     "setup_first_customer": "添加您的第一位客户",
     "setup_first_booking": "接受您的第一笔预订",
@@ -1122,7 +1124,13 @@
     "setupTitleLater": "完成设置",
     "setup_payment_methods": "设置客户付款方式",
     "copy": "复制",
-    "trialLeftShort": "试用期剩余 {days} 天"
+    "trialLeftShort": "试用期剩余 {days} 天",
+    "setup_verify_email": "验证您的邮箱",
+    "setupEmailHint": "点击后我们将向您发送验证链接。",
+    "setupEmailSent": "已发送。请查收邮件并点击链接。",
+    "setupEmailFailed": "发送失败。请稍后再试。",
+    "setupPrev": "上一步",
+    "setupNext": "下一步"
   },
   "todo": {
     "eyebrow": "待办",
@@ -3620,7 +3628,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "车辆登记簿",
     "regDoc_KH": "车辆登记卡",
-    "regDoc_default": "车辆登记证件"
+    "regDoc_default": "车辆登记证件",
+    "qp_title": "照片",
+    "qp_main": "封面",
+    "qp_remove": "删除照片",
+    "qp_add": "添加",
+    "backSetup": "设置",
+    "quickSubtitle": "只需基本信息。仅需填写车辆类型、品牌和型号。",
+    "quickLater": "税费、保险日期、里程、贷款等信息以后可以在车队中补充。"
   },
   "bookingEdit": {
     "crumbBookings": "预订",
@@ -4733,7 +4748,8 @@
     "showPassword": "显示",
     "hidePassword": "隐藏",
     "continueFree": "继续使用 Free 套餐",
-    "continueFreeError": "无法切换到免费版，请重试。"
+    "continueFreeError": "无法切换到免费版，请重试。",
+    "signUpExists": "该邮箱已注册账户。请直接登录或重置密码。"
   },
   "calc": {
     "title": "购买车辆",
@@ -6185,5 +6201,57 @@
     "prev": "上一张",
     "next": "下一张",
     "more": "还有 {count} 张"
+  },
+  "onboarding": {
+    "title": "设置 RoveHQ",
+    "stepOf": "第 {step} 步，共 {total} 步",
+    "welcome": "欢迎，{name}",
+    "welcomeBody": "只需两步即可完成设置。",
+    "language": "语言",
+    "phone": "客户联系电话",
+    "phoneHint": "选填。将显示在您的租赁合同和预订页面上。",
+    "country": "国家/地区",
+    "town": "城镇或地区",
+    "needTown": "请填写您所在的城镇或地区。",
+    "saveFailed": "保存失败。请检查网络后重试。",
+    "continue": "继续",
+    "vehiclesTitle": "添加您的车辆",
+    "vehiclesBody": "选择最快的方式。您可以随时添加更多车辆。",
+    "vehiclesAdded": "{count, plural, other {已添加 {count} 辆车}}",
+    "vehiclesAddedBody": "现在添加更多，或直接进入控制面板。",
+    "optAssistant": "告诉我们的助手",
+    "optAssistantBody": "输入文字、语音或发送车辆及行驶证照片，即可自动填写。",
+    "optForm": "填写简短表单",
+    "optFormBody": "逐辆添加：类型、品牌、型号、照片和价格。",
+    "optList": "导入车辆列表",
+    "optListBody": "已有电子表格？可一次性全部导入。",
+    "toDashboard": "前往控制面板",
+    "later": "以后再添加车辆",
+    "laterHint": "“添加您的车辆”功能将保留在您的控制面板中。"
+  },
+  "fleetAssistant": {
+    "title": "车队助手",
+    "subtitle": "打字、说话或发送照片",
+    "hello": "你好！告诉我你的车，例如“三辆 3,000/月的 Honda Click 踏板车和一辆白色 Toyota Yaris”。你也可以发送车辆或行驶证的照片。",
+    "photosOnly": "（照片）",
+    "unavailable": "助手当前不可用，请改用表单填写。",
+    "failed": "抱歉，我没能识别。请重试，或使用表单填写。",
+    "thinking": "正在读取…",
+    "listTitle": "{count, plural, other {目前已添加 {count} 辆车}}",
+    "unnamed": "车辆",
+    "perMonth": "{price}/月",
+    "perDay": "{price}/天",
+    "noDetails": "车牌和价格以后再填也可以",
+    "remove": "移除",
+    "adding": "正在添加…",
+    "addButton": "{count, plural, other {将 {count} 辆车加入车队}}",
+    "added": "{count, plural, other {完成：已将 {count} 辆车加入车队。}}",
+    "addFailed": "部分车辆添加失败。请检查后重试。",
+    "addPhoto": "添加照片",
+    "talk": "说话",
+    "stopTalking": "停止",
+    "listening": "正在聆听…",
+    "placeholder": "告诉我你的车辆信息…",
+    "send": "发送"
   }
 }

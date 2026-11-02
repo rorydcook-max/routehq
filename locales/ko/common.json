@@ -157,7 +157,9 @@
     "msgConnect": "LINE이나 Telegram을 연결하면 고객 메시지가 여기에 표시돼요.",
     "msgConnectBtn": "연결",
     "bkTitle": "예약",
-    "bkAll": "전체 예약"
+    "bkAll": "전체 예약",
+    "emailVerified": "이메일이 인증되었습니다. 감사합니다!",
+    "emailLinkOld": "만료된 링크입니다. 새 링크를 받으려면 \"이메일 인증\"을 탭하세요."
   },
   "vehicles": {
     "addVehicle": "차량 추가",
@@ -1047,7 +1049,7 @@
     "setupHide": "숨기기",
     "setupComplete": "<b>설정이 완료되었습니다.</b> RoveHQ를 바로 사용할 수 있습니다.",
     "setup_business_profile": "사업자 프로필 완성",
-    "setup_first_vehicle": "첫 차량 추가",
+    "setup_first_vehicle": "차량 등록하기",
     "setup_all_vehicles": "모든 차량 추가",
     "setup_first_customer": "첫 고객 추가",
     "setup_first_booking": "첫 예약 받기",
@@ -1082,7 +1084,13 @@
     "setupTitleLater": "설정 마무리하기",
     "setup_payment_methods": "고객 결제 수단 설정",
     "copy": "복사",
-    "trialLeftShort": "체험판 {days}일 남음"
+    "trialLeftShort": "체험판 {days}일 남음",
+    "setup_verify_email": "이메일 인증",
+    "setupEmailHint": "탭하시면 인증 링크를 보내드려요.",
+    "setupEmailSent": "보냈습니다. 받은편지함의 링크를 열어주세요.",
+    "setupEmailFailed": "전송되지 않았어요. 잠시 후 다시 시도해 주세요.",
+    "setupPrev": "이전 단계",
+    "setupNext": "다음 단계"
   },
   "todo": {
     "eyebrow": "할 일",
@@ -3580,7 +3588,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "차량 등록부",
     "regDoc_KH": "차량 등록 카드",
-    "regDoc_default": "차량 등록 서류"
+    "regDoc_default": "차량 등록 서류",
+    "qp_title": "사진",
+    "qp_main": "대표",
+    "qp_remove": "사진 삭제",
+    "qp_add": "추가",
+    "backSetup": "설정",
+    "quickSubtitle": "기본 정보만 입력하세요. 차량 종류, 제조사, 모델만 있으면 돼요.",
+    "quickLater": "세금 및 보험일, 주행거리, 대출 정보 등은 나중에 '차량 관리'에서 추가할 수 있어요."
   },
   "bookingEdit": {
     "crumbBookings": "예약",
@@ -4693,7 +4708,8 @@
     "showPassword": "보기",
     "hidePassword": "숨기기",
     "continueFree": "Free 요금제로 계속하기",
-    "continueFreeError": "Free 요금제로 전환하지 못했어요. 다시 시도해 주세요."
+    "continueFreeError": "Free 요금제로 전환하지 못했어요. 다시 시도해 주세요.",
+    "signUpExists": "이미 이 이메일로 가입된 계정이 있어요. 로그인하시거나 비밀번호를 재설정해 주세요."
   },
   "calc": {
     "title": "차량 구매",
@@ -6185,5 +6201,57 @@
     "prev": "이전 사진",
     "next": "다음 사진",
     "more": "사진 {count}장 더"
+  },
+  "onboarding": {
+    "title": "RoveHQ 설정",
+    "stepOf": "총 {total}단계 중 {step}단계",
+    "welcome": "환영합니다, {name}님",
+    "welcomeBody": "간단한 두 단계만 거치면 바로 시작할 수 있어요.",
+    "language": "언어",
+    "phone": "고객 문의 전화번호",
+    "phoneHint": "선택사항입니다. 계약서와 예약 페이지에 표시됩니다.",
+    "country": "국가",
+    "town": "동네 또는 지역",
+    "needTown": "계신 동네나 지역을 알려주세요.",
+    "saveFailed": "저장되지 않았어요. 연결 상태를 확인하고 다시 시도해 주세요.",
+    "continue": "계속",
+    "vehiclesTitle": "차량 등록하기",
+    "vehiclesBody": "가장 편한 방법을 선택하세요. 언제든 차량을 추가할 수 있어요.",
+    "vehiclesAdded": "{count, plural, other {차량 {count}대 등록됨}}",
+    "vehiclesAddedBody": "지금 더 추가하거나 대시보드로 이동하세요.",
+    "optAssistant": "어시스턴트에게 말하기",
+    "optAssistantBody": "차량 종류, 제조사, 모델, 사진이나 등록증을 입력하거나 보내주세요. 알아서 척척 입력해드려요.",
+    "optForm": "간편 양식 작성하기",
+    "optFormBody": "차량 종류, 제조사, 모델, 사진, 가격을 하나씩 입력합니다.",
+    "optList": "목록 가져오기",
+    "optListBody": "스프레드시트에 차량 목록이 있으신가요? 한 번에 등록해 보세요.",
+    "toDashboard": "대시보드로 가기",
+    "later": "나중에 차량 추가하기",
+    "laterHint": "\"차량 등록하기\"는 대시보드에 그대로 남아있어요."
+  },
+  "fleetAssistant": {
+    "title": "차량 관리 어시스턴트",
+    "subtitle": "타이핑, 음성, 또는 사진 전송",
+    "hello": "안녕하세요! 예를 들어 \"혼다 클릭 스쿠터 3대 월 3,000, 하얀색 토요타 야리스\"처럼 차량 정보를 알려주세요. 차량 사진이나 등록증을 보내주셔도 돼요.",
+    "photosOnly": "(사진)",
+    "unavailable": "지금은 어시스턴트를 사용할 수 없어요. 대신 간편 양식을 이용해 주세요.",
+    "failed": "죄송해요, 읽지 못했어요. 다시 시도하시거나 간편 양식을 사용해 주세요.",
+    "thinking": "읽는 중…",
+    "listTitle": "{count, plural, other {지금까지 차량 {count}대}}",
+    "unnamed": "차량",
+    "perMonth": "{price}/월",
+    "perDay": "{price}/일",
+    "noDetails": "번호판과 가격은 나중에 입력해도 돼요",
+    "remove": "삭제",
+    "adding": "추가 중…",
+    "addButton": "{count, plural, other {차량 {count}대 내 차고에 추가하기}}",
+    "added": "{count, plural, other {완료: 차량 {count}대가 등록되었어요.}}",
+    "addFailed": "일부 차량을 추가하지 못했어요. 확인 후 다시 시도해 주세요.",
+    "addPhoto": "사진 추가",
+    "talk": "말하기",
+    "stopTalking": "중지",
+    "listening": "듣는 중…",
+    "placeholder": "차량에 대해 알려주세요…",
+    "send": "보내기"
   }
 }

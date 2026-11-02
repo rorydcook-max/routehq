@@ -157,7 +157,9 @@
     "msgConnect": "LINE または Telegram を接続すると、お客様のメッセージがここに表示されます。",
     "msgConnectBtn": "接続",
     "bkTitle": "予約",
-    "bkAll": "すべての予約"
+    "bkAll": "すべての予約",
+    "emailVerified": "メールアドレスが確認されました。ありがとうございます！",
+    "emailLinkOld": "そのリンクの有効期限が切れています。「メールアドレスを確認」をタップして新しいリンクを取得してください。"
   },
   "settings": {
     "contractsBranding": {
@@ -1047,7 +1049,7 @@
     "setupHide": "非表示",
     "setupComplete": "<b>設定が完了しました。</b>RoveHQ を日々の業務に使えます。",
     "setup_business_profile": "会社プロフィールを完成させる",
-    "setup_first_vehicle": "最初の車両を追加",
+    "setup_first_vehicle": "車両を追加する",
     "setup_all_vehicles": "すべての車両を追加",
     "setup_first_customer": "最初のお客様を追加",
     "setup_first_booking": "最初の予約を受ける",
@@ -1082,7 +1084,13 @@
     "setupTitleLater": "設定を完了する",
     "setup_payment_methods": "お客様の支払い方法を設定",
     "copy": "コピー",
-    "trialLeftShort": "トライアル: 残り {days} 日"
+    "trialLeftShort": "トライアル: 残り {days} 日",
+    "setup_verify_email": "メールアドレスを確認",
+    "setupEmailHint": "タップすると確認リンクが送信されます。",
+    "setupEmailSent": "送信しました。受信箱のリンクを開いてください。",
+    "setupEmailFailed": "送信できませんでした。しばらくしてからもう一度お試しください。",
+    "setupPrev": "前のステップ",
+    "setupNext": "次のステップ"
   },
   "todo": {
     "eyebrow": "やること",
@@ -3580,7 +3588,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "車両登録簿",
     "regDoc_KH": "車両登録カード",
-    "regDoc_default": "車両登録書類"
+    "regDoc_default": "車両登録書類",
+    "qp_title": "写真",
+    "qp_main": "メイン",
+    "qp_remove": "写真を削除",
+    "qp_add": "追加",
+    "backSetup": "設定",
+    "quickSubtitle": "基本情報のみ。タイプ、メーカー、モデルのみ必要です。",
+    "quickLater": "税金や保険の期限、走行距離、ローンなどは後からフリート管理で追加できます。"
   },
   "bookingEdit": {
     "crumbBookings": "予約",
@@ -4693,7 +4708,8 @@
     "showPassword": "表示",
     "hidePassword": "隠す",
     "continueFree": "Free プランで続ける",
-    "continueFreeError": "Free プランに切り替えられませんでした。もう一度お試しください。"
+    "continueFreeError": "Free プランに切り替えられませんでした。もう一度お試しください。",
+    "signUpExists": "このメールアドレスのアカウントはすでに存在します。サインインするか、パスワードをリセットしてください。"
   },
   "calc": {
     "title": "車両の購入",
@@ -6185,5 +6201,57 @@
     "prev": "前の写真",
     "next": "次の写真",
     "more": "他 {count} 枚"
+  },
+  "onboarding": {
+    "title": "RoveHQの設定",
+    "stepOf": "ステップ {step} / {total}",
+    "welcome": "ようこそ、{name}さん",
+    "welcomeBody": "あと2ステップですぐに始められます。",
+    "language": "言語",
+    "phone": "お客様がかけられる電話番号",
+    "phoneHint": "任意です。契約書や予約ページに記載されます。",
+    "country": "国",
+    "town": "市区町村またはエリア",
+    "needTown": "市区町村またはエリアを入力してください。",
+    "saveFailed": "保存できませんでした。接続を確認してもう一度お試しください。",
+    "continue": "続ける",
+    "vehiclesTitle": "車両を追加する",
+    "vehiclesBody": "一番簡単な方法を選んでください。後からいつでも追加できます。",
+    "vehiclesAdded": "{count, plural, other {#台の車両を追加しました}}",
+    "vehiclesAddedBody": "今すぐさらに追加するか、ダッシュボードにお進みください。",
+    "optAssistant": "アシスタントに伝える",
+    "optAssistantBody": "入力、音声、または車両や登録証の写真送信で、すべて自動で入力されます。",
+    "optForm": "簡単なフォームに入力",
+    "optFormBody": "1台ずつ：タイプ、メーカー、モデル、写真、料金を入力します。",
+    "optList": "リストを取り込む",
+    "optListBody": "スプレッドシートに車両データがありますか？まとめて追加できます。",
+    "toDashboard": "ダッシュボードへ移動",
+    "later": "車両は後で追加する",
+    "laterHint": "「車両を追加する」はダッシュボードに表示されます。"
+  },
+  "fleetAssistant": {
+    "title": "フリートアシスタント",
+    "subtitle": "入力、音声、または写真を送信",
+    "hello": "こんにちは！「ホンダ Clickのスクーター3台、月3,000、白いトヨタ ヤリス1台」のように車両について教えてください。車両や登録証の写真も送信できます。",
+    "photosOnly": "（写真）",
+    "unavailable": "現在アシスタントを利用できません。代わりに簡易フォームをご利用ください。",
+    "failed": "申し訳ありません、読み取れませんでした。もう一度お試しいただくか、簡易フォームをご利用ください。",
+    "thinking": "読み取り中…",
+    "listTitle": "{count, plural, other {これまでに #台}}",
+    "unnamed": "車両",
+    "perMonth": "{price}/月",
+    "perDay": "{price}/日",
+    "noDetails": "ナンバープレートと料金は後からでも登録できます",
+    "remove": "削除",
+    "adding": "追加中…",
+    "addButton": "{count, plural, other {#台をフリートに追加}}",
+    "added": "{count, plural, other {完了：#台の車両がフリートに追加されました。}}",
+    "addFailed": "一部の車両を追加できませんでした。内容を確認してもう一度お試しください。",
+    "addPhoto": "写真を追加",
+    "talk": "話す",
+    "stopTalking": "停止",
+    "listening": "聞いています…",
+    "placeholder": "車両について教えてください…",
+    "send": "送信"
   }
 }

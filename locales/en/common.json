@@ -157,7 +157,9 @@
     "msgConnect": "Connect LINE or Telegram and customer messages show up here.",
     "msgConnectBtn": "Connect",
     "bkTitle": "Bookings",
-    "bkAll": "All bookings"
+    "bkAll": "All bookings",
+    "emailVerified": "Email verified. Thanks!",
+    "emailLinkOld": "That link has expired. Tap \"Verify your email\" to get a new one."
   },
   "nav": {
     "main": "Main",
@@ -1047,7 +1049,7 @@
     "setupHide": "Hide",
     "setupComplete": "<b>Setup complete.</b> RoveHQ is ready for daily work.",
     "setup_business_profile": "Complete your business profile",
-    "setup_first_vehicle": "Add your first vehicle",
+    "setup_first_vehicle": "Add your vehicles",
     "setup_all_vehicles": "Add all your vehicles",
     "setup_first_customer": "Add your first customer",
     "setup_first_booking": "Take your first booking",
@@ -1082,7 +1084,13 @@
     "setupTitleLater": "Finish setting up",
     "setup_payment_methods": "Say how customers pay you",
     "copy": "Copy",
-    "trialLeftShort": "Trial: {days, plural, one {# day} other {# days}} left"
+    "trialLeftShort": "Trial: {days, plural, one {# day} other {# days}} left",
+    "setup_verify_email": "Verify your email",
+    "setupEmailHint": "Tap and we'll send you a link.",
+    "setupEmailSent": "Sent. Open the link in your inbox.",
+    "setupEmailFailed": "That didn't send. Try again in a minute.",
+    "setupPrev": "Previous steps",
+    "setupNext": "Next steps"
   },
   "todo": {
     "eyebrow": "To do",
@@ -3580,7 +3588,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "registration book",
     "regDoc_KH": "registration card",
-    "regDoc_default": "registration document"
+    "regDoc_default": "registration document",
+    "qp_title": "Photos",
+    "qp_main": "Main",
+    "qp_remove": "Remove photo",
+    "qp_add": "Add",
+    "backSetup": "Setup",
+    "quickSubtitle": "Just the basics. Only type, make and model are needed.",
+    "quickLater": "Tax and insurance dates, mileage, loan and more can be added later from Fleet."
   },
   "bookingEdit": {
     "crumbBookings": "Bookings",
@@ -4693,7 +4708,8 @@
     "showPassword": "Show",
     "hidePassword": "Hide",
     "continueFree": "Continue on the Free plan",
-    "continueFreeError": "Couldn't switch to the Free plan. Try again."
+    "continueFreeError": "Couldn't switch to the Free plan. Try again.",
+    "signUpExists": "There's already an account with this email. Sign in instead, or reset your password."
   },
   "calc": {
     "title": "Buying a vehicle",
@@ -6185,5 +6201,57 @@
     "prev": "Previous photo",
     "next": "Next photo",
     "more": "{count} more photos"
+  },
+  "onboarding": {
+    "title": "Set up RoveHQ",
+    "stepOf": "Step {step} of {total}",
+    "welcome": "Welcome, {name}",
+    "welcomeBody": "Two quick steps and you're in.",
+    "language": "Language",
+    "phone": "Phone number customers can call",
+    "phoneHint": "Optional. It goes on your agreements and booking page.",
+    "country": "Country",
+    "town": "Town or area",
+    "needTown": "Say which town or area you're in.",
+    "saveFailed": "That didn't save. Check your connection and try again.",
+    "continue": "Continue",
+    "vehiclesTitle": "Add your vehicles",
+    "vehiclesBody": "Pick whichever is quickest for you. You can add more any time.",
+    "vehiclesAdded": "{count, plural, one {# vehicle added} other {# vehicles added}}",
+    "vehiclesAddedBody": "Add more now, or carry on to your dashboard.",
+    "optAssistant": "Tell our assistant",
+    "optAssistantBody": "Type, talk or send photos of your vehicles or registration books. It fills everything in.",
+    "optForm": "Fill in a short form",
+    "optFormBody": "One vehicle at a time: type, make, model, photos and prices.",
+    "optList": "Bring in a list",
+    "optListBody": "Have your vehicles in a spreadsheet? Add them all at once.",
+    "toDashboard": "Go to my dashboard",
+    "later": "I'll add vehicles later",
+    "laterHint": "\"Add your vehicles\" will be waiting on your dashboard."
+  },
+  "fleetAssistant": {
+    "title": "Fleet assistant",
+    "subtitle": "Type, talk or send photos",
+    "hello": "Hi! Tell me about your vehicles, for example \"three Honda Click scooters at 3,000 a month and a white Toyota Yaris\". You can also send photos of the vehicles or their registration books.",
+    "photosOnly": "(photos)",
+    "unavailable": "The assistant isn't available right now. Use the short form instead.",
+    "failed": "Sorry, I couldn't read that. Try again, or use the short form.",
+    "thinking": "Reading…",
+    "listTitle": "{count, plural, one {# vehicle so far} other {# vehicles so far}}",
+    "unnamed": "Vehicle",
+    "perMonth": "{price}/month",
+    "perDay": "{price}/day",
+    "noDetails": "Plate and prices can come later",
+    "remove": "Remove",
+    "adding": "Adding…",
+    "addButton": "{count, plural, one {Add # vehicle to my fleet} other {Add # vehicles to my fleet}}",
+    "added": "{count, plural, one {Done: # vehicle is in your fleet.} other {Done: # vehicles are in your fleet.}}",
+    "addFailed": "Some vehicles couldn't be added. Check them and try again.",
+    "addPhoto": "Add photos",
+    "talk": "Talk",
+    "stopTalking": "Stop",
+    "listening": "Listening…",
+    "placeholder": "Tell me about your vehicles…",
+    "send": "Send"
   }
 }

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { AuthCard } from "@/components/auth-card";
 import { CreateOrganizationForm } from "@/app/onboarding/create-organization-form";
 import { OnboardingWizard } from "@/app/onboarding/onboarding-wizard";
@@ -8,7 +9,7 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
-export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ preview?: string }> }) {
+export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ preview?: string; step?: string; added?: string }> }) {
   // On a developer's machine only: /onboarding?preview=2 shows a step of the wizard for an account that has already finished it. Never on the live site.
   const previewStep = process.env.NODE_ENV === "development" ? Number((await searchParams).preview || 0) : 0;
   await getCurrentUserEmail();
@@ -43,36 +44,33 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   }
 
   const organization = await getDefaultOrganization();
-  const [{ data: organizationDetail, error: organizationError }, { data: profileStep }, { data: vehicles }] = await Promise.all([
+  const [{ data: organizationDetail, error: organizationError }, { data: vehicles }] = await Promise.all([
     supabase
       .from("organizations")
       .select("id, name, default_locale, settings, onboarding_completed, onboarding_skipped")
       .eq("id", organization.id)
       .is("deleted_at", null)
       .maybeSingle(),
-    supabase.from("onboarding_checklist").select("completed").eq("organization_id", organization.id).eq("step", "business_profile").maybeSingle(),
-    supabase.from("vehicles").select("make, model, registration_number, metadata").eq("organization_id", organization.id).is("deleted_at", null).order("created_at", { ascending: true }).limit(1)
+    supabase.from("vehicles").select("make, model, registration_number").eq("organization_id", organization.id).is("deleted_at", null).order("created_at", { ascending: true }).limit(60)
   ]);
 
   if (organizationError || !organizationDetail) {
     throw new Error(organizationError?.message || "Organization was not found.");
   }
-  if ((organizationDetail.onboarding_completed || organizationDetail.onboarding_skipped) && !previewStep) {
-    redirect("/");
-  }
+  // Once step 1 is saved, setup is done and this page is simply "Add your vehicles" (the Get ready list, the short form and
+  // the import all come back here). It never sends anyone away: saving step 1 re-draws this page, and a redirect then
+  // skipped straight past the vehicles step.
+  const profileDone = Boolean(organizationDetail.settings?.location);
 
-  // Start the wizard in the language the person has been reading so far (their phone's, or the one they picked when signing up).
-  const locale = await getLocale();
-  // The vehicle is added on the normal Add vehicle screen, which sends the person back here. Carry on from where they are.
-  const first = (vehicles || [])[0];
-  const firstVehicle = first ? { make: first.make, model: first.model, registrationNumber: first.registration_number, compliance: first.metadata?.compliance || null } : null;
-  const resumeStep = !profileStep?.completed ? 1 : firstVehicle ? 3 : 2;
-  return (
-    <OnboardingWizard
-      firstVehicle={firstVehicle}
-      initialLanguage={locale === "th" ? "th" : undefined}
-      initialStep={previewStep >= 1 && previewStep <= 3 ? previewStep : resumeStep}
-      organization={organizationDetail}
-    />
-  );
+  // Where they are, guessed from where they are browsing, until they say.
+  const countryCode = ((await headers()).get("x-vercel-ip-country") || "").toUpperCase();
+  const defaultCountry = COUNTRY_NAMES[countryCode] || "Thailand";
+  const names = (vehicles || []).map((row: any) => [row.make, row.model, row.registration_number].filter(Boolean).join(" "));
+  const initialStep = previewStep === 1 || previewStep === 2 ? previewStep : profileDone ? 2 : 1;
+  return <OnboardingWizard defaultCountry={defaultCountry} initialStep={initialStep as 1 | 2} organization={organizationDetail} vehicles={names} />;
 }
+
+const COUNTRY_NAMES: Record<string, string> = {
+  TH: "Thailand", ID: "Indonesia", PH: "Philippines", VN: "Vietnam", MY: "Malaysia", SG: "Singapore", LA: "Laos", KH: "Cambodia",
+  CN: "China", JP: "Japan", TW: "Taiwan", KR: "South Korea", BN: "Brunei", IN: "India", BD: "Bangladesh", LK: "Sri Lanka"
+};

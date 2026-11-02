@@ -157,7 +157,9 @@
     "msgConnect": "Anslut LINE eller Telegram så visas kundmeddelanden här.",
     "msgConnectBtn": "Anslut",
     "bkTitle": "Bokningar",
-    "bkAll": "Alla bokningar"
+    "bkAll": "Alla bokningar",
+    "emailVerified": "E-postadressen har verifierats. Tack!",
+    "emailLinkOld": "Länken har löpt ut. Tryck på \"Verifiera din e-postadress\" för att få en ny."
   },
   "vehicles": {
     "addVehicle": "Lägg till fordon",
@@ -1047,7 +1049,7 @@
     "setupHide": "Dölj",
     "setupComplete": "<b>Konfigurationen är klar.</b> RoveHQ är redo för det dagliga arbetet.",
     "setup_business_profile": "Fyll i din företagsprofil",
-    "setup_first_vehicle": "Lägg till ditt första fordon",
+    "setup_first_vehicle": "Lägg till dina fordon",
     "setup_all_vehicles": "Lägg till alla dina fordon",
     "setup_first_customer": "Lägg till din första kund",
     "setup_first_booking": "Ta emot din första bokning",
@@ -1082,7 +1084,13 @@
     "setupTitleLater": "Slutför konfigurationen",
     "setup_payment_methods": "Ange hur kunderna betalar dig",
     "copy": "Kopiera",
-    "trialLeftShort": "Provperiod: {days, plural, one {# dag} other {# dagar}} kvar"
+    "trialLeftShort": "Provperiod: {days, plural, one {# dag} other {# dagar}} kvar",
+    "setup_verify_email": "Verifiera din e-postadress",
+    "setupEmailHint": "Tryck så skickar vi en länk.",
+    "setupEmailSent": "Skickat. Öppna länken i din inkorg.",
+    "setupEmailFailed": "Det skickades inte. Försök igen om en minut.",
+    "setupPrev": "Föregående steg",
+    "setupNext": "Nästa steg"
   },
   "todo": {
     "eyebrow": "Att göra",
@@ -3580,7 +3588,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "registreringsboken",
     "regDoc_KH": "registreringskortet",
-    "regDoc_default": "registreringsbeviset"
+    "regDoc_default": "registreringsbeviset",
+    "qp_title": "Foton",
+    "qp_main": "Huvud",
+    "qp_remove": "Ta bort foto",
+    "qp_add": "Lägg till",
+    "backSetup": "Konfiguration",
+    "quickSubtitle": "Bara det grundläggande. Endast typ, märke och modell behövs.",
+    "quickLater": "Skatte- och försäkringsdatum, mätarställning, lån med mera kan läggas till senare under Flotta."
   },
   "bookingEdit": {
     "crumbBookings": "Bokningar",
@@ -4693,7 +4708,8 @@
     "showPassword": "Visa",
     "hidePassword": "Dölj",
     "continueFree": "Fortsätt med Free-abonnemanget",
-    "continueFreeError": "Det gick inte att byta till Gratis-planen. Försök igen."
+    "continueFreeError": "Det gick inte att byta till Gratis-planen. Försök igen.",
+    "signUpExists": "Det finns redan ett konto med den här e-postadressen. Logga in i stället eller återställ ditt lösenord."
   },
   "calc": {
     "title": "Köpa ett fordon",
@@ -6185,5 +6201,57 @@
     "prev": "Föregående foto",
     "next": "Nästa foto",
     "more": "{count} foton till"
+  },
+  "onboarding": {
+    "title": "Konfigurera RoveHQ",
+    "stepOf": "Steg {step} av {total}",
+    "welcome": "Välkommen, {name}",
+    "welcomeBody": "Bara två snabba steg så är du igång.",
+    "language": "Språk",
+    "phone": "Telefonnummer som kunder kan ringa",
+    "phoneHint": "Valfritt. Det hamnar på dina avtal och bokningssidor.",
+    "country": "Land",
+    "town": "Stad eller område",
+    "needTown": "Ange vilken stad eller vilket område du befinner dig i.",
+    "saveFailed": "Det sparades inte. Kontrollera din anslutning och försök igen.",
+    "continue": "Fortsätt",
+    "vehiclesTitle": "Lägg till dina fordon",
+    "vehiclesBody": "Välj det som går snabbast för dig. Du kan lägga till fler när som helst.",
+    "vehiclesAdded": "{count, plural, one {# fordon tillagt} other {# fordon tillagda}}",
+    "vehiclesAddedBody": "Lägg till fler nu eller gå vidare till din instrumentpanel.",
+    "optAssistant": "Berätta för vår助手",
+    "optAssistantBody": "Skriv, prata eller skicka foton på dina fordon eller registreringsbevis. Allt fylls i automatiskt.",
+    "optForm": "Fyll i ett kort formulär",
+    "optFormBody": "Ett fordon i taget: typ, märke, modell, foton och priser.",
+    "optList": "Importera en lista",
+    "optListBody": "Har du dina fordon i ett kalkylblad? Lägg till alla på en gång.",
+    "toDashboard": "Gå till min instrumentpanel",
+    "later": "Jag lägger till fordon senare",
+    "laterHint": "\"Lägg till dina fordon\" kommer att vänta på din instrumentpanel."
+  },
+  "fleetAssistant": {
+    "title": "Fordonshjälp",
+    "subtitle": "Skriv, prata eller skicka foton",
+    "hello": "Hej! Berätta om dina fordon, till exempel \"tre Honda Click-scootrar för 3 000 i månaden och en vit Toyota Yaris\". Du kan också skicka foton på fordonen eller deras registreringsbevis.",
+    "photosOnly": "(foton)",
+    "unavailable": "Assistenten är inte tillgänglig just nu. Använd det korta formuläret i stället.",
+    "failed": "Tyvärr kunde jag inte läsa det där. Försök igen eller använd det korta formuläret.",
+    "thinking": "Läser…",
+    "listTitle": "{count, plural, one {# fordon hittills} other {# fordon hittills}}",
+    "unnamed": "Fordon",
+    "perMonth": "{price}/månad",
+    "perDay": "{price}/dag",
+    "noDetails": "Registreringsnummer och priser kan läggas till senare",
+    "remove": "Ta bort",
+    "adding": "Lägger till…",
+    "addButton": "{count, plural, one {Lägg till # fordon i flottan} other {Lägg till # fordon i flottan}}",
+    "added": "{count, plural, one {Klart: # fordon finns i din flotta.} other {Klart: # fordon finns i din flotta.}}",
+    "addFailed": "Vissa fordon kunde inte läggas till. Kontrollera dem och försök igen.",
+    "addPhoto": "Lägg till foton",
+    "talk": "Prata",
+    "stopTalking": "Stopp",
+    "listening": "Lyssnar…",
+    "placeholder": "Berätta om dina fordon…",
+    "send": "Skicka"
   }
 }

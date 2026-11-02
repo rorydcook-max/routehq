@@ -10,6 +10,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { appRoleFromForm, dbRoleFromApp, getCurrentMembership, OWNER_ONLY_MESSAGE, requireOwner, type AppRole } from "@/lib/auth/roles";
 import { ACTIVE_ORGANIZATION_COOKIE } from "@/lib/auth/active-organization";
 import { shellBrand } from "@/lib/shell-brand";
+import { emailCheckToken } from "@/lib/email-check";
 
 export type AuthActionState = {
   error?: string;
@@ -264,30 +265,49 @@ export async function signUpWithEmail(_state: AuthActionState, formData: FormDat
     return { error: say("passwordShort") };
   }
 
-  const origin = await requestOrigin();
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.auth.signUp({
+  // Straight in, no trip to the inbox first (Rory, 2 Nov 2026): the account is made and signed in now, and checking the
+  // email address is a step on the dashboard's "Get ready" list (email_check "pending" until they open the link we send).
+  const admin = createSupabaseAdminClient() as any;
+  const { error: createError } = await admin.auth.admin.createUser({
     email,
     password,
-    options: {
-      emailRedirectTo: origin ? `${origin}/auth/callback?next=/onboarding` : undefined,
-      data: { full_name: fullName, business_name: businessName }
-    }
+    email_confirm: true,
+    user_metadata: { full_name: fullName, business_name: businessName },
+    app_metadata: { email_check: "pending" }
   });
-
-  if (error) {
-    return { error: /password/i.test(error.message) ? say("passwordShort") : say("signUpFailed") };
+  if (createError) {
+    if (/already|registered|exists/i.test(createError.message)) return { error: say("signUpExists") };
+    return { error: /password/i.test(createError.message) ? say("passwordShort") : say("signUpFailed") };
   }
 
-  // If email confirmation is switched off in Supabase, a session comes back
-  // straight away and the user can go directly to setting up their business.
-  if (data.session) {
-    redirect("/onboarding");
+  const supabase = await createSupabaseServerClient();
+  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+  if (signInError) {
+    return { error: say("signUpFailed") };
   }
+  // The business is made here too, so setup opens on its first step at once (making it on the setup page and then
+  // re-opening that page left a blank screen for many seconds).
+  await (supabase as any).rpc("create_my_organization", { p_name: businessName, p_full_name: fullName }).then(
+    () => null,
+    () => null
+  );
+  redirect("/onboarding");
+}
 
-  // Same message whether or not the email was already registered, so the form
-  // cannot be used to find out who has an account.
-  return { success: say("signUpSent") };
+/** "Verify your email" on the Get ready list: sends a sign-in link to their address; opening it marks the address as checked. */
+export async function sendEmailCheck(): Promise<{ ok: boolean }> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user?.email) return { ok: false };
+  const origin = await requestOrigin();
+  const next = `/auth/verified?t=${encodeURIComponent(await emailCheckToken(user.id))}`;
+  const { error } = await supabase.auth.signInWithOtp({
+    email: user.email,
+    options: { shouldCreateUser: false, emailRedirectTo: origin ? `${origin}/auth/callback?next=${encodeURIComponent(next)}` : undefined }
+  });
+  return { ok: !error };
 }
 
 export async function createMyOrganization(_state: AuthActionState, formData: FormData): Promise<AuthActionState> {

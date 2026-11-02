@@ -2,12 +2,13 @@ import { onlineSigningGaps } from "@/lib/online-signing-readiness";
 export const onboardingSteps = [
   // In the order a new business needs them: what must be in place to take a booking first, the rest after.
   { step: "business_profile", label: "Business profile complete", href: "/onboarding" },
-  { step: "first_vehicle", label: "First vehicle added", href: "/fleet/new" },
+  // Only for accounts that came straight in without checking their email first (Rory, 2 Nov 2026).
+  { step: "verify_email", label: "Verify your email", href: "#verify-email" },
+  { step: "first_vehicle", label: "Add your vehicles", href: "/onboarding?step=2" },
   // Without this the customer is stopped at the last step of their booking link.
   { step: "signature", label: "Add your signature", href: "/settings/signature" },
   { step: "payment_methods", label: "Say how customers pay you", href: "/settings?tab=rentals#payment-methods" },
   { step: "first_booking", label: "First booking created", href: "/bookings/new" },
-  { step: "all_vehicles", label: "All vehicles added", href: "/fleet" },
   { step: "contract_template", label: "Contract template reviewed", href: "/settings/contracts" },
   { step: "line_connected", label: "LINE notifications connected", href: "/settings?tab=notifications" },
   { step: "team_invited", label: "Team member invited", href: "/invite" }
@@ -18,13 +19,6 @@ type ChecklistRow = { step: string; completed: boolean; completed_at: string | n
 
 function settingsObject(value: unknown) {
   return typeof value === "object" && value !== null && !Array.isArray(value) ? (value as Record<string, any>) : {};
-}
-
-function fleetTargetMet(fleetSize: string | null | undefined, vehicleCount: number) {
-  if (fleetSize === "6-15") return vehicleCount >= 6;
-  if (fleetSize === "16-50") return vehicleCount >= 16;
-  if (fleetSize === "50+") return vehicleCount >= 50;
-  return vehicleCount >= 1;
 }
 
 export async function markOnboardingStep(supabase: any, organizationId: string, step: OnboardingStepKey, completed = true) {
@@ -59,7 +53,7 @@ export async function ensureOnboardingChecklist(supabase: any, organizationId: s
   if (error) console.warn("set-up checklist not updated:", error.message);
 }
 
-export async function getOnboardingStatus(supabase: any, organizationId: string) {
+export async function getOnboardingStatus(supabase: any, organizationId: string, options: { emailPending?: boolean } = {}) {
   const [orgResult, checklistResult, vehicleResult, customerResult, rentalResult, memberResult] = await Promise.all([
     supabase.from("organizations").select("*").eq("id", organizationId).is("deleted_at", null).maybeSingle(),
     supabase.from("onboarding_checklist").select("step, completed, completed_at").eq("organization_id", organizationId),
@@ -83,10 +77,10 @@ export async function getOnboardingStatus(supabase: any, organizationId: string)
   const memberCount = memberResult.count || 0;
 
   const dynamicCompletion: Record<OnboardingStepKey, boolean> = {
-    business_profile: Boolean(organization.name && settings.location && settings.fleet_type && settings.fleet_size),
+    business_profile: Boolean(organization.name && settings.location),
+    verify_email: !options.emailPending,
     first_vehicle: vehicleCount >= 1,
     signature: orgResult.data ? onlineSigningGaps(orgResult.data).length === 0 : false,
-    all_vehicles: fleetTargetMet(settings.fleet_size, vehicleCount),
     payment_methods: Boolean(organization.promptpay_id || organization.promptpay_qr_url || organization.bank_account_number || organization.wise_link || organization.revolut_link),
     first_booking: rentalCount >= 1,
     contract_template: Boolean(checklistRows.get("contract_template")?.completed || settings.contract_template_reviewed_at),
@@ -94,9 +88,10 @@ export async function getOnboardingStatus(supabase: any, organizationId: string)
     team_invited: memberCount > 1
   };
 
-  const items = onboardingSteps.map((item) => {
+  // Steps already dealt with in setup, or not needed for this account, are left off the list (and the count).
+  const items = onboardingSteps.filter((item) => item.step !== "business_profile" && (item.step !== "verify_email" || options.emailPending)).map((item) => {
     const stored = checklistRows.get(item.step);
-    const completed = Boolean(dynamicCompletion[item.step] || stored?.completed);
+    const completed = item.step === "verify_email" ? !options.emailPending : Boolean(dynamicCompletion[item.step] || stored?.completed);
     return {
       ...item,
       completed,

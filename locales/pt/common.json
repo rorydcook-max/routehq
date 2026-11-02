@@ -157,7 +157,9 @@
     "msgConnect": "Conecte o LINE ou o Telegram e as mensagens dos clientes aparecem aqui.",
     "msgConnectBtn": "Conectar",
     "bkTitle": "Reservas",
-    "bkAll": "Todas as reservas"
+    "bkAll": "Todas as reservas",
+    "emailVerified": "E-mail confirmado. Obrigado!",
+    "emailLinkOld": "Este link expirou. Toque em \"Confirmar e-mail\" para obter um novo."
   },
   "nav": {
     "main": "Principal",
@@ -1047,7 +1049,7 @@
     "setupHide": "Ocultar",
     "setupComplete": "<b>Configuração concluída.</b> O RoveHQ está pronto para o dia a dia.",
     "setup_business_profile": "Complete o perfil da sua empresa",
-    "setup_first_vehicle": "Adicione seu primeiro veículo",
+    "setup_first_vehicle": "Adicionar veículos",
     "setup_all_vehicles": "Adicione todos os seus veículos",
     "setup_first_customer": "Adicione seu primeiro cliente",
     "setup_first_booking": "Faça sua primeira reserva",
@@ -1082,7 +1084,13 @@
     "setupTitleLater": "Termine a configuração",
     "setup_payment_methods": "Informe como os clientes pagam você",
     "copy": "Copiar",
-    "trialLeftShort": "Teste: {days, plural, one {falta # dia} other {faltam # dias}}"
+    "trialLeftShort": "Teste: {days, plural, one {falta # dia} other {faltam # dias}}",
+    "setup_verify_email": "Confirmar e-mail",
+    "setupEmailHint": "Toque para enviarmos um link.",
+    "setupEmailSent": "Enviado. Abra o link no seu e-mail.",
+    "setupEmailFailed": "Não foi possível enviar. Tente novamente daqui a pouco.",
+    "setupPrev": "Passos anteriores",
+    "setupNext": "Próximos passos"
   },
   "todo": {
     "eyebrow": "A fazer",
@@ -3580,7 +3588,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "livro de registro",
     "regDoc_KH": "cartão de registro",
-    "regDoc_default": "documento do veículo"
+    "regDoc_default": "documento do veículo",
+    "qp_title": "Fotos",
+    "qp_main": "Principal",
+    "qp_remove": "Remover foto",
+    "qp_add": "Adicionar",
+    "backSetup": "Configuração",
+    "quickSubtitle": "Apenas o essencial. Só precisa do tipo, marca e modelo.",
+    "quickLater": "Datas de seguro e impostos, quilometragem, financiamento e outros dados podem ser adicionados mais tarde em Frota."
   },
   "bookingEdit": {
     "crumbBookings": "Reservas",
@@ -4693,7 +4708,8 @@
     "showPassword": "Mostrar",
     "hidePassword": "Ocultar",
     "continueFree": "Continuar no plano Free",
-    "continueFreeError": "Não foi possível mudar para o plano Grátis. Tente novamente."
+    "continueFreeError": "Não foi possível mudar para o plano Grátis. Tente novamente.",
+    "signUpExists": "Já existe uma conta com este e-mail. Inicie sessão ou reponha a palavra-passe."
   },
   "calc": {
     "title": "Comprar um veículo",
@@ -6185,5 +6201,57 @@
     "prev": "Foto anterior",
     "next": "Próxima foto",
     "more": "Mais {count} fotos"
+  },
+  "onboarding": {
+    "title": "Configurar o RoveHQ",
+    "stepOf": "Passo {step} de {total}",
+    "welcome": "Bem-vindo(a), {name}",
+    "welcomeBody": "Faltam dois passos rápidos.",
+    "language": "Idioma",
+    "phone": "Número de telefone para os clientes ligarem",
+    "phoneHint": "Opcional. Aparece nos contratos e na página de reservas.",
+    "country": "País",
+    "town": "Cidade ou zona",
+    "needTown": "Indique a sua cidade ou zona.",
+    "saveFailed": "Não foi possível guardar. Verifique a ligação e tente novamente.",
+    "continue": "Continuar",
+    "vehiclesTitle": "Adicionar veículos",
+    "vehiclesBody": "Escolha a opção mais rápida para si. Pode adicionar mais a qualquer momento.",
+    "vehiclesAdded": "{count, plural, one {# veículo adicionado} other {# veículos adicionados}}",
+    "vehiclesAddedBody": "Adicione mais agora ou avance para o painel.",
+    "optAssistant": "Falar com o assistente",
+    "optAssistantBody": "Escreva, fale ou envie fotos dos veículos ou documentos. O assistente preenche tudo.",
+    "optForm": "Preencher um formulário curto",
+    "optFormBody": "Um veículo de cada vez: tipo, marca, modelo, fotos e preços.",
+    "optList": "Importar uma lista",
+    "optListBody": "Tem os veículos numa folha de cálculo? Adicione-os todos de uma vez.",
+    "toDashboard": "Ir para o meu painel",
+    "later": "Adicionar veículos mais tarde",
+    "laterHint": "\"Adicionar veículos\" ficará disponível no seu painel."
+  },
+  "fleetAssistant": {
+    "title": "Assistente de frota",
+    "subtitle": "Escreva, fale ou envie fotos",
+    "hello": "Olá! Conte-me sobre os seus veículos, por exemplo \"três scooters Honda Click a 3.000 por mês e um Toyota Yaris branco\". Também pode enviar fotos dos veículos ou dos documentos.",
+    "photosOnly": "(fotos)",
+    "unavailable": "O assistente não está disponível de momento. Use o formulário curto.",
+    "failed": "Não foi possível ler isso. Tente novamente ou use o formulário curto.",
+    "thinking": "A ler...",
+    "listTitle": "{count, plural, one {# veículo até agora} other {# veículos até agora}}",
+    "unnamed": "Veículo",
+    "perMonth": "{price}/mês",
+    "perDay": "{price}/dia",
+    "noDetails": "A matrícula e os preços podem ser adicionados mais tarde",
+    "remove": "Remover",
+    "adding": "A adicionar...",
+    "addButton": "{count, plural, one {Adicionar # veículo à frota} other {Adicionar # veículos à frota}}",
+    "added": "{count, plural, one {Concluído: # veículo adicionado à frota.} other {Concluído: # veículos adicionados à frota.}}",
+    "addFailed": "Não foi possível adicionar alguns veículos. Verifique-os e tente novamente.",
+    "addPhoto": "Adicionar fotos",
+    "talk": "Falar",
+    "stopTalking": "Parar",
+    "listening": "A ouvir...",
+    "placeholder": "Conte-me sobre os seus veículos...",
+    "send": "Enviar"
   }
 }

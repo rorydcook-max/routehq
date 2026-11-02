@@ -157,7 +157,9 @@
     "msgConnect": "Ikonekta ang LINE o Telegram at lalabas dito ang mga mensahe ng customer.",
     "msgConnectBtn": "Ikonekta",
     "bkTitle": "Mga booking",
-    "bkAll": "Lahat ng booking"
+    "bkAll": "Lahat ng booking",
+    "emailVerified": "Na-verify na ang email. Salamat!",
+    "emailLinkOld": "Nag-expire na ang link na iyon. I-tap ang \"I-verify ang iyong email\" para kumuha ng bago."
   },
   "vehicles": {
     "addVehicle": "Magdagdag ng sasakyan",
@@ -1047,7 +1049,7 @@
     "setupHide": "Itago",
     "setupComplete": "<b>Kumpleto na ang pag-setup.</b> Handa na ang RoveHQ para sa araw-araw na gawain.",
     "setup_business_profile": "Kumpletuhin ang profile ng negosyo mo",
-    "setup_first_vehicle": "Idagdag ang iyong unang sasakyan",
+    "setup_first_vehicle": "Idagdag ang iyong mga sasakyan",
     "setup_all_vehicles": "Idagdag ang lahat ng iyong sasakyan",
     "setup_first_customer": "Idagdag ang iyong unang customer",
     "setup_first_booking": "Kumuha ng iyong unang booking",
@@ -1082,7 +1084,13 @@
     "setupTitleLater": "Tapusin ang pag-setup",
     "setup_payment_methods": "Sabihin kung paano nagbabayad ang mga customer sa iyo",
     "copy": "Kopyahin",
-    "trialLeftShort": "Subok: {days, plural, one {# araw} other {# araw}} ang natitira"
+    "trialLeftShort": "Subok: {days, plural, one {# araw} other {# araw}} ang natitira",
+    "setup_verify_email": "I-verify ang iyong email",
+    "setupEmailHint": "I-tap at padadalhan ka namin ng link.",
+    "setupEmailSent": "Naipadala na. Buksan ang link sa iyong inbox.",
+    "setupEmailFailed": "Hindi naipadala iyon. Subukan ulit maya-maya.",
+    "setupPrev": "Mga nakaraang hakbang",
+    "setupNext": "Mga susunod na hakbang"
   },
   "todo": {
     "eyebrow": "Gagawin",
@@ -3580,7 +3588,14 @@
     "regDoc_PH": "OR/CR",
     "regDoc_LA": "registration book",
     "regDoc_KH": "registration card",
-    "regDoc_default": "rehistro ng sasakyan"
+    "regDoc_default": "rehistro ng sasakyan",
+    "qp_title": "Mga Larawan",
+    "qp_main": "Pangunahin",
+    "qp_remove": "Alisin ang larawan",
+    "qp_add": "Idagdag",
+    "backSetup": "Setup",
+    "quickSubtitle": "Mga pangunahing detalye lang. Uri, tatak at modelo lang ang kailangan.",
+    "quickLater": "Ang mga petsa ng buwis at insurance, mileage, utang at iba pa ay puwedeng idagdag mamaya mula sa Fleet."
   },
   "bookingEdit": {
     "crumbBookings": "Mga booking",
@@ -4693,7 +4708,8 @@
     "showPassword": "Ipakita",
     "hidePassword": "Itago",
     "continueFree": "Magpatuloy sa Free plan",
-    "continueFreeError": "Hindi makalipat sa Libreng plan. Subukan ulit."
+    "continueFreeError": "Hindi makalipat sa Libreng plan. Subukan ulit.",
+    "signUpExists": "May account na sa email na ito. Mag-sign in na lang o i-reset ang iyong password."
   },
   "calc": {
     "title": "Pagbili ng sasakyan",
@@ -6185,5 +6201,57 @@
     "prev": "Nakaraang litrato",
     "next": "Susunod na litrato",
     "more": "{count} pang litrato"
+  },
+  "onboarding": {
+    "title": "I-setup ang RoveHQ",
+    "stepOf": "Hakbang {step} ng {total}",
+    "welcome": "Mabuhay, {name}",
+    "welcomeBody": "Dalawang mabilis na hakbang at pasok ka na.",
+    "language": "Wika",
+    "phone": "Numero ng telepono na matatawagan ng mga customer",
+    "phoneHint": "Opsyonal. Ilalagay ito sa iyong mga kasunduan at booking page.",
+    "country": "Bansa",
+    "town": "Bayan o lugar",
+    "needTown": "Sabihin kung saang bayan o lugar ka.",
+    "saveFailed": "Hindi na-save. Suriin ang iyong koneksyon at subukan ulit.",
+    "continue": "Magpatuloy",
+    "vehiclesTitle": "Idagdag ang iyong mga sasakyan",
+    "vehiclesBody": "Piliin ang pinakamabilis para sa iyo. Pwede kang magdagdag pa kahit kailan.",
+    "vehiclesAdded": "{count, plural, one {# sasakyan ang naidagdag} other {# sasakyan ang naidagdag}}",
+    "vehiclesAddedBody": "Magdagdag pa ngayon, o pumunta na sa iyong dashboard.",
+    "optAssistant": "Sabihin sa aming assistant",
+    "optAssistantBody": "Mag-type, magsalita, o magpadala ng mga larawan ng iyong mga sasakyan o rehistro. Ito na ang bahala.",
+    "optForm": "Punan ang maikling form",
+    "optFormBody": "Isang sasakyan kada beses: uri, tatak, modelo, mga larawan at presyo.",
+    "optList": "Magdala ng listahan",
+    "optListBody": "Nasa spreadsheet ba ang iyong mga sasakyan? Idagdag silang lahat nang sabay-sabay.",
+    "toDashboard": "Pumunta sa aking dashboard",
+    "later": "Magdadagdag ako mamaya",
+    "laterHint": "Maghihintay ang \"Idagdag ang iyong mga sasakyan\" sa iyong dashboard."
+  },
+  "fleetAssistant": {
+    "title": "Fleet assistant",
+    "subtitle": "Mag-type, magsalita o magpadala ng larawan",
+    "hello": "Uy! Sabihin sa akin ang tungkol sa iyong mga sasakyan, halimbawa \"tatlong Honda Click scooter sa 3,000 bawat buwan at isang puting Toyota Yaris\". Pwede ka ring magpadala ng mga larawan ng sasakyan o ng rehistro nila.",
+    "photosOnly": "(mga larawan)",
+    "unavailable": "Hindi available ang assistant ngayon. Gamitin na lang ang maikling form.",
+    "failed": "Pasensya na, hindi ko nabasa iyon. Subukan ulit, o gamitin ang maikling form.",
+    "thinking": "Binabasa…",
+    "listTitle": "{count, plural, one {# sasakyan pa lang} other {# sasakyan pa lang}}",
+    "unnamed": "Sasakyan",
+    "perMonth": "{price}/buwan",
+    "perDay": "{price}/araw",
+    "noDetails": "Puwede nang huli ang plaka at presyo",
+    "remove": "Alisin",
+    "adding": "Idinaragdag…",
+    "addButton": "{count, plural, one {Idagdag ang # sasakyan sa aking fleet} other {Idagdag ang # sasakyan sa aking fleet}}",
+    "added": "{count, plural, one {Tapos na: nasa fleet mo na ang # sasakyan.} other {Tapos na: nasa fleet mo na ang # sasakyan.}}",
+    "addFailed": "May ilang sasakyan na hindi naidagdag. Suriin ang mga ito at subukan ulit.",
+    "addPhoto": "Magdagdag ng mga larawan",
+    "talk": "Magsalita",
+    "stopTalking": "Itigil",
+    "listening": "Nakikinig…",
+    "placeholder": "Sabihin sa akin ang tungkol sa iyong mga sasakyan…",
+    "send": "Ipadala"
   }
 }

@@ -178,9 +178,12 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
   const [notice, setNotice] = useState("");
   const [undone, setUndone] = useState<Set<string>>(new Set());
   // A spreadsheet sent in the live chat ("Import this spreadsheet"): already chosen here, ready to read.
+  // A Google Sheet link sent in the chat comes as ?sheet=.
   useEffect(() => {
     const [handed] = takeHandedFiles("sheet");
     if (handed) setFile(handed);
+    const link = new URLSearchParams(window.location.search).get("sheet") || "";
+    if (/^https:\/\/docs\.google\.com\/spreadsheets\//.test(link)) setSheetUrl(link);
   }, []);
 
   const counts = useMemo(() => (preview ? previewCounts(preview) : null), [preview]);

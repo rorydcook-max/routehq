@@ -6,7 +6,19 @@ import { TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
  * and only "Confirm" runs it, through the same code the forms use.
  */
 
-export type ActionKind = "add_vehicle" | "add_transaction" | "create_booking_link" | "renew_paperwork";
+export type ActionKind = "add_vehicle" | "add_transaction" | "create_booking_link" | "renew_paperwork" | "record_cost" | "record_payment" | "create_booking";
+
+/** A value on the card the person can change before saving (the newer cards: cost, payment, booking). */
+export type ProposalField = {
+  /** The args key it edits. */
+  key: string;
+  label: string;
+  type: "text" | "number" | "date" | "select" | "tel";
+  value: string;
+  options?: Array<{ value: string; label: string }>;
+  /** May be left empty (an open-ended booking's end date, a note). */
+  optional?: boolean;
+};
 
 export type ProposedAction = {
   kind: ActionKind;
@@ -15,7 +27,14 @@ export type ProposedAction = {
   rows: Array<{ label: string; value: string }>;
   /** Cleaned-up values; these are what Confirm sends back. */
   args: Record<string, string | number | boolean | null>;
+  /** Editable values, shown as inputs on the card; what's typed there replaces the matching args on Confirm. */
+  fields?: ProposalField[];
+  /** An escape hatch under the card ("Open the full form"), with the file handed over where it can be. */
+  fullForm?: { label: string; href: string; receiptPath?: string };
 };
+
+/** A payment a customer still owes, for recording money in from the chat. */
+export type OpenPayment = { id: string; label: string; amount: number; customer: string; rentalId: string; dueDate: string };
 
 export type AssistantRecords = {
   today: string;
@@ -24,98 +43,18 @@ export type AssistantRecords = {
   vehicles: Array<{ id: string; name: string; plate: string }>;
   customers: Array<{ id: string; name: string }>;
   categories: Array<{ id: string; code: string; name: string }>;
+  /** Payments still due (record_payment only). */
+  payments?: OpenPayment[];
 };
+
+/** The running costs a cost card offers, in the money types' own names. */
+export const COST_TYPES = ["fuel", "repair", "servicing", "maintenance", "insurance", "tax", "fine", "accessories", "finance", "other"] as const;
+export const PAYMENT_METHODS = { cash: "Cash", bank_transfer: "Bank transfer", promptpay: "PromptPay", card: "Card" } as const;
 
 const VEHICLE_TYPES = ["car", "van", "motorcycle", "scooter", "ebike", "atv"] as const;
 // Inspection too (Malaysia's PUSPAKOM, Indonesia's KIR...): the vehicle page keeps a date for it outside Thailand.
 const PAPERWORK = { tax: "Road tax", porbor: "Compulsory insurance (Por Ror Bor)", insurance: "Insurance", inspection: "Vehicle inspection", service: "Service", oil: "Oil change" } as const;
 const PERIODS = { daily: "day", weekly: "week", monthly: "month" } as const;
-
-/** The function list given to the model. */
-export const ASSISTANT_TOOLS = [
-  {
-    type: "function" as const,
-    function: {
-      name: "add_vehicle",
-      description: "Add a new vehicle to the fleet. Needs at least make, model and registration plate.",
-      parameters: {
-        type: "object",
-        properties: {
-          vehicleType: { type: "string", enum: [...VEHICLE_TYPES], description: "car unless the owner says otherwise" },
-          make: { type: "string" },
-          model: { type: "string" },
-          year: { type: "integer" },
-          registrationNumber: { type: "string", description: "License plate exactly as given. Never make one up or write 'unknown': if the owner didn't give it, ask for it instead of calling." },
-          color: { type: "string" },
-          mileage: { type: "number" },
-          dailyRate: { type: "number" },
-          weeklyRate: { type: "number" },
-          monthlyRate: { type: "number" },
-          purchasePrice: { type: "number", description: "Only what the owner says they paid or bought it for" },
-          currentValue: { type: "number", description: "What the owner says it is worth now (its value), not what they paid" }
-        },
-        required: ["make", "model", "registrationNumber"]
-      }
-    }
-  },
-  {
-    type: "function" as const,
-    function: {
-      name: "add_transaction",
-      description: "Record money received or a cost against a vehicle (repair, fuel, insurance, rental income...).",
-      parameters: {
-        type: "object",
-        properties: {
-          vehicleId: { type: "string", description: "id of the vehicle from the records" },
-          type: { type: "string", enum: TRANSACTION_TYPE_OPTIONS.map((option) => option.value) },
-          amount: { type: "number", description: "Positive amount in the business's own currency (given in the records)" },
-          date: { type: "string", description: "Optional, YYYY-MM-DD. Leave out when not stated; today is used. Never ask for it." },
-          notes: { type: "string", description: "What it was for, in the owner's words" },
-          supplier: { type: "string" }
-        },
-        required: ["vehicleId", "type", "amount"]
-      }
-    }
-  },
-  {
-    type: "function" as const,
-    function: {
-      name: "create_booking_link",
-      description: "Create a booking and its link for a customer to fill in their details and sign.",
-      parameters: {
-        type: "object",
-        properties: {
-          vehicleId: { type: "string" },
-          customerId: { type: "string", description: "Optional. Fill in only if the owner named an existing customer. Never ask for it: without it the customer fills in their own details from the link." },
-          startDate: { type: "string", description: "YYYY-MM-DD" },
-          endDate: { type: "string", description: "Optional, YYYY-MM-DD. Leave out when no end is mentioned (e.g. 'run monthly'): the rental is then open-ended. Never ask for it." },
-          pricingModel: { type: "string", enum: ["daily", "weekly", "monthly"] },
-          rentalRate: { type: "number", description: "Price per day, week or month" },
-          depositAmount: { type: "number" }
-        },
-        required: ["vehicleId", "startDate", "pricingModel", "rentalRate"]
-      }
-    }
-  },
-  {
-    type: "function" as const,
-    function: {
-      name: "renew_paperwork",
-      description: "Mark a vehicle's road tax, compulsory insurance, insurance, inspection (PUSPAKOM, KIR...), service or oil change as renewed, with its new expiry or next-due date.",
-      parameters: {
-        type: "object",
-        properties: {
-          vehicleId: { type: "string" },
-          what: { type: "string", enum: Object.keys(PAPERWORK) },
-          newExpiryDate: { type: "string", description: "YYYY-MM-DD. 'Renewed today for 1 year' means one year from today." },
-          cost: { type: "number", description: "Total paid for this renewal, if the owner gave a total" },
-          notes: { type: "string", description: "Anything else said, e.g. a monthly price" }
-        },
-        required: ["vehicleId", "what", "newExpiryDate"]
-      }
-    }
-  }
-];
 
 const isDate = (value: unknown): value is string => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(`${value}T00:00:00Z`).getTime());
 const text = (value: unknown, max = 200) => String(value ?? "").trim().slice(0, max);
@@ -256,6 +195,94 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
       args.notes ? { label: "Note", value: args.notes } : null
     ].filter(Boolean) as ProposedAction["rows"];
     return { ok: true, action: { kind: "renew_paperwork", title: "Mark this as renewed", rows, args } };
+  }
+
+  const vehicleOptions = records.vehicles.map((entry) => ({ value: entry.id, label: `${entry.name} · ${entry.plate}` }));
+
+  if (kind === "record_cost") {
+    const value = amount(raw.amount);
+    if (!value) return { ok: false, error: "How much was it? I need an amount." };
+    const type = COST_TYPES.includes(raw.type as never) ? String(raw.type) : "other";
+    // A cost can belong to the business rather than one vehicle (rent, a phone bill).
+    const vehicleId = raw.vehicleId === "none" ? "none" : vehicle ? vehicle.id : "";
+    // Left for them to pick on the card when the receipt doesn't say; needed by Confirm.
+    if (!vehicleId && raw.strict === true) return { ok: false, error: "Which vehicle is this for? Pick one, or No vehicle for a business cost." };
+    const date = isDate(raw.date) ? raw.date : records.today;
+    if (date > records.today) return { ok: false, error: "That date is in the future. Costs are recorded once the money has moved." };
+    const receiptPath = typeof raw.receiptPath === "string" && raw.receiptPath && !raw.receiptPath.includes("..") ? raw.receiptPath.slice(0, 400) : null;
+    const mileage = amount(raw.mileage);
+    const args = { amount: value, date, type, vehicleId, supplier: text(raw.supplier, 80) || null, notes: text(raw.notes, 300) || null, mileage, receiptPath };
+    const fields: ProposalField[] = [
+      { key: "amount", label: "Amount", type: "number", value: String(value) },
+      { key: "date", label: "Date", type: "date", value: date },
+      { key: "supplier", label: "Paid to", type: "text", value: args.supplier || "", optional: true },
+      { key: "vehicleId", label: "Vehicle", type: "select", value: vehicleId, options: [...vehicleOptions, { value: "none", label: "No vehicle (business cost)" }] },
+      { key: "type", label: "What for", type: "select", value: type, options: COST_TYPES.map((code) => ({ value: code, label: TRANSACTION_TYPE_OPTIONS.find((option) => option.value === code)?.label || code })) },
+      { key: "notes", label: "Note", type: "text", value: args.notes || "", optional: true }
+    ];
+    return { ok: true, action: { kind: "record_cost", title: receiptPath ? "Record this receipt" : "Record this cost", rows: [], args, fields } };
+  }
+
+  if (kind === "record_payment") {
+    const payments = records.payments || [];
+    const payment = payments.find((entry) => entry.id === raw.paymentId);
+    if (!payment) return { ok: false, error: "I couldn't find that payment. Which customer paid?" };
+    const value = amount(raw.amount) || payment.amount;
+    const date = isDate(raw.date) ? raw.date : records.today;
+    if (date > records.today) return { ok: false, error: "That date is in the future. Payments are recorded once the money has moved." };
+    const method = (raw.method as string) in PAYMENT_METHODS ? String(raw.method) : "cash";
+    const args = { paymentId: payment.id, rentalId: payment.rentalId, amount: value, date, method, note: text(raw.note, 300) || null };
+    // The same customer's other payments can be picked instead (paying next month's rent early, the deposit).
+    const theirs = payments.filter((entry) => entry.customer === payment.customer);
+    const fields: ProposalField[] = [
+      { key: "paymentId", label: "For", type: "select", value: payment.id, options: theirs.map((entry) => ({ value: entry.id, label: entry.label })) },
+      { key: "amount", label: "Amount", type: "number", value: String(value) },
+      { key: "date", label: "Paid on", type: "date", value: date },
+      { key: "method", label: "How", type: "select", value: method, options: Object.entries(PAYMENT_METHODS).map(([code, label]) => ({ value: code, label })) },
+      { key: "note", label: "Note", type: "text", value: args.note || "", optional: true }
+    ];
+    return { ok: true, action: { kind: "record_payment", title: "Record this payment", rows: [{ label: "Customer", value: payment.customer }], args, fields } };
+  }
+
+  if (kind === "create_booking") {
+    if (!isDate(raw.startDate)) return { ok: false, error: "When does the booking start?" };
+    const period = (raw.pricingModel as keyof typeof PERIODS) in PERIODS ? (raw.pricingModel as keyof typeof PERIODS) : "daily";
+    const rate = amount(raw.rentalRate);
+    const endDate = isDate(raw.endDate) ? raw.endDate : null;
+    if (endDate && endDate <= raw.startDate) return { ok: false, error: "The end date needs to be after the start date." };
+    const typedName = text(raw.customerName, 80);
+    // An existing customer by id, or by exactly the name typed.
+    const customer = records.customers.find((entry) => entry.id === raw.customerId) || (typedName ? records.customers.find((entry) => entry.name.toLowerCase() === typedName.toLowerCase()) : null) || null;
+    const customerName = typedName || customer?.name || "";
+    // A name typed over the matched customer is someone else.
+    const customerId = customer && (!customerName || customerName.toLowerCase() === customer.name.toLowerCase()) ? customer.id : null;
+    const deposit = amount(raw.depositAmount) || 0;
+    const args = {
+      vehicleId: vehicle?.id || "",
+      customerId,
+      customerName: customerName || null,
+      customerPhone: text(raw.customerPhone, 30) || null,
+      startDate: raw.startDate,
+      endDate,
+      pricingModel: period,
+      rentalRate: rate,
+      depositAmount: deposit
+    };
+    const fields: ProposalField[] = [
+      { key: "vehicleId", label: "Vehicle", type: "select", value: args.vehicleId, options: vehicleOptions },
+      { key: "customerName", label: "Customer", type: "text", value: customerName, optional: true },
+      { key: "customerPhone", label: "Phone", type: "tel", value: args.customerPhone || "", optional: true },
+      { key: "startDate", label: "From", type: "date", value: raw.startDate },
+      { key: "endDate", label: "Until", type: "date", value: endDate || "", optional: true },
+      { key: "pricingModel", label: "Billed", type: "select", value: period, options: [{ value: "daily", label: "Per day" }, { value: "weekly", label: "Per week" }, { value: "monthly", label: "Per month" }] },
+      { key: "rentalRate", label: "Price", type: "number", value: rate ? String(rate) : "" },
+      { key: "depositAmount", label: "Deposit", type: "number", value: deposit ? String(deposit) : "", optional: true }
+    ];
+    // Checked again on Confirm, after any edits: these are what must be there by then.
+    if (!vehicle && raw.strict === true) return { ok: false, error: "Which vehicle is the booking for?" };
+    if (!rate && raw.strict === true) return { ok: false, error: "What's the price?" };
+    if (customerName && !customerId && !args.customerPhone && raw.strict === true) return { ok: false, error: "Add the customer's phone number, or clear the name to let them fill in their own details from the link." };
+    return { ok: true, action: { kind: "create_booking", title: "New booking", rows: [], args, fields } };
   }
 
   return { ok: false, error: "That isn't something I can do from here yet." };

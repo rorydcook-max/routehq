@@ -378,7 +378,7 @@ export function ChatPanel({
 
   function chooseChip(chip: ChatChip) {
     if (chip.kind === "ask") {
-      void send({ prompt: t(chip.label), route: chip.route });
+      void send({ prompt: t(chip.label) });
       return;
     }
     if (chip.action === "handoff") {
@@ -445,20 +445,34 @@ export function ChatPanel({
     router.push(action.href as Route);
   }
 
-  async function confirmProposal(message: Shown) {
+  /** Save on a card: what's in its fields (as they left them) goes with the values the assistant filled in. */
+  async function confirmProposal(message: Shown, values: Record<string, string> = {}) {
     const proposal = message.meta.proposal;
     if (!proposal || proposalBusy) return;
     setProposalBusy(message.id);
     setProposalError((current) => ({ ...current, [message.id]: "" }));
-    const outcome = await confirmAssistantAction(proposal.kind, proposal.args).catch(() => ({ ok: false as const, error: t("sendFailed") }));
+    const outcome = await confirmAssistantAction(proposal.kind, { ...proposal.args, ...values }).catch(() => ({ ok: false as const, error: t("sendFailed") }));
     setProposalBusy(null);
     if (!outcome.ok) {
       setProposalError((current) => ({ ...current, [message.id]: outcome.error }));
       return;
     }
     const result = { message: outcome.message, link: outcome.link, copy: outcome.copy };
-    patchMeta(message.id, { proposalState: "done", proposalResult: result });
-    void chatMarkProposal({ threadId, messageId: message.id, state: "done", result }).catch(() => undefined);
+    const fields = proposal.fields?.map((field) => (field.key in values ? { ...field, value: values[field.key] } : field));
+    patchMeta(message.id, { proposal: { ...proposal, fields }, proposalState: "done", proposalResult: result });
+    void chatMarkProposal({ threadId, messageId: message.id, state: "done", result, values }).catch(() => undefined);
+  }
+
+  /** "Open the full form" under a card: the form opens with the receipt from the chat already in it. */
+  async function openFullForm(message: Shown) {
+    const full = message.meta.proposal?.fullForm;
+    if (!full) return;
+    if (full.receiptPath) {
+      const file = await photoFile(full.receiptPath);
+      if (file) setPendingReceipt(file);
+    }
+    if (!desktop) onClose();
+    router.push(full.href as Route);
   }
 
   function cancelProposal(message: Shown) {
@@ -495,7 +509,7 @@ export function ChatPanel({
   }
 
   // On the website the starters are about RoveHQ itself, signed in or not; the answers still use their normal context.
-  const chips = chatSuggestions(pathname, { site, owner: context.owner });
+  const chips = chatSuggestions(pathname, { site, owner: context.owner, fleet: context.fleet });
   const human = withTeam;
   const linkClick = () => {
     if (!desktop) onClose();
@@ -621,7 +635,7 @@ export function ChatPanel({
                           : message.meta.error
                             ? "bg-[var(--danger-light)] text-[var(--danger)]"
                             : "bg-[var(--panel-secondary)]"
-                    } ${message.pending ? "opacity-80" : ""} ${message.meta.fleet && message.id === fleetMessageId ? "w-full" : ""}`}
+                    } ${message.pending ? "opacity-80" : ""} ${(message.meta.fleet && message.id === fleetMessageId) || message.meta.proposal?.fields?.length ? "w-full" : ""}`}
                   >
                     {mine ? null : <p className="text-[12px] font-semibold text-[var(--muted)]">{name}</p>}
                     {message.body ? <p className="whitespace-pre-line [overflow-wrap:anywhere] text-[15px] leading-relaxed">{emphasised(message.body)}</p> : null}
@@ -665,7 +679,18 @@ export function ChatPanel({
                         threadId={threadId}
                       />
                     ) : null}
-                    {message.meta.proposal ? <ProposalCard busy={proposalBusy === message.id} error={proposalError[message.id]} message={message} onCancel={() => cancelProposal(message)} onConfirm={() => void confirmProposal(message)} onLink={linkClick} say={t} /> : null}
+                    {message.meta.proposal ? (
+                      <ProposalCard
+                        busy={proposalBusy === message.id}
+                        error={proposalError[message.id]}
+                        message={message}
+                        onCancel={() => cancelProposal(message)}
+                        onConfirm={(values) => void confirmProposal(message, values)}
+                        onFullForm={() => void openFullForm(message)}
+                        onLink={linkClick}
+                        say={t}
+                      />
+                    ) : null}
                     {message.meta.links?.length ? (
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {message.meta.links.map((link) => (
@@ -805,22 +830,94 @@ export function ChatPanel({
   );
 }
 
-/** A records change waiting for the owner's go-ahead: the same Confirm / Cancel card the old question box had. */
-function ProposalCard({ message, busy, error, onConfirm, onCancel, onLink, say }: { message: Shown; busy: boolean; error?: string; onConfirm: () => void; onCancel: () => void; onLink: () => void; say: Say }) {
+/**
+ * A change waiting for the go-ahead. The older records cards list what will be saved; the newer ones (a cost, a
+ * payment, a booking) have their key values as fields to change right here, then Save. Nothing is saved before that,
+ * and Save checks everything again on the server (confirmAssistantAction).
+ */
+function ProposalCard({
+  message,
+  busy,
+  error,
+  onConfirm,
+  onCancel,
+  onFullForm,
+  onLink,
+  say
+}: {
+  message: Shown;
+  busy: boolean;
+  error?: string;
+  onConfirm: (values: Record<string, string>) => void;
+  onCancel: () => void;
+  onFullForm: () => void;
+  onLink: () => void;
+  say: Say;
+}) {
   const proposal = message.meta.proposal!;
   const state = message.meta.proposalState;
   const result = message.meta.proposalResult;
+  const fields = proposal.fields || [];
+  const [values, setValues] = useState<Record<string, string>>(() => Object.fromEntries(fields.map((field) => [field.key, field.value])));
+  const open = !state;
+  const missing = fields.some((field) => !field.optional && !String(values[field.key] ?? "").trim());
+  const shown = (key: string) => {
+    const field = fields.find((item) => item.key === key)!;
+    const value = values[key] ?? field.value;
+    return field.type === "select" ? field.options?.find((option) => option.value === value)?.label || value : value;
+  };
+  const input = "block min-h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--panel)] px-2.5 py-1.5 text-[16px] lg:text-[14px]";
   return (
     <div className="mt-2.5 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)]">
       <p className="border-b border-[var(--border)] px-3 py-2 text-[13px] font-semibold">{proposal.title}</p>
-      <dl className="divide-y divide-[var(--border)]">
-        {proposal.rows.map((row) => (
-          <div className="flex gap-3 px-3 py-2 text-[13px]" key={row.label}>
-            <dt className="w-24 shrink-0 text-[var(--muted)]">{row.label}</dt>
-            <dd className="min-w-0 flex-1 font-medium [overflow-wrap:anywhere]">{row.value}</dd>
-          </div>
-        ))}
-      </dl>
+      {proposal.rows.length || (fields.length && !open) ? (
+        <dl className="divide-y divide-[var(--border)]">
+          {proposal.rows.map((row) => (
+            <div className="flex gap-3 px-3 py-2 text-[13px]" key={row.label}>
+              <dt className="w-24 shrink-0 text-[var(--muted)]">{row.label}</dt>
+              <dd className="min-w-0 flex-1 font-medium [overflow-wrap:anywhere]">{row.value}</dd>
+            </div>
+          ))}
+          {open
+            ? null
+            : fields
+                .filter((field) => String(values[field.key] ?? "").trim())
+                .map((field) => (
+                  <div className="flex gap-3 px-3 py-2 text-[13px]" key={field.key}>
+                    <dt className="w-24 shrink-0 text-[var(--muted)]">{field.label}</dt>
+                    <dd className="min-w-0 flex-1 font-medium [overflow-wrap:anywhere]">{shown(field.key)}</dd>
+                  </div>
+                ))}
+        </dl>
+      ) : null}
+      {open && fields.length ? (
+        <div className="grid grid-cols-2 gap-x-2 gap-y-2 px-3 py-2.5">
+          {fields.map((field) => (
+            <label className={`block min-w-0 ${field.type === "select" || field.type === "text" || field.type === "tel" ? "col-span-2" : ""}`} key={field.key}>
+              <span className="mb-0.5 block text-[12px] font-medium text-[var(--muted)]">{field.label}</span>
+              {field.type === "select" ? (
+                <select className={input} disabled={busy} onChange={(event) => setValues((current) => ({ ...current, [field.key]: event.target.value }))} value={values[field.key] ?? ""}>
+                  {values[field.key] ? null : <option value="">{say("choose")}</option>}
+                  {(field.options || []).map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  className={input}
+                  disabled={busy}
+                  inputMode={field.type === "number" ? "decimal" : field.type === "tel" ? "tel" : undefined}
+                  onChange={(event) => setValues((current) => ({ ...current, [field.key]: event.target.value }))}
+                  type={field.type === "number" ? "number" : field.type === "date" ? "date" : field.type === "tel" ? "tel" : "text"}
+                  value={values[field.key] ?? ""}
+                />
+              )}
+            </label>
+          ))}
+        </div>
+      ) : null}
       <div className="border-t border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2.5">
         {state === "done" && result ? (
           <div>
@@ -846,14 +943,20 @@ function ProposalCard({ message, busy, error, onConfirm, onCancel, onLink, say }
           <div>
             {error ? <p className="mb-2 text-[13px] font-medium text-[var(--danger)]">{error}</p> : null}
             <div className="flex flex-wrap items-center gap-2">
-              <button className="primary-action pressable min-h-9 px-4 text-[13px] disabled:opacity-60" disabled={busy} onClick={onConfirm} type="button">
-                {busy ? say("saving") : say("confirm")}
+              <button className="primary-action pressable min-h-9 px-4 text-[13px] disabled:opacity-60" disabled={busy || missing} onClick={() => onConfirm(fields.length ? values : {})} type="button">
+                {busy ? say("saving") : fields.length ? say("save") : say("confirm")}
               </button>
               <button className="secondary-action pressable min-h-9 px-3 text-[13px]" disabled={busy} onClick={onCancel} type="button">
                 {say("cancel")}
               </button>
+              {proposal.fullForm ? (
+                <button className="ml-auto inline-flex items-center gap-1 text-[13px] font-semibold text-[var(--primary)]" disabled={busy} onClick={onFullForm} type="button">
+                  {proposal.fullForm.label}
+                  <ArrowRight size={13} />
+                </button>
+              ) : null}
             </div>
-            <p className="mt-1.5 text-[12px] text-[var(--muted)]">{say("wrongHint")}</p>
+            {fields.length ? null : <p className="mt-1.5 text-[12px] text-[var(--muted)]">{say("wrongHint")}</p>}
           </div>
         )}
       </div>

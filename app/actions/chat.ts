@@ -4,20 +4,20 @@ import { cookies } from "next/headers";
 import { after } from "next/server";
 import { getLocale, getTranslations } from "next-intl/server";
 import { askFleetAssistant, type AssistantTurn } from "@/app/actions/fleet-assistant";
-import { answerQuestion, type AskTurn } from "@/lib/ask";
+import type { AskTurn } from "@/lib/ask";
+import { runAssistant, runToolDirectly, type AssistantInput, type AssistantResult } from "@/lib/assistant/agent";
+import { assistantRole, mayUseFleet as roleMayUseFleet, type ToolName } from "@/lib/assistant/permissions";
 import { paperworkFor } from "@/lib/country-paperwork";
-import { FLEET_ROLES, isFleetText, withoutAdded, type ChatFleet } from "@/lib/fleet-chat";
+import { withoutAdded, type ChatFleet } from "@/lib/fleet-chat";
 import { getDefaultOrganization } from "@/lib/organization";
 import {
   VISITOR_COOKIE,
   chatFolder,
   chatMessages,
   chatWho,
-  classifyFiles,
-  isHowTo,
+  fileHint,
   loadChatThread,
   readChatFiles,
-  replyForFiles,
   subjectFrom,
   threadInfo,
   visitorOverLimit,
@@ -33,7 +33,7 @@ import type { PreparedUploads, UploadRequest } from "@/lib/direct-uploads";
 import { said } from "@/lib/i18n/server-text";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { answerSupportQuestion, isContentRequest } from "@/lib/support-assistant";
+import { isContentRequest } from "@/lib/support-assistant";
 import { SUPPORT_BUCKET, SUPPORT_MAX_FILE_MB, SUPPORT_MAX_FILES, alertTeam, cleanFileName, type SupportAttachment } from "@/lib/support";
 
 type Fail = { ok: false; error: string };
@@ -160,45 +160,52 @@ async function handOver(admin: any, thread: any, who: ChatWho) {
   }
 }
 
+/** What a reply showed besides its words (a card, a button), so a follow-up ("make it 500", "the plate is…") makes sense. */
+function shownNote(meta: any) {
+  if (!meta || typeof meta !== "object") return "";
+  if (meta.fleet) return " [vehicle and paperwork cards shown]";
+  if (meta.proposal) return ` [card: ${meta.proposal.title}, ${meta.proposalState === "done" ? "saved" : meta.proposalState === "cancelled" ? "cancelled" : "not saved yet"}]`;
+  if (meta.action) return ` [button: ${meta.action.label}]`;
+  return "";
+}
+
 /** Earlier turns, so a follow-up ("the red one") makes sense. Team replies aren't sent to the models. */
 async function historyFor(admin: any, threadId: string, beforeId: string): Promise<AskTurn[]> {
   const { data } = await admin
     .from("support_messages")
-    .select("id, from_team, from_assistant, internal, body, created_at")
+    .select("id, from_team, from_assistant, internal, body, meta, attachments, created_at")
     .eq("thread_id", threadId)
     .order("created_at", { ascending: false })
     .limit(10);
   return ((data || []) as any[])
-    .filter((row) => row.id !== beforeId && !row.internal && !row.from_team && String(row.body || "").trim())
+    .filter((row) => row.id !== beforeId && !row.internal && !row.from_team && (String(row.body || "").trim() || (Array.isArray(row.attachments) && row.attachments.length)))
     .reverse()
     .slice(-8)
-    .map((row) => ({ role: row.from_assistant ? ("assistant" as const) : ("user" as const), content: String(row.body).slice(0, 1500) }));
+    .map((row) => ({
+      role: row.from_assistant ? ("assistant" as const) : ("user" as const),
+      content: `${String(row.body || "").slice(0, 1500)}${row.from_assistant ? shownNote(row.meta) : Array.isArray(row.attachments) && row.attachments.length ? ` [sent ${row.attachments.length} file(s)]` : ""}`
+    }));
 }
 
-/** A record question about the thing on screen ("When does its tax run out?") needs to know which thing. */
-function withPageContext(text: string, pathname: string | null) {
-  const vehicle = String(pathname || "").match(/^\/fleet\/([0-9a-f-]{36})/i)?.[1];
-  if (vehicle) return `${text} (about the vehicle on screen, id ${vehicle})`.slice(0, 500);
-  const booking = String(pathname || "").match(/^\/bookings\/([0-9a-f-]{36})/i)?.[1];
-  if (booking) return `${text} (about the booking on screen, id ${booking})`.slice(0, 500);
-  return text;
-}
+/** A chip's files go straight to the tool for them: no model call to work out what they are. */
+const CHIP_TOOLS: Partial<Record<ChatFileKind, ToolName>> = { receipt: "record_cost", vehicle: "add_vehicles", contract: "contract_upload", spreadsheet: "import_sheet", damage: "damage_photos" };
 
 /**
  * One message from the chat panel. The first one creates the chat. Then, in order:
  * - handed over already: it goes to the team, no AI reply;
  * - asks for a person (in words, or the Talk to a person chip): hand over;
- * - vehicle photos, blue books, policies, tax receipts, "add a 2022 Honda Click", a Google Sheet of vehicles: the fleet
- *   assistant, right here, its drafts as cards in the chat (fleetTurn, below);
- * - other files: say where they go, with a card to that screen (the file handed over where it can be);
- * - an owner's question about their business: the records assistant (proposals confirmed with confirmAssistantAction);
- * - anything else, any teammate, any visitor: the help-centre assistant, logged for the content queue as before.
+ * - a website visitor's files: a person can open them (the assistant never does for visitors);
+ * - files picked with a chip ("Record a receipt"): straight to that tool, no model call to say what they are;
+ * - photos only, mid-way through the vehicle cards: back to the fleet assistant, as before;
+ * - anything else: the one assistant (lib/assistant/agent.ts), which answers, looks things up or makes a card.
+ * Its vehicle and paperwork tools hand the turn to the fleet assistant (fleetTurn, below), whose cards show here.
  */
 export async function chatSend(input: {
   threadId?: string | null;
   text: string;
   files?: Array<{ path: string; name?: string; type?: string; size?: number }>;
   pathname?: string | null;
+  /** Kept for older panels still open in a browser; the assistant decides now. */
   route?: "records" | "support" | "fleet" | null;
   action?: ChatActionChip | null;
 }): Promise<ChatResult> {
@@ -234,68 +241,65 @@ export async function chatSend(input: {
       return finish();
     }
 
-    // Already talking to the fleet assistant (cards open, a question asked): photos and follow-ups go straight back to
-    // it, without a look at what the photo is. How-to questions still go to the help-centre assistant.
-    const fleetAllowed = mayUseFleet(who);
-    const fleetOngoing = fleetAllowed && input.route !== "support" && input.route !== "records" && (await inFleetConversation(admin, thread.id));
-
-    if (files.length) {
-      // The chip they picked ("Record a receipt") says what the files are; "handoff" was dealt with above.
-      const chosen: ChatFileKind | null = input.action || null;
-      const imagesOnly = files.every((file) => file.type.startsWith("image/"));
-      const kind = fleetOngoing && imagesOnly && !chosen ? "vehicle" : await classifyFiles(admin, files, text, chosen);
-      // Vehicle photos, blue books, policies and tax receipts: read right here by the fleet assistant (one assistant
-      // for everything, Rory 3 Nov 2026), its drafts shown as cards in the chat.
-      if (kind === "vehicle" && fleetAllowed) {
-        await fleetTurn(admin, thread, who, text, files, userMessage.id);
-        return finish();
-      }
-      const reply = replyForFiles(kind, files, who, pathname);
-      const action = reply.action ? { ...reply.action, label: await said(reply.action.label) } : undefined;
-      await addMessage(admin, thread, who, { body: await said(reply.body), fromAssistant: true, meta: { action, offerHandoff: reply.offerHandoff } });
+    if (who.kind === "visitor" && files.length) {
+      await addMessage(admin, thread, who, { body: await said("Thanks. I can't open files here on the website, but the RoveHQ team can. Tap Talk to a person and we'll look at them."), fromAssistant: true, meta: { offerHandoff: true } });
       return finish();
     }
 
-    // "Add a 2022 Honda Click, plate 1กก 1234", a Google Sheet of vehicles, a reply to the fleet assistant's question.
-    // A question of their own ("who owes me money?") mid-way still goes to the records or help assistant.
-    const ownQuestion = /^(who|what|when|which|why|how|where|does|do|can)\b/i.test(text) && !isFleetText(text);
-    if (fleetAllowed && input.route !== "support" && input.route !== "records" && !isHowTo(text) && (input.route === "fleet" || isFleetText(text) || (fleetOngoing && !ownQuestion))) {
-      await fleetTurn(admin, thread, who, text, [], userMessage.id);
-      return finish();
+    const role = who.kind === "member" ? assistantRole(who.role) : "visitor";
+    const chosen: ChatFileKind | null = files.length && input.action && input.action !== "other" ? input.action : null;
+    const hint = files.length ? chosen || fileHint(files, text) : null;
+    const base: AssistantInput = {
+      role,
+      organizationId: who.kind === "member" ? who.organizationId : null,
+      text,
+      files,
+      fileHint: hint,
+      images: [],
+      pathname,
+      language: await readerLanguage(),
+      history: await historyFor(admin, thread.id, userMessage.id),
+      admin
+    };
+
+    let result: AssistantResult | null = null;
+    const chipTool = chosen ? CHIP_TOOLS[chosen] : undefined;
+    if (chipTool) result = await runToolDirectly(chipTool, base);
+    // Photos and nothing else while the vehicle cards are open: more of the same, as before.
+    const imagesOnly = files.length > 0 && files.every((file) => file.type.startsWith("image/"));
+    if (!result && imagesOnly && !text && !hint && roleMayUseFleet(role) && (await inFleetConversation(admin, thread.id))) result = { type: "fleet" };
+    if (!result) {
+      // The model looks at the photos only when nothing else says what they are.
+      const images = files.length && !hint ? (await photoDataUrls(admin, files)).urls : [];
+      result = await runAssistant({ ...base, images });
     }
 
-    const language = await readerLanguage();
-    const history = await historyFor(admin, thread.id, userMessage.id);
-    const owner = who.kind === "member" && who.role === "owner";
-    // The records assistant reads the figures: owners only, and not for how-to questions (unless a chip said so).
-    const records = owner && input.route !== "support" && (input.route === "records" || !isHowTo(text));
-    if (records) {
-      const answer = await answerQuestion(withPageContext(text, pathname), language, history);
-      if (answer.ok) await addMessage(admin, thread, who, { body: answer.answer, fromAssistant: true, meta: { links: answer.links, proposal: answer.proposal } });
-      else await addMessage(admin, thread, who, { body: await said(answer.error), fromAssistant: true, meta: { error: true, offerHandoff: true } });
-      return finish();
-    }
-
-    const answer = await answerSupportQuestion({ question: text, pathname, history, language, role: who.kind === "member" ? who.role : "visitor" });
-    if (answer.ok) {
-      await addMessage(admin, thread, who, { body: answer.answer, fromAssistant: true, meta: { articles: answer.articles, offerHandoff: answer.handoff } });
-      // Kept for the team's content queue, as the old question box did. After the reply, so it never slows it down.
-      const logged = {
-        organizationId: who.kind === "member" ? who.organizationId : null,
-        userId: who.kind === "member" ? who.userId : null,
-        question: text.slice(0, 500),
-        pathname,
-        articles: answer.articles.map((article) => article.slug),
-        handoff: answer.handoff,
-        request: answer.request === true || isContentRequest(text)
-      };
-      try {
-        after(() => logSupportQuestion(logged));
-      } catch {
-        // after() only fails outside a request; the answer matters more than the log.
-      }
+    if (result.type === "fleet") {
+      if (roleMayUseFleet(role)) await fleetTurn(admin, thread, who, text, files, userMessage.id);
+      else await addMessage(admin, thread, who, { body: await said("Adding vehicles and renewing their paperwork is done by the owner or a manager. Ask them to send these here."), fromAssistant: true });
+    } else if (result.type === "handoff") {
+      await handOver(admin, thread, who);
+    } else if (result.type === "error") {
+      await addMessage(admin, thread, who, { body: await said(result.error), fromAssistant: true, meta: { error: true, offerHandoff: true } });
     } else {
-      await addMessage(admin, thread, who, { body: await said(answer.error), fromAssistant: true, meta: { error: true, offerHandoff: true } });
+      await addMessage(admin, thread, who, { body: result.body, fromAssistant: true, meta: result.meta });
+      // Help questions are kept for the team's content queue, as before. After the reply, so it never slows it down.
+      if (result.helpUsed) {
+        const logged = {
+          organizationId: who.kind === "member" ? who.organizationId : null,
+          userId: who.kind === "member" ? who.userId : null,
+          question: text.slice(0, 500),
+          pathname,
+          articles: result.helpUsed.articles,
+          handoff: result.helpUsed.handoff,
+          request: result.helpUsed.request || isContentRequest(text)
+        };
+        try {
+          after(() => logSupportQuestion(logged));
+        } catch {
+          // after() only fails outside a request; the answer matters more than the log.
+        }
+      }
     }
     return finish();
   } catch (error) {
@@ -376,7 +380,14 @@ export async function chatSetEmail(threadId: string, email: string): Promise<{ o
  * Remembers what happened to a records change card (confirmed or cancelled), so it shows the same after a reload.
  * The change itself is saved by confirmAssistantAction in app/actions/ask.ts, which checks everything again.
  */
-export async function chatMarkProposal(input: { threadId: string; messageId: string; state: "done" | "cancelled"; result?: ChatMeta["proposalResult"] }): Promise<{ ok: boolean }> {
+export async function chatMarkProposal(input: {
+  threadId: string;
+  messageId: string;
+  state: "done" | "cancelled";
+  result?: ChatMeta["proposalResult"];
+  /** What was on the card's fields when it was saved, so a reload shows what was saved. */
+  values?: Record<string, string>;
+}): Promise<{ ok: boolean }> {
   const who = await chatWho();
   if (who?.kind !== "member") return { ok: false };
   const admin = createSupabaseAdminClient() as any;
@@ -384,7 +395,12 @@ export async function chatMarkProposal(input: { threadId: string; messageId: str
   if (!thread) return { ok: false };
   const { data: message } = await admin.from("support_messages").select("id, meta").eq("id", input.messageId).eq("thread_id", thread.id).eq("from_assistant", true).maybeSingle();
   if (!message) return { ok: false };
-  const meta = { ...(message.meta || {}), proposalState: input.state === "done" ? "done" : "cancelled", proposalResult: input.state === "done" ? input.result : undefined };
+  const proposal = message.meta?.proposal;
+  const values = input.state === "done" && input.values && typeof input.values === "object" ? input.values : null;
+  const fields = Array.isArray(proposal?.fields) && values
+    ? proposal.fields.map((field: any) => (typeof values[field.key] === "string" ? { ...field, value: String(values[field.key]).slice(0, 200) } : field))
+    : proposal?.fields;
+  const meta = { ...(message.meta || {}), ...(proposal ? { proposal: { ...proposal, fields } } : {}), proposalState: input.state === "done" ? "done" : "cancelled", proposalResult: input.state === "done" ? input.result : undefined };
   await admin.from("support_messages").update({ meta }).eq("id", message.id);
   return { ok: true };
 }
@@ -418,9 +434,9 @@ async function inFleetConversation(admin: any, threadId: string) {
   return Boolean(data?.meta?.fleet || data?.meta?.fleetDone);
 }
 
-/** Whoever may add vehicles here: a member with a fleet role (the same rule as the vehicles table). */
+/** Whoever may add vehicles here: the owner and managers (lib/assistant/permissions.ts). */
 function mayUseFleet(who: ChatWho) {
-  return who.kind === "member" && FLEET_ROLES.includes(who.role);
+  return who.kind === "member" && roleMayUseFleet(assistantRole(who.role));
 }
 
 /** Photos from the support bucket as data URLs for the model. The browser already shrank them (about 1600 px JPEG). */

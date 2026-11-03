@@ -1,4 +1,3 @@
-import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import { BUSINESS_INCLUDED, PLANS, TRIAL_DAYS, YEARLY_MONTHS } from "@/lib/plans";
 import { docForAppPath, docMarkdown, listDocs, loadPublishedArticles, publishedVersion, DOCS_LOCALE } from "@/lib/site/docs";
 
@@ -9,8 +8,6 @@ import { docForAppPath, docMarkdown, listDocs, loadPublishedArticles, publishedV
  * in lib/ask.ts stays owner-only.
  */
 
-// A light model is plenty: the answer is lifted from a handful of short articles.
-const MODEL = process.env.OPENAI_SUPPORT_MODEL || "gpt-4o-mini";
 const MAX_ARTICLES = 3;
 const MAX_ARTICLE_CHARS = 9000;
 
@@ -112,11 +109,11 @@ export function pickArticles(question: string, pathname: string | null | undefin
 }
 
 /** "How much does it cost?", "is there a free plan?": the pricing page, not an article, has the answer. */
-const PRICE_WORDS = /\b(cost|costs|price|prices|pricing|plan|plans|pay|paying|free|trial|subscription|subscribe|month|monthly|yearly|expensive|cheap|afford)\b|ราคา|แพลน|ฟรี|ค่าใช้จ่าย|ทดลอง/i;
-const PRICING_SLUG = "pricing";
+export const PRICE_WORDS = /\b(cost|costs|price|prices|pricing|plan|plans|pay|paying|free|trial|subscription|subscribe|month|monthly|yearly|expensive|cheap|afford)\b|ราคา|แพลน|ฟรี|ค่าใช้จ่าย|ทดลอง/i;
+export const PRICING_SLUG = "pricing";
 
 /** The plans as one short article, built from lib/plans so it can't drift from the pricing page. */
-function pricingArticle() {
+export function pricingArticle() {
   const count = (value: number | null) => (value === null ? "unlimited" : String(value));
   const lines = PLANS.map((plan) => {
     const name = plan.id[0].toUpperCase() + plan.id.slice(1);
@@ -171,100 +168,5 @@ export function parseJson(content: string): any {
     } catch {
       return { answer: text };
     }
-  }
-}
-
-export async function answerSupportQuestion(input: { question: string; pathname?: string | null; history?: SupportTurn[]; language?: string; role?: string | null }): Promise<SupportAnswer> {
-  const asked = String(input.question || "").trim().slice(0, 500);
-  if (asked.length < 3) return { ok: false, error: "Type a question first." };
-  if (!aiTextConfigured()) return { ok: false, error: "The assistant isn't switched on for this account yet." };
-  const language = input.language || "English";
-  const history = (input.history || []).slice(-6);
-  const askedForContent = isContentRequest(asked);
-
-  let articles: ReturnType<typeof pickArticles>;
-  // Articles approved from the content queue are in the database; refreshed (at most once a minute) before picking.
-  await loadPublishedArticles();
-  try {
-    // The articles are English. A question in Thai (or any script without spaces between words) matches
-    // nothing by itself, so it is first turned into a few English search words. One small, quick call.
-    let searchText = asked;
-    if (words(asked).length < 2 && /[^\x00-\x7F]/.test(asked)) {
-      try {
-        const keywords = await createChatCompletion(
-          {
-            model: MODEL,
-            max_tokens: 40,
-            temperature: 0,
-            messages: [
-              { role: "system", content: "Translate the question into 3 to 6 English search words about using a vehicle rental app (for example: deposit return refund). Reply with the words only." },
-              { role: "user", content: asked }
-            ]
-          },
-          { timeout: 8000 }
-        );
-        searchText = `${asked} ${String(keywords.choices[0]?.message?.content || "")}`;
-      } catch {
-        // The on-screen article still comes along below.
-      }
-    }
-    articles = pickArticles(searchText, input.pathname);
-  } catch {
-    articles = [];
-  }
-  // Pricing isn't an article: when the question is about cost or plans, the plans come along too.
-  if (PRICE_WORDS.test(asked)) articles = [...articles.slice(0, MAX_ARTICLES - 1), pricingArticle()];
-
-  try {
-    const completion = await createChatCompletion({
-      model: MODEL,
-      max_tokens: 500,
-      temperature: 0,
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role: "system",
-          content: [
-            "You are RoveHQ's support assistant. RoveHQ is an app for small vehicle rental businesses; the people asking are owners and staff, often on a phone.",
-            `Answer ONLY from the help articles below. Answer in ${language}.`,
-            "Tone: friendly and personable but professional, like a helpful colleague. Direct and instructional. No padding: no restating the question, no \"follow these steps\", no closing summary, no \"let me know if\", no sign-off.",
-            "Length: at most 60 words of prose. If there are steps, one short lead-in line (or none) then the steps, at most 6, each one action. Mention a detail only if the reader needs it to finish the task.",
-            'Write steps as lines starting with "• ". Keep button, tab and field names in **bold**, spelled exactly as the articles spell them.',
-            "Articles marked (has video) have a screen recording that the reader will see under your answer; don't describe or link it yourself.",
-            input.role && input.role !== "owner" ? "The reader is a teammate, not the owner: if an article says something is for the owner only, say so." : "",
-            "If the articles don't cover the question, say so in one sentence and offer to send it to the RoveHQ team. Never invent a feature, button or setting that the articles don't mention.",
-            // Requests for new help content are collected for the RoveHQ team's content queue (/help/team/content).
-            `If the message asks for new help content (a guide, article, video, FAQ, template or checklist), answer anything the articles do cover, then end with "Thanks, I've passed that on to the team." (in ${language}), and set "request" to true. A request for new content on its own is not a handoff.`,
-            askedForContent ? "This message is a request for new help content." : "",
-            'Reply as JSON: {"answer": string, "articles": [slugs of the articles you actually used], "handoff": boolean, "request": boolean}. "handoff" is true when the articles could not answer the question.',
-            articles.length ? `Help articles:\n${articles.map((article) => `--- slug: ${article.slug}\ntitle: ${article.title}${article.video ? " (has video)" : ""}\n${article.description}\n\n${article.body}`).join("\n\n")}` : "Help articles: none matched this question."
-          ]
-            .filter(Boolean)
-            .join("\n")
-        },
-        ...history.map((turn) => ({ role: turn.role, content: String(turn.content || "").slice(0, 1500) })),
-        { role: "user", content: asked }
-      ]
-    });
-
-    const parsed = parseJson(String(completion.choices[0]?.message?.content || ""));
-    const answer = typeof parsed.answer === "string" ? parsed.answer.trim() : "";
-    if (!answer) return { ok: false, error: "Couldn't work out an answer to that. Try asking it another way." };
-
-    // Only articles that were really given to the model are linked, whatever it says it used.
-    const used = new Set((Array.isArray(parsed.articles) ? parsed.articles : []).map((slug: unknown) => String(slug)));
-    const linked = articles.filter((article) => used.has(article.slug));
-    const shown = (linked.length ? linked : articles.slice(0, 1)).map((article) => ({ slug: article.slug, title: article.title, href: article.slug === PRICING_SLUG ? "/pricing" : `/docs/${article.slug}`, video: article.video, poster: article.poster }));
-    const request = parsed.request === true || askedForContent;
-    // A content request has already been "passed on" in the answer: no second offer to send it to the team.
-    const handoff = request ? parsed.handoff === true : parsed.handoff === true || !articles.length;
-    return { ok: true, kind: "support", answer, articles: parsed.handoff === true ? [] : shown, handoff, request };
-  } catch (error) {
-    const why = error instanceof Error ? error.message : String(error);
-    console.warn("[support-assistant] failed:", why.slice(0, 300));
-    if (/no credits|insufficient_quota|exceeded your current quota|billing/i.test(why)) {
-      return { ok: false, error: "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal." };
-    }
-    return { ok: false, error: "Couldn't reach the assistant just now. Try again in a moment." };
   }
 }

@@ -21,9 +21,6 @@ export type ChatFleet = {
   paperNames?: Record<string, string>;
 };
 
-/** Who may add vehicles and renew their paperwork: the same roles the vehicles table lets in (RLS). */
-export const FLEET_ROLES = ["owner", "manager", "operator"];
-
 export function vehicleKey(vehicle: DraftVehicle) {
   return [vehicle.make, vehicle.model, vehicle.year, vehicle.plate].map((part) => String(part ?? "").trim().toLowerCase()).join("|");
 }
@@ -41,20 +38,4 @@ export function withoutAdded(list: DraftVehicle[], added: string[] = []) {
 /** The model is told what the owner removed, so a wrong reading isn't put back on the list next turn. */
 export function dismissNote(item: DraftPaperwork) {
   return `The owner removed the ${item.kind} entry for ${item.vehicleName || item.vehicleId} as wrong; do not list it again unless they ask.`;
-}
-
-/**
- * A message that is about the fleet in so many words: adding vehicles ("add a 2022 Honda Click, plate 1กก 1234"),
- * a Google Sheet of them, who's renting one now, or paperwork renewed. How-to questions are checked first by the caller.
- */
-export function isFleetText(text: string) {
-  const words = String(text || "");
-  return (
-    /https:\/\/docs\.google\.com\/spreadsheets\//.test(words) ||
-    /\b(add|adding|new|bought|got)\b.{0,40}\b(car|cars|vehicle|vehicles|bike|bikes|motorbike|motorbikes|motorcycle|motorcycles|scooter|scooters|van|vans|truck|pickup|suv)\b/i.test(words) ||
-    /\badd\b.{0,30}\b(19|20)\d{2}\b/i.test(words) ||
-    /\b(add|new)\b.{0,30}\b(honda|toyota|yamaha|suzuki|kawasaki|vespa|nissan|mazda|mitsubishi|isuzu|ford|kia|hyundai|mg|byd|bmw|mercedes|ducati|triumph|royal enfield|gpx)\b/i.test(words) ||
-    /\b(is|are) (rented|renting)\b|\brented (out )?to\b|\brenewed (the |my |its )?(insurance|tax|road tax|policy|inspection)\b/i.test(words) ||
-    /เพิ่มรถ|รถใหม่|ต่อภาษี|ต่อประกัน|ต่อ พ\.ร\.บ|เช่าอยู่/.test(words)
-  );
 }

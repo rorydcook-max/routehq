@@ -1,55 +1,18 @@
 "use server";
 
 import { said } from "@/lib/i18n/server-text";
-import { getLocale } from "next-intl/server";
-import { createBooking } from "@/app/actions/bookings";
+import { createBooking, recordPaymentReceived } from "@/app/actions/bookings";
+import { createInlineCustomer } from "@/app/actions/customers";
 import { createTransaction } from "@/app/actions/transactions";
 import { createVehicle, renewVehicleCompliance } from "@/app/actions/vehicles";
-import { askSupport } from "@/app/actions/support-assistant";
-import { answerQuestion, assistantRecords, type AskAnswer, type AskTurn } from "@/lib/ask";
-import type { SupportAnswer } from "@/lib/support-assistant";
+import { assistantRecords } from "@/lib/ask";
 import { checkAction } from "@/lib/assistant-actions";
+import { assistantRole, mayConfirm } from "@/lib/assistant/permissions";
+import { loadAssistantRecords, matchCustomer } from "@/lib/assistant/records";
 import { getCurrentMembership } from "@/lib/auth/roles";
-import { supportedLocaleOptions } from "@/lib/i18n/locales";
-
-const OWNER_ONLY = "Only the business owner can use the assistant.";
-
-/**
- * Whether a message is about using the app ("how do I take a deposit?") rather than about the business's figures
- * ("who owes me money?"). A cheap word check, in English and Thai; anything it doesn't catch goes to the records
- * assistant as before, which tells the owner where to look if it can't answer.
- */
-function isSupportQuestion(text: string) {
-  const asked = String(text || "").trim();
-  return (
-    /\b(how (do|can|should) (i|we|you)|how to|where (is|are|do|can|does)|can i|could i|what does .{1,40} mean|why (can'?t|cannot|isn'?t|doesn'?t|won'?t|don'?t)|set ?up|turn (on|off)|switch (on|off)|enable|disable|connect|not working|doesn'?t work|isn'?t working|won'?t (load|save|open|work)|error|help|tutorial|guide|explain how)\b/i.test(asked) ||
-    // "…ยังไง / …อย่างไร" (how do I…) at the end of a Thai sentence is how most how-to questions are asked.
-    /(ทำยังไง|ทำอย่างไร|ตั้งค่า|อยู่ตรงไหน|ใช้ยังไง|ใช้อย่างไร|เปิดใช้|วิธี|ช่วยด้วย|ไม่ทำงาน|ใช้ไม่ได้|ยังไง\s*[?]?$|อย่างไร\s*[?]?$|ตรงไหน|ที่ไหน|เปิดยังไง|ปิดยังไง)/.test(asked)
-  );
-}
-
-/**
- * "Ask RoveHQ": answers a question from the business's records, or proposes a change for the owner to confirm.
- * How-to questions, and anything a teammate asks, go to the support assistant instead, which answers from the
- * help centre and never sees the records.
- */
-export async function askRouteHq(question: string, history: AskTurn[] = [], pathname?: string | null): Promise<AskAnswer | SupportAnswer> {
-  const membership = await getCurrentMembership();
-  if (!membership) return { ok: false, error: await said("Please sign in again.") };
-  const turns = (Array.isArray(history) ? history : []).filter((turn) => turn && (turn.role === "user" || turn.role === "assistant") && typeof turn.content === "string");
-
-  // Money questions and changes are the owner's business; teammates still get help with using the app.
-  if (membership.role !== "owner" || isSupportQuestion(question)) return askSupport(question, pathname, turns);
-
-  let language = "English";
-  try {
-    const locale = await getLocale();
-    language = supportedLocaleOptions.find((option) => option.code === locale)?.english || "English";
-  } catch {
-    // English is fine.
-  }
-  return answerQuestion(question, language, turns);
-}
+import { getDefaultOrganization } from "@/lib/organization";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { SUPPORT_BUCKET } from "@/lib/support";
 
 type Done = { ok: true; message: string; link?: { label: string; href: string }; copy?: string } | { ok: false; error: string };
 
@@ -67,19 +30,26 @@ function form(organizationId: string, values: Record<string, string | number | b
   return data;
 }
 
+const DIAL_CODES: Record<string, string> = { TH: "+66", MY: "+60", ID: "+62", PH: "+63", VN: "+84", SG: "+65", KH: "+855", LA: "+856" };
+const TASKS = new Set(["record_cost", "record_payment", "create_booking"]);
+
 /**
- * Runs a change the owner has just confirmed. The values are checked again
- * here against the real records, then saved through the same code the
+ * Runs a change the person has just confirmed on an assistant card (with any values they changed on it). The values
+ * are checked again here against the real records and the person's role, then saved through the same code the
  * ordinary forms use, so the assistant can't do anything a form can't.
  */
 export async function confirmAssistantAction(kind: string, args: Record<string, unknown>): Promise<Done> {
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: await said("Please sign in again.") };
-  if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY) };
+  if (!mayConfirm(String(kind), assistantRole(membership.role))) {
+    return { ok: false, error: await said(TASKS.has(kind) ? "You can't do this from your account." : "Only the business owner can do this.") };
+  }
+  const values = args && typeof args === "object" ? args : {};
+  if (TASKS.has(kind)) return confirmTask(kind as "record_cost" | "record_payment" | "create_booking", values, membership.organizationId);
 
   const records = await assistantRecords();
-  const checked = checkAction(String(kind), args && typeof args === "object" ? args : {}, records);
-  if (!checked.ok) return { ok: false, error: checked.error };
+  const checked = checkAction(String(kind), values, records);
+  if (!checked.ok) return { ok: false, error: await said(checked.error) };
   const a = checked.action.args;
   const organizationId = membership.organizationId;
   // The booking is priced in the business's own money (it was always THB before, wrong for a Malaysian business).
@@ -115,9 +85,90 @@ export async function confirmAssistantAction(kind: string, args: Record<string, 
     await renewVehicleCompliance(form(organizationId, { vehicleId: a.vehicleId, complianceType: a.what, newExpiryDate: a.newExpiryDate, cost: a.cost, notes: a.notes }));
     return { ok: true, message: "Marked as renewed.", link: { label: "Open the vehicle", href: `/fleet/${a.vehicleId}` } };
   } catch (error) {
-    if (isRedirect(error)) return { ok: true, message: "Done." };
-    // Server code hides its messages in production; this one is safe to show because it is ours.
-    const message = error instanceof Error && error.message && !/digest|NEXT_/.test(error.message) ? error.message : "";
-    return { ok: false, error: message ? `That couldn't be saved: ${message}` : "That couldn't be saved. Nothing was changed." };
+    return failed(error);
+  }
+}
+
+async function failed(error: unknown): Promise<Done> {
+  if (isRedirect(error)) return { ok: true, message: await said("Done.") };
+  // Server code hides its messages in production; this one is safe to show because it is ours.
+  const message = error instanceof Error && error.message && !/digest|NEXT_/.test(error.message) ? error.message : "";
+  return { ok: false, error: message ? await said(`That couldn't be saved: ${message}`) : await said("That couldn't be saved. Nothing was changed.") };
+}
+
+/** The newer cards (cost, payment, booking), open to every member, as their screens are. */
+async function confirmTask(kind: "record_cost" | "record_payment" | "create_booking", values: Record<string, unknown>, organizationId: string): Promise<Done> {
+  const records = await loadAssistantRecords({ payments: kind === "record_payment" });
+  // strict: everything a save needs must be there now (the card may have left the vehicle or price to fill in).
+  const checked = checkAction(kind, { ...values, strict: true }, records);
+  if (!checked.ok) return { ok: false, error: await said(checked.error) };
+  const a = checked.action.args;
+
+  try {
+    if (kind === "record_cost") {
+      const data = form(organizationId, { vehicleId: a.vehicleId, type: a.type, amount: a.amount, transactionDate: a.date, supplier: a.supplier, notes: a.notes, mileage: a.mileage });
+      // The receipt photo sent in the chat goes with the cost, as "Upload a receipt" does. Only from this business's
+      // own chat folder.
+      const path = typeof a.receiptPath === "string" ? a.receiptPath : "";
+      if (path && path.startsWith(`${organizationId}/`)) {
+        const { data: blob } = await (createSupabaseAdminClient() as any).storage.from(SUPPORT_BUCKET).download(path);
+        if (blob) {
+          const name = path.slice(path.lastIndexOf("/") + 1).replace(/^\d+-/, "") || "receipt.jpg";
+          data.set("receipt", new File([await blob.arrayBuffer()], name, { type: blob.type || "image/jpeg" }));
+        }
+      }
+      try {
+        await createTransaction(data);
+      } catch (error) {
+        if (!isRedirect(error)) throw error;
+      }
+      return { ok: true, message: await said("Cost saved."), link: { label: await said("See Money in & out"), href: "/transactions" } };
+    }
+
+    if (kind === "record_payment") {
+      await recordPaymentReceived(String(a.paymentId), { amount: Number(a.amount), date: String(a.date), method: String(a.method), note: a.note ? String(a.note) : "" } as any);
+      return { ok: true, message: await said("Payment saved."), link: { label: await said("Open the booking"), href: `/bookings/${a.rentalId}` } };
+    }
+
+    // A booking: the customer they named (an existing one, or added now with their phone), or none, and then the
+    // customer fills in their own details from the link.
+    let customerId = typeof a.customerId === "string" ? a.customerId : "";
+    if (!customerId && a.customerName) {
+      const found = matchCustomer(records, String(a.customerName), a.customerPhone ? String(a.customerPhone) : null);
+      if (found) customerId = found.id;
+      else {
+        const organization = (await getDefaultOrganization()) as any;
+        const country = String(organization.country_code || organization.settings?.main_location?.country || "TH").toUpperCase();
+        const created = await createInlineCustomer(form(organizationId, { fullName: a.customerName, phone: a.customerPhone, phoneCountryCode: DIAL_CODES[country] || "+66" }));
+        customerId = created.id;
+      }
+    }
+    const result = await createBooking(
+      form(organizationId, {
+        vehicleId: a.vehicleId,
+        customerId,
+        startDate: a.startDate,
+        endDate: a.endDate,
+        openEnded: a.endDate ? "" : "true",
+        pricingModel: a.pricingModel,
+        rentalRate: a.rentalRate,
+        depositAmount: a.depositAmount,
+        deliveryMethod: "tbd",
+        bookingMode: "booking_link",
+        shareChannel: "copy",
+        currency: records.currency || "THB",
+        // A price typed for a vehicle that had none is kept on it, as the booking form does.
+        saveVehicleRate: "true"
+      })
+    );
+    if (!result.ok) return { ok: false, error: result.error };
+    return {
+      ok: true,
+      message: customerId ? await said("Booking saved. Send this link so they can check and sign:") : await said("Booking saved. Send this link to your customer:"),
+      copy: result.bookingUrl,
+      link: { label: await said("Open the booking"), href: `/bookings/${result.rentalId}` }
+    };
+  } catch (error) {
+    return failed(error);
   }
 }

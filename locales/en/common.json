@@ -6568,8 +6568,8 @@
     "close": "Close",
     "newChat": "New chat",
     "greeting": "Hi! How can we help?",
-    "greetingOwner": "Ask about your vehicles, bookings and money, how to do something in RoveHQ, or send a photo or file.",
-    "greetingTeammate": "Ask how to do anything in RoveHQ, or send a photo or file.",
+    "greetingOwner": "Ask anything, send a photo or file, or tell me what to do: a booking, a payment, a cost, a vehicle.",
+    "greetingTeammate": "Ask anything, send a photo or file, or tell me what to do: a booking, a payment, a cost.",
     "greetingSite": "Ask anything about RoveHQ. A person from our team can help too.",
     "previous": "Previous conversations",
     "untitled": "Conversation",
@@ -6620,10 +6620,7 @@
     "sExtendRental": "Extend this rental",
     "sDepositBack": "Take the deposit back",
     "sDamagePhotos": "Upload damage photos",
-    "sNewBookingHow": "How do I make a booking?",
-    "sBookingLinkHow": "How do I send a booking link?",
-    "sRecordReceipt": "Record a receipt",
-    "sRecordCostHow": "How do I record a cost?",
+    "sRecordReceipt": "Scan a receipt",
     "sUploadContract": "Upload my own contract",
     "sContractHow": "How do I change my contract?",
     "sAddTeammate": "How do I add a teammate?",
@@ -6635,6 +6632,12 @@
     "sNextSixMonths": "What income can I expect over the next 6 months?",
     "sending": "Sending.",
     "preparing": "Preparing photos.",
-    "reading": "Reading."
+    "reading": "Reading.",
+    "sNewBooking": "New booking",
+    "sBookingLink": "Send a booking link",
+    "sRecordPayment": "Record a payment",
+    "sRecordCost": "Record a cost",
+    "choose": "Choose",
+    "save": "Save"
   }
 }

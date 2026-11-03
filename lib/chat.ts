@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import { readFileAsJson } from "@/lib/ai-vision";
 import type { ProposedAction } from "@/lib/assistant-actions";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { fileKindFromName, type ChatFileKind } from "@/lib/chat-suggestions";
@@ -12,7 +11,8 @@ import { SUPPORT_BUCKET, SUPPORT_MAX_FILES, signAttachments, type SupportAttachm
  * their queue) and moves to mode 'human' when the person asks for a person. See the shared spec (chat-spec.md).
  *
  * Who is chatting is either a signed-in member of a business, or a website visitor known only by a random id in an
- * httpOnly cookie. Visitors never reach the records assistant: they only get the help-centre assistant.
+ * httpOnly cookie. One assistant answers both (lib/assistant/agent.ts), with only the tools their role allows: a
+ * visitor gets help articles, pricing and a person, never a business's records.
  */
 
 export const VISITOR_COOKIE = "rove_visitor";
@@ -149,18 +149,6 @@ export function wantsPerson(text: string) {
   return /\b(talk|speak|chat) (to|with) (a |an |someone|somebody|a real |the )?(person|human|someone|somebody|agent|team|support|staff)\b|\breal (person|human)\b|\bhuman (please|agent)\b|ขอคุยกับ(คน|เจ้าหน้าที่|พนักงาน)|ติดต่อเจ้าหน้าที่/i.test(String(text || ""));
 }
 
-/**
- * A how-to question rather than a question about the business's figures. The same word check as askRouteHq in
- * app/actions/ask.ts (a "use server" file can only export actions, so it is repeated here rather than shared).
- */
-export function isHowTo(text: string) {
-  const asked = String(text || "").trim();
-  return (
-    /\b(how (do|can|should) (i|we|you)|how to|where (is|are|do|can|does)|can i|could i|what does .{1,40} mean|why (can'?t|cannot|isn'?t|doesn'?t|won'?t|don'?t)|set ?up|turn (on|off)|switch (on|off)|enable|disable|connect|not working|doesn'?t work|isn'?t working|won'?t (load|save|open|work)|error|help|tutorial|guide|explain how)\b/i.test(asked) ||
-    /(ทำยังไง|ทำอย่างไร|ตั้งค่า|อยู่ตรงไหน|ใช้ยังไง|ใช้อย่างไร|เปิดใช้|วิธี|ช่วยด้วย|ไม่ทำงาน|ใช้ไม่ได้|ยังไง\s*[?]?$|อย่างไร\s*[?]?$|ตรงไหน|ที่ไหน|เปิดยังไง|ปิดยังไง)/.test(asked)
-  );
-}
-
 /** Visitors' messages in the last hour, across all their chats. */
 export async function visitorOverLimit(admin: any, visitorId: string) {
   const { data: threads } = await admin.from("support_threads").select("id").eq("visitor_id", visitorId).limit(50);
@@ -189,95 +177,15 @@ function kindFromWords(text: string): ChatFileKind | null {
 }
 
 /**
- * What a set of files is, for routing them to the right screen: the chip they picked wins; then the file type
- * (spreadsheets, Word files); then words in their message; then one quick look at the first photo or PDF.
- * Anything still unclear is "other", which offers a person.
+ * What a set of files is when that's already clear without looking at them: their file type (spreadsheets, Word
+ * files), then words in the message. Null means the assistant looks at the photos itself.
  */
-export async function classifyFiles(admin: any, files: SupportAttachment[], text: string, chosen?: ChatFileKind | null): Promise<ChatFileKind> {
-  if (chosen && chosen !== "other") return chosen;
+export function fileHint(files: SupportAttachment[], text: string): ChatFileKind | null {
   for (const file of files) {
     const byName = fileKindFromName(file.name, file.type);
     if (byName) return byName;
   }
-  const byWords = kindFromWords(text);
-  if (byWords) return byWords;
-  const first = files.find((file) => file.type.startsWith("image/") || file.type === "application/pdf");
-  // Very large files aren't worth sending for a one-word answer.
-  if (!first || first.size > 8 * 1024 * 1024) return "other";
-  try {
-    const { data } = await admin.storage.from(SUPPORT_BUCKET).download(first.path);
-    if (!data) return "other";
-    const bytes = Buffer.from(await data.arrayBuffer());
-    const read = await readFileAsJson({
-      system: "You sort files sent to the support chat of an app for small vehicle rental businesses.",
-      prompt: [
-        "Which one is this file? Answer with one kind:",
-        "receipt: a bill or receipt for something paid (fuel, repairs, parts, a car wash).",
-        "vehicle: a vehicle registration book, an insurance policy, a road tax receipt or sticker, an inspection certificate, or a photo of a whole vehicle to add it to the fleet.",
-        "contract: a rental agreement or contract.",
-        "spreadsheet: a table or list of vehicles, customers or bookings (a photo of a notebook page or a printed list counts).",
-        "damage: a close photo of damage (a scratch, dent, crack) or of an odometer or fuel gauge.",
-        "other: anything else.",
-        'Reply as {"kind": "receipt" | "vehicle" | "contract" | "spreadsheet" | "damage" | "other"}.'
-      ].join("\n"),
-      bytes,
-      mediaType: first.type || "image/jpeg",
-      maxTokens: 60,
-      personal: true
-    });
-    const kind = String(read.kind || "");
-    return (["receipt", "vehicle", "contract", "spreadsheet", "damage"] as const).find((value) => value === kind) || "other";
-  } catch {
-    return "other";
-  }
-}
-
-/**
- * The reply to files: a sentence on where they go, and a card that opens that screen with the file handed over where
- * the screen can take it. Owner-only screens (contracts, imports) tell a teammate to ask the owner instead.
- * Text is English; the action translates it with said().
- */
-export function replyForFiles(kind: ChatFileKind, files: SupportAttachment[], who: ChatWho, pathname: string | null): { body: string; action?: ChatAction; offerHandoff?: boolean } {
-  const paths = files.map((file) => file.path);
-  if (who.kind === "visitor") {
-    return { body: "Thanks. I can't open files here on the website, but the RoveHQ team can. Tap Talk to a person and we'll look at them.", offerHandoff: true };
-  }
-  const owner = who.role === "owner";
-  if (kind === "receipt") {
-    return {
-      body: "That looks like a receipt. Tap the button and I'll pass it over: the amount, date and who was paid are filled in from it, ready for you to check and save.",
-      action: { kind, href: "/transactions/new", label: "Record this cost", paths: paths.slice(0, 1), handover: "receipt" }
-    };
-  }
-  if (kind === "vehicle") {
-    // Members who may add vehicles have their photos read in the chat itself (fleetTurn in app/actions/chat.ts).
-    // This is everyone else.
-    return { body: "Adding vehicles and renewing their paperwork is done by the owner or a manager. Ask them to send these here." };
-  }
-  if (kind === "contract") {
-    if (!owner) return { body: "Contracts are set up by the business owner in Settings. Ask them to send it in this chat, or to upload it under Settings, Rental agreement.", offerHandoff: false };
-    const path = paths[0] || "";
-    return {
-      body: "That looks like your own contract. Tap the button and it's read in from this file under Rental agreement: you check the wording and where the details go before customers sign it.",
-      action: { kind, href: `/settings/contracts?file=${encodeURIComponent(path)}`, label: "Set up this contract", paths: [path], handover: "url" }
-    };
-  }
-  if (kind === "spreadsheet") {
-    if (!owner) return { body: "Importing a spreadsheet is done by the business owner. Ask them to send it here, or the RoveHQ team can bring it in for you.", offerHandoff: true };
-    const sheet = files.find((file) => fileKindFromName(file.name, file.type) === "spreadsheet") || files[0];
-    return {
-      body: "Spreadsheets go in Import. Open it and your file is ready to read: you see what it found before anything is added. If it's a mess, the RoveHQ team can import it for you, free.",
-      action: { kind, href: "/fleet/import", label: "Import this spreadsheet", paths: sheet ? [sheet.path] : [], handover: sheet ? "sheet" : null }
-    };
-  }
-  if (kind === "damage") {
-    const booking = String(pathname || "").match(/^\/bookings\/([0-9a-f-]{36})/i)?.[1];
-    return {
-      body: "Damage and odometer photos belong in the booking's handover or return check, so they stay with the rental and are there if there's a dispute. Open the booking and add them in the check.",
-      action: booking ? { kind, href: `/bookings/${booking}`, label: "Open this booking", paths } : { kind, href: "/bookings", label: "Open Bookings", paths }
-    };
-  }
-  return { body: "I'm not sure where these go. A person from the RoveHQ team can take a look: tap Talk to a person.", offerHandoff: true };
+  return kindFromWords(text);
 }
 
 /** A short title from the first message: its first line, cut at a word. */

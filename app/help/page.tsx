@@ -7,7 +7,7 @@ import { AskBox } from "@/components/ask-box";
 import { PageBand } from "@/components/page-band";
 import { HelpCompose } from "@/components/help/help-compose";
 import { HelpGuides } from "@/components/help/help-guides";
-import { DOC_CATEGORIES, docSearchIndex, listDocs } from "@/lib/site/docs";
+import { DOC_CATEGORIES, docSearchIndex, listDocs, loadPublishedArticles } from "@/lib/site/docs";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -28,7 +28,8 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
     getLocale()
   ]);
   const supabase = (await createSupabaseServerClient()) as any;
-  const [threads, team] = await Promise.all([listBusinessThreads(supabase, organization.id), isPlatformAdmin(supabase, membership?.userId)]);
+  // Articles approved from the team's content queue are fetched alongside, before the guide list is built.
+  const [threads, team] = await Promise.all([listBusinessThreads(supabase, organization.id), isPlatformAdmin(supabase, membership?.userId), loadPublishedArticles()]);
   const waiting = team ? await countWaitingForTeam() : 0;
   const org = organization as any;
   const included = importIncluded(org);

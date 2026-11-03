@@ -111,9 +111,110 @@ function read(locale: string, slug: string): Doc | null {
   return value;
 }
 
-/** An article in a language, falling back to English. */
+/**
+ * Articles published from the team's content queue (/help/team/content), kept in the help_articles table rather than
+ * as files so approving one doesn't need a deploy. Two kinds of row:
+ * - a whole article: a slug with no file, a title in its frontmatter and a body. Shown like any file article.
+ * - extra questions for an existing article: frontmatter {} and body '' with questions in extra_faq. These are merged
+ *   into that article's "Common questions" (a whole article's own extra_faq is merged the same way).
+ * Everything below stays synchronous for its many callers: the rows are held here, and pages that show articles call
+ * loadPublishedArticles() first to refresh them (at most once a minute per server, or straight away after a publish).
+ */
+type Published = { articles: Map<string, Doc>; markdown: Map<string, string>; extraFaq: Map<string, FaqItem[]> };
+let published: Published = { articles: new Map(), markdown: new Map(), extraFaq: new Map() };
+let publishedAt = 0;
+let publishedVersionNumber = 0;
+const PUBLISHED_TTL_MS = 60_000;
+
+/** Goes up whenever the published rows change, so anything that caches articles (the support assistant) knows to rebuild. */
+export function publishedVersion() {
+  return publishedVersionNumber;
+}
+
+function fileExists(slug: string) {
+  return SLUG.test(slug) && existsSync(join(DOCS, DOCS_LOCALE, `${slug}.md`));
+}
+
+function publishedDoc(row: any): { doc: Doc; markdown: string } | null {
+  const slug = str(row?.slug);
+  const data = (row?.frontmatter && typeof row.frontmatter === "object" ? row.frontmatter : {}) as Record<string, any>;
+  const body = String(row?.body || "");
+  // A questions-only row, or a row for a slug that is (now) a file: the file wins, only its questions are used.
+  if (!SLUG.test(slug) || !str(data.title) || !body.trim() || fileExists(slug)) return null;
+  const { html, headings } = renderMarkdown(body, DOCS_LOCALE);
+  const category = (DOC_CATEGORIES as readonly string[]).includes(str(data.category)) ? (str(data.category) as DocCategory) : "getting-started";
+  return {
+    markdown: body.trim(),
+    doc: {
+      slug,
+      locale: DOCS_LOCALE,
+      title: str(data.title),
+      description: str(data.description),
+      category,
+      order: Number.isFinite(Number(data.order)) ? Number(data.order) : 99,
+      appPath: str(data.appPath),
+      related: Array.isArray(data.related) ? data.related.map(str).filter((item: string) => SLUG.test(item) && item !== slug) : [],
+      updated: isoDate(data.updated) || isoDate(row?.published_at),
+      video: helpVideoUrl(str(data.video) || null),
+      poster: helpVideoUrl(str(data.poster) || null),
+      faq: Array.isArray(data.faq) ? data.faq.map((item: any) => ({ q: str(item?.q), a: str(item?.a) })).filter((item: FaqItem) => item.q && item.a) : [],
+      readingMinutes: Math.max(1, Math.round(body.split(/\s+/).filter(Boolean).length / 220)),
+      html,
+      headings
+    }
+  };
+}
+
+/**
+ * Refreshes the published articles from the database. Never throws: without a database (a build, a missing key) the
+ * help centre is simply the files, as before. `force` skips the one-minute wait (used right after a publish).
+ */
+export async function loadPublishedArticles(force = false): Promise<void> {
+  if (!force && Date.now() - publishedAt < PUBLISHED_TTL_MS) return;
+  publishedAt = Date.now();
+  try {
+    const { createSupabaseAdminClient } = await import("@/lib/supabase/admin");
+    const { data, error } = await (createSupabaseAdminClient() as any)
+      .from("help_articles")
+      .select("slug, frontmatter, body, extra_faq, published_at")
+      .not("published_at", "is", null)
+      .limit(1000);
+    if (error) throw error;
+    const next: Published = { articles: new Map(), markdown: new Map(), extraFaq: new Map() };
+    for (const row of (data || []) as any[]) {
+      const built = publishedDoc(row);
+      if (built) {
+        next.articles.set(built.doc.slug, built.doc);
+        next.markdown.set(built.doc.slug, built.markdown);
+      }
+      const extra = (Array.isArray(row.extra_faq) ? row.extra_faq : []).map((item: any) => ({ q: str(item?.q), a: str(item?.a) })).filter((item: FaqItem) => item.q && item.a);
+      if (extra.length && SLUG.test(str(row.slug))) next.extraFaq.set(str(row.slug), extra);
+    }
+    const changed = JSON.stringify([...next.markdown.entries(), ...next.extraFaq.entries()]) !== JSON.stringify([...published.markdown.entries(), ...published.extraFaq.entries()]);
+    published = next;
+    if (changed) publishedVersionNumber += 1;
+  } catch (error) {
+    console.warn("[docs] published articles not loaded:", (error instanceof Error ? error.message : String(error)).slice(0, 200));
+  }
+}
+
+/** A file article with any approved extra questions added to its own. */
+function withExtraFaq(doc: Doc | null): Doc | null {
+  if (!doc) return null;
+  const extra = published.extraFaq.get(doc.slug);
+  if (!extra?.length) return doc;
+  const known = new Set(doc.faq.map((item) => item.q.toLowerCase()));
+  const added = extra.filter((item) => !known.has(item.q.toLowerCase()));
+  if (!added.length) return doc;
+  // The article page cuts a "Common questions" heading out of the body when the article has FAQ items, expecting
+  // them to be the same questions. When the file had none of its own, rename that heading so its body text stays.
+  const html = doc.faq.length ? doc.html : doc.html.replace('<h2 id="common-questions">', '<h2 id="common-questions-body">');
+  return { ...doc, html, faq: [...doc.faq, ...added] };
+}
+
+/** An article in a language, falling back to English, then to one published from the content queue. */
 export function getDoc(locale: string, slug: string): Doc | null {
-  return read(locale, slug) || read(DOCS_LOCALE, slug);
+  return withExtraFaq(read(locale, slug) || read(DOCS_LOCALE, slug) || published.articles.get(slug) || null);
 }
 
 /**
@@ -127,14 +228,22 @@ export function docMarkdown(locale: string, slug: string): string | null {
     if (!existsSync(path)) continue;
     const raw = readFileSync(path, "utf8").replace(/^﻿/, "");
     const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
-    return (match ? match[2] : raw).trim();
+    return withExtraFaqText(slug, (match ? match[2] : raw).trim());
   }
-  return null;
+  const fromQueue = published.markdown.get(slug);
+  return fromQueue ? withExtraFaqText(slug, fromQueue) : null;
 }
 
-/** Whether an article exists (in English, which every article starts in). */
+/** Approved extra questions, written onto the end of the Markdown so the support assistant can answer from them too. */
+function withExtraFaqText(slug: string, markdown: string) {
+  const extra = published.extraFaq.get(slug);
+  if (!extra?.length) return markdown;
+  return `${markdown}\n\n## More questions\n\n${extra.map((item) => `**${item.q}**\n${item.a}`).join("\n\n")}`;
+}
+
+/** Whether an article exists (in English, which every article starts in), as a file or published from the queue. */
 export function docExists(slug: string) {
-  return SLUG.test(slug) && existsSync(join(DOCS, DOCS_LOCALE, `${slug}.md`));
+  return fileExists(slug) || published.articles.has(slug);
 }
 
 /** Every article, in category then reading order. */
@@ -145,9 +254,10 @@ export function listDocs(locale = DOCS_LOCALE): DocMeta[] {
   } catch {
     return [];
   }
-  return names
-    .filter((name) => name.endsWith(".md") && !name.startsWith("_"))
-    .map((name) => getDoc(locale, name.slice(0, -3)))
+  const fileSlugs = names.filter((name) => name.endsWith(".md") && !name.startsWith("_")).map((name) => name.slice(0, -3));
+  const queueSlugs = [...published.articles.keys()].filter((slug) => !fileSlugs.includes(slug));
+  return [...fileSlugs, ...queueSlugs]
+    .map((slug) => getDoc(locale, slug))
     .filter((doc): doc is Doc => Boolean(doc))
     .map(({ html, headings, ...meta }) => meta)
     .sort((a, b) => DOC_CATEGORIES.indexOf(a.category) - DOC_CATEGORIES.indexOf(b.category) || a.order - b.order || a.title.localeCompare(b.title));

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { DOC_CATEGORIES, DOC_CATEGORY_KEY, docSearchIndex, listDocs } from "@/lib/site/docs";
+import { DOC_CATEGORIES, DOC_CATEGORY_KEY, docSearchIndex, listDocs, loadPublishedArticles } from "@/lib/site/docs";
 import { localizeSitePath } from "@/lib/site/locale-path";
 import { siteMetadata, siteUrl } from "@/lib/site/seo";
 import { JsonLd } from "../_components/content-ui";
@@ -22,7 +22,8 @@ export async function generateMetadata(): Promise<Metadata> {
  * has a video. Public, so search engines find "how do I…" answers; the app's Help page and "?" links open the same pages.
  */
 export default async function DocsPage() {
-  const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
+  // Articles approved from the team's content queue live in the database: fetched before the lists are built.
+  const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale(), loadPublishedArticles()]);
   const docs = listDocs(locale);
   const href = (slug: string) => localizeSitePath(`/docs/${slug}`, locale);
   const entries = docSearchIndex(locale).map((entry) => ({ href: href(entry.slug), title: entry.title, description: entry.description, text: entry.text }));

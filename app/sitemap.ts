@@ -4,7 +4,7 @@ import type { MetadataRoute } from "next";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { allGuideSlugs, allResourceSlugs, getGuide, getResource, GUIDE_CATEGORIES, guideLocales, listGuides, resourceLocales } from "@/lib/site/content";
 import { DEFAULT_SITE_LOCALE, hreflangFor } from "@/lib/site/locale-path";
-import { listDocs } from "@/lib/site/docs";
+import { listDocs, loadPublishedArticles } from "@/lib/site/docs";
 import { siteUrl } from "@/lib/site/seo";
 
 /**
@@ -12,7 +12,9 @@ import { siteUrl } from "@/lib/site/seo";
  * for every language (home, pricing, FAQ, contact, the guide and resource lists) are listed in all of them; a guide or
  * resource only in the languages it has been written in. The staff app is never listed.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Help articles approved from the team's content queue are in the database, not files: fetched before listing.
+  await loadPublishedArticles();
   const entries: MetadataRoute.Sitemap = [];
   const add = (path: string, locales: readonly string[], lastModified: Date | string, priority: number) => {
     const languages: Record<string, string> = {};

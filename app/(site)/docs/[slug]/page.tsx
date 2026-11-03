@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { DOC_CATEGORY_KEY, getDoc, listDocs } from "@/lib/site/docs";
+import { DOC_CATEGORY_KEY, getDoc, listDocs, loadPublishedArticles } from "@/lib/site/docs";
 import { siteMetadata, siteOrigin, siteUrl } from "@/lib/site/seo";
 import { contentDate, JsonLd } from "../../_components/content-ui";
 import { Arrow, Container, Plus, SITE_LINKS, SiteLink } from "../../_components/site-ui";
@@ -12,7 +12,8 @@ import d from "../docs.module.css";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const [{ slug }, locale] = await Promise.all([params, getLocale()]);
+  // Articles and extra questions approved from the team's content queue live in the database: fetched first.
+  const [{ slug }, locale] = await Promise.all([params, getLocale(), loadPublishedArticles()]);
   const doc = getDoc(locale, slug);
   if (!doc) notFound();
   // Shown in every language, written in English for now: the English address is the one to index.
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * TechArticle, BreadcrumbList, FAQPage and VideoObject structured data.
  */
 export default async function DocPage({ params }: Props) {
-  const [{ slug }, locale, m] = await Promise.all([params, getLocale(), getTranslations("marketing")]);
+  const [{ slug }, locale, m] = await Promise.all([params, getLocale(), getTranslations("marketing"), loadPublishedArticles()]);
   const doc = getDoc(locale, slug);
   if (!doc) notFound();
   const topic = m(DOC_CATEGORY_KEY[doc.category] as never);

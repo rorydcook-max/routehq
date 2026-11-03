@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
+import { countOpenContentRequests, maybeAutoCollate } from "@/lib/content-requests";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
@@ -19,7 +21,9 @@ export default async function HelpTeamPage({ searchParams }: { searchParams: Pro
   const supabase = (await createSupabaseServerClient()) as any;
   if (!(await isPlatformAdmin(supabase, membership?.userId))) notFound();
   const filter = show === "all" ? "all" : "waiting";
-  const threads = await listTeamThreads(filter);
+  const [threads, contentWaiting] = await Promise.all([listTeamThreads(filter), countOpenContentRequests()]);
+  // The content queue fills itself: at most once a day, after this page has been sent, new questions are collated.
+  after(() => maybeAutoCollate());
   const date = (iso: string) => new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-GB", { timeZone: BANGKOK, day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 
   return (
@@ -27,6 +31,15 @@ export default async function HelpTeamPage({ searchParams }: { searchParams: Pro
       <div className="space-y-4">
         {/* Part of the RoveHQ admin console: the same header and tabs as the other admin pages. */}
         <AdminHeader active="/help/team" subtitle={t("teamSubtitle")} title={t("teamTitle")} />
+        {/* The help centre's content queue: what the assistant couldn't answer and what people asked to be written. */}
+        <Link className="card flex items-center gap-3 px-4 py-3" href={"/help/team/content" as Route}>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[16px] font-bold text-[var(--foreground)]">{t("contentLink")}</span>
+            <span className="block truncate font-medium text-[var(--muted)]">{t("contentLinkNote")}</span>
+          </span>
+          {contentWaiting ? <span className="shrink-0 rounded-full bg-[var(--primary)] px-2.5 py-0.5 text-[13px] font-bold text-white">{t("contentLinkCount", { count: contentWaiting })}</span> : null}
+          <ChevronRight className="shrink-0 text-[var(--muted)]" size={18} />
+        </Link>
         <div className="chip-row flex flex-wrap gap-2">
           {(["waiting", "all"] as const).map((value) => (
             <Link

@@ -1,11 +1,13 @@
 "use server";
 
+import { after } from "next/server";
 import { getLocale } from "next-intl/server";
+import { logSupportQuestion } from "@/lib/content-requests";
 import { startSupportThread } from "@/app/actions/support";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { said } from "@/lib/i18n/server-text";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
-import { answerSupportQuestion, type SupportAnswer, type SupportTurn } from "@/lib/support-assistant";
+import { answerSupportQuestion, isContentRequest, type SupportAnswer, type SupportTurn } from "@/lib/support-assistant";
 
 /** The reader's language, in English, for the model ("Thai"). */
 async function readerLanguage() {
@@ -28,13 +30,33 @@ function cleanHistory(history: unknown): SupportTurn[] {
 export async function askSupport(question: string, pathname?: string | null, history: SupportTurn[] = []): Promise<SupportAnswer> {
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: await said("Please sign in again.") };
+  const page = typeof pathname === "string" ? pathname.slice(0, 200) : null;
   const result = await answerSupportQuestion({
     question,
-    pathname: typeof pathname === "string" ? pathname.slice(0, 200) : null,
+    pathname: page,
     history: cleanHistory(history),
     language: await readerLanguage(),
     role: membership.role
   });
+  // Every answered question is kept for the team's content queue (what people couldn't find, what they asked to be
+  // written). It runs after the reply is sent, so a slow or failed write never holds up or breaks the answer.
+  if (result.ok) {
+    const asked = String(question || "").trim().slice(0, 500);
+    const logged = {
+      organizationId: membership.organizationId,
+      userId: membership.userId,
+      question: asked,
+      pathname: page,
+      articles: result.articles.map((article) => article.slug),
+      handoff: result.handoff,
+      request: result.request === true || isContentRequest(asked)
+    };
+    try {
+      after(() => logSupportQuestion(logged));
+    } catch {
+      // after() is only unavailable outside a request; the answer matters more than the log.
+    }
+  }
   // The library speaks English; the reader may not.
   return result.ok ? result : { ok: false, error: await said(result.error) };
 }

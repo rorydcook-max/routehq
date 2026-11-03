@@ -1,5 +1,5 @@
 import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
-import { docForAppPath, docMarkdown, listDocs, DOCS_LOCALE } from "@/lib/site/docs";
+import { docForAppPath, docMarkdown, listDocs, loadPublishedArticles, publishedVersion, DOCS_LOCALE } from "@/lib/site/docs";
 
 /**
  * The support assistant: answers "how do I…" questions about using RoveHQ from the help centre's articles
@@ -15,7 +15,8 @@ const MAX_ARTICLE_CHARS = 9000;
 
 export type SupportTurn = { role: "user" | "assistant"; content: string };
 export type SupportArticle = { slug: string; title: string; href: string };
-export type SupportAnswer = { ok: true; answer: string; articles: SupportArticle[]; handoff: boolean; kind: "support" } | { ok: false; error: string };
+/** `request` is true when the message asked for new help content (a guide, video…): it is logged for the team's content queue. */
+export type SupportAnswer = { ok: true; answer: string; articles: SupportArticle[]; handoff: boolean; kind: "support"; request?: boolean } | { ok: false; error: string };
 
 /** Words worth matching on: lowercased, punctuation off, the little joining words dropped. */
 const STOP = new Set(["the", "a", "an", "and", "or", "to", "of", "in", "on", "for", "my", "me", "i", "it", "is", "do", "does", "can", "how", "what", "where", "why", "when", "with", "from", "at", "this", "that", "be", "are", "you", "your"]);
@@ -36,10 +37,15 @@ function words(text: string) {
 type Indexed = { doc: ReturnType<typeof listDocs>[number]; body: string; inTitle: Set<string>; inFaq: Set<string>; inBody: Set<string> };
 const indexCache = new Map<string, Indexed[]>();
 
-/** The articles' words, read once per process: 45 files per question would be wasteful. */
+/**
+ * The articles' words, read once per process: 45 files per question would be wasteful. Keyed on the published
+ * articles' version too, so an article or FAQ approved from the content queue is picked up without a restart.
+ */
 function articleIndex(locale: string): Indexed[] {
-  const cached = indexCache.get(locale);
+  const key = `${locale}:${publishedVersion()}`;
+  const cached = indexCache.get(key);
   if (cached) return cached;
+  for (const old of indexCache.keys()) if (old.startsWith(`${locale}:`)) indexCache.delete(old);
   const built = listDocs(locale).map((doc) => {
     const body = docMarkdown(locale, doc.slug) || "";
     return {
@@ -50,7 +56,7 @@ function articleIndex(locale: string): Indexed[] {
       inBody: new Set(words(body))
     };
   });
-  indexCache.set(locale, built);
+  indexCache.set(key, built);
   return built;
 }
 
@@ -86,8 +92,32 @@ export function pickArticles(question: string, pathname: string | null | undefin
   });
 }
 
-/** Gemini sometimes wraps JSON in ``` fences or a sentence; the first whole object inside is taken. */
-function parseJson(content: string): any {
+/**
+ * Whether a message asks for new help content rather than (or as well as) asking how to do something: "there should
+ * be a guide for…", "can you add a video", "please write…", "I wish there was…", and the Thai "อยากให้มี" (I'd like
+ * there to be), "ขอวิดีโอ" (a video please), "ขอคู่มือ" (a guide please). These go to the team's content queue.
+ */
+const CONTENT_WORDS = "(guide|article|video|tutorial|faq|help page|page|doc|docs|walkthrough|template|checklist|explanation|instructions)";
+const CONTENT_REQUEST_PATTERNS = [
+  new RegExp(`\\bthere (should|needs to|ought to) be (an? |some )?(\\w+ ){0,3}${CONTENT_WORDS}`, "i"),
+  new RegExp(`\\b(can|could|would|will) you (please )?(add|make|write|create|record|do|put up) (an? |some )?(\\w+ ){0,3}${CONTENT_WORDS}`, "i"),
+  new RegExp(`\\bplease (add|make|write|create|record) (an? |some )?(\\w+ ){0,3}${CONTENT_WORDS}`, "i"),
+  /\bplease write\b/i,
+  /\bi wish there (was|were|is)\b/i,
+  new RegExp(`\\b(need|want|would like|request|requesting) (an? |some )?(\\w+ ){0,2}(video|tutorial|guide|walkthrough|template|checklist) (on|for|about|of|showing|explaining)\\b`, "i"),
+  new RegExp(`\\bis there (an? |any )?${CONTENT_WORDS} (on|for|about)\\b.*\\?\\s*if not`, "i"),
+  /อยากให้มี/,
+  /ขอวิดีโอ|ขอวีดีโอ|ขอคลิป/,
+  /ขอคู่มือ/
+];
+
+export function isContentRequest(text: string) {
+  const value = String(text || "");
+  return CONTENT_REQUEST_PATTERNS.some((pattern) => pattern.test(value));
+}
+
+/** Gemini sometimes wraps JSON in ``` fences or a sentence; the first whole object inside is taken. Also used by lib/content-requests.ts. */
+export function parseJson(content: string): any {
   const text = String(content || "").trim();
   try {
     return JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, "") || "{}");
@@ -107,8 +137,11 @@ export async function answerSupportQuestion(input: { question: string; pathname?
   if (!aiTextConfigured()) return { ok: false, error: "The assistant isn't switched on for this account yet." };
   const language = input.language || "English";
   const history = (input.history || []).slice(-6);
+  const askedForContent = isContentRequest(asked);
 
   let articles: ReturnType<typeof pickArticles>;
+  // Articles approved from the content queue are in the database; refreshed (at most once a minute) before picking.
+  await loadPublishedArticles();
   try {
     // The articles are English. A question in Thai (or any script without spaces between words) matches
     // nothing by itself, so it is first turned into a few English search words. One small, quick call.
@@ -152,7 +185,10 @@ export async function answerSupportQuestion(input: { question: string; pathname?
             'Write steps as lines starting with "• ". Keep button, tab and field names in **bold**, spelled exactly as the articles spell them.',
             input.role && input.role !== "owner" ? "The reader is a teammate, not the owner: if an article says something is for the owner only, say so." : "",
             "If the articles don't cover the question, say so in one sentence and offer to send it to the RoveHQ team. Never invent a feature, button or setting that the articles don't mention.",
-            'Reply as JSON: {"answer": string, "articles": [slugs of the articles you actually used], "handoff": boolean}. "handoff" is true when the articles could not answer the question.',
+            // Requests for new help content are collected for the RoveHQ team's content queue (/help/team/content).
+            `If the message asks for new help content (a guide, article, video, FAQ, template or checklist), answer anything the articles do cover, then end with "Thanks, I've passed that on to the team." (in ${language}), and set "request" to true. A request for new content on its own is not a handoff.`,
+            askedForContent ? "This message is a request for new help content." : "",
+            'Reply as JSON: {"answer": string, "articles": [slugs of the articles you actually used], "handoff": boolean, "request": boolean}. "handoff" is true when the articles could not answer the question.',
             articles.length ? `Help articles:\n${articles.map((article) => `--- slug: ${article.slug}\ntitle: ${article.title}\n${article.description}\n\n${article.body}`).join("\n\n")}` : "Help articles: none matched this question."
           ]
             .filter(Boolean)
@@ -171,7 +207,10 @@ export async function answerSupportQuestion(input: { question: string; pathname?
     const used = new Set((Array.isArray(parsed.articles) ? parsed.articles : []).map((slug: unknown) => String(slug)));
     const linked = articles.filter((article) => used.has(article.slug));
     const shown = (linked.length ? linked : articles.slice(0, 1)).map((article) => ({ slug: article.slug, title: article.title, href: `/docs/${article.slug}` }));
-    return { ok: true, kind: "support", answer, articles: parsed.handoff === true ? [] : shown, handoff: parsed.handoff === true || !articles.length };
+    const request = parsed.request === true || askedForContent;
+    // A content request has already been "passed on" in the answer: no second offer to send it to the team.
+    const handoff = request ? parsed.handoff === true : parsed.handoff === true || !articles.length;
+    return { ok: true, kind: "support", answer, articles: parsed.handoff === true ? [] : shown, handoff, request };
   } catch (error) {
     const why = error instanceof Error ? error.message : String(error);
     console.warn("[support-assistant] failed:", why.slice(0, 300));

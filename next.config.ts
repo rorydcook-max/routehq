@@ -22,6 +22,9 @@ const nextConfig: NextConfig = {
     return [{ source: "/owners", destination: "/home", permanent: true }];
   },
   experimental: {
+    // The app and the website have separate root layouts (app/(app), app/(site)/site/[locale]), so an address that
+    // matches no page gets its own complete page: app/global-not-found.tsx.
+    globalNotFound: true,
     // Going back to a page seen in the last 30 seconds is instant instead of loading it again.
     // Every save already clears this (revalidatePath), so your own changes always show straight away.
     staleTimes: { dynamic: 30, static: 180 },

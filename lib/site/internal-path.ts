@@ -1,0 +1,67 @@
+import { CONTRACT_BUILDER_PAGES, isContractBuilder } from "@/lib/contract-builder/fields";
+import { LEAD_COUNTRIES } from "@/lib/leads";
+import { currencyForCountry, isSiteCurrency, PRICING_CURRENCIES } from "@/lib/site-currency";
+
+/**
+ * Where proxy.ts serves each website address from (Rory, 3 Nov 2026: the website is drawn ahead of time and served
+ * from Vercel's cache, not drawn again for every visit and every search-engine crawl).
+ *
+ * The pages live under app/(site)/site/[locale]/, one copy per language. Everything that used to be read from the
+ * request while drawing a page is in the internal address instead, worked out here from the request by the proxy:
+ * - the language: /th/pricing → /site/th/pricing/…, /pricing → /site/en/pricing/…;
+ * - the visitor's currency (home and pricing), from their country, never their language (lib/site-currency.ts);
+ * - the pricing page's monthly/yearly and currency choice (?billing=yearly&currency=EUR);
+ * - the visitor's country, which the main contract builder starts on.
+ * Each combination is drawn once and then served from the cache. The public addresses never change.
+ * Safe to import from the proxy (no server-only imports).
+ */
+
+export const SITE_INTERNAL_PREFIX = "/site";
+/** "No country" in an internal address (a resource page that doesn't start on the visitor's country). */
+export const NO_COUNTRY = "-";
+
+/** The pricing page's segment: detected currency, chosen currency, monthly or yearly. "THB_EUR_y". */
+export function pricingView(detected: string, chosen: string, yearly: boolean) {
+  return `${detected}_${chosen}_${yearly ? "y" : "m"}`;
+}
+
+export function parsePricingView(view: string): { detected: string; chosen: string; yearly: boolean } | null {
+  const match = /^([A-Z]{3})_([A-Z]{3})_([my])$/.exec(view);
+  if (!match || !isSiteCurrency(match[1]) || !isSiteCurrency(match[2])) return null;
+  return { detected: match[1], chosen: match[2], yearly: match[3] === "y" };
+}
+
+/** The visitor's country (Vercel's x-vercel-ip-country; SITE_DEFAULT_COUNTRY on a server without it), or "". */
+export function visitorCountryFrom(headers: Headers) {
+  return String(headers.get("x-vercel-ip-country") || process.env.SITE_DEFAULT_COUNTRY || "").trim().toUpperCase();
+}
+
+/** The visitor's currency: their country's, US dollars when we can't tell (same rule as before, lib/site-currency.ts). */
+export function visitorCurrencyFrom(headers: Headers) {
+  return currencyForCountry(headers.get("x-vercel-ip-country")) || currencyForCountry(process.env.SITE_DEFAULT_COUNTRY) || "USD";
+}
+
+/**
+ * The internal address of a website page. `path` is the page without a language ("/pricing", "/home",
+ * "/guides/<slug>"); `search` the address's query (only the pricing page reads it).
+ */
+export function siteInternalPath(path: string, locale: string, headers: Headers, search: URLSearchParams) {
+  const base = `${SITE_INTERNAL_PREFIX}/${locale}`;
+  if (path === "/" || path === "/home") return `${base}/home/${visitorCurrencyFrom(headers)}`;
+  if (path === "/pricing") {
+    const detected = visitorCurrencyFrom(headers);
+    const asked = String(search.get("currency") || "").toUpperCase();
+    // Only the currencies the page offers (plus the visitor's own), so a made-up ?currency= is just the default.
+    const chosen = (PRICING_CURRENCIES.includes(asked) || asked === detected) && isSiteCurrency(asked) ? asked : detected;
+    return `${base}/pricing/${pricingView(detected, chosen, search.get("billing") === "yearly")}`;
+  }
+  const resource = path.match(/^\/resources\/([^/]+)$/);
+  if (resource) {
+    // The main contract builder starts on the visitor's country; a country or city page on its own.
+    const slug = resource[1];
+    const country = visitorCountryFrom(headers);
+    const here = isContractBuilder(slug) && !CONTRACT_BUILDER_PAGES[slug] && (LEAD_COUNTRIES as readonly string[]).includes(country) ? country : NO_COUNTRY;
+    return `${base}${path}/${here}`;
+  }
+  return `${base}${path}`;
+}

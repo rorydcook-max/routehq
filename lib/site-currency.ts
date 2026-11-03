@@ -4,7 +4,6 @@
  * server), SITE_DEFAULT_COUNTRY. Never the browser's language. Only currencies lib/plan-currency.ts has a rate for.
  */
 
-import { headers } from "next/headers";
 import { localPrice, planCurrency } from "@/lib/plan-currency";
 
 const EURO = ["AT", "BE", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK", "ME", "XK", "AD", "MC", "SM", "VA"];
@@ -33,17 +32,13 @@ export function isSiteCurrency(code: string | null | undefined) {
  * English (UK) pays in baht, not pounds (Rory, 27 Oct 2026). (1) Vercel's x-vercel-ip-country header; (2) the
  * SITE_DEFAULT_COUNTRY env var, for servers without that header (the local build sets TH); (3) US dollars.
  * The pricing page's currency picker stays as the manual override.
+ *
+ * The website's pages are drawn ahead of time (3 Nov 2026), so they no longer read the request: proxy.ts works the
+ * currency and country out (lib/site/internal-path.ts) and puts them in the page's internal address.
  */
-/** The visitor's country code (same sources as the currency), or "" when unknown. */
-export async function visitorCountry(): Promise<string> {
-  const list = await headers();
-  return String(list.get("x-vercel-ip-country") || process.env.SITE_DEFAULT_COUNTRY || "").trim().toUpperCase();
-}
 
-export async function visitorCurrency(): Promise<string> {
-  const list = await headers();
-  return currencyForCountry(list.get("x-vercel-ip-country")) || currencyForCountry(process.env.SITE_DEFAULT_COUNTRY) || "USD";
-}
+/** Currencies offered in the pricing page's switcher: US dollars and Thai baht first, then the region's and visitors' usual ones. All are in lib/plan-currency.ts. */
+export const PRICING_CURRENCIES = ["USD", "THB", "EUR", "GBP", "AUD", "SGD", "MYR", "IDR", "VND", "PHP", "LAK", "KHR", "MMK", "INR", "CNY", "JPY", "KRW"];
 
 /**
  * A made-up amount for the website's pictures, set in THB and shown as a plausible round number in the currency:

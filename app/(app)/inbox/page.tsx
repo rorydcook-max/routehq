@@ -1,0 +1,149 @@
+import Link from "next/link";
+import type { Route } from "next";
+import { getTranslations } from "next-intl/server";
+import { MessagesSquare } from "lucide-react";
+import { AppShell } from "@/components/app-shell";
+import { PageBand } from "@/components/page-band";
+import { InboxView } from "@/app/(app)/inbox/inbox-view";
+import { sharedHistory } from "@/lib/customer-history";
+import { MessagesToSend, type ToSendGroup } from "@/app/(app)/inbox/messages-to-send";
+import { getCurrentUserEmail } from "@/lib/auth/session";
+import { getCurrentMembership } from "@/lib/auth/roles";
+import type { InboxConversation, InboxMessage } from "@/lib/inbox/store";
+import { getDefaultOrganization } from "@/lib/organization";
+import { amountDueNowByRental } from "@/lib/rental-balances";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
+
+export default async function InboxPage({ searchParams }: { searchParams: Promise<{ c?: string; show?: string }> }) {
+  const { c: selectedId, show } = await searchParams;
+  const [userEmail, organization, membership] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization(), getCurrentMembership()]);
+  const supabase = (await createSupabaseServerClient()) as any;
+  const filter = show === "closed" ? "closed" : "open";
+
+  const [{ data: channels }, { data: conversations }, { data: customers }] = await Promise.all([
+    supabase.from("messaging_channels").select("id, provider, display_name, status").eq("organization_id", organization.id).neq("status", "disconnected"),
+    supabase
+      .from("conversations")
+      .select("id, channel_id, provider, external_user_id, display_name, avatar_url, customer_id, status, unread_count, last_message_at, last_message_preview, last_message_direction")
+      .eq("organization_id", organization.id)
+      .eq("status", filter)
+      .order("last_message_at", { ascending: false, nullsFirst: false })
+      .limit(100),
+    supabase.from("customers").select("id, full_name, phone").eq("organization_id", organization.id).is("deleted_at", null).order("full_name", { ascending: true }).limit(500)
+  ]);
+
+  const list = (conversations || []) as InboxConversation[];
+  let selected = list.find((conversation) => conversation.id === selectedId) || null;
+  // A link to a conversation that's in the other list (say, a closed one) still opens it.
+  if (!selected && selectedId) {
+    const { data } = await supabase
+      .from("conversations")
+      .select("id, channel_id, provider, external_user_id, display_name, avatar_url, customer_id, status, unread_count, last_message_at, last_message_preview, last_message_direction")
+      .eq("organization_id", organization.id)
+      .eq("id", selectedId)
+      .maybeSingle();
+    selected = (data as InboxConversation) || null;
+  }
+  // On a computer the first chat opens straight away instead of an empty pane; a phone still shows the list first.
+  const autoSelected = !selected && !selectedId && list.length > 0;
+  if (autoSelected) selected = list[0];
+
+  const [{ data: messages }, { data: bookingRows }] = await Promise.all([
+    selected
+      ? supabase.from("conversation_messages").select("id, conversation_id, direction, message_type, body, status, error, created_at").eq("conversation_id", selected.id).order("created_at", { ascending: true }).limit(300)
+      : Promise.resolve({ data: [] }),
+    selected?.customer_id
+      ? supabase
+          .from("rentals")
+          .select("id, status, start_date, end_date, balance_due, reference, display_code, vehicles(make, model, registration_number)")
+          .eq("organization_id", organization.id)
+          .eq("customer_id", selected.customer_id)
+          .is("deleted_at", null)
+          .order("start_date", { ascending: false })
+          .limit(4)
+      : Promise.resolve({ data: [] })
+  ]);
+  // "Owed" beside a booking is what is due by today on a vehicle that has gone out, as everywhere else —
+  // not the whole balance, which counts rent months ahead.
+  const dueNow = await amountDueNowByRental(supabase, ((bookingRows || []) as any[]).map((row) => row.id));
+  // Whoever is writing: what other RoveHQ businesses have reported about them, by the customer they're linked to
+  // or, before they're linked, by the WhatsApp number they write from.
+  const linked = selected?.customer_id
+    ? (await supabase.from("customers").select("phone, whatsapp_number, passport_number, driver_license_number").eq("id", selected.customer_id).eq("organization_id", organization.id).maybeSingle()).data
+    : null;
+  const historySignals = selected
+    ? await sharedHistory(supabase, organization.id, { ...(linked || {}), whatsapp_number: linked?.whatsapp_number || (selected.provider === "whatsapp" ? selected.external_user_id : null) }).catch(() => [])
+    : [];
+  const bookings = ((bookingRows || []) as any[]).map((row) => ({ ...row, balance_due: dueNow.get(row.id) || 0 }));
+
+  const hasChannel = (channels || []).length > 0;
+
+  // Messages the app wrote for customers with no chat open yet: they wait for the owner to send them in a tap.
+  // Same rule as the booking page: the last three days, and not overtaken by a later message.
+  const { data: waiting } = await supabase
+    .from("communication_log")
+    .select("id, rental_id, customer_id, content, metadata, created_at, customers(full_name), rentals(reference, display_code)")
+    .eq("organisation_id", organization.id)
+    .eq("type", "automated_reminder")
+    .in("status", ["pending", "failed"])
+    .not("metadata->handoff_label", "is", null)
+    .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString())
+    .order("created_at", { ascending: false })
+    .limit(100);
+  const toSend = new Map<string, ToSendGroup>();
+  for (const row of (waiting || []) as any[]) {
+    if (row.metadata?.superseded) continue;
+    const key = String(row.rental_id || row.customer_id || row.id);
+    const group: ToSendGroup = toSend.get(key) || {
+      key,
+      customerName: String(row.customers?.full_name || ""),
+      bookingRef: String(row.rentals?.reference || row.rentals?.display_code || ""),
+      rentalId: row.rental_id || null,
+      messages: []
+    };
+    group.messages.push({ id: row.id, content: String(row.content || ""), url: row.metadata?.handoff_url || null });
+    toSend.set(key, group);
+  }
+  const toSendGroups = [...toSend.values()];
+  const t = await getTranslations("inbox");
+
+  return (
+    // "Chats from all your messaging apps" only once an app is connected; before that it promises something that isn't there.
+    <AppShell userEmail={userEmail} hero={<PageBand subtitle={hasChannel ? t("subtitle") : undefined} title={t("title")} />}>
+
+      {toSendGroups.length ? <MessagesToSend groups={toSendGroups} /> : null}
+
+      {!hasChannel && list.length === 0 ? (
+        <div className="card p-8 text-center">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
+            <MessagesSquare size={22} />
+          </span>
+          <h2 className="card-title mt-4">{t("emptyTitle")}</h2>
+          <p className="mx-auto mt-1 max-w-md font-medium text-[var(--foreground-secondary)]">
+            {t("emptyBody")}
+          </p>
+          {membership?.role === "owner" ? (
+            <Link className="primary-action pressable mt-5 inline-flex" href={"/settings?tab=messaging" as Route}>
+              {t("connect")}
+            </Link>
+          ) : (
+            <p className="mt-4 font-medium text-[var(--foreground-secondary)]">{t("askOwner")}</p>
+          )}
+        </div>
+      ) : (
+        <InboxView
+          bookings={(bookings || []) as any[]}
+          conversations={list}
+          customers={(customers || []) as Array<{ id: string; full_name: string | null; phone: string | null }>}
+          filter={filter}
+          autoSelected={autoSelected}
+          history={historySignals}
+          messages={(messages || []) as InboxMessage[]}
+          selected={selected}
+        />
+      )}
+    </AppShell>
+  );
+}

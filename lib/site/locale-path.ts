@@ -4,12 +4,11 @@ import { supportedLocaleCodes } from "@/lib/i18n/locales";
  * Language-prefixed addresses for RoveHQ's own website (SEO: one address per language).
  *
  * English lives at the root (/pricing, /guides/<slug>); every other language under its code (/th/pricing,
- * /zh-TW/guides/<slug>). proxy.ts strips the prefix, serves the unprefixed page and passes the language in
- * SITE_LOCALE_HEADER, which i18n/request.ts prefers over the cookie on website pages. The staff app's addresses
- * never carry a prefix. Safe to import from the proxy and the browser (no server-only imports).
+ * /zh-TW/guides/<slug>). proxy.ts serves every one of them from that language's page drawn ahead of time
+ * (app/(site)/site/[locale], lib/site/internal-path.ts). The staff app's addresses never carry a prefix.
+ * Safe to import from the proxy and the browser (no server-only imports).
  */
 
-export const SITE_LOCALE_HEADER = "x-routehq-site-locale";
 export const DEFAULT_SITE_LOCALE = "en";
 
 const codes = new Set<string>(supportedLocaleCodes);

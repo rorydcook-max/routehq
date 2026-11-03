@@ -480,8 +480,11 @@ async function uniqueSlug(title: string) {
 async function refreshHelpCentre(slug: string | null) {
   await loadPublishedArticles(true);
   try {
-    revalidatePath("/docs");
-    if (slug) revalidatePath(`/docs/${slug}`);
+    // The website's help centre is drawn ahead of time (app/(site)/site/[locale]/docs): every language's list and
+    // every article page (their "related" lists can name the new one), drawn again on their next visit.
+    revalidatePath("/site/[locale]/docs", "page");
+    revalidatePath("/site/[locale]/docs/[slug]", "page");
+    if (slug) revalidatePath(`/site/en/docs/${slug}`);
     revalidatePath("/help");
     revalidatePath("/sitemap.xml");
   } catch {

@@ -6,7 +6,8 @@ import type { Database } from "@/lib/supabase/database.types";
 import { ACTIVE_ORGANIZATION_COOKIE, loadActiveMembership } from "@/lib/auth/active-organization";
 import { aliasTarget, canUseOwnDomain, canUseSubdomain, hostTarget, isAppHost, isBookingSitePath, isMarketingHost, isRenterHost, isRenterSitePath, rootDomain, siteDomain } from "@/lib/booking-address";
 import { signedOutLocale, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
-import { DEFAULT_SITE_LOCALE, isSitePath, localizeSitePath, SITE_LOCALE_HEADER, splitSiteLocale } from "@/lib/site/locale-path";
+import { DEFAULT_SITE_LOCALE, isSitePath, localizeSitePath, splitSiteLocale } from "@/lib/site/locale-path";
+import { SITE_INTERNAL_PREFIX, siteInternalPath } from "@/lib/site/internal-path";
 
 // custom_limits: an admin-set custom plan (returned by resolve_booking_host_v2, migration 0108).
 type BookingSite = { slug: string; tier: string | null; status: string | null; has_domain: boolean; custom_limits: unknown };
@@ -95,10 +96,17 @@ export async function proxy(request: NextRequest) {
       return NextResponse.rewrite(url, { request });
     }
   }
-  // RoveHQ's own website: home (what a signed-out visitor sees at "/", rewritten below), plans, FAQ, contact, guides and
-  // free resources. Marked so the root layout sends them no staff-app words. (/owners was dropped on 28 Oct 2026.)
+  // The website's pages live at internal addresses (/site/<language>/…, lib/site/internal-path.ts) that only this
+  // proxy serves them from: asked for directly, they are not a page.
+  if (pathname === SITE_INTERNAL_PREFIX || pathname.startsWith(`${SITE_INTERNAL_PREFIX}/`)) {
+    return new NextResponse("Not found", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
+  }
+  // RoveHQ's own website: home (what a signed-out visitor sees at "/", rewritten below), plans, FAQ, contact, guides,
+  // free resources and the help centre. (/owners was dropped on 28 Oct 2026.)
   // Each language has its own address (lib/site/locale-path.ts): English at the root, others under /<code>/.
-  // A prefixed address is served from the unprefixed page with the language in a request header.
+  // Every website address is served from its page drawn ahead of time for that language (and, on the home and pricing
+  // pages, the visitor's currency): app/(site)/site/[locale], via lib/site/internal-path.ts. Nothing about the
+  // visitor is passed in headers, so Vercel serves those pages from its cache.
   const { locale: prefixLocale, rest: unprefixed } = splitSiteLocale(pathname);
   const prefixedSite = Boolean(prefixLocale) && isSitePath(unprefixed);
   if (prefixedSite && prefixLocale === DEFAULT_SITE_LOCALE) {
@@ -109,12 +117,13 @@ export async function proxy(request: NextRequest) {
   }
   const sitePath = prefixedSite ? (unprefixed === "/" ? "/home" : unprefixed) : pathname;
   const isSitePage = sitePath !== "/" && isSitePath(sitePath);
-  // Rewritten to the unprefixed page when the address carried a language.
-  const siteRewrite = prefixedSite ? (() => { const url = request.nextUrl.clone(); url.pathname = sitePath; return url; })() : null;
-  if (isSitePage) {
-    request.headers.set("x-routehq-site-page", "1");
-    request.headers.set(SITE_LOCALE_HEADER, prefixLocale || DEFAULT_SITE_LOCALE);
-  }
+  /** A website page's internal address, in this address's language. */
+  const internalSite = (path: string, locale: string) => {
+    const url = request.nextUrl.clone();
+    url.pathname = siteInternalPath(path, locale, request.headers, request.nextUrl.searchParams);
+    return url;
+  };
+  const siteRewrite = isSitePage ? internalSite(sitePath, prefixLocale || DEFAULT_SITE_LOCALE) : null;
   /** The language a visitor would like the website in: the one they picked (cookie), else their phone's (people only). */
   const preferredSiteLocale = () => {
     const chosen = request.cookies.get(STAFF_LOCALE_COOKIE)?.value;
@@ -138,16 +147,12 @@ export async function proxy(request: NextRequest) {
       url.pathname = `/${wanted}`;
       return NextResponse.redirect(url);
     }
-    const url = request.nextUrl.clone();
-    url.pathname = "/home";
-    request.headers.set("x-routehq-site-page", "1");
-    request.headers.set(SITE_LOCALE_HEADER, DEFAULT_SITE_LOCALE);
-    return NextResponse.rewrite(url, { request });
+    return NextResponse.rewrite(internalSite("/home", DEFAULT_SITE_LOCALE), { request });
   };
   // A guide, resource or topic that does not exist (in this language): the page shows "not found", and the answer
   // says 404 from the start (the app's root loading screen would otherwise have streamed a 200 already).
   const contentMissing = isSitePage && missingSiteContent(sitePath, prefixLocale || DEFAULT_SITE_LOCALE);
-  /** Carry on to the page: the unprefixed page when the address carried a language. */
+  /** Carry on to the page: a website page's internal address (see above). */
   const pass = () =>
     contentMissing
       ? NextResponse.rewrite(siteRewrite || request.nextUrl.clone(), { request, status: 404 })

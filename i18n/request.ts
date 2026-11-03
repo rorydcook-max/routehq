@@ -3,7 +3,6 @@ import { cookies, headers } from "next/headers";
 import { CUSTOMER_LOCALE_COOKIE, pickLocale } from "@/lib/i18n/customer-locale";
 import { supportedLocaleCodes, type SupportedLocale } from "@/lib/i18n/locales";
 import { signedOutLocale, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
-import { SITE_LOCALE_HEADER } from "@/lib/site/locale-path";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -43,12 +42,6 @@ async function resolveLocale(): Promise<SupportedLocale> {
   // Customer pages: the language the customer picked, else the first language their phone asks for that we have.
   try {
     const requestHeaders = await headers();
-    // RoveHQ's website: the language is in the address (/th/pricing), passed on by proxy.ts. It wins over the cookie
-    // and the signed-in person's own language, so each address always shows one language (what search engines index).
-    if (requestHeaders.get("x-routehq-site-page")) {
-      const siteLocale = requestHeaders.get(SITE_LOCALE_HEADER);
-      if (siteLocale && supported.has(siteLocale)) return siteLocale as SupportedLocale;
-    }
     if (requestHeaders.get("x-routehq-customer-page")) {
       const chosen = (await cookies()).get(CUSTOMER_LOCALE_COOKIE)?.value || requestHeaders.get("x-routehq-page-lang") || undefined;
       return pickLocale(chosen, requestHeaders.get("accept-language"));
@@ -108,7 +101,27 @@ async function isCustomerPage(): Promise<boolean> {
   }
 }
 
-export default getRequestConfig(async () => {
+/**
+ * RoveHQ's website (app/(site)/site/[locale]) is drawn ahead of time, one copy per language: its layout and pages pass
+ * the language from the address (setRequestLocale, lib/site/static-page.ts). It wins over the cookie and the
+ * signed-in person's own language, so each address always shows one language (what search engines index), and
+ * nothing about the request is read, or those pages would be drawn again for every visit.
+ */
+async function sitePageLocale(requestLocale: Promise<string | undefined>): Promise<SupportedLocale | null> {
+  try {
+    const locale = await requestLocale;
+    return locale && supported.has(locale) ? (locale as SupportedLocale) : null;
+  } catch {
+    return null;
+  }
+}
+
+export default getRequestConfig(async ({ requestLocale }) => {
+  const siteLocale = await sitePageLocale(requestLocale);
+  if (siteLocale) {
+    const english = await loadMessages("en");
+    return { locale: siteLocale, messages: siteLocale === "en" ? english : merge(english, await loadMessages(siteLocale)), timeZone: "Asia/Bangkok" };
+  }
   const [locale, customerPage] = await Promise.all([resolveLocale(), isCustomerPage()]);
   const english = await loadMessages("en");
   const all = locale === "en" ? english : merge(english, await loadMessages(locale));

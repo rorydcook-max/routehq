@@ -630,7 +630,6 @@ export function ChatPanel({
         </div>
         {progress ? <p className="mt-1.5 text-[13px] font-medium text-[var(--muted)]">{progress}</p> : null}
         {error ? <p className="mt-1.5 text-[13px] font-semibold text-[var(--danger)]">{error}</p> : null}
-        {human ? null : <p className="mt-1.5 text-[12px] text-[var(--muted)]">{t("footer")}</p>}
       </form>
     </div>
   );

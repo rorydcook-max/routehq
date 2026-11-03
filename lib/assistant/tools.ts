@@ -6,6 +6,7 @@ import type { ChatAction, ChatMeta } from "@/lib/chat";
 import { fileKindFromName } from "@/lib/chat-suggestions";
 import { said } from "@/lib/i18n/server-text";
 import { googleSheetToSpreadsheetInput, isGoogleSheetsUrl, parseSpreadsheetFile } from "@/lib/import/spreadsheet";
+import { describeMatches, detectPreset } from "@/lib/import/presets";
 import { readReceipt } from "@/lib/receipt-reading";
 import { loadPublishedArticles } from "@/lib/site/docs";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -107,7 +108,7 @@ const SPECS: Record<ToolName, Spec> = {
     },
     ["startDate"]
   ),
-  import_sheet: fn("import_sheet", "Bring a whole spreadsheet (a file they sent, or a Google Sheet link) of vehicles, customers, bookings and payment history into RoveHQ.", { sheetUrl: { type: "string" } }),
+  import_sheet: fn("import_sheet", "Bring a whole spreadsheet (a file they sent, or a Google Sheet link) of vehicles, customers, bookings and payment history into RoveHQ, including an export from other rental software (Booqable, HQ Rental Software, RentWorks, Checkfront and others), which it recognises by name.", { sheetUrl: { type: "string" } }),
   contract_upload: fn("contract_upload", "They sent their own rental agreement or contract (PDF or Word) to use for bookings."),
   damage_photos: fn("damage_photos", "Photos of damage, an odometer or a fuel gauge for a rental.")
 };
@@ -324,24 +325,33 @@ async function importSheet(args: Record<string, any>, ctx: ToolContext): Promise
   if (!file && !url) return { done: false, content: "Ask them to send the spreadsheet here, or a Google Sheet link." };
   if (!file && !isGoogleSheetsUrl(url)) return { done: false, content: "Only Google Sheets links can be read. Ask for the file or a Google Sheet link." };
   let summary = "";
+  // An export from other rental software (Booqable, HQ, RentWorks...): said by name, and the import opens on it.
+  let matched: { software: string; text: string } | null = null;
   try {
     const bytes = file ? await fileBytes(ctx.admin, file) : null;
     const tabs = await parseSpreadsheetFile(file && bytes ? { bytes, filename: file.name, type: file.type } : await googleSheetToSpreadsheetInput(url));
     const kept = tabs.filter((tab) => tab.rows.length).slice(0, 6);
     if (kept.length) summary = kept.map((tab) => `${tab.sheetName} (${tab.rows.length})`).join(", ");
+    const matches = tabs.flatMap((tab) => {
+      const preset = detectPreset(tab);
+      return preset ? [{ sheetName: tab.sheetName, software: preset.software, kind: preset.kind, generic: false }] : [];
+    });
+    if (matches.length) matched = { software: matches[0].software, text: describeMatches(matches) };
   } catch (error) {
     if (!file) return { done: false, content: `The Google Sheet couldn't be opened (${error instanceof Error ? error.message.slice(0, 120) : "error"}). Tell them to set sharing to "Anyone with the link can view" and send it again.` };
   }
+  const from = matched ? `from=${matched.software}` : "";
   const action: ChatAction = {
     kind: "spreadsheet",
-    href: file ? "/fleet/import" : `/fleet/import?sheet=${encodeURIComponent(url)}`,
+    href: file ? `/fleet/import${from ? `?${from}` : ""}` : `/fleet/import?sheet=${encodeURIComponent(url)}${from ? `&${from}` : ""}`,
     label: await said("Open the import"),
     paths: file ? [file.path] : [],
     handover: file ? "sheet" : "url"
   };
+  const recognised = matched ? ` This is a ${matched.text} export: RoveHQ recognises it and reads it straight away.` : "";
   const body = summary
-    ? await said(`Found these tabs and rows: ${summary}. Open the import to check what goes in before anything is added.`)
-    : await said("Open the import to read it: you check what it found before anything is added.");
+    ? await said(`Found these tabs and rows: ${summary}.${recognised} Open the import to check what goes in before anything is added.`)
+    : await said(`${recognised.trim() ? `${recognised.trim()} ` : ""}Open the import to read it: you check what it found before anything is added.`);
   return reply(body, { action });
 }
 

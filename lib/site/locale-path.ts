@@ -27,6 +27,9 @@ export function isSitePath(path: string) {
     path.startsWith("/resources/") ||
     path === "/docs" ||
     path.startsWith("/docs/") ||
+    // Switching from other rental software (lib/site/switch.ts).
+    path === "/switch" ||
+    path.startsWith("/switch/") ||
     // Privacy policy, terms, DPA, sub-processors, cookies (lib/site/legal.ts).
     path === "/legal" ||
     path.startsWith("/legal/")

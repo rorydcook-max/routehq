@@ -21,6 +21,8 @@ export type SheetAnalysis = {
   date_order_unsure?: boolean;
   date_example?: string | null;
   rate_period?: "day" | "week" | "month";
+  /** Read as another rental software's export (lib/import/presets.ts): its name. */
+  preset?: string;
 };
 export type Analysis = { detected_data_types: string[]; import_summary: string; sheets: SheetAnalysis[] };
 
@@ -133,7 +135,9 @@ export function normaliseAnalysis(raw: any, sheets: ParsedSheet[], learned: Map<
     const column_mappings = first.map(({ header, field, confidence }) => {
       let chosen = field;
       let sure = confidence;
-      if (chosen === "__ignore__" && !taught.has(header)) {
+      // A column a preset set aside on purpose (an ID a linked name replaced) isn't guessed again.
+      const setAside = suggestions.get(header)?.routehq_field === "__ignore__" && Number(suggestions.get(header)?.confidence) >= 1;
+      if (chosen === "__ignore__" && !taught.has(header) && !setAside) {
         const guess = guessField(header, used);
         if (guess && IMPORT_FIELD_KEYS.has(guess)) {
           chosen = guess;
@@ -168,6 +172,9 @@ export function normaliseAnalysis(raw: any, sheets: ParsedSheet[], learned: Map<
     // How this sheet writes 05/06/2026, from every date column at once.
     const dateColumns = column_mappings.filter((mapping) => DATE_FIELDS.has(mapping.routehq_field)).map((mapping) => mapping.source_column);
     const dates = dateOrderOf(sheet.rows.flatMap((row) => dateColumns.map((column) => cleanString(row[column]))).filter(Boolean));
+    // Dates the file can't settle (05/06) read the way that software writes them (US tools month first); still asked.
+    const hint = match?.date_order_hint === "mdy" || match?.date_order_hint === "dmy" ? match.date_order_hint : null;
+    if (dates.unsure && hint) dates.order = hint;
     return {
       sheet_name: sheet.sheetName,
       primary_data_type: DATA_TYPES.has(type) ? type : inferred === "payments" ? "transactions" : inferred,
@@ -176,7 +183,8 @@ export function normaliseAnalysis(raw: any, sheets: ParsedSheet[], learned: Map<
       row_count: sheet.rows.length,
       date_order: dates.order,
       date_order_unsure: dates.unsure,
-      date_example: dates.example
+      date_example: dates.example,
+      ...(match?.preset ? { preset: String(match.preset).slice(0, 60) } : {})
     };
   });
 

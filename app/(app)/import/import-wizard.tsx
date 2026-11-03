@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Camera, CheckCircle2, FileSpreadsheet, Loader2, MessageSquareText, RotateCcw, Undo2, X } from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, ExternalLink, FileSpreadsheet, Loader2, MessageSquareText, RotateCcw, Undo2, X } from "lucide-react";
 import { compressImage } from "@/lib/direct-upload-client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -12,6 +12,7 @@ import type { ImportPreview, PreviewCustomer, PreviewRental, PreviewTransaction,
 import { previewCounts } from "@/lib/import/preview";
 import { answerQuestion, importQuestions, type ImportQuestion } from "@/lib/import/questions";
 import { distanceKey } from "@/lib/business-units";
+import { SOFTWARE, softwareById } from "@/lib/import/software";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -30,6 +31,7 @@ type SheetMapping = {
   date_order_unsure?: boolean;
   date_example?: string | null;
   rate_period?: "day" | "week" | "month";
+  preset?: string;
 };
 
 /**
@@ -156,7 +158,13 @@ function More({ total, shown, onMore, t }: { total: number; shown: number; onMor
 export function ImportWizard({ recent = [] }: { defaultImportType?: string; recent?: RecentImport[] }) {
   const t = useTranslations("importer") as unknown as Say;
   const locale = useLocale();
-  const [file, setFile] = useState<File | null>(null);
+  // Several exports at once are fine (vehicles, customers and bookings from the same software).
+  const [files, setFiles] = useState<File[]>([]);
+  const file = files[0] || null;
+  const setFile = (next: File | null) => setFiles(next ? [next] : []);
+  // Where the data is now: another rental software (its export steps are shown), a spreadsheet, Google Sheets, paper.
+  const [source, setSource] = useState<string | null>(null);
+  const [recognised, setRecognised] = useState("");
   // Photos of registration books, notebook pages and lists (up to 8).
   const [photos, setPhotos] = useState<File[]>([]);
   const [sheetUrl, setSheetUrl] = useState("");
@@ -182,9 +190,18 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
   // A Google Sheet link sent in the chat comes as ?sheet=.
   useEffect(() => {
     const [handed] = takeHandedFiles("sheet");
-    if (handed) setFile(handed);
-    const link = new URLSearchParams(window.location.search).get("sheet") || "";
-    if (/^https:\/\/docs\.google\.com\/spreadsheets\//.test(link)) setSheetUrl(link);
+    const query = new URLSearchParams(window.location.search);
+    const from = query.get("from") || "";
+    if (softwareById(from)) setSource(from);
+    if (handed) {
+      setFiles([handed]);
+      if (!softwareById(from)) setSource("spreadsheet");
+    }
+    const link = query.get("sheet") || "";
+    if (/^https:\/\/docs\.google\.com\/spreadsheets\//.test(link)) {
+      setSheetUrl(link);
+      setSource("sheets");
+    }
   }, []);
 
   const counts = useMemo(() => (preview ? previewCounts(preview) : null), [preview]);
@@ -216,6 +233,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
     setStatus("idle");
     setError("");
     setNotice("");
+    setRecognised("");
     setMappingOpen(false);
     setShown(SHOW);
   }
@@ -236,8 +254,9 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
       // Smaller photos upload faster and still read well.
       for (const photo of photos) formData.append("photo", await compressImage(photo, 1800, 0.82));
     } else {
-      if (file) formData.append("file", file);
+      for (const one of files) formData.append("file", one);
       formData.append("sheetUrl", sheetUrl.trim());
+      if (softwareById(source)) formData.append("software", String(source));
     }
     const response = await fetch("/api/import/analyze", { method: "POST", body: formData });
     const payload = await response.json().catch(() => ({ error: t("readFailed") }));
@@ -251,6 +270,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
     setFleet(Array.isArray(payload.fleet) ? payload.fleet : []);
     setBatchId(payload.batchId || null);
     setNotice(payload.warning || "");
+    setRecognised(typeof payload.recognised === "string" ? payload.recognised : "");
     const next = payload.preview as ImportPreview | undefined;
     setTab(next?.vehicles.length ? "vehicles" : next?.rentals.length ? "rentals" : next?.customers.length ? "customers" : "transactions");
     setStatus("review");
@@ -312,8 +332,12 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
 
   return (
     <div className="space-y-5">
+      {/* 0. Where the data is now: another rental software shows how to get it out, then the upload box. */}
+      <SourcePicker onPick={(next) => { setSource(next); if (next === "sheets") { setFiles([]); setPhotos([]); } reset(); }} source={source} t={t} />
+
       {/* 1. The file */}
       {/* One left edge for everything in the card: help first, then the inputs, then the button that reads them. */}
+      {source ? (
       <section className="card p-4">
         <h2 className="card-title flex items-center gap-2">
           <FileSpreadsheet aria-hidden="true" className="shrink-0 text-[var(--primary)]" size={20} />
@@ -325,13 +349,14 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
           <label className="block min-w-0">
             <span className="secondary-action pressable w-full cursor-pointer">
               <FileSpreadsheet aria-hidden="true" className="shrink-0" size={18} />
-              <span className="truncate">{file ? file.name : t("file")}</span>
+              <span className="truncate">{files.length > 1 ? t("filesChosen", { count: files.length }) : file ? file.name : t("file")}</span>
             </span>
             <input
               accept=".csv,.xlsx,.xls,.ics,.txt,text/csv,text/calendar,text/plain,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               className="sr-only"
+              multiple
               onChange={(event) => {
-                setFile(event.target.files?.[0] || null);
+                setFiles(Array.from(event.target.files || []).slice(0, 8));
                 setSheetUrl("");
                 setPhotos([]);
                 setChatText("");
@@ -379,6 +404,18 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             />
           </label>
         </div>
+        {files.length > 1 ? (
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {files.map((one, index) => (
+              <li className="flex max-w-full items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--panel)] py-1 pl-3 pr-1.5 text-sm font-medium" key={`${one.name}-${index}`}>
+                <span className="truncate">{one.name}</span>
+                <button aria-label={t("removeFile", { name: one.name })} className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full hover:bg-[var(--panel-secondary)]" onClick={() => { setFiles((current) => current.filter((_, at) => at !== index)); reset(); }} type="button">
+                  <X size={14} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
         {photos.length ? (
           <ul className="mt-3 flex flex-wrap gap-2">
             {photos.map((photo, index) => (
@@ -432,6 +469,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
           </Link>
         </p>
       </section>
+      ) : null}
 
       {/* 2. What we found, in RoveHQ's shape */}
       {(status === "review" || status === "remapping" || status === "importing") && preview && counts ? (
@@ -442,6 +480,12 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             {counts.needsLook ? <span className="text-[var(--warning)]"> {t("foundLook", { count: counts.needsLook })}</span> : null}
           </p>
           <p className="mt-1 text-sm text-[var(--muted)]">{t("foundBody")}</p>
+          {recognised ? (
+            <p className="mt-3 flex items-start gap-2 rounded-lg bg-[var(--success-light)] px-3 py-2 text-sm font-semibold text-[var(--foreground)]">
+              <CheckCircle2 aria-hidden="true" className="mt-0.5 shrink-0 text-[var(--success)]" size={16} />
+              {recognised}
+            </p>
+          ) : null}
           {notice ? <p className="mt-3 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{notice}</p> : null}
           <QuickQuestions busy={status !== "review"} locale={locale} onAnswer={answer} questions={questions} t={t} />
 
@@ -533,6 +577,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <p className="font-semibold text-[var(--foreground)]">
                       {sheet.sheet_name} <span className="font-medium text-[var(--muted)]">· {t("rows", { count: sheet.row_count ?? 0 })}</span>
+                      {sheet.preset ? <span className="font-medium text-[var(--muted)]"> · {t("readAsPreset", { name: sheet.preset })}</span> : null}
                     </p>
                     <label className="block sm:max-w-[260px]">
                       <span className="sr-only">{t("eachRow")}</span>
@@ -707,6 +752,77 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
         </section>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * "Where is your data now?": rental software by name (alphabetical, plain text, no logos), then a spreadsheet, Google
+ * Sheets, paper or photos, or other software. Picking a rental software shows how to export from it (a few steps and
+ * its own help article), then the upload box below. Importing is free whichever it is.
+ */
+function SourcePicker({ source, onPick, t }: { source: string | null; onPick: (source: string | null) => void; t: Say }) {
+  const software = softwareById(source);
+  const chip = "pressable rounded-full border border-[var(--border)] bg-white px-3.5 py-2 text-sm font-semibold text-[var(--foreground)] hover:border-[var(--primary)]";
+  if (source) {
+    return (
+      <section className="card p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm text-[var(--muted)]">{t("whereTitle")}</p>
+            <h2 className="card-title">{software ? software.name : t(`src_${source}`)}</h2>
+          </div>
+          <button className="shrink-0 text-sm font-semibold text-[var(--primary)]" onClick={() => onPick(null)} type="button">
+            {t("whereChange")}
+          </button>
+        </div>
+        {software ? (
+          <>
+            <p className="mt-3 text-sm font-semibold text-[var(--foreground)]">{t("howToExport", { name: software.name })}</p>
+            <ol className="measure mt-2 list-decimal space-y-1 pl-5 text-sm text-[var(--foreground-secondary)]">
+              {software.steps.map((key) => (
+                <li key={key}>{t(key, { name: software.name })}</li>
+              ))}
+            </ol>
+            {software.help ? (
+              <a className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[var(--primary)]" href={software.help} rel="noopener noreferrer" target="_blank">
+                {t("helpArticle", { name: software.name })}
+                <ExternalLink aria-hidden="true" size={14} />
+              </a>
+            ) : null}
+            <p className="measure mt-2 text-sm text-[var(--muted)]">{software.preset ? t("presetReady", { name: software.name }) : t("freeImport")}</p>
+          </>
+        ) : source === "other" ? (
+          <p className="measure mt-2 text-sm text-[var(--foreground-secondary)]">{t("otherBody")}</p>
+        ) : null}
+      </section>
+    );
+  }
+  const names = [...SOFTWARE].sort((a, b) => a.name.localeCompare(b.name));
+  const general = (["spreadsheet", "sheets", "paper"] as const).map((key) => ({ key, label: t(`src_${key}`) })).sort((a, b) => a.label.localeCompare(b.label));
+  return (
+    <section className="card p-4">
+      <h2 className="card-title">{t("whereTitle")}</h2>
+      <p className="measure mt-1 text-sm text-[var(--foreground-secondary)]">{t("whereBody")}</p>
+      <p className="mt-4 text-sm font-semibold text-[var(--foreground)]">{t("whereSoftware")}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {names.map((item) => (
+          <button className={chip} key={item.id} onClick={() => onPick(item.id)} type="button">
+            {item.name}
+          </button>
+        ))}
+      </div>
+      <p className="mt-4 text-sm font-semibold text-[var(--foreground)]">{t("whereElse")}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {general.map((item) => (
+          <button className={chip} key={item.key} onClick={() => onPick(item.key)} type="button">
+            {item.label}
+          </button>
+        ))}
+        <button className={chip} onClick={() => onPick("other")} type="button">
+          {t("src_other")}
+        </button>
+      </div>
+    </section>
   );
 }
 

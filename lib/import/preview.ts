@@ -197,7 +197,8 @@ function daysBetween(start: string, end: string) {
   return Math.max(1, Math.round((new Date(`${end}T00:00:00Z`).getTime() - new Date(`${start}T00:00:00Z`).getTime()) / 86_400_000));
 }
 
-const CANCELLED = /cancel|annul|storn|no.?show|void|ยกเลิก|ไม่มา/i;
+// Cancelled, or never confirmed in the other system (a quote, a draft, an enquiry, one on hold): left out unless ticked.
+const CANCELLED = /cancel|annul|storn|no.?show|void|declined|rejected|expired|abandoned|ยกเลิก|ไม่มา|^\s*(quote|quoted|draft|concept|enquiry|inquiry|tentative|on.?hold|hold)\s*$/i;
 
 export function sheetDataType(value: string, mappings: Mapping[]) {
   const cleaned = cleanString(value).toLowerCase();
@@ -281,7 +282,8 @@ export function guessMakeModel(name: string): { make: string; model: string } {
   const text = cleanString(name).split(/\s[-–]\s/).pop()!.trim();
   if (!text) return { make: "", model: "" };
   const known = MAKE_OF_MODEL.find(([pattern]) => pattern.test(text));
-  if (known) return { make: known[1], model: text };
+  // "Vespa Primavera 125": the make isn't repeated in the model.
+  if (known) return { make: known[1], model: text.replace(new RegExp(`^${known[1]}\\s+`, "i"), "") || text };
   const split = splitVehicleName(text);
   return { make: split.make, model: split.model || text };
 }
@@ -453,6 +455,8 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
         const plateText = cleanString(fields.vehicle_registration || fields.registration_number);
         const split = splitPlateFromName(plateText || fields.vehicle_name);
         if (!plateText && split.plate && !/\d/.test(split.plate)) split.plate = "";
+        // A product name with a number in it ("Scooter 125cc") is not a plate: plates don't carry a long word.
+        if (!plateText && split.plate && /\p{L}{5,}/u.test(split.plate) && !/[ก-๙]/.test(split.plate)) split.plate = "";
         if (split.name && (!cleanString(fields.vehicle_name) || !plateText)) fields.vehicle_name = split.name;
         const plate = split.plate;
         const rental = rentalFrom(fields, base, plate, today);
@@ -507,8 +511,9 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
         let kind = worked !== "other" ? worked : known;
         if (incoming) {
           // Money that came in is rent, unless it says it's a deposit or a charge recovered.
-          kind = /deposit|bond|มัดจำ/i.test(described) ? "deposit_received" : /damage|charge|fine|ค่าเสียหาย|ค่าปรับ/i.test(described) ? "charge_recovered" : "rental_income";
-        } else if (ledger && /deposit|bond|มัดจำ/i.test(described) && /return|refund|back|คืน/i.test(described)) {
+          // A deposit is never income, unless it was kept (forfeited, kept for damage).
+          kind = /deposit|bond|มัดจำ/i.test(described) ? (/kept|keep|retain|forfeit|withh[eo]ld|claimed|deduct|ยึด/i.test(described) ? "deposit_forfeited" : "deposit_received") : /damage|charge|fine|ค่าเสียหาย|ค่าปรับ/i.test(described) ? "charge_recovered" : "rental_income";
+        } else if (ledger && /deposit|bond|มัดจำ/i.test(described) && /return|refund|back|releas|คืน/i.test(described)) {
           kind = "deposit_refunded";
         } else if (ledger && ["rental_income", "deposit_received", "deposit", "charge_recovered"].includes(kind)) {
           // Money going out isn't rent received ("Office rent", "Parking rent").

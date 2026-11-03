@@ -14,6 +14,9 @@ import { MAX_IMPORT_PHOTOS, photoSheetKinds, readImportPhotos } from "@/lib/impo
 import { visionProvider } from "@/lib/ai-vision";
 import { canReadChat, chatSheetKinds, isChatFile, readChatText } from "@/lib/import/chat-text";
 import { calendarToSheets, fetchCalendar, isCalendarFile, isCalendarUrl, parseIcs } from "@/lib/import/calendar";
+import { describeMatches, prepareImport, type RawPresetSheet } from "@/lib/import/presets";
+import { guessField } from "@/lib/import/header-guess";
+import { distanceUnitFor } from "@/lib/regional";
 
 // Reading several photos takes a while.
 export const maxDuration = 120;
@@ -113,17 +116,23 @@ export async function POST(request: Request) {
     });
   }
 
-  if ((!(file instanceof File) || file.size === 0) && !sheetUrl) {
+  // Several exports at once (vehicles, customers, bookings, payments from the same software) are read together.
+  const files = formData.getAll("file").filter((item): item is File => item instanceof File && item.size > 0).slice(0, MAX_FILES);
+  if (!files.length && !sheetUrl) {
     return NextResponse.json({ error: await said("Upload a spreadsheet or paste a public Google Sheets link first.") }, { status: 400 });
   }
   if (sheetUrl && !isGoogleSheetsUrl(sheetUrl)) {
     return NextResponse.json({ error: await said("Only public Google Sheets links are supported.") }, { status: 400 });
   }
 
-  let sheets: ParsedSheet[];
+  let sheets: ParsedSheet[] = [];
   try {
-    const spreadsheetInput = sheetUrl ? await googleSheetToSpreadsheetInput(sheetUrl) : (file as File);
-    sheets = await parseSpreadsheetFile(spreadsheetInput);
+    if (sheetUrl && !files.length) sheets = await parseSpreadsheetFile(await googleSheetToSpreadsheetInput(sheetUrl));
+    for (const one of files) {
+      const read = await parseSpreadsheetFile(one);
+      // Two files with a "Sheet1" each: the file's name tells them apart.
+      for (const sheet of read) sheets.push(sheets.some((other) => other.sheetName === sheet.sheetName) ? { ...sheet, sheetName: `${sheet.sheetName} (${one.name})`.slice(0, 120) } : sheet);
+    }
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to read the spreadsheet." }, { status: 400 });
   }
@@ -132,12 +141,42 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: await said("No readable rows were found in this spreadsheet.") }, { status: 400 });
   }
 
-  const sourceName = sheetUrl ? "Google Sheet" : (file as File).name;
+  const sourceName = files.length > 1 ? files.map((one) => one.name).join(", ") : files.length ? files[0].name : "Google Sheet";
+  const supabase = await createSupabaseServerClient();
+  // Exports from other rental software are recognised by their headings and read without the AI (lib/import/presets.ts).
+  const organization = await getDefaultOrganization().catch(() => null);
+  const prepared = prepareImport(sheets, { software: String(formData.get("software") || ""), distanceUnit: organization ? distanceUnitFor(organization) : undefined, currency: (organization as any)?.currency || null });
+  sheets = prepared.sheets;
   // Headings this business has re-mapped before are read the way the owner chose.
-  const learned = (await loadLearnings(await createSupabaseServerClient(), membership.organizationId).catch(() => emptyLearnings())).columns;
-  // The built-in rules read the file on their own; the AI, when it's there, checks and corrects that reading.
-  // Either way the owner sees every card before anything is saved.
-  const raw = aiTextConfigured() ? await mapColumnsWithAi(sheets, importType, learned) : null;
+  const learned = (await loadLearnings(supabase, membership.organizationId).catch(() => emptyLearnings())).columns;
+  // The built-in rules read the file on their own; the AI, when it's there, checks and corrects that reading. A sheet a
+  // preset read goes to the AI only for the columns the preset didn't place. Either way the owner sees every card first.
+  const matched = new Set(prepared.raw.map((sheet) => sheet.sheet_name));
+  const forAi = sheets.filter((sheet) => !matched.has(sheet.sheetName) || prepared.unplaced.get(sheet.sheetName)?.some((header) => !guessField(header, new Set())));
+  const ai = aiTextConfigured() && forAi.length ? await mapColumnsWithAi(forAi, importType, learned) : null;
+  const raw = mergeReadings(prepared.raw, ai);
   const analysis = normaliseAnalysis(raw, sheets, learned);
-  return NextResponse.json({ analysis, ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)) });
+  const notes = await Promise.all(prepared.notes.map((note) => said(note)));
+  const recognised = prepared.matches.length ? await said(`Read as ${describeMatches(prepared.matches)} export.`) : "";
+  return NextResponse.json({
+    analysis,
+    presets: prepared.matches,
+    ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)),
+    ...(recognised || notes.length ? { recognised: [recognised, ...notes].filter(Boolean).join(" ") } : {})
+  });
+}
+
+const MAX_FILES = 8;
+
+/** The presets' reading first; the AI's answer for the sheets and columns they left. */
+function mergeReadings(presets: RawPresetSheet[], ai: any) {
+  const aiSheets: any[] = Array.isArray(ai?.sheets) ? ai.sheets : [];
+  const merged: any[] = presets.map((sheet) => {
+    const theirs = aiSheets.find((item) => item?.sheet_name === sheet.sheet_name);
+    const placed = new Set(sheet.column_mappings.map((mapping) => mapping.source_column));
+    const extra = (Array.isArray(theirs?.column_mappings) ? theirs.column_mappings : []).filter((mapping: any) => !placed.has(String(mapping?.source_column || "")));
+    return { ...sheet, column_mappings: [...sheet.column_mappings, ...extra] };
+  });
+  for (const sheet of aiSheets) if (!presets.some((item) => item.sheet_name === sheet?.sheet_name)) merged.push(sheet);
+  return merged.length ? { sheets: merged } : null;
 }

@@ -15,6 +15,7 @@ export async function SiteFooter() {
       links: [
         { href: SITE_LINKS.features, label: m("navFeatures") },
         { href: SITE_LINKS.pricing, label: m("navPricing") },
+        { href: SITE_LINKS.switch, label: m("navSwitch") },
         { href: SITE_LINKS.contact, label: m("navContact") }
       ]
     },

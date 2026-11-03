@@ -9,8 +9,8 @@ import s from "../site.module.css";
 export const r = (path: string) => path as Route;
 
 /** Website pages that open each other in place. */
-const IN_SITE = new Set(["/pricing", "/faq", "/contact", "/guides", "/resources", "/legal"]);
-const inSite = (path: string) => IN_SITE.has(path) || path.startsWith("/guides/") || path.startsWith("/resources/") || path.startsWith("/legal/");
+const IN_SITE = new Set(["/pricing", "/faq", "/contact", "/guides", "/resources", "/legal", "/switch"]);
+const inSite = (path: string) => IN_SITE.has(path) || path.startsWith("/guides/") || path.startsWith("/resources/") || path.startsWith("/legal/") || path.startsWith("/switch/");
 
 /**
  * A link from the website. Between website pages it opens in place; anywhere else (the app's sign-in, the directory,
@@ -62,6 +62,7 @@ export const SITE_LINKS = {
   guides: "/guides",
   resources: "/resources",
   docs: "/docs",
+  switch: "/switch",
   // No link to the renters' booking site (/rent): it is moving to its own consumer brand, and this site speaks to rental businesses.
   signIn: "/login",
   signUp: "/signup"

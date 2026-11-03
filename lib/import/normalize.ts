@@ -34,15 +34,18 @@ export function findByPlate<T>(map: Map<string, T>, plate: unknown): T | undefin
  * "80,500 กม.", "45,000 km", "(1,200)" for a negative, and "9.500,00" from a sheet saved with comma decimals.
  */
 export function parseNumberValue(value: unknown) {
+  // Currency signs and codes either side ("US$ 1,200.00", "1.200,00 EUR", "RM 350", "Rp 250.000", "₱1,500").
   let cleaned = cleanString(value)
-    .replace(/[฿$€£]|THB|baht|บาท|บ\./gi, "")
+    .replace(/[฿$€£₱₫₭¥₩]|THB|baht|บาท|บ\./gi, "")
+    .replace(/^\s*(USD|US|EUR|GBP|AUD|NZD|CAD|SGD|MYR|IDR|PHP|VND|LAK|KHR|CHF|RM|Rp\.?|A|NZ|C|S)\s*(?=[-\d(.])/i, "")
+    .replace(/(?<=[\d)])\s*(USD|EUR|GBP|AUD|NZD|CAD|SGD|MYR|IDR|PHP|VND|LAK|KHR|CHF|RM)\s*$/i, "")
     .replace(/\.-$/, "")
     .trim();
   if (!cleaned) return null;
   // What it's per comes after the number: "/เดือน", "per day", " a month".
   cleaned = cleaned.replace(/\s*(\/|\bper\b|\ba\b\s+(day|week|month)|ต่อ).*$/i, "").trim();
   // Units after the number.
-  cleaned = cleaned.replace(/\s*(kms?|kilomet\w*|กม\.?|กิโล(เมตร)?|cc|ซีซี|days?|วัน|months?|เดือน|pcs|ชิ้น)\s*$/i, "").trim();
+  cleaned = cleaned.replace(/\s*(kms?|kilomet\w*|mi|miles|กม\.?|กิโล(เมตร)?|cc|ซีซี|days?|วัน|months?|เดือน|pcs|ชิ้น)\s*$/i, "").trim();
   const negative = /^\(.*\)$/.test(cleaned);
   if (negative) cleaned = cleaned.slice(1, -1);
   let multiplier = 1;

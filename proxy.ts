@@ -79,6 +79,16 @@ function missingSiteContent(path: string, locale: string) {
       return false;
     }
   }
+  // Switching pages: written in English first, every language shows the English one (lib/site/switch.ts).
+  const switching = path.match(/^\/switch\/([^/]+)$/);
+  if (switching) {
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(switching[1])) return true;
+    try {
+      return !existsSync(join(process.cwd(), "content", "switch", "en", `${switching[1]}.md`));
+    } catch {
+      return false;
+    }
+  }
   const item = path.match(/^\/(guides|resources)\/([^/]+)$/);
   if (!item) return false;
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item[2])) return true;
@@ -91,7 +101,7 @@ function missingSiteContent(path: string, locale: string) {
 
 /** The app's and website's own top-level pages: on rove.rent these still go to RoveHQ, never read as a business's name. */
 const APP_TOP_LEVEL = new Set(
-  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,docs,faq,guides,home,legal,pricing,resources,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko,el,it,nl,pl,hr".split(",")
+  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,docs,faq,guides,home,legal,pricing,resources,switch,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko,el,it,nl,pl,hr".split(",")
 );
 
 /** Search engines and link previews: never sent to a language by their Accept-Language (they index each address as it is). */

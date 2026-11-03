@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
 export async function GET() {
   const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  // Read from the signed sign-in token (as every page does), not a trip to the sign-in service on each call.
+  const user = await getRequestUser();
 
   if (!user) {
     return NextResponse.json({ authenticated: false }, { status: 401 });

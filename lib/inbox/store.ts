@@ -1,18 +1,6 @@
 import { sendPushToOrganization } from "@/lib/push";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
-export type InboxChannel = {
-  id: string;
-  organization_id: string;
-  provider: string;
-  display_name: string | null;
-  external_id: string | null;
-  webhook_key: string;
-  status: string;
-  last_error: string | null;
-  created_at: string;
-};
-
 export type InboxConversation = {
   id: string;
   channel_id: string;

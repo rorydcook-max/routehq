@@ -61,8 +61,6 @@ export type PortalPayment = {
   receiptDeclined: boolean;
 };
 
-export const RECEIPT_METHODS = ["promptpay", "bank_transfer", "wise", "revolut", "other"] as const;
-
 export function receiptOf(metadata: any): PaymentReceipt | null {
   const receipt = metadata?.receipt;
   return receipt && typeof receipt === "object" && typeof receipt.path === "string" && receipt.path ? (receipt as PaymentReceipt) : null;

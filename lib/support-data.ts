@@ -1,6 +1,6 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { planById } from "@/lib/plans";
-import { importIncluded, signAttachments, supportPreference, type SupportAttachment, type SupportChannel } from "@/lib/support";
+import { importIncluded, signAttachments, type SupportAttachment } from "@/lib/support";
 
 export type SupportThreadRow = {
   id: string;
@@ -50,11 +50,6 @@ export async function listBusinessThreads(supabase: any, organizationId: string)
   return ((data || []) as any[]).map((thread) => row(thread, "business"));
 }
 
-export async function countUnreadForBusiness(supabase: any, organizationId: string) {
-  const { count } = await supabase.from("support_threads").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).eq("unread_by_business", true);
-  return count || 0;
-}
-
 export async function countWaitingForTeam() {
   const admin = createSupabaseAdminClient() as any;
   // Only conversations handed to the team: the assistant's own chats (mode 'ai') aren't waiting for anyone.
@@ -99,7 +94,6 @@ export async function loadThread(threadId: string, viewer: { side: "business" | 
   if (viewer.side === "business" && thread.unread_by_business) await admin.from("support_threads").update({ unread_by_business: false }).eq("id", thread.id);
 
   const org = thread.organizations || {};
-  const preference = supportPreference(org.settings);
   return {
     thread: row(thread, viewer.side),
     createdAt: thread.created_at as string,
@@ -113,10 +107,8 @@ export async function loadThread(threadId: string, viewer: { side: "business" | 
       importIncluded: importIncluded(org),
       phone: String(org.business_phone || org.whatsapp || ""),
       email: String(org.business_email || ""),
-      lineId: String(org.line_id || ""),
-      preference: preference as { channel: SupportChannel; handle: string }
+      lineId: String(org.line_id || "")
     }
   };
 }
 
-export type LoadedThread = NonNullable<Awaited<ReturnType<typeof loadThread>>>;

@@ -69,10 +69,6 @@ function load(country: ContractCountry): RawContract | null {
   return raw;
 }
 
-export function hasContract(country: ContractCountry) {
-  return Boolean(load(country));
-}
-
 const bi = (value: RawBi, fallback = ""): Bi => ({ en: String(value?.en ?? fallback), local: String(value?.local ?? "") });
 
 function money(value: string | undefined, currency: string) {

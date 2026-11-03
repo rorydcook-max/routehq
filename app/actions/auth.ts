@@ -104,7 +104,7 @@ export async function getShellContext(): Promise<ShellContext> {
       const { getTaskList } = await import("@/lib/tasks");
       const { businessToday } = await import("@/lib/business-time");
       const today = businessToday();
-      return (await getTaskList(membership.organizationId)).filter((task) => !task.completedAt && !task.coveredBy && !!task.dueDate && task.dueDate <= today).length;
+      return (await getTaskList(membership.organizationId, { openOnly: true })).filter((task) => !task.completedAt && !task.coveredBy && !!task.dueDate && task.dueDate <= today).length;
     } catch {
       return 0;
     }

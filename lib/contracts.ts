@@ -1,7 +1,6 @@
 import { createHash } from "node:crypto";
-import { localizeAgreementTemplate } from "@/lib/agreement-localize";
 import { browserSafeAssetUrl, createBrandingSignedUrl, parseLegacyBrandingReference } from "@/lib/branding-assets";
-import { buildContractVariables, contractVariableKeys, renderContractTemplate } from "@/lib/contract-rendering";
+import { buildContractVariables, contractVariableKeys } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate } from "@/lib/default-contract-template";
 import { UPLOADED_TEMPLATE_KEY } from "@/lib/contract-import-template";
 
@@ -13,11 +12,6 @@ const defaultTemplateHash = createHash("sha256")
   .update(defaultRentalContractTemplate)
   .digest("hex")
   .slice(0, 16);
-
-export const contractVariables = contractVariableKeys.map((key) => ({
-  key,
-  token: `{{${key}}}`
-}));
 
 const defaultTemplateMinimumLength = 5000;
 
@@ -137,10 +131,6 @@ export function buildSampleContractVariables(organization: any) {
       special_conditions: "No cross-border travel without written approval."
     }
   });
-}
-
-export function renderSampleContract(template: string) {
-  return renderContractTemplate(template, buildSampleContractVariables({ name: "RoveHQ Demo Rentals", settings: {} }));
 }
 
 /**
@@ -279,65 +269,3 @@ export async function ensureDefaultContractTemplate(supabase: any, organizationI
   return data;
 }
 
-export async function getContractGenerationContext(supabase: any, rentalId?: string | null, token?: string | null) {
-  let bookingLink = null;
-  let rental = null;
-
-  if (token) {
-    const { data, error } = await supabase.from("booking_links").select("*").eq("token", token).is("deleted_at", null).maybeSingle();
-    if (error) {
-      throw new Error(error.message);
-    }
-    bookingLink = data;
-  }
-
-  if (bookingLink?.rental_id || rentalId) {
-    const { data, error } = await supabase.from("rentals").select("*").eq("id", bookingLink?.rental_id || rentalId).is("deleted_at", null).maybeSingle();
-    if (error) {
-      throw new Error(error.message);
-    }
-    rental = data;
-  }
-
-  if (!rental) {
-    throw new Error("Rental was not found.");
-  }
-
-  const [{ data: organization }, { data: vehicle }, { data: customer }, { data: contract }] = await Promise.all([
-    supabase.from("organizations").select("*").eq("id", rental.organization_id).maybeSingle(),
-    supabase.from("vehicles").select("*").eq("id", rental.vehicle_id).maybeSingle(),
-    supabase.from("customers").select("*").eq("id", rental.customer_id).maybeSingle(),
-    rental.contract_id ? supabase.from("contracts").select("*").eq("id", rental.contract_id).maybeSingle() : Promise.resolve({ data: null })
-  ]);
-
-  if (!organization || !vehicle || !customer) {
-    throw new Error("Contract context is incomplete.");
-  }
-
-  if (!bookingLink) {
-    const { data, error } = await supabase.from("booking_links").select("*").eq("rental_id", rental.id).is("deleted_at", null).order("created_at", { ascending: false }).limit(1).maybeSingle();
-    if (error) {
-      throw new Error(error.message);
-    }
-    bookingLink = data || { organization_id: rental.organization_id, booking_data: {}, included_items: [], special_conditions: null };
-  }
-
-  const template = await ensureDefaultContractTemplate(supabase, rental.organization_id);
-  const templateHtml = template.content_html || template.body || defaultRentalContractTemplate;
-  const variables = await embedLogoInContractVariables(supabase, buildContractVariables({ organization, customer, vehicle, rental, bookingLink }));
-  const html = renderContractTemplate(localizeAgreementTemplate(templateHtml, String(variables.agreement_language || "")), variables);
-  const { htmlToPdf } = await import("@/lib/html-to-pdf");
-  const pdfBytes = await htmlToPdf(html);
-
-  return {
-    organization,
-    vehicle,
-    customer,
-    rental,
-    contract,
-    bookingLink,
-    template,
-    html,
-    pdfBytes
-  };
-}

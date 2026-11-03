@@ -5,8 +5,6 @@
  */
 export const CONDITIONS = ["new", "like_new", "great", "good", "fair", "poor"] as const;
 export type Condition = (typeof CONDITIONS)[number];
-export type ConditionRecord = { value: Condition; set_at: string; by: "owner" | "damage"; damage_on?: string };
-
 export function asCondition(value: unknown): Condition | null {
   return CONDITIONS.includes(value as Condition) ? (value as Condition) : null;
 }

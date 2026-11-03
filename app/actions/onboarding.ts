@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { ensureOnboardingChecklist, getOnboardingStatus as getOnboardingStatusForOrg, markOnboardingStep } from "@/lib/onboarding";
+import { ensureOnboardingChecklist, markOnboardingStep } from "@/lib/onboarding";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -144,14 +144,6 @@ export async function saveBusinessProfile(formData: FormData) {
   revalidatePath("/");
 }
 
-export async function skipFirstVehicle(formData: FormData) {
-  const { supabase } = await requireUser();
-  const organizationId = requiredString(formData, "organizationId");
-  await ensureOnboardingChecklist(supabase, organizationId);
-  await markOnboardingStep(supabase, organizationId, "first_vehicle", false);
-  revalidatePath("/onboarding");
-}
-
 export async function finishOnboarding(formData: FormData) {
   const { supabase } = await requireUser();
   const organizationId = requiredString(formData, "organizationId");
@@ -222,11 +214,6 @@ export async function dismissChecklist(formData: FormData) {
   }
 
   revalidatePath("/");
-}
-
-export async function getOnboardingStatus(organizationId: string) {
-  const { supabase } = await requireUser();
-  return getOnboardingStatusForOrg(supabase, organizationId);
 }
 
 /** "Share your booking page" on the Get ready list: ticked when they copy or share the link. */

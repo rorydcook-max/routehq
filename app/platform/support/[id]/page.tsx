@@ -39,7 +39,7 @@ export default async function SupportConversationPage({ params }: { params: Prom
 
   return (
     <AppShell userEmail={userEmail}>
-      <AutoRefresh />
+      <AutoRefresh threadId={thread.id} />
       <BackLink href="/platform/support" label="Support" />
       <header className="mb-5">
         <p className="text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--primary)]">RoveHQ support</p>

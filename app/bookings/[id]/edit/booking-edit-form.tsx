@@ -235,7 +235,6 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
   const t = useTranslations("bookingEdit");
   const say = t as unknown as Say;
   const locale = useLocale();
-  const router = useRouter();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);

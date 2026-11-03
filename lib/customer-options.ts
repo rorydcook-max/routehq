@@ -111,11 +111,6 @@ export function countriesSorted(locale: string) {
     .sort((a, b) => collator.compare(a.label, b.label));
 }
 
-/** Dialling codes, one per country, alphabetical by English country name ("🇫🇷 France +33"). */
-export const phoneCodeOptions = countriesSorted("en").map((country) => ({ code: country.phoneCode, country: country.code, label: `${country.flag} ${country.label} ${country.phoneCode}` }));
-
-export const countryCodes = Array.from(new Set(allCountries.map((country) => country.phoneCode)));
-
 /**
  * Read a typed or pasted phone number (Rory, 1 Nov 2026): "+262 693 47 87 99" or "00262…" finds the country by
  * itself; a number without a country code stays with the country already chosen.

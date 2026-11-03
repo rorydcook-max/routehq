@@ -28,17 +28,6 @@ const COUNTRY_BY_NAME: Record<string, string> = {
 };
 const COUNTRY_NAME: Record<string, string> = { TH: "Thailand", ID: "Indonesia", VN: "Vietnam", MY: "Malaysia", PH: "the Philippines", LA: "Laos", KH: "Cambodia" };
 
-export const AGREEMENT_LANGUAGE_NAMES: Record<AgreementLanguage, string> = {
-  th: "Thai",
-  id: "Indonesian",
-  vi: "Vietnamese",
-  ms: "Malay",
-  fil: "Filipino",
-  lo: "Lao",
-  km: "Khmer",
-  en: "English"
-};
-
 function toCode(value: unknown) {
   const text = String(value || "").trim();
   if (/^[a-z]{2}$/i.test(text)) return text.toUpperCase();

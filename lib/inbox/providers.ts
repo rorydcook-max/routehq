@@ -6,8 +6,6 @@ import crypto from "crypto";
  * a page down.
  */
 
-export type InboxProvider = "line" | "telegram";
-
 export const PROVIDER_LABELS: Record<string, string> = {
   line: "LINE",
   telegram: "Telegram",

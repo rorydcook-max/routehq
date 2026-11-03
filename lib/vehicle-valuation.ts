@@ -108,7 +108,3 @@ value_*: what this vehicle, at this year and kilometres, in fair condition, woul
   return valuation;
 }
 
-/** A valuation over a month old, or none, needs looking at again. */
-export function valuationStale(valuation: Valuation | null | undefined) {
-  return !valuation?.checked_at || Date.now() - new Date(valuation.checked_at).getTime() >= KEEP_DAYS * 86400000;
-}

@@ -12,9 +12,6 @@ import { viewerIsPlatformAdmin } from "@/lib/admin";
 import { businessToday, toWallTime } from "@/lib/business-time";
 import { effectiveLimits } from "@/lib/plans";
 
-/** Once this many or fewer are left, the calculator says how many. */
-export const SHOW_CHECKS_LEFT_AT = 5;
-
 /** What the calculator shows: null means no limit (platform admins, or nothing to count with). */
 export type ChecksLeft = { limit: number; left: number; resetsOn: string } | null;
 

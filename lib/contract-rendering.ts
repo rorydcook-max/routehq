@@ -94,13 +94,6 @@ function optionalText(value: unknown, fallback = "Not provided") {
   return stripEmpty(value, fallback);
 }
 
-export function renderBilingualSection(english: string, thai: string): string {
-  return `<div class="bilingual-section">
-  <div class="lang-en">${english}</div>
-  <div class="lang-th">${thai}</div>
-</div>`;
-}
-
 export interface ContractVariables {
   business_name: string;
   business_logo_url: string;
@@ -253,15 +246,6 @@ export const contractVariableKeys = [
   "delivery_datetime"
 ] as const;
 
-export const defaultRentalContractTemplate = `
-  <h2>Vehicle Rental Agreement</h2>
-  {{#if business_logo_url}}<img src="{{business_logo_url}}" alt="{{business_name}} logo" style="max-width: 200px; max-height: 80px; object-fit: contain;" />{{else}}<h1>{{business_name}}</h1>{{/if}}
-  <p>This agreement is made on {{contract_date}} between <strong>{{business_name}}</strong> and <strong>{{renter_full_name}}</strong>.</p>
-  <p>Vehicle: {{vehicle_year}} {{vehicle_make}} {{vehicle_model}}, registration {{vehicle_registration}}.</p>
-  <p>Rental: {{rental_start_date}} to {{rental_end_date}}, {{rental_rate}} per {{billing_period_label}}. Deposit: {{deposit_amount}}.</p>
-  <p>Governing law: {{jurisdiction}}.</p>
-`;
-
 export function renderContractTemplate(template: string, variables: Record<string, unknown>) {
   // These arrive already made safe (built by this file, or escaped by textToHtml); everything else is escaped below.
   const rawHtmlKeys = new Set(["included_items", "special_conditions", "owner_extra_terms", "delivery_damage_report"]);
@@ -394,10 +378,6 @@ export function extractBodyHtml(fullHtml: string): string {
     bodyClose !== -1 ? fullHtml.slice(bodyTagEnd, bodyClose) : fullHtml.slice(bodyTagEnd);
 
   return `${styleBlock}\n${bodyContent}`;
-}
-
-export function renderContract(template: string, variables: Record<string, unknown>) {
-  return renderContractTemplate(template, variables);
 }
 
 export function buildContractVariables({
@@ -675,18 +655,3 @@ export function buildContractVariables({
   return variables;
 }
 
-export function htmlToPlainText(html: string) {
-  return html
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<\/(h1|h2|h3|p|li|div)>/gi, "\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}

@@ -1,5 +1,5 @@
 import { planById } from "@/lib/plans";
-import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
+import { organizationLogoReference, resolveBrandingDisplayUrl } from "@/lib/branding-assets";
 
 export type ShellBrand = {
   name: string;
@@ -21,7 +21,9 @@ export async function shellBrand(supabase: any, organizationId: string): Promise
     if (!organization) return null;
     const onTrial = String(organization.subscription_status || "trial") === "trial";
     if (!onTrial && !planById(organization.subscription_tier).whiteLabel) return null;
-    const { logoUrl } = await resolveOrganizationBrandingDisplayUrls(supabase, organization);
+    // Only the logo: the signature's link (resolved alongside it before) was never shown in the shell, and this runs
+    // on every page.
+    const logoUrl = await resolveBrandingDisplayUrl(supabase, organizationLogoReference(organization));
     return {
       name: String(organization.trading_name || organization.name || ""),
       logoUrl: logoUrl || null,

@@ -28,17 +28,6 @@ function money(value: number) {
   return `฿${Math.round(value).toLocaleString("en-US")}`;
 }
 
-/**
- * Everything dated in one month: deliveries, returns, payments due and
- * vehicle paperwork. (This used to query an "organisation_id" column that
- * rentals and vehicles don't have, and a "-31" date that doesn't exist in
- * shorter months, so the calendar was always empty.)
- */
-export async function getCalendarEvents(organizationId: string, year: number, month: number): Promise<CalendarEvent[]> {
-  const mm = String(month).padStart(2, "0");
-  return getCalendarEventsBetween(organizationId, `${year}-${mm}-01`, `${year}-${mm}-${String(lastDayOfMonth(year, month)).padStart(2, "0")}`);
-}
-
 /** The same events for any stretch of days (the dashboard asks for a few months around today). */
 export async function getCalendarEventsBetween(organizationId: string, startDate: string, endDate: string): Promise<CalendarEvent[]> {
   const supabase = (await createSupabaseServerClient()) as any;

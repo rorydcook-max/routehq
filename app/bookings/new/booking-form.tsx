@@ -18,7 +18,6 @@ import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
 import { QuickDocs } from "@/components/quick-docs";
 import { Badge, ProgressBar } from "@/components/ui";
-import { flagForNationality } from "@/lib/customer-options";
 import { findConflict, type BusyPeriod } from "@/lib/rental-conflicts";
 import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places";
 

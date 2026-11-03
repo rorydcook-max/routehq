@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowRight, Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, MapPin, PenLine, ReceiptText, ShieldCheck, Wrench } from "lucide-react";
 import { createVehicleTask } from "@/app/actions/tasks";
-import { logVehicleMaintenance, renewVehicleCompliance, setVehicleInShop } from "@/app/actions/vehicles";
+import { logVehicleMaintenance, setVehicleInShop } from "@/app/actions/vehicles";
 import { OpenFoldsOnHash } from "@/components/open-folds-on-hash";
 import { ShowMoreList } from "@/components/show-more-list";
 import { serviceKmLeft } from "@/lib/vehicle-service";

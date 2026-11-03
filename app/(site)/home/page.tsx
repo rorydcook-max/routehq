@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { numberLocale } from "@/lib/i18n/dates";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
-import { PLANS, TRIAL_DAYS, fleetText } from "@/lib/plans";
+import { PLANS, fleetText } from "@/lib/plans";
 import { formatPlanPrice, planPrices } from "@/lib/plan-currency";
 import { visitorCurrency } from "@/lib/site-currency";
 import { BookingPhoneMock, DashboardWindowMock, HandoverPhoneMock, ImportMock, LedgerCard, PassportCard, PaymentPhoneMock, ReturnCard, ShopPageMock, TodayPhoneMock, sampleMoney } from "../_components/mockups";

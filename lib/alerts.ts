@@ -11,8 +11,6 @@ export type AlertChannel = (typeof ALERT_CHANNELS)[number];
 
 /** Events an operator can be told about, in the order they're shown. `type` matches notifyOperator's type. */
 export const ALERT_EVENTS = ["contract_signed", "payment_received", "portal_action", "new_message", "return_inspection", "plan_activated"] as const;
-export type AlertEvent = (typeof ALERT_EVENTS)[number];
-
 /** On unless switched off: device alerts, LINE and Telegram. Email is opt-in (it's the noisiest place). */
 const DEFAULT_ON: Record<AlertChannel, boolean> = { push: true, line: true, email: false, telegram: true };
 

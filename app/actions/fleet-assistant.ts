@@ -512,29 +512,3 @@ export async function saveAssistantConversation(input: { id?: string | null; sho
   const { data } = await admin.from("assistant_conversations").insert(row).select("id").single();
   return { id: data?.id || null };
 }
-
-/** The person's recent assistant chats in this business, newest first. */
-export async function listAssistantConversations(limit = 20): Promise<Array<{ id: string; title: string; updatedAt: string }>> {
-  const [organization, user] = await Promise.all([getDefaultOrganization(), getRequestUser()]);
-  if (!user) return [];
-  const admin = createSupabaseAdminClient() as any;
-  const { data } = await admin
-    .from("assistant_conversations")
-    .select("id, title, updated_at")
-    .eq("organization_id", organization.id)
-    .eq("user_id", user.id)
-    .order("updated_at", { ascending: false })
-    .limit(limit);
-  return ((data || []) as any[]).map((row) => ({ id: row.id, title: row.title || "", updatedAt: row.updated_at }));
-}
-
-/** One of the person's chats, to carry on with. */
-export async function loadAssistantConversation(id: string): Promise<SavedConversation | null> {
-  if (!/^[0-9a-f-]{36}$/i.test(id || "")) return null;
-  const [organization, user] = await Promise.all([getDefaultOrganization(), getRequestUser()]);
-  if (!user) return null;
-  const admin = createSupabaseAdminClient() as any;
-  const { data } = await admin.from("assistant_conversations").select("*").eq("id", id).eq("organization_id", organization.id).eq("user_id", user.id).maybeSingle();
-  if (!data) return null;
-  return { id: data.id, title: data.title || "", shown: data.shown || [], turns: data.turns || [], draft: data.draft || [], rentals: data.rentals || [], paperwork: Array.isArray(data.paperwork) ? data.paperwork : [], updatedAt: data.updated_at };
-}

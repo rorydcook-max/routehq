@@ -6,7 +6,6 @@ import { LoanFields } from "@/app/fleet/new/loan-fields";
 import { RatesFields } from "@/app/fleet/new/rates-fields";
 import { VehicleIdentityFields } from "@/app/fleet/new/vehicle-identity-fields";
 import { AppShell } from "@/components/app-shell";
-import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
 import { QuickPhotos } from "@/app/fleet/new/quick-photos";

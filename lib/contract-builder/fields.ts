@@ -39,8 +39,6 @@ export function contractCountryFor(leadCountry: string | null | undefined): Cont
   return (CONTRACT_COUNTRIES as readonly string[]).includes(code) && code !== "XX" ? (code as ContractCountry) : "XX";
 }
 
-/** Which language the agreement is written in alongside English, per country version. */
-export const CONTRACT_LANGUAGE: Record<ContractCountry, string> = { TH: "th", ID: "id", VN: "vi", MY: "ms", PH: "fil", LA: "lo", KH: "km", XX: "en" };
 /** The currency the form suggests (operators can change it: plenty of shops price in USD or THB elsewhere). */
 export const CONTRACT_CURRENCY: Record<ContractCountry, string> = { TH: "THB", ID: "IDR", VN: "VND", MY: "MYR", PH: "PHP", LA: "LAK", KH: "USD", XX: "USD" };
 export const CURRENCIES = ["THB", "IDR", "VND", "MYR", "PHP", "LAK", "KHR", "USD", "EUR", "AUD", "SGD"] as const;

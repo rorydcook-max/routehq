@@ -391,7 +391,19 @@ function InsightsPanel({ data, say, locale }: { data: ReportsData; say: Say; loc
   const fetchInsights = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/reports/insights", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data, locale }) });
+      // Only what the summary for the AI uses (api/reports/insights): the whole report was sent before.
+      const summary = {
+        dateRange: { label: data.dateRange?.label },
+        totalRevenue: data.totalRevenue,
+        totalExpenses: data.totalExpenses,
+        netProfit: data.netProfit,
+        revenueChange: data.revenueChange,
+        profitChange: data.profitChange,
+        vehicleMetrics: (data.vehicleMetrics || []).slice(0, 5).map((v) => ({ label: v.label, profit: v.profit, utilizationRate: v.utilizationRate, roi: v.roi })),
+        expensesByType: (data.expensesByType || []).slice(0, 5),
+        outstandingBalances: (data.outstandingBalances || []).map((b) => ({ totalBalance: b.totalBalance }))
+      };
+      const response = await fetch("/api/reports/insights", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: summary, locale }) });
       const json = await response.json();
       setInsights(json.insights || []);
     } catch {

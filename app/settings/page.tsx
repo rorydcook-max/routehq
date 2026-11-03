@@ -7,25 +7,14 @@ import { CalendarFeedCard, EmailAlertsCard, IntegrationCard, TelegramCard } from
 import { SwitchField } from "@/components/switch-field";
 import { InfoTip } from "@/components/info-tip";
 import { currencySymbol } from "@/components/currency-symbol";
-import { effectiveLimits, fleetMix, fleetText, planById } from "@/lib/plans";
+import { effectiveLimits, fleetMix, planById } from "@/lib/plans";
 import { getCustomPlan } from "@/lib/custom-plan";
 import { SettingsTabs } from "@/app/settings/settings-tabs";
 import { isEmailConfigured } from "@/lib/email";
 import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dateFormat } from "@/lib/i18n/dates";
-import {
-  approveVehicleCatalogSubmission,
-  createVehicleMake,
-  createVehicleModel,
-  createVehicleTrim,
-  disconnectLine,
-  mergeVehicleCatalogResearch,
-  researchVehicleCatalogSubmission,
-  rejectVehicleCatalogSubmission,
-  updateLineSettings,
-  updateUpfrontDiscountSettings
-} from "@/app/actions/settings";
+import { disconnectLine, updateLineSettings, updateUpfrontDiscountSettings } from "@/app/actions/settings";
 import { BranchList } from "@/app/settings/branch-list";
 import { ContractsBrandingSection } from "@/app/settings/contracts-branding-section";
 import { MessagingPanel } from "@/app/settings/messaging-panel";
@@ -56,7 +45,7 @@ import { TravelPolicyForm } from "@/app/settings/travel-policy-form";
 import { AppShell } from "@/components/app-shell";
 import { PageBand, bandTab } from "@/components/page-band";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, Fold, SectionHeader } from "@/components/ui";
+import { Badge, Card, Fold } from "@/components/ui";
 import { OpenOnHash } from "@/components/open-on-hash";
 import { freshPromptPayQrUrl } from "@/lib/promptpay-qr";
 import { PushToggle } from "@/components/push-toggle";
@@ -69,77 +58,13 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
 
-type VehicleMakeSetting = {
-  id: string;
-  name: string;
-  slug: string;
-  origin_country: string | null;
-  logo_url: string | null;
-  sort_order: number;
-  is_active: boolean;
-};
-
-type VehicleModelSetting = {
-  id: string;
-  make_id: string;
-  name: string;
-  category_code: string;
-  body_type: string | null;
-  is_active: boolean;
-};
-
-type VehicleTrimSetting = {
-  id: string;
-  model_id: string;
-  name: string;
-  year_from: number;
-  year_to: number | null;
-  engine_cc: number | null;
-  transmission: string | null;
-  fuel_type: string | null;
-  seating_capacity: number | null;
-  drivetrain: string | null;
-  created_at: string;
-};
-
-type VehicleCatalogSubmissionSetting = {
-  id: string;
-  status: string;
-  make_name: string;
-  model_name: string | null;
-  trim_name: string | null;
-  category_code: string | null;
-  year_from: number | null;
-  year_to: number | null;
-  notes: string | null;
-  research_status: string | null;
-  research_payload: any;
-  created_at: string;
-};
-
-function candidateLabel(candidate: any) {
-  return [candidate?.make, candidate?.model, candidate?.trim].filter(Boolean).join(" ");
-}
-
-function candidateSpecs(candidate: any) {
-  return [
-    candidate?.year_from ? `${candidate.year_from}${candidate.year_to ? `-${candidate.year_to}` : "+"}` : null,
-    candidate?.engine_cc ? `${candidate.engine_cc}cc` : null,
-    candidate?.transmission,
-    candidate?.fuel_type,
-    candidate?.drivetrain
-  ]
-    .filter(Boolean)
-    .join(" / ");
-}
-
 function browserSafeAssetFallback(value: string | null | undefined) {
   const rawValue = String(value || "").trim();
   return rawValue.startsWith("http") || rawValue.startsWith("data:") ? rawValue : null;
 }
 
 // The wording for the parts operators see is in locales/<language>/common.json under
-// "settingsPage". The vehicle catalogue tools at the bottom are for RoveHQ staff only.
+// "settingsPage".
 const SETTINGS_TABS = [{ key: "business" }, { key: "rentals" }, { key: "messaging" }, { key: "notifications" }, { key: "team" }, { key: "more" }] as const;
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -179,13 +104,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const {
     data: { user }
   } = await supabase.auth.getUser();
-  const { data: platformAdmin } = await supabase
-    .from("platform_admins")
-    .select("user_id")
-    .eq("user_id", user?.id)
-    .limit(1)
-    .maybeSingle();
-  const isPlatformAdmin = Boolean(platformAdmin);
   const { data: addressRow } = await supabase.from("organizations").select("booking_subdomain, custom_domain, custom_domain_status, trial_ends_at").eq("id", organization.id).maybeSingle();
   // Custom limits a RoveHQ admin set for this business (none: the plan's own), read separately so a missing column can't break the page.
   const customPlan = await getCustomPlan(organization.id);
@@ -195,10 +113,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     { data: members },
     branches,
     categories,
-    { data: vehicleMakes },
-    { data: vehicleModels },
-    { data: recentTrims },
-    catalogSubmissionsResult,
     { data: lineMessages }
   ] = await Promise.all([
     supabase
@@ -208,30 +122,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       .order("created_at", { ascending: true }),
     ensureDefaultBranch(organization),
     getVehicleCategories(organization.id),
-    supabase
-      .from("vehicle_makes")
-      .select("id, name, slug, origin_country, logo_url, sort_order, is_active")
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true })
-      .order("name", { ascending: true }),
-    supabase
-      .from("vehicle_models")
-      .select("id, make_id, name, category_code, body_type, is_active")
-      .eq("is_active", true)
-      .order("name", { ascending: true }),
-    supabase
-      .from("vehicle_trims")
-      .select("id, model_id, name, year_from, year_to, engine_cc, transmission, fuel_type, seating_capacity, drivetrain, created_at")
-      .eq("is_active", true)
-      .order("created_at", { ascending: false })
-      .limit(12),
-    isPlatformAdmin
-      ? supabase
-          .from("vehicle_catalog_submissions")
-          .select("id, status, make_name, model_name, trim_name, category_code, year_from, year_to, notes, research_status, research_payload, created_at")
-          .order("created_at", { ascending: false })
-          .limit(20)
-      : Promise.resolve({ data: [] }),
     supabase
       .from("line_messages")
       .select("id, type, status, sent_at, created_at, error, recipient_line_id")
@@ -266,11 +156,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     const last = lastSendByChannel.get(channel.id);
     if (last?.failed && channel.updated_at && new Date(last.at).getTime() < new Date(channel.updated_at).getTime()) lastSendByChannel.delete(channel.id);
   }
-  const typedVehicleMakes = (vehicleMakes || []) as VehicleMakeSetting[];
-  const typedVehicleModels = (vehicleModels || []) as VehicleModelSetting[];
-  const typedRecentTrims = (recentTrims || []) as VehicleTrimSetting[];
-  const typedCatalogSubmissions = (catalogSubmissionsResult.data || []) as VehicleCatalogSubmissionSetting[];
-  const catalogWaiting = typedCatalogSubmissions.filter((submission) => submission.status === "pending_review").length;
   const brandingDisplayUrls = await resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true });
   const organizationSettings = organization.settings && typeof organization.settings === "object" && !Array.isArray(organization.settings)
     ? (organization.settings as Record<string, unknown>)
@@ -282,8 +167,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const signatureDisplayUrl = organization.authorised_signature_storage_bucket && organization.authorised_signature_storage_path
     ? "/api/branding-assets/signature"
     : brandingDisplayUrls.signatureUrl || browserSafeAssetFallback(ownerSignatureUrl);
-  const makeMap = new Map<string, VehicleMakeSetting>(typedVehicleMakes.map((make) => [make.id, make]));
-  const modelMap = new Map<string, VehicleModelSetting>(typedVehicleModels.map((model) => [model.id, model]));
   const travelPolicySettings = getTravelPolicySettings(organization.settings);
 
   const lineUserId = organization.line_user_id ?? null;

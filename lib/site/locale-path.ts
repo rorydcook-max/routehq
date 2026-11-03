@@ -14,10 +14,6 @@ export const DEFAULT_SITE_LOCALE = "en";
 
 const codes = new Set<string>(supportedLocaleCodes);
 
-export function isSupportedSiteLocale(code: string | null | undefined): code is string {
-  return Boolean(code && codes.has(code));
-}
-
 /** Website pages, written without a language prefix. "/" is the home page for someone signed out. */
 export function isSitePath(path: string) {
   return (

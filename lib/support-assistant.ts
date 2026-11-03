@@ -1,5 +1,5 @@
 import { BUSINESS_INCLUDED, PLANS, TRIAL_DAYS, YEARLY_MONTHS } from "@/lib/plans";
-import { docForAppPath, docMarkdown, listDocs, loadPublishedArticles, publishedVersion, DOCS_LOCALE } from "@/lib/site/docs";
+import { docForAppPath, docMarkdown, listDocs, publishedVersion, DOCS_LOCALE } from "@/lib/site/docs";
 
 /**
  * The support assistant: answers "how do I…" questions about using RoveHQ from the help centre's articles
@@ -10,12 +10,6 @@ import { docForAppPath, docMarkdown, listDocs, loadPublishedArticles, publishedV
 
 const MAX_ARTICLES = 3;
 const MAX_ARTICLE_CHARS = 9000;
-
-export type SupportTurn = { role: "user" | "assistant"; content: string };
-/** `video`/`poster` are set when the article has a screen recording, so the chat can play it right there. */
-export type SupportArticle = { slug: string; title: string; href: string; video?: string | null; poster?: string | null };
-/** `request` is true when the message asked for new help content (a guide, video…): it is logged for the team's content queue. */
-export type SupportAnswer = { ok: true; answer: string; articles: SupportArticle[]; handoff: boolean; kind: "support"; request?: boolean } | { ok: false; error: string };
 
 /** Words worth matching on: lowercased, punctuation off, the little joining words dropped. */
 const STOP = new Set(["the", "a", "an", "and", "or", "to", "of", "in", "on", "for", "my", "me", "i", "it", "is", "do", "does", "can", "how", "what", "where", "why", "when", "with", "from", "at", "this", "that", "be", "are", "you", "your"]);

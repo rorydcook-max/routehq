@@ -188,10 +188,6 @@ async function loadByToken(token: string) {
 
 type LoadedContext = Awaited<ReturnType<typeof loadByToken>>;
 
-export async function getCustomerSigningEligibility(token: string) {
-  return eligibilityFor(await loadByToken(token));
-}
-
 /** The same check, for records already loaded: loading them again for every question made the customer's page slow. */
 async function eligibilityFor(ctx: LoadedContext) {
   if (ctx.state !== "found") {
@@ -268,12 +264,6 @@ async function eligibilityFor(ctx: LoadedContext) {
     customerAlreadySigned: Boolean(renterSignature),
     fullyExecuted: Boolean(renterSignature && certificate)
   };
-}
-
-export async function loadPublicRentalAgreement(token: string) {
-  const ctx = await loadByToken(token);
-  if (ctx.state !== "found") return null;
-  return agreementFor(ctx, await eligibilityFor(ctx));
 }
 
 /**
@@ -557,14 +547,6 @@ export async function getCustomerExecutedAgreementDownloads(token: string): Prom
   if (!eligibility.fullyExecuted) return { original: null, certificate: null };
   const [original, certificate] = await Promise.all([downloadFor(ctx, "original").catch(() => null), downloadFor(ctx, "certificate").catch(() => null)]);
   return { original, certificate };
-}
-
-export async function getCustomerExecutedAgreementDownload(token: string, kind: "original" | "certificate") {
-  const ctx = await loadByToken(token);
-  if (ctx.state !== "found" || !ctx.version || !ctx.certificate) throw new Error("Executed agreement is not available.");
-  const eligibility = await eligibilityFor(ctx);
-  if (!eligibility.fullyExecuted) throw new Error("Agreement execution is not complete.");
-  return downloadFor(ctx, kind);
 }
 
 async function downloadFor(ctx: Extract<LoadedContext, { state: "found" }>, kind: "original" | "certificate") {

@@ -41,12 +41,6 @@ export async function getCurrentMembership() {
   };
 }
 
-/** Refunds, waived charges and the like: true for the owner and managers. */
-export async function currentCanDecideMoney() {
-  const membership = await getCurrentMembership();
-  return membership?.role === "owner" || membership?.role === "manager";
-}
-
 /** For server actions that change the business. Redirects if signed out; throws a clear message for teammates. */
 export async function requireOwner() {
   const membership = await getCurrentMembership();

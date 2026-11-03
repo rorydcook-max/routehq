@@ -1,4 +1,3 @@
-import crypto from "crypto";
 
 const LINE_API_BASE = "https://api.line.me/v2/bot";
 
@@ -14,13 +13,6 @@ export interface LineFlexMessage {
 }
 
 export type LineMessage = LineTextMessage | LineFlexMessage;
-
-export function verifyLineSignature(rawBody: string, signature: string): boolean {
-  const secret = process.env.LINE_CHANNEL_SECRET;
-  if (!secret) return false;
-  const expected = crypto.createHmac("sha256", secret).update(rawBody).digest("base64");
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
-}
 
 export async function sendLinePushMessage(userId: string, messages: LineMessage[]): Promise<void> {
   const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;
@@ -49,15 +41,3 @@ export function lineFlex(altText: string, contents: Record<string, unknown>): Li
   return { type: "flex", altText, contents };
 }
 
-export async function sendLineText(userId: string, text: string): Promise<void> {
-  await sendLinePushMessage(userId, [lineText(text)]);
-}
-
-export async function sendLineNotification(
-  userId: string,
-  title: string,
-  body: string,
-  emoji = "🔔"
-): Promise<void> {
-  await sendLineText(userId, `${emoji} *${title}*\n${body}`);
-}

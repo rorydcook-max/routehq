@@ -5,7 +5,7 @@ import type { PreparedUploads, UploadRequest } from "@/lib/direct-uploads";
 import { countsFor, isQueueView, listQueueRows, uploadFolderFor, verifyUploadedFiles, type HelpdeskCounts, type QueueRow } from "@/lib/helpdesk";
 import { notifyOperator } from "@/lib/notify-operator";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 import { SUPPORT_BUCKET, SUPPORT_MAX_FILE_MB, SUPPORT_MAX_FILES, cleanFileName, isPlatformAdmin } from "@/lib/support";
 
 /**
@@ -19,10 +19,9 @@ type Result<T = {}> = ({ ok: true } & T) | { ok: false; error: string };
 const NOT_ALLOWED = "Not found.";
 
 async function teamMember() {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  // From the signed sign-in token (getRequestUser), not a trip to the sign-in service: the queue and the open
+  // conversation poll this every 15 seconds. The admin check below still asks the database.
+  const [supabase, user] = (await Promise.all([createSupabaseServerClient(), getRequestUser()])) as [any, Awaited<ReturnType<typeof getRequestUser>>];
   if (!user || !(await isPlatformAdmin(supabase, user.id))) return null;
   return { userId: user.id as string, email: (user.email || null) as string | null };
 }
@@ -58,6 +57,24 @@ export async function listQueue(filters: { view?: string; search?: string }): Pr
   const view = isQueueView(filters?.view) ? filters.view : "waiting";
   const [rows, counts] = await Promise.all([listQueueRows(view, String(filters?.search || ""), me.userId), countsFor(me.userId)]);
   return { ok: true, rows, counts };
+}
+
+/**
+ * A short fingerprint of one conversation (its messages and its status, assignee, priority, tags), polled by the
+ * conversation page: the page is only fetched again when this changes, instead of in full every 15 seconds.
+ */
+export async function conversationStamp(threadId: string): Promise<string> {
+  const me = await teamMember();
+  if (!me) return "";
+  const admin = createSupabaseAdminClient() as any;
+  const id = String(threadId || "");
+  const [{ data: thread }, { data: latest, count }] = await Promise.all([
+    admin.from("support_threads").select("mode, status, priority, tags, assigned_to, last_message_at").eq("id", id).maybeSingle(),
+    admin.from("support_messages").select("id, created_at", { count: "exact" }).eq("thread_id", id).order("created_at", { ascending: false }).limit(1)
+  ]);
+  if (!thread) return "";
+  const last = ((latest || []) as any[])[0];
+  return JSON.stringify([thread.mode, thread.status, thread.priority, thread.tags, thread.assigned_to, thread.last_message_at, count || 0, last?.id || null]);
 }
 
 /** Signed upload links for files the team sends: straight from the browser to storage, in the conversation's folder. */

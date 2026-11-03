@@ -24,6 +24,8 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
   useEffect(() => {
     if (!code) return;
     const timer = window.setInterval(async () => {
+      // They are in LINE sending the code: no need to ask while this tab is in the background (checked again on return).
+      if (document.hidden) return;
       try {
         const status = await lineConnectionStatus(organizationId);
         if (status.connected) {

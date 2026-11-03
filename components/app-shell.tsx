@@ -38,7 +38,7 @@ import { BusinessLogoImage } from "@/components/business-logo-image";
 import { useInitialShellBrand } from "@/components/shell-brand-provider";
 import { FastActionSheet } from "@/components/fast-action-sheet";
 import { PendingButton } from "@/components/pending-button";
-import { TrialBanner } from "@/components/trial-banner";
+import { forgetSubscriptionStatus, TrialBanner } from "@/components/trial-banner";
 import { ScreenHelp } from "@/components/screen-help";
 
 type NavKey =
@@ -140,6 +140,7 @@ function loadShellContext(): Promise<ShellContext | null> {
 export function forgetShellContext() {
   shellCache.value = null;
   shellCache.at = 0;
+  forgetSubscriptionStatus();
 }
 
 /**

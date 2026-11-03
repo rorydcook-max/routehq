@@ -5,12 +5,6 @@ function timestampRevision() {
   return new Date().toISOString().replace(/[-:.TZ]/g, "");
 }
 
-export function withDraftWatermark(html: string) {
-  const banner = `<div style="position: fixed; top: 10mm; left: 15mm; right: 15mm; z-index: 9999; border: 2px solid #b91c1c; color: #b91c1c; background: rgba(255,255,255,0.92); font-family: Arial, sans-serif; font-size: 16px; font-weight: 700; text-align: center; padding: 8px;">DRAFT - NOT SIGNED</div>`;
-  const watermark = `<div style="position: fixed; top: 45%; left: 8%; right: 8%; z-index: 9998; transform: rotate(-22deg); opacity: 0.08; color: #991b1b; font-family: Arial, sans-serif; font-size: 72px; font-weight: 900; text-align: center;">DRAFT - NOT SIGNED</div>`;
-  return html.includes("<body") ? html.replace(/<body([^>]*)>/i, `<body$1>${banner}${watermark}`) : `${banner}${watermark}${html}`;
-}
-
 export function buildRentalDocumentPdfPath({
   organizationId,
   rentalId,
@@ -69,10 +63,6 @@ export async function createRentalDocumentSignedUrl(bucket: string, path: string
     throw failure;
   }
   return data.signedUrl;
-}
-
-export async function renderDraftPdfBuffer(html: string) {
-  return htmlToPdf(withDraftWatermark(html));
 }
 
 export async function renderFinalPdfBuffer(html: string) {

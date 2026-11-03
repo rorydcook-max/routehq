@@ -19,7 +19,7 @@ import { PageTabs } from "@/components/page-tabs";
 import { CommunicationPanel } from "@/components/communication-panel";
 import { PendingButton } from "@/components/pending-button";
 import { BackLink, Badge, Card, Pane } from "@/components/ui";
-import { DateLeaf, ElapsedBar, Ring, TileHead, initialsOf } from "@/components/glance";
+import { DateLeaf, ElapsedBar, initialsOf } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
 import { countriesSorted, customerLanguages, flagForNationality } from "@/lib/customer-options";

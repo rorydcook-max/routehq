@@ -1,7 +1,6 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendLineMessage } from "@/services/messaging/line";
 import { sendPushToUsers } from "@/lib/push";
-import { planById } from "@/lib/plans";
 
 /**
  * Help: a conversation between a business and the RoveHQ team, with files.

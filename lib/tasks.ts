@@ -85,16 +85,25 @@ function isVoided(payment: any) {
  * creating a reminder, and a recorded payment disappears at once. The older
  * auto-created "payment reminder" task rows are left out for the same reason.
  */
-export async function getTaskList(organizationId: string): Promise<TaskListItem[]> {
+export async function getTaskList(
+  organizationId: string,
+  /**
+   * `openOnly`: just the open items, without receipt links or vehicle/booking names: enough to count what is due
+   * (the To do badge, asked on every page) without reading every finished job ever done and signing receipt links.
+   */
+  options: { openOnly?: boolean } = {}
+): Promise<TaskListItem[]> {
+  const openOnly = options.openOnly === true;
   const supabase = (await createSupabaseServerClient()) as any;
+  let tasksQuery = supabase
+    .from("tasks")
+    .select("id, title, task_type, due_at, completed_at, vehicle_id, rental_id, rental_payment_id, action, portal_action_id")
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .neq("task_type", "payment_reminder");
+  if (openOnly) tasksQuery = tasksQuery.is("completed_at", null);
   const [tasksResult, paymentsResult, requestsResult, handoversResult] = await Promise.all([
-    supabase
-      .from("tasks")
-      .select("id, title, task_type, due_at, completed_at, vehicle_id, rental_id, rental_payment_id, action, portal_action_id")
-      .eq("organization_id", organizationId)
-      .is("deleted_at", null)
-      .neq("task_type", "payment_reminder")
-      .order("due_at", { ascending: true, nullsFirst: false }),
+    tasksQuery.order("due_at", { ascending: true, nullsFirst: false }),
     supabase
       .from("rental_payments")
       .select("id, rental_id, vehicle_id, due_date, amount, status, voided, metadata, rentals!inner(id, status, vehicle_id, reference, display_code, customers!rentals_customer_id_fkey(full_name))")
@@ -150,7 +159,7 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       (isHandedOver(payment.rentals.status) && (!payment.due_date || String(payment.due_date).slice(0, 10) <= horizon))
   );
 
-  const receiptUrls = await signedReceiptUrls(payments.map((row: any) => receiptOf(row.metadata)?.path).filter(Boolean) as string[]);
+  const receiptUrls = openOnly ? new Map<string, string>() : await signedReceiptUrls(payments.map((row: any) => receiptOf(row.metadata)?.path).filter(Boolean) as string[]);
 
   const vehicleIds = [
     ...new Set([
@@ -162,10 +171,10 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
   const rentalIds = [...new Set([...tasks.map((row: any) => row.rental_id), ...requests.map((row) => row.rental_id)].filter(Boolean))];
 
   const [vehiclesResult, rentalsResult] = await Promise.all([
-    vehicleIds.length
+    vehicleIds.length && !openOnly
       ? supabase.from("vehicles").select("id, registration_number, make, model").in("id", vehicleIds)
       : Promise.resolve({ data: [] }),
-    rentalIds.length
+    rentalIds.length && !openOnly
       ? supabase.from("rentals").select("id, reference, display_code, vehicle_id, customers!rentals_customer_id_fkey(full_name), vehicles!rentals_vehicle_id_fkey(make, model, registration_number)").in("id", rentalIds)
       : Promise.resolve({ data: [] })
   ]);

@@ -30,22 +30,6 @@ export type VehicleTrim = {
   drivetrain: string | null;
 };
 
-export async function fetchVehicleMakes() {
-  const supabase = createSupabaseBrowserClient() as any;
-  const { data, error } = await supabase
-    .from("vehicle_makes")
-    .select("id, name, slug, origin_country, logo_url, sort_order")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true })
-    .order("name", { ascending: true });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return (data || []) as VehicleMake[];
-}
-
 export async function fetchVehicleMakesForCategory(categoryCode: string) {
   const supabase = createSupabaseBrowserClient() as any;
   const { data: modelRows, error: modelError } = await supabase

@@ -259,8 +259,4 @@ export async function getTransactionFormPrefill({
   return null;
 }
 
-export function isIncomeTransactionType(type: string) {
-  return type === "rental_income" || type === "charge_recovered" || type === "deposit_forfeited" || type === "deposit_deduction";
-}
-
 export { TRANSACTION_TYPE_OPTIONS };

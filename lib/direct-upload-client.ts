@@ -47,24 +47,6 @@ function imageElement(file: File): Promise<{ width: number; height: number; sour
   });
 }
 
-/** A copy of the form data with every photo shrunk (see compressImage). */
-export async function compressFormImages(formData: FormData): Promise<FormData> {
-  const next = new FormData();
-  for (const [field, value] of formData.entries()) {
-    next.append(field, value instanceof File && value.size > 0 ? await compressImage(value) : value);
-  }
-  return next;
-}
-
-/**
- * Wrap a server action used as a form action so photos are shrunk in the
- * browser first. Keeps each request under Vercel's 4.5 MB limit for forms
- * that send one or a few photos.
- */
-export function withCompressedImages<T>(action: (formData: FormData) => Promise<T>) {
-  return async (formData: FormData) => action(await compressFormImages(formData));
-}
-
 type Uploaded = { field: string; path: string; name: string; type: string; size: number };
 type Prepare = (files: UploadRequest[]) => Promise<PreparedUploads>;
 

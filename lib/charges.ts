@@ -10,8 +10,6 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
  * "charge paid by customer", money in, so the cost and what came back stand side by side. If the customer never
  * pays, the owner waives it from the booking and the expense stands alone.
  */
-export type ChargeReason = "damage" | "fuel" | "cleaning" | "fine" | "repair" | "other";
-
 export async function billRentalCustomer(
   supabase: any,
   input: {

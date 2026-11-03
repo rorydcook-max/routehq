@@ -155,48 +155,6 @@ async function researchJsonOpenAI(prompt: string): Promise<{ data: Record<string
   return { data: parseJsonObject(response.output_text || ""), sources: collectSources(response) };
 }
 
-const middle = (values: number[]) => {
-  const sorted = values.filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
-  if (!sorted.length) return undefined;
-  const half = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[half] : (sorted[half - 1] + sorted[half]) / 2;
-};
-
-/**
- * One look at the web can land on an unusual price. This asks the same question
- * several times at once and takes the middle answer for every number, so a
- * single odd advert or a misread page does not swing the result.
- */
-export async function researchJsonSteady(prompt: string, times = 3): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
-  // With Claude, once: three looks tripled the cost (about $0.19 a vehicle, 2 Nov 2026) for little steadier figures.
-  if (process.env.ANTHROPIC_API_KEY) times = 1;
-  const settled = await Promise.allSettled(Array.from({ length: times }, () => researchJson(prompt)));
-  const runs = settled.filter((run): run is PromiseFulfilledResult<{ data: Record<string, any>; sources: ResearchSource[] }> => run.status === "fulfilled").map((run) => run.value);
-  if (!runs.length) throw (settled[0] as PromiseRejectedResult).reason;
-
-  const data: Record<string, any> = { ...runs[0].data };
-  for (const field of Object.keys(data)) {
-    const values = runs.map((run) => run.data[field]);
-    if (values.every((value) => typeof value === "number")) {
-      data[field] = Math.round((middle(values) as number) * 10) / 10;
-    } else if (values.every((value) => Array.isArray(value) && value.every((item: unknown) => typeof item === "number"))) {
-      const length = Math.min(...values.map((value) => value.length));
-      data[field] = Array.from({ length }, (_, index) => Math.round((middle(values.map((value) => Number(value[index]))) as number) * 10) / 10);
-    }
-  }
-  // Every price each look found counts: together they show the real spread.
-  if (runs.some((run) => Array.isArray(run.data.rent_quotes))) data.rent_quotes = runs.flatMap((run) => (Array.isArray(run.data.rent_quotes) ? run.data.rent_quotes : []));
-  // Only as sure as the least sure look.
-  const order = ["low", "medium", "high"];
-  const confidences = runs.map((run) => order.indexOf(String(run.data.confidence))).filter((index) => index >= 0);
-  if (confidences.length) data.confidence = order[Math.min(...confidences)];
-
-  const seen = new Map<string, ResearchSource>();
-  // Take pages from each look in turn so every kind of source is represented.
-  for (let index = 0; index < 30; index++) for (const run of runs) if (run.sources[index] && !seen.has(run.sources[index].url)) seen.set(run.sources[index].url, run.sources[index]);
-  return { data, sources: Array.from(seen.values()) };
-}
-
 /** Where the business works and what money it uses, for a research prompt. */
 export function businessPlace(organization: { currency?: string | null; settings?: Record<string, any> | null }) {
   const place = organization.settings?.main_location || {};

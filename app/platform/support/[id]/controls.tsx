@@ -4,7 +4,7 @@ import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Hand, X } from "lucide-react";
-import { assign, markUnread, setPriority, setStatus, setTags, takeOver } from "@/app/actions/helpdesk";
+import { assign, conversationStamp, markUnread, setPriority, setStatus, setTags, takeOver } from "@/app/actions/helpdesk";
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -24,17 +24,30 @@ function useAct() {
 }
 
 /**
- * New messages arrive without a refresh: the page's server data is fetched again every 15 seconds while the tab is
- * visible. Whatever is typed in the reply box is kept (it lives in the browser, not in the server data).
+ * New messages arrive without a refresh: every 15 seconds while the tab is visible a small fingerprint of the
+ * conversation is checked, and the page's server data is fetched again only when it changed (the whole page every
+ * 15 seconds was heavy, and re-marked it read each time). Whatever is typed in the reply box is kept.
  */
-export function AutoRefresh({ seconds = 15 }: { seconds?: number }) {
+export function AutoRefresh({ threadId, seconds = 15 }: { threadId: string; seconds?: number }) {
   const router = useRouter();
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      if (document.visibilityState === "visible") router.refresh();
+    let last: string | null = null;
+    let running = false;
+    const timer = window.setInterval(async () => {
+      if (document.visibilityState !== "visible" || running) return;
+      running = true;
+      try {
+        const stamp = await conversationStamp(threadId);
+        if (last !== null && stamp && stamp !== last) router.refresh();
+        if (stamp) last = stamp;
+      } catch {
+        // Offline for a moment: try again next time.
+      } finally {
+        running = false;
+      }
     }, seconds * 1000);
     return () => window.clearInterval(timer);
-  }, [router, seconds]);
+  }, [router, seconds, threadId]);
   return null;
 }
 

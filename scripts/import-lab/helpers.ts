@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx";
 import { businessToday } from "@/lib/business-time";
 import { plateKey } from "@/lib/import/normalize";
-import type { ImportPreview, PreviewRental, PreviewTransaction, PreviewVehicle } from "@/lib/import/preview";
+import type { ImportPreview, PreviewRental, PreviewVehicle } from "@/lib/import/preview";
 
 export type Cell = string | number | null;
 export type Tab = { name: string; rows: Cell[][]; merges?: string[] };
@@ -75,8 +75,6 @@ export const monthTab = (days: number) => {
 export type Check = (preview: ImportPreview) => string | null;
 export const vehicle = (preview: ImportPreview, plate: string): PreviewVehicle | undefined => preview.vehicles.find((item) => plateKey(item.plate) === plateKey(plate));
 export const rentalOn = (preview: ImportPreview, plate: string): PreviewRental | undefined => preview.rentals.find((item) => plateKey(item.plate) === plateKey(plate) && item.include);
-export const moneyOn = (preview: ImportPreview, plate: string): PreviewTransaction[] => preview.transactions.filter((item) => plateKey(item.plate) === plateKey(plate));
-
 export function same(label: string, actual: unknown, expected: unknown): string | null {
   return JSON.stringify(actual) === JSON.stringify(expected) ? null : `${label}: got ${JSON.stringify(actual)}, expected ${JSON.stringify(expected)}`;
 }

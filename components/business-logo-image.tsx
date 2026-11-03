@@ -8,6 +8,23 @@ function stableKey(src: string) {
   return src.split("?")[0];
 }
 
+/**
+ * Across pages too: every page draws its own shell, so each one mounted a new logo with a freshly signed link and the
+ * browser downloaded the same file again on every tap. The first link for a file is reused for 45 minutes (links
+ * are signed for an hour), then a fresh one is taken.
+ */
+const LINK_REUSE_MS = 45 * 60_000;
+const firstLinks = new Map<string, { src: string; at: number }>();
+function reusableLink(src: string) {
+  // Browser only: on the server this list would be shared between requests.
+  if (typeof window === "undefined") return src;
+  const key = stableKey(src);
+  const known = firstLinks.get(key);
+  if (known && Date.now() - known.at < LINK_REUSE_MS) return known.src;
+  firstLinks.set(key, { src, at: Date.now() });
+  return src;
+}
+
 export function BusinessLogoImage({
   alt,
   className,
@@ -22,9 +39,9 @@ export function BusinessLogoImage({
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   // First src wins for a given file; later renders with only a new token are ignored.
-  const srcRef = useRef<string | null>(src || null);
+  const srcRef = useRef<string | null>(src ? reusableLink(src) : null);
   if (src && (!srcRef.current || stableKey(src) !== stableKey(srcRef.current))) {
-    srcRef.current = src;
+    srcRef.current = reusableLink(src);
   }
   const effectiveSrc = srcRef.current;
   const fileKey = effectiveSrc ? stableKey(effectiveSrc) : null;

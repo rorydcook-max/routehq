@@ -19,6 +19,39 @@ type SubscriptionPayload = {
 
 const dismissKey = "routehq_trial_banner_dismissed_until";
 
+/**
+ * One answer shared by the banner's three copies (sidebar, floating, inline) and reused across pages for a few
+ * minutes: every page draws its own shell, and each copy used to ask the server again on every tap. Trial days
+ * change once a day, so a five-minute-old answer is as good as a new one.
+ */
+const STATUS_MAX_AGE_MS = 5 * 60_000;
+const statusCache: { value: SubscriptionPayload | null; at: number; pending: Promise<SubscriptionPayload | null> | null } = { value: null, at: 0, pending: null };
+
+/** Switching business (or a plan just chosen): the next banner asks again. */
+export function forgetSubscriptionStatus() {
+  statusCache.value = null;
+  statusCache.at = 0;
+}
+
+function loadSubscriptionStatus(): Promise<SubscriptionPayload | null> {
+  // On the plans page the answer is always fresh: that is where a plan is chosen.
+  if (window.location.pathname.startsWith("/settings/billing")) forgetSubscriptionStatus();
+  if (statusCache.at && Date.now() - statusCache.at < STATUS_MAX_AGE_MS) return Promise.resolve(statusCache.value);
+  if (statusCache.pending) return statusCache.pending;
+  statusCache.pending = fetch("/api/subscription/status", { cache: "no-store" })
+    .then((response) => (response.ok ? (response.json() as Promise<SubscriptionPayload>) : null))
+    .then((data) => {
+      statusCache.value = data;
+      statusCache.at = Date.now();
+      return data;
+    })
+    .catch(() => null)
+    .finally(() => {
+      statusCache.pending = null;
+    });
+  return statusCache.pending;
+}
+
 function toneForDays(days: number | null | undefined) {
   if (days === null || days === undefined || days > 7) {
     return {
@@ -55,8 +88,7 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
       return;
     }
 
-    fetch("/api/subscription/status", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : null))
+    loadSubscriptionStatus()
       .then((data) => {
         // Free chosen and the trial over: they are simply on Free now, nothing to remind them of.
         const onFreeAfterTrial = data?.organization?.subscription_tier === "free" && data?.daysRemaining === 0;

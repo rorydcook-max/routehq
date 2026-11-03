@@ -7,8 +7,6 @@
 
 import { BUSINESS_INCLUDED, YEARLY_MONTHS, businessExtras, type FleetMix, type Plan } from "@/lib/plans";
 
-/** Units of each currency per 1 THB, open.er-api.com, 26 Oct 2026. */
-export const PLAN_RATES_DATE = "2026-10-26";
 const PER_THB: Record<string, number> = {
   THB: 1,
   USD: 0.029619,

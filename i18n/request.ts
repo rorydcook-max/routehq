@@ -5,7 +5,7 @@ import { supportedLocaleCodes, type SupportedLocale } from "@/lib/i18n/locales";
 import { signedOutLocale, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
 import { SITE_LOCALE_HEADER } from "@/lib/site/locale-path";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
  * Staff interface language.
@@ -76,10 +76,9 @@ async function resolveLocale(): Promise<SupportedLocale> {
   };
   if (!hasSupabaseEnv()) return beforeSignIn();
   try {
-    const supabase = (await createSupabaseServerClient()) as any;
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
+    // Who is signed in comes from the signed sign-in token, checked once per request (getRequestUser): this runs on
+    // every page and every save, and used to be its own trip to the sign-in service each time.
+    const [supabase, user] = (await Promise.all([createSupabaseServerClient(), getRequestUser()])) as [any, Awaited<ReturnType<typeof getRequestUser>>];
     if (!user) return beforeSignIn();
     const { data } = await supabase.from("users").select("preferred_locale").eq("id", user.id).maybeSingle();
     const locale = String(data?.preferred_locale || "");

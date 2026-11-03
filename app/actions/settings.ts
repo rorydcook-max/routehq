@@ -861,40 +861,6 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-function parseJsonObject(value: string) {
-  try {
-    return JSON.parse(value);
-  } catch {
-    const start = value.indexOf("{");
-    const end = value.lastIndexOf("}");
-    if (start >= 0 && end > start) {
-      return JSON.parse(value.slice(start, end + 1));
-    }
-    throw new Error("AI research did not return valid JSON.");
-  }
-}
-
-function collectResponseSources(response: any) {
-  const sources: unknown[] = [];
-
-  for (const item of response.output || []) {
-    const actionSources = item?.action?.sources;
-    if (Array.isArray(actionSources)) {
-      sources.push(...actionSources);
-    }
-
-    for (const content of item?.content || []) {
-      for (const annotation of content?.annotations || []) {
-        if (annotation?.type === "url_citation") {
-          sources.push(annotation);
-        }
-      }
-    }
-  }
-
-  return sources;
-}
-
 async function requirePlatformAdmin() {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -1439,69 +1405,6 @@ Rules:
   }
 
   revalidatePath("/settings");
-}
-
-const NOTIFICATION_KEYS = [
-  "daily_active_rentals",
-  "daily_overdue",
-  "daily_payments",
-  "daily_compliance",
-  "daily_revenue",
-  "event_payment_received",
-  "event_contract_signed",
-  "event_return_inspection",
-  "event_portal_action"
-] as const;
-
-export async function saveNotificationSettings(formData: FormData) {
-  await requireOwner();
-  const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const organizationId = String(formData.get("organizationId") || "");
-  if (!organizationId) {
-    throw new Error("Organization ID is required.");
-  }
-
-  const { data: organization, error: orgError } = await supabase
-    .from("organizations")
-    .select("settings")
-    .eq("id", organizationId)
-    .maybeSingle();
-
-  if (orgError || !organization) {
-    throw new Error(orgError?.message || "Organization not found.");
-  }
-
-  const dailySummaryTime = String(formData.get("daily_summary_time") || "08:00");
-  // Keep any switches this form doesn't show; set the ones it does.
-  const notifications: Record<string, boolean> = { ...(organization.settings?.line_notifications || {}) };
-  for (const key of NOTIFICATION_KEYS) {
-    notifications[key] = formData.get(key) === "on";
-  }
-
-  const updatedSettings = {
-    ...organization.settings,
-    daily_summary_time: dailySummaryTime,
-    line_notifications: notifications
-  };
-
-  const { error } = await supabase
-    .from("organizations")
-    .update({ settings: updatedSettings })
-    .eq("id", organizationId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  revalidatePath("/settings/notifications");
 }
 
 export async function updateLineSettings(formData: FormData) {

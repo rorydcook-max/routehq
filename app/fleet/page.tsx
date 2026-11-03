@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
-import type { Route } from "next";
-import { FileSpreadsheet, Plus, Sparkles } from "lucide-react";
+import { FileSpreadsheet, Plus } from "lucide-react";
 import { bulkArchiveVehicles, bulkDeleteVehicles, setVehicleRate } from "@/app/actions/vehicles";
 import { AppShell } from "@/components/app-shell";
 import { Badge, EmptyState } from "@/components/ui";
@@ -144,12 +143,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                   {t("import")}
                 </Link>
               ) : null}
-              {/* The assistant: vehicles or who's renting now, by typing, talking or photos (Rory, 2 Nov 2026). */}
-              {/* An outline and the brand colour on the icon: on the dark theme a panel-coloured circle disappeared into the band (Rory, 2 Nov 2026). */}
-              <Link aria-label={t("assistant")} className="pressable inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] bg-[var(--panel)] font-bold text-[var(--foreground)] shadow-[var(--shadow-card)] sm:px-4" href={"/fleet/assistant" as Route}>
-                <Sparkles className="text-[var(--primary)]" size={18} />
-                <span className="hidden sm:inline">{t("assistant")}</span>
-              </Link>
+              {/* The Assistant button moved into the live chat (3 Nov 2026): "Add vehicles from photos" there opens the
+                  fleet assistant with the photos. The assistant page itself stays (/fleet/assistant). */}
               <Link aria-label={t("addVehicle")} className="band-action pressable inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-[var(--band-action)] font-bold text-[var(--band-action-ink)] sm:px-4" href="/fleet/new">
                 <Plus size={16} />
                 <span className="hidden sm:inline">{t("addVehicle")}</span>

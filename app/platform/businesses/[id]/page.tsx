@@ -176,7 +176,7 @@ export default async function AdminBusinessPage({ params, searchParams }: { para
             </p>
           </div>
           {org.plan_request_thread_id ? (
-            <Link className="primary-action pressable" href={`/help/team/${org.plan_request_thread_id}` as Route}>
+            <Link className="primary-action pressable" href={`/platform/support/${org.plan_request_thread_id}` as Route}>
               Open the request
             </Link>
           ) : null}

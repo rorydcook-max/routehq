@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Geist, Instrument_Serif } from "next/font/google";
-import { getTranslations } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getTranslations } from "next-intl/server";
+import { ChatLauncher } from "@/components/chat/chat-launcher";
 import { SiteFooter } from "./_components/site-footer";
 import { SiteHeader } from "./_components/site-header";
 import s from "./site.module.css";
@@ -15,7 +17,7 @@ const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: "ital
  * /pricing. Server-rendered, in the visitor's language (the same choice the sign-in pages use).
  */
 export default async function SiteLayout({ children }: { children: ReactNode }) {
-  const t = await getTranslations("site");
+  const [t, messages] = await Promise.all([getTranslations("site"), getMessages()]);
   return (
     // light-island: the website has its own fixed look, so the app's dark mode (theme-dark.css) leaves it as drawn.
     <div className={`light-island ${s.site} ${geist.variable} ${serif.variable}`}>
@@ -25,6 +27,11 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
       <SiteHeader />
       <main id="main">{children}</main>
       <SiteFooter />
+      {/* The live chat for visitors (help-centre answers and the RoveHQ team, never anyone's records). The website's
+          client parts get no words by default (app/layout.tsx), so the chat's own words come with it. */}
+      <NextIntlClientProvider messages={{ chat: ((messages as Record<string, any>).chat ?? {}) as Record<string, string> }}>
+        <ChatLauncher site />
+      </NextIntlClientProvider>
     </div>
   );
 }

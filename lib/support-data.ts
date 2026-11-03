@@ -16,6 +16,8 @@ export type SupportThreadRow = {
 export type SupportMessageRow = {
   id: string;
   fromTeam: boolean;
+  /** An AI reply (chat panel). Not from the business and not from a RoveHQ person. */
+  fromAssistant: boolean;
   authorName: string;
   body: string;
   createdAt: string;
@@ -41,6 +43,8 @@ export async function listBusinessThreads(supabase: any, organizationId: string)
     .from("support_threads")
     .select("id, organization_id, topic, subject, status, last_message_at, unread_by_business, unread_by_team")
     .eq("organization_id", organizationId)
+    // Live chats appear here once handed to the team (mode 'human'); ones the assistant handled alone stay in the chat.
+    .or("channel.is.null,channel.neq.chat,mode.eq.human")
     .order("last_message_at", { ascending: false })
     .limit(50);
   return ((data || []) as any[]).map((thread) => row(thread, "business"));
@@ -54,6 +58,8 @@ export async function listTeamThreads(filter: "waiting" | "all"): Promise<Suppor
     .select("id, organization_id, topic, subject, status, last_message_at, unread_by_business, unread_by_team, organizations(name)")
     .order("last_message_at", { ascending: false })
     .limit(200);
+  // Conversations the assistant is still handling (mode 'ai') are not the team's yet.
+  query = query.eq("mode", "human");
   if (filter === "waiting") query = query.eq("status", "open");
   const { data } = await query;
   return ((data || []) as any[]).map((thread) => row(thread, "team"));
@@ -66,7 +72,8 @@ export async function countUnreadForBusiness(supabase: any, organizationId: stri
 
 export async function countWaitingForTeam() {
   const admin = createSupabaseAdminClient() as any;
-  const { count } = await admin.from("support_threads").select("id", { count: "exact", head: true }).eq("status", "open");
+  // Only conversations handed to the team: the assistant's own chats (mode 'ai') aren't waiting for anyone.
+  const { count } = await admin.from("support_threads").select("id", { count: "exact", head: true }).eq("mode", "human").eq("status", "open");
   return count || 0;
 }
 
@@ -84,7 +91,10 @@ export async function loadThread(threadId: string, viewer: { side: "business" | 
   if (!thread) return null;
   if (viewer.side === "business" && thread.organization_id !== viewer.organizationId) return null;
 
-  const { data: messages } = await admin.from("support_messages").select("id, author_id, from_team, body, attachments, created_at").eq("thread_id", thread.id).order("created_at", { ascending: true });
+  let messageQuery = admin.from("support_messages").select("id, author_id, from_team, from_assistant, body, attachments, created_at").eq("thread_id", thread.id);
+  // The team's internal notes are never shown to the business (helpdesk spec, 3 Nov 2026).
+  if (viewer.side === "business") messageQuery = messageQuery.not("internal", "is", true);
+  const { data: messages } = await messageQuery.order("created_at", { ascending: true });
   const authorIds = Array.from(new Set(((messages || []) as any[]).map((message) => message.author_id).filter(Boolean)));
   const { data: profiles } = authorIds.length ? await admin.from("users").select("id, full_name").in("id", authorIds) : { data: [] };
   const names = new Map(((profiles || []) as any[]).map((profile) => [profile.id, String(profile.full_name || "")]));
@@ -92,6 +102,7 @@ export async function loadThread(threadId: string, viewer: { side: "business" | 
     ((messages || []) as any[]).map(async (message) => ({
       id: message.id,
       fromTeam: Boolean(message.from_team),
+      fromAssistant: Boolean(message.from_assistant),
       authorName: names.get(message.author_id) || "",
       body: String(message.body || ""),
       createdAt: message.created_at,

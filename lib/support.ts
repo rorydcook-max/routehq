@@ -59,7 +59,8 @@ export async function signAttachments(admin: any, attachments: SupportAttachment
 export async function alertTeam(text: string, threadId: string, path?: string) {
   try {
     const admin = createSupabaseAdminClient() as any;
-    const url = path || `/help/team/${threadId}`;
+    // Opens the conversation in the admin console's helpdesk (/help/team only redirects there now).
+    const url = path || `/platform/support/${threadId}`;
     const { data: admins } = await admin.from("platform_admins").select("user_id");
     const ids = ((admins || []) as any[]).map((row) => row.user_id).filter(Boolean);
     if (ids.length) await sendPushToUsers(admin, ids, { title: "RoveHQ Help", body: text, url, tag: `support-${threadId}` });

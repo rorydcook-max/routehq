@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Route } from "next";
+import { countUnreadForTeam } from "@/lib/helpdesk";
 
 /** Tabs across the top of the RoveHQ admin console. */
 const TABS = [
   { href: "/platform", label: "Overview" },
+  { href: "/platform/support", label: "Support" },
   { href: "/platform/businesses", label: "Businesses" },
   { href: "/platform/setup", label: "Set it up for me" },
   { href: "/platform/users", label: "Users" },
@@ -11,9 +13,19 @@ const TABS = [
   { href: "/platform/log", label: "Admin log" },
   { href: "/platform/renters", label: "Renters" },
   { href: "/platform/messages", label: "Messages" },
-  { href: "/platform/leads", label: "Leads" },
-  { href: "/help/team", label: "Help queue" }
+  { href: "/platform/leads", label: "Leads" }
 ];
+
+/** The unread number on the Support tab, so a waiting customer is visible from every admin page. Never breaks the nav. */
+async function SupportUnread({ active }: { active: boolean }) {
+  const unread = await countUnreadForTeam().catch(() => 0);
+  if (!unread) return null;
+  return (
+    <span aria-label={`${unread} unread`} className={`num ml-1.5 rounded-full px-1.5 text-[12px] ${active ? "bg-white/25 text-white" : "bg-[var(--primary)] text-white"}`}>
+      {unread}
+    </span>
+  );
+}
 
 export function AdminHeader({ active, title, subtitle }: { active: string; title: string; subtitle?: string }) {
   return (
@@ -30,6 +42,7 @@ export function AdminHeader({ active, title, subtitle }: { active: string; title
             key={tab.href}
           >
             {tab.label}
+            {tab.href === "/platform/support" ? <SupportUnread active={tab.href === active} /> : null}
           </Link>
         ))}
       </nav>

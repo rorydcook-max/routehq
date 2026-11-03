@@ -18,6 +18,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { renewVehicleCompliance, uploadVehiclePhotos } from "@/app/actions/vehicles";
 import { compressImage } from "@/lib/direct-upload-client";
+import { takeHandedFiles } from "@/components/chat/chat-handoff";
 import { dateFormat } from "@/lib/i18n/dates";
 
 type Photo = { file: File; url: string };
@@ -191,6 +192,13 @@ export function FleetAssistant({
     }
     setPending((list) => [...list, ...added]);
   }
+
+  // Photos sent in the live chat ("Add vehicles from photos", a policy photo): ready to send here, nothing re-uploaded.
+  useEffect(() => {
+    const handed = takeHandedFiles("photos").filter((file) => file.type.startsWith("image/"));
+    if (handed.length) void pick(handed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function send() {
     const message = text.trim();

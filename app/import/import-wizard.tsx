@@ -3,8 +3,9 @@
 import { AlertTriangle, Camera, CheckCircle2, FileSpreadsheet, Loader2, MessageSquareText, RotateCcw, Undo2, X } from "lucide-react";
 import { compressImage } from "@/lib/direct-upload-client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { takeHandedFiles } from "@/components/chat/chat-handoff";
 import { longDate, numberLocale } from "@/lib/i18n/dates";
 import { IMPORT_FIELD_GROUPS, IMPORT_FIELDS } from "@/lib/import/fields";
 import type { ImportPreview, PreviewCustomer, PreviewRental, PreviewTransaction, PreviewVehicle, Problem } from "@/lib/import/preview";
@@ -176,6 +177,11 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [undone, setUndone] = useState<Set<string>>(new Set());
+  // A spreadsheet sent in the live chat ("Import this spreadsheet"): already chosen here, ready to read.
+  useEffect(() => {
+    const [handed] = takeHandedFiles("sheet");
+    if (handed) setFile(handed);
+  }, []);
 
   const counts = useMemo(() => (preview ? previewCounts(preview) : null), [preview]);
   const questions = useMemo(() => (preview ? importQuestions(mappings, preview) : []), [mappings, preview]);

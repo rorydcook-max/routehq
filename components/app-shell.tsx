@@ -30,7 +30,7 @@ import { useEffect, useState, Fragment } from "react";
 import { signOut, switchActiveOrganization, type ShellContext } from "@/app/actions/auth";
 import { adminStopViewing } from "@/app/actions/admin";
 import { Toaster } from "@/components/toast";
-import { AskBox } from "@/components/ask-box";
+import { ChatLauncher } from "@/components/chat/chat-launcher";
 import { SidebarLanguage } from "@/components/sidebar-language";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { BrandStyle } from "@/components/brand-style";
@@ -260,25 +260,19 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           </form>
         ) : null}
         {/* Quick add sits in the side menu on computers: floating over the page it covered the buttons at the end of each row. */}
-        <div className="mb-3 flex items-center gap-2">
-          {/* Teammates get the box too: for them it answers "how do I…" from the help centre, never from the figures. */}
-          <div className="min-w-0 flex-1">
-            <AskBox support={isTeammate} variant="sidebar" />
-          </div>
-          {/* Kept in place (just hidden) during a form, so the search box doesn't change width from page to page. */}
-          {(
-            <button
-              aria-hidden={onFocusedFlow || undefined}
-              aria-label={t("quickAdd")}
-              tabIndex={onFocusedFlow ? -1 : undefined}
-              className={`${onFocusedFlow ? "invisible" : ""} flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--primary)] text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)]`}
-              data-tip={t("quickAdd")}
-              onClick={() => setFastActionOpen(true)}
-              type="button"
-            >
-              <Plus size={20} />
-            </button>
-          )}
+        {/* The "Ask anything…" box that sat here moved into the live chat (the round button at the bottom right,
+            Ctrl/⌘+K) on 3 Nov 2026. Quick add keeps its place, just hidden during a form so the menu doesn't jump. */}
+        <div className="mb-3">
+          <button
+            aria-hidden={onFocusedFlow || undefined}
+            tabIndex={onFocusedFlow ? -1 : undefined}
+            className={`${onFocusedFlow ? "invisible" : ""} flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-3 text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)]`}
+            onClick={() => setFastActionOpen(true)}
+            type="button"
+          >
+            <Plus size={18} />
+            {t("quickAdd")}
+          </button>
         </div>
         {/* On a short laptop screen the rows tighten so every link, Settings included, stays in view without scrolling. */}
         {/* Room above and below the links so the chosen one's shadow isn't trimmed by the scrolling list. */}
@@ -378,7 +372,6 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
             </Link>
             <span className="ml-auto flex items-center gap-2">
               <ScreenHelp variant="icon" />
-              <AskBox support={isTeammate} variant="icon" />
             </span>
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization}>
@@ -551,6 +544,8 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
       ) : null}
 
       <FastActionSheet canImport={shell.role === "owner"} open={fastActionOpen} onClose={() => setFastActionOpen(false)} />
+      {/* The live chat on every signed-in page: owners get records questions, teammates how-to (checked on the server). */}
+      <ChatLauncher owner={shell.role === "owner"} />
       <Toaster />
     </div>
   );

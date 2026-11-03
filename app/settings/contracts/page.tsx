@@ -2,6 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { BackLink } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
+import { getCurrentMembership } from "@/lib/auth/roles";
+import { UPLOADED_TEMPLATE_KEY } from "@/lib/contract-import-template";
 import { agreementExtraTerms } from "@/lib/contract-rendering";
 import { buildSampleContractVariables, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { markOnboardingStep } from "@/lib/onboarding";
@@ -9,20 +11,35 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { feeOn, getTravelPolicySettings } from "@/lib/travel-policy";
 import { AgreementTerms } from "./agreement-terms";
+import { ContractImportCard } from "./import-card";
 import { currencySymbol } from "@/components/currency-symbol";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
+// Reading an uploaded agreement with the vision model can take a minute or two (Settings › Use your own agreement).
+export const maxDuration = 300;
 
-export default async function ContractSettingsPage() {
-  const [userEmail, defaultOrganization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
+export default async function ContractSettingsPage({ searchParams }: { searchParams: Promise<{ file?: string }> }) {
+  const [userEmail, defaultOrganization, membership, params] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization(), getCurrentMembership(), searchParams]);
   const say = (await getTranslations("settingsPage")) as unknown as Say;
   const supabase = (await createSupabaseServerClient()) as any;
   const { data: organizationRow } = await supabase.from("organizations").select("*").eq("id", defaultOrganization.id).maybeSingle();
   const organization = organizationRow || defaultOrganization;
-  const template = await ensureDefaultContractTemplate(supabase, organization.id);
-  const sampleData = await embedLogoInContractVariables(supabase, buildSampleContractVariables(organization));
+  const [template, sampleData, { data: latestUpload }] = await Promise.all([
+    ensureDefaultContractTemplate(supabase, organization.id),
+    embedLogoInContractVariables(supabase, buildSampleContractVariables(organization)),
+    // The owner's most recent upload, so a draft they haven't finished reviewing can be picked up again.
+    supabase
+      .from("contract_templates")
+      .select("id, title, is_active, created_at")
+      .eq("organization_id", organization.id)
+      .eq("template_key", UPLOADED_TEMPLATE_KEY)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+  ]);
   await markOnboardingStep(supabase, organization.id, "contract_template");
+  const usingUploaded = template?.template_key === UPLOADED_TEMPLATE_KEY;
 
   const policy = getTravelPolicySettings(organization.settings);
   const money = currencySymbol(organization.currency);
@@ -41,6 +58,9 @@ export default async function ContractSettingsPage() {
     { label: say("ag_n_law"), value: policy.jurisdiction }
   ].map((row) => ({ ...row, value: String(row.value || "").replace(/^[a-z]/, (letter) => letter.toUpperCase()) })); // "the Kingdom of Thailand" reads as a value, not mid-sentence
 
+  // A file handed over from the chat widget ("Upload my own contract"): only a path inside this business's folder.
+  const handoffFile = typeof params?.file === "string" && params.file.startsWith(`${organization.id}/`) && !params.file.includes("..") ? params.file : null;
+
   return (
     <AppShell userEmail={userEmail}>
       <div className="page-form">
@@ -49,6 +69,16 @@ export default async function ContractSettingsPage() {
           <h1 className="page-title">{say("ag_title")}</h1>
           <p className="page-subtitle page-subtitle-keep mt-1">{say("ag_subtitle")}</p>
         </div>
+
+        {membership?.role === "owner" ? (
+          <div className="mb-3">
+            <ContractImportCard
+              active={usingUploaded ? { id: String(template.id), title: String(template.title || template.name || "") } : null}
+              draft={!usingUploaded && latestUpload ? { id: String(latestUpload.id), title: String(latestUpload.title || "") } : null}
+              handoffFile={handoffFile}
+            />
+          </div>
+        ) : null}
 
         <AgreementTerms
           initialTerms={agreementExtraTerms(organization.settings)}

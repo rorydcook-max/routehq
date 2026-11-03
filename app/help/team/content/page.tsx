@@ -59,7 +59,8 @@ export default async function HelpContentPage() {
     <AppShell userEmail={userEmail}>
       <div className="space-y-4">
         <div className="page-hero">
-          <BackLink href="/help/team" label={t("teamTitle")} />
+          {/* The conversations queue now lives in the admin console's helpdesk; this page is linked from there. */}
+          <BackLink href="/platform/support" label="Support" />
           <h1 className="page-title">{t("contentTitle")}</h1>
           <p className="page-subtitle mt-2">{t("contentSubtitle")}</p>
         </div>

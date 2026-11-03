@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { browserSafeAssetUrl, createBrandingSignedUrl, parseLegacyBrandingReference } from "@/lib/branding-assets";
 import { buildContractVariables, contractVariableKeys, renderContractTemplate } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate } from "@/lib/default-contract-template";
+import { UPLOADED_TEMPLATE_KEY } from "@/lib/contract-import-template";
 
 export { defaultRentalContractTemplate } from "@/lib/default-contract-template";
 
@@ -141,13 +142,38 @@ export function renderSampleContract(template: string) {
   return renderContractTemplate(template, buildSampleContractVariables({ name: "RoveHQ Demo Rentals", settings: {} }));
 }
 
+/**
+ * The owner's own uploaded agreement, when they chose "Use this agreement for new bookings" (Settings › Rental
+ * agreement). The choice is organizations.default_contract_template_id pointing at an active uploaded row. It is
+ * returned as is: the stale-template check below would otherwise "repair" it back to the RoveHQ wording.
+ */
+async function chosenUploadedTemplate(supabase: any, organizationId: string) {
+  const { data: organization } = await supabase.from("organizations").select("default_contract_template_id").eq("id", organizationId).maybeSingle();
+  const templateId = organization?.default_contract_template_id;
+  if (!templateId) return null;
+  const { data: template } = await supabase
+    .from("contract_templates")
+    .select("*")
+    .eq("id", templateId)
+    .eq("organization_id", organizationId)
+    .eq("template_key", UPLOADED_TEMPLATE_KEY)
+    .eq("is_active", true)
+    .maybeSingle();
+  return template && String(template.content_html || template.body || "").trim() ? template : null;
+}
+
 export async function ensureDefaultContractTemplate(supabase: any, organizationId: string) {
+  const uploaded = await chosenUploadedTemplate(supabase, organizationId);
+  if (uploaded) return uploaded;
+
   const { data: existingDefault, error: defaultError } = await supabase
     .from("contract_templates")
     .select("*")
     .eq("organization_id", organizationId)
     .eq("is_default", true)
     .eq("is_active", true)
+    // An uploaded agreement is never the platform default row, so it can never be overwritten by the reseed below.
+    .neq("template_key", UPLOADED_TEMPLATE_KEY)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();

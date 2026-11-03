@@ -15,8 +15,10 @@ export async function HelpThread({ messages, side, businessName, locale }: { mes
   return (
     <ol className="space-y-3">
       {messages.map((message) => {
-        const mine = side === "team" ? message.fromTeam : !message.fromTeam;
-        const who = message.fromTeam ? t("fromTeam") : message.authorName || businessName;
+        // The assistant's turns from a live chat (handed over to the team) are shown as the assistant's, never as "mine".
+        const assistant = Boolean(message.fromAssistant) && !message.fromTeam;
+        const mine = side === "team" ? message.fromTeam : !message.fromTeam && !assistant;
+        const who = message.fromTeam ? t("fromTeam") : assistant ? t("fromAssistant") : message.authorName || businessName;
         return (
           <li className={`flex ${mine ? "justify-end" : "justify-start"}`} key={message.id}>
             <div className={`max-w-[88%] rounded-2xl px-4 py-3 sm:max-w-[75%] ${mine ? "bg-[var(--primary)] text-white" : "border border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)]"}`}>

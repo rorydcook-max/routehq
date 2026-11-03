@@ -1,9 +1,9 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, MessageCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
-import { AskBox } from "@/components/ask-box";
+import { OpenChatButton } from "@/components/chat/open-chat-button";
 import { PageBand } from "@/components/page-band";
 import { HelpCompose } from "@/components/help/help-compose";
 import { HelpGuides } from "@/components/help/help-guides";
@@ -47,21 +47,24 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
       <div className="min-w-0 max-w-5xl space-y-4">
 
         {team ? (
-          <Link className="card pressable flex items-center gap-3 p-4" href={"/help/team" as Route}>
+          <Link className="card pressable flex items-center gap-3 p-4" href={"/platform/support" as Route}>
             <span className="font-bold text-[var(--foreground)]">{t("teamLink")}</span>
             <span className="ml-auto rounded-full bg-[var(--primary)] px-2.5 py-0.5 text-[14px] font-bold text-white">{waiting}</span>
             <ChevronRight size={18} />
           </Link>
         ) : null}
 
-        {/* The same question box as the sidebar: how-to questions are answered from the guides below, and
-            anything it can't answer can be passed on to us in one tap. */}
-        <section className="card p-5" id="assistant">
-          <h2 className="card-title">{t("assistantTitle")}</h2>
-          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("assistantBody")}</p>
-          <div className="mt-3 max-w-md">
-            <AskBox support={membership?.role !== "owner"} variant="button" />
+        {/* The live chat (Rory, 3 Nov 2026): the same panel as the round chat button on every page. The assistant
+            answers first; "Talk to a person" brings in the RoveHQ team, and those chats are listed below too. */}
+        <section className="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:p-6" id="live-chat">
+          <span aria-hidden="true" className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary-light)] text-[var(--primary)]">
+            <MessageCircle size={28} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="card-title">{t("liveTitle")}</h2>
+            <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("liveBody")}</p>
           </div>
+          <OpenChatButton className="primary-action pressable shrink-0 justify-center" label={t("liveButton")} />
         </section>
 
         {guides.length ? (

@@ -1,6 +1,6 @@
 ---
 title: "Get help from RoveHQ"
-description: "Ask the assistant, find a how-to guide, or write to the RoveHQ team and send files. Every reply comes back here in RoveHQ."
+description: "Use the live chat, find a how-to guide, or write to the RoveHQ team and send files. Every reply comes back here in RoveHQ."
 category: account
 order: 5
 appPath: "/help"
@@ -8,15 +8,17 @@ related: ["getting-started", "ask-anything", "import-a-spreadsheet", "plans-and-
 updated: 2026-11-03
 ---
 
-Tap **Help** at the bottom of the menu (on a phone, under **More**).
+## Live chat
 
-## Ask the assistant
+Tap the round chat button at the bottom right of any page (or **Open live chat** on the Help page). Ask your question, like "How do I take a deposit?", or send a photo or file with the paperclip. The assistant answers first, from the guides, with a link to the full one.
 
-Type a question in **Ask the assistant** at the top of the Help page (or in **Ask anything…** on any page), like "How do I take a deposit?". The answer comes from the guides, with a link to the full one. If it can't answer, tap **Send this to the RoveHQ team** and it becomes a conversation with us below.
+Want a real person? Tap **Talk to a person** at the top of the chat. Someone from RoveHQ replies right there, usually within a few hours. You can close the chat and come back: the reply waits for you, and the chat button shows a dot when it's there.
+
+Earlier chats are under **Previous conversations** when you open a new one.
 
 ## Find a guide
 
-Under **How-to guides**, type in **Search the guides**, or open a section. Guides open in a new tab, so you keep your place.
+Tap **Help** at the bottom of the menu (on a phone, under **More**). Under **How-to guides**, type in **Search the guides**, or open a section. Guides open in a new tab, so you keep your place.
 
 Stuck on a screen? Tap **Help with this page** at the bottom of the menu (on a phone, the **?** at the top) to open the guide for that screen.
 
@@ -31,6 +33,6 @@ Want us to set up your data? Choose **Bring in my data** and send your spreadshe
 
 ## Read replies
 
-We always reply here in RoveHQ, and you get an alert when we do. Your messages are under **Your conversations**. Each shows **Waiting for us**, **Replied** or **Resolved**. A dot means a new reply.
+We always reply here in RoveHQ, and you get an alert when we do. Your messages, and any chat you passed to a person, are under **Your conversations**. Each shows **Waiting for us**, **Replied** or **Resolved**. A dot means a new reply.
 
 Open a conversation to **Send reply**. When it's sorted, tap **Mark as resolved**. Need it again? Write in it or tap **Open again**.

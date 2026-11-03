@@ -644,6 +644,18 @@ export function buildContractVariables({
     delivery_datetime: deliveryDateTime ? `${formatContractDate(deliveryDateTime, locale)} ${formatContractTime(deliveryDateTime)}` : "To be confirmed"
   };
 
+  // An owner's uploaded agreement can ask for these too (lib/contract-import-template.ts). The booking's signed
+  // agreement already gets them from the business snapshot (lib/rental-document-template-adapter.ts, which
+  // overrides these); here they make the sample preview and the older booking-link path fill them as well.
+  variables.business_legal_name = stripEmpty(organization?.legal_name || organization?.name);
+  variables.business_registration_or_tax_number = stripEmpty(organization?.registration_or_tax_number);
+  variables.authorised_signatory_name = stripEmpty(organization?.authorised_signatory_name);
+  variables.customer_date_of_birth = (() => {
+    const dob = customer?.date_of_birth || customer?.dob;
+    return dob ? formatContractDate(String(dob), locale) : "";
+  })();
+  variables.vehicle_vin = stripEmpty(vehicle?.vin || vehicle?.chassis_number);
+
   return variables;
 }
 

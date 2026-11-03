@@ -15,6 +15,8 @@ faq:
 
 RoveHQ writes the agreement for every booking in English and Thai. You don't write one, you just add your signature and any extra terms.
 
+Already have your own contract? [Use your own agreement](/docs/use-your-own-agreement) instead.
+
 ## Add your signature
 
 Customers can't finish a booking until you do this.

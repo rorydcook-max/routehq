@@ -614,7 +614,9 @@ export async function updateContractBrandingSettings(formData: FormData) {
     contract_footer_text: footerText,
     powered_by_routehq_enabled: String(formData.get("powered_by_routehq_enabled") || "") === "true",
     ...(sentContractLocale ? { default_contract_locale: defaultContractLocale } : {}),
-    default_contract_template_id: limitedString(formData, "default_contract_template_id", 80),
+    // Only when the form sends it: the business details form has no such field, and saving it used to blank the
+    // owner's choice of their own uploaded agreement (Settings › Rental agreement › Use your own agreement).
+    ...(formData.has("default_contract_template_id") ? { default_contract_template_id: limitedString(formData, "default_contract_template_id", 80) } : {}),
     authorised_signatory_name: limitedString(formData, "authorised_signatory_name", 160),
     authorised_signatory_title: limitedString(formData, "authorised_signatory_title", 160),
     settings: {

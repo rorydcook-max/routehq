@@ -508,6 +508,10 @@ export function ChatPanel({
                         ))}
                       </div>
                     ) : null}
+                    {message.meta.articles?.find((article) => article.video) ? (
+                      // The walkthrough plays right here: a short recording beats reading the steps.
+                      <video className="mt-2.5 w-full rounded-xl bg-black" controls playsInline poster={message.meta.articles.find((article) => article.video)!.poster || undefined} preload="none" src={message.meta.articles.find((article) => article.video)!.video!} />
+                    ) : null}
                     {message.meta.articles?.length ? (
                       // Guides open in a new tab, so the chat and the page under it stay put.
                       <div className="mt-2 flex flex-wrap gap-1.5">

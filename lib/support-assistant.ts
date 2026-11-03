@@ -14,7 +14,8 @@ const MAX_ARTICLES = 3;
 const MAX_ARTICLE_CHARS = 9000;
 
 export type SupportTurn = { role: "user" | "assistant"; content: string };
-export type SupportArticle = { slug: string; title: string; href: string };
+/** `video`/`poster` are set when the article has a screen recording, so the chat can play it right there. */
+export type SupportArticle = { slug: string; title: string; href: string; video?: string | null; poster?: string | null };
 /** `request` is true when the message asked for new help content (a guide, video…): it is logged for the team's content queue. */
 export type SupportAnswer = { ok: true; answer: string; articles: SupportArticle[]; handoff: boolean; kind: "support"; request?: boolean } | { ok: false; error: string };
 
@@ -105,7 +106,7 @@ export function pickArticles(question: string, pathname: string | null | undefin
     const share = Math.floor(room / (all.length - index));
     const body = entry.body.length > share ? `${entry.body.slice(0, share).replace(/\s+\S*$/, "")}\n…` : entry.body;
     room -= body.length;
-    return { slug: entry.doc.slug, title: entry.doc.title, description: entry.doc.description, body };
+    return { slug: entry.doc.slug, title: entry.doc.title, description: entry.doc.description, body, video: entry.doc.video, poster: entry.doc.poster };
   });
 }
 
@@ -198,15 +199,18 @@ export async function answerSupportQuestion(input: { question: string; pathname?
           role: "system",
           content: [
             "You are RoveHQ's support assistant. RoveHQ is an app for small vehicle rental businesses; the people asking are owners and staff, often on a phone.",
-            `Answer ONLY from the help articles below. Answer in ${language}. Be short, plain and friendly: a sentence or two, then steps if there are steps.`,
+            `Answer ONLY from the help articles below. Answer in ${language}.`,
+            "Tone: friendly and personable but professional, like a helpful colleague. Direct and instructional. No padding: no restating the question, no \"follow these steps\", no closing summary, no \"let me know if\", no sign-off.",
+            "Length: at most 60 words of prose. If there are steps, one short lead-in line (or none) then the steps, at most 6, each one action. Mention a detail only if the reader needs it to finish the task.",
             'Write steps as lines starting with "• ". Keep button, tab and field names in **bold**, spelled exactly as the articles spell them.',
+            "Articles marked (has video) have a screen recording that the reader will see under your answer; don't describe or link it yourself.",
             input.role && input.role !== "owner" ? "The reader is a teammate, not the owner: if an article says something is for the owner only, say so." : "",
             "If the articles don't cover the question, say so in one sentence and offer to send it to the RoveHQ team. Never invent a feature, button or setting that the articles don't mention.",
             // Requests for new help content are collected for the RoveHQ team's content queue (/help/team/content).
             `If the message asks for new help content (a guide, article, video, FAQ, template or checklist), answer anything the articles do cover, then end with "Thanks, I've passed that on to the team." (in ${language}), and set "request" to true. A request for new content on its own is not a handoff.`,
             askedForContent ? "This message is a request for new help content." : "",
             'Reply as JSON: {"answer": string, "articles": [slugs of the articles you actually used], "handoff": boolean, "request": boolean}. "handoff" is true when the articles could not answer the question.',
-            articles.length ? `Help articles:\n${articles.map((article) => `--- slug: ${article.slug}\ntitle: ${article.title}\n${article.description}\n\n${article.body}`).join("\n\n")}` : "Help articles: none matched this question."
+            articles.length ? `Help articles:\n${articles.map((article) => `--- slug: ${article.slug}\ntitle: ${article.title}${article.video ? " (has video)" : ""}\n${article.description}\n\n${article.body}`).join("\n\n")}` : "Help articles: none matched this question."
           ]
             .filter(Boolean)
             .join("\n")
@@ -223,7 +227,7 @@ export async function answerSupportQuestion(input: { question: string; pathname?
     // Only articles that were really given to the model are linked, whatever it says it used.
     const used = new Set((Array.isArray(parsed.articles) ? parsed.articles : []).map((slug: unknown) => String(slug)));
     const linked = articles.filter((article) => used.has(article.slug));
-    const shown = (linked.length ? linked : articles.slice(0, 1)).map((article) => ({ slug: article.slug, title: article.title, href: `/docs/${article.slug}` }));
+    const shown = (linked.length ? linked : articles.slice(0, 1)).map((article) => ({ slug: article.slug, title: article.title, href: `/docs/${article.slug}`, video: article.video, poster: article.poster }));
     const request = parsed.request === true || askedForContent;
     // A content request has already been "passed on" in the answer: no second offer to send it to the team.
     const handoff = request ? parsed.handoff === true : parsed.handoff === true || !articles.length;

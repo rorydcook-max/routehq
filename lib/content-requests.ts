@@ -358,7 +358,7 @@ export async function draftContentRequest(id: string): Promise<Result> {
   if (request.kind === "faq" && request.targetSlug && docExists(request.targetSlug)) {
     const target = listDocs(DOCS_LOCALE).find((doc) => doc.slug === request.targetSlug);
     const body = (docMarkdown(DOCS_LOCALE, request.targetSlug) || "").slice(0, 6000);
-    if (target) references = [{ slug: target.slug, title: target.title, description: target.description, body }, ...references.filter((item) => item.slug !== target.slug)].slice(0, 3);
+    if (target) references = [{ slug: target.slug, title: target.title, description: target.description, body, video: target.video, poster: target.poster }, ...references.filter((item) => item.slug !== target.slug)].slice(0, 3);
   }
   const existing = listDocs(DOCS_LOCALE).map((doc) => doc.slug);
   const ui = uiStringsFor(searchText);

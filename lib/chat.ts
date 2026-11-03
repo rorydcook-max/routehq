@@ -36,7 +36,7 @@ export type ChatAction = {
 };
 
 export type ChatMeta = {
-  articles?: Array<{ slug: string; title: string; href: string }>;
+  articles?: Array<{ slug: string; title: string; href: string; video?: string | null; poster?: string | null }>;
   links?: Array<{ label: string; href: string }>;
   proposal?: ProposedAction;
   proposalState?: "done" | "cancelled";

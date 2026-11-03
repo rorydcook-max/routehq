@@ -203,18 +203,55 @@ export function ChatPanel({
    * panel is open it is sized to the visual viewport (the part above the keyboard) and follows its offset, and the
    * page behind is pinned in place (position: fixed on body, its scroll position put back on close).
    */
-  const [viewport, setViewport] = useState<{ height: number; top: number; keyboard: boolean } | null>(null);
   useEffect(() => {
     if (!open || desktop) return;
     const visual = window.visualViewport;
-    const update = () => {
-      if (!visual) return;
-      // Reading innerHeight here, not once: it changes as Safari's toolbars show and hide.
-      setViewport({ height: visual.height, top: visual.offsetTop, keyboard: window.innerHeight - visual.height > 150 });
+    /*
+     * Rory, 3 Nov 2026 (iPhone recording): the panel lagged behind the keyboard animation, leaving a gap that showed
+     * the page, and dragging panned the page behind. Events alone fire too late on iOS, so the panel follows the visual
+     * viewport every frame, written straight to the element (no React render per frame).
+     */
+    let frame = 0;
+    let last = "";
+    const follow = () => {
+      const element = panel.current;
+      if (element && visual) {
+        const layout = document.documentElement.clientHeight || window.innerHeight;
+        const keyboard = layout - visual.height > 150;
+        const next = `${visual.offsetTop}|${visual.height}|${keyboard}`;
+        if (next !== last) {
+          last = next;
+          element.style.top = `${visual.offsetTop}px`;
+          element.style.height = `${visual.height}px`;
+          // With the keyboard up the home-bar gap is under the keyboard: the box sits right on top of it.
+          element.style.paddingBottom = keyboard ? "0px" : "env(safe-area-inset-bottom)";
+        }
+      }
+      frame = requestAnimationFrame(follow);
     };
-    update();
-    visual?.addEventListener("resize", update);
-    visual?.addEventListener("scroll", update);
+    frame = requestAnimationFrame(follow);
+
+    // Dragging anywhere but a list that can still scroll that way would pan the page behind on iOS: stop it there.
+    let startY = 0;
+    const onStart = (event: TouchEvent) => {
+      startY = event.touches[0]?.clientY ?? 0;
+    };
+    const onMove = (event: TouchEvent) => {
+      const target = event.target as HTMLElement | null;
+      const scroller = target?.closest("[data-chat-scroll], textarea") as HTMLElement | null;
+      if (!scroller || scroller.scrollHeight <= scroller.clientHeight + 1) {
+        if (event.cancelable) event.preventDefault();
+        return;
+      }
+      const down = (event.touches[0]?.clientY ?? 0) > startY;
+      const atTop = scroller.scrollTop <= 0;
+      const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+      if (((down && atTop) || (!down && atBottom)) && event.cancelable) event.preventDefault();
+    };
+    const element = panel.current;
+    element?.addEventListener("touchstart", onStart, { passive: true });
+    element?.addEventListener("touchmove", onMove, { passive: false });
+
     const body = document.body.style;
     const root = document.documentElement.style;
     const saved = { position: body.position, top: body.top, left: body.left, right: body.right, width: body.width, overflow: body.overflow, overscroll: root.overscrollBehavior };
@@ -227,8 +264,9 @@ export function ChatPanel({
     body.overflow = "hidden";
     root.overscrollBehavior = "none";
     return () => {
-      visual?.removeEventListener("resize", update);
-      visual?.removeEventListener("scroll", update);
+      cancelAnimationFrame(frame);
+      element?.removeEventListener("touchstart", onStart);
+      element?.removeEventListener("touchmove", onMove);
       body.position = saved.position;
       body.top = saved.top;
       body.left = saved.left;
@@ -237,7 +275,6 @@ export function ChatPanel({
       body.overflow = saved.overflow;
       root.overscrollBehavior = saved.overscroll;
       window.scrollTo(0, scrollY);
-      setViewport(null);
     };
   }, [open, desktop]);
 
@@ -533,12 +570,14 @@ export function ChatPanel({
         desktop
           ? { right: "max(16px, env(safe-area-inset-right))", bottom: desktopBottom, height: `min(640px, calc(100dvh - ${desktopBottom + 24}px))` }
           : {
-              // Exactly the visible part of the screen, above the keyboard when it's up (see the viewport effect).
-              top: viewport ? viewport.top : 0,
-              height: viewport ? viewport.height : "100dvh",
+              // Exactly the visible part of the screen, above the keyboard when it's up: top, height and the bottom
+              // padding are kept in step every frame by the viewport effect. These are only the first paint.
+              top: 0,
+              height: "100dvh",
               paddingTop: "env(safe-area-inset-top)",
-              // With the keyboard up the home-bar gap is under the keyboard: the box sits right on top of it.
-              paddingBottom: viewport?.keyboard ? 0 : "env(safe-area-inset-bottom)",
+              paddingBottom: "env(safe-area-inset-bottom)",
+              // Whatever iOS pans into view around the panel is panel-coloured, never the page behind.
+              boxShadow: "0 0 0 100vh var(--panel)",
               paddingLeft: "env(safe-area-inset-left)",
               paddingRight: "env(safe-area-inset-right)"
             }
@@ -566,6 +605,7 @@ export function ChatPanel({
       <div
         aria-live="polite"
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 [-webkit-overflow-scrolling:touch]"
+        data-chat-scroll=""
         onScroll={onListScroll}
         onTouchEnd={() => {
           touching.current = false;

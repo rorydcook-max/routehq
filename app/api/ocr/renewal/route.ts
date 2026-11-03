@@ -46,7 +46,8 @@ export async function POST(request: Request) {
       kind: ["porbor", "insurance", "tax", "inspection"].includes(String(raw.kind)) ? String(raw.kind) : null,
       startDate: paperExpiry(raw.start_date),
       expiryDate: paperExpiry(raw.expiry_date),
-      cost: Number.isFinite(cost) && cost > 0 && cost < 1_000_000 ? Math.round(cost * 100) / 100 : null,
+      // The cap allows rupiah and dong: an Indonesian policy of 3,000,000 IDR is an ordinary premium there.
+      cost: Number.isFinite(cost) && cost > 0 && cost < 100_000_000_000 ? Math.round(cost * 100) / 100 : null,
       provider: typeof raw.provider === "string" ? raw.provider.slice(0, 80) : null,
       policyNumber: typeof raw.policy_number === "string" ? raw.policy_number.slice(0, 60) : null,
       plate: typeof raw.plate === "string" ? raw.plate.slice(0, 20) : null

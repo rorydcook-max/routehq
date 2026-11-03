@@ -1138,7 +1138,16 @@
     "setup_booking_page": "Partager votre page de réservation",
     "setupShared": "Lien copié. Partagez-le sur votre page Facebook, Google Maps et LINE.",
     "quick_askAssistant": "Parler à l'assistant",
-    "quick_askAssistant_hint": "Ajoutez des véhicules ou des locations en cours par chat, voix ou photos"
+    "quick_askAssistant_hint": "Ajoutez des véhicules ou des locations en cours par chat, voix ou photos",
+    "askExample7": "Comment encaisser une caution ?",
+    "askExample8": "Où activer la réservation en ligne ?",
+    "askHowTo": "Comment faire pour… ?",
+    "askIntroSupport": "Demandez comment faire quoi que ce soit dans RoveHQ. Les réponses viennent du centre d'aide. Essayez par exemple :",
+    "askFooterSupport": "Rédigé par AI à partir du centre d'aide RoveHQ. S'il ne peut pas répondre, envoyez la question à notre équipe.",
+    "askSendToTeam": "Envoyer à l'équipe RoveHQ",
+    "askSending": "Envoi…",
+    "askSent": "Envoyé. Nous vous répondrons sur la page Aide.",
+    "askOpenConversation": "Ouvrir la conversation"
   },
   "todo": {
     "eyebrow": "À faire",
@@ -4118,7 +4127,7 @@
     "nt_daily_payments": "Paiements dus aujourd’hui",
     "nt_daily_paymentsBody": "Paiements dus par les clients aujourd’hui",
     "nt_daily_compliance": "Documents bientôt expirés",
-    "nt_daily_complianceBody": "Vignette, assurance et entretiens dus sous 7 jours, ou déjà en retard",
+    "nt_daily_complianceBody": "Taxe, assurance, contrôle technique et entretiens à échéance dans les 7 jours, ou déjà en retard",
     "nt_daily_revenue": "Revenus du mois",
     "nt_daily_revenueBody": "Loyers reçus ce mois-ci, plus les cautions conservées",
     "nt_instant": "Alertes en temps réel",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "Véhicules et papiers",
     "guideCat_daily_work": "Travail quotidien et messages",
     "guideCat_tools": "Outils",
-    "guideCat_account": "Votre compte"
+    "guideCat_account": "Votre compte",
+    "assistantTitle": "Demander à l'assistant",
+    "assistantBody": "Posez une question sur l'utilisation de RoveHQ et obtenez la réponse tirée des guides, avec les étapes à suivre. Ce qu'il ne peut pas répondre, vous pouvez nous l'envoyer directement."
   },
   "inspectStart": {
     "titleOut": "Remettre un véhicule",

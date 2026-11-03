@@ -5,19 +5,40 @@ import { getLocale } from "next-intl/server";
 import { createBooking } from "@/app/actions/bookings";
 import { createTransaction } from "@/app/actions/transactions";
 import { createVehicle, renewVehicleCompliance } from "@/app/actions/vehicles";
+import { askSupport } from "@/app/actions/support-assistant";
 import { answerQuestion, assistantRecords, type AskAnswer, type AskTurn } from "@/lib/ask";
+import type { SupportAnswer } from "@/lib/support-assistant";
 import { checkAction } from "@/lib/assistant-actions";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 
 const OWNER_ONLY = "Only the business owner can use the assistant.";
 
-/** "Ask RoveHQ": answers a question from the business's records, or proposes a change for the owner to confirm. */
-export async function askRouteHq(question: string, history: AskTurn[] = []): Promise<AskAnswer> {
+/**
+ * Whether a message is about using the app ("how do I take a deposit?") rather than about the business's figures
+ * ("who owes me money?"). A cheap word check, in English and Thai; anything it doesn't catch goes to the records
+ * assistant as before, which tells the owner where to look if it can't answer.
+ */
+function isSupportQuestion(text: string) {
+  const asked = String(text || "").trim();
+  return (
+    /\b(how (do|can|should) (i|we|you)|how to|where (is|are|do|can|does)|can i|could i|what does .{1,40} mean|why (can'?t|cannot|isn'?t|doesn'?t|won'?t|don'?t)|set ?up|turn (on|off)|switch (on|off)|enable|disable|connect|not working|doesn'?t work|isn'?t working|won'?t (load|save|open|work)|error|help|tutorial|guide|explain how)\b/i.test(asked) ||
+    /(ทำยังไง|ทำอย่างไร|ตั้งค่า|อยู่ตรงไหน|ใช้ยังไง|ใช้อย่างไร|เปิดใช้|วิธี|ช่วยด้วย|ไม่ทำงาน|ใช้ไม่ได้)/.test(asked)
+  );
+}
+
+/**
+ * "Ask RoveHQ": answers a question from the business's records, or proposes a change for the owner to confirm.
+ * How-to questions, and anything a teammate asks, go to the support assistant instead, which answers from the
+ * help centre and never sees the records.
+ */
+export async function askRouteHq(question: string, history: AskTurn[] = [], pathname?: string | null): Promise<AskAnswer | SupportAnswer> {
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: await said("Please sign in again.") };
-  // Money questions and changes are the owner's business; teammates handle day-to-day work.
-  if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY) };
+  const turns = (Array.isArray(history) ? history : []).filter((turn) => turn && (turn.role === "user" || turn.role === "assistant") && typeof turn.content === "string");
+
+  // Money questions and changes are the owner's business; teammates still get help with using the app.
+  if (membership.role !== "owner" || isSupportQuestion(question)) return askSupport(question, pathname, turns);
 
   let language = "English";
   try {
@@ -26,7 +47,6 @@ export async function askRouteHq(question: string, history: AskTurn[] = []): Pro
   } catch {
     // English is fine.
   }
-  const turns = (Array.isArray(history) ? history : []).filter((turn) => turn && (turn.role === "user" || turn.role === "assistant") && typeof turn.content === "string");
   return answerQuestion(question, language, turns);
 }
 
@@ -56,10 +76,13 @@ export async function confirmAssistantAction(kind: string, args: Record<string, 
   if (!membership) return { ok: false, error: await said("Please sign in again.") };
   if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY) };
 
-  const checked = checkAction(String(kind), args && typeof args === "object" ? args : {}, await assistantRecords());
+  const records = await assistantRecords();
+  const checked = checkAction(String(kind), args && typeof args === "object" ? args : {}, records);
   if (!checked.ok) return { ok: false, error: checked.error };
   const a = checked.action.args;
   const organizationId = membership.organizationId;
+  // The booking is priced in the business's own money (it was always THB before, wrong for a Malaysian business).
+  const currency = records.currency || "THB";
 
   try {
     if (checked.action.kind === "add_vehicle") {
@@ -82,7 +105,7 @@ export async function confirmAssistantAction(kind: string, args: Record<string, 
 
     if (checked.action.kind === "create_booking_link") {
       const result = await createBooking(
-        form(organizationId, { vehicleId: a.vehicleId, customerId: a.customerId, startDate: a.startDate, endDate: a.endDate, openEnded: a.endDate ? "" : "true", pricingModel: a.pricingModel, rentalRate: a.rentalRate, depositAmount: a.depositAmount, deliveryMethod: "tbd", bookingMode: "booking_link", shareChannel: "copy", currency: "THB" })
+        form(organizationId, { vehicleId: a.vehicleId, customerId: a.customerId, startDate: a.startDate, endDate: a.endDate, openEnded: a.endDate ? "" : "true", pricingModel: a.pricingModel, rentalRate: a.rentalRate, depositAmount: a.depositAmount, deliveryMethod: "tbd", bookingMode: "booking_link", shareChannel: "copy", currency })
       );
       if (!result.ok) return { ok: false, error: result.error };
       return { ok: true, message: "Booking created. Send this link to your customer:", copy: result.bookingUrl, link: { label: "Open the booking", href: `/bookings/${result.rentalId}` } };

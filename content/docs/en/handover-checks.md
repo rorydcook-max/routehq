@@ -5,6 +5,8 @@ category: bookings
 order: 6
 appPath: "/inspections/start/delivery"
 related: ["create-a-booking", "deposits", "charge-a-renter", "extend-or-end-a-rental"]
+video: "help-handover-checks.mp4"
+poster: "help-handover-checks.jpg"
 updated: 2026-11-02
 faq:
   - q: "Can I hand over without the form?"
@@ -20,7 +22,7 @@ Do this every time. If there's ever an argument about a scratch or the fuel, the
    - **Odometer**: take a photo. RoveHQ reads the number from it. Check it and fix it if it's wrong.
    - **Fuel**: photo of the gauge, then tap the level that matches.
    - **Walkaround**: one video walking round the vehicle, or a photo of each of the four sides.
-   - **Damage**: tap the part of the vehicle where there's damage, choose the type (scratch, dent, crack, missing part), add a photo and tap **Add this damage**. Nothing there? Tick **No damage to report**.
+   - **Damage**: tap the part of the vehicle where there's damage, choose the type (scratch, dent, crack, missing part), write a few words and tap **Add this damage**. Then tap **Add damage photo** on it. Nothing there? Tick **No damage to report**.
    - **GPS**: confirm the tracker is working. Skipped if the vehicle has no tracker.
    - **Signature**: the customer types their name and signs on your phone.
 3. On **Check and sign**, if they pay cash now, enter the rent and deposit and tap **Confirm cash and make receipt**. You can share or download the receipt.

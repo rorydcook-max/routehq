@@ -57,7 +57,7 @@ With 90 days or fewer left, road tax, Por Ror Bor and insurance get a **How to r
 - The vehicle's **Paperwork & service** tab is flagged and opens first at 7 days.
 - **Fleet** shows it and counts it under **need attention**.
 - The dashboard lists anything due within 7 days in **Today**.
-- The LINE morning summary includes road tax, Por Ror Bor, insurance and service due within 7 days, plus a heads-up 90, 60 and 30 days before tax and insurance run out. See [Notifications](/docs/notifications).
+- The LINE morning summary includes road tax, Por Ror Bor, insurance, inspection and service due within 7 days or already overdue, plus a heads-up 90, 60 and 30 days before any paperwork runs out. See [Notifications](/docs/notifications).
 
 ## Common questions
 

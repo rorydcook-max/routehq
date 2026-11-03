@@ -172,5 +172,10 @@
   "{} is larger than {} MB.": "{} அளவு {} MB-ஐ விடப் பெரியது.",
   "{}. Please choose a longer stay or another vehicle.": "{}. நீண்ட காலத்தையோ வேறொரு வாகனத்தையோ தேர்வுசெய்யவும்.",
   "Your own booking address comes with the Pro plan and above.": "உங்கள் சொந்த புக்கிங் முகவரி க்ரோத் திட்டம் மற்றும் அதற்கு மேல் கிடைக்கும்.",
-  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "உங்கள் விவரங்கள் சேமிக்கப்பட்டன. ஒப்பந்தம் இன்னும் கையெழுத்திடத் தயாராகவில்லை. வாடகை நிறுவனத்துக்குத் தெரிவித்துள்ளோம், அவர்கள் உங்களைத் தொடர்புகொள்வார்கள்."
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "உங்கள் விவரங்கள் சேமிக்கப்பட்டன. ஒப்பந்தம் இன்னும் கையெழுத்திடத் தயாராகவில்லை. வாடகை நிறுவனத்துக்குத் தெரிவித்துள்ளோம், அவர்கள் உங்களைத் தொடர்புகொள்வார்கள்.",
+  "Type a question first.": "முதலில் ஒரு கேள்வியைத் தட்டச்சு செய்யுங்கள்.",
+  "The assistant isn't switched on for this account yet.": "இந்தக் கணக்கிற்கு உதவியாளர் இன்னும் இயக்கப்படவில்லை.",
+  "Couldn't work out an answer to that. Try asking it another way.": "அதற்கு பதில் கண்டுபிடிக்க முடியவில்லை. வேறு விதமாகக் கேட்டுப் பாருங்கள்.",
+  "Couldn't reach the assistant just now. Try again in a moment.": "இப்போது உதவியாளரை அணுக முடியவில்லை. சிறிது நேரத்தில் மீண்டும் முயலுங்கள்.",
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "உதவியாளரின் AI சேவையில் கிரெடிட் தீர்ந்துவிட்டது, அதனால் இப்போது பதில் சொல்ல முடியாது. RoveHQ-இல் மற்ற எல்லாம் வழக்கம் போல் வேலை செய்யும்."
 }

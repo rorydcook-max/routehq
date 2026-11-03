@@ -5,6 +5,8 @@ category: daily-work
 order: 2
 appPath: "/tasks"
 related: ["dashboard", "record-a-payment", "vehicle-page", "extend-or-end-a-rental"]
+video: "help-to-do.mp4"
+poster: "help-to-do.jpg"
 updated: 2026-11-02
 faq:
   - q: "How do I add a job?"
@@ -38,7 +40,7 @@ Tap the customer or vehicle on a job to open the booking or vehicle.
 2. Enter the **Amount that arrived**, **Date received** and **Method**.
 3. If they paid for more than one thing, tick it under **What is it for?**. **What will be recorded** shows what's left or extra.
 4. Leave **Tell the customer the payment was received** ticked if you want them told.
-5. Tap **Record ฿…** (it shows the amount).
+5. Tap **Record** (the button shows the amount).
 
 ## Check a customer's receipt
 

@@ -5,6 +5,8 @@ category: bookings
 order: 3
 appPath: "/settings?tab=rentals#booking-page"
 related: ["booking-and-price-rules", "create-a-booking", "payment-reminders-and-methods", "add-a-vehicle"]
+video: "help-online-booking-page.mp4"
+poster: "help-online-booking-page.jpg"
 updated: 2026-11-02
 faq:
   - q: "Why isn't one of my vehicles on the page?"

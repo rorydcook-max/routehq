@@ -3,8 +3,10 @@ title: "Deposits"
 description: "Take a deposit, keep track of what you hold, take deductions at return, and give the rest back."
 category: bookings
 order: 8
-appPath: "/bookings"
+appPath: "/bookings/[id]"
 related: ["handover-checks", "charge-a-renter", "money-in-and-out", "booking-and-price-rules"]
+video: "help-deposits.mp4"
+poster: "help-deposits.jpg"
 updated: 2026-11-02
 faq:
   - q: "Why doesn't the deposit show in my income?"

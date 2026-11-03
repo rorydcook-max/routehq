@@ -65,8 +65,14 @@ function shortDate(value: string | null | undefined, locale = "en-GB") {
   return dateFormat(locale === "en-GB" ? "en" : locale, { day: "numeric", month: "short" }).format(new Date(value));
 }
 
+// The booking's currency (set when the form opens; one form per page). Was always THB, which showed ฿ to businesses elsewhere.
+let formCurrency = "THB";
 function money(value: unknown) {
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(Number(value || 0));
+  try {
+    return new Intl.NumberFormat("en", { style: "currency", currency: formCurrency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(Number(value || 0));
+  } catch {
+    return `${formCurrency} ${Math.round(Number(value || 0)).toLocaleString("en-US")}`;
+  }
 }
 
 /** Days a rental has run, counting the first day, on the business's calendar (the same on the server and on the phone). */
@@ -466,6 +472,7 @@ function SignaturePad({
 export function InspectionForm({ context, unsigned = false, blocker = null, blockerLinks = null, canWaive = true }: { context: InspectionContext; /** The booking in the way, so the owner can go straight to it. */ blockerLinks?: { otherRentalId: string; code: string } | null; /** Owners can give early days for free; teammates charge them or keep the length. */ canWaive?: boolean; /** The customer has not signed the agreement yet. */ unsigned?: boolean; /** Why the handover cannot go ahead right now (another customer still has the vehicle). */ blocker?: string | null }) {
   const t = useTranslations("inspection");
   const locale = useLocale();
+  formCurrency = String(context.rental?.currency || "THB");
   const areaName = (location: string) => {
     const key = `area${location.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("")}`;
     return t.has(key) ? t(key) : location.replace(/_/g, " ");
@@ -1109,7 +1116,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               <p className="font-semibold text-[var(--warning)]">{t("fuelDeficitApprox", { percent: deliveryFuel - fuelLevel })}</p>
               <label className="mt-2 block text-sm font-bold text-[var(--foreground)]">
                 {t("applyFuelCharge")}
-                <input className={inputClass} min="0" onChange={(event) => setFuelDeficitCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={fuelDeficitCharge || ""} />
+                <input className={inputClass} min="0" onChange={(event) => setFuelDeficitCharge(Number(event.target.value || 0))} placeholder={formCurrency} step="0.01" type="number" value={fuelDeficitCharge || ""} />
               </label>
             </div>
           ) : null}
@@ -1242,7 +1249,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
           {mode === "return" && damageItems.some((item) => !item.is_pre_existing) ? (
             <label className="mt-4 block rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3">
               <span className="text-sm font-semibold text-[var(--danger)]">{t("applyDamageExcess")}</span>
-              <input className={inputClass} min="0" onChange={(event) => setDamageCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={damageCharge || ""} />
+              <input className={inputClass} min="0" onChange={(event) => setDamageCharge(Number(event.target.value || 0))} placeholder={formCurrency} step="0.01" type="number" value={damageCharge || ""} />
             </label>
           ) : null}
         </StepShell>
@@ -1346,7 +1353,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               <div className="mt-3 space-y-3">
                 <label className="block">
                   <span className="text-sm font-semibold text-[var(--foreground)]">{t("cleaningFee")}</span>
-                  <input className={inputClass} min="0" onChange={(event) => setCleaningCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={cleaningCharge || ""} />
+                  <input className={inputClass} min="0" onChange={(event) => setCleaningCharge(Number(event.target.value || 0))} placeholder={formCurrency} step="0.01" type="number" value={cleaningCharge || ""} />
                 </label>
                 <label className="block">
                   <span className="text-sm font-semibold text-[var(--foreground)]">{t("overrideRefund")}</span>

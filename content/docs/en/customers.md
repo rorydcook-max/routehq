@@ -3,8 +3,10 @@ title: "Customers"
 description: "Find a customer, check their documents and what they owe, see their rental history, and flag people you won't rent to again."
 category: bookings
 order: 11
-appPath: "/customers"
+appPath: "/customers/[id]"
 related: ["create-a-booking", "inbox-and-messaging", "record-a-payment", "automatic-customer-messages"]
+video: "help-customers.mp4"
+poster: "help-customers.jpg"
 updated: 2026-11-02
 faq:
   - q: "Do I have to add customers myself?"

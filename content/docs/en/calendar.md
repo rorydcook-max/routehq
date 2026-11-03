@@ -5,6 +5,8 @@ category: bookings
 order: 10
 appPath: "/calendar"
 related: ["create-a-booking", "paperwork-and-renewals", "to-do", "dashboard"]
+video: "help-calendar.mp4"
+poster: "help-calendar.jpg"
 updated: 2026-11-02
 faq: []
 ---

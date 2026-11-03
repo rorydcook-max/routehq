@@ -5,6 +5,8 @@ category: bookings
 order: 5
 appPath: "/settings/contracts"
 related: ["create-a-booking", "booking-and-price-rules", "extend-or-end-a-rental", "business-settings"]
+video: "help-rental-agreements.mp4"
+poster: "help-rental-agreements.jpg"
 updated: 2026-11-02
 faq:
   - q: "If I change my terms, do signed agreements change too?"

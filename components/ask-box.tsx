@@ -3,19 +3,32 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Route } from "next";
-import { ArrowRight, Check, Copy, Search, Sparkles, X } from "lucide-react";
+import { ArrowRight, BookOpen, Check, Copy, LifeBuoy, Search, Sparkles, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { askRouteHq, confirmAssistantAction } from "@/app/actions/ask";
+import { sendToTeam } from "@/app/actions/support-assistant";
 import type { ProposedAction } from "@/lib/assistant-actions";
 
-// Starter questions, worded in the reader's language (askExample1…4 in the locale files). Two more show what it can change.
-const EXAMPLE_KEYS = ["askExample1", "askExample2", "askExample3", "askExample4", "askExample5", "askExample6"];
+// Starter questions, worded in the reader's language (askExample1…4 in the locale files). Two more show what it can
+// change, and the last two are about using the app itself (answered from the help centre).
+const EXAMPLE_KEYS = ["askExample1", "askExample2", "askExample3", "askExample4", "askExample5", "askExample6", "askExample7", "askExample8"];
+// Teammates can't see the figures, so they only get the how-to starters.
+const SUPPORT_EXAMPLE_KEYS = ["askExample7", "askExample8"];
 
 type Turn = {
   question: string;
   answer?: string;
   links?: Array<{ label: string; href: string }>;
   error?: string;
+  /** Answered from the help centre rather than the records: shows articles and a way to reach the team. */
+  support?: boolean;
+  articles?: Array<{ slug: string; title: string; href: string }>;
+  handoff?: boolean;
+  /** The page the question was asked from, kept so the team knows where they were. */
+  pathname?: string;
+  sending?: boolean;
+  sent?: { id: string };
+  sendError?: string;
   /** A change waiting for the owner's go-ahead. */
   proposal?: ProposedAction;
   proposalState?: "waiting" | "saving" | "done" | "cancelled";
@@ -26,11 +39,17 @@ type Turn = {
 /**
  * "Ask RoveHQ": a question box available on every page. It answers from the
  * business's own records, and can make a few changes when asked. Every change
- * is shown first and saved only when the owner presses Confirm.
+ * is shown first and saved only when the owner presses Confirm. "How do I…"
+ * questions are answered from the help centre instead, for owners and
+ * teammates alike, with a way to pass the question on to the RoveHQ team.
+ *
+ * `support` is set for teammates: they see the how-to intro and starters only.
+ * The "button" variant is the sidebar look without the Ctrl+K shortcut, for the
+ * Help page.
  */
-export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
+export function AskBox({ variant, support = false }: { variant: "sidebar" | "icon" | "button"; support?: boolean }) {
   const t = useTranslations("shell");
-  const EXAMPLES = EXAMPLE_KEYS.map((key) => t(key));
+  const EXAMPLES = (support ? SUPPORT_EXAMPLE_KEYS : EXAMPLE_KEYS).map((key) => t(key));
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -78,17 +97,23 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
         { role: "assistant" as const, content: `${reply}${proposed}`.trim() || "…" }
       ];
     });
-    setTurns((current) => [...current, { question: asked }]);
+    // The page they're on, so a how-to question about "this screen" finds the right article.
+    const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+    setTurns((current) => [...current, { question: asked, pathname }]);
     startTransition(async () => {
       let result: Awaited<ReturnType<typeof askRouteHq>>;
       try {
-        result = await askRouteHq(asked, history);
+        result = await askRouteHq(asked, history, pathname);
       } catch {
         result = { ok: false, error: t("askFailed") };
       }
       setTurns((current) => {
         const next = [...current];
-        next[next.length - 1] = result.ok ? { question: asked, answer: result.answer, links: result.links, proposal: result.proposal, proposalState: result.proposal ? "waiting" : undefined } : { question: asked, error: result.error };
+        next[next.length - 1] = !result.ok
+          ? { question: asked, pathname, error: result.error }
+          : "links" in result
+            ? { question: asked, pathname, answer: result.answer, links: result.links, proposal: result.proposal, proposalState: result.proposal ? "waiting" : undefined }
+            : { question: asked, pathname, answer: result.answer, support: true, articles: result.articles, handoff: result.handoff };
         return next;
       });
     });
@@ -96,6 +121,32 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
 
   function patch(index: number, changes: Partial<Turn>) {
     setTurns((current) => current.map((turn, position) => (position === index ? { ...turn, ...changes } : turn)));
+  }
+
+  /** Passes a how-to question (and the conversation before it) to the RoveHQ team as a Help conversation. */
+  function send(index: number) {
+    const turn = turns[index];
+    if (!turn || turn.sending || turn.sent) return;
+    patch(index, { sending: true, sendError: undefined });
+    const history = turns.slice(0, index).flatMap((earlier) => [
+      { role: "user" as const, content: earlier.question },
+      { role: "assistant" as const, content: earlier.answer || earlier.error || "…" }
+    ]);
+    startTransition(async () => {
+      let outcome: Awaited<ReturnType<typeof sendToTeam>>;
+      try {
+        outcome = await sendToTeam({ question: turn.question, answer: turn.answer, history, pathname: turn.pathname });
+      } catch {
+        outcome = { ok: false, error: t("askFailed") };
+      }
+      if (outcome.ok) patch(index, { sending: false, sent: { id: outcome.id } });
+      else patch(index, { sending: false, sendError: outcome.error });
+    });
+  }
+
+  /** The articles write button names in **bold**; the answer keeps them that way. */
+  function emphasised(text: string) {
+    return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => (part.startsWith("**") && part.endsWith("**") ? <strong className="font-semibold text-[var(--foreground)]" key={index}>{part.slice(2, -2)}</strong> : part));
   }
 
   function confirm(index: number) {
@@ -116,15 +167,15 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
 
   return (
     <>
-      {variant === "sidebar" ? (
+      {variant === "sidebar" || variant === "button" ? (
         <button
           className="flex h-10 w-full items-center gap-2 rounded-xl border border-[var(--sidebar-border)] bg-white px-3 text-left text-[14px] text-[var(--muted)] transition hover:border-[var(--primary)] hover:text-[var(--foreground)]"
-          title="Ctrl K"
+          title={variant === "sidebar" ? "Ctrl K" : undefined}
           onClick={() => setOpen(true)}
           type="button"
         >
           <Search size={16} />
-          <span className="min-w-0 flex-1 truncate font-medium">{t("askAnything")}</span>
+          <span className="min-w-0 flex-1 truncate font-medium">{support ? t("askHowTo") : t("askAnything")}</span>
         </button>
       ) : (
         <button aria-label={t("askTitle")} className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--foreground-secondary)]" onClick={() => setOpen(true)} type="button">
@@ -162,7 +213,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
               {turns.length === 0 ? (
                 <div>
-                  <p className="text-[13px] text-[var(--muted)]">{t("askIntro")}</p>
+                  <p className="text-[13px] text-[var(--muted)]">{support ? t("askIntroSupport") : t("askIntro")}</p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     {EXAMPLES.map((example) => (
                       <button className="pressable rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" key={example} onClick={() => ask(example)} type="button">
@@ -180,7 +231,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                         <p className="mt-2 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-[13px] text-[var(--danger)]">{turn.error}</p>
                       ) : turn.answer ? (
                         <>
-                          <p className="mt-2 whitespace-pre-line [overflow-wrap:anywhere] text-[14px] leading-relaxed text-[var(--foreground-secondary)]">{turn.answer}</p>
+                          <p className="mt-2 whitespace-pre-line [overflow-wrap:anywhere] text-[14px] leading-relaxed text-[var(--foreground-secondary)]">{emphasised(turn.answer)}</p>
                           {turn.proposal ? (
                             <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border)]">
                               <p className="border-b border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-[13px] font-semibold text-[var(--foreground)]">{turn.proposal.title}</p>
@@ -245,6 +296,43 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                               ))}
                             </div>
                           ) : null}
+                          {turn.support ? (
+                            <div className="mt-3">
+                              {turn.articles && turn.articles.length > 0 ? (
+                                // Help articles open in a new tab so the question box, and the page under it, stay put.
+                                <div className="flex flex-wrap gap-2">
+                                  {turn.articles.map((article) => (
+                                    <a className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-[13px] font-semibold text-[var(--primary)] hover:border-[var(--primary)]" href={article.href} key={article.slug} rel="noreferrer" target="_blank">
+                                      <BookOpen size={13} />
+                                      {article.title}
+                                    </a>
+                                  ))}
+                                </div>
+                              ) : null}
+                              {turn.sent ? (
+                                <p className="mt-2 flex flex-wrap items-center gap-1.5 text-[13px] font-medium text-[var(--success)]">
+                                  <Check size={15} /> {t("askSent")}
+                                  <Link className="inline-flex items-center gap-1 font-semibold text-[var(--primary)]" href={`/help/${turn.sent.id}` as Route} onClick={() => setOpen(false)}>
+                                    {t("askOpenConversation")}
+                                    <ArrowRight size={13} />
+                                  </Link>
+                                </p>
+                              ) : (
+                                <div className={turn.handoff ? "mt-3" : "mt-2"}>
+                                  {turn.sendError ? <p className="mb-1.5 text-[13px] font-medium text-[var(--danger)]">{turn.sendError}</p> : null}
+                                  <button
+                                    className={turn.handoff ? "secondary-action pressable min-h-9 px-3 text-[13px] disabled:opacity-60" : "inline-flex items-center gap-1.5 text-[12px] font-medium text-[var(--muted)] hover:text-[var(--primary)] disabled:opacity-60"}
+                                    disabled={turn.sending}
+                                    onClick={() => send(index)}
+                                    type="button"
+                                  >
+                                    <LifeBuoy size={turn.handoff ? 15 : 13} />
+                                    {turn.sending ? t("askSending") : t("askSendToTeam")}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ) : null}
                         </>
                       ) : (
                         <p className="mt-2 animate-pulse text-[13px] text-[var(--muted)]">{t("askLooking")}</p>
@@ -255,7 +343,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                 </div>
               )}
             </div>
-            <p className="border-t border-[var(--border)] px-4 py-2 text-[11px] text-[var(--muted)]">{t("askFooter")}</p>
+            <p className="border-t border-[var(--border)] px-4 py-2 text-[11px] text-[var(--muted)]">{support ? t("askFooterSupport") : t("askFooter")}</p>
           </div>
         </div>
       ) : null}

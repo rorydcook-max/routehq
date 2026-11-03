@@ -41,7 +41,7 @@ If you run more than one business, pick which one at the top of the menu.
 Tap **+** (on a computer it's the round **Quick add** button at the top of the menu) for:
 
 - **New booking**, **Hand over a vehicle**, **Take a vehicle back**, **Record money in or out**, **Upload a receipt**
-- Under **Less often**: **Add a customer**, **Add a vehicle**, **Tell the assistant**, **Import vehicles**
+- Under **Less often**: **Add a customer**, **Add a vehicle**, **Tell the assistant**, **Import vehicles** (owner only)
 
 ## Ask a question
 

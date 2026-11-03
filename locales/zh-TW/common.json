@@ -1098,7 +1098,16 @@
     "setup_booking_page": "分享您的預約頁面",
     "setupShared": "已複製連結。請將它貼到您的 Facebook 粉絲專頁、Google 地圖和 LINE。",
     "quick_askAssistant": "告訴助理",
-    "quick_askAssistant_hint": "透過聊天、語音或照片新增車輛或目前的租約"
+    "quick_askAssistant_hint": "透過聊天、語音或照片新增車輛或目前的租約",
+    "askExample7": "如何收取押金？",
+    "askExample8": "在哪裡開啟線上預訂？",
+    "askHowTo": "如何……？",
+    "askIntroSupport": "可以詢問 RoveHQ 中任何操作的方法，答案來自說明中心。試試這些：",
+    "askFooterSupport": "由 AI 根據 RoveHQ 說明中心的內容撰寫。如果無法回答，可將問題傳送給我們的團隊。",
+    "askSendToTeam": "傳送給 RoveHQ 團隊",
+    "askSending": "傳送中…",
+    "askSent": "已傳送。我們會在「說明」頁面回覆。",
+    "askOpenConversation": "開啟對話"
   },
   "todo": {
     "eyebrow": "待辦",
@@ -4078,7 +4087,7 @@
     "nt_daily_payments": "今日應付款項",
     "nt_daily_paymentsBody": "客戶今天應支付的款項",
     "nt_daily_compliance": "即將到期的文件",
-    "nt_daily_complianceBody": "7 天內到期或已逾期的牌照稅、保險和保養",
+    "nt_daily_complianceBody": "7 天內到期或已逾期的牌照稅、保險、驗車和保養",
     "nt_daily_revenue": "本月收入",
     "nt_daily_revenueBody": "本月至今收到的租金，加上您扣留的押金",
     "nt_instant": "即時通知",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "車輛和證件",
     "guideCat_daily_work": "日常工作和訊息",
     "guideCat_tools": "工具",
-    "guideCat_account": "你的帳戶"
+    "guideCat_account": "你的帳戶",
+    "assistantTitle": "詢問助理",
+    "assistantBody": "輸入關於使用 RoveHQ 的問題，即可從指南中取得答案和操作步驟。無法回答的問題，可以直接傳送給我們。"
   },
   "inspectStart": {
     "titleOut": "交車",

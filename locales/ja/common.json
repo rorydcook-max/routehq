@@ -1098,7 +1098,16 @@
     "setup_booking_page": "予約ページをシェアする",
     "setupShared": "リンクをコピーしました。Facebookページ、Googleマップ、LINEに貼り付けてください。",
     "quick_askAssistant": "アシスタントに頼む",
-    "quick_askAssistant_hint": "チャット、音声、写真で車両や貸出情報を追加"
+    "quick_askAssistant_hint": "チャット、音声、写真で車両や貸出情報を追加",
+    "askExample7": "デポジットを受け取るには？",
+    "askExample8": "オンライン予約はどこで有効にできますか？",
+    "askHowTo": "…するには？",
+    "askIntroSupport": "RoveHQ の使い方について何でも質問できます。回答はヘルプセンターの内容に基づきます。例えば：",
+    "askFooterSupport": "RoveHQ ヘルプセンターの内容をもとに AI が作成しています。回答できない場合は、質問をチームに送信できます。",
+    "askSendToTeam": "RoveHQ チームに送信",
+    "askSending": "送信中…",
+    "askSent": "送信しました。ヘルプページで返信します。",
+    "askOpenConversation": "会話を開く"
   },
   "todo": {
     "eyebrow": "やること",
@@ -4078,7 +4087,7 @@
     "nt_daily_payments": "本日期日の支払い",
     "nt_daily_paymentsBody": "本日顧客から受け取る予定の支払い",
     "nt_daily_compliance": "期限切れ間近の書類",
-    "nt_daily_complianceBody": "7日以内に期限を迎える、またはすでに期限切れの自動車税、保険、点検",
+    "nt_daily_complianceBody": "7日以内に期限を迎える、または期限切れの自動車税・保険・車検・点検整備",
     "nt_daily_revenue": "今月の収入",
     "nt_daily_revenueBody": "今月これまでに受け取ったレンタル料と没収した保証金",
     "nt_instant": "随時の通知",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "車両と書類",
     "guideCat_daily_work": "日々の業務とメッセージ",
     "guideCat_tools": "ツール",
-    "guideCat_account": "アカウント"
+    "guideCat_account": "アカウント",
+    "assistantTitle": "アシスタントに質問",
+    "assistantBody": "RoveHQ の使い方について質問を入力すると、ガイドから手順付きの回答が得られます。回答できない内容は、そのまま私たちに送信できます。"
   },
   "inspectStart": {
     "titleOut": "車両を引き渡す",

@@ -19,13 +19,16 @@ export type ProposedAction = {
 
 export type AssistantRecords = {
   today: string;
+  /** The business's money (THB, MYR, IDR...): amounts on the card are shown in it. */
+  currency?: string;
   vehicles: Array<{ id: string; name: string; plate: string }>;
   customers: Array<{ id: string; name: string }>;
   categories: Array<{ id: string; code: string; name: string }>;
 };
 
 const VEHICLE_TYPES = ["car", "van", "motorcycle", "scooter", "ebike", "atv"] as const;
-const PAPERWORK = { tax: "Road tax", porbor: "Compulsory insurance (Por Ror Bor)", insurance: "Insurance", service: "Service", oil: "Oil change" } as const;
+// Inspection too (Malaysia's PUSPAKOM, Indonesia's KIR...): the vehicle page keeps a date for it outside Thailand.
+const PAPERWORK = { tax: "Road tax", porbor: "Compulsory insurance (Por Ror Bor)", insurance: "Insurance", inspection: "Vehicle inspection", service: "Service", oil: "Oil change" } as const;
 const PERIODS = { daily: "day", weekly: "week", monthly: "month" } as const;
 
 /** The function list given to the model. */
@@ -65,7 +68,7 @@ export const ASSISTANT_TOOLS = [
         properties: {
           vehicleId: { type: "string", description: "id of the vehicle from the records" },
           type: { type: "string", enum: TRANSACTION_TYPE_OPTIONS.map((option) => option.value) },
-          amount: { type: "number", description: "Positive amount in THB" },
+          amount: { type: "number", description: "Positive amount in the business's own currency (given in the records)" },
           date: { type: "string", description: "Optional, YYYY-MM-DD. Leave out when not stated; today is used. Never ask for it." },
           notes: { type: "string", description: "What it was for, in the owner's words" },
           supplier: { type: "string" }
@@ -98,7 +101,7 @@ export const ASSISTANT_TOOLS = [
     type: "function" as const,
     function: {
       name: "renew_paperwork",
-      description: "Mark a vehicle's road tax, compulsory insurance, insurance, service or oil change as renewed, with its new expiry or next-due date.",
+      description: "Mark a vehicle's road tax, compulsory insurance, insurance, inspection (PUSPAKOM, KIR...), service or oil change as renewed, with its new expiry or next-due date.",
       parameters: {
         type: "object",
         properties: {
@@ -118,9 +121,17 @@ const isDate = (value: unknown): value is string => typeof value === "string" &&
 const text = (value: unknown, max = 200) => String(value ?? "").trim().slice(0, max);
 const amount = (value: unknown) => {
   const number = Number(value);
-  return Number.isFinite(number) && number > 0 && number < 100_000_000 ? Math.round(number * 100) / 100 : null;
+  // The cap allows rupiah and dong: a car bought for 300,000,000 IDR is an ordinary purchase price there.
+  return Number.isFinite(number) && number > 0 && number < 100_000_000_000 ? Math.round(number * 100) / 100 : null;
 };
-const baht = (value: number) => `฿${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+/** An amount in the business's money: ฿12,500, RM 1,200... (not always baht: Malaysian and Indonesian businesses too). */
+const inMoney = (currency: string) => (value: number) => {
+  try {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 2 }).format(value);
+  } catch {
+    return `${currency} ${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+  }
+};
 
 function plainDate(iso: string) {
   return new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
@@ -134,6 +145,7 @@ type Checked = { ok: true; action: ProposedAction } | { ok: false; error: string
  * and again on Confirm, so nothing unchecked is ever saved.
  */
 export function checkAction(kind: string, raw: Record<string, unknown>, records: AssistantRecords): Checked {
+  const money = inMoney(records.currency || "THB");
   const vehicle = records.vehicles.find((entry) => entry.id === raw.vehicleId);
   const vehicleLabel = vehicle ? `${vehicle.name} · ${vehicle.plate}` : "";
 
@@ -178,11 +190,11 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
       { label: "Plate", value: plate },
       args.color ? { label: "Colour", value: args.color } : null,
       args.mileage ? { label: "Mileage", value: `${args.mileage.toLocaleString("en-US")} km` } : null,
-      args.dailyRate ? { label: "Per day", value: baht(args.dailyRate) } : null,
-      args.weeklyRate ? { label: "Per week", value: baht(args.weeklyRate) } : null,
-      args.monthlyRate ? { label: "Per month", value: baht(args.monthlyRate) } : null,
-      args.purchasePrice ? { label: "Bought for", value: baht(args.purchasePrice) } : null,
-      args.currentValue ? { label: "Worth now", value: baht(args.currentValue) } : null
+      args.dailyRate ? { label: "Per day", value: money(args.dailyRate) } : null,
+      args.weeklyRate ? { label: "Per week", value: money(args.weeklyRate) } : null,
+      args.monthlyRate ? { label: "Per month", value: money(args.monthlyRate) } : null,
+      args.purchasePrice ? { label: "Bought for", value: money(args.purchasePrice) } : null,
+      args.currentValue ? { label: "Worth now", value: money(args.currentValue) } : null
     ].filter(Boolean) as ProposedAction["rows"];
     return { ok: true, action: { kind: "add_vehicle", title: "Add this vehicle", rows, args } };
   }
@@ -197,7 +209,7 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
     if (date > records.today) return { ok: false, error: "That date is in the future. Transactions are recorded once the money has moved." };
     const args = { vehicleId: vehicle.id, type: option.value, amount: value, date, notes: text(raw.notes, 300) || null, supplier: text(raw.supplier, 80) || null };
     const rows = [
-      { label: option.category === "expense" ? "Cost" : "Money in", value: `${option.label} · ${baht(value)}` },
+      { label: option.category === "expense" ? "Cost" : "Money in", value: `${option.label} · ${money(value)}` },
       { label: "Vehicle", value: vehicleLabel },
       { label: "Date", value: plainDate(date) },
       args.supplier ? { label: "Paid to", value: args.supplier } : null,
@@ -222,8 +234,8 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
       { label: "Customer", value: customer ? customer.name : "They fill in their details from the link" },
       { label: "From", value: plainDate(raw.startDate) },
       { label: "Until", value: endDate ? plainDate(endDate) : `Open-ended, billed each ${PERIODS[period]}` },
-      { label: "Price", value: `${baht(rate)} per ${PERIODS[period]}` },
-      { label: "Deposit", value: deposit > 0 ? baht(deposit) : "None" }
+      { label: "Price", value: `${money(rate)} per ${PERIODS[period]}` },
+      { label: "Deposit", value: deposit > 0 ? money(deposit) : "None" }
     ];
     return { ok: true, action: { kind: "create_booking_link", title: "Create this booking link", rows, args } };
   }
@@ -240,7 +252,7 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
       { label: "Vehicle", value: vehicleLabel },
       { label: "Renewed", value: PAPERWORK[what] },
       { label: what === "service" || what === "oil" ? "Next due" : "Now valid until", value: plainDate(raw.newExpiryDate) },
-      cost ? { label: "Cost", value: baht(cost) } : null,
+      cost ? { label: "Cost", value: money(cost) } : null,
       args.notes ? { label: "Note", value: args.notes } : null
     ].filter(Boolean) as ProposedAction["rows"];
     return { ok: true, action: { kind: "renew_paperwork", title: "Mark this as renewed", rows, args } };

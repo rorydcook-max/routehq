@@ -33,7 +33,7 @@ If it can't read it, fill it in by hand or tap **Use a different photo**. The ph
 
 ## Rates and deposit
 
-Fill in any of **Daily rate**, **Weekly rate** or **Monthly rate**. Only the ones you type are saved; when a booking needs one you left empty, it's worked out from the nearest one you set.
+Fill in the ones you use out of **Daily rate**, **Weekly rate** and **Monthly rate**. A missing one is worked out from the others when you book.
 
 Leave **Deposit for this vehicle** empty to use your usual deposit (set in **Settings**, **Rentals and payments**). See [Deposits](/docs/deposits).
 

@@ -1138,7 +1138,16 @@
     "setup_booking_page": "Buchungsseite teilen",
     "setupShared": "Link kopiert. Füge ihn auf deiner Facebook-Seite, bei Google Maps und LINE ein.",
     "quick_askAssistant": "Dem Assistenten sagen",
-    "quick_askAssistant_hint": "Fahrzeuge oder aktuelle Vermietungen per Chat, Sprache oder Fotos hinzufügen"
+    "quick_askAssistant_hint": "Fahrzeuge oder aktuelle Vermietungen per Chat, Sprache oder Fotos hinzufügen",
+    "askExample7": "Wie nehme ich eine Kaution?",
+    "askExample8": "Wo schalte ich die Online-Buchung ein?",
+    "askHowTo": "Wie kann ich…?",
+    "askIntroSupport": "Fragen Sie, wie etwas in RoveHQ geht. Die Antworten kommen aus dem Hilfe-Center. Probieren Sie zum Beispiel:",
+    "askFooterSupport": "Von AI aus dem RoveHQ-Hilfe-Center verfasst. Wenn keine Antwort möglich ist, senden Sie die Frage an unser Team.",
+    "askSendToTeam": "An das RoveHQ-Team senden",
+    "askSending": "Wird gesendet…",
+    "askSent": "Gesendet. Wir antworten auf der Hilfe-Seite.",
+    "askOpenConversation": "Unterhaltung öffnen"
   },
   "todo": {
     "eyebrow": "Zu erledigen",
@@ -4118,7 +4127,7 @@
     "nt_daily_payments": "Heute fällige Zahlungen",
     "nt_daily_paymentsBody": "Heute von Kunden fällige Zahlungen",
     "nt_daily_compliance": "Ablaufende Papiere",
-    "nt_daily_complianceBody": "Kfz-Steuer, Versicherung und Services, die innerhalb von 7 Tagen fällig oder bereits überfällig sind",
+    "nt_daily_complianceBody": "Kfz-Steuer, Versicherung, Prüfung und Service, die in den nächsten 7 Tagen fällig oder bereits überfällig sind",
     "nt_daily_revenue": "Einnahmen dieses Monats",
     "nt_daily_revenueBody": "Bisher in diesem Monat erhaltene Miete plus einbehaltene Kautionen",
     "nt_instant": "Benachrichtigungen in Echtzeit",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "Fahrzeuge und Papiere",
     "guideCat_daily_work": "Tagesgeschäft und Nachrichten",
     "guideCat_tools": "Werkzeuge",
-    "guideCat_account": "Dein Konto"
+    "guideCat_account": "Dein Konto",
+    "assistantTitle": "Assistenten fragen",
+    "assistantBody": "Stellen Sie eine Frage zur Nutzung von RoveHQ und erhalten Sie die Antwort aus den Anleitungen, mit den nötigen Schritten. Was nicht beantwortet werden kann, senden Sie direkt an uns."
   },
   "inspectStart": {
     "titleOut": "Fahrzeug übergeben",

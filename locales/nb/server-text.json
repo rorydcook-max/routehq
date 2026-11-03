@@ -172,5 +172,10 @@
   "{} is larger than {} MB.": "{} er større enn {} MB.",
   "{}. Please choose a longer stay or another vehicle.": "{}. Velg et lengre opphold eller et annet kjøretøy.",
   "Your own booking address comes with the Pro plan and above.": "Din egen bookingadresse følger med Pro-abonnementet og høyere.",
-  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "Opplysningene dine er lagret. Avtalen er ikke klar til signering ennå. Vi har sagt fra til utleiefirmaet, og de tar kontakt med deg."
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "Opplysningene dine er lagret. Avtalen er ikke klar til signering ennå. Vi har sagt fra til utleiefirmaet, og de tar kontakt med deg.",
+  "Type a question first.": "Skriv inn et spørsmål først.",
+  "The assistant isn't switched on for this account yet.": "Assistenten er ikke slått på for denne kontoen enda.",
+  "Couldn't work out an answer to that. Try asking it another way.": "Fant ikke noe svar på det. Prøv å spørre på en annen måte.",
+  "Couldn't reach the assistant just now. Try again in a moment.": "Fikk ikke kontakt med assistenten akkurat nå. Prøv igjen om litt.",
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "AI-tjenesten til assistenten har gått tom for kreditt, så den kan ikke svare akkurat nå. Alt annet i RoveHQ fungerer som normalt."
 }

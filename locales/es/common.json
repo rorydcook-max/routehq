@@ -1098,7 +1098,16 @@
     "setup_booking_page": "Compartir página de reservas",
     "setupShared": "Enlace copiado. Pégalo en tu página de Facebook, Google Maps y LINE.",
     "quick_askAssistant": "Decir al asistente",
-    "quick_askAssistant_hint": "Agrega vehículos o alquileres actuales por chat, voz o fotos"
+    "quick_askAssistant_hint": "Agrega vehículos o alquileres actuales por chat, voz o fotos",
+    "askExample7": "¿Cómo cobro un depósito?",
+    "askExample8": "¿Dónde activo la reserva online?",
+    "askHowTo": "¿Cómo…?",
+    "askIntroSupport": "Pregunta cómo hacer cualquier cosa en RoveHQ. Las respuestas vienen del centro de ayuda. Prueba con una de estas:",
+    "askFooterSupport": "Escrito por AI a partir del centro de ayuda de RoveHQ. Si no puede responder, envía la pregunta a nuestro equipo.",
+    "askSendToTeam": "Enviar al equipo de RoveHQ",
+    "askSending": "Enviando…",
+    "askSent": "Enviado. Te responderemos en la página de Ayuda.",
+    "askOpenConversation": "Abrir la conversación"
   },
   "todo": {
     "eyebrow": "Pendientes",
@@ -4078,7 +4087,7 @@
     "nt_daily_payments": "Pagos que vencen hoy",
     "nt_daily_paymentsBody": "Pagos de clientes que vencen hoy",
     "nt_daily_compliance": "Papeles por vencer",
-    "nt_daily_complianceBody": "Impuesto de circulación, seguro y mantenimientos que vencen en 7 días o ya vencidos",
+    "nt_daily_complianceBody": "Impuesto de circulación, seguro, inspección y revisiones que vencen en los próximos 7 días o ya están vencidos",
     "nt_daily_revenue": "Ingresos del mes",
     "nt_daily_revenueBody": "Renta cobrada hasta ahora este mes, más las fianzas que haya retenido",
     "nt_instant": "Avisos al momento",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "Vehículos y documentación",
     "guideCat_daily_work": "Trabajo diario y mensajes",
     "guideCat_tools": "Herramientas",
-    "guideCat_account": "Tu cuenta"
+    "guideCat_account": "Tu cuenta",
+    "assistantTitle": "Pregunta al asistente",
+    "assistantBody": "Escribe una pregunta sobre cómo usar RoveHQ y recibe la respuesta de las guías, con los pasos a seguir. Lo que no pueda responder, puedes enviárnoslo directamente."
   },
   "inspectStart": {
     "titleOut": "Entregar un vehículo",

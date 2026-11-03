@@ -5,6 +5,8 @@ category: vehicles
 order: 5
 appPath: "/documents"
 related: ["paperwork-and-renewals", "service-and-maintenance", "rental-agreements", "receipts"]
+video: "help-documents.mp4"
+poster: "help-documents.jpg"
 updated: 2026-11-02
 faq:
   - q: "Where's the upload button?"

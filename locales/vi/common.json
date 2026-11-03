@@ -1138,7 +1138,16 @@
     "setup_booking_page": "Chia sẻ trang đặt xe",
     "setupShared": "Đã sao chép liên kết. Hãy dán lên trang Facebook, Google Maps và LINE của bạn.",
     "quick_askAssistant": "Nói với trợ lý",
-    "quick_askAssistant_hint": "Thêm xe hoặc hợp đồng đang thuê bằng chat, giọng nói hoặc ảnh"
+    "quick_askAssistant_hint": "Thêm xe hoặc hợp đồng đang thuê bằng chat, giọng nói hoặc ảnh",
+    "askExample7": "Làm sao để thu tiền đặt cọc?",
+    "askExample8": "Bật đặt xe trực tuyến ở đâu?",
+    "askHowTo": "Làm sao để…?",
+    "askIntroSupport": "Hỏi cách làm bất cứ việc gì trong RoveHQ. Câu trả lời lấy từ trung tâm trợ giúp. Thử một trong các câu sau:",
+    "askFooterSupport": "Do AI viết từ trung tâm trợ giúp RoveHQ. Nếu không trả lời được, hãy gửi câu hỏi cho đội ngũ của chúng tôi.",
+    "askSendToTeam": "Gửi câu hỏi này cho đội ngũ RoveHQ",
+    "askSending": "Đang gửi…",
+    "askSent": "Đã gửi. Chúng tôi sẽ trả lời trên trang Trợ giúp.",
+    "askOpenConversation": "Mở cuộc trò chuyện"
   },
   "todo": {
     "eyebrow": "Việc cần làm",
@@ -4118,7 +4127,7 @@
     "nt_daily_payments": "Khoản thanh toán đến hạn hôm nay",
     "nt_daily_paymentsBody": "Các khoản khách phải thanh toán hôm nay",
     "nt_daily_compliance": "Giấy tờ sắp hết hạn",
-    "nt_daily_complianceBody": "Thuế đường bộ, bảo hiểm và bảo dưỡng đến hạn trong 7 ngày hoặc đã quá hạn",
+    "nt_daily_complianceBody": "Thuế đường, bảo hiểm, kiểm định và bảo dưỡng đến hạn trong 7 ngày tới, hoặc đã quá hạn",
     "nt_daily_revenue": "Thu nhập tháng này",
     "nt_daily_revenueBody": "Tiền thuê đã nhận trong tháng này, cộng với tiền cọc bạn đã giữ lại",
     "nt_instant": "Thông báo ngay khi có việc",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "Xe và giấy tờ",
     "guideCat_daily_work": "Công việc hằng ngày và tin nhắn",
     "guideCat_tools": "Công cụ",
-    "guideCat_account": "Tài khoản của bạn"
+    "guideCat_account": "Tài khoản của bạn",
+    "assistantTitle": "Hỏi trợ lý",
+    "assistantBody": "Nhập câu hỏi về cách dùng RoveHQ và nhận câu trả lời từ hướng dẫn, kèm các bước thực hiện. Câu nào không trả lời được, bạn có thể gửi thẳng cho chúng tôi."
   },
   "inspectStart": {
     "titleOut": "Giao xe",

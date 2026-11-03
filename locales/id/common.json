@@ -1138,7 +1138,16 @@
     "setup_booking_page": "Bagikan halaman pemesanan Anda",
     "setupShared": "Tautan disalin. Tempel di halaman Facebook, Google Maps, dan LINE Anda.",
     "quick_askAssistant": "Tanya Asisten",
-    "quick_askAssistant_hint": "Tambah kendaraan atau sewa saat ini via chat, suara, atau foto"
+    "quick_askAssistant_hint": "Tambah kendaraan atau sewa saat ini via chat, suara, atau foto",
+    "askExample7": "Bagaimana cara mengambil deposit?",
+    "askExample8": "Di mana saya mengaktifkan pemesanan online?",
+    "askHowTo": "Bagaimana cara…?",
+    "askIntroSupport": "Tanyakan cara melakukan apa saja di RoveHQ. Jawaban diambil dari pusat bantuan. Coba salah satu dari ini:",
+    "askFooterSupport": "Ditulis oleh AI dari pusat bantuan RoveHQ. Jika tidak bisa menjawab, kirim pertanyaan ke tim kami.",
+    "askSendToTeam": "Kirim ini ke tim RoveHQ",
+    "askSending": "Mengirim…",
+    "askSent": "Terkirim. Kami akan membalas di halaman Bantuan.",
+    "askOpenConversation": "Buka percakapan"
   },
   "todo": {
     "eyebrow": "Tugas",
@@ -4118,7 +4127,7 @@
     "nt_daily_payments": "Pembayaran jatuh tempo hari ini",
     "nt_daily_paymentsBody": "Pembayaran dari pelanggan yang jatuh tempo hari ini",
     "nt_daily_compliance": "Dokumen yang akan habis",
-    "nt_daily_complianceBody": "Pajak kendaraan, asuransi, dan servis yang jatuh tempo dalam 7 hari, atau sudah lewat",
+    "nt_daily_complianceBody": "Pajak kendaraan, asuransi, inspeksi dan servis yang jatuh tempo dalam 7 hari ke depan, atau sudah lewat jatuh tempo",
     "nt_daily_revenue": "Pemasukan bulan ini",
     "nt_daily_revenueBody": "Uang sewa yang diterima sejauh ini bulan ini, ditambah uang jaminan yang Anda tahan",
     "nt_instant": "Peringatan saat sesuatu terjadi",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "Kendaraan dan dokumen",
     "guideCat_daily_work": "Pekerjaan harian dan pesan",
     "guideCat_tools": "Alat",
-    "guideCat_account": "Akun Anda"
+    "guideCat_account": "Akun Anda",
+    "assistantTitle": "Tanya asisten",
+    "assistantBody": "Ketik pertanyaan tentang cara menggunakan RoveHQ dan dapatkan jawaban dari panduan, lengkap dengan langkah-langkahnya. Yang tidak bisa dijawab bisa langsung Anda kirim ke kami."
   },
   "inspectStart": {
     "titleOut": "Serahkan kendaraan",

@@ -116,6 +116,22 @@ export function getDoc(locale: string, slug: string): Doc | null {
   return read(locale, slug) || read(DOCS_LOCALE, slug);
 }
 
+/**
+ * An article's Markdown body without its frontmatter, falling back to English. The support assistant reads this
+ * rather than the rendered HTML so it can mirror the article's own **bold** button names in its answer.
+ */
+export function docMarkdown(locale: string, slug: string): string | null {
+  if (!SLUG.test(slug) || !/^[A-Za-z-]{2,5}$/.test(locale)) return null;
+  for (const lang of [locale, DOCS_LOCALE]) {
+    const path = join(DOCS, lang, `${slug}.md`);
+    if (!existsSync(path)) continue;
+    const raw = readFileSync(path, "utf8").replace(/^﻿/, "");
+    const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    return (match ? match[2] : raw).trim();
+  }
+  return null;
+}
+
 /** Whether an article exists (in English, which every article starts in). */
 export function docExists(slug: string) {
   return SLUG.test(slug) && existsSync(join(DOCS, DOCS_LOCALE, `${slug}.md`));

@@ -1098,7 +1098,16 @@
     "setup_booking_page": "Share your booking page",
     "setupShared": "Link copied. Put it on your Facebook page, Google Maps and LINE.",
     "quick_askAssistant": "Tell the assistant",
-    "quick_askAssistant_hint": "Add vehicles or current rentals by chat, voice or photos"
+    "quick_askAssistant_hint": "Add vehicles or current rentals by chat, voice or photos",
+    "askExample7": "How do I take a deposit?",
+    "askExample8": "Where do I turn on online booking?",
+    "askHowTo": "How do I…?",
+    "askIntroSupport": "Ask how to do anything in RoveHQ. Answers come from the help centre. Try one of these:",
+    "askFooterSupport": "Written by AI from the RoveHQ help centre. If it can't answer, send the question to our team.",
+    "askSendToTeam": "Send this to the RoveHQ team",
+    "askSending": "Sending…",
+    "askSent": "Sent. We'll reply on the Help page.",
+    "askOpenConversation": "Open the conversation"
   },
   "todo": {
     "eyebrow": "To do",
@@ -4078,7 +4087,7 @@
     "nt_daily_payments": "Payments due today",
     "nt_daily_paymentsBody": "Payments due from customers today",
     "nt_daily_compliance": "Paperwork running out",
-    "nt_daily_complianceBody": "Road tax, insurance and services due within 7 days, or already overdue",
+    "nt_daily_complianceBody": "Road tax, insurance, inspection and services due within 7 days, or already overdue",
     "nt_daily_revenue": "This month's income",
     "nt_daily_revenueBody": "Rent received so far this month, plus any deposits you kept",
     "nt_instant": "Alerts as things happen",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "Vehicles and paperwork",
     "guideCat_daily_work": "Daily work and messages",
     "guideCat_tools": "Tools",
-    "guideCat_account": "Your account"
+    "guideCat_account": "Your account",
+    "assistantTitle": "Ask the assistant",
+    "assistantBody": "Type a question about using RoveHQ and get the answer from the guides, with the steps to follow. Anything it can't answer, you can send straight to us."
   },
   "inspectStart": {
     "titleOut": "Hand over a vehicle",

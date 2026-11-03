@@ -1098,7 +1098,16 @@
     "setup_booking_page": "Dela din bokningssida",
     "setupShared": "Länk kopierad. Lägg upp den på din Facebook-sida, Google Maps och LINE.",
     "quick_askAssistant": "Berätta för assistenten",
-    "quick_askAssistant_hint": "Lägg till fordon eller pågående hyror via chatt, röst eller foton"
+    "quick_askAssistant_hint": "Lägg till fordon eller pågående hyror via chatt, röst eller foton",
+    "askExample7": "Hur tar jag en deposition?",
+    "askExample8": "Var slår jag på onlinebokning?",
+    "askHowTo": "Hur gör jag…?",
+    "askIntroSupport": "Fråga hur du gör vad som helst i RoveHQ. Svaren kommer från hjälpcentret. Prova en av dessa:",
+    "askFooterSupport": "Skrivet av AI utifrån RoveHQ:s hjälpcenter. Om den inte kan svara, skicka frågan till vårt team.",
+    "askSendToTeam": "Skicka detta till RoveHQ-teamet",
+    "askSending": "Skickar…",
+    "askSent": "Skickat. Vi svarar på Hjälp-sidan.",
+    "askOpenConversation": "Öppna konversationen"
   },
   "todo": {
     "eyebrow": "Att göra",
@@ -4078,7 +4087,7 @@
     "nt_daily_payments": "Betalningar som förfaller i dag",
     "nt_daily_paymentsBody": "Betalningar från kunder som förfaller i dag",
     "nt_daily_compliance": "Dokument som löper ut",
-    "nt_daily_complianceBody": "Fordonsskatt, försäkring och service som förfaller inom 7 dagar eller redan har förfallit",
+    "nt_daily_complianceBody": "Fordonsskatt, försäkring, besiktning och service som förfaller inom 7 dagar, eller som redan har förfallit",
     "nt_daily_revenue": "Månadens intäkter",
     "nt_daily_revenueBody": "Hyra som tagits emot hittills i månaden, plus depositioner du har behållit",
     "nt_instant": "Aviseringar när saker händer",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "Fordon och papper",
     "guideCat_daily_work": "Dagligt arbete och meddelanden",
     "guideCat_tools": "Verktyg",
-    "guideCat_account": "Ditt konto"
+    "guideCat_account": "Ditt konto",
+    "assistantTitle": "Fråga assistenten",
+    "assistantBody": "Skriv en fråga om hur du använder RoveHQ och få svaret från guiderna, med stegen att följa. Det den inte kan svara på kan du skicka direkt till oss."
   },
   "inspectStart": {
     "titleOut": "Lämna ut ett fordon",

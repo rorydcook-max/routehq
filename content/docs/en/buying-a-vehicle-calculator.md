@@ -5,6 +5,8 @@ category: tools
 order: 1
 appPath: "/rental-calculator"
 related: ["fleet-value", "vehicle-report", "vehicle-loans", "reports"]
+video: "help-buying-a-vehicle-calculator.mp4"
+poster: "help-buying-a-vehicle-calculator.jpg"
 updated: 2026-11-02
 faq:
   - q: "How many checks do I get?"

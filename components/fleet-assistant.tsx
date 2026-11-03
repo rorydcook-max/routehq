@@ -49,8 +49,11 @@ export function FleetAssistant({
   greeting,
   initial,
   rememberInUrl = false,
-  tall = false
+  tall = false,
+  paperNames
 }: {
+  /** Each paperwork kind's name in this country ("Road tax (LKM)", "Vehicle inspection (PUSPAKOM)"), by key. */
+  paperNames?: Record<string, string>;
   /** On its own page: the chat fills the height of the screen. */
   tall?: boolean;
   organizationId: string;
@@ -446,7 +449,7 @@ export function FleetAssistant({
                   </span>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-[var(--foreground)]">{t(`paper_${item.kind}` as never)} · {item.vehicleName || t("unnamed")}</p>
+                  <p className="truncate font-semibold text-[var(--foreground)]">{paperNames?.[item.kind] || t(`paper_${item.kind}` as never)} · {item.vehicleName || t("unnamed")}</p>
                   <p className="truncate text-[13px] text-[var(--muted)]">
                     {[
                       t("paperUntil", { date: dateFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${item.coverTo}T00:00:00Z`)) }),

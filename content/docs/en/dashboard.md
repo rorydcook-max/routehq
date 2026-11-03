@@ -5,6 +5,8 @@ category: daily-work
 order: 1
 appPath: "/"
 related: ["to-do", "calendar", "inbox-and-messaging", "record-a-payment"]
+video: "help-dashboard.mp4"
+poster: "help-dashboard.jpg"
 updated: 2026-11-02
 faq:
   - q: "Why can't my staff see the profit?"

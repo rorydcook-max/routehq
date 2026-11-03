@@ -18,7 +18,7 @@ faq:
 1. Go to **Money in & out** and tap **Record money** (on a phone: the + button, then **Record money in or out**).
 2. RoveHQ lists the payments customers owe you first, for example "Rent for Honda Click · due today". Tap the one you got. (Tap **Show … more** if it's not in the first five.)
 3. Tap **Use this payment**.
-4. Check the **Amount (฿)** and **Date**, then tap **Save**.
+4. Check the **Amount** and **Date**, then tap **Save**.
 
 The rent is marked as paid on the booking, and any matching job on your To do list is ticked off.
 

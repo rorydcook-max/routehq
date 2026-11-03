@@ -3,8 +3,10 @@ title: "Your vehicle's page"
 description: "Find everything about one vehicle in one place: its rentals, money, paperwork, service, checks, photos and notes."
 category: vehicles
 order: 1
-appPath: "/fleet"
+appPath: "/fleet/[id]"
 related: ["paperwork-and-renewals", "service-and-maintenance", "add-a-vehicle", "documents"]
+video: "help-vehicle-page.mp4"
+poster: "help-vehicle-page.jpg"
 updated: 2026-11-02
 faq:
   - q: "Why does the page open on a different tab each time?"
@@ -21,7 +23,7 @@ Vehicles are grouped by type. The counts at the top (**on rent**, **available**,
 
 Each vehicle shows **On rent**, **Booked**, **In the shop**, **Available** or **Free until** a date.
 
-On a computer, the list also lets you tap **Set price** when there's no price yet, or **Add dates** when there are no tax or insurance dates. Tick vehicles to **Archive** or **Delete** them together (delete asks again and can't be undone).
+On a computer, the list also lets you tap **Set price** when there's no price yet, or **Add dates** when there are no tax or insurance dates. The owner also sees each vehicle's profit, the **Import** button, and tick boxes to **Archive** or **Delete** several at once (delete asks again and can't be undone). Staff don't get these.
 
 ## Top of the page
 

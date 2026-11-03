@@ -1098,7 +1098,16 @@
     "setup_booking_page": "Del bestillingssiden din",
     "setupShared": "Lenke kopiert. Del den på Facebook-siden din, Google Maps og LINE.",
     "quick_askAssistant": "Fortell assistenten",
-    "quick_askAssistant_hint": "Legg til kjøretøy eller pågående utleie via chat, stemme eller bilder"
+    "quick_askAssistant_hint": "Legg til kjøretøy eller pågående utleie via chat, stemme eller bilder",
+    "askExample7": "Hvordan tar jeg depositum?",
+    "askExample8": "Hvor slår jeg på nettbooking?",
+    "askHowTo": "Hvordan…?",
+    "askIntroSupport": "Spør om hvordan du gjør hva som helst i RoveHQ. Svarene kommer fra hjelpesenteret. Prøv en av disse:",
+    "askFooterSupport": "Skrevet av AI fra RoveHQ-hjelpesenteret. Hvis den ikke kan svare, send spørsmålet til teamet vårt.",
+    "askSendToTeam": "Send dette til RoveHQ-teamet",
+    "askSending": "Sender…",
+    "askSent": "Sendt. Vi svarer på Hjelp-siden.",
+    "askOpenConversation": "Åpne samtalen"
   },
   "todo": {
     "eyebrow": "Å gjøre",
@@ -4078,7 +4087,7 @@
     "nt_daily_payments": "Betalinger som forfaller i dag",
     "nt_daily_paymentsBody": "Betalinger fra kunder som forfaller i dag",
     "nt_daily_compliance": "Papirer som går ut",
-    "nt_daily_complianceBody": "Veiavgift, forsikring og service som forfaller innen 7 dager, eller allerede er forfalt",
+    "nt_daily_complianceBody": "Veiavgift, forsikring, EU-kontroll og service som forfaller innen 7 dager, eller som allerede er forfalt",
     "nt_daily_revenue": "Inntekter denne måneden",
     "nt_daily_revenueBody": "Leie mottatt så langt denne måneden, pluss depositum du har beholdt",
     "nt_instant": "Varsler med en gang noe skjer",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "Kjøretøy og papirer",
     "guideCat_daily_work": "Daglig arbeid og meldinger",
     "guideCat_tools": "Verktøy",
-    "guideCat_account": "Kontoen din"
+    "guideCat_account": "Kontoen din",
+    "assistantTitle": "Spør assistenten",
+    "assistantBody": "Skriv et spørsmål om bruk av RoveHQ og få svaret fra veiledningene, med trinnene du skal følge. Det den ikke kan svare på, kan du sende rett til oss."
   },
   "inspectStart": {
     "titleOut": "Lever ut et kjøretøy",

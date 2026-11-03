@@ -261,24 +261,22 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
         ) : null}
         {/* Quick add sits in the side menu on computers: floating over the page it covered the buttons at the end of each row. */}
         <div className="mb-3 flex items-center gap-2">
-          {!isTeammate ? (
-            <div className="min-w-0 flex-1">
-              <AskBox variant="sidebar" />
-            </div>
-          ) : null}
+          {/* Teammates get the box too: for them it answers "how do I…" from the help centre, never from the figures. */}
+          <div className="min-w-0 flex-1">
+            <AskBox support={isTeammate} variant="sidebar" />
+          </div>
           {/* Kept in place (just hidden) during a form, so the search box doesn't change width from page to page. */}
           {(
             <button
               aria-hidden={onFocusedFlow || undefined}
               aria-label={t("quickAdd")}
               tabIndex={onFocusedFlow ? -1 : undefined}
-              className={`${onFocusedFlow ? "invisible" : ""} flex h-10 items-center justify-center gap-2 rounded-full bg-[var(--primary)] text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] ${isTeammate ? "w-full px-3" : "w-10 shrink-0"}`}
-              data-tip={isTeammate ? undefined : t("quickAdd")}
+              className={`${onFocusedFlow ? "invisible" : ""} flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--primary)] text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)]`}
+              data-tip={t("quickAdd")}
               onClick={() => setFastActionOpen(true)}
               type="button"
             >
-              <Plus size={isTeammate ? 16 : 20} />
-              {isTeammate ? t("quickAdd") : null}
+              <Plus size={20} />
             </button>
           )}
         </div>
@@ -380,7 +378,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
             </Link>
             <span className="ml-auto flex items-center gap-2">
               <ScreenHelp variant="icon" />
-              {!isTeammate ? <AskBox variant="icon" /> : null}
+              <AskBox support={isTeammate} variant="icon" />
             </span>
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization}>

@@ -1133,7 +1133,16 @@
     "setup_booking_page": "แชร์หน้าจองรถของคุณ",
     "setupShared": "คัดลอกลิงก์แล้ว นำไปวางในเพจ Facebook, Google Maps และ LINE ของคุณได้เลย",
     "quick_askAssistant": "บอกผู้ช่วย",
-    "quick_askAssistant_hint": "เพิ่มรถหรือรายการเช่าด้วยการแชท พูด หรือส่งรูป"
+    "quick_askAssistant_hint": "เพิ่มรถหรือรายการเช่าด้วยการแชท พูด หรือส่งรูป",
+    "askExample7": "รับเงินมัดจำอย่างไร?",
+    "askExample8": "เปิดการจองออนไลน์ได้ที่ไหน?",
+    "askHowTo": "ทำอย่างไร…?",
+    "askIntroSupport": "ถามวิธีใช้งานทุกอย่างใน RoveHQ ได้เลย คำตอบมาจากศูนย์ช่วยเหลือ ลองถามแบบนี้:",
+    "askFooterSupport": "เขียนโดย AI จากศูนย์ช่วยเหลือ RoveHQ หากตอบไม่ได้ ส่งคำถามให้ทีมงานได้",
+    "askSendToTeam": "ส่งเรื่องนี้ให้ทีม RoveHQ",
+    "askSending": "กำลังส่ง…",
+    "askSent": "ส่งแล้ว เราจะตอบกลับในหน้าช่วยเหลือ",
+    "askOpenConversation": "เปิดการสนทนา"
   },
   "todo": {
     "eyebrow": "สิ่งที่ต้องทำ",
@@ -4113,7 +4122,7 @@
     "nt_daily_payments": "เงินที่ครบกำหนดวันนี้",
     "nt_daily_paymentsBody": "ยอดที่ลูกค้าต้องจ่ายวันนี้",
     "nt_daily_compliance": "เอกสารใกล้หมดอายุ",
-    "nt_daily_complianceBody": "ภาษี ประกัน และเช็กระยะที่ครบกำหนดภายใน 7 วัน หรือเลยกำหนดแล้ว",
+    "nt_daily_complianceBody": "ภาษีรถ ประกัน ตรวจสภาพ และนัดเข้าศูนย์ที่ครบกำหนดภายใน 7 วัน หรือเกินกำหนดแล้ว",
     "nt_daily_revenue": "รายได้เดือนนี้",
     "nt_daily_revenueBody": "ค่าเช่าที่ได้รับในเดือนนี้ รวมมัดจำที่คุณยึดไว้",
     "nt_instant": "แจ้งเตือนทันทีที่มีเรื่องเกิดขึ้น",
@@ -5513,7 +5522,9 @@
     "guideCat_vehicles": "รถและเอกสาร",
     "guideCat_daily_work": "งานประจำวันและข้อความ",
     "guideCat_tools": "เครื่องมือ",
-    "guideCat_account": "บัญชีของคุณ"
+    "guideCat_account": "บัญชีของคุณ",
+    "assistantTitle": "ถามผู้ช่วย",
+    "assistantBody": "พิมพ์คำถามเกี่ยวกับการใช้ RoveHQ แล้วรับคำตอบจากคู่มือพร้อมขั้นตอนที่ต้องทำ ถ้าตอบไม่ได้ ส่งถึงเราได้โดยตรง"
   },
   "inspectStart": {
     "titleOut": "ส่งมอบรถ",

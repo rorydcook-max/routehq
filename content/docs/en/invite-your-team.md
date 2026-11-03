@@ -5,6 +5,8 @@ category: account
 order: 1
 appPath: "/settings?tab=team"
 related: ["business-settings", "plans-and-billing", "getting-started"]
+video: "help-invite-your-team.mp4"
+poster: "help-invite-your-team.jpg"
 updated: 2026-11-02
 faq:
   - q: "My teammate didn't get the email."

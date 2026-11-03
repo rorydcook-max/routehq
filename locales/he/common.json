@@ -1138,7 +1138,16 @@
     "setup_booking_page": "שתף את דף ההזמנות שלך",
     "setupShared": "הקישור הועתק. הדבק אותו בעמוד הפייסבוק שלך, ב-Google Maps וב-LINE.",
     "quick_askAssistant": "ספר לעוזר",
-    "quick_askAssistant_hint": "הוסף רכבים או השכרות נוכחיות בצ'אט, קול או תמונות"
+    "quick_askAssistant_hint": "הוסף רכבים או השכרות נוכחיות בצ'אט, קול או תמונות",
+    "askExample7": "איך לוקחים פיקדון?",
+    "askExample8": "איפה מפעילים הזמנה אונליין?",
+    "askHowTo": "איך אני…?",
+    "askIntroSupport": "שאלו איך לעשות כל דבר ב‑RoveHQ. התשובות מגיעות ממרכז העזרה. נסו אחת מאלה:",
+    "askFooterSupport": "נכתב על ידי AI ממרכז העזרה של RoveHQ. אם אין תשובה, שלחו את השאלה לצוות שלנו.",
+    "askSendToTeam": "לשלוח את זה לצוות RoveHQ",
+    "askSending": "שולח…",
+    "askSent": "נשלח. נענה לכם בעמוד העזרה.",
+    "askOpenConversation": "פתיחת השיחה"
   },
   "todo": {
     "eyebrow": "משימות",
@@ -4118,7 +4127,7 @@
     "nt_daily_payments": "תשלומים שמועדם היום",
     "nt_daily_paymentsBody": "תשלומים שלקוחות צריכים לשלם היום",
     "nt_daily_compliance": "מסמכים שעומדים לפוג",
-    "nt_daily_complianceBody": "רישוי, ביטוח וטיפולים שמועדם בתוך 7 ימים, או שכבר עבר",
+    "nt_daily_complianceBody": "אגרת רישוי, ביטוח, טסט וטיפולים שמועדם בתוך 7 ימים, או שכבר עבר",
     "nt_daily_revenue": "ההכנסות החודש",
     "nt_daily_revenueBody": "דמי שכירות שהתקבלו עד כה החודש, בתוספת פיקדונות שחולטו",
     "nt_instant": "התראות בזמן אמת",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "רכבים ומסמכים",
     "guideCat_daily_work": "עבודה יומית והודעות",
     "guideCat_tools": "כלים",
-    "guideCat_account": "החשבון שלך"
+    "guideCat_account": "החשבון שלך",
+    "assistantTitle": "לשאול את העוזר",
+    "assistantBody": "הקלידו שאלה על השימוש ב‑RoveHQ וקבלו תשובה מהמדריכים, עם השלבים לביצוע. כל מה שהעוזר לא יודע לענות עליו אפשר לשלוח ישירות אלינו."
   },
   "inspectStart": {
     "titleOut": "מסירת רכב",

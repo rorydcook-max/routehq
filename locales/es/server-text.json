@@ -172,5 +172,10 @@
   "{} is larger than {} MB.": "{} supera los {} MB.",
   "{}. Please choose a longer stay or another vehicle.": "{}. Elija una estancia más larga u otro vehículo.",
   "Your own booking address comes with the Pro plan and above.": "Su propia dirección de reservas viene con el plan Pro y superiores.",
-  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "Tus datos están guardados. El contrato aún no está listo para firmar. Hemos avisado a la empresa de alquiler y se pondrán en contacto contigo."
+  "Your details are saved. The agreement isn't ready to sign yet. We've told the rental company and they'll contact you.": "Tus datos están guardados. El contrato aún no está listo para firmar. Hemos avisado a la empresa de alquiler y se pondrán en contacto contigo.",
+  "Type a question first.": "Escribe una pregunta primero.",
+  "The assistant isn't switched on for this account yet.": "El asistente aún no está activado para esta cuenta.",
+  "Couldn't work out an answer to that. Try asking it another way.": "No se encontró una respuesta para eso. Prueba a preguntarlo de otra forma.",
+  "Couldn't reach the assistant just now. Try again in a moment.": "No se pudo conectar con el asistente. Inténtalo de nuevo en un momento.",
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "El servicio de AI del asistente se ha quedado sin crédito, así que no puede responder ahora. Todo lo demás en RoveHQ funciona con normalidad."
 }

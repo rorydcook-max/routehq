@@ -8,6 +8,7 @@ import { FleetAssistant } from "@/components/fleet-assistant";
 import { BackLink } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { dateFormat } from "@/lib/i18n/dates";
+import { paperworkFor } from "@/lib/country-paperwork";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -17,7 +18,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  */
 export default async function FleetAssistantPage({ searchParams }: { searchParams: Promise<{ c?: string }> }) {
   const { c } = await searchParams;
-  const [userEmail, organization, t, locale] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization(), getTranslations("fleetAssistant"), getLocale()]);
+  const [userEmail, organization, t, tv, locale] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization(), getTranslations("fleetAssistant"), getTranslations("vehiclePage"), getLocale()]);
+  // Paperwork named as the vehicle page names it in this country: "Road tax (LKM)", "Vehicle inspection (PUSPAKOM)".
+  const paperNames = Object.fromEntries(
+    paperworkFor((organization as any).country_code || (organization as any).settings?.main_location?.country).map((item) => [item.key, `${tv(item.nameKey as never)}${item.local ? ` (${item.local})` : ""}`])
+  );
   const supabase = (await createSupabaseServerClient()) as any;
   const [{ count }, initial, earlier] = await Promise.all([
     supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).is("deleted_at", null),
@@ -59,6 +64,7 @@ export default async function FleetAssistantPage({ searchParams }: { searchParam
             initial={initial}
             key={initial?.id || "new"}
             organizationId={organization.id}
+            paperNames={paperNames}
             rememberInUrl
             tall
           />

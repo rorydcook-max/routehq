@@ -3,6 +3,7 @@ import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronRight, Mail, MessageCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { AskBox } from "@/components/ask-box";
 import { PageBand } from "@/components/page-band";
 import { HelpPreference } from "@/components/help/help-actions";
 import { HelpCompose } from "@/components/help/help-compose";
@@ -56,6 +57,16 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
             <ChevronRight size={18} />
           </Link>
         ) : null}
+
+        {/* The same question box as the sidebar: how-to questions are answered from the guides below, and
+            anything it can't answer can be passed on to us in one tap. */}
+        <section className="card p-5" id="assistant">
+          <h2 className="card-title">{t("assistantTitle")}</h2>
+          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("assistantBody")}</p>
+          <div className="mt-3 max-w-md">
+            <AskBox support={membership?.role !== "owner"} variant="button" />
+          </div>
+        </section>
 
         {guides.length ? (
           <section className="card p-5" id="guides">

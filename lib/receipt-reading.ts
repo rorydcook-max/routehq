@@ -78,7 +78,8 @@ function coverDate(value: unknown, today = new Date()) {
 
 export function tidyReceipt(raw: Record<string, unknown>): ReadReceipt {
   const amountValue = typeof raw.amount === "number" ? raw.amount : Number(String(raw.amount ?? "").replace(/[^\d.]/g, ""));
-  const amount = Number.isFinite(amountValue) && amountValue > 0 && amountValue < 10_000_000 ? Math.round(amountValue * 100) / 100 : null;
+  // The cap allows rupiah and dong receipts (a 1,500,000 IDR tyre bill is ordinary), not only baht.
+  const amount = Number.isFinite(amountValue) && amountValue > 0 && amountValue < 100_000_000_000 ? Math.round(amountValue * 100) / 100 : null;
   const costType = RECEIPT_COST_TYPES.includes(raw.cost_type as never) ? (raw.cost_type as ReadReceipt["costType"]) : null;
   const odometerValue = Number(raw.odometer);
   return {

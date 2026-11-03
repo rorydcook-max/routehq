@@ -1098,7 +1098,16 @@
     "setup_booking_page": "Partilhar página de reservas",
     "setupShared": "Link copiado. Coloque-o no Facebook, Google Maps e LINE.",
     "quick_askAssistant": "Falar com o assistente",
-    "quick_askAssistant_hint": "Adicione veículos ou aluguéis atuais por chat, voz ou fotos"
+    "quick_askAssistant_hint": "Adicione veículos ou aluguéis atuais por chat, voz ou fotos",
+    "askExample7": "Como cobro um depósito caução?",
+    "askExample8": "Onde ativo a reserva online?",
+    "askHowTo": "Como faço para…?",
+    "askIntroSupport": "Pergunte como fazer qualquer coisa no RoveHQ. As respostas vêm da central de ajuda. Experimente uma destas:",
+    "askFooterSupport": "Escrito por AI a partir da central de ajuda do RoveHQ. Se não conseguir responder, envie a pergunta para a nossa equipe.",
+    "askSendToTeam": "Enviar para a equipe do RoveHQ",
+    "askSending": "Enviando…",
+    "askSent": "Enviado. Vamos responder na página de Ajuda.",
+    "askOpenConversation": "Abrir a conversa"
   },
   "todo": {
     "eyebrow": "A fazer",
@@ -4078,7 +4087,7 @@
     "nt_daily_payments": "Pagamentos que vencem hoje",
     "nt_daily_paymentsBody": "Pagamentos de clientes com vencimento hoje",
     "nt_daily_compliance": "Documentos vencendo",
-    "nt_daily_complianceBody": "Imposto veicular, seguro e revisões que vencem em 7 dias ou já venceram",
+    "nt_daily_complianceBody": "IPVA, seguro, vistoria e revisões que vencem em até 7 dias ou já estão atrasados",
     "nt_daily_revenue": "Receita do mês",
     "nt_daily_revenueBody": "Aluguel recebido até agora neste mês, mais as cauções retidas",
     "nt_instant": "Alertas na hora",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "Veículos e documentos",
     "guideCat_daily_work": "Rotina e mensagens",
     "guideCat_tools": "Ferramentas",
-    "guideCat_account": "Sua conta"
+    "guideCat_account": "Sua conta",
+    "assistantTitle": "Perguntar ao assistente",
+    "assistantBody": "Digite uma pergunta sobre como usar o RoveHQ e receba a resposta dos guias, com os passos a seguir. O que ele não conseguir responder, você pode enviar direto para nós."
   },
   "inspectStart": {
     "titleOut": "Entregar um veículo",

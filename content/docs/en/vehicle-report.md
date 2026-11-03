@@ -3,7 +3,7 @@ title: "Vehicle report"
 description: "See one vehicle's profit, time rented, average price per day, rentals, costs and how much of its price it has earned back."
 category: money
 order: 9
-appPath: "/reports/vehicle"
+appPath: "/reports/vehicle/[id]"
 related: ["reports", "fleet-value", "vehicle-page", "add-a-vehicle"]
 updated: 2026-11-02
 ---

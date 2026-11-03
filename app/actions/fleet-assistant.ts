@@ -107,7 +107,7 @@ export type DraftPaperwork = {
 /** A Thai Buddhist year (2569) read off a document, as the Gregorian year. */
 const gregorian = (day: string | null) => (day && Number(day.slice(0, 4)) > 2400 ? `${Number(day.slice(0, 4)) - 543}${day.slice(4)}` : day);
 
-function cleanPaperwork(items: unknown, vehicleIds: Set<string>): DraftPaperwork[] {
+function cleanPaperwork(items: unknown, vehicleIds: Set<string>, kinds: string[] = ["tax", "porbor", "insurance", "inspection"]): DraftPaperwork[] {
   if (!Array.isArray(items)) return [];
   return items
     .map((item: any) => ({
@@ -121,7 +121,8 @@ function cleanPaperwork(items: unknown, vehicleIds: Set<string>): DraftPaperwork
       photo: Number.isInteger(Number(item?.photo)) && Number(item.photo) > 0 ? Number(item.photo) : null,
       inspectionCost: item?.kind === "tax" && Number(item?.inspectionCost) > 0 ? Number(item.inspectionCost) : null
     }))
-    .filter((item) => vehicleIds.has(item.vehicleId) && ["tax", "porbor", "insurance", "inspection"].includes(item.kind) && item.coverTo)
+    // Only the kinds this country keeps a date for: in Thailand an inspection has no date of its own (it goes with the tax).
+    .filter((item) => vehicleIds.has(item.vehicleId) && kinds.includes(item.kind) && item.coverTo)
     .slice(0, 40);
 }
 
@@ -171,6 +172,8 @@ export async function askFleetAssistant(input: {
     year: row.year || null,
     ...Object.fromEntries(papers.map((item) => [item.key, row.compliance?.[`${item.key}_expiry_date`] || null]))
   }));
+  const taxInspection = papers.find((item) => item.key === "tax")?.inspectionWith || null;
+  const paperKinds = papers.map((item) => item.key);
   const kinds = categories.map((category) => category.code).join(", ") || "car, scooter, motorcycle";
   const language = supportedLocaleOptions.find((option) => option.code === input.locale)?.english || "English";
   const currency = organization.currency || "THB";
@@ -192,7 +195,11 @@ export async function askFleetAssistant(input: {
     "A rental's vehicleId must be one of the ids listed. Never put a vehicle in rentals that is only in the new-vehicle list; ask them to tap Add first. Nothing is saved until they tap the Add button under the list, so never say you have added or recorded anything; say it's ready to add. Ask one short question at a time.",
     `PAPERWORK: a photo of an insurance policy, cover note, compulsory insurance certificate, road tax receipt or tax disc, or inspection certificate (or them telling you they renewed one) is a renewal for a vehicle already in the fleet, never a new vehicle. The kinds for this business: ${papers.map((item) => `${item.key} = ${item.key === "porbor" ? "compulsory insurance" : item.key === "insurance" ? "voluntary insurance" : item.key === "tax" ? "road tax or registration" : "vehicle inspection"}${item.local ? ` (${item.local})` : ""}`).join("; ")}.`,
     "For each one: vehicleId (match the plate printed on it to the fleet list; if no plate matches, ask which vehicle), kind, coverFrom and coverTo (the first and last day it is valid, YYYY-MM-DD Gregorian: Thai documents use Buddhist years, subtract 543), cost (the total paid, or the monthly amount if it is paid monthly), monthly (true only if it says it is paid in monthly instalments), note (insurer and policy number, a few words), photo (the number of the photo it is in). Never invent a date or amount; ask for what isn't printed.",
-    "Thailand: the inspection (ตรอ.) is done with the road tax for cars over 7 years and bikes over 5, so an inspection receipt there is part of the tax renewal: put its cost in inspectionCost on the tax entry, not a separate entry. Tell them to tap Save to update the car's dates and record the cost.",
+    // Only where the inspection is paid with the road tax (Thailand's ตรอ.); elsewhere (PUSPAKOM, KIR) it has its own date and entry.
+    taxInspection
+      ? `The inspection (${taxInspection.local}) is done with the road tax for cars over ${taxInspection.car} years and bikes over ${taxInspection.bike}, so an inspection receipt is part of the tax renewal: put its cost in inspectionCost on the tax entry, never a separate entry, and never use the kind "inspection".`
+      : "An inspection certificate is its own entry, kind inspection, with the date it runs out as coverTo.",
+    "Tell them to tap Save to update the vehicle's dates and record the cost.",
     `Paperwork dates now, by vehicle id: ${JSON.stringify(paperDates)}`,
     'Return JSON only, exactly this shape: {"reply": "...", "vehicles": [{"kind": "car", "make": "Toyota", "model": "Yaris", "variant": "", "year": 2021, "plate": "", "colour": "white", "dailyRate": null, "weeklyRate": null, "monthlyRate": 15000, "photos": []}], "rentals": [{"vehicleId": "<id>", "customerName": "John Smith", "customerPhone": "+66812345678", "startDate": "2026-10-05", "endDate": null, "rate": 15000, "ratePeriod": "month", "nextPaymentDate": "2026-11-05", "depositHeld": 10000, "remind": true}], "paperwork": [{"vehicleId": "<id>", "kind": "insurance", "coverFrom": "2026-03-15", "coverTo": "2027-03-14", "cost": 12000, "monthly": false, "note": "Viriyah 12345", "photo": 1}]}. Always return all three whole lists so far, updated (an empty list when there are none).'
   ].join(" ");
@@ -245,7 +252,7 @@ export async function askFleetAssistant(input: {
       rentals: cleanRentals(parsed.rentals ?? input.rentals ?? [], ids)
         .filter((rental) => !rentedNow.has(rental.vehicleId))
         .map((rental) => ({ ...rental, vehicleName: fleetList.find((vehicle) => vehicle.id === rental.vehicleId)?.name || "" })),
-      paperwork: cleanPaperwork(parsed.paperwork ?? input.paperwork ?? [], ids).map((item) => ({ ...item, vehicleName: fleetList.find((vehicle) => vehicle.id === item.vehicleId)?.name || "" }))
+      paperwork: cleanPaperwork(parsed.paperwork ?? input.paperwork ?? [], ids, paperKinds).map((item) => ({ ...item, vehicleName: fleetList.find((vehicle) => vehicle.id === item.vehicleId)?.name || "" }))
     };
   } catch (error) {
     console.warn("[fleet-assistant]", error instanceof Error ? error.message.slice(0, 200) : error);

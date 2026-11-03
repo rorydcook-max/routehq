@@ -4,7 +4,21 @@ import { getDashboardData } from "@/lib/dashboard";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
 import { ASSISTANT_TOOLS, checkAction, type AssistantRecords, type ProposedAction } from "@/lib/assistant-actions";
-import { getVehicleCategories } from "@/lib/organization";
+import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
+import { countryCode } from "@/lib/country-paperwork";
+
+const COUNTRY_NAMES: Record<string, string> = { TH: "Thailand", MY: "Malaysia", ID: "Indonesia", PH: "the Philippines", VN: "Vietnam" };
+
+/** The business's money and country, so the answers aren't written for Thailand when the business is elsewhere. */
+async function businessPlace() {
+  try {
+    const organization = (await getDefaultOrganization()) as any;
+    const code = countryCode(organization.country_code || organization.settings?.main_location?.country);
+    return { currency: String(organization.currency || "THB"), country: COUNTRY_NAMES[code] || (code ? code : "Thailand") };
+  } catch {
+    return { currency: "THB", country: "Thailand" };
+  }
+}
 
 const MODEL = process.env.OPENAI_ASSISTANT_MODEL || "gpt-4o";
 
@@ -13,10 +27,11 @@ export type AskTurn = { role: "user" | "assistant"; content: string };
 
 /** The records an action is checked against: real vehicles, customers and vehicle types. */
 export async function assistantRecords(): Promise<AssistantRecords> {
-  const data = await getDashboardData();
+  const [data, place] = await Promise.all([getDashboardData(), businessPlace()]);
   const categories = data.organizationId ? await getVehicleCategories(data.organizationId) : [];
   return {
     today: businessToday(),
+    currency: place.currency,
     vehicles: data.vehicles.map((vehicle) => ({ id: vehicle.id, name: `${vehicle.make} ${vehicle.model}${vehicle.year ? ` ${vehicle.year}` : ""}`, plate: vehicle.plate })),
     customers: data.customers.map((customer) => ({ id: customer.id, name: customer.name })),
     categories
@@ -46,7 +61,7 @@ function addMonths(isoMonth: string, count: number) {
  * than by the model: the model reads figures, it doesn't do the bookkeeping.
  */
 async function businessSnapshot() {
-  const data = await getDashboardData();
+  const [data, place] = await Promise.all([getDashboardData(), businessPlace()]);
   const today = businessToday();
   const thisMonth = monthKey(today);
   const supabase = (await createSupabaseServerClient()) as any;
@@ -101,7 +116,8 @@ async function businessSnapshot() {
 
   return {
     today,
-    currency: "THB",
+    currency: place.currency,
+    country: place.country,
     vehicles: data.vehicles.map((vehicle) => ({
       id: vehicle.id,
       name: `${vehicle.make} ${vehicle.model}${vehicle.year ? ` ${vehicle.year}` : ""}`,
@@ -170,8 +186,9 @@ export async function answerQuestion(question: string, language = "English", his
         {
           role: "system",
           content: [
-            "You answer questions for the owner of a small vehicle rental business in Thailand, using only the JSON records below. They are not an accountant: answer like a sharp, friendly assistant would, in plain words.",
-            `Answer in ${language}. Lead with the answer itself. Keep it to a few short sentences, or a short list when comparing several things. Write amounts like ฿12,500. Write dates like 14 Oct 2026.`,
+            `You answer questions for the owner of a small vehicle rental business in ${snapshot.country}, using only the JSON records below. They are not an accountant: answer like a sharp, friendly assistant would, in plain words.`,
+            // Amounts in the business's own money: a Malaysian owner reads RM, not baht.
+            `Answer in ${language}. Lead with the answer itself. Keep it to a few short sentences, or a short list when comparing several things. All amounts are in ${snapshot.currency}: write them like ${snapshot.currency === "THB" ? "฿12,500" : `${snapshot.currency} 12,500`}. Write dates like 14 Oct 2026.`,
             "Use only the figures given. Never invent a vehicle, customer, amount or date. If the records can't answer the question, say what's missing in one sentence and suggest where to add it.",
             "For income forecasts: use next6MonthsRent. Give each month's total, then next6MonthsRentTotal as the six-month sum (never add figures up yourself; use totals given in the records). Mention how much of the first month is already overdue. If any month includes an assumed amount, say how much of the total assumes open-ended rentals continue. Say it's a projection from current bookings, not a promise.",
             "Never show field names from the records (like profitToDate); describe them in everyday words.",
@@ -202,6 +219,7 @@ export async function answerQuestion(question: string, language = "English", his
       }
       const records: AssistantRecords = {
         today: snapshot.today,
+        currency: snapshot.currency,
         vehicles: snapshot.vehicles.map((vehicle) => ({ id: vehicle.id, name: vehicle.name, plate: vehicle.plate })),
         customers: snapshot.customers,
         categories: snapshot.vehicleTypes

@@ -1098,7 +1098,16 @@
     "setup_booking_page": "I-share ang booking page mo",
     "setupShared": "Na-copy na ang link. Ilagay ito sa iyong Facebook page, Google Maps at LINE.",
     "quick_askAssistant": "Sabihin sa katulong",
-    "quick_askAssistant_hint": "Magdagdag ng sasakyan o kasalukuyang paupa sa pamamagitan ng chat, boses o litrato"
+    "quick_askAssistant_hint": "Magdagdag ng sasakyan o kasalukuyang paupa sa pamamagitan ng chat, boses o litrato",
+    "askExample7": "Paano kumuha ng deposit?",
+    "askExample8": "Saan ko i-on ang online booking?",
+    "askHowTo": "Paano ko…?",
+    "askIntroSupport": "Itanong kung paano gawin ang kahit ano sa RoveHQ. Galing sa help centre ang mga sagot. Subukan ang isa sa mga ito:",
+    "askFooterSupport": "Isinulat ng AI mula sa RoveHQ help centre. Kung hindi ito makasagot, ipadala ang tanong sa team namin.",
+    "askSendToTeam": "Ipadala ito sa RoveHQ team",
+    "askSending": "Ipinapadala…",
+    "askSent": "Naipadala. Sasagot kami sa Help page.",
+    "askOpenConversation": "Buksan ang conversation"
   },
   "todo": {
     "eyebrow": "Gagawin",
@@ -4078,7 +4087,7 @@
     "nt_daily_payments": "Mga bayaring due ngayon",
     "nt_daily_paymentsBody": "Mga bayad na due mula sa customer ngayong araw",
     "nt_daily_compliance": "Papeles na mag-e-expire",
-    "nt_daily_complianceBody": "Road tax, insurance at service na due sa loob ng 7 araw, o lampas na",
+    "nt_daily_complianceBody": "Road tax, insurance, inspection at service na due sa loob ng 7 araw, o overdue na",
     "nt_daily_revenue": "Kita ngayong buwan",
     "nt_daily_revenueBody": "Rentang natanggap ngayong buwan, kasama ang anumang deposit na kinuha mo",
     "nt_instant": "Alerto habang nangyayari",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "Mga sasakyan at papeles",
     "guideCat_daily_work": "Araw-araw na trabaho at mensahe",
     "guideCat_tools": "Mga tool",
-    "guideCat_account": "Ang iyong account"
+    "guideCat_account": "Ang iyong account",
+    "assistantTitle": "Tanungin ang assistant",
+    "assistantBody": "Mag-type ng tanong tungkol sa paggamit ng RoveHQ at makakuha ng sagot mula sa mga guide, kasama ang mga hakbang na susundan. Anumang hindi nito masagot, puwede mong ipadala direkta sa amin."
   },
   "inspectStart": {
     "titleOut": "Mag-handover ng sasakyan",

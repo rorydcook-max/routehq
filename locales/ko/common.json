@@ -1098,7 +1098,16 @@
     "setup_booking_page": "예약 페이지 공유",
     "setupShared": "링크가 복사되었습니다. 페이스북 페이지, 구글 맵, LINE에 공유해 보세요.",
     "quick_askAssistant": "어시스턴트에게 말하기",
-    "quick_askAssistant_hint": "채팅, 음성, 사진으로 차량이나 대여 내역을 추가하세요"
+    "quick_askAssistant_hint": "채팅, 음성, 사진으로 차량이나 대여 내역을 추가하세요",
+    "askExample7": "보증금은 어떻게 받나요?",
+    "askExample8": "온라인 예약은 어디서 켜나요?",
+    "askHowTo": "어떻게 하나요…?",
+    "askIntroSupport": "RoveHQ 사용법을 무엇이든 물어보세요. 답변은 도움말 센터에서 가져옵니다. 이런 질문을 해 보세요:",
+    "askFooterSupport": "RoveHQ 도움말 센터를 바탕으로 AI가 작성했습니다. 답변할 수 없는 경우 질문을 팀에 보내세요.",
+    "askSendToTeam": "RoveHQ 팀에 보내기",
+    "askSending": "보내는 중…",
+    "askSent": "보냈습니다. 도움말 페이지에서 답변드리겠습니다.",
+    "askOpenConversation": "대화 열기"
   },
   "todo": {
     "eyebrow": "할 일",
@@ -4078,7 +4087,7 @@
     "nt_daily_payments": "오늘 결제 예정",
     "nt_daily_paymentsBody": "오늘 고객에게 받을 결제",
     "nt_daily_compliance": "만료 임박 서류",
-    "nt_daily_complianceBody": "7일 이내 만료 또는 이미 만료된 자동차세, 보험, 정비",
+    "nt_daily_complianceBody": "7일 이내에 만료되거나 이미 기한이 지난 자동차세, 보험, 검사 및 정비",
     "nt_daily_revenue": "이번 달 수입",
     "nt_daily_revenueBody": "이번 달 지금까지 받은 렌탈 요금과 몰수한 보증금",
     "nt_instant": "실시간 알림",
@@ -5478,7 +5487,9 @@
     "guideCat_vehicles": "차량과 서류",
     "guideCat_daily_work": "일상 업무와 메시지",
     "guideCat_tools": "도구",
-    "guideCat_account": "내 계정"
+    "guideCat_account": "내 계정",
+    "assistantTitle": "어시스턴트에게 질문",
+    "assistantBody": "RoveHQ 사용에 대해 질문을 입력하면 가이드에서 따라야 할 단계와 함께 답변을 받을 수 있습니다. 답변할 수 없는 내용은 바로 저희에게 보낼 수 있습니다."
   },
   "inspectStart": {
     "titleOut": "차량 인도",

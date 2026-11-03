@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "此账户尚未开启助手。",
   "Couldn't work out an answer to that. Try asking it another way.": "暂时无法回答这个问题，请换个说法再试。",
   "Couldn't reach the assistant just now. Try again in a moment.": "暂时无法连接助手，请稍后再试。",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "助手的 AI 服务额度已用完，目前无法回答。RoveHQ 的其他功能不受影响。"
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "助手的 AI 服务额度已用完，目前无法回答。RoveHQ 的其他功能不受影响。",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "我已转交给 RoveHQ 团队。会有人在这里回复您，通常在几小时内。您可以先关闭，稍后再回来。",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "这看起来不像租赁协议。请上传合同本身。"
 }

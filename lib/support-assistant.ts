@@ -1,4 +1,5 @@
 import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
+import { BUSINESS_INCLUDED, PLANS, TRIAL_DAYS, YEARLY_MONTHS } from "@/lib/plans";
 import { docForAppPath, docMarkdown, listDocs, loadPublishedArticles, publishedVersion, DOCS_LOCALE } from "@/lib/site/docs";
 
 /**
@@ -110,6 +111,30 @@ export function pickArticles(question: string, pathname: string | null | undefin
   });
 }
 
+/** "How much does it cost?", "is there a free plan?": the pricing page, not an article, has the answer. */
+const PRICE_WORDS = /\b(cost|costs|price|prices|pricing|plan|plans|pay|paying|free|trial|subscription|subscribe|month|monthly|yearly|expensive|cheap|afford)\b|ราคา|แพลน|ฟรี|ค่าใช้จ่าย|ทดลอง/i;
+const PRICING_SLUG = "pricing";
+
+/** The plans as one short article, built from lib/plans so it can't drift from the pricing page. */
+function pricingArticle() {
+  const count = (value: number | null) => (value === null ? "unlimited" : String(value));
+  const lines = PLANS.map((plan) => {
+    const name = plan.id[0].toUpperCase() + plan.id.slice(1);
+    const price = plan.monthly ? `฿${plan.monthly.toLocaleString("en-US")} a month` : "free";
+    const fleet = plan.cars === null ? `up to ${BUSINESS_INCLUDED.cars} cars and ${BUSINESS_INCLUDED.motorbikes} motorbikes included, then ฿${plan.extraCar} a month per extra car and ฿${plan.extraMotorbike} per extra motorbike` : `up to ${plan.cars} cars and ${plan.motorbikes} motorbikes`;
+    const extras = [plan.team === null ? "unlimited team logins" : `${count(plan.team)} team login${plan.team === 1 ? "" : "s"}`, plan.whiteLabel ? "your own branding" : "", plan.customDomain ? "booking page on your own domain" : "", plan.setupService ? "import and setup done for you on the yearly plan" : "", plan.prioritySupport ? "priority support" : ""].filter(Boolean).join(", ");
+    return `- **${name}**: ${price}, ${fleet}; ${extras}.`;
+  });
+  return {
+    slug: PRICING_SLUG,
+    title: "Plans and pricing",
+    description: "What RoveHQ costs: priced by fleet size, every feature on every plan.",
+    body: [`Prices are in Thai baht. Every plan starts with ${TRIAL_DAYS} days of everything, free. Every feature is included on every plan: the plans differ by fleet size and team size. Yearly costs ${YEARLY_MONTHS} months, so one month is free.`, ...lines, "The pricing page has the full comparison and other currencies."].join("\n"),
+    video: null,
+    poster: null
+  };
+}
+
 /**
  * Whether a message asks for new help content rather than (or as well as) asking how to do something: "there should
  * be a guide for…", "can you add a video", "please write…", "I wish there was…", and the Thai "อยากให้มี" (I'd like
@@ -187,6 +212,8 @@ export async function answerSupportQuestion(input: { question: string; pathname?
   } catch {
     articles = [];
   }
+  // Pricing isn't an article: when the question is about cost or plans, the plans come along too.
+  if (PRICE_WORDS.test(asked)) articles = [...articles.slice(0, MAX_ARTICLES - 1), pricingArticle()];
 
   try {
     const completion = await createChatCompletion({
@@ -227,7 +254,7 @@ export async function answerSupportQuestion(input: { question: string; pathname?
     // Only articles that were really given to the model are linked, whatever it says it used.
     const used = new Set((Array.isArray(parsed.articles) ? parsed.articles : []).map((slug: unknown) => String(slug)));
     const linked = articles.filter((article) => used.has(article.slug));
-    const shown = (linked.length ? linked : articles.slice(0, 1)).map((article) => ({ slug: article.slug, title: article.title, href: `/docs/${article.slug}`, video: article.video, poster: article.poster }));
+    const shown = (linked.length ? linked : articles.slice(0, 1)).map((article) => ({ slug: article.slug, title: article.title, href: article.slug === PRICING_SLUG ? "/pricing" : `/docs/${article.slug}`, video: article.video, poster: article.poster }));
     const request = parsed.request === true || askedForContent;
     // A content request has already been "passed on" in the answer: no second offer to send it to the team.
     const handoff = request ? parsed.handoff === true : parsed.handoff === true || !articles.length;

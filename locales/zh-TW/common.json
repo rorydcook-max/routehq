@@ -4485,7 +4485,8 @@
     "season_monthlyTip": "通常不勾選：長租客戶維持同一價格。",
     "extra_bodyTip": "顯示在預訂表單和預訂頁面，計入第一筆付款，並列在合約上。",
     "b_brandTip": "預訂連結、簽署頁面、客戶預訂頁面、收據和合約。",
-    "pn_bodyTip": "只有網絡內的商家才能互相看到。"
+    "pn_bodyTip": "只有網絡內的商家才能互相看到。",
+    "ag_subtitleOwn": "新預訂使用您自己的合約。您在下方新增的內容會放在合約末尾。"
   },
   "accountPage": {
     "roleOwner": "負責人",
@@ -5387,7 +5388,7 @@
   },
   "help": {
     "title": "說明",
-    "subtitle": "有任何問題都可以問 RoveHQ 團隊，也可以把檔案傳給我們。",
+    "subtitle": "指南、即時聊天，或寫信給我們。",
     "newTitle": "寫信給我們",
     "aboutLabel": "關於什麼？",
     "topic_question": "問題",
@@ -5491,9 +5492,10 @@
     "assistantTitle": "詢問助理",
     "assistantBody": "輸入關於使用 RoveHQ 的問題，即可從指南中取得答案和操作步驟。無法回答的問題，可以直接傳送給我們。",
     "liveTitle": "線上聊天",
-    "liveBody": "有任何問題都可以問，傳送照片或檔案，或與 RoveHQ 團隊成員交談。回覆會出現在聊天中。",
+    "liveBody": "想問什麼都可以，傳送檔案，或與 RoveHQ 團隊的真人交談。",
     "liveButton": "開啟線上聊天",
-    "fromAssistant": "RoveHQ 助理"
+    "fromAssistant": "RoveHQ 助理",
+    "contentSubtitle": "使用者向助理要求的，或助理無法回答的文章、常見問題、影片和資源。在您核准之前不會發布任何內容。"
   },
   "inspectStart": {
     "titleOut": "交車",
@@ -6443,7 +6445,7 @@
   },
   "contractImport": {
     "title": "使用你自己的合約",
-    "body": "已經有滿意的合約了嗎？以 PDF、Word 檔或照片上傳即可。我們保留你的原文用字，把它變成客戶可在手機上簽署的版本，就像 RoveHQ 合約一樣。",
+    "body": "上傳您正在使用的合約，可以是 PDF、Word 檔或照片。您的措辭保持不變，客戶像簽 RoveHQ 合約一樣在手機上簽署。",
     "activeBody": "新預訂使用你自己的合約「{title}」。已簽署的合約維持不變。",
     "yourAgreement": "你的合約",
     "review": "檢視或編輯",
@@ -6462,7 +6464,7 @@
     "upload": "上傳並讀取",
     "backLabel": "租賃合約",
     "reviewTitle": "檢查你的合約",
-    "reviewSubtitle": "左邊是原件，右邊是附上範例預訂的可簽署版本。修正讀錯的地方，然後開始使用。",
+    "reviewSubtitle": "您的原件與可簽署的副本並排顯示，並以範例預訂填寫。修正辨識錯誤的地方，然後開始使用。",
     "statusActive": "新預訂使用中",
     "statusDraft": "尚未使用",
     "signedNeverChange": "已簽署的合約永遠不會改變。",
@@ -6545,7 +6547,8 @@
     "v_owner_email": "商家電子郵件",
     "v_home_territory": "車輛可使用區域",
     "v_jurisdiction": "準據法",
-    "v_contract_date": "合約日期"
+    "v_contract_date": "合約日期",
+    "v_vehicle_make_model": "車輛廠牌和型號"
   },
   "chat": {
     "launcher": "與 RoveHQ 聊天",
@@ -6577,10 +6580,10 @@
     "sendFailed": "傳送失敗，請再試一次。",
     "footer": "回答由 AI 撰寫。點選「聯絡真人客服」聯繫 RoveHQ 團隊。",
     "humanNote": "RoveHQ 團隊的成員會在這裡回覆。你可以先關閉，稍後再回來，回覆會在這裡等你。",
-    "emailPrompt": "我們的回覆會顯示在這裡。如果想讓我們知道你是誰，可以留下電子郵件（選填）。",
+    "emailPrompt": "您的電子郵件，以便我們回覆後通知您（選填）",
     "emailPlaceholder": "you@example.com",
     "emailSave": "儲存",
-    "emailSaved": "謝謝。回到這個聊天就能看到我們的回覆。",
+    "emailSaved": "已儲存。請回到這裡查看我們的回覆。",
     "confirm": "確認",
     "cancel": "取消",
     "saving": "儲存中…",

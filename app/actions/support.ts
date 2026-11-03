@@ -4,12 +4,10 @@ import { revalidatePath } from "next/cache";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import type { PreparedUploads, UploadRequest } from "@/lib/direct-uploads";
 import { said } from "@/lib/i18n/server-text";
-import { notifyOperator } from "@/lib/notify-operator";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   SUPPORT_BUCKET,
-  SUPPORT_CHANNELS,
   SUPPORT_MAX_FILE_MB,
   SUPPORT_MAX_FILES,
   SUPPORT_TOPICS,
@@ -31,17 +29,12 @@ async function who() {
 }
 
 /** Signed upload links for files going with a Help message: straight from the phone to storage, under the business's own folder. */
-export async function prepareSupportUploads(files: UploadRequest[], teamThreadId?: string): Promise<PreparedUploads> {
+export async function prepareSupportUploads(files: UploadRequest[]): Promise<PreparedUploads> {
   const me = await who();
   if (!me) return { uploads: [], error: await said("Please sign in first.") };
   if (!Array.isArray(files) || files.length > SUPPORT_MAX_FILES) return { uploads: [], error: await said(`Send up to ${SUPPORT_MAX_FILES} files at a time.`) };
   const admin = createSupabaseAdminClient() as any;
-  // The team's files go into the business's folder, so the business can always open them.
-  let folder = me.membership.organizationId;
-  if (teamThreadId && me.team) {
-    const { data: thread } = await admin.from("support_threads").select("organization_id").eq("id", teamThreadId).maybeSingle();
-    if (thread?.organization_id) folder = thread.organization_id;
-  }
+  const folder = me.membership.organizationId;
   const batch = crypto.randomUUID();
   const uploads = [];
   for (const [index, file] of files.entries()) {
@@ -123,33 +116,30 @@ export async function startSupportThread(formData: FormData): Promise<Result<{ i
   return { ok: true, id: thread.id };
 }
 
-/** A reply in a conversation, from the business or (for platform admins on the team page) from RoveHQ. */
+/**
+ * A reply from the business in one of its conversations. Writing again reopens a closed one: it goes back into the
+ * team's queue as waiting. (The team replies from the helpdesk, app/actions/helpdesk.ts.)
+ */
 export async function replySupportThread(formData: FormData): Promise<Result> {
   const me = await who();
   if (!me) return { ok: false, error: await said("Please sign in first.") };
   const threadId = String(formData.get("threadId") || "");
-  const asTeam = formData.get("asTeam") === "1" && me.team;
   const admin = createSupabaseAdminClient() as any;
   const { data: thread } = await admin.from("support_threads").select("id, organization_id, subject").eq("id", threadId).maybeSingle();
   if (!thread) return { ok: false, error: await said("This conversation was not found.") };
-  if (!asTeam && thread.organization_id !== me.membership.organizationId) return { ok: false, error: await said("Switch to the business you want to work in and try again.") };
+  if (thread.organization_id !== me.membership.organizationId) return { ok: false, error: await said("Switch to the business you want to work in and try again.") };
   const body = String(formData.get("body") || "").trim().slice(0, 8000);
   const files = await readFiles(formData, thread.organization_id);
   if (!body && !files.length) return { ok: false, error: await said("Write a message or add a file.") };
 
-  const { error } = await admin.from("support_messages").insert({ thread_id: thread.id, organization_id: thread.organization_id, author_id: me.membership.userId, from_team: asTeam, body, attachments: files });
+  const { error } = await admin.from("support_messages").insert({ thread_id: thread.id, organization_id: thread.organization_id, author_id: me.membership.userId, from_team: false, body, attachments: files });
   if (error) return { ok: false, error: error.message };
-  const now = new Date().toISOString();
-  if (asTeam) {
-    await admin.from("support_threads").update({ last_message_at: now, status: "answered", unread_by_business: true, unread_by_team: false }).eq("id", thread.id);
-    await notifyOperator(thread.organization_id, `💬 RoveHQ replied: ${firstLine(body) || thread.subject}`, "support_reply", `/help/${thread.id}`);
-  } else {
-    await admin.from("support_threads").update({ last_message_at: now, status: "open", unread_by_team: true }).eq("id", thread.id);
-    const { data: org } = await admin.from("organizations").select("name").eq("id", thread.organization_id).maybeSingle();
-    await alertTeam(`${org?.name || "A business"} replied: ${firstLine(body) || thread.subject}`, thread.id);
-  }
+  await admin.from("support_threads").update({ last_message_at: new Date().toISOString(), status: "open", unread_by_team: true }).eq("id", thread.id);
+  const { data: org } = await admin.from("organizations").select("name").eq("id", thread.organization_id).maybeSingle();
+  await alertTeam(`${org?.name || "A business"} replied: ${firstLine(body) || thread.subject}`, thread.id);
   revalidatePath(`/help/${thread.id}`);
-  revalidatePath(`/help/team/${thread.id}`);
+  revalidatePath("/help");
+  revalidatePath("/platform/support");
   return { ok: true };
 }
 
@@ -160,27 +150,12 @@ export async function setSupportThreadStatus(input: { threadId: string; status: 
   const admin = createSupabaseAdminClient() as any;
   const { data: thread } = await admin.from("support_threads").select("id, organization_id").eq("id", input.threadId).maybeSingle();
   if (!thread || (!me.team && thread.organization_id !== me.membership.organizationId)) return { ok: false, error: await said("This conversation was not found.") };
-  await admin.from("support_threads").update({ status: input.status === "closed" ? "closed" : "open" }).eq("id", thread.id);
+  // A business closing its own conversation takes it off the team's plate: the unread dot goes with it.
+  const update = input.status === "closed" ? { status: "closed", unread_by_team: false } : { status: "open" };
+  await admin.from("support_threads").update(update).eq("id", thread.id);
   revalidatePath(`/help/${thread.id}`);
-  revalidatePath(`/help/team/${thread.id}`);
   revalidatePath("/help");
-  revalidatePath("/help/team");
-  return { ok: true };
-}
-
-/** How the business prefers to hear back from RoveHQ. */
-export async function saveSupportPreference(input: { channel: string; handle: string }): Promise<Result> {
-  const me = await who();
-  if (!me) return { ok: false, error: await said("Please sign in first.") };
-  if (me.membership.role !== "owner") return { ok: false, error: await said("Only the business owner can change this.") };
-  const channel = (SUPPORT_CHANNELS as readonly string[]).includes(input.channel) ? input.channel : "app";
-  const handle = String(input.handle || "").trim().slice(0, 120);
-  if (channel !== "app" && !handle) return { ok: false, error: await said(channel === "email" ? "Add the email address to reply to." : channel === "line" ? "Add your LINE ID." : "Add your WhatsApp number.") };
-  const supabase = (await createSupabaseServerClient()) as any;
-  const { data: org } = await supabase.from("organizations").select("settings").eq("id", me.membership.organizationId).maybeSingle();
-  const current = (org?.settings && typeof org.settings === "object" ? org.settings : {}) as Record<string, unknown>;
-  const { error } = await supabase.from("organizations").update({ settings: { ...current, support: { channel, handle } } }).eq("id", me.membership.organizationId);
-  if (error) return { ok: false, error: error.message };
-  revalidatePath("/help");
+  revalidatePath("/platform/support");
+  revalidatePath(`/platform/support/${thread.id}`);
   return { ok: true };
 }

@@ -4525,7 +4525,8 @@
     "season_monthlyTip": "Biasanya dimatikan: pelanggan jangka panjang kekal satu harga.",
     "extra_bodyTip": "Ditawarkan dalam borang dan halaman tempahan, ditambah ke bayaran pertama dan disenaraikan dalam perjanjian.",
     "b_brandTip": "Pautan tempahan, halaman tandatangan, halaman tempahan pelanggan, resit dan perjanjian.",
-    "pn_bodyTip": "Hanya perniagaan dalam rangkaian boleh melihat satu sama lain."
+    "pn_bodyTip": "Hanya perniagaan dalam rangkaian boleh melihat satu sama lain.",
+    "ag_subtitleOwn": "Tempahan baharu menggunakan perjanjian anda sendiri. Apa sahaja yang anda tambah di bawah diletakkan di hujungnya."
   },
   "accountPage": {
     "roleOwner": "Pemilik",
@@ -5387,7 +5388,7 @@
   },
   "help": {
     "title": "Bantuan",
-    "subtitle": "Tanya pasukan RoveHQ apa sahaja, atau hantar fail anda kepada kami.",
+    "subtitle": "Panduan, sembang langsung, atau tulis kepada kami.",
     "newTitle": "Tulis kepada kami",
     "aboutLabel": "Tentang apa?",
     "topic_question": "Soalan",
@@ -5491,9 +5492,10 @@
     "assistantTitle": "Tanya pembantu",
     "assistantBody": "Taip soalan tentang cara menggunakan RoveHQ dan dapatkan jawapan daripada panduan, dengan langkah-langkah untuk diikuti. Apa yang tidak dapat dijawab, anda boleh terus hantar kepada kami.",
     "liveTitle": "Sembang langsung",
-    "liveBody": "Tanya apa sahaja, hantar foto atau fail, atau bercakap dengan seseorang daripada pasukan RoveHQ. Balasan muncul dalam sembang.",
+    "liveBody": "Tanya apa sahaja, hantar fail, atau bercakap dengan seseorang daripada pasukan RoveHQ.",
     "liveButton": "Buka sembang langsung",
-    "fromAssistant": "Pembantu RoveHQ"
+    "fromAssistant": "Pembantu RoveHQ",
+    "contentSubtitle": "Artikel, Soalan Lazim, video dan sumber yang diminta orang daripada pembantu, atau yang tidak dapat dijawabnya. Tiada apa yang diterbitkan sehingga anda meluluskannya."
   },
   "inspectStart": {
     "titleOut": "Serah kenderaan",
@@ -6443,7 +6445,7 @@
   },
   "contractImport": {
     "title": "Guna perjanjian anda sendiri",
-    "body": "Sudah ada kontrak yang anda suka? Muat naik sebagai PDF, fail Word atau gambar. Kami kekalkan ayat anda dan jadikannya salinan yang ditandatangani pelanggan di telefon, seperti perjanjian RoveHQ.",
+    "body": "Muat naik kontrak yang sudah anda gunakan, sebagai PDF, fail Word atau gambar. Kata-kata anda dikekalkan, dan pelanggan menandatanganinya di telefon seperti perjanjian RoveHQ.",
     "activeBody": "Tempahan baharu guna perjanjian anda, \"{title}\". Perjanjian yang sudah ditandatangani kekal seperti asal.",
     "yourAgreement": "perjanjian anda",
     "review": "Semak atau sunting",
@@ -6462,7 +6464,7 @@
     "upload": "Muat naik dan baca",
     "backLabel": "Perjanjian sewa",
     "reviewTitle": "Semak perjanjian anda",
-    "reviewSubtitle": "Asal anda di kiri, salinan untuk ditandatangani di kanan dengan contoh tempahan. Betulkan apa-apa yang tersalah baca, kemudian mula guna.",
+    "reviewSubtitle": "Dokumen asal anda di sebelah salinan yang boleh ditandatangani, diisi dengan contoh tempahan. Betulkan apa yang salah dibaca, kemudian mula gunakannya.",
     "statusActive": "Digunakan untuk tempahan baharu",
     "statusDraft": "Belum digunakan",
     "signedNeverChange": "Perjanjian yang sudah ditandatangani tidak akan berubah.",
@@ -6545,7 +6547,8 @@
     "v_owner_email": "E-mel perniagaan",
     "v_home_territory": "Kawasan kenderaan boleh digunakan",
     "v_jurisdiction": "Undang-undang yang terpakai",
-    "v_contract_date": "Tarikh perjanjian"
+    "v_contract_date": "Tarikh perjanjian",
+    "v_vehicle_make_model": "Jenama dan model kenderaan"
   },
   "chat": {
     "launcher": "Sembang dengan RoveHQ",
@@ -6577,10 +6580,10 @@
     "sendFailed": "Tidak dapat dihantar. Sila cuba lagi.",
     "footer": "Jawapan ditulis oleh AI. Ketik Bercakap dengan orang untuk menghubungi pasukan RoveHQ.",
     "humanNote": "Seseorang daripada pasukan RoveHQ akan membalas di sini. Anda boleh tutup dan kembali kemudian: balasan akan menunggu.",
-    "emailPrompt": "Balasan kami akan muncul di sini. Tinggalkan e-mel jika anda mahu kami tahu siapa anda (pilihan).",
+    "emailPrompt": "E-mel anda, supaya kami boleh maklumkan apabila kami sudah membalas (pilihan)",
     "emailPlaceholder": "you@example.com",
     "emailSave": "Simpan",
-    "emailSaved": "Terima kasih. Kembali ke sembang ini untuk melihat balasan kami.",
+    "emailSaved": "Disimpan. Kembali ke sini untuk balasan kami.",
     "confirm": "Sahkan",
     "cancel": "Batal",
     "saving": "Menyimpan…",

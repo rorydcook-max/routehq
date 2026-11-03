@@ -28,7 +28,8 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
   const [template, sampleData, { data: latestUpload }] = await Promise.all([
     ensureDefaultContractTemplate(supabase, organization.id),
     embedLogoInContractVariables(supabase, buildSampleContractVariables(organization)),
-    // The owner's most recent upload, so a draft they haven't finished reviewing can be picked up again.
+    // The owner's most recent upload, so a draft they haven't finished reviewing can be picked up again (also
+    // when an older upload is the one in use: a newer one otherwise had no way back to its review screen).
     supabase
       .from("contract_templates")
       .select("id, title, is_active, created_at")
@@ -67,14 +68,14 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
         <div className="page-hero mb-4">
           <BackLink href="/settings?tab=business" label={say("title")} />
           <h1 className="page-title">{say("ag_title")}</h1>
-          <p className="page-subtitle page-subtitle-keep mt-1">{say("ag_subtitle")}</p>
+          <p className="page-subtitle page-subtitle-keep mt-1">{say(usingUploaded ? "ag_subtitleOwn" : "ag_subtitle")}</p>
         </div>
 
         {membership?.role === "owner" ? (
           <div className="mb-3">
             <ContractImportCard
               active={usingUploaded ? { id: String(template.id), title: String(template.title || template.name || "") } : null}
-              draft={!usingUploaded && latestUpload ? { id: String(latestUpload.id), title: String(latestUpload.title || "") } : null}
+              draft={latestUpload && latestUpload.id !== template?.id ? { id: String(latestUpload.id), title: String(latestUpload.title || "") } : null}
               handoffFile={handoffFile}
             />
           </div>
@@ -82,7 +83,7 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
 
         <AgreementTerms
           initialTerms={agreementExtraTerms(organization.settings)}
-          numbers={numbers}
+          numbers={usingUploaded ? [] : numbers}
           numbersHref="/settings?tab=rentals#travel"
           organizationId={organization.id}
           sampleData={sampleData}

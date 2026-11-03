@@ -4525,7 +4525,8 @@
     "season_monthlyTip": "Généralement désactivé : les clients longue durée gardent un seul prix.",
     "extra_bodyTip": "Proposées sur le formulaire et la page de réservation, ajoutées au premier paiement et listées dans le contrat.",
     "b_brandTip": "Liens de réservation, page de signature, leur page de réservation, reçus et contrats.",
-    "pn_bodyTip": "Seules les entreprises du réseau se voient entre elles."
+    "pn_bodyTip": "Seules les entreprises du réseau se voient entre elles.",
+    "ag_subtitleOwn": "Les nouvelles réservations utilisent votre propre contrat. Tout ce que vous ajoutez ci-dessous est placé à la fin."
   },
   "accountPage": {
     "roleOwner": "Propriétaire",
@@ -5387,7 +5388,7 @@
   },
   "help": {
     "title": "Aide",
-    "subtitle": "Posez toutes vos questions à l’équipe RoveHQ, ou envoyez-nous vos fichiers.",
+    "subtitle": "Guides, chat en direct, ou écrivez-nous.",
     "newTitle": "Écrivez-nous",
     "aboutLabel": "De quoi s'agit-il ?",
     "topic_question": "Une question",
@@ -5491,9 +5492,10 @@
     "assistantTitle": "Demander à l'assistant",
     "assistantBody": "Posez une question sur l'utilisation de RoveHQ et obtenez la réponse tirée des guides, avec les étapes à suivre. Ce qu'il ne peut pas répondre, vous pouvez nous l'envoyer directement.",
     "liveTitle": "Chat en direct",
-    "liveBody": "Posez vos questions, envoyez des photos ou des fichiers, ou parlez à une personne de l’équipe RoveHQ. Les réponses arrivent dans le chat.",
+    "liveBody": "Posez vos questions, envoyez des fichiers ou parlez à une personne de l'équipe RoveHQ.",
     "liveButton": "Ouvrir le chat en direct",
-    "fromAssistant": "Assistant RoveHQ"
+    "fromAssistant": "Assistant RoveHQ",
+    "contentSubtitle": "Articles, FAQ, vidéos et ressources demandés à l'assistant, ou auxquels il n'a pas su répondre. Rien n'est publié sans votre approbation."
   },
   "inspectStart": {
     "titleOut": "Remettre un véhicule",
@@ -6443,7 +6445,7 @@
   },
   "contractImport": {
     "title": "Utiliser votre propre contrat",
-    "body": "Vous avez déjà un contrat qui vous convient ? Importez-le en PDF, en fichier Word ou en photos. Nous gardons votre texte et en faisons une version que les clients signent sur leur téléphone, comme le contrat RoveHQ.",
+    "body": "Importez le contrat que vous utilisez déjà, en PDF, Word ou photos. Votre texte est conservé et les clients le signent sur leur téléphone, comme le contrat RoveHQ.",
     "activeBody": "Les nouvelles réservations utilisent votre propre contrat, « {title} ». Les contrats déjà signés restent inchangés.",
     "yourAgreement": "votre contrat",
     "review": "Le vérifier ou le modifier",
@@ -6462,7 +6464,7 @@
     "upload": "Importer et lire",
     "backLabel": "Contrat de location",
     "reviewTitle": "Vérifiez votre contrat",
-    "reviewSubtitle": "Votre original à gauche, la version à signer à droite avec une réservation d’exemple. Corrigez ce qui a été mal lu, puis commencez à l’utiliser.",
+    "reviewSubtitle": "Votre original à côté de la copie à signer, remplie avec une réservation d'exemple. Corrigez ce qui a été mal lu, puis commencez à l'utiliser.",
     "statusActive": "Utilisé pour les nouvelles réservations",
     "statusDraft": "Pas encore utilisé",
     "signedNeverChange": "Les contrats déjà signés ne changent jamais.",
@@ -6545,7 +6547,8 @@
     "v_owner_email": "E-mail de l’entreprise",
     "v_home_territory": "Où le véhicule peut être utilisé",
     "v_jurisdiction": "Droit applicable",
-    "v_contract_date": "Date du contrat"
+    "v_contract_date": "Date du contrat",
+    "v_vehicle_make_model": "Marque et modèle du véhicule"
   },
   "chat": {
     "launcher": "Discuter avec RoveHQ",
@@ -6577,10 +6580,10 @@
     "sendFailed": "Envoi impossible. Veuillez réessayer.",
     "footer": "Les réponses sont rédigées par une AI. Touchez Parler à une personne pour joindre l’équipe RoveHQ.",
     "humanNote": "Une personne de l’équipe RoveHQ vous répondra ici. Vous pouvez fermer et revenir plus tard : la réponse vous attendra.",
-    "emailPrompt": "Notre réponse s’affichera ici. Laissez votre e-mail si vous souhaitez que nous sachions qui vous êtes (facultatif).",
+    "emailPrompt": "Votre e-mail, pour vous prévenir quand nous aurons répondu (facultatif)",
     "emailPlaceholder": "you@example.com",
     "emailSave": "Enregistrer",
-    "emailSaved": "Merci. Revenez sur ce chat pour voir notre réponse.",
+    "emailSaved": "Enregistré. Revenez ici pour lire notre réponse.",
     "confirm": "Confirmer",
     "cancel": "Annuler",
     "saving": "Enregistrement…",

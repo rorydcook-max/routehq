@@ -99,6 +99,8 @@ export function AgreementTerms({
         </form>
       </section>
 
+      {/* No numbers when the owner's own uploaded agreement is in use: its amounts are in their own wording. */}
+      {numbers.length ? (
       <section className="card p-4">
         <h2 className={h2}>{say("ag_numbersTitle")}</h2>
         <p className={`mt-1 ${soft}`}>{say("ag_numbersBody")}</p>
@@ -115,6 +117,7 @@ export function AgreementTerms({
           {say("ag_numbersChange")}
         </a>
       </section>
+      ) : null}
 
       <section className="card scroll-mt-4 p-4" id="sample">
         <h2 className={h2}>{say("ag_sampleTitle")}</h2>

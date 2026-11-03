@@ -84,6 +84,7 @@ export default async function SupportConversationPage({ params }: { params: Prom
               assignedTo={thread.assignedTo}
               assigneeName={thread.assigneeName}
               meId={me.userId}
+              mode={thread.mode}
               priority={thread.priority}
               status={thread.status}
               tags={thread.tags}
@@ -109,7 +110,7 @@ export default async function SupportConversationPage({ params }: { params: Prom
                 <dd className="font-medium">{business.country || "—"}</dd>
                 <dt className="font-semibold text-[var(--muted)]">Vehicles</dt>
                 <dd className="num font-medium">{business.vehicles}</dd>
-                <dt className="font-semibold text-[var(--muted)]">Started on</dt>
+                <dt className="font-semibold text-[var(--muted)]">Page</dt>
                 <dd className="font-medium [overflow-wrap:anywhere]">{thread.page || "—"}</dd>
               </dl>
             </section>
@@ -122,7 +123,7 @@ export default async function SupportConversationPage({ params }: { params: Prom
                 <dd className="font-medium">{thread.visitorName || "—"}</dd>
                 <dt className="font-semibold text-[var(--muted)]">Email</dt>
                 <dd className="font-medium [overflow-wrap:anywhere]">{thread.visitorEmail ? <a className="text-[var(--primary)] hover:underline" href={`mailto:${thread.visitorEmail}`}>{thread.visitorEmail}</a> : "Not given"}</dd>
-                <dt className="font-semibold text-[var(--muted)]">Started on</dt>
+                <dt className="font-semibold text-[var(--muted)]">Page</dt>
                 <dd className="font-medium [overflow-wrap:anywhere]">{thread.page || "—"}</dd>
               </dl>
             </section>

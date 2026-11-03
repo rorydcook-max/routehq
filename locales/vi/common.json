@@ -4525,7 +4525,8 @@
     "season_monthlyTip": "Thường tắt: khách thuê dài hạn giữ một mức giá.",
     "extra_bodyTip": "Hiện trên form đặt xe và trang đặt xe, cộng vào lần thanh toán đầu và ghi trong hợp đồng.",
     "b_brandTip": "Link đặt xe, trang ký, trang đặt xe của khách, biên nhận và hợp đồng.",
-    "pn_bodyTip": "Chỉ các doanh nghiệp trong mạng lưới mới thấy nhau."
+    "pn_bodyTip": "Chỉ các doanh nghiệp trong mạng lưới mới thấy nhau.",
+    "ag_subtitleOwn": "Các đặt xe mới dùng hợp đồng của riêng bạn. Những gì bạn thêm bên dưới sẽ nằm ở cuối hợp đồng."
   },
   "accountPage": {
     "roleOwner": "Chủ sở hữu",
@@ -5387,7 +5388,7 @@
   },
   "help": {
     "title": "Trợ giúp",
-    "subtitle": "Hỏi đội RoveHQ bất cứ điều gì, hoặc gửi file cho chúng tôi.",
+    "subtitle": "Hướng dẫn, trò chuyện trực tiếp, hoặc viết cho chúng tôi.",
     "newTitle": "Viết cho chúng tôi",
     "aboutLabel": "Về việc gì?",
     "topic_question": "Câu hỏi",
@@ -5491,9 +5492,10 @@
     "assistantTitle": "Hỏi trợ lý",
     "assistantBody": "Nhập câu hỏi về cách dùng RoveHQ và nhận câu trả lời từ hướng dẫn, kèm các bước thực hiện. Câu nào không trả lời được, bạn có thể gửi thẳng cho chúng tôi.",
     "liveTitle": "Chat trực tiếp",
-    "liveBody": "Hỏi bất cứ điều gì, gửi ảnh hoặc tệp, hoặc nói chuyện với nhân viên RoveHQ. Câu trả lời sẽ hiện trong chat.",
+    "liveBody": "Hỏi bất cứ điều gì, gửi tệp, hoặc nói chuyện với một người trong đội ngũ RoveHQ.",
     "liveButton": "Mở chat trực tiếp",
-    "fromAssistant": "Trợ lý RoveHQ"
+    "fromAssistant": "Trợ lý RoveHQ",
+    "contentSubtitle": "Bài viết, câu hỏi thường gặp, video và tài liệu mà người dùng đã yêu cầu trợ lý, hoặc trợ lý không trả lời được. Không có gì được đăng cho đến khi bạn phê duyệt."
   },
   "inspectStart": {
     "titleOut": "Giao xe",
@@ -6443,7 +6445,7 @@
   },
   "contractImport": {
     "title": "Dùng hợp đồng của bạn",
-    "body": "Đã có hợp đồng ưng ý? Tải lên dạng PDF, file Word hoặc ảnh chụp. Chúng tôi giữ nguyên câu chữ của bạn và biến nó thành bản để khách ký trên điện thoại, giống hợp đồng RoveHQ.",
+    "body": "Tải lên hợp đồng bạn đang dùng, dưới dạng PDF, tệp Word hoặc ảnh. Nội dung của bạn được giữ nguyên, và khách hàng ký trên điện thoại như hợp đồng RoveHQ.",
     "activeBody": "Các đặt xe mới dùng hợp đồng của bạn, \"{title}\". Hợp đồng đã ký vẫn giữ nguyên.",
     "yourAgreement": "hợp đồng của bạn",
     "review": "Xem hoặc sửa",
@@ -6462,7 +6464,7 @@
     "upload": "Tải lên và đọc",
     "backLabel": "Hợp đồng thuê xe",
     "reviewTitle": "Kiểm tra hợp đồng",
-    "reviewSubtitle": "Bản gốc bên trái, bản để ký bên phải với một đặt xe mẫu. Sửa chỗ nào đọc sai, rồi bắt đầu dùng.",
+    "reviewSubtitle": "Bản gốc của bạn bên cạnh bản ký, đã điền bằng một đặt xe mẫu. Sửa những chỗ đọc sai, rồi bắt đầu sử dụng.",
     "statusActive": "Đang dùng cho đặt xe mới",
     "statusDraft": "Chưa dùng",
     "signedNeverChange": "Hợp đồng đã ký không bao giờ thay đổi.",
@@ -6545,7 +6547,8 @@
     "v_owner_email": "Email cơ sở",
     "v_home_territory": "Khu vực được dùng xe",
     "v_jurisdiction": "Luật áp dụng",
-    "v_contract_date": "Ngày lập hợp đồng"
+    "v_contract_date": "Ngày lập hợp đồng",
+    "v_vehicle_make_model": "Hãng và mẫu xe"
   },
   "chat": {
     "launcher": "Chat với RoveHQ",
@@ -6577,10 +6580,10 @@
     "sendFailed": "Không gửi được. Vui lòng thử lại.",
     "footer": "Câu trả lời do AI viết. Chạm Nói chuyện với nhân viên để liên hệ đội ngũ RoveHQ.",
     "humanNote": "Nhân viên của RoveHQ sẽ trả lời tại đây. Bạn có thể đóng và quay lại sau: câu trả lời sẽ chờ bạn.",
-    "emailPrompt": "Câu trả lời của chúng tôi sẽ hiện ngay tại đây. Để lại email nếu bạn muốn chúng tôi biết bạn là ai (không bắt buộc).",
+    "emailPrompt": "Email của bạn, để chúng tôi báo khi đã trả lời (không bắt buộc)",
     "emailPlaceholder": "you@example.com",
     "emailSave": "Lưu",
-    "emailSaved": "Cảm ơn bạn. Quay lại cuộc chat này để xem câu trả lời.",
+    "emailSaved": "Đã lưu. Hãy quay lại đây để xem câu trả lời của chúng tôi.",
     "confirm": "Xác nhận",
     "cancel": "Hủy",
     "saving": "Đang lưu…",

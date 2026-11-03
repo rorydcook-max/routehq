@@ -11,20 +11,17 @@ import { PICKABLE_TOPICS, SUPPORT_ACCEPT, SUPPORT_BUCKET, SUPPORT_MAX_FILES, fil
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * Write to the RoveHQ team (or, on the team page, back to a business), with files:
- * spreadsheets, photos of notebooks and registration books, PDFs. Files go straight
- * from the phone to storage, so large ones are fine.
+ * Write to the RoveHQ team, with files: spreadsheets, photos of notebooks and registration books, PDFs.
+ * Files go straight from the phone to storage, so large ones are fine. (The team answers from the helpdesk.)
  */
 export function HelpCompose({
   mode,
   threadId,
-  asTeam = false,
   initialTopic = "question",
   hints
 }: {
   mode: "new" | "reply";
   threadId?: string;
-  asTeam?: boolean;
   initialTopic?: SupportTopic;
   /** Extra line under the box for a topic, e.g. what the import service includes on their plan. */
   hints?: Partial<Record<SupportTopic, string>>;
@@ -60,14 +57,8 @@ export function HelpCompose({
       form.set("body", body);
       form.set("topic", topic);
       if (threadId) form.set("threadId", threadId);
-      if (asTeam) form.set("asTeam", "1");
       files.forEach((file) => form.append("file", file));
-      const ready = await uploadFormFiles(
-        form,
-        (requests) => prepareSupportUploads(requests, asTeam ? threadId : undefined),
-        (done, total) => setProgress(say("uploading", { done, total })),
-        SUPPORT_BUCKET
-      );
+      const ready = await uploadFormFiles(form, prepareSupportUploads, (done, total) => setProgress(say("uploading", { done, total })), SUPPORT_BUCKET);
       setProgress(null);
       const result = mode === "new" ? await startSupportThread(ready) : await replySupportThread(ready);
       if (!result.ok) {
@@ -114,7 +105,7 @@ export function HelpCompose({
           className="block min-h-[120px] w-full resize-y"
           disabled={busy}
           onChange={(event) => setBody(event.target.value)}
-          placeholder={mode === "new" ? say(`placeholder_${topic}`) : asTeam ? say("placeholderTeam") : say("placeholderReply")}
+          placeholder={mode === "new" ? say(`placeholder_${topic}`) : say("placeholderReply")}
           value={body}
         />
       </label>

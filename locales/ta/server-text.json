@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "இந்தக் கணக்கிற்கு உதவியாளர் இன்னும் இயக்கப்படவில்லை.",
   "Couldn't work out an answer to that. Try asking it another way.": "அதற்கு பதில் கண்டுபிடிக்க முடியவில்லை. வேறு விதமாகக் கேட்டுப் பாருங்கள்.",
   "Couldn't reach the assistant just now. Try again in a moment.": "இப்போது உதவியாளரை அணுக முடியவில்லை. சிறிது நேரத்தில் மீண்டும் முயலுங்கள்.",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "உதவியாளரின் AI சேவையில் கிரெடிட் தீர்ந்துவிட்டது, அதனால் இப்போது பதில் சொல்ல முடியாது. RoveHQ-இல் மற்ற எல்லாம் வழக்கம் போல் வேலை செய்யும்."
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "உதவியாளரின் AI சேவையில் கிரெடிட் தீர்ந்துவிட்டது, அதனால் இப்போது பதில் சொல்ல முடியாது. RoveHQ-இல் மற்ற எல்லாம் வழக்கம் போல் வேலை செய்யும்.",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "இதை RoveHQ குழுவிடம் அனுப்பிவிட்டேன். பொதுவாக சில மணி நேரத்தில் ஒருவர் இங்கே பதிலளிப்பார். இதை மூடிவிட்டு பிறகு திரும்பி வரலாம்.",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "அது வாடகை ஒப்பந்தம் போல் தெரியவில்லை. ஒப்பந்தத்தையே பதிவேற்றுங்கள்."
 }

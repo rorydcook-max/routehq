@@ -24,7 +24,8 @@ async function teamUser(): Promise<string | null> {
 async function finish(result: { ok: true } | { ok: false; error: string }): Promise<ActionResult> {
   if (!result.ok) return { ok: false, error: await said(result.error) };
   revalidatePath("/help/team/content");
-  revalidatePath("/help/team");
+  // The "N waiting" badge on the helpdesk's Content requests card.
+  revalidatePath("/platform/support");
   return { ok: true };
 }
 
@@ -35,7 +36,8 @@ export async function collateContentAction(): Promise<{ ok: true; questions: num
   const result = await collateContentRequests();
   if (!result.ok) return { ok: false, error: await said(result.error) };
   revalidatePath("/help/team/content");
-  revalidatePath("/help/team");
+  // The "N waiting" badge on the helpdesk's Content requests card.
+  revalidatePath("/platform/support");
   return result;
 }
 

@@ -111,7 +111,7 @@ const SYSTEM =
   "The agreement may be in English, Thai, another language, or two languages side by side. " +
   "KEEP THE OWNER'S WORDING EXACTLY: copy every clause word for word, with the same spelling, numbers and amounts. Do not summarise, translate, correct, reorder or add anything. " +
   "Leave out only: the letterhead (business name, address and contact details at the very top), page numbers, headers/footers repeated on every page, and the signature/witness lines and boxes at the end (a signature page is added automatically). Keep any sentence about copies, signing or acceptance as a clause. " +
-  "Split the agreement into sections under its own headings (use the document's headings; if it has none, one section with an empty heading). Each numbered or separate paragraph is one clause; drop the original clause numbers (they are renumbered), but keep sub-lists inside a clause with line breaks. " +
+  "Split the agreement into sections under its own headings (use the document's headings; if it has none, one section with an empty heading). Each numbered or separate paragraph is one clause; drop the original clause and heading numbers (they are renumbered), but keep sub-lists inside a clause with line breaks. " +
   "If the agreement is bilingual, put the first language's text in `text` and the matching translation in `text_secondary` (same for headings and title); never drop either language. " +
   "BLANKS: wherever the original has a space to fill in for each rental (underscores, dots, empty boxes, brackets like [name], or an obvious example value such as a sample name, plate or date), replace just that blank with a marker [[F1]], [[F2]], ... and list it in `fields`. Reuse the same id when the same detail appears again (including in the translation). " +
   `Match each field to one of these booking details: ${variableList}. If none fits (e.g. hotel room number, flight number, witness), use "custom:<short label>". ` +
@@ -178,8 +178,16 @@ export async function readImportedAgreement(input: { text?: string; pdf?: Buffer
     throw new Error("Nothing to read.");
   }
   const doc = tidyImportedAgreement(raw);
-  if (!doc.sections.length) throw new Error("No agreement text was found in the file.");
+  if (!doc.sections.length) throw new NotAnAgreementError();
   return doc;
+}
+
+/** The model read the file fine but found no agreement in it (a receipt, a photo of a car...). */
+export class NotAnAgreementError extends Error {
+  constructor() {
+    super("No agreement text was found in the file.");
+    this.name = "NotAnAgreementError";
+  }
 }
 
 function parseJson(text: string): Record<string, unknown> {

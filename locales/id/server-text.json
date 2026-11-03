@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "Asisten belum diaktifkan untuk akun ini.",
   "Couldn't work out an answer to that. Try asking it another way.": "Tidak bisa menemukan jawaban untuk itu. Coba tanyakan dengan cara lain.",
   "Couldn't reach the assistant just now. Try again in a moment.": "Asisten tidak bisa dihubungi saat ini. Coba lagi sebentar.",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "Layanan AI asisten kehabisan kredit, jadi tidak bisa menjawab sekarang. Fitur lain di RoveHQ tetap berjalan normal."
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "Layanan AI asisten kehabisan kredit, jadi tidak bisa menjawab sekarang. Fitur lain di RoveHQ tetap berjalan normal.",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "Sudah saya teruskan ke tim RoveHQ. Seseorang akan membalas di sini, biasanya dalam beberapa jam. Anda bisa menutup ini dan kembali lagi nanti.",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "Itu tidak tampak seperti perjanjian sewa. Unggah kontraknya sendiri."
 }

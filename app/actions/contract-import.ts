@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireOwner } from "@/lib/auth/roles";
-import { checkThaiEssentials, readDocxText, readImportedAgreement } from "@/lib/contract-import";
+import { NotAnAgreementError, checkThaiEssentials, readDocxText, readImportedAgreement } from "@/lib/contract-import";
 import {
   DOCX_TYPE,
   IMPORT_MAX_PAGES,
@@ -131,6 +131,7 @@ async function importFiles(organizationId: string, files: StoredFile[], fromChat
     }
   } catch (error) {
     console.error("[contract-import] read:", errorText(error));
+    if (error instanceof NotAnAgreementError) return { ok: false, error: await said("That doesn't look like a rental agreement. Upload the contract itself.") };
     return { ok: false, error: await said("We couldn't read that agreement. Try a clearer copy, or a PDF or Word file.") };
   }
 

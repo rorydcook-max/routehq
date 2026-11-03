@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "इस अकाउंट के लिए असिस्टेंट अभी चालू नहीं है।",
   "Couldn't work out an answer to that. Try asking it another way.": "इसका जवाब नहीं मिल पाया। इसे दूसरे तरीके से पूछकर देखें।",
   "Couldn't reach the assistant just now. Try again in a moment.": "अभी असिस्टेंट से कनेक्ट नहीं हो पाया। थोड़ी देर में फिर कोशिश करें।",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "असिस्टेंट की AI सर्विस का क्रेडिट खत्म हो गया है, इसलिए यह अभी जवाब नहीं दे सकता। RoveHQ में बाकी सब कुछ सामान्य रूप से काम कर रहा है।"
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "असिस्टेंट की AI सर्विस का क्रेडिट खत्म हो गया है, इसलिए यह अभी जवाब नहीं दे सकता। RoveHQ में बाकी सब कुछ सामान्य रूप से काम कर रहा है।",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "मैंने इसे RoveHQ टीम को भेज दिया है। कोई व्यक्ति यहीं जवाब देगा, आमतौर पर कुछ घंटों में। आप इसे बंद करके बाद में वापस आ सकते हैं।",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "यह किराये का अनुबंध नहीं लगता। अनुबंध ही अपलोड करें।"
 }

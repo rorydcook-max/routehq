@@ -4485,7 +4485,8 @@
     "season_monthlyTip": "보통 꺼 둬요: 장기 고객은 같은 가격을 유지해요.",
     "extra_bodyTip": "예약 양식과 예약 페이지에 표시되고, 첫 결제에 더해지며, 계약서에 기재돼요.",
     "b_brandTip": "예약 링크, 서명 페이지, 고객 예약 페이지, 영수증, 계약서.",
-    "pn_bodyTip": "네트워크에 있는 업체끼리만 서로 볼 수 있어요."
+    "pn_bodyTip": "네트워크에 있는 업체끼리만 서로 볼 수 있어요.",
+    "ag_subtitleOwn": "새 예약에는 직접 올린 계약서가 사용됩니다. 아래에 추가하는 내용은 계약서 끝에 들어갑니다."
   },
   "accountPage": {
     "roleOwner": "대표",
@@ -5387,7 +5388,7 @@
   },
   "help": {
     "title": "도움말",
-    "subtitle": "RoveHQ 팀에 무엇이든 물어보거나 파일을 보내 주세요.",
+    "subtitle": "가이드, 실시간 채팅, 또는 문의하기.",
     "newTitle": "문의하기",
     "aboutLabel": "어떤 내용인가요?",
     "topic_question": "질문",
@@ -5491,9 +5492,10 @@
     "assistantTitle": "어시스턴트에게 질문",
     "assistantBody": "RoveHQ 사용에 대해 질문을 입력하면 가이드에서 따라야 할 단계와 함께 답변을 받을 수 있습니다. 답변할 수 없는 내용은 바로 저희에게 보낼 수 있습니다.",
     "liveTitle": "실시간 채팅",
-    "liveBody": "무엇이든 물어보고, 사진이나 파일을 보내거나, RoveHQ 팀원과 대화하세요. 답장은 채팅으로 와요.",
+    "liveBody": "무엇이든 물어보고, 파일을 보내거나, RoveHQ 팀 담당자와 이야기하세요.",
     "liveButton": "실시간 채팅 열기",
-    "fromAssistant": "RoveHQ 어시스턴트"
+    "fromAssistant": "RoveHQ 어시스턴트",
+    "contentSubtitle": "사용자가 어시스턴트에게 요청했거나 어시스턴트가 답하지 못한 문서, FAQ, 동영상, 자료입니다. 승인하기 전에는 아무것도 게시되지 않습니다."
   },
   "inspectStart": {
     "titleOut": "차량 인도",
@@ -6443,7 +6445,7 @@
   },
   "contractImport": {
     "title": "내 계약서 사용하기",
-    "body": "마음에 드는 계약서가 이미 있나요? PDF, Word 파일 또는 사진으로 올려 주세요. 문구는 그대로 두고, RoveHQ 계약서처럼 고객이 휴대폰으로 서명할 수 있는 사본으로 만들어 드립니다.",
+    "body": "이미 사용 중인 계약서를 PDF, Word 파일 또는 사진으로 올리세요. 문구는 그대로 유지되고, 고객은 RoveHQ 계약서처럼 휴대폰에서 서명합니다.",
     "activeBody": "새 예약에는 내 계약서 \"{title}\"이(가) 사용됩니다. 이미 서명된 계약서는 그대로 유지됩니다.",
     "yourAgreement": "내 계약서",
     "review": "검토 또는 수정",
@@ -6462,7 +6464,7 @@
     "upload": "올리고 읽기",
     "backLabel": "임대차 계약서",
     "reviewTitle": "계약서 확인",
-    "reviewSubtitle": "왼쪽은 원본, 오른쪽은 예시 예약이 들어간 서명용 사본입니다. 잘못 읽힌 부분을 고친 다음 사용을 시작하세요.",
+    "reviewSubtitle": "원본과 서명용 사본을 나란히 두고 샘플 예약으로 채웠습니다. 잘못 읽힌 부분을 고친 뒤 사용을 시작하세요.",
     "statusActive": "새 예약에 사용 중",
     "statusDraft": "아직 사용 안 함",
     "signedNeverChange": "이미 서명된 계약서는 절대 바뀌지 않습니다.",
@@ -6545,7 +6547,8 @@
     "v_owner_email": "업체 이메일",
     "v_home_territory": "차량 사용 가능 지역",
     "v_jurisdiction": "준거법",
-    "v_contract_date": "계약일"
+    "v_contract_date": "계약일",
+    "v_vehicle_make_model": "차량 제조사와 모델"
   },
   "chat": {
     "launcher": "RoveHQ와 채팅",
@@ -6577,10 +6580,10 @@
     "sendFailed": "보내지 못했어요. 다시 시도해 주세요.",
     "footer": "답변은 AI가 작성해요. RoveHQ 팀과 대화하려면 상담원과 대화를 누르세요.",
     "humanNote": "RoveHQ 팀원이 여기서 답장해요. 창을 닫았다가 나중에 돌아와도 답장이 기다리고 있어요.",
-    "emailPrompt": "답장은 바로 여기에 표시돼요. 누구신지 알려 주시려면 이메일을 남겨 주세요(선택).",
+    "emailPrompt": "답변을 드리면 알려드릴 수 있도록 이메일을 남겨 주세요 (선택)",
     "emailPlaceholder": "you@example.com",
     "emailSave": "저장",
-    "emailSaved": "감사합니다. 이 채팅으로 돌아와서 답장을 확인하세요.",
+    "emailSaved": "저장했습니다. 답변은 여기에서 확인하세요.",
     "confirm": "확인",
     "cancel": "취소",
     "saving": "저장 중…",

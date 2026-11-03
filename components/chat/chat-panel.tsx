@@ -103,6 +103,7 @@ export function ChatPanel({
   const input = useRef<HTMLTextAreaElement>(null);
   const picker = useRef<HTMLInputElement>(null);
   const end = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLDivElement>(null);
   // The files sent from this page, by storage path: handed straight to the next screen without downloading them again.
   const localFiles = useRef(new Map<string, File>());
   const loaded = useRef(false);
@@ -152,19 +153,34 @@ export function ChatPanel({
     end.current?.scrollIntoView({ block: "end" });
   }, [messages, busy, open]);
 
-  // New team replies while it's open: every 5 seconds, paused while the tab is in the background.
+  // A reply keeps growing after it lands (the video's poster, a photo): stay at the bottom unless they've scrolled up.
   useEffect(() => {
-    if (!open || !threadId) return;
+    const box = list.current;
+    const inner = box?.firstElementChild;
+    if (!open || !box || !inner || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => {
+      if (box.scrollHeight - box.scrollTop - box.clientHeight < 240) box.scrollTop = box.scrollHeight;
+    });
+    observer.observe(inner);
+    return () => observer.disconnect();
+  }, [open]);
+
+  // New team replies while it's open: every 5 seconds, paused while the tab is in the background. Only once the
+  // chat is with the team: the assistant answers in the same call, so there's nothing to poll for before that.
+  const latest = useRef<string | null>(null);
+  latest.current = [...messages].reverse().find((message) => !message.pending)?.createdAt || null;
+  const withTeam = thread?.mode === "human";
+  useEffect(() => {
+    if (!open || !threadId || !withTeam) return;
     const timer = window.setInterval(async () => {
       if (document.hidden) return;
-      const since = [...messages].reverse().find((message) => !message.pending)?.createdAt || null;
-      const result = await chatPoll(threadId, since).catch(() => null);
+      const result = await chatPoll(threadId, latest.current).catch(() => null);
       if (!result || !result.ok) return;
       setThread(result.thread);
       if (result.messages.length) setMessages((list) => [...list.filter((message) => !result.messages.some((fresh) => fresh.id === message.id)), ...result.messages]);
     }, 5000);
     return () => window.clearInterval(timer);
-  }, [open, threadId, messages]);
+  }, [open, threadId, withTeam]);
 
   // Escape closes; Tab stays inside the panel while it's open (it's a dialog).
   useEffect(() => {
@@ -372,7 +388,7 @@ export function ChatPanel({
 
   // On the website the starters are about RoveHQ itself, signed in or not; the answers still use their normal context.
   const chips = chatSuggestions(pathname, { site, owner: context.owner });
-  const human = thread?.mode === "human";
+  const human = withTeam;
   const linkClick = () => {
     if (!desktop) onClose();
   };
@@ -415,7 +431,8 @@ export function ChatPanel({
         </button>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4" aria-live="polite">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4" aria-live="polite" ref={list}>
+       <div>
         {messages.length === 0 ? (
           <div>
             <p className="text-[18px] font-bold">{t("greeting")}</p>
@@ -542,38 +559,36 @@ export function ChatPanel({
             {busy && !progress && !human ? <li className="animate-pulse text-[14px] text-[var(--muted)]">{t("thinking")}</li> : null}
           </ol>
         )}
-        {human ? (
+        {/* Visitors can leave an email so we can tell them a reply is waiting (optional). Signed-in people have the
+            hand-over note in the chat itself, so nothing is repeated under it. */}
+        {human && !context.signedIn ? (
           <div className="mt-4 rounded-xl bg-[var(--panel-secondary)] px-3.5 py-3 text-[14px] font-medium text-[var(--foreground-secondary)]">
-            <p>{t("humanNote")}</p>
-            {/* Visitors can leave an email so we can tell them a reply is waiting (optional). */}
-            {!context.signedIn ? (
-              thread?.visitorEmail || emailState === "saved" ? (
-                <p className="mt-2 flex items-center gap-1.5 font-semibold text-[var(--success)]">
-                  <Check size={15} /> {t("emailSaved")}
-                </p>
-              ) : (
-                <form
-                  className="mt-2"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    void saveEmail();
-                  }}
-                >
-                  <label className="block text-[13px]" htmlFor="chat-email">
-                    {t("emailPrompt")}
-                  </label>
-                  <div className="mt-1.5 flex gap-2">
-                    <input autoComplete="email" className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-[15px]" id="chat-email" inputMode="email" onChange={(event) => setEmail(event.target.value)} placeholder={t("emailPlaceholder")} type="email" value={email} />
-                    <button className="secondary-action pressable min-h-10 px-3 text-[14px]" disabled={emailState === "saving" || !email.trim()} type="submit">
-                      {t("emailSave")}
-                    </button>
-                  </div>
-                </form>
-              )
-            ) : null}
+            {thread?.visitorEmail || emailState === "saved" ? (
+              <p className="flex items-center gap-1.5 font-semibold text-[var(--success)]">
+                <Check size={15} /> {t("emailSaved")}
+              </p>
+            ) : (
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  void saveEmail();
+                }}
+              >
+                <label className="block" htmlFor="chat-email">
+                  {t("emailPrompt")}
+                </label>
+                <div className="mt-1.5 flex gap-2">
+                  <input autoComplete="email" className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-[15px]" id="chat-email" inputMode="email" onChange={(event) => setEmail(event.target.value)} placeholder={t("emailPlaceholder")} type="email" value={email} />
+                  <button className="secondary-action pressable min-h-10 px-3 text-[14px]" disabled={emailState === "saving" || !email.trim()} type="submit">
+                    {t("emailSave")}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         ) : null}
         <div ref={end} />
+       </div>
       </div>
 
       <form

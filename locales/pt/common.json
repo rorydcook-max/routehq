@@ -4485,7 +4485,8 @@
     "season_monthlyTip": "Geralmente desligado: clientes de longa estadia mantêm um preço só.",
     "extra_bodyTip": "Oferecidos no formulário e na página de reserva, somados ao primeiro pagamento e listados no contrato.",
     "b_brandTip": "Links de reserva, a página de assinatura, a página da reserva do cliente, recibos e contratos.",
-    "pn_bodyTip": "Só as empresas da rede se veem."
+    "pn_bodyTip": "Só as empresas da rede se veem.",
+    "ag_subtitleOwn": "As novas reservas usam o seu próprio contrato. Tudo o que acrescentar abaixo fica no fim dele."
   },
   "accountPage": {
     "roleOwner": "Proprietário",
@@ -5387,7 +5388,7 @@
   },
   "help": {
     "title": "Ajuda",
-    "subtitle": "Pergunte qualquer coisa à equipe do RoveHQ ou envie seus arquivos.",
+    "subtitle": "Guias, chat ao vivo ou escreva-nos.",
     "newTitle": "Escreva para nós",
     "aboutLabel": "Sobre o que é?",
     "topic_question": "Uma pergunta",
@@ -5491,9 +5492,10 @@
     "assistantTitle": "Perguntar ao assistente",
     "assistantBody": "Digite uma pergunta sobre como usar o RoveHQ e receba a resposta dos guias, com os passos a seguir. O que ele não conseguir responder, você pode enviar direto para nós.",
     "liveTitle": "Chat ao vivo",
-    "liveBody": "Pergunte o que quiser, envie fotos ou arquivos, ou fale com uma pessoa da equipe RoveHQ. As respostas chegam no chat.",
+    "liveBody": "Pergunte o que quiser, envie ficheiros ou fale com alguém da equipa RoveHQ.",
     "liveButton": "Abrir chat ao vivo",
-    "fromAssistant": "Assistente RoveHQ"
+    "fromAssistant": "Assistente RoveHQ",
+    "contentSubtitle": "Artigos, FAQ, vídeos e recursos que as pessoas pediram ao assistente, ou que ele não conseguiu responder. Nada é publicado até que aprove."
   },
   "inspectStart": {
     "titleOut": "Entregar um veículo",
@@ -6443,7 +6445,7 @@
   },
   "contractImport": {
     "title": "Use seu próprio contrato",
-    "body": "Já tem um contrato de que gosta? Envie em PDF, Word ou fotos. Mantemos o seu texto e transformamos em uma cópia que os clientes assinam no celular, como o contrato da RoveHQ.",
+    "body": "Carregue o contrato que já usa, em PDF, Word ou fotografias. O seu texto é mantido e os clientes assinam-no no telemóvel, como o contrato RoveHQ.",
     "activeBody": "As novas reservas usam o seu próprio contrato, \"{title}\". Contratos já assinados continuam como estavam.",
     "yourAgreement": "seu contrato",
     "review": "Revisar ou editar",
@@ -6462,7 +6464,7 @@
     "upload": "Enviar e ler",
     "backLabel": "Contrato de locação",
     "reviewTitle": "Revise seu contrato",
-    "reviewSubtitle": "Seu original à esquerda, a cópia para assinar à direita com uma reserva de exemplo. Corrija o que foi lido errado e comece a usar.",
+    "reviewSubtitle": "O seu original ao lado da cópia para assinatura, preenchida com uma reserva de exemplo. Corrija o que foi mal lido e comece a usá-lo.",
     "statusActive": "Em uso para novas reservas",
     "statusDraft": "Ainda não está em uso",
     "signedNeverChange": "Contratos já assinados nunca mudam.",
@@ -6545,7 +6547,8 @@
     "v_owner_email": "E-mail da empresa",
     "v_home_territory": "Onde o veículo pode ser usado",
     "v_jurisdiction": "Lei aplicável",
-    "v_contract_date": "Data do contrato"
+    "v_contract_date": "Data do contrato",
+    "v_vehicle_make_model": "Marca e modelo do veículo"
   },
   "chat": {
     "launcher": "Converse com a RoveHQ",
@@ -6577,10 +6580,10 @@
     "sendFailed": "Não foi possível enviar. Tente de novo.",
     "footer": "As respostas são escritas por AI. Toque em Falar com uma pessoa para falar com a equipe RoveHQ.",
     "humanNote": "Uma pessoa da equipe RoveHQ vai responder aqui. Você pode fechar e voltar depois: a resposta estará esperando.",
-    "emailPrompt": "Nossa resposta vai aparecer aqui mesmo. Deixe seu e-mail se quiser que a gente saiba quem você é (opcional).",
+    "emailPrompt": "O seu e-mail, para o avisarmos quando respondermos (opcional)",
     "emailPlaceholder": "you@example.com",
     "emailSave": "Salvar",
-    "emailSaved": "Obrigado. Volte a este chat para ver nossa resposta.",
+    "emailSaved": "Guardado. Volte aqui para ver a nossa resposta.",
     "confirm": "Confirmar",
     "cancel": "Cancelar",
     "saving": "Salvando…",

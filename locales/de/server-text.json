@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "Der Assistent ist für dieses Konto noch nicht aktiviert.",
   "Couldn't work out an answer to that. Try asking it another way.": "Dazu konnte keine Antwort gefunden werden. Formulieren Sie die Frage anders.",
   "Couldn't reach the assistant just now. Try again in a moment.": "Der Assistent ist gerade nicht erreichbar. Versuchen Sie es gleich noch einmal.",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "Das Guthaben des KI-Dienstes für den Assistenten ist aufgebraucht, daher kann er gerade nicht antworten. Alles andere in RoveHQ funktioniert wie gewohnt."
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "Das Guthaben des KI-Dienstes für den Assistenten ist aufgebraucht, daher kann er gerade nicht antworten. Alles andere in RoveHQ funktioniert wie gewohnt.",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "Ich habe das an das RoveHQ-Team weitergegeben. Jemand antwortet Ihnen hier, meist innerhalb weniger Stunden. Sie können den Chat schließen und später wiederkommen.",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "Das sieht nicht wie ein Mietvertrag aus. Laden Sie den Vertrag selbst hoch."
 }

@@ -146,7 +146,7 @@ async function handOver(admin: any, thread: any, who: ChatWho) {
       .eq("id", thread.id);
     thread.mode = "human";
     await addMessage(admin, thread, who, {
-      body: await said("I've passed this to the RoveHQ team. A person will reply here in this chat, usually within a few hours. You can close this and come back: the reply will be waiting."),
+      body: await said("I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back."),
       fromAssistant: true,
       meta: { handoff: true }
     });

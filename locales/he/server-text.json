@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "העוזר עדיין לא מופעל בחשבון הזה.",
   "Couldn't work out an answer to that. Try asking it another way.": "לא הצלחנו למצוא תשובה לזה. נסו לנסח את השאלה אחרת.",
   "Couldn't reach the assistant just now. Try again in a moment.": "לא ניתן להתחבר לעוזר כרגע. נסו שוב בעוד רגע.",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "לשירות ה‑AI של העוזר נגמר הקרדיט, ולכן הוא לא יכול לענות כרגע. כל שאר הדברים ב‑RoveHQ עובדים כרגיל."
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "לשירות ה‑AI של העוזר נגמר הקרדיט, ולכן הוא לא יכול לענות כרגע. כל שאר הדברים ב‑RoveHQ עובדים כרגיל.",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "העברתי את זה לצוות RoveHQ. נציג יענה כאן, בדרך כלל תוך כמה שעות. אפשר לסגור ולחזור מאוחר יותר.",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "זה לא נראה כמו הסכם השכרה. העלו את החוזה עצמו."
 }

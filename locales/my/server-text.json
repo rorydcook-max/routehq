@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "ဤအကောင့်အတွက် အကူအညီပေးသူကို မဖွင့်ရသေးပါ။",
   "Couldn't work out an answer to that. Try asking it another way.": "အဲဒါကို အဖြေရှာမရပါ။ တစ်မျိုးပြောင်းမေးကြည့်ပါ။",
   "Couldn't reach the assistant just now. Try again in a moment.": "အကူအညီပေးသူကို ယခု ဆက်သွယ်မရပါ။ ခဏနေ ထပ်ကြိုးစားပါ။",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "အကူအညီပေးသူ၏ AI ဝန်ဆောင်မှု ခရက်ဒစ်ကုန်သွားသဖြင့် ယခု အဖြေမပေးနိုင်ပါ။ RoveHQ ရှိ အခြားအရာအားလုံး ပုံမှန်အတိုင်း အလုပ်လုပ်ပါသည်။"
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "အကူအညီပေးသူ၏ AI ဝန်ဆောင်မှု ခရက်ဒစ်ကုန်သွားသဖြင့် ယခု အဖြေမပေးနိုင်ပါ။ RoveHQ ရှိ အခြားအရာအားလုံး ပုံမှန်အတိုင်း အလုပ်လုပ်ပါသည်။",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "RoveHQ အဖွဲ့ထံ လွှဲပြောင်းပေးလိုက်ပါပြီ။ ပုံမှန်အားဖြင့် နာရီအနည်းငယ်အတွင်း လူတစ်ဦးက ဤနေရာတွင် ပြန်ဖြေပါမည်။ ပိတ်ထားပြီး နောက်မှ ပြန်လာနိုင်ပါသည်။",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "၎င်းသည် ငှားရမ်းမှုစာချုပ်နှင့် မတူပါ။ စာချုပ်ကိုယ်တိုင်ကို တင်ပါ။"
 }

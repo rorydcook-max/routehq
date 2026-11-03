@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "ຜູ້ຊ່ວຍຍັງບໍ່ໄດ້ເປີດໃຊ້ສຳລັບບັນຊີນີ້.",
   "Couldn't work out an answer to that. Try asking it another way.": "ບໍ່ສາມາດຊອກຄຳຕອບໃຫ້ໄດ້. ລອງຖາມແບບອື່ນ.",
   "Couldn't reach the assistant just now. Try again in a moment.": "ບໍ່ສາມາດຕິດຕໍ່ຜູ້ຊ່ວຍໄດ້ໃນຕອນນີ້. ລອງໃໝ່ອີກຄັ້ງໃນອີກບໍ່ດົນ.",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "ບໍລິການ AI ຂອງຜູ້ຊ່ວຍໝົດເຄຣດິດແລ້ວ, ຈຶ່ງບໍ່ສາມາດຕອບໄດ້ໃນຕອນນີ້. ທຸກຢ່າງອື່ນໃນ RoveHQ ຍັງໃຊ້ງານໄດ້ປົກກະຕິ."
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "ບໍລິການ AI ຂອງຜູ້ຊ່ວຍໝົດເຄຣດິດແລ້ວ, ຈຶ່ງບໍ່ສາມາດຕອບໄດ້ໃນຕອນນີ້. ທຸກຢ່າງອື່ນໃນ RoveHQ ຍັງໃຊ້ງານໄດ້ປົກກະຕິ.",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "ຂ້ອຍສົ່ງຕໍ່ໃຫ້ທີມ RoveHQ ແລ້ວ. ຈະມີຄົນຕອບຢູ່ທີ່ນີ້ ໂດຍປົກກະຕິພາຍໃນສອງສາມຊົ່ວໂມງ. ທ່ານປິດແລ້ວກັບມາໃໝ່ໄດ້.",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "ນັ້ນບໍ່ຄືກັບສັນຍາເຊົ່າ. ກະລຸນາອັບໂຫຼດສັນຍາຕົວຈິງ."
 }

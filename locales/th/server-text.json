@@ -298,5 +298,7 @@
   "The assistant isn't switched on for this account yet.": "ยังไม่ได้เปิดใช้ผู้ช่วยสำหรับบัญชีนี้",
   "Couldn't work out an answer to that. Try asking it another way.": "หาคำตอบให้ไม่ได้ ลองถามด้วยวิธีอื่น",
   "Couldn't reach the assistant just now. Try again in a moment.": "ติดต่อผู้ช่วยไม่ได้ในขณะนี้ ลองอีกครั้งสักครู่",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "บริการ AI ของผู้ช่วยเครดิตหมด จึงตอบไม่ได้ในตอนนี้ ส่วนอื่นๆ ของ RoveHQ ใช้งานได้ตามปกติ"
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "บริการ AI ของผู้ช่วยเครดิตหมด จึงตอบไม่ได้ในตอนนี้ ส่วนอื่นๆ ของ RoveHQ ใช้งานได้ตามปกติ",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "ส่งต่อให้ทีม RoveHQ แล้ว จะมีคนมาตอบที่นี่ โดยปกติภายในไม่กี่ชั่วโมง คุณปิดหน้าต่างนี้แล้วกลับมาดูทีหลังได้",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "ไฟล์นี้ดูไม่เหมือนสัญญาเช่า กรุณาอัปโหลดตัวสัญญาเอง"
 }

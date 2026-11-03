@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "このアカウントではアシスタントがまだ有効になっていません。",
   "Couldn't work out an answer to that. Try asking it another way.": "回答を見つけられませんでした。別の言い方で質問してみてください。",
   "Couldn't reach the assistant just now. Try again in a moment.": "現在アシスタントに接続できません。しばらくしてからもう一度お試しください。",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "アシスタントの AI サービスのクレジットが不足しているため、現在は回答できません。RoveHQ のその他の機能は通常どおりご利用いただけます。"
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "アシスタントの AI サービスのクレジットが不足しているため、現在は回答できません。RoveHQ のその他の機能は通常どおりご利用いただけます。",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "RoveHQチームに引き継ぎました。担当者がこちらで返信します（通常は数時間以内）。閉じて後で戻ってきても大丈夫です。",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "これはレンタル契約書ではないようです。契約書そのものをアップロードしてください。"
 }

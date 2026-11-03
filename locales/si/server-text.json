@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "මේ ගිණුම සඳහා සහායක තවම සක්‍රිය කර නැහැ.",
   "Couldn't work out an answer to that. Try asking it another way.": "ඒකට පිළිතුරක් හොයාගන්න බැරි වුණා. වෙනත් විදියකට අහලා බලන්න.",
   "Couldn't reach the assistant just now. Try again in a moment.": "දැන් සහායක සම්බන්ධ කරගන්න බැරි වුණා. ටික වෙලාවකින් නැවත උත්සාහ කරන්න.",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "සහායකයේ AI සේවාවේ ක්‍රෙඩිට් ඉවර වී ඇති නිසා දැන් පිළිතුරු දෙන්න බැහැ. RoveHQ හි අනිත් සියල්ල සාමාන්‍ය පරිදි ක්‍රියා කරයි."
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "සහායකයේ AI සේවාවේ ක්‍රෙඩිට් ඉවර වී ඇති නිසා දැන් පිළිතුරු දෙන්න බැහැ. RoveHQ හි අනිත් සියල්ල සාමාන්‍ය පරිදි ක්‍රියා කරයි.",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "මෙය RoveHQ කණ්ඩායමට යොමු කළා. සාමාන්‍යයෙන් පැය කිහිපයක් ඇතුළත කෙනෙකු මෙහි පිළිතුරු දෙනු ඇත. ඔබට මෙය වසා පසුව නැවත පැමිණිය හැකිය.",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "එය කුලී ගිවිසුමක් ලෙස නොපෙනේ. ගිවිසුමම උඩුගත කරන්න."
 }

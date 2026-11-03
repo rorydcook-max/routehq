@@ -1,13 +1,14 @@
 "use client";
 
+import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Hand, X } from "lucide-react";
-import { assign, setPriority, setStatus, setTags, takeOver } from "@/app/actions/helpdesk";
+import { assign, markUnread, setPriority, setStatus, setTags, takeOver } from "@/app/actions/helpdesk";
 
 type Result = { ok: true } | { ok: false; error: string };
 
-/** Runs a helpdesk action, shows its error if it had one, and reloads the page's data when it worked. */
+/** Runs a helpdesk action, shows its error if it had one, and reloads the page's data either way (someone else may have changed it). */
 function useAct() {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -17,7 +18,7 @@ function useAct() {
       setError(null);
       const result = await run().catch(() => ({ ok: false as const, error: "That didn't work. Please try again." }));
       if (!result.ok) setError(result.error);
-      else router.refresh();
+      router.refresh();
     });
   return { pending, error, act };
 }
@@ -58,6 +59,7 @@ const chip = (active: boolean) =>
 export function ConversationControls({
   threadId,
   meId,
+  mode,
   status,
   priority,
   tags,
@@ -66,12 +68,14 @@ export function ConversationControls({
 }: {
   threadId: string;
   meId: string;
+  mode: "ai" | "human";
   status: "open" | "answered" | "closed";
   priority: "normal" | "high";
   tags: string[];
   assignedTo: string | null;
   assigneeName: string | null;
 }) {
+  const router = useRouter();
   const { pending, error, act } = useAct();
   const [tagList, setTagList] = useState(tags);
   const [draft, setDraft] = useState("");
@@ -144,6 +148,23 @@ export function ConversationControls({
               </button>
             </>
           )}
+          {mode === "human" && status !== "closed" ? (
+            // Back to the queue with the dot on: staying here would mark it read again on the next refresh.
+            <button
+              className={chip(false)}
+              disabled={pending}
+              onClick={() =>
+                act(async () => {
+                  const result = await markUnread(threadId);
+                  if (result.ok) router.push("/platform/support" as Route);
+                  return result;
+                })
+              }
+              type="button"
+            >
+              Mark unread
+            </button>
+          ) : null}
         </div>
       </div>
 

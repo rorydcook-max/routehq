@@ -4485,7 +4485,8 @@
     "season_monthlyTip": "Vanligvis av: langtidskunder beholder én pris.",
     "extra_bodyTip": "Tilbys i bookingskjemaet og på bookingsiden, legges til første betaling og står i avtalen.",
     "b_brandTip": "Bookinglenker, signeringssiden, bookingsiden deres, kvitteringer og avtaler.",
-    "pn_bodyTip": "Bare bedrifter i nettverket ser hverandre."
+    "pn_bodyTip": "Bare bedrifter i nettverket ser hverandre.",
+    "ag_subtitleOwn": "Nye bestillinger bruker din egen avtale. Alt du legger til nedenfor havner til slutt i den."
   },
   "accountPage": {
     "roleOwner": "Eier",
@@ -5387,7 +5388,7 @@
   },
   "help": {
     "title": "Hjelp",
-    "subtitle": "Spør RoveHQ-teamet om hva som helst, eller send oss filene dine.",
+    "subtitle": "Veiledninger, direktechat, eller skriv til oss.",
     "newTitle": "Skriv til oss",
     "aboutLabel": "Hva gjelder det?",
     "topic_question": "Et spørsmål",
@@ -5491,9 +5492,10 @@
     "assistantTitle": "Spør assistenten",
     "assistantBody": "Skriv et spørsmål om bruk av RoveHQ og få svaret fra veiledningene, med trinnene du skal følge. Det den ikke kan svare på, kan du sende rett til oss.",
     "liveTitle": "Live-chat",
-    "liveBody": "Spør om hva som helst, send bilder eller filer, eller snakk med noen fra RoveHQ-teamet. Svarene kommer i chatten.",
+    "liveBody": "Spør om hva som helst, send filer, eller snakk med en person fra RoveHQ-teamet.",
     "liveButton": "Åpne live-chat",
-    "fromAssistant": "RoveHQ-assistent"
+    "fromAssistant": "RoveHQ-assistent",
+    "contentSubtitle": "Artikler, vanlige spørsmål, videoer og ressurser folk har bedt assistenten om, eller som den ikke kunne svare på. Ingenting publiseres før du godkjenner det."
   },
   "inspectStart": {
     "titleOut": "Lever ut et kjøretøy",
@@ -6443,7 +6445,7 @@
   },
   "contractImport": {
     "title": "Bruk din egen avtale",
-    "body": "Har du allerede en kontrakt du liker? Last den opp som PDF, Word-fil eller bilder. Vi beholder ordlyden din og gjør den om til en kopi kundene signerer på mobilen, som RoveHQ-avtalen.",
+    "body": "Last opp kontrakten du allerede bruker, som PDF, Word-fil eller bilder. Ordlyden din beholdes, og kundene signerer den på telefonen som RoveHQ-avtalen.",
     "activeBody": "Nye bestillinger bruker din egen avtale, «{title}». Avtaler som allerede er signert, forblir som de var.",
     "yourAgreement": "avtalen din",
     "review": "Se over eller rediger",
@@ -6462,7 +6464,7 @@
     "upload": "Last opp og les",
     "backLabel": "Leieavtale",
     "reviewTitle": "Se over avtalen din",
-    "reviewSubtitle": "Originalen til venstre, kopien som skal signeres til høyre med en eksempelbestilling. Rett det som ble lest feil, og ta den i bruk.",
+    "reviewSubtitle": "Originalen din ved siden av den signerbare kopien, fylt ut med en eksempelbestilling. Rett opp det som ble lest feil, og ta den i bruk.",
     "statusActive": "I bruk for nye bestillinger",
     "statusDraft": "Ikke i bruk ennå",
     "signedNeverChange": "Avtaler som allerede er signert, endres aldri.",
@@ -6545,7 +6547,8 @@
     "v_owner_email": "Firmaets e-post",
     "v_home_territory": "Hvor kjøretøyet kan brukes",
     "v_jurisdiction": "Gjeldende lov",
-    "v_contract_date": "Avtaledato"
+    "v_contract_date": "Avtaledato",
+    "v_vehicle_make_model": "Kjøretøyets merke og modell"
   },
   "chat": {
     "launcher": "Chat med RoveHQ",
@@ -6577,10 +6580,10 @@
     "sendFailed": "Kunne ikke sende. Prøv igjen.",
     "footer": "Svarene skrives av AI. Trykk på Snakk med et menneske for å nå RoveHQ-teamet.",
     "humanNote": "Noen fra RoveHQ-teamet svarer her. Du kan lukke dette og komme tilbake: svaret venter på deg.",
-    "emailPrompt": "Svaret vårt dukker opp her. Legg igjen e-posten din hvis du vil at vi skal vite hvem du er (valgfritt).",
+    "emailPrompt": "E-posten din, så vi kan si fra når vi har svart (valgfritt)",
     "emailPlaceholder": "you@example.com",
     "emailSave": "Lagre",
-    "emailSaved": "Takk. Kom tilbake til denne chatten for å se svaret vårt.",
+    "emailSaved": "Lagret. Kom tilbake hit for svaret vårt.",
     "confirm": "Bekreft",
     "cancel": "Avbryt",
     "saving": "Lagrer …",

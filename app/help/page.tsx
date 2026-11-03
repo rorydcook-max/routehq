@@ -97,7 +97,7 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
                   <Link className="flex items-center gap-3 py-3" href={`/help/${thread.id}` as Route}>
                     {thread.unread ? <span aria-label={t("newReply")} className="h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--primary)]" /> : null}
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[16px] font-bold text-[var(--foreground)]">{thread.subject}</span>
+                      <span className="line-clamp-2 text-[16px] font-bold text-[var(--foreground)]">{thread.subject}</span>
                       <span className="block font-medium text-[var(--muted)]">
                         {t(`topic_${thread.topic}`)} · {date(thread.lastMessageAt)}, {time(thread.lastMessageAt)}
                       </span>

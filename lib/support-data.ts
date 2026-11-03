@@ -50,21 +50,6 @@ export async function listBusinessThreads(supabase: any, organizationId: string)
   return ((data || []) as any[]).map((thread) => row(thread, "business"));
 }
 
-/** Every business's conversations, for the RoveHQ team. */
-export async function listTeamThreads(filter: "waiting" | "all"): Promise<SupportThreadRow[]> {
-  const admin = createSupabaseAdminClient() as any;
-  let query = admin
-    .from("support_threads")
-    .select("id, organization_id, topic, subject, status, last_message_at, unread_by_business, unread_by_team, organizations(name)")
-    .order("last_message_at", { ascending: false })
-    .limit(200);
-  // Conversations the assistant is still handling (mode 'ai') are not the team's yet.
-  query = query.eq("mode", "human");
-  if (filter === "waiting") query = query.eq("status", "open");
-  const { data } = await query;
-  return ((data || []) as any[]).map((thread) => row(thread, "team"));
-}
-
 export async function countUnreadForBusiness(supabase: any, organizationId: string) {
   const { count } = await supabase.from("support_threads").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).eq("unread_by_business", true);
   return count || 0;

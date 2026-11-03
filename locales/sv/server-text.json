@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "Assistenten är inte påslagen för det här kontot än.",
   "Couldn't work out an answer to that. Try asking it another way.": "Hittade inget svar på det. Försök att fråga på ett annat sätt.",
   "Couldn't reach the assistant just now. Try again in a moment.": "Kunde inte nå assistenten just nu. Försök igen om en stund.",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "Assistentens AI-tjänst har slut på kredit, så den kan inte svara just nu. Allt annat i RoveHQ fungerar som vanligt."
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "Assistentens AI-tjänst har slut på kredit, så den kan inte svara just nu. Allt annat i RoveHQ fungerar som vanligt.",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "Jag har skickat detta vidare till RoveHQ-teamet. En person svarar här, oftast inom några timmar. Du kan stänga och komma tillbaka senare.",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "Det ser inte ut som ett hyresavtal. Ladda upp själva avtalet."
 }

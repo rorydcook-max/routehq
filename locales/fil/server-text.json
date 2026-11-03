@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "Hindi pa naka-on ang assistant para sa account na ito.",
   "Couldn't work out an answer to that. Try asking it another way.": "Hindi makahanap ng sagot diyan. Subukang itanong sa ibang paraan.",
   "Couldn't reach the assistant just now. Try again in a moment.": "Hindi ma-reach ang assistant ngayon. Subukan ulit sa ilang sandali.",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "Wala nang credit ang AI service ng assistant, kaya hindi ito makasagot sa ngayon. Normal na gumagana ang lahat ng iba pa sa RoveHQ."
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "Wala nang credit ang AI service ng assistant, kaya hindi ito makasagot sa ngayon. Normal na gumagana ang lahat ng iba pa sa RoveHQ.",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "Ipinasa ko na ito sa RoveHQ team. May taong sasagot dito, karaniwang sa loob ng ilang oras. Puwede mo itong isara at bumalik mamaya.",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "Mukhang hindi iyan kasunduan sa pag-upa. I-upload ang mismong kontrata."
 }

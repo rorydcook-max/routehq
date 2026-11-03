@@ -5,8 +5,9 @@
  * Two kinds of chip:
  * - "ask": sends its prompt as a message. `route` tells the server which assistant should answer it ("records" is
  *   the owner-only assistant that reads the business's figures; "support" answers from the help centre).
- * - "action": a file flow (pick a receipt, vehicle photos, a contract, a spreadsheet, damage photos) or "Talk to a
- *   person". Picking a file chip opens the file picker and tells the server what the files are, so no guessing.
+ * - "action": a file flow (pick a receipt, vehicle photos, a contract, a spreadsheet, damage photos). Picking one
+ *   opens the file picker and tells the server what the files are, so no guessing. ("handoff" is only sent by
+ *   openChat() from elsewhere in the app; the panel's header has its own Talk to a person button.)
  *
  * `label` is a key in the "chat" namespace of the locale files (English text in keys-chat.json until merged).
  */
@@ -36,7 +37,8 @@ export function chatSuggestions(pathname: string, options: { site: boolean; owne
 }
 
 function pick(path: string, site: boolean): ChatChip[] {
-  if (site) return [ask("sCost"), ask("sImportSheet"), ask("sCustomersSign"), act("talkToPerson", "handoff")];
+  // No "Talk to a person" chip anywhere: the panel's header has that button already.
+  if (site) return [ask("sCost"), ask("sImportSheet"), ask("sCustomersSign")];
 
   if (path === "/" || path === "/tasks") return [ask("sOwesMe", "records"), ask("sDueWeek", "records"), ...HOW_TO.slice(0, 2)];
   if (path === "/fleet") return [act("sVehiclePhotos", "vehicle"), act("sRenewPolicy", "vehicle"), act("sImportSpreadsheet", "spreadsheet", true), ask("sAddVehicleHow")];
@@ -46,7 +48,7 @@ function pick(path: string, site: boolean): ChatChip[] {
   if (path.startsWith("/transactions")) return [act("sRecordReceipt", "receipt"), ask("sOwesMe", "records"), ask("sRecordCostHow")];
   if (path.startsWith("/settings/contracts")) return [act("sUploadContract", "contract", true), ask("sContractHow")];
   if (path.startsWith("/settings")) return [ask("sAddTeammate"), ask("sOnlineBooking"), ask("sContractHow"), ask("sBrandHow")];
-  if (path.startsWith("/help")) return [act("talkToPerson", "handoff"), ...HOW_TO];
+  if (path.startsWith("/help")) return [...HOW_TO, ask("sAddVehicleHow")];
   if (path.startsWith("/customers")) return [ask("sAddCustomerHow"), ask("sOwesMe", "records")];
   if (path.startsWith("/inbox")) return [ask("sConnectWhatsApp"), ask("sConnectLine")];
   if (path.startsWith("/reports")) return [ask("sLeastMoney", "records"), ask("sNextSixMonths", "records")];

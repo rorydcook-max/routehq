@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import type { PreparedUploads, UploadRequest } from "@/lib/direct-uploads";
-import { countsFor, isQueueView, listQueueRows, loadConversationData, uploadFolderFor, verifyUploadedFiles, type HelpdeskCounts, type QueueRow } from "@/lib/helpdesk";
+import { countsFor, isQueueView, listQueueRows, uploadFolderFor, verifyUploadedFiles, type HelpdeskCounts, type QueueRow } from "@/lib/helpdesk";
 import { notifyOperator } from "@/lib/notify-operator";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -58,20 +58,6 @@ export async function listQueue(filters: { view?: string; search?: string }): Pr
   const view = isQueueView(filters?.view) ? filters.view : "waiting";
   const [rows, counts] = await Promise.all([listQueueRows(view, String(filters?.search || ""), me.userId), countsFor(me.userId)]);
   return { ok: true, rows, counts };
-}
-
-/** The numbers on the tabs and the nav. */
-export async function helpdeskCounts(): Promise<Result<{ counts: HelpdeskCounts }>> {
-  const me = await teamMember();
-  if (!me) return { ok: false, error: NOT_ALLOWED };
-  return { ok: true, counts: await countsFor(me.userId) };
-}
-
-/** One conversation with every message. Opening it marks it read for the team. */
-export async function loadConversation(id: string) {
-  const me = await teamMember();
-  if (!me) return null;
-  return loadConversationData(id);
 }
 
 /** Signed upload links for files the team sends: straight from the browser to storage, in the conversation's folder. */
@@ -137,7 +123,8 @@ export async function teamReply(formData: FormData): Promise<Result> {
   if (thread.mode === "ai") Object.assign(update, { mode: "human", handed_off_at: thread.handed_off_at || now });
   // Whoever answers an unclaimed conversation owns it, so two people don't both pick it up.
   if (!thread.assigned_to) update.assigned_to = me.userId;
-  await admin.from("support_threads").update(update).eq("id", thread.id);
+  const { error: threadError } = await admin.from("support_threads").update(update).eq("id", thread.id);
+  if (threadError) return { ok: false, error: `Sent, but the conversation couldn't be updated: ${threadError.message}` };
   if (thread.organization_id) await notifyOperator(thread.organization_id, `💬 RoveHQ replied: ${firstLine(body) || thread.subject}`, "support_reply", `/help/${thread.id}`);
   refresh(thread.id);
   return { ok: true };
@@ -154,8 +141,13 @@ export async function assign(id: string, userId: string | null): Promise<Result>
     const { data } = await admin.from("platform_admins").select("user_id").eq("user_id", userId).maybeSingle();
     if (!data) return { ok: false, error: "Only someone on the RoveHQ team can be assigned." };
   }
-  await admin.from("support_threads").update({ assigned_to: userId || null }).eq("id", thread.id);
+  // Only change it from the state the page showed: two people pressing "Assign to me" at once can't both win.
+  let update = admin.from("support_threads").update({ assigned_to: userId || null }).eq("id", thread.id);
+  update = thread.assigned_to ? update.eq("assigned_to", thread.assigned_to) : update.is("assigned_to", null);
+  const { data, error } = await update.select("id");
+  if (error) return { ok: false, error: error.message };
   refresh(thread.id);
+  if (!data?.length) return { ok: false, error: "Someone else just picked this up. The page has been refreshed." };
   return { ok: true };
 }
 
@@ -163,7 +155,19 @@ export async function setPriority(id: string, priority: "normal" | "high"): Prom
   const me = await teamMember();
   if (!me) return { ok: false, error: NOT_ALLOWED };
   const admin = createSupabaseAdminClient() as any;
-  await admin.from("support_threads").update({ priority: priority === "high" ? "high" : "normal" }).eq("id", String(id || ""));
+  const { error } = await admin.from("support_threads").update({ priority: priority === "high" ? "high" : "normal" }).eq("id", String(id || ""));
+  if (error) return { ok: false, error: error.message };
+  refresh(id);
+  return { ok: true };
+}
+
+/** Puts the dot back on a conversation (to come back to it later). Only "human" conversations are ever unread. */
+export async function markUnread(id: string): Promise<Result> {
+  const me = await teamMember();
+  if (!me) return { ok: false, error: NOT_ALLOWED };
+  const admin = createSupabaseAdminClient() as any;
+  const { error } = await admin.from("support_threads").update({ unread_by_team: true }).eq("id", String(id || "")).eq("mode", "human");
+  if (error) return { ok: false, error: error.message };
   refresh(id);
   return { ok: true };
 }
@@ -186,7 +190,10 @@ export async function setStatus(id: string, status: "open" | "answered" | "close
   if (!me) return { ok: false, error: NOT_ALLOWED };
   const next = status === "closed" ? "closed" : status === "answered" ? "answered" : "open";
   const admin = createSupabaseAdminClient() as any;
-  await admin.from("support_threads").update({ status: next }).eq("id", String(id || ""));
+  // Closing means "dealt with": the unread dot goes too, or the nav badge would keep counting it.
+  const update: Record<string, unknown> = next === "closed" ? { status: next, unread_by_team: false } : { status: next };
+  const { error } = await admin.from("support_threads").update(update).eq("id", String(id || ""));
+  if (error) return { ok: false, error: error.message };
   refresh(id);
   return { ok: true };
 }

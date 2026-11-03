@@ -126,16 +126,19 @@ export async function countsFor(meId: string): Promise<HelpdeskCounts> {
     head().eq("mode", "human").eq("status", "open"),
     head().eq("assigned_to", meId).neq("status", "closed"),
     head().eq("mode", "human").neq("status", "closed").is("assigned_to", null),
-    head().eq("mode", "human").eq("unread_by_team", true),
+    head().eq("mode", "human").eq("unread_by_team", true).neq("status", "closed"),
     head().eq("mode", "ai").gte("last_message_at", new Date(Date.now() - 7 * 86_400_000).toISOString())
   ]);
   return { waiting: waiting.count || 0, mine: mine.count || 0, unassigned: unassigned.count || 0, unread: unread.count || 0, ai: ai.count || 0 };
 }
 
-/** Conversations with the team that have something new from the customer: the number on the admin nav's Support tab. */
+/**
+ * Conversations with the team that have something new from the customer: the number on the admin nav's Support tab.
+ * Closed ones don't count: a plan request the business closed itself shouldn't keep the badge lit.
+ */
 export async function countUnreadForTeam() {
   const admin = createSupabaseAdminClient() as any;
-  const { count } = await admin.from("support_threads").select("id", { count: "exact", head: true }).eq("mode", "human").eq("unread_by_team", true);
+  const { count } = await admin.from("support_threads").select("id", { count: "exact", head: true }).eq("mode", "human").eq("unread_by_team", true).neq("status", "closed");
   return count || 0;
 }
 
@@ -223,8 +226,6 @@ export async function loadConversationData(threadId: string) {
     previous
   };
 }
-
-export type ConversationData = NonNullable<Awaited<ReturnType<typeof loadConversationData>>>;
 
 /** Who the business is: plan, size, owner and any plan request waiting for payment, for the side panel. */
 export async function loadBusinessContext(organizationId: string) {

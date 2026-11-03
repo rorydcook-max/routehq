@@ -10,6 +10,15 @@ import { QUEUE_VIEWS, QUEUE_VIEW_LABEL, QUEUE_VIEW_NOTE, STATUS_LABEL, waitingLa
 const POLL_MS = 15_000;
 const BANGKOK = "Asia/Bangkok";
 
+const EMPTY: Record<QueueView, string> = {
+  waiting: "Nobody is waiting. Nice.",
+  mine: "Nothing assigned to you.",
+  unassigned: "Everything open has an owner.",
+  answered: "Nothing waiting on a customer.",
+  closed: "Nothing closed yet.",
+  ai: "The assistant hasn't had a chat in the last 7 days."
+};
+
 function when(iso: string) {
   return new Intl.DateTimeFormat("en-GB", { timeZone: BANGKOK, day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
@@ -67,6 +76,7 @@ export function HelpdeskInbox({ view, search, initialRows, initialCounts }: { vi
               className={`pressable inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-[14px] font-bold ${key === view ? "bg-[var(--foreground)] text-white" : "bg-white text-[var(--foreground-secondary)] shadow-[0_0_0_1px_var(--border)] hover:text-[var(--foreground)]"}`}
               href={hrefFor(key, search) as Route}
               key={key}
+              title={QUEUE_VIEW_NOTE[key]}
             >
               {QUEUE_VIEW_LABEL[key]}
               {tabCount[key] ? <span className={`num rounded-full px-1.5 text-[12px] ${key === view ? "bg-white/20" : "bg-[var(--panel-secondary)]"}`}>{tabCount[key]}</span> : null}
@@ -86,18 +96,15 @@ export function HelpdeskInbox({ view, search, initialRows, initialCounts }: { vi
           </button>
         </form>
       </div>
-      <p className="text-[14px] font-medium text-[var(--foreground-secondary)]">
-        {QUEUE_VIEW_NOTE[view]}
-        {search ? (
-          <>
-            {" "}
-            Showing matches for &ldquo;{search}&rdquo;.{" "}
-            <Link className="font-bold text-[var(--primary)] hover:underline" href={hrefFor(view, "") as Route}>
-              Clear
-            </Link>
-          </>
-        ) : null}
-      </p>
+      {/* What each tab means is on the tab itself (hover); only an active search needs a line here. */}
+      {search ? (
+        <p className="text-[14px] font-medium text-[var(--foreground-secondary)]">
+          Matches for &ldquo;{search}&rdquo;.{" "}
+          <Link className="font-bold text-[var(--primary)] hover:underline" href={hrefFor(view, "") as Route}>
+            Clear
+          </Link>
+        </p>
+      ) : null}
 
       <section className="card overflow-hidden p-0">
         {/* Column headings on wide screens; on a phone each conversation is a stacked card. */}
@@ -109,7 +116,7 @@ export function HelpdeskInbox({ view, search, initialRows, initialCounts }: { vi
           <span>Assignee</span>
         </div>
         {rows.length === 0 ? (
-          <p className="p-5 font-medium text-[var(--muted)]">{search ? "Nothing matches that search." : view === "waiting" ? "Nobody is waiting. Nice." : "Nothing here."}</p>
+          <p className="p-5 font-medium text-[var(--muted)]">{search ? "Nothing matches that search." : EMPTY[view]}</p>
         ) : (
           <ul className="divide-y divide-[var(--border)]">
             {rows.map((row) => {

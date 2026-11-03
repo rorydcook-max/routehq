@@ -27,6 +27,7 @@ export const IMPORT_VARIABLES = [
   { key: "renter_phone", label: "Renter's phone" },
   { key: "renter_email", label: "Renter's email" },
   { key: "renter_address", label: "Renter's address" },
+  { key: "vehicle_make_model", label: "Vehicle make and model" },
   { key: "vehicle_make", label: "Vehicle make" },
   { key: "vehicle_model", label: "Vehicle model" },
   { key: "vehicle_year", label: "Vehicle year" },
@@ -129,7 +130,10 @@ export function clauseHtml(text: string, fields: ImportedField[]) {
     .replace(/\[\[\s*([A-Za-z0-9_-]{1,12})\s*\]\]/g, (_match, id: string) => {
       const field = byId.get(id);
       if (!field) return BLANK;
-      if (isImportVariable(field.variable)) return `<strong>{{${field.variable}}}</strong>`;
+      // Owners' contracts usually ask for "make/model" as one blank; the engine knows them as two.
+      if (field.variable === "vehicle_make_model") return "<strong>{{vehicle_make}} {{vehicle_model}}</strong>";
+      // A detail the booking doesn't have yet (a return time, say) stays a visible blank, not a hole in the sentence.
+      if (isImportVariable(field.variable)) return `<strong>{{#if ${field.variable}}}{{${field.variable}}}{{else}}${BLANK}{{/if}}</strong>`;
       if (field.variable.startsWith("custom:")) return `<span class="fill-line">${BLANK}</span>`;
       // Removed by the owner: what the original said there goes back in.
       return escapeHtml(field.placeholder_text_in_original);
@@ -219,13 +223,15 @@ function signatureBlock(thai: boolean) {
  */
 export function buildUploadedTemplateHtml(doc: ImportedAgreement, options: { styleCss: string; includeDetails: boolean }) {
   const thai = doc.languages.includes("th");
+  // Only headed sections are numbered: an opening paragraph before the first heading reads as a preamble.
+  let numbered = 0;
   const sections = doc.sections
-    .map((section, sectionIndex) => {
-      const number = sectionIndex + 1;
+    .map((section) => {
       const heading = [section.heading, section.heading_secondary].filter((part) => part && part.trim()).map(escapeHtml).join(" / ");
+      const number = heading ? ++numbered : 0;
       const clauses = section.clauses
         .map((clause, clauseIndex) => {
-          const num = `<span class="clause-num">${number}.${clauseIndex + 1}</span> `;
+          const num = number ? `<span class="clause-num">${number}.${clauseIndex + 1}</span> ` : "";
           const secondary = clause.text_secondary?.trim()
             ? `\n          <div class="lang-th">${num}${clauseHtml(clause.text_secondary, doc.fields)}</div>`
             : "";
@@ -238,8 +244,8 @@ export function buildUploadedTemplateHtml(doc: ImportedAgreement, options: { sty
         })
         .join("");
       return `
-  <section class="section">
-    <div class="section-title">${number}. ${heading || "&nbsp;"}</div>
+  <section class="section">${number ? `
+    <div class="section-title">${number}. ${heading}</div>` : ""}
     <div class="section-body">${clauses}
     </div>
   </section>`;
@@ -310,11 +316,17 @@ export function styleOf(fullHtml: string) {
 /** Accepts what the model (or the review screen) sent and keeps only what fits the shape, within sensible sizes. */
 export function tidyImportedAgreement(raw: any): ImportedAgreement {
   const text = (value: unknown, max: number) => (typeof value === "string" ? value.replace(/\u0000/g, "").trim().slice(0, max) : "");
+  // Sections are renumbered when rendered, so "3. Deposit" or "ข้อ 3 เงินประกัน" would otherwise read "3. 3. Deposit".
+  const heading = (value: unknown) =>
+    text(value, 200)
+      .replace(/^(?:section|clause|ข้อ(?:ที่)?)\s*\d+(?:\.\d+)*\s*[.):]?\s*/i, "")
+      // A bare number needs its full stop or bracket, so "24 hour support" is left alone.
+      .replace(/^\d+(?:\.\d+)*\s*[.):]\s*/, "");
   const sections: ImportedSection[] = (Array.isArray(raw?.sections) ? raw.sections : [])
     .slice(0, 60)
     .map((section: any) => ({
-      heading: text(section?.heading, 200),
-      heading_secondary: text(section?.heading_secondary, 200) || undefined,
+      heading: heading(section?.heading),
+      heading_secondary: heading(section?.heading_secondary) || undefined,
       clauses: (Array.isArray(section?.clauses) ? section.clauses : [])
         .slice(0, 80)
         .map((clause: any) => (typeof clause === "string" ? { text: text(clause, 6000) } : { text: text(clause?.text, 6000), text_secondary: text(clause?.text_secondary, 6000) || undefined }))

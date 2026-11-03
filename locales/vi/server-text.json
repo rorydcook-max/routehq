@@ -177,5 +177,7 @@
   "The assistant isn't switched on for this account yet.": "Trợ lý chưa được bật cho tài khoản này.",
   "Couldn't work out an answer to that. Try asking it another way.": "Không tìm được câu trả lời cho câu hỏi đó. Hãy thử hỏi theo cách khác.",
   "Couldn't reach the assistant just now. Try again in a moment.": "Hiện không kết nối được với trợ lý. Vui lòng thử lại sau ít phút.",
-  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "Dịch vụ AI của trợ lý đã hết tín dụng nên hiện không thể trả lời. Mọi tính năng khác trong RoveHQ vẫn hoạt động bình thường."
+  "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal.": "Dịch vụ AI của trợ lý đã hết tín dụng nên hiện không thể trả lời. Mọi tính năng khác trong RoveHQ vẫn hoạt động bình thường.",
+  "I've passed this to the RoveHQ team. A person will reply here, usually within a few hours. You can close this and come back.": "Tôi đã chuyển việc này cho đội ngũ RoveHQ. Sẽ có người trả lời tại đây, thường trong vài giờ. Bạn có thể đóng và quay lại sau.",
+  "That doesn't look like a rental agreement. Upload the contract itself.": "Tệp này không giống hợp đồng thuê xe. Hãy tải lên chính hợp đồng."
 }

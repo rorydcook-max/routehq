@@ -22,8 +22,8 @@ You pay by fleet size. Cars and motorbikes are counted separately (scooters, e-b
 | Plan | Fleet | Team accounts |
 |---|---|---|
 | **Free** | Up to 2 cars and 5 motorbikes | 1 |
-| **Starter** | Up to 8 cars and 20 motorbikes | 2 |
-| **Pro** | Up to 20 cars and 40 motorbikes | Unlimited |
+| **Starter** | Up to 5 cars and 10 motorbikes | 2 |
+| **Pro** | Up to 15 cars and 25 motorbikes | Unlimited |
 | **Business** | Any size; extra cars and motorbikes are charged each | Unlimited |
 
 Everything that runs a rental is in every plan, even Free. Bigger plans add more ID scans and purchase checks, accounting export (from Starter), more than one location and your logo in the app (from Pro), and your booking page on your own web address (Business). Prices are on the page in your currency. Switch to **Yearly** to get a month free.

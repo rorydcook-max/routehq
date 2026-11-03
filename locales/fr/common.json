@@ -4177,7 +4177,7 @@
     "ct_resetBody": "Remplace votre texte par le contrat standard en anglais et en thaï.",
     "ct_sample": "Rendu avec un client fictif",
     "ag_title": "Contrat de location",
-    "ag_subtitle": "RoveHQ rédige le contrat en anglais et en thaï. Ajoutez seulement ce qui est en plus.",
+    "ag_subtitle": "Prêt à l'emploi : le contrat RoveHQ en anglais et en thaï, rempli à partir de chaque réservation. Ajoutez simplement vos conditions et vos chiffres.",
     "ag_ownTitle": "Vos propres conditions",
     "ag_ownBody": "Une phrase simple par clause, dans n’importe quelle langue. Ajoutées à la fin, numérotées.",
     "ag_term": "Condition {number}",
@@ -6548,7 +6548,10 @@
     "v_home_territory": "Où le véhicule peut être utilisé",
     "v_jurisdiction": "Droit applicable",
     "v_contract_date": "Date du contrat",
-    "v_vehicle_make_model": "Marque et modèle du véhicule"
+    "v_vehicle_make_model": "Marque et modèle du véhicule",
+    "optionalTitle": "Vous préférez votre propre contrat ?",
+    "optionalBody": "Facultatif. Seulement si vous préférez garder votre contrat actuel : les clients signeront alors le vôtre au lieu du nôtre.",
+    "optionalOpen": "Importer mon propre contrat"
   },
   "chat": {
     "launcher": "Discuter avec RoveHQ",

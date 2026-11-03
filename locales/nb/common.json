@@ -4137,7 +4137,7 @@
     "ct_resetBody": "Erstatter ordlyden din med standardavtalen på engelsk og thai.",
     "ct_sample": "Slik ser den ut, med en oppdiktet kunde",
     "ag_title": "Leieavtale",
-    "ag_subtitle": "RoveHQ skriver avtalen på engelsk og thai. Legg bare til det som kommer i tillegg.",
+    "ag_subtitle": "Klar til bruk: RoveHQ-avtalen på engelsk og thai, fylt ut fra hver bestilling. Legg bare til dine egne vilkår og tall.",
     "ag_ownTitle": "Dine egne vilkår",
     "ag_ownBody": "Én enkel setning per punkt, på hvilket som helst språk. Legges til nummerert på slutten.",
     "ag_term": "Vilkår {number}",
@@ -6548,7 +6548,10 @@
     "v_home_territory": "Hvor kjøretøyet kan brukes",
     "v_jurisdiction": "Gjeldende lov",
     "v_contract_date": "Avtaledato",
-    "v_vehicle_make_model": "Kjøretøyets merke og modell"
+    "v_vehicle_make_model": "Kjøretøyets merke og modell",
+    "optionalTitle": "Vil du heller bruke din egen kontrakt?",
+    "optionalBody": "Valgfritt. Bare hvis du vil beholde avtalen du allerede bruker: da signerer kundene din i stedet for vår.",
+    "optionalOpen": "Last opp min egen kontrakt"
   },
   "chat": {
     "launcher": "Chat med RoveHQ",

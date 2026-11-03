@@ -4151,7 +4151,7 @@
     "ct_resetBody": "Ersetzt Ihren Wortlaut durch den Standardvertrag auf Englisch und Thai.",
     "ct_sample": "So liest es sich, mit einem erfundenen Kunden",
     "ag_title": "Mietvertrag",
-    "ag_subtitle": "RoveHQ schreibt den Vertrag auf Englisch und Thai. Fügen Sie nur hinzu, was extra ist.",
+    "ag_subtitle": "Sofort einsatzbereit: der RoveHQ-Vertrag auf Englisch und Thai, ausgefüllt aus jeder Buchung. Ergänzen Sie nur Ihre eigenen Bedingungen und Zahlen.",
     "ag_ownTitle": "Ihre eigenen Bedingungen",
     "ag_ownBody": "Je ein einfacher Satz, in jeder Sprache. Wird nummeriert am Ende angefügt.",
     "ag_term": "Bedingung {number}",
@@ -6482,7 +6482,10 @@
     "v_home_territory": "Wo das Fahrzeug genutzt werden darf",
     "v_jurisdiction": "Anwendbares Recht",
     "v_contract_date": "Vertragsdatum",
-    "v_vehicle_make_model": "Marke und Modell des Fahrzeugs"
+    "v_vehicle_make_model": "Marke und Modell des Fahrzeugs",
+    "optionalTitle": "Lieber Ihren eigenen Vertrag?",
+    "optionalBody": "Optional. Nur wenn Sie Ihren bisherigen Vertrag behalten möchten: Kunden unterschreiben dann Ihren statt unseren.",
+    "optionalOpen": "Eigenen Vertrag hochladen"
   },
   "chat": {
     "launcher": "Mit RoveHQ chatten",

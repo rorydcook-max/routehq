@@ -4111,7 +4111,7 @@
     "ct_resetBody": "Replaces your wording with the standard English and Thai agreement.",
     "ct_sample": "How it reads, with a made-up customer",
     "ag_title": "Rental agreement",
-    "ag_subtitle": "RoveHQ writes the agreement in English and Thai. Add only what's extra.",
+    "ag_subtitle": "Ready to use: RoveHQ's agreement in English and Thai, filled in from each booking. Just add your own terms and numbers.",
     "ag_subtitleOwn": "New bookings use your own agreement. Anything you add below goes at the end of it.",
     "ag_ownTitle": "Your own terms",
     "ag_ownBody": "One plain sentence each, in any language. Added at the end, numbered.",
@@ -6525,7 +6525,10 @@
     "v_owner_email": "Business email",
     "v_home_territory": "Where the vehicle can be used",
     "v_jurisdiction": "Governing law",
-    "v_contract_date": "Agreement date"
+    "v_contract_date": "Agreement date",
+    "optionalTitle": "Prefer your own contract?",
+    "optionalBody": "Optional. Only if you'd rather keep the agreement you already use: customers then sign yours instead of ours.",
+    "optionalOpen": "Upload my own contract"
   },
   "chat": {
     "launcher": "Chat with RoveHQ",

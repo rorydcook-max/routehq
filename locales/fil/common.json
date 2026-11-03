@@ -4111,7 +4111,7 @@
     "ct_resetBody": "Pinapalitan ang iyong teksto ng standard na English at Thai na kasunduan.",
     "ct_sample": "Ganito ang basa, gamit ang kunwaring customer",
     "ag_title": "Kasunduan sa pagrenta",
-    "ag_subtitle": "Isinusulat ng RoveHQ ang agreement sa English at Thai. Idagdag lang ang dagdag.",
+    "ag_subtitle": "Handa nang gamitin: ang kasunduan ng RoveHQ sa English at Thai, napupunan mula sa bawat booking. Idagdag lang ang sarili mong mga tuntunin at numero.",
     "ag_ownTitle": "Sarili mong terms",
     "ag_ownBody": "Isang simpleng pangungusap bawat isa, sa kahit anong wika. Idinadagdag sa dulo, may numero.",
     "ag_term": "Term {number}",
@@ -6482,7 +6482,10 @@
     "v_home_territory": "Saan puwedeng gamitin ang sasakyan",
     "v_jurisdiction": "Batas na umiiral",
     "v_contract_date": "Petsa ng kontrata",
-    "v_vehicle_make_model": "Make at model ng sasakyan"
+    "v_vehicle_make_model": "Make at model ng sasakyan",
+    "optionalTitle": "Mas gusto ang sarili mong kontrata?",
+    "optionalBody": "Opsyonal. Kung gusto mo lang gamitin pa rin ang kasunduang gamit mo na: ang sa iyo ang pipirmahan ng mga customer sa halip na amin.",
+    "optionalOpen": "I-upload ang sarili kong kontrata"
   },
   "chat": {
     "launcher": "Mag-chat sa RoveHQ",

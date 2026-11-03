@@ -4177,7 +4177,7 @@
     "ct_resetBody": "Thay nội dung của bạn bằng hợp đồng tiếng Anh và tiếng Thái tiêu chuẩn.",
     "ct_sample": "Hợp đồng trông thế nào, với một khách hàng giả định",
     "ag_title": "Hợp đồng thuê xe",
-    "ag_subtitle": "RoveHQ soạn hợp đồng bằng tiếng Anh và tiếng Thái. Bạn chỉ cần thêm phần bổ sung.",
+    "ag_subtitle": "Sẵn sàng sử dụng: hợp đồng RoveHQ bằng tiếng Anh và tiếng Thái, tự điền từ mỗi đặt xe. Chỉ cần thêm điều khoản và con số của riêng bạn.",
     "ag_ownTitle": "Điều khoản riêng của bạn",
     "ag_ownBody": "Mỗi điều một câu đơn giản, ngôn ngữ nào cũng được. Được thêm vào cuối, có đánh số.",
     "ag_term": "Điều khoản {number}",
@@ -6548,7 +6548,10 @@
     "v_home_territory": "Khu vực được dùng xe",
     "v_jurisdiction": "Luật áp dụng",
     "v_contract_date": "Ngày lập hợp đồng",
-    "v_vehicle_make_model": "Hãng và mẫu xe"
+    "v_vehicle_make_model": "Hãng và mẫu xe",
+    "optionalTitle": "Muốn dùng hợp đồng của riêng bạn?",
+    "optionalBody": "Không bắt buộc. Chỉ khi bạn muốn tiếp tục dùng hợp đồng hiện có: khách hàng sẽ ký hợp đồng của bạn thay vì của chúng tôi.",
+    "optionalOpen": "Tải lên hợp đồng của tôi"
   },
   "chat": {
     "launcher": "Chat với RoveHQ",

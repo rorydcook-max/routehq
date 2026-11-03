@@ -4137,7 +4137,7 @@
     "ct_resetBody": "Ersätter din text med standardavtalet på engelska och thailändska.",
     "ct_sample": "Så här lyder det, med en påhittad kund",
     "ag_title": "Hyresavtal",
-    "ag_subtitle": "RoveHQ skriver avtalet på engelska och thai. Lägg bara till det som är extra.",
+    "ag_subtitle": "Klart att använda: RoveHQ-avtalet på engelska och thai, ifyllt från varje bokning. Lägg bara till dina egna villkor och siffror.",
     "ag_ownTitle": "Dina egna villkor",
     "ag_ownBody": "En enkel mening per punkt, på valfritt språk. Läggs till numrerade i slutet.",
     "ag_term": "Villkor {number}",
@@ -6548,7 +6548,10 @@
     "v_home_territory": "Var fordonet får användas",
     "v_jurisdiction": "Tillämplig lag",
     "v_contract_date": "Avtalsdatum",
-    "v_vehicle_make_model": "Fordonets märke och modell"
+    "v_vehicle_make_model": "Fordonets märke och modell",
+    "optionalTitle": "Vill du hellre använda ditt eget avtal?",
+    "optionalBody": "Valfritt. Bara om du vill behålla avtalet du redan använder: då signerar kunderna ditt i stället för vårt.",
+    "optionalOpen": "Ladda upp mitt eget avtal"
   },
   "chat": {
     "launcher": "Chatta med RoveHQ",

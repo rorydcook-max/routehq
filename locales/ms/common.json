@@ -4177,7 +4177,7 @@
     "ct_resetBody": "Menggantikan teks anda dengan perjanjian standard Bahasa Inggeris dan Thai.",
     "ct_sample": "Rupanya dengan pelanggan rekaan",
     "ag_title": "Perjanjian sewa",
-    "ag_subtitle": "RoveHQ menulis perjanjian dalam bahasa Inggeris dan Thai. Tambah apa yang lebih sahaja.",
+    "ag_subtitle": "Sedia digunakan: perjanjian RoveHQ dalam bahasa Inggeris dan Thai, diisi daripada setiap tempahan. Hanya tambah syarat dan angka anda sendiri.",
     "ag_ownTitle": "Syarat anda sendiri",
     "ag_ownBody": "Satu ayat mudah bagi setiap satu, dalam apa-apa bahasa. Ditambah di hujung, bernombor.",
     "ag_term": "Syarat {number}",
@@ -6548,7 +6548,10 @@
     "v_home_territory": "Kawasan kenderaan boleh digunakan",
     "v_jurisdiction": "Undang-undang yang terpakai",
     "v_contract_date": "Tarikh perjanjian",
-    "v_vehicle_make_model": "Jenama dan model kenderaan"
+    "v_vehicle_make_model": "Jenama dan model kenderaan",
+    "optionalTitle": "Lebih suka kontrak sendiri?",
+    "optionalBody": "Pilihan. Hanya jika anda mahu terus menggunakan perjanjian sedia ada: pelanggan akan menandatangani perjanjian anda, bukan kami.",
+    "optionalOpen": "Muat naik kontrak saya sendiri"
   },
   "chat": {
     "launcher": "Sembang dengan RoveHQ",

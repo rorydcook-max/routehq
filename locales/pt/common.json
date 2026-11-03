@@ -4137,7 +4137,7 @@
     "ct_resetBody": "Substitui seu texto pelo contrato padrão em inglês e tailandês.",
     "ct_sample": "Como fica, com um cliente fictício",
     "ag_title": "Contrato de aluguel",
-    "ag_subtitle": "O RoveHQ escreve o contrato em inglês e tailandês. Adicione só o que for extra.",
+    "ag_subtitle": "Pronto a usar: o contrato RoveHQ em inglês e tailandês, preenchido a partir de cada reserva. Basta acrescentar os seus termos e valores.",
     "ag_ownTitle": "Seus próprios termos",
     "ag_ownBody": "Uma frase simples para cada, em qualquer idioma. Entram no final, numeradas.",
     "ag_term": "Termo {number}",
@@ -6548,7 +6548,10 @@
     "v_home_territory": "Onde o veículo pode ser usado",
     "v_jurisdiction": "Lei aplicável",
     "v_contract_date": "Data do contrato",
-    "v_vehicle_make_model": "Marca e modelo do veículo"
+    "v_vehicle_make_model": "Marca e modelo do veículo",
+    "optionalTitle": "Prefere o seu próprio contrato?",
+    "optionalBody": "Opcional. Só se preferir manter o contrato que já usa: os clientes assinam o seu em vez do nosso.",
+    "optionalOpen": "Carregar o meu próprio contrato"
   },
   "chat": {
     "launcher": "Converse com a RoveHQ",

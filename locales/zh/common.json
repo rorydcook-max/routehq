@@ -4176,7 +4176,7 @@
     "ct_resetBody": "将您的协议文本替换为标准的英文和泰文版本。",
     "ct_sample": "带有虚拟客户的实际显示效果",
     "ag_title": "租赁协议",
-    "ag_subtitle": "RoveHQ 会用英文和泰文生成协议。您只需添加额外条款。",
+    "ag_subtitle": "开箱即用：RoveHQ 的英泰双语协议，根据每笔预订自动填写。只需添加您自己的条款和数字。",
     "ag_ownTitle": "您自己的条款",
     "ag_ownBody": "每条一句简单的话，任何语言均可。会附在末尾并自动编号。",
     "ag_term": "条款 {number}",
@@ -6548,7 +6548,10 @@
     "v_home_territory": "车辆可使用区域",
     "v_jurisdiction": "适用法律",
     "v_contract_date": "合同日期",
-    "v_vehicle_make_model": "车辆品牌和型号"
+    "v_vehicle_make_model": "车辆品牌和型号",
+    "optionalTitle": "更想用自己的合同？",
+    "optionalBody": "可选。只有在您想继续使用现有合同时才需要：客户将签署您的合同，而不是我们的。",
+    "optionalOpen": "上传我自己的合同"
   },
   "chat": {
     "launcher": "与 RoveHQ 聊天",

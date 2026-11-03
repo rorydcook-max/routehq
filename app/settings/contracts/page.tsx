@@ -62,6 +62,15 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
   // A file handed over from the chat widget ("Upload my own contract"): only a path inside this business's folder.
   const handoffFile = typeof params?.file === "string" && params.file.startsWith(`${organization.id}/`) && !params.file.includes("..") ? params.file : null;
 
+  const importCard =
+    membership?.role === "owner" ? (
+      <ContractImportCard
+        active={usingUploaded ? { id: String(template.id), title: String(template.title || template.name || "") } : null}
+        draft={latestUpload && latestUpload.id !== template?.id ? { id: String(latestUpload.id), title: String(latestUpload.title || "") } : null}
+        handoffFile={handoffFile}
+      />
+    ) : null;
+
   return (
     <AppShell userEmail={userEmail}>
       <div className="page-form">
@@ -71,15 +80,8 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
           <p className="page-subtitle page-subtitle-keep mt-1">{say(usingUploaded ? "ag_subtitleOwn" : "ag_subtitle")}</p>
         </div>
 
-        {membership?.role === "owner" ? (
-          <div className="mb-3">
-            <ContractImportCard
-              active={usingUploaded ? { id: String(template.id), title: String(template.title || template.name || "") } : null}
-              draft={latestUpload && latestUpload.id !== template?.id ? { id: String(latestUpload.id), title: String(latestUpload.title || "") } : null}
-              handoffFile={handoffFile}
-            />
-          </div>
-        ) : null}
+        {/* An uploaded agreement in use leads the page; otherwise the upload is an optional extra at the end. */}
+        {importCard && (usingUploaded || handoffFile) ? <div className="mb-3">{importCard}</div> : null}
 
         <AgreementTerms
           initialTerms={agreementExtraTerms(organization.settings)}
@@ -89,6 +91,8 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
           sampleData={sampleData}
           templateHtml={String(template.content_html || template.body || "")}
         />
+
+        {importCard && !usingUploaded && !handoffFile ? <div className="mt-3">{importCard}</div> : null}
       </div>
     </AppShell>
   );

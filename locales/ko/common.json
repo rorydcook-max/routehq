@@ -4137,7 +4137,7 @@
     "ct_resetBody": "문구를 표준 영어·태국어 계약서로 바꿔요.",
     "ct_sample": "가상 고객으로 본 계약서",
     "ag_title": "렌탈 계약서",
-    "ag_subtitle": "RoveHQ가 영어와 태국어로 계약서를 작성해요. 추가할 내용만 넣으세요.",
+    "ag_subtitle": "바로 사용 가능: 영어와 태국어로 된 RoveHQ 계약서가 예약마다 자동으로 채워집니다. 나만의 조건과 숫자만 추가하세요.",
     "ag_ownTitle": "자체 약관",
     "ag_ownBody": "항목마다 간단한 한 문장, 어떤 언어든 괜찮아요. 끝에 번호를 붙여 추가돼요.",
     "ag_term": "약관 {number}",
@@ -6548,7 +6548,10 @@
     "v_home_territory": "차량 사용 가능 지역",
     "v_jurisdiction": "준거법",
     "v_contract_date": "계약일",
-    "v_vehicle_make_model": "차량 제조사와 모델"
+    "v_vehicle_make_model": "차량 제조사와 모델",
+    "optionalTitle": "직접 쓰는 계약서가 있나요?",
+    "optionalBody": "선택 사항입니다. 지금 쓰는 계약서를 계속 쓰고 싶을 때만: 고객은 저희 계약서 대신 귀사의 계약서에 서명합니다.",
+    "optionalOpen": "내 계약서 올리기"
   },
   "chat": {
     "launcher": "RoveHQ와 채팅",

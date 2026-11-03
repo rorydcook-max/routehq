@@ -4137,7 +4137,7 @@
     "ct_resetBody": "以標準英泰雙語合約取代您的文字。",
     "ct_sample": "以虛構客戶呈現的效果",
     "ag_title": "租賃合約",
-    "ag_subtitle": "RoveHQ 會以英文和泰文產生合約。您只需加入額外條款。",
+    "ag_subtitle": "立即可用：RoveHQ 的英泰雙語合約，依每筆預訂自動填寫。只需加入您自己的條款和數字。",
     "ag_ownTitle": "您的自訂條款",
     "ag_ownBody": "每條一句簡單的話，任何語言皆可。會加在最後並自動編號。",
     "ag_term": "條款 {number}",
@@ -6548,7 +6548,10 @@
     "v_home_territory": "車輛可使用區域",
     "v_jurisdiction": "準據法",
     "v_contract_date": "合約日期",
-    "v_vehicle_make_model": "車輛廠牌和型號"
+    "v_vehicle_make_model": "車輛廠牌和型號",
+    "optionalTitle": "想用自己的合約？",
+    "optionalBody": "選用。只有在您想繼續使用現有合約時才需要：客戶將簽署您的合約，而不是我們的。",
+    "optionalOpen": "上傳我自己的合約"
   },
   "chat": {
     "launcher": "與 RoveHQ 聊天",

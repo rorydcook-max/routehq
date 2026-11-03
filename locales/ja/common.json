@@ -4137,7 +4137,7 @@
     "ct_resetBody": "文面を標準の英語・タイ語の契約書に置き換えます。",
     "ct_sample": "架空の顧客での表示例",
     "ag_title": "レンタル契約書",
-    "ag_subtitle": "RoveHQ が英語とタイ語で契約書を作成します。追加したい内容だけ入力してください。",
+    "ag_subtitle": "すぐに使えます：英語とタイ語のRoveHQ契約書が予約ごとに自動入力されます。独自の条件と数値を加えるだけです。",
     "ag_ownTitle": "独自の条件",
     "ag_ownBody": "1 項目につき簡単な 1 文で、言語は自由です。末尾に番号付きで追加されます。",
     "ag_term": "条件{number}",
@@ -6548,7 +6548,10 @@
     "v_home_territory": "車両の使用可能地域",
     "v_jurisdiction": "準拠法",
     "v_contract_date": "契約日",
-    "v_vehicle_make_model": "車両のメーカーと車種"
+    "v_vehicle_make_model": "車両のメーカーと車種",
+    "optionalTitle": "自社の契約書を使いたい場合",
+    "optionalBody": "任意です。今お使いの契約書を続けたい場合のみ：お客様は当社のものではなく貴社の契約書に署名します。",
+    "optionalOpen": "自社の契約書をアップロード"
   },
   "chat": {
     "launcher": "RoveHQ とチャット",

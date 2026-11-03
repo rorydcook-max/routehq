@@ -43,6 +43,8 @@ export function ContractImportCard({
   const [error, setError] = useState("");
   const [switching, startSwitch] = useTransition();
   const startedHandoff = useRef(false);
+  // Uploading is optional: while the RoveHQ agreement is in use, the form stays folded away until asked for.
+  const [open, setOpen] = useState(Boolean(active || draft || handoffFile));
 
   function openReview(id: string) {
     router.push(`/settings/contracts/import/${id}` as Route);
@@ -105,9 +107,22 @@ export function ContractImportCard({
 
   const busy = stage !== "idle";
 
+  if (!open) {
+    return (
+      <section className="card p-4">
+        <h2 className="card-title">{say("optionalTitle")}</h2>
+        <p className={`mt-1 ${soft}`}>{say("optionalBody")}</p>
+        <button className="secondary-action pressable mt-3 w-full sm:w-auto" onClick={() => setOpen(true)} type="button">
+          <FileUp size={18} />
+          {say("optionalOpen")}
+        </button>
+      </section>
+    );
+  }
+
   return (
     <section className="card p-4">
-      <h2 className="card-title">{say("title")}</h2>
+      <h2 className="card-title">{active ? say("title") : say("optionalTitle")}</h2>
       {active ? (
         <>
           <p className={`mt-1 ${soft}`}>{say("activeBody", { title: active.title || say("yourAgreement") })}</p>

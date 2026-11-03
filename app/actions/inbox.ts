@@ -212,3 +212,24 @@ export async function suggestInboxReply(conversationId: string): Promise<ActionR
   if (!draft.ok) return { ok: false, error: draft.error };
   return { ok: true, draft: draft.text };
 }
+
+/**
+ * A tiny "has anything changed?" for the inbox's background check: the newest message time and the unread total.
+ * The page used to re-render in full every 8 seconds (every chat, customer and message), which was most of the
+ * site's server traffic while an inbox sat open; now it re-renders only when this changes.
+ */
+export async function inboxStamp(): Promise<string> {
+  const membership = await getCurrentMembership();
+  if (!membership) return "";
+  const admin = createSupabaseAdminClient() as any;
+  const { data } = await admin
+    .from("conversations")
+    .select("last_message_at, unread_count, status")
+    .eq("organization_id", membership.organizationId)
+    .order("last_message_at", { ascending: false, nullsFirst: false })
+    .limit(200);
+  const rows = (data || []) as Array<{ last_message_at: string | null; unread_count: number | null; status: string | null }>;
+  const open = rows.filter((row) => row.status === "open").length;
+  const unread = rows.reduce((sum, row) => sum + (Number(row.unread_count) || 0), 0);
+  return `${rows[0]?.last_message_at || ""}|${unread}|${open}|${rows.length}`;
+}

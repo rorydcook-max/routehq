@@ -9,7 +9,7 @@ import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { AlertCircle, ArrowLeft, Check, RotateCcw, Send, Sparkles } from "lucide-react";
-import { linkConversationCustomer, markConversationRead, sendInboxMessage, setConversationStatus, suggestInboxReply } from "@/app/actions/inbox";
+import { inboxStamp, linkConversationCustomer, markConversationRead, sendInboxMessage, setConversationStatus, suggestInboxReply } from "@/app/actions/inbox";
 import type { InboxConversation, InboxMessage } from "@/lib/inbox/store";
 import { dateFormat, shortDate as dateInWords } from "@/lib/i18n/dates";
 
@@ -100,10 +100,23 @@ export function InboxView({
   const nameOf = (conversation: InboxConversation) =>
     conversation.display_name || customers.find((entry) => entry.id === conversation.customer_id)?.full_name || say("customer");
 
-  // New messages arrive without a reload: check every few seconds while the tab is in view.
+  // New messages arrive without a reload: a small check every few seconds while the tab is in view, and the page is
+  // only re-drawn when something actually changed (a full re-draw every 8 s was most of the server traffic).
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      if (document.visibilityState === "visible") router.refresh();
+    let last: string | null = null;
+    let running = false;
+    const timer = window.setInterval(async () => {
+      if (document.visibilityState !== "visible" || running) return;
+      running = true;
+      try {
+        const stamp = await inboxStamp();
+        if (last !== null && stamp && stamp !== last) router.refresh();
+        if (stamp) last = stamp;
+      } catch {
+        // Offline for a moment: try again next time.
+      } finally {
+        running = false;
+      }
     }, 8000);
     return () => window.clearInterval(timer);
   }, [router]);

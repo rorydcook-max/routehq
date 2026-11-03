@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, one {Enregistré : la date et le coût du véhicule sont à jour.} other {# renouvellements enregistrés, avec dates et coûts.}}",
     "paperFailed": "Échec de l'enregistrement : {names}",
     "sugPaper": "Photo d'une police ou d'un reçu de taxe",
-    "canPaper": "Envoyez une photo d'une police d'assurance ou d'un reçu de taxe : les dates et le coût du véhicule sont remplis."
+    "canPaper": "Envoyez une photo d'une police d'assurance ou d'un reçu de taxe : les dates et le coût du véhicule sont remplis.",
+    "paperNoDate": "Date d'expiration illisible. Saisissez la date :",
+    "paperPrinted": "(Il est écrit « {text} ».)",
+    "paperNeedDates": "Ajoutez les dates manquantes pour enregistrer",
+    "paperCheck": "Vérifiez chaque élément avec le document. Touchez ✕ pour supprimer celui qui est faux.",
+    "paperDismiss": "Incorrect ? Supprimez-le"
   },
   "setupRequest": {
     "title": "On s'occupe de la configuration pour vous",

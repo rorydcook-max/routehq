@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, one {Tersimpan: tanggal dan biaya kendaraan diperbarui.} other {Tersimpan # perpanjangan, dengan tanggal dan biaya.}}",
     "paperFailed": "Gagal disimpan: {names}",
     "sugPaper": "Foto polis atau bukti pajak",
-    "canPaper": "Kirim foto polis asuransi atau bukti pajak: tanggal dan biaya kendaraan akan terisi."
+    "canPaper": "Kirim foto polis asuransi atau bukti pajak: tanggal dan biaya kendaraan akan terisi.",
+    "paperNoDate": "Tanggal habis berlaku tidak terbaca. Masukkan tanggalnya:",
+    "paperPrinted": "(Tertulis \"{text}\".)",
+    "paperNeedDates": "Tambahkan tanggal yang kurang untuk menyimpan",
+    "paperCheck": "Cocokkan masing-masing dengan dokumen. Ketuk ✕ untuk menghapus yang salah.",
+    "paperDismiss": "Tidak sesuai? Hapus"
   },
   "setupRequest": {
     "title": "Kami yang akan aturkan untuk Anda",

@@ -7,8 +7,10 @@ appPath: "/fleet/[id]"
 related: ["paperwork-and-renewals", "service-and-maintenance", "add-a-vehicle", "documents"]
 video: "help-vehicle-page.mp4"
 poster: "help-vehicle-page.jpg"
-updated: 2026-11-02
+updated: 2026-11-03
 faq:
+  - q: "I sold a vehicle. How do I take it off my fleet but keep its history?"
+    a: "Open the vehicle, tap Edit, and use Archive vehicle at the bottom. It stops being bookable and leaves the fleet list, but its rentals, money and paperwork stay in your records and reports. Delete removes everything, so only use it for a vehicle added by mistake."
   - q: "Why does the page open on a different tab each time?"
     a: "It opens what needs you first: Paperwork & service if something runs out within 7 days, then To do if there are open jobs. Otherwise owners get Money and staff get Rentals."
   - q: "Can my staff see what I paid for the vehicle?"

@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, one {Disimpan: tarikh dan kos kenderaan dikemas kini.} other {Disimpan # pembaharuan, dengan tarikh dan kos.}}",
     "paperFailed": "Tidak dapat disimpan: {names}",
     "sugPaper": "Foto polisi atau resit cukai",
-    "canPaper": "Hantar foto polisi insurans atau resit cukai: tarikh dan kos kenderaan diisi."
+    "canPaper": "Hantar foto polisi insurans atau resit cukai: tarikh dan kos kenderaan diisi.",
+    "paperNoDate": "Tarikh tamat tidak dapat dibaca. Masukkan tarikh:",
+    "paperPrinted": "(Tertulis \"{text}\".)",
+    "paperNeedDates": "Tambah tarikh yang tiada untuk simpan",
+    "paperCheck": "Semak setiap satu dengan dokumen. Ketik ✕ untuk buang yang salah.",
+    "paperDismiss": "Tidak betul? Buang"
   },
   "setupRequest": {
     "title": "Kami akan sediakannya untuk anda",

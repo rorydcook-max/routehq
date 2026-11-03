@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, other {Đã lưu # lần gia hạn, kèm ngày và chi phí.}}",
     "paperFailed": "Không lưu được: {names}",
     "sugPaper": "Ảnh hợp đồng bảo hiểm hoặc biên lai thuế",
-    "canPaper": "Gửi ảnh hợp đồng bảo hiểm hoặc biên lai thuế: ngày và chi phí của xe sẽ được điền sẵn."
+    "canPaper": "Gửi ảnh hợp đồng bảo hiểm hoặc biên lai thuế: ngày và chi phí của xe sẽ được điền sẵn.",
+    "paperNoDate": "Không đọc được ngày hết hạn. Nhập ngày:",
+    "paperPrinted": "(Ghi là \"{text}\".)",
+    "paperNeedDates": "Thêm các ngày còn thiếu để lưu",
+    "paperCheck": "Đối chiếu từng mục với giấy tờ. Nhấn ✕ để xóa mục sai.",
+    "paperDismiss": "Không đúng? Xóa"
   },
   "setupRequest": {
     "title": "Chúng tôi sẽ cài đặt giúp bạn",

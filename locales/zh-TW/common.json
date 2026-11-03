@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, other {已儲存 # 項續期，日期和費用已更新。}}",
     "paperFailed": "無法儲存：{names}",
     "sugPaper": "保單或稅單照片",
-    "canPaper": "傳一張保單或稅單照片：車輛的日期和費用會自動填好。"
+    "canPaper": "傳一張保單或稅單照片：車輛的日期和費用會自動填好。",
+    "paperNoDate": "無法辨識到期日，請輸入日期：",
+    "paperPrinted": "（上面寫著「{text}」。）",
+    "paperNeedDates": "請補上缺少的日期後儲存",
+    "paperCheck": "請逐項與文件核對。點選 ✕ 刪除錯誤的項目。",
+    "paperDismiss": "不對？刪除"
   },
   "setupRequest": {
     "title": "我們來幫您設定",

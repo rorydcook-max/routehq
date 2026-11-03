@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, one {Salvo: a data e o custo do veículo foram atualizados.} other {# renovações salvas, com datas e custos.}}",
     "paperFailed": "Não foi possível salvar: {names}",
     "sugPaper": "Foto de uma apólice ou recibo de imposto",
-    "canPaper": "Envie uma foto de uma apólice de seguro ou recibo de imposto: as datas e o custo do veículo são preenchidos."
+    "canPaper": "Envie uma foto de uma apólice de seguro ou recibo de imposto: as datas e o custo do veículo são preenchidos.",
+    "paperNoDate": "Não consegui ler a data de vencimento. Digite a data:",
+    "paperPrinted": "(Está escrito \"{text}\".)",
+    "paperNeedDates": "Adicione as datas que faltam para salvar",
+    "paperCheck": "Confira cada um com o documento. Toque em ✕ para remover o que estiver errado.",
+    "paperDismiss": "Não está certo? Remova"
   },
   "setupRequest": {
     "title": "Nós configuramos por si",

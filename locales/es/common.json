@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, one {Guardado: la fecha y el coste del vehículo están al día.} other {Guardadas # renovaciones, con fechas y costes.}}",
     "paperFailed": "No se pudo guardar: {names}",
     "sugPaper": "Foto de una póliza o recibo del impuesto",
-    "canPaper": "Envía una foto de una póliza de seguro o recibo del impuesto: se rellenan las fechas y el coste del vehículo."
+    "canPaper": "Envía una foto de una póliza de seguro o recibo del impuesto: se rellenan las fechas y el coste del vehículo.",
+    "paperNoDate": "No pude leer cuándo vence. Escribe la fecha:",
+    "paperPrinted": "(Dice \"{text}\".)",
+    "paperNeedDates": "Añade las fechas que faltan para guardar",
+    "paperCheck": "Compara cada uno con el documento. Toca ✕ para quitar el que esté mal.",
+    "paperDismiss": "¿No es correcto? Quítalo"
   },
   "setupRequest": {
     "title": "Te lo configuramos",

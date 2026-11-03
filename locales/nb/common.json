@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, one {Lagret: kjøretøyets dato og kostnad er oppdatert.} other {Lagret # fornyelser, med datoer og kostnader.}}",
     "paperFailed": "Kunne ikke lagre: {names}",
     "sugPaper": "Bilde av en polise eller avgiftskvittering",
-    "canPaper": "Send et bilde av en forsikringspolise eller avgiftskvittering: kjøretøyets datoer og kostnad fylles inn."
+    "canPaper": "Send et bilde av en forsikringspolise eller avgiftskvittering: kjøretøyets datoer og kostnad fylles inn.",
+    "paperNoDate": "Fant ikke utløpsdatoen. Skriv inn datoen:",
+    "paperPrinted": "(Det står «{text}».)",
+    "paperNeedDates": "Legg til manglende datoer for å lagre",
+    "paperCheck": "Sjekk hver av dem mot dokumentet. Trykk ✕ for å fjerne en som er feil.",
+    "paperDismiss": "Ikke riktig? Fjern den"
   },
   "setupRequest": {
     "title": "Vi ordner det for deg",

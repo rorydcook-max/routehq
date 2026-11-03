@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, one {Sparat: fordonets datum och kostnad är uppdaterade.} other {Sparade # förnyelser, med datum och kostnader.}}",
     "paperFailed": "Kunde inte spara: {names}",
     "sugPaper": "Foto på en försäkring eller skattekvitto",
-    "canPaper": "Skicka ett foto på ett försäkringsbrev eller skattekvitto: fordonets datum och kostnad fylls i."
+    "canPaper": "Skicka ett foto på ett försäkringsbrev eller skattekvitto: fordonets datum och kostnad fylls i.",
+    "paperNoDate": "Kunde inte läsa när den går ut. Ange datumet:",
+    "paperPrinted": "(Det står ”{text}”.)",
+    "paperNeedDates": "Lägg till saknade datum för att spara",
+    "paperCheck": "Kontrollera var och en mot dokumentet. Tryck på ✕ för att ta bort en som är fel.",
+    "paperDismiss": "Stämmer inte? Ta bort den"
   },
   "setupRequest": {
     "title": "Vi ordnar det åt dig",

@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, other {저장됨: 갱신 #건의 날짜와 비용이 업데이트됐어요.}}",
     "paperFailed": "저장하지 못했어요: {names}",
     "sugPaper": "보험증권이나 세금 영수증 사진",
-    "canPaper": "보험증권이나 세금 영수증 사진을 보내면 차량의 날짜와 비용이 채워져요."
+    "canPaper": "보험증권이나 세금 영수증 사진을 보내면 차량의 날짜와 비용이 채워져요.",
+    "paperNoDate": "만료일을 읽지 못했어요. 날짜를 입력하세요:",
+    "paperPrinted": "(표기: \"{text}\")",
+    "paperNeedDates": "저장하려면 빠진 날짜를 입력하세요",
+    "paperCheck": "서류와 하나씩 비교해 보세요. 잘못된 항목은 ✕를 눌러 삭제하세요.",
+    "paperDismiss": "틀렸나요? 삭제"
   },
   "setupRequest": {
     "title": "저희가 대신 세팅해 드립니다",

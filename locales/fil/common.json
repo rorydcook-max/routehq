@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, one {Na-save: na-update ang petsa at gastos ng sasakyan.} other {Na-save ang # renewal, kasama ang mga petsa at gastos.}}",
     "paperFailed": "Hindi na-save: {names}",
     "sugPaper": "Larawan ng policy o resibo ng tax",
-    "canPaper": "Magpadala ng larawan ng insurance policy o resibo ng tax: mapupunan ang mga petsa at gastos ng sasakyan."
+    "canPaper": "Magpadala ng larawan ng insurance policy o resibo ng tax: mapupunan ang mga petsa at gastos ng sasakyan.",
+    "paperNoDate": "Hindi mabasa kung kailan mag-e-expire. Ilagay ang petsa:",
+    "paperPrinted": "(Nakasulat ay \"{text}\".)",
+    "paperNeedDates": "Idagdag ang kulang na petsa para ma-save",
+    "paperCheck": "I-check ang bawat isa sa dokumento. I-tap ang ✕ para alisin ang mali.",
+    "paperDismiss": "Mali? Alisin ito"
   },
   "setupRequest": {
     "title": "Kami na ang maglalagay para sa iyo",

@@ -21,12 +21,29 @@ export type SupportAnswer = { ok: true; answer: string; articles: SupportArticle
 /** Words worth matching on: lowercased, punctuation off, the little joining words dropped. */
 const STOP = new Set(["the", "a", "an", "and", "or", "to", "of", "in", "on", "for", "my", "me", "i", "it", "is", "do", "does", "can", "how", "what", "where", "why", "when", "with", "from", "at", "this", "that", "be", "are", "you", "your"]);
 
+/**
+ * The words people use for things the articles name differently ("I sold a car" is **Archive vehicle**). Each
+ * everyday word also searches for the app's word, so the right article is found.
+ */
+const SYNONYMS: Record<string, string[]> = {
+  sell: ["archive"], sold: ["archive"], selling: ["archive"], retire: ["archive"], retired: ["archive"], remove: ["archive", "delete"], scrap: ["archive"], hide: ["archive"],
+  contract: ["agreement"], contracts: ["agreement"], sign: ["agreement", "signature"], signing: ["agreement", "signature"],
+  staff: ["team", "teammate"], employee: ["team", "teammate"], employees: ["team", "teammate"], worker: ["team"],
+  refund: ["deposit", "refunds"], bond: ["deposit"], ticket: ["fine"], tickets: ["fine"], penalty: ["fine"],
+  car: ["vehicle"], cars: ["vehicle"], bike: ["vehicle"], scooter: ["vehicle"], motorbike: ["vehicle"],
+  pickup: ["handover"], delivery: ["handover"], collect: ["handover"], return: ["return"], inspection: ["handover", "inspection"],
+  invoice: ["receipt"], invoices: ["receipt"], bill: ["charge"], expense: ["cost"], expenses: ["cost"],
+  plate: ["registration"], tax: ["tax", "paperwork"], insurance: ["insurance", "paperwork"], renew: ["renewal", "paperwork"],
+  website: ["booking", "page"], online: ["booking", "page"], reminder: ["reminders"], whatsapp: ["messaging", "inbox"], line: ["messaging", "inbox"]
+};
+
 function words(text: string) {
-  return String(text || "")
+  const base = String(text || "")
     .toLowerCase()
     .replace(/[^\p{L}\p{N}\s]+/gu, " ")
     .split(/\s+/)
     .filter((word) => word.length > 1 && !STOP.has(word));
+  return base.flatMap((word) => [word, ...(SYNONYMS[word] || [])]);
 }
 
 /**

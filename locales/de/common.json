@@ -6415,7 +6415,12 @@
     "paperSaved": "{count, plural, one {Gespeichert: Datum und Kosten des Fahrzeugs sind aktualisiert.} other {Gespeichert: # Verlängerungen mit Daten und Kosten.}}",
     "paperFailed": "Nicht gespeichert: {names}",
     "sugPaper": "Foto einer Police oder Steuerquittung",
-    "canPaper": "Schick ein Foto einer Versicherungspolice oder Steuerquittung: Daten und Kosten des Fahrzeugs werden ausgefüllt."
+    "canPaper": "Schick ein Foto einer Versicherungspolice oder Steuerquittung: Daten und Kosten des Fahrzeugs werden ausgefüllt.",
+    "paperNoDate": "Ablaufdatum nicht lesbar. Geben Sie das Datum ein:",
+    "paperPrinted": "(Dort steht „{text}“.)",
+    "paperNeedDates": "Fehlende Daten ergänzen, um zu speichern",
+    "paperCheck": "Prüfen Sie jeden Eintrag anhand des Dokuments. Tippen Sie auf ✕, um einen falschen zu entfernen.",
+    "paperDismiss": "Nicht richtig? Entfernen"
   },
   "setupRequest": {
     "title": "Wir richten es für dich ein",

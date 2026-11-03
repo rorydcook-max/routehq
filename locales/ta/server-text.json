@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "இந்த வாடிக்கையாளரை நீக்க முடியவில்லை. மீண்டும் முயலவும்.",
   "Choose between 1 and 120 months.": "1 முதல் 120 மாதங்களுக்குள் தேர்ந்தெடுக்கவும்.",
   "We couldn't save that. Please try again.": "அதைச் சேமிக்க முடியவில்லை. மீண்டும் முயலவும்.",
-  "Please pick a country.": "ஒரு நாட்டைத் தேர்ந்தெடுக்கவும்."
+  "Please pick a country.": "ஒரு நாட்டைத் தேர்ந்தெடுக்கவும்.",
+  "Bookings in “{}” were matched to customers in “{}”.": "“{}” இல் உள்ள முன்பதிவுகள் “{}” இல் உள்ள வாடிக்கையாளர்களுடன் பொருத்தப்பட்டன.",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "“{}” இல் உள்ள முன்பதிவுகள் “{}” இல் உள்ள வாகனங்களுடன் பொருத்தப்பட்டன.",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "நடப்பிலுள்ள வாடகைகளின் {} கட்டணம்(கள்) சேர்க்கப்படவில்லை: ஒவ்வொரு வாடகையின் “செலுத்தப்பட்ட தேதி வரை” அவற்றைப் பதிவு செய்கிறது, எனவே எதுவும் இருமுறை கணக்கிடப்படாது.",
+  "Mileage in “{}” was converted from miles to km.": "“{}” இல் உள்ள ஓட்டத் தூரம் மைல்களிலிருந்து km ஆக மாற்றப்பட்டது.",
+  "Mileage in “{}” was converted from km to miles.": "“{}” இல் உள்ள ஓட்டத் தூரம் km இலிருந்து மைல்களாக மாற்றப்பட்டது.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "“{}” இல் உள்ள தொகைகள் {} இல் உள்ளன, எழுதியபடியே வைக்கப்பட்டுள்ளன; உங்கள் வணிகம் {} ஐப் பயன்படுத்துகிறது.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "இந்தத் தாவல்களும் வரிசைகளும் கிடைத்தன: {}. இது ஒரு {} ஏற்றுமதி: RoveHQ இதை அடையாளம் கண்டு உடனே படிக்கும். எதுவும் சேர்க்கப்படும் முன் என்ன உள்ளே வரும் என்று சரிபார்க்க இறக்குமதியைத் திறங்கள்.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "இது ஒரு {} ஏற்றுமதி: RoveHQ இதை அடையாளம் கண்டு உடனே படிக்கும். படிக்க இறக்குமதியைத் திறங்கள்: எதுவும் சேர்க்கப்படும் முன் கிடைத்ததை நீங்கள் சரிபார்க்கலாம்.",
+  "Read as {} export.": "{} ஏற்றுமதியாகப் படிக்கப்பட்டது."
 }

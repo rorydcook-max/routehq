@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "यह ग्राहक हटाया नहीं जा सका। कृपया फिर से कोशिश करें।",
   "Choose between 1 and 120 months.": "1 से 120 महीने के बीच चुनें।",
   "We couldn't save that. Please try again.": "हम इसे सहेज नहीं सके। कृपया फिर से कोशिश करें।",
-  "Please pick a country.": "कृपया एक देश चुनें।"
+  "Please pick a country.": "कृपया एक देश चुनें।",
+  "Bookings in “{}” were matched to customers in “{}”.": "“{}” की बुकिंग को “{}” के ग्राहकों से मिलाया गया।",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "“{}” की बुकिंग को “{}” के वाहनों से मिलाया गया।",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "अभी चल रहे रेंटल के {} भुगतान छोड़ दिए गए: हर रेंटल का “कब तक भुगतान हुआ” उन्हें पहले से दर्ज करता है, इसलिए कुछ भी दो बार नहीं गिना जाता।",
+  "Mileage in “{}” was converted from miles to km.": "“{}” में माइलेज को मील से km में बदला गया।",
+  "Mileage in “{}” was converted from km to miles.": "“{}” में माइलेज को km से मील में बदला गया।",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "“{}” में रकम {} में है और जैसी लिखी है वैसी ही रखी गई है; आपका बिज़नेस {} इस्तेमाल करता है।",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "ये टैब और पंक्तियाँ मिलीं: {}। यह {} एक्सपोर्ट है: RoveHQ इसे पहचानता है और तुरंत पढ़ लेता है। कुछ भी जोड़ने से पहले क्या जाएगा, यह जाँचने के लिए इम्पोर्ट खोलें।",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "यह {} एक्सपोर्ट है: RoveHQ इसे पहचानता है और तुरंत पढ़ लेता है। इसे पढ़ने के लिए इम्पोर्ट खोलें: कुछ भी जोड़ने से पहले आप जाँचते हैं कि क्या मिला।",
+  "Read as {} export.": "{} एक्सपोर्ट के रूप में पढ़ा गया।"
 }

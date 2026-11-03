@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "Kunne ikke slette denne kunden. Prøv igjen.",
   "Choose between 1 and 120 months.": "Velg mellom 1 og 120 måneder.",
   "We couldn't save that. Please try again.": "Vi kunne ikke lagre det. Prøv igjen.",
-  "Please pick a country.": "Velg et land."
+  "Please pick a country.": "Velg et land.",
+  "Bookings in “{}” were matched to customers in “{}”.": "Bestillinger i «{}» ble koblet til kunder i «{}».",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "Bestillinger i «{}» ble koblet til kjøretøy i «{}».",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "{} betaling(er) på utleier som fortsatt pågår ble utelatt: hver utleies «betalt til» registrerer dem, så ingenting telles to ganger.",
+  "Mileage in “{}” was converted from miles to km.": "Kilometerstand i «{}» ble gjort om fra miles til km.",
+  "Mileage in “{}” was converted from km to miles.": "Kilometerstand i «{}» ble gjort om fra km til miles.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Beløp i «{}» er i {} og beholdes slik de står; bedriften din bruker {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "Fant disse fanene og radene: {}. Dette er en eksport fra {}: RoveHQ kjenner den igjen og leser den med en gang. Åpne importen for å sjekke hva som kommer inn før noe legges til.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Dette er en eksport fra {}: RoveHQ kjenner den igjen og leser den med en gang. Åpne importen for å lese den: du sjekker hva den fant før noe legges til.",
+  "Read as {} export.": "Lest som eksport fra {}."
 }

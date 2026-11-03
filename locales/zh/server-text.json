@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "无法删除此客户。请重试。",
   "Choose between 1 and 120 months.": "请选择 1 到 120 个月。",
   "We couldn't save that. Please try again.": "无法保存。请重试。",
-  "Please pick a country.": "请选择一个国家。"
+  "Please pick a country.": "请选择一个国家。",
+  "Bookings in “{}” were matched to customers in “{}”.": "“{}”中的预订已匹配到“{}”中的客户。",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "“{}”中的预订已匹配到“{}”中的车辆。",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "已略过进行中租赁的 {} 笔付款：每笔租赁的“已付至”已记录这些付款，因此不会重复计算。",
+  "Mileage in “{}” was converted from miles to km.": "“{}”中的里程已从英里换算为公里。",
+  "Mileage in “{}” was converted from km to miles.": "“{}”中的里程已从公里换算为英里。",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "“{}”中的金额以 {} 计，已按原样保留；您的业务使用 {}。",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "找到以下分页和行：{}。这是 {} 导出文件：RoveHQ 能识别并直接读取。打开导入，在添加任何内容前核对要导入的内容。",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "这是 {} 导出文件：RoveHQ 能识别并直接读取。打开导入进行读取：添加任何内容前，您会先核对找到的内容。",
+  "Read as {} export.": "按 {} 导出文件读取。"
 }

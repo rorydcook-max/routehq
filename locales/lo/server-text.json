@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "ລຶບລູກຄ້ານີ້ບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່.",
   "Choose between 1 and 120 months.": "ເລືອກລະຫວ່າງ 1 ຫາ 120 ເດືອນ.",
   "We couldn't save that. Please try again.": "ບັນທຶກບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່.",
-  "Please pick a country.": "ກະລຸນາເລືອກປະເທດ."
+  "Please pick a country.": "ກະລຸນາເລືອກປະເທດ.",
+  "Bookings in “{}” were matched to customers in “{}”.": "ການຈອງໃນ “{}” ຖືກເຊື່ອມກັບລູກຄ້າໃນ “{}”.",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "ການຈອງໃນ “{}” ຖືກເຊື່ອມກັບລົດໃນ “{}”.",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "ການຈ່າຍເງິນ {} ລາຍການຂອງການເຊົ່າທີ່ຍັງດຳເນີນຢູ່ຖືກຂ້າມໄປ: “ຈ່າຍແລ້ວເຖິງ” ຂອງແຕ່ລະການເຊົ່າບັນທຶກໄວ້ແລ້ວ, ຈຶ່ງບໍ່ມີຫຍັງຖືກນັບສອງເທື່ອ.",
+  "Mileage in “{}” was converted from miles to km.": "ໄລຍະທາງໃນ “{}” ຖືກປ່ຽນຈາກໄມລ໌ເປັນ km.",
+  "Mileage in “{}” was converted from km to miles.": "ໄລຍະທາງໃນ “{}” ຖືກປ່ຽນຈາກ km ເປັນໄມລ໌.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "ຈຳນວນເງິນໃນ “{}” ເປັນ {} ແລະ ເກັບໄວ້ຕາມທີ່ຂຽນ; ທຸລະກິດຂອງທ່ານໃຊ້ {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "ພົບແຖບ ແລະ ແຖວເຫຼົ່ານີ້: {}. ນີ້ແມ່ນໄຟລ໌ສົ່ງອອກຈາກ {}: RoveHQ ຮູ້ຈັກ ແລະ ອ່ານໄດ້ທັນທີ. ເປີດການນຳເຂົ້າເພື່ອກວດສິ່ງທີ່ຈະເຂົ້າມາກ່ອນມີການເພີ່ມຫຍັງ.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "ນີ້ແມ່ນໄຟລ໌ສົ່ງອອກຈາກ {}: RoveHQ ຮູ້ຈັກ ແລະ ອ່ານໄດ້ທັນທີ. ເປີດການນຳເຂົ້າເພື່ອອ່ານ: ທ່ານກວດສິ່ງທີ່ພົບກ່ອນມີການເພີ່ມຫຍັງ.",
+  "Read as {} export.": "ອ່ານເປັນໄຟລ໌ສົ່ງອອກຈາກ {}."
 }

@@ -389,5 +389,14 @@
   "This customer could not be deleted. Please try again.": "ลบลูกค้ารายนี้ไม่สำเร็จ โปรดลองอีกครั้ง",
   "Choose between 1 and 120 months.": "เลือกระหว่าง 1 ถึง 120 เดือน",
   "We couldn't save that. Please try again.": "บันทึกไม่สำเร็จ โปรดลองอีกครั้ง",
-  "Please pick a country.": "โปรดเลือกประเทศ"
+  "Please pick a country.": "โปรดเลือกประเทศ",
+  "Bookings in “{}” were matched to customers in “{}”.": "จับคู่การจองใน “{}” กับลูกค้าใน “{}” แล้ว",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "จับคู่การจองใน “{}” กับรถใน “{}” แล้ว",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "ไม่นำเข้าการชำระเงิน {} รายการของการเช่าที่ยังไม่สิ้นสุด เพราะ “จ่ายถึงวันที่” ของแต่ละการเช่าบันทึกไว้แล้ว จึงไม่นับซ้ำ",
+  "Mileage in “{}” was converted from miles to km.": "แปลงเลขไมล์ใน “{}” จากไมล์เป็นกม. แล้ว",
+  "Mileage in “{}” was converted from km to miles.": "แปลงเลขไมล์ใน “{}” จากกม. เป็นไมล์แล้ว",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "จำนวนเงินใน “{}” เป็นสกุล {} และคงไว้ตามเดิม ธุรกิจของคุณใช้ {}",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "พบแท็บและแถวเหล่านี้: {} นี่คือไฟล์ส่งออกจาก {} RoveHQ รู้จักและอ่านได้ทันที เปิดหน้านำเข้าเพื่อตรวจสอบสิ่งที่จะนำเข้าก่อนเพิ่มข้อมูลใดๆ",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "นี่คือไฟล์ส่งออกจาก {} RoveHQ รู้จักและอ่านได้ทันที เปิดหน้านำเข้าเพื่ออ่านไฟล์ คุณจะได้ตรวจสอบสิ่งที่พบก่อนเพิ่มข้อมูลใดๆ",
+  "Read as {} export.": "อ่านเป็นไฟล์ส่งออกจาก {}"
 }

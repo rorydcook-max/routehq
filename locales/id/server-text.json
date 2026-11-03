@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "Pelanggan ini tidak dapat dihapus. Silakan coba lagi.",
   "Choose between 1 and 120 months.": "Pilih antara 1 dan 120 bulan.",
   "We couldn't save that. Please try again.": "Kami tidak bisa menyimpannya. Silakan coba lagi.",
-  "Please pick a country.": "Silakan pilih negara."
+  "Please pick a country.": "Silakan pilih negara.",
+  "Bookings in “{}” were matched to customers in “{}”.": "Pemesanan di “{}” dicocokkan dengan pelanggan di “{}”.",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "Pemesanan di “{}” dicocokkan dengan kendaraan di “{}”.",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "{} pembayaran untuk sewa yang masih berjalan tidak disertakan: “dibayar sampai” di setiap sewa sudah mencatatnya, jadi tidak ada yang terhitung dua kali.",
+  "Mileage in “{}” was converted from miles to km.": "Jarak tempuh di “{}” dikonversi dari mil ke km.",
+  "Mileage in “{}” was converted from km to miles.": "Jarak tempuh di “{}” dikonversi dari km ke mil.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Jumlah di “{}” dalam {} dan dibiarkan sesuai aslinya; usaha Anda memakai {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "Tab dan baris yang ditemukan: {}. Ini adalah ekspor {}: RoveHQ mengenalinya dan langsung membacanya. Buka impor untuk memeriksa apa yang masuk sebelum ada yang ditambahkan.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Ini adalah ekspor {}: RoveHQ mengenalinya dan langsung membacanya. Buka impor untuk membacanya: Anda memeriksa apa yang ditemukan sebelum ada yang ditambahkan.",
+  "Read as {} export.": "Dibaca sebagai ekspor {}."
 }

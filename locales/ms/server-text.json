@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "Pelanggan ini tidak dapat dipadam. Sila cuba lagi.",
   "Choose between 1 and 120 months.": "Pilih antara 1 hingga 120 bulan.",
   "We couldn't save that. Please try again.": "Kami tidak dapat menyimpannya. Sila cuba lagi.",
-  "Please pick a country.": "Sila pilih negara."
+  "Please pick a country.": "Sila pilih negara.",
+  "Bookings in “{}” were matched to customers in “{}”.": "Tempahan dalam “{}” telah dipadankan dengan pelanggan dalam “{}”.",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "Tempahan dalam “{}” telah dipadankan dengan kenderaan dalam “{}”.",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "{} bayaran untuk sewaan yang masih berjalan tidak dimasukkan: “dibayar sehingga” bagi setiap sewaan sudah merekodkannya, jadi tiada yang dikira dua kali.",
+  "Mileage in “{}” was converted from miles to km.": "Perbatuan dalam “{}” telah ditukar daripada batu kepada km.",
+  "Mileage in “{}” was converted from km to miles.": "Perbatuan dalam “{}” telah ditukar daripada km kepada batu.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Jumlah dalam “{}” adalah dalam {} dan dikekalkan seperti yang ditulis; perniagaan anda menggunakan {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "Tab dan baris yang ditemui: {}. Ini ialah eksport {}: RoveHQ mengenalinya dan terus membacanya. Buka import untuk menyemak apa yang masuk sebelum apa-apa ditambah.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Ini ialah eksport {}: RoveHQ mengenalinya dan terus membacanya. Buka import untuk membacanya: anda semak apa yang ditemui sebelum apa-apa ditambah.",
+  "Read as {} export.": "Dibaca sebagai eksport {}."
 }

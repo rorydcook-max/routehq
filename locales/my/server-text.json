@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "ဤဖောက်သည်ကို ဖျက်၍ မရပါ။ ထပ်ကြိုးစားပါ။",
   "Choose between 1 and 120 months.": "1 မှ 120 လအတွင်း ရွေးပါ။",
   "We couldn't save that. Please try again.": "သိမ်း၍ မရပါ။ ထပ်ကြိုးစားပါ။",
-  "Please pick a country.": "နိုင်ငံတစ်ခု ရွေးပါ။"
+  "Please pick a country.": "နိုင်ငံတစ်ခု ရွေးပါ။",
+  "Bookings in “{}” were matched to customers in “{}”.": "“{}” ထဲက ဘွတ်ကင်တွေကို “{}” ထဲက ဖောက်သည်တွေနဲ့ ချိတ်ပြီးပါပြီ။",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "“{}” ထဲက ဘွတ်ကင်တွေကို “{}” ထဲက ယာဉ်တွေနဲ့ ချိတ်ပြီးပါပြီ။",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "ငှားရမ်းဆဲ ယာဉ်တွေအတွက် ငွေပေးချေမှု {} ခုကို ချန်ထားပါတယ်- ငှားရမ်းမှုတစ်ခုစီရဲ့ “ပေးချေပြီးသည့်ရက်” မှာ မှတ်ထားပြီးသားမို့ နှစ်ခါ မတွက်ပါဘူး။",
+  "Mileage in “{}” was converted from miles to km.": "“{}” ထဲက မိုင်နှုန်းကို မိုင်မှ km သို့ ပြောင်းထားပါတယ်။",
+  "Mileage in “{}” was converted from km to miles.": "“{}” ထဲက မိုင်နှုန်းကို km မှ မိုင်သို့ ပြောင်းထားပါတယ်။",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "“{}” ထဲက ပမာဏတွေက {} ဖြစ်ပြီး ရေးထားတဲ့အတိုင်း ထားပါတယ်၊ သင့်လုပ်ငန်းက {} ကို သုံးပါတယ်။",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "တွေ့ရှိသည့် tab နဲ့ အတန်းများ- {}။ ဒါက {} ထုတ်ယူဖိုင် ဖြစ်ပါတယ်- RoveHQ က သိပြီး ချက်ချင်း ဖတ်ပါတယ်။ ဘာမှ မထည့်ခင် ဝင်မယ့်အရာကို စစ်ဖို့ ထည့်သွင်းမှုကို ဖွင့်ပါ။",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "ဒါက {} ထုတ်ယူဖိုင် ဖြစ်ပါတယ်- RoveHQ က သိပြီး ချက်ချင်း ဖတ်ပါတယ်။ ဖတ်ဖို့ ထည့်သွင်းမှုကို ဖွင့်ပါ- ဘာမှ မထည့်ခင် တွေ့ရှိတာကို သင် စစ်ကြည့်နိုင်ပါတယ်။",
+  "Read as {} export.": "{} ထုတ်ယူဖိုင်အဖြစ် ဖတ်ထားပါတယ်။"
 }

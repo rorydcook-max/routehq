@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "Kupca nije bilo moguće izbrisati. Pokušajte ponovno.",
   "Choose between 1 and 120 months.": "Odaberite između 1 i 120 mjeseci.",
   "We couldn't save that. Please try again.": "Spremanje nije uspjelo. Pokušajte ponovno.",
-  "Please pick a country.": "Odaberite državu."
+  "Please pick a country.": "Odaberite državu.",
+  "Bookings in “{}” were matched to customers in “{}”.": "Rezervacije u „{}” povezane su s klijentima u „{}”.",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "Rezervacije u „{}” povezane su s vozilima u „{}”.",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "Izostavljene uplate za najmove koji još traju: {}. „Plaćeno do” svakog najma već ih bilježi, pa se ništa ne broji dvaput.",
+  "Mileage in “{}” was converted from miles to km.": "Kilometraža u „{}” pretvorena je iz milja u km.",
+  "Mileage in “{}” was converted from km to miles.": "Kilometraža u „{}” pretvorena je iz km u milje.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Iznosi u „{}” su u valuti {} i ostavljeni su kako su upisani; Vaša tvrtka koristi {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "Pronađene kartice i retci: {}. Ovo je izvoz iz sustava {}: RoveHQ ga prepoznaje i odmah čita. Otvorite uvoz da provjerite što ulazi prije nego što se išta doda.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Ovo je izvoz iz sustava {}: RoveHQ ga prepoznaje i odmah čita. Otvorite uvoz da ga pročitate: provjerit ćete što je pronađeno prije nego što se išta doda.",
+  "Read as {} export.": "Pročitano kao izvoz iz sustava {}."
 }

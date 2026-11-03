@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "No se pudo eliminar este cliente. Inténtalo de nuevo.",
   "Choose between 1 and 120 months.": "Elige entre 1 y 120 meses.",
   "We couldn't save that. Please try again.": "No pudimos guardarlo. Inténtalo de nuevo.",
-  "Please pick a country.": "Elige un país."
+  "Please pick a country.": "Elige un país.",
+  "Bookings in “{}” were matched to customers in “{}”.": "Las reservas de «{}» se vincularon con los clientes de «{}».",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "Las reservas de «{}» se vincularon con los vehículos de «{}».",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "Se omitieron {} pago(s) de alquileres aún en curso: el «pagado hasta» de cada alquiler ya los registra, así que nada se cuenta dos veces.",
+  "Mileage in “{}” was converted from miles to km.": "El kilometraje de «{}» se convirtió de millas a km.",
+  "Mileage in “{}” was converted from km to miles.": "El kilometraje de «{}» se convirtió de km a millas.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Los importes de «{}» están en {} y se mantienen tal cual; su negocio usa {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "Pestañas y filas encontradas: {}. Es una exportación de {}: RoveHQ la reconoce y la lee al momento. Abra la importación para revisar qué entra antes de añadir nada.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Es una exportación de {}: RoveHQ la reconoce y la lee al momento. Abra la importación para leerla: revisará lo que encontró antes de añadir nada.",
+  "Read as {} export.": "Leído como exportación de {}."
 }

@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "මෙම පාරිභෝගිකයා මැකිය නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.",
   "Choose between 1 and 120 months.": "මාස 1 සිට 120 දක්වා තෝරන්න.",
   "We couldn't save that. Please try again.": "අපට එය සුරැකිය නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.",
-  "Please pick a country.": "කරුණාකර රටක් තෝරන්න."
+  "Please pick a country.": "කරුණාකර රටක් තෝරන්න.",
+  "Bookings in “{}” were matched to customers in “{}”.": "“{}” හි වෙන්කිරීම් “{}” හි පාරිභෝගිකයින් සමඟ ගළපන ලදී.",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "“{}” හි වෙන්කිරීම් “{}” හි වාහන සමඟ ගළපන ලදී.",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "තවමත් පවතින කුලීවල ගෙවීම් {} ක් ඉවත් කරන ලදී: එක් එක් කුලියේ “ගෙවා ඇති දිනය” ඒවා සටහන් කරන නිසා කිසිවක් දෙවරක් ගණන් නොගැනේ.",
+  "Mileage in “{}” was converted from miles to km.": "“{}” හි ධාවන දුර සැතපුම්වලින් km වලට පරිවර්තනය කරන ලදී.",
+  "Mileage in “{}” was converted from km to miles.": "“{}” හි ධාවන දුර km වලින් සැතපුම්වලට පරිවර්තනය කරන ලදී.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "“{}” හි මුදල් {} වලින් ඇති අතර ලියා ඇති ආකාරයටම තබා ඇත; ඔබේ ව්‍යාපාරය භාවිත කරන්නේ {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "මෙම tab සහ පේළි හමු විය: {}. මෙය {} අපනයනයකි: RoveHQ එය හඳුනාගෙන වහාම කියවයි. කිසිවක් එක් කිරීමට පෙර ඇතුළත් වන දේ පරීක්ෂා කිරීමට ආයාතය විවෘත කරන්න.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "මෙය {} අපනයනයකි: RoveHQ එය හඳුනාගෙන වහාම කියවයි. එය කියවීමට ආයාතය විවෘත කරන්න: කිසිවක් එක් කිරීමට පෙර හමු වූ දේ ඔබ පරීක්ෂා කරනවා.",
+  "Read as {} export.": "{} අපනයනයක් ලෙස කියවන ලදී."
 }

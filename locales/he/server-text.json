@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "לא ניתן היה למחוק את הלקוח. אפשר לנסות שוב.",
   "Choose between 1 and 120 months.": "יש לבחור בין 1 ל-120 חודשים.",
   "We couldn't save that. Please try again.": "לא הצלחנו לשמור. אפשר לנסות שוב.",
-  "Please pick a country.": "יש לבחור מדינה."
+  "Please pick a country.": "יש לבחור מדינה.",
+  "Bookings in “{}” were matched to customers in “{}”.": "ההזמנות ב„{}” שויכו ללקוחות ב„{}”.",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "ההזמנות ב„{}” שויכו לרכבים ב„{}”.",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "{} תשלומים על השכרות שעדיין פעילות הושמטו: „שולם עד” של כל השכרה כבר רושם אותם, כך ששום דבר לא נספר פעמיים.",
+  "Mileage in “{}” was converted from miles to km.": "הקילומטראז׳ ב„{}” הומר ממיילים לק״מ.",
+  "Mileage in “{}” was converted from km to miles.": "הקילומטראז׳ ב„{}” הומר מק״מ למיילים.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "הסכומים ב„{}” הם ב-{} ונשמרים כפי שנכתבו; העסק שלכם משתמש ב-{}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "נמצאו הלשוניות והשורות האלה: {}. זה ייצוא של {}: RoveHQ מזהה אותו וקורא אותו מיד. פתחו את הייבוא כדי לבדוק מה נכנס לפני שמשהו מתווסף.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "זה ייצוא של {}: RoveHQ מזהה אותו וקורא אותו מיד. פתחו את הייבוא כדי לקרוא אותו: אתם בודקים מה נמצא לפני שמשהו מתווסף.",
+  "Read as {} export.": "נקרא כייצוא מ-{}."
 }

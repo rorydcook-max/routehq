@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "Dieser Kunde konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
   "Choose between 1 and 120 months.": "Wählen Sie zwischen 1 und 120 Monaten.",
   "We couldn't save that. Please try again.": "Das konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
-  "Please pick a country.": "Bitte wählen Sie ein Land."
+  "Please pick a country.": "Bitte wählen Sie ein Land.",
+  "Bookings in “{}” were matched to customers in “{}”.": "Buchungen in „{}“ wurden Kunden in „{}“ zugeordnet.",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "Buchungen in „{}“ wurden Fahrzeugen in „{}“ zugeordnet.",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "{} Zahlung(en) zu laufenden Vermietungen wurden ausgelassen: Das „Bezahlt bis“ jeder Vermietung erfasst sie bereits, sodass nichts doppelt gezählt wird.",
+  "Mileage in “{}” was converted from miles to km.": "Der Kilometerstand in „{}“ wurde von Meilen in km umgerechnet.",
+  "Mileage in “{}” was converted from km to miles.": "Der Kilometerstand in „{}“ wurde von km in Meilen umgerechnet.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Beträge in „{}“ sind in {} und bleiben wie angegeben; Ihr Betrieb verwendet {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "Gefundene Tabellenblätter und Zeilen: {}. Das ist ein {}-Export: RoveHQ erkennt ihn und liest ihn sofort ein. Öffnen Sie den Import, um zu prüfen, was übernommen wird, bevor etwas hinzugefügt wird.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Das ist ein {}-Export: RoveHQ erkennt ihn und liest ihn sofort ein. Öffnen Sie den Import, um ihn einzulesen: Sie prüfen, was gefunden wurde, bevor etwas hinzugefügt wird.",
+  "Read as {} export.": "Gelesen als Export aus {}."
 }

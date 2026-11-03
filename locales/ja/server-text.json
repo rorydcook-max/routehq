@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "この顧客を削除できませんでした。もう一度お試しください。",
   "Choose between 1 and 120 months.": "1〜120 か月の間で選んでください。",
   "We couldn't save that. Please try again.": "保存できませんでした。もう一度お試しください。",
-  "Please pick a country.": "国を選んでください。"
+  "Please pick a country.": "国を選んでください。",
+  "Bookings in “{}” were matched to customers in “{}”.": "「{}」の予約を「{}」の顧客にひも付けました。",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "「{}」の予約を「{}」の車両にひも付けました。",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "レンタル中の支払い{}件は除外しました。各レンタルの「支払済み期限」に記録されているため、二重に計上されることはありません。",
+  "Mileage in “{}” was converted from miles to km.": "「{}」の走行距離をマイルからkmに換算しました。",
+  "Mileage in “{}” was converted from km to miles.": "「{}」の走行距離をkmからマイルに換算しました。",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "「{}」の金額は{}のため、記載どおりに保持しています。お店の通貨は{}です。",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "見つかったタブと行：{}。これは{}のエクスポートです。RoveHQが認識し、すぐに読み込みます。追加する前に、インポートを開いて取り込む内容を確認してください。",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "これは{}のエクスポートです。RoveHQが認識し、すぐに読み込みます。インポートを開いて読み込んでください。追加する前に、見つかった内容を確認できます。",
+  "Read as {} export.": "{}のエクスポートとして読み込みました。"
 }

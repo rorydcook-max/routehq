@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "Hindi mabura ang customer na ito. Subukan ulit.",
   "Choose between 1 and 120 months.": "Pumili mula 1 hanggang 120 buwan.",
   "We couldn't save that. Please try again.": "Hindi namin iyon ma-save. Subukan ulit.",
-  "Please pick a country.": "Pumili ng bansa."
+  "Please pick a country.": "Pumili ng bansa.",
+  "Bookings in “{}” were matched to customers in “{}”.": "Itinugma ang mga booking sa “{}” sa mga customer sa “{}”.",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "Itinugma ang mga booking sa “{}” sa mga sasakyan sa “{}”.",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "Hindi isinama ang {} bayad sa mga rental na tumatakbo pa: nakatala na ang mga ito sa “bayad hanggang” ng bawat rental, kaya walang nabibilang nang dalawang beses.",
+  "Mileage in “{}” was converted from miles to km.": "Na-convert mula milya papuntang km ang mileage sa “{}”.",
+  "Mileage in “{}” was converted from km to miles.": "Na-convert mula km papuntang milya ang mileage sa “{}”.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Ang mga halaga sa “{}” ay nasa {} at pinanatili gaya ng nakasulat; {} ang gamit ng negosyo mo.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "Nakita ang mga tab at row na ito: {}. Isa itong {} export: kilala ito ng RoveHQ at binabasa agad. Buksan ang import para suriin kung ano ang papasok bago may maidagdag.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Isa itong {} export: kilala ito ng RoveHQ at binabasa agad. Buksan ang import para basahin ito: susuriin mo ang nakita nito bago may maidagdag.",
+  "Read as {} export.": "Binasa bilang {} export."
 }

@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "Δεν ήταν δυνατή η διαγραφή του πελάτη. Δοκιμάστε ξανά.",
   "Choose between 1 and 120 months.": "Επιλέξτε από 1 έως 120 μήνες.",
   "We couldn't save that. Please try again.": "Δεν ήταν δυνατή η αποθήκευση. Δοκιμάστε ξανά.",
-  "Please pick a country.": "Επιλέξτε χώρα."
+  "Please pick a country.": "Επιλέξτε χώρα.",
+  "Bookings in “{}” were matched to customers in “{}”.": "Οι κρατήσεις στο «{}» αντιστοιχίστηκαν με πελάτες στο «{}».",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "Οι κρατήσεις στο «{}» αντιστοιχίστηκαν με οχήματα στο «{}».",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "{} πληρωμή(ές) σε ενοικιάσεις που τρέχουν ακόμη παραλείφθηκαν: το «πληρωμένο έως» κάθε ενοικίασης τις καταγράφει ήδη, οπότε τίποτα δεν μετριέται δύο φορές.",
+  "Mileage in “{}” was converted from miles to km.": "Οι ενδείξεις χιλιομετρητή στο «{}» μετατράπηκαν από μίλια σε km.",
+  "Mileage in “{}” was converted from km to miles.": "Οι ενδείξεις χιλιομετρητή στο «{}» μετατράπηκαν από km σε μίλια.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Τα ποσά στο «{}» είναι σε {} και διατηρούνται όπως γράφτηκαν· η επιχείρησή σας χρησιμοποιεί {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "Βρέθηκαν αυτές οι καρτέλες και γραμμές: {}. Πρόκειται για εξαγωγή {}: το RoveHQ την αναγνωρίζει και τη διαβάζει αμέσως. Ανοίξτε την εισαγωγή για να ελέγξετε τι θα μπει πριν προστεθεί οτιδήποτε.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Πρόκειται για εξαγωγή {}: το RoveHQ την αναγνωρίζει και τη διαβάζει αμέσως. Ανοίξτε την εισαγωγή για να τη διαβάσετε: ελέγχετε τι βρέθηκε πριν προστεθεί οτιδήποτε.",
+  "Read as {} export.": "Διαβάστηκε ως εξαγωγή {}."
 }

@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "Deze klant kon niet worden verwijderd. Probeer het opnieuw.",
   "Choose between 1 and 120 months.": "Kies tussen 1 en 120 maanden.",
   "We couldn't save that. Please try again.": "Opslaan is niet gelukt. Probeer het opnieuw.",
-  "Please pick a country.": "Kies een land."
+  "Please pick a country.": "Kies een land.",
+  "Bookings in “{}” were matched to customers in “{}”.": "Boekingen in “{}” zijn gekoppeld aan klanten in “{}”.",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "Boekingen in “{}” zijn gekoppeld aan voertuigen in “{}”.",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "{} betaling(en) op verhuur die nog loopt zijn weggelaten: de “betaald tot” van elke verhuur legt ze al vast, dus niets wordt dubbel geteld.",
+  "Mileage in “{}” was converted from miles to km.": "Kilometerstand in “{}” is omgerekend van mijlen naar km.",
+  "Mileage in “{}” was converted from km to miles.": "Kilometerstand in “{}” is omgerekend van km naar mijlen.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Bedragen in “{}” zijn in {} en blijven zoals ze er staan; je bedrijf gebruikt {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "Deze tabbladen en rijen gevonden: {}. Dit is een export uit {}: RoveHQ herkent die en leest hem meteen. Open de import om te controleren wat erin gaat voordat er iets wordt toegevoegd.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Dit is een export uit {}: RoveHQ herkent die en leest hem meteen. Open de import om hem te lezen: je controleert wat er gevonden is voordat er iets wordt toegevoegd.",
+  "Read as {} export.": "Gelezen als export uit {}."
 }

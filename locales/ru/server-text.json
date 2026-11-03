@@ -282,5 +282,14 @@
   "This customer could not be deleted. Please try again.": "Не удалось удалить этого клиента. Попробуйте ещё раз.",
   "Choose between 1 and 120 months.": "Выберите от 1 до 120 месяцев.",
   "We couldn't save that. Please try again.": "Не удалось сохранить. Попробуйте ещё раз.",
-  "Please pick a country.": "Выберите страну."
+  "Please pick a country.": "Выберите страну.",
+  "Bookings in “{}” were matched to customers in “{}”.": "Бронирования в «{}» сопоставлены с клиентами в «{}».",
+  "Bookings in “{}” were matched to vehicles in “{}”.": "Бронирования в «{}» сопоставлены с автомобилями в «{}».",
+  "{} payment(s) on rentals still running were left out: each rental's “paid up to” records them, so nothing is counted twice.": "Платежи по текущим арендам ({} шт.) не включены: их уже учитывает поле «оплачено до» каждой аренды, так что ничего не считается дважды.",
+  "Mileage in “{}” was converted from miles to km.": "Пробег в «{}» переведён из миль в км.",
+  "Mileage in “{}” was converted from km to miles.": "Пробег в «{}» переведён из км в мили.",
+  "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Суммы в «{}» указаны в {} и оставлены как есть; ваш бизнес использует {}.",
+  "Found these tabs and rows: {}. This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to check what goes in before anything is added.": "Найдены вкладки и строки: {}. Это экспорт из {}: RoveHQ распознаёт его и сразу читает. Откройте импорт и проверьте, что будет перенесено, прежде чем что-либо добавится.",
+  "This is a {} export: RoveHQ recognises it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Это экспорт из {}: RoveHQ распознаёт его и сразу читает. Откройте импорт, чтобы прочитать его: вы проверите найденное, прежде чем что-либо добавится.",
+  "Read as {} export.": "Прочитано как экспорт {}."
 }

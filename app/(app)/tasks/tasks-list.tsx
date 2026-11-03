@@ -16,6 +16,7 @@ import { dateFormat, longDate, shortDate } from "@/lib/i18n/dates";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import type { TaskListItem } from "@/lib/tasks";
 import { BOARD_BUCKETS, BUCKET_LABEL_KEY, bucketOf, type Bucket } from "./buckets";
+import { businessTimeZone } from "@/lib/business-time";
 
 type Filter = "open" | "done";
 
@@ -52,7 +53,7 @@ function dayLabel(iso: string | null, today: string, tx: Tx) {
 /** The short note on the right of a job: "16 days late", "Today", "Tomorrow", "8 Oct". */
 function whenShort(item: TaskListItem, today: string, overdue: boolean, tx: Tx) {
   if (item.completedAt) {
-    const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(item.completedAt));
+    const day = new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone() }).format(new Date(item.completedAt));
     return dayLabel(day, today, tx);
   }
   const due = item.dueDate;
@@ -181,7 +182,7 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
 function timeLabel(dueAt: string | null) {
   if (!dueAt) return null;
   const when = new Date(dueAt);
-  const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(when);
+  const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: businessTimeZone() }).format(when);
   // Tasks created with a date only are stored at midnight (local or UTC, which reads as "07:00" here); neither is a real time.
   if (time === "00:00" || (when.getUTCHours() === 0 && when.getUTCMinutes() === 0)) return null;
   return time;
@@ -486,7 +487,7 @@ function TaskRow({
           ) : null}
           {receipt ? (
             <p className="mt-1 text-sm font-semibold text-[var(--primary)]">
-              {tx.say("receiptSent", { method: methodLabel(receipt.method, tx), day: dayLabel(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(receipt.submittedAt)), today, tx) })}
+              {tx.say("receiptSent", { method: methodLabel(receipt.method, tx), day: dayLabel(new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone() }).format(new Date(receipt.submittedAt)), today, tx) })}
             </p>
           ) : null}
           {receipt?.slip?.amount ? (

@@ -9,7 +9,9 @@ export { CONTACT_FLEETS as LEAD_FLEETS, CONTACT_FLEET_LABEL as LEAD_FLEET_LABEL 
 export const LEAD_COUNTRIES = [
   "TH", "VN", "ID", "MY", "PH", "KH", "LA", "MM", "SG", "BN", "TL", "LK", "IN", "NP", "BD", "MV",
   "CN", "TW", "HK", "JP", "KR", "AE", "IL", "TR", "AU", "NZ", "US", "CA", "MX", "BR", "GB", "IE",
-  "DE", "FR", "ES", "PT", "IT", "NL", "SE", "NO", "DK", "FI", "CH", "AT", "PL", "RU", "ZA", "KE"
+  "DE", "FR", "ES", "PT", "IT", "NL", "SE", "NO", "DK", "FI", "CH", "AT", "PL", "RU", "ZA", "KE",
+  // Europe's rental agreement countries not listed above (3 Nov 2026).
+  "MT", "CY", "GR", "HR"
 ] as const;
 
 /** open: shown in a new tab instead of saved (the contract builder's print page). */

@@ -8,6 +8,7 @@ import { aliasTarget, canUseOwnDomain, canUseSubdomain, hostTarget, isAppHost, i
 import { signedOutLocale, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
 import { DEFAULT_SITE_LOCALE, isSitePath, localizeSitePath, splitSiteLocale } from "@/lib/site/locale-path";
 import { SITE_INTERNAL_PREFIX, siteInternalPath } from "@/lib/site/internal-path";
+import { LEGAL_SLUGS } from "@/lib/site/legal-slugs";
 
 // custom_limits: an admin-set custom plan (returned by resolve_booking_host_v2, migration 0108).
 type BookingSite = { slug: string; tier: string | null; status: string | null; has_domain: boolean; custom_limits: unknown };
@@ -65,6 +66,9 @@ const GUIDE_TOPICS = new Set(["starting", "legal", "operations", "money", "marke
 function missingSiteContent(path: string, locale: string) {
   const topic = path.match(/^\/guides\/category\/([^/]+)$/);
   if (topic) return !GUIDE_TOPICS.has(topic[1]);
+  // Legal pages: a fixed list (lib/site/legal-slugs.ts), English for every language.
+  const legal = path.match(/^\/legal\/([^/]+)$/);
+  if (legal) return !(LEGAL_SLUGS as readonly string[]).includes(legal[1]);
   // Help articles are written in English first; every language shows the English one until it is translated.
   const doc = path.match(/^\/docs\/([^/]+)$/);
   if (doc) {
@@ -87,7 +91,7 @@ function missingSiteContent(path: string, locale: string) {
 
 /** The app's and website's own top-level pages: on rove.rent these still go to RoveHQ, never read as a business's name. */
 const APP_TOP_LEVEL = new Set(
-  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,docs,faq,guides,home,pricing,resources,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko".split(",")
+  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,docs,faq,guides,home,legal,pricing,resources,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko,el,it,nl,pl,hr".split(",")
 );
 
 /** Search engines and link previews: never sent to a language by their Accept-Language (they index each address as it is). */

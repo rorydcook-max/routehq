@@ -11,6 +11,7 @@ import { Dot, Ring } from "@/components/glance";
 import { VehicleArt } from "@/components/vehicle-art";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { Breakdown, MonthRows, WeekBars, money } from "../../reports-view";
+import { businessTimeZone } from "@/lib/business-time";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -119,7 +120,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
   const weekFormat = dateFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" });
   const weekly = (data.weeklyData || []).map((week) => ({ ...week, key: String(week.key || week.label), label: weekFormat.format(new Date(`${String(week.key || week.label)}T00:00:00Z`)) }));
   const busyMonths = monthly.filter((month) => month.revenue !== 0 || month.expenses !== 0).length;
-  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone() }).format(new Date());
   const spent = totalRevenue > 0 ? Math.min(100, Math.round((totalExpenses / totalRevenue) * 100)) : totalExpenses > 0 ? 100 : 0;
   const used = Math.round(utilizationRate);
   const earned = Math.max(0, Math.min(100, roi));

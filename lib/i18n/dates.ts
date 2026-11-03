@@ -1,4 +1,5 @@
 import { customerDate } from "@/lib/i18n/customer-dates";
+import { businessTimeZone } from "@/lib/business-time";
 
 /**
  * Dates on staff pages, in the reader's language. One place, so a screen never
@@ -113,7 +114,7 @@ export function longDate(iso: string | null | undefined, locale: string) {
 /** This year's dates without the year ("27 Sep"), other years with it ("27 Sep 2025"). */
 export function sinceDate(iso: string | null | undefined, locale: string) {
   const value = String(iso || "");
-  const thisYear = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok", year: "numeric" }).format(new Date());
+  const thisYear = new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone(), year: "numeric" }).format(new Date());
   return value.slice(0, 4) === thisYear ? shortDate(value, locale) : longDate(value, locale);
 }
 

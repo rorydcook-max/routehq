@@ -9,8 +9,8 @@ import s from "../site.module.css";
 export const r = (path: string) => path as Route;
 
 /** Website pages that open each other in place. */
-const IN_SITE = new Set(["/pricing", "/faq", "/contact", "/guides", "/resources"]);
-const inSite = (path: string) => IN_SITE.has(path) || path.startsWith("/guides/") || path.startsWith("/resources/");
+const IN_SITE = new Set(["/pricing", "/faq", "/contact", "/guides", "/resources", "/legal"]);
+const inSite = (path: string) => IN_SITE.has(path) || path.startsWith("/guides/") || path.startsWith("/resources/") || path.startsWith("/legal/");
 
 /**
  * A link from the website. Between website pages it opens in place; anywhere else (the app's sign-in, the directory,

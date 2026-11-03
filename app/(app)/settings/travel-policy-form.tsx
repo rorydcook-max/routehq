@@ -9,6 +9,7 @@ import { feeOn, jurisdictionByCountry, type FeeKey, type TravelPolicySettings } 
 import { SwitchField } from "@/components/switch-field";
 import { InfoTip } from "@/components/info-tip";
 import { displayNamesLocale } from "@/lib/i18n/dates";
+import { distanceKey } from "@/lib/business-units";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
@@ -140,7 +141,7 @@ export function TravelPolicyForm({ organizationId, settings, currency = "฿" }:
             <FeeRow
               defaultValue={settings[fee.key]}
               key={fee.key}
-              label={say(fee.label, { currency })}
+              label={say(fee.label === "tp_km" ? distanceKey("tp_km") : fee.label, { currency })}
               name={fee.name}
               offText={say(`tp_off_${fee.key}`)}
               on={feeOn(settings, fee.key)}

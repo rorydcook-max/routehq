@@ -2,6 +2,7 @@
 
 import { extrasFrom, priceExtras } from "@/lib/price-rules";
 import { extrasIncomeTag } from "@/lib/extras";
+import { vatSettings, withVat } from "@/lib/regional";
 import { billingPeriodAmounts, generatePaymentSchedule } from "@/lib/payment-schedule";
 
 import { said } from "@/lib/i18n/server-text";
@@ -398,8 +399,12 @@ async function createBookingOrThrow(formData: FormData) {
 
   // Paid extras: priced again here from Settings, so the price can't be changed in the browser.
   const extraIds = safeJsonArray(formData, "extraIds").map(String);
+  // Prices typed before VAT (Settings › Country and units) are charged with it, the same as the booking form shows.
+  const extrasVat = vatSettings(organization);
   const extrasPriced = priceExtras(
-    extrasFrom(organization.settings).filter((extra) => extraIds.includes(extra.id)),
+    extrasFrom(organization.settings)
+      .filter((extra) => extraIds.includes(extra.id))
+      .map((extra) => ({ ...extra, price: Math.round(withVat(extra.price, extrasVat) * 100) / 100 })),
     endDate ? Math.max(1, Math.round((new Date(`${endDate}T00:00:00Z`).getTime() - new Date(`${startDate}T00:00:00Z`).getTime()) / 86_400_000)) : null
   );
 

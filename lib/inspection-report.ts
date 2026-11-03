@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { htmlToPdf } from "@/lib/html-to-pdf";
+import { businessTimeZone } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { recordActivityEventOnce } from "@/lib/supabase/activity";
 import { emailExecutedDocumentToCustomer } from "@/lib/rental-document-email";
@@ -129,7 +130,7 @@ function labelFor(labels: Record<string, string>, value: string) {
 }
 
 /** Business wall time, e.g. "26 Sep 2026, 10:46 (Bangkok time)". Pure: formats the value given. */
-export function formatReportTime(iso: string, timeZone = "Asia/Bangkok") {
+export function formatReportTime(iso: string, timeZone = businessTimeZone()) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
   const text = new Intl.DateTimeFormat("en-GB", {
@@ -141,7 +142,7 @@ export function formatReportTime(iso: string, timeZone = "Asia/Bangkok") {
     hour12: false,
     timeZone
   }).format(date);
-  return `${text} (${timeZone === "Asia/Bangkok" ? "Bangkok time" : timeZone})`;
+  return `${text} (${(timeZone.split("/").pop() || timeZone).replace(/_/g, " ")} time)`;
 }
 
 function describeDamage(item: unknown) {

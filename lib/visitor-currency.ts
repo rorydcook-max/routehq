@@ -21,7 +21,7 @@ const BY_COUNTRY: Record<string, string> = {
 
 /** Without a country (or one not listed), the language is the next best guess. */
 const BY_LANGUAGE: Record<string, string> = {
-  de: "EUR", fr: "EUR", es: "EUR", it: "EUR", nl: "EUR", fi: "EUR", pt: "EUR", sv: "SEK", nb: "NOK", da: "DKK", ru: "RUB", uk: "UAH",
+  de: "EUR", fr: "EUR", es: "EUR", it: "EUR", nl: "EUR", el: "EUR", hr: "EUR", pl: "PLN", fi: "EUR", pt: "EUR", sv: "SEK", nb: "NOK", da: "DKK", ru: "RUB", uk: "UAH",
   he: "ILS", hi: "INR", ja: "JPY", ko: "KRW", zh: "CNY", "zh-TW": "TWD", id: "IDR", ms: "MYR", vi: "VND", fil: "PHP", th: "THB"
 };
 

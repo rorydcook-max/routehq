@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTimeZone } from "next-intl/server";
 import { textDirection } from "@/lib/i18n/locales";
 import { ImageShrinker } from "@/components/image-shrinker";
 import { FlagFont } from "@/components/flag-font";
 import { BrandStyle } from "@/components/brand-style";
 import { ShellBrandProvider } from "@/components/shell-brand-provider";
+import { businessCurrency, businessDistanceUnit } from "@/lib/business-units";
 import { cookies, headers } from "next/headers";
 import { THEME_COOKIE, themeScript, type ThemeChoice } from "@/lib/theme";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -60,8 +61,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, brand, customerPage, theme] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage(), themeChoice()]);
-  const page = <ShellBrandProvider brand={brand}>{children}</ShellBrandProvider>;
+  const [locale, brand, customerPage, theme, timeZone] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage(), themeChoice(), getTimeZone().catch(() => null)]);
+  // Read after getTimeZone(): loading the signed-in business recorded its unit for this request.
+  const page = <ShellBrandProvider brand={brand} currency={businessCurrency()} distanceUnit={businessDistanceUnit()} timeZone={timeZone}>{children}</ShellBrandProvider>;
   return (
     // "System" is resolved in the browser before the first paint, so the attribute can differ from the server's: expected.
     <html data-theme={theme === "system" ? undefined : theme} dir={textDirection(locale)} lang={locale} suppressHydrationWarning>
@@ -75,7 +77,7 @@ export default async function RootLayout({
         {customerPage ? (
           <NextIntlClientProvider>{page}</NextIntlClientProvider>
         ) : (
-          <StaffMessages locale={locale}>{page}</StaffMessages>
+          <StaffMessages locale={locale} timeZone={timeZone}>{page}</StaffMessages>
         )}
         <ImageShrinker />
         <FlagFont />

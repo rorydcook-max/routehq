@@ -8,7 +8,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { dateFormat, dayOfWeekDate, shortDate as shortDateIn } from "@/lib/i18n/dates";
 import { ArrowRight, Bell, Car, CheckCircle2, TrendingUp, Clock3, FileWarning, KeyRound, Lock, Plus, ReceiptText, RotateCcw, Wallet, MessageCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
-import { businessToday } from "@/lib/business-time";
+import { businessToday, businessTimeZone } from "@/lib/business-time";
 import { jobNameFor } from "@/lib/job-name";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -31,6 +31,7 @@ import { Dot, FleetLot, InOutBars, Ring, Spark, TileHead, type LotState, type Lo
 import { AgendaCalendar } from "@/components/agenda-calendar";
 import { getCalendarEventsBetween, type CalendarEvent } from "@/lib/calendar";
 import { taskCalendarEvents } from "@/lib/calendar-tasks";
+import { distanceKey } from "@/lib/business-units";
 
 // Dates and counts are worded by the translation files (see lib/i18n/dates.ts and locales/).
 function addDays(isoDate: string, days: number) {
@@ -204,7 +205,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const latestChats = ((chatsResult?.data || []) as Array<{ id: string; display_name: string | null; unread_count: number | null; last_message_at: string | null; last_message_preview: string | null; last_message_direction: string | null }>).filter((chat) => chat.last_message_at);
   const unreadTotal = ((unreadResult?.data || []) as Array<{ unread_count: number | null }>).reduce((sum, row) => sum + Number(row.unread_count || 0), 0);
   const bookingCounts = { onRent: onRentCount?.count || 0, starting: startingCount?.count || 0, owing: owingCount?.count || 0 };
-  const chatTimeZone = (organization as any).timezone || "Asia/Bangkok";
+  const chatTimeZone = (organization as any).timezone || businessTimeZone();
   const chatWhen = (iso: string) => {
     const at = new Date(iso);
     const day = dateFormat(locale, { year: "numeric", month: "2-digit", day: "2-digit", timeZone: chatTimeZone }).format(at);
@@ -224,7 +225,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const weekAhead = addDays(today, 7);
   const bangkokHour = (now.getUTCHours() + 7) % 24;
   const greeting = bangkokHour < 12 ? t("goodMorning") : bangkokHour < 18 ? t("goodAfternoon") : t("goodEvening");
-  const headerDate = dateFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Bangkok" }).format(now);
+  const headerDate = dateFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: businessTimeZone() }).format(now);
 
   // ── Money ────────────────────────────────────────────────────────────────
   // Expenses are stored as positive amounts, so they're recognised by type.
@@ -333,7 +334,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       rank: 3,
       tone: "amber",
       icon: <Bell size={17} />,
-      title: t("holdEnding", { vehicle: hold.vehicle, time: new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Bangkok" }).format(new Date(hold.holdUntil)) }),
+      title: t("holdEnding", { vehicle: hold.vehicle, time: new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: businessTimeZone() }).format(new Date(hold.holdUntil)) }),
       detail: hold.who ? t("holdEndingDetail", { who: hold.who }) : t("waitingForCustomer"),
       href: `/bookings/${hold.rentalId}`,
       action: t("open")
@@ -380,7 +381,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           // Due by km: say how far, not a date.
           detail:
             item.kmLeft !== undefined
-              ? t(item.kmLeft < 0 ? "kmOver" : "kmToGo", { km: Math.abs(item.kmLeft).toLocaleString("en-US") })
+              ? t(item.kmLeft < 0 ? distanceKey("kmOver") : distanceKey("kmToGo"), { km: Math.abs(item.kmLeft).toLocaleString("en-US") })
               : item.daysLeft < 0 ? t(service ? "overdueSince" : "expiredSince", { date: shortDate(item.date) }) : item.daysLeft === 0 ? t("today") : `${dayLabel(item.date)}`,
           href: `/fleet/${v.id}`,
           action: t("update")

@@ -8,6 +8,8 @@ import { Card, Fold } from "@/components/ui";
 import { longDate, numberLocale, shortDate } from "@/lib/i18n/dates";
 import { buildAssumptions, evaluate, flatResaleCurve, yearlyLossPct } from "@/lib/vehicle-investment";
 import { rentForAge } from "@/lib/rent-age";
+import { businessDistanceUnit, distanceKey } from "@/lib/business-units";
+import { fromKm, toKm } from "@/lib/regional";
 import type { Assumptions, Outcome, RentStyle, Research, Verdict } from "@/lib/vehicle-investment";
 import type { ChecksLeft } from "@/lib/purchase-checks";
 import Link from "next/link";
@@ -204,6 +206,7 @@ export function CalculatorClient({
   const t = useTranslations("calc");
   const say = t as unknown as Say;
   const locale = useLocale();
+  const distanceUnit = businessDistanceUnit();
   const money = useMemo(() => {
     const format = new Intl.NumberFormat(numberLocale(locale), { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 });
     return (value: number) => format.format(Math.round(value));
@@ -608,7 +611,8 @@ export function CalculatorClient({
           ) : null}
           {/* No empty half-row beside Year: the price moves up next to it when there is no version to choose. */}
           <Num label={t("price")} onChange={setPrice} prefix={currency === "THB" ? "฿" : currency} value={price} />
-          <Num label={t("mileage")} onChange={setMileage} suffix="km" value={mileage} />
+          {/* Typed in the business's unit; kept in km for the sums and the used-car research. */}
+          <Num label={t(distanceKey("mileage"))} onChange={(value) => setMileage(Math.round(toKm(value, distanceUnit)))} suffix={distanceUnit} value={Math.round(fromKm(mileage, distanceUnit))} />
         </div>
 
         <p className={labelCls + " mt-4"}>{t("howRent")}</p>
@@ -930,7 +934,7 @@ export function CalculatorClient({
                           <p className="shrink-0 font-bold">{money(Number(listing.price))}</p>
                         </div>
                         <p className="mt-1 text-xs text-[var(--muted)]">
-                          {[listing.mileage_km ? `${Number(listing.mileage_km).toLocaleString(numberLocale(locale))} km` : "", listing.location, listing.source].filter(Boolean).join(" · ")}
+                          {[listing.mileage_km ? `${Math.round(fromKm(Number(listing.mileage_km), distanceUnit)).toLocaleString(numberLocale(locale))} ${distanceUnit}` : "", listing.location, listing.source].filter(Boolean).join(" · ")}
                         </p>
                         <p className="mt-2 text-sm">
                           {say("otherLine", { amount: about(result.expected.best.perYear), years: result.expected.best.year, pct: result.expected.returnPct.toFixed(1) })}

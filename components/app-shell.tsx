@@ -40,6 +40,7 @@ import { FastActionSheet } from "@/components/fast-action-sheet";
 import { PendingButton } from "@/components/pending-button";
 import { forgetSubscriptionStatus, TrialBanner } from "@/components/trial-banner";
 import { ScreenHelp } from "@/components/screen-help";
+import { businessTimeZone } from "@/lib/business-time";
 
 type NavKey =
   | "dashboard"
@@ -556,7 +557,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
 /** "14:30" for RoveHQ support's access, in Thailand time (where RoveHQ's businesses are). */
 function supportTime(iso: string) {
   try {
-    return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(iso));
+    return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: businessTimeZone() }).format(new Date(iso));
   } catch {
     return "";
   }

@@ -20,6 +20,7 @@ import { effectiveLimits, fleetMix, fleetText, planForFleet, vehiclesOverLimit }
 import { getCustomPlan } from "@/lib/custom-plan";
 import { groupVehiclesByKind, kindLabel } from "@/lib/vehicle-groups";
 import { dateFormat } from "@/lib/i18n/dates";
+import { businessDistanceUnit } from "@/lib/business-units";
 
 const statusTone = {
   Rented: "blue",
@@ -343,7 +344,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                               {/* The one vehicle header: name, year, plate chip. */}
                               <VehicleTitle name={`${vehicle.make} ${vehicle.model}`} nameClassName="truncate font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)]" plate={vehicle.plate} year={vehicle.year} />
                               {/* A mileage nobody has entered yet isn't "0 km". */}
-                              {vehicle.mileage > 0 ? <span className="mt-0.5 block truncate text-[14px] tabular-nums text-[var(--muted)]">{vehicle.mileage.toLocaleString()} km</span> : null}
+                              {vehicle.mileage > 0 ? <span className="mt-0.5 block truncate text-[14px] tabular-nums text-[var(--muted)]">{vehicle.mileage.toLocaleString()} {businessDistanceUnit()}</span> : null}
                             </span>
                           </Link>
                         </td>

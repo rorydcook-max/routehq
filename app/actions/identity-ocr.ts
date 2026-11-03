@@ -2,6 +2,7 @@
 
 import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { licenceCategoriesText } from "@/lib/licence";
 
 /**
  * Reads a customer's passport or driving licence photo so their booking form
@@ -20,6 +21,8 @@ export type IdentityFields = {
   licenceNumber: string | null;
   licenceExpiry: string | null;
   licenceCountry: string | null;
+  /** EU / UK categories (field 9): "A2, B". */
+  licenceCategories?: string | null;
 };
 
 export type IdentityRead = { ok: true; fields: IdentityFields } | { ok: false; reason: "unreadable" | "unavailable" };
@@ -52,7 +55,7 @@ export async function readIdentityDocument(formData: FormData): Promise<Identity
     const wanted =
       kind === "passport"
         ? "is_document (true only if this is a passport or a national identity card with readable text), full_name (given names then family name, in Latin letters, normal capitalisation such as \"Anna Maria Schmidt\"), nationality (the adjective in English, such as \"German\"), nationality_country_code (ISO 3166-1 alpha-2), date_of_birth (YYYY-MM-DD), document_number, expiry_date (YYYY-MM-DD)"
-        : "is_document (true only if this is a driving licence or international driving permit with readable text), full_name (given names then family name, in Latin letters, normal capitalisation), licence_number, expiry_date (YYYY-MM-DD, or null if the licence shows no expiry), issuing_country (in English), date_of_birth (YYYY-MM-DD)";
+        : "is_document (true only if this is a driving licence or international driving permit with readable text), full_name (given names then family name, in Latin letters, normal capitalisation), licence_number, expiry_date (YYYY-MM-DD, or null if the licence shows no expiry), issuing_country (in English), date_of_birth (YYYY-MM-DD), categories (the vehicle categories it allows, as printed in field 9 of an EU or UK licence, as a list such as [\"AM\", \"A2\", \"B\"]; null if none are shown)";
     const parsed = await readFileAsJson({
       system:
         "You read identity documents for a vehicle rental form. Copy what is printed; never guess, complete or correct anything. Use null for any field you cannot read clearly. If the photo is blurred, cropped, a plain colour, or not the document asked for, is_document is false and every other field is null.",
@@ -68,7 +71,8 @@ export async function readIdentityDocument(formData: FormData): Promise<Identity
       passportNumber: kind === "passport" ? text(parsed.document_number, 40) : null,
       licenceNumber: kind === "driver_license" ? text(parsed.licence_number, 40) : null,
       licenceExpiry: kind === "driver_license" ? isoDate(parsed.expiry_date) : null,
-      licenceCountry: kind === "driver_license" ? text(parsed.issuing_country, 60) : null
+      licenceCountry: kind === "driver_license" ? text(parsed.issuing_country, 60) : null,
+      licenceCategories: kind === "driver_license" ? licenceCategoriesText(parsed.categories) || null : null
     };
     const read = parsed.is_document === true && Object.values(fields).some(Boolean);
 
@@ -84,6 +88,7 @@ export async function readIdentityDocument(formData: FormData): Promise<Identity
       if (fields.licenceNumber) next.ocr_licence_number = fields.licenceNumber;
       if (fields.licenceCountry) next.ocr_licence_country = fields.licenceCountry;
       if (fields.licenceExpiry) next.ocr_licence_expiry = fields.licenceExpiry;
+      if (fields.licenceCategories) next.ocr_licence_categories = fields.licenceCategories;
     }
     await admin.from("booking_links").update({ booking_data: next }).eq("id", link.id);
 

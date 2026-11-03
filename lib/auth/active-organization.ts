@@ -11,6 +11,8 @@
  * This file has no server-only imports so the middleware can use it too.
  */
 
+import { distanceUnitFor, type DistanceUnit } from "@/lib/regional";
+
 export const ACTIVE_ORGANIZATION_COOKIE = "rhq_active_org";
 
 export type ActiveMembership = {
@@ -36,7 +38,7 @@ export function pickActiveMembership(memberships: ActiveMembership[], preferredO
  */
 export const SUPPORT_DISPLAY_NAME = "RoveHQ support";
 
-type MembershipRow = ActiveMembership & { display_name?: string | null; organizations?: { deleted_at?: string | null } | null };
+type MembershipRow = ActiveMembership & { display_name?: string | null; organizations?: { deleted_at?: string | null; timezone?: string | null; country_code?: string | null; currency?: string | null; distance_unit?: string | null } | null };
 
 const isSupportMembership = (row: MembershipRow) => row.display_name === SUPPORT_DISPLAY_NAME && row.role === "manager";
 
@@ -50,7 +52,7 @@ const isSupportMembership = (row: MembershipRow) => row.display_name === SUPPORT
 export async function loadActiveMembership(supabase: any, userId: string, preferredOrganizationId?: string | null) {
   let { data, error } = await supabase
     .from("organization_members")
-    .select("organization_id, role, is_active, created_at, display_name, organizations(deleted_at)")
+    .select("organization_id, role, is_active, created_at, display_name, organizations(deleted_at, timezone, country_code, currency, distance_unit:settings->>distance_unit)")
     .eq("user_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: true });
@@ -64,7 +66,7 @@ export async function loadActiveMembership(supabase: any, userId: string, prefer
       .eq("is_active", true)
       .order("created_at", { ascending: true }));
   }
-  if (error) return { data: null as ActiveMembership | null, error, closed: false };
+  if (error) return { data: null as ActiveMembership | null, error, closed: false, timezone: null as string | null, distanceUnit: null as DistanceUnit | null, currency: null as string | null };
 
   const rows = (data || []) as MembershipRow[];
   const open = rows.filter((row) => !row.organizations?.deleted_at);
@@ -82,5 +84,11 @@ export async function loadActiveMembership(supabase: any, userId: string, prefer
   }
 
   const closed = rows.length > 0 && open.length === 0;
-  return { data: pickActiveMembership(usable.map(({ organizations: _org, display_name: _name, ...rest }) => rest), preferredOrganizationId), error: null, closed };
+  const picked = pickActiveMembership(usable.map(({ organizations: _org, display_name: _name, ...rest }) => rest), preferredOrganizationId);
+  // The business's time zone, for its "today" (lib/business-time.ts; recorded by getActiveMembership on the server).
+  const org = picked ? rows.find((row) => row.organization_id === picked.organization_id)?.organizations || null : null;
+  const timezone = org?.timezone || null;
+  // Miles or km (lib/business-units.ts): the saved choice, else the country's usual unit.
+  const distanceUnit = org ? distanceUnitFor({ country_code: org.country_code, settings: { distance_unit: org.distance_unit } }) : null;
+  return { data: picked, error: null, closed, timezone, distanceUnit, currency: org?.currency || null };
 }

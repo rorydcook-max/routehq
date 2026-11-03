@@ -1,6 +1,7 @@
 export const supportedLocaleCodes = [
   "en", "th", "my", "vi", "id", "ms", "zh", "zh-TW", "fil", "hi", "ta", "si",
-  "fr", "ru", "es", "pt", "he", "de", "sv", "nb", "lo", "ko", "ja"
+  "fr", "ru", "es", "pt", "he", "de", "sv", "nb", "lo", "ko", "ja",
+  "el", "it", "nl", "pl", "hr"
 ] as const;
 
 export type SupportedLocale = (typeof supportedLocaleCodes)[number];
@@ -21,7 +22,7 @@ export type SupportedLocale = (typeof supportedLocaleCodes)[number];
  *   pt     Brazilian Portuguese (Brazil's rental market); readers in Portugal and Africa understand it.
  *
  * Order (Rory, 27 Oct 2026): alphabetical by each language's own name, the way language lists are
- * usually sorted: Latin-script names A–Z first, then the other scripts (Cyrillic, Hebrew, the Indian
+ * usually sorted: Latin-script names A–Z first, then the other scripts (Greek, Cyrillic, Hebrew, the Indian
  * scripts, Thai, Lao, Burmese, Korean, Japanese, Chinese). Written out rather than sorted at run time so
  * the server and every browser show the same order. Every language picker reads this list.
  */
@@ -32,11 +33,16 @@ export const supportedLocaleOptions: Array<{ code: SupportedLocale; label: strin
   { code: "en", label: "English", english: "English" },
   { code: "es", label: "Español (Spanish)", english: "Spanish" },
   { code: "fr", label: "Français (French)", english: "French" },
+  { code: "hr", label: "Hrvatski (Croatian)", english: "Croatian" },
+  { code: "it", label: "Italiano (Italian)", english: "Italian" },
+  { code: "nl", label: "Nederlands (Dutch)", english: "Dutch" },
   { code: "nb", label: "Norsk (Norwegian)", english: "Norwegian (Bokmal)" },
+  { code: "pl", label: "Polski (Polish)", english: "Polish" },
   { code: "pt", label: "Português (Portuguese)", english: "Portuguese (Brazil)" },
   { code: "sv", label: "Svenska (Swedish)", english: "Swedish" },
   { code: "fil", label: "Tagalog (Filipino)", english: "Filipino (Tagalog)" },
   { code: "vi", label: "Tiếng Việt (Vietnamese)", english: "Vietnamese" },
+  { code: "el", label: "Ελληνικά (Greek)", english: "Greek" },
   { code: "ru", label: "Русский (Russian)", english: "Russian" },
   { code: "he", label: "עברית (Hebrew)", english: "Hebrew" },
   { code: "hi", label: "हिन्दी (Hindi)", english: "Hindi" },

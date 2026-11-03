@@ -24,6 +24,7 @@ import { chatInvites } from "@/lib/customer-chat-link";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { PortalPayments } from "./portal-payments";
 import { getLocale, getTranslations } from "next-intl/server";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 /** The page's words in the customer's language. Passed to the helpers below so they stay plain functions. */
 type T = Awaited<ReturnType<typeof getTranslations>>;
@@ -49,7 +50,7 @@ async function pendingAmendmentFor(rentalId: string) {
 }
 
 function money(value: unknown, currency = "THB") {
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
+  return currency === "THB" ? new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0)) : formatRegionalMoney(Number(value || 0), currency, "en-GB");
 }
 
 function rateLabel(rental: any, t: T) {
@@ -407,7 +408,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           {/* One fact per line on a phone: two columns broke prices and place names across four lines. Tiles keep their own height. */}
           <div className="mt-4 grid items-start gap-3 sm:grid-cols-2">
             <Info icon={CalendarDays} label={t("rentalPeriod")} value={rental.is_indefinite && detail.state !== "completed" ? t("openEndedFrom", { date: formatSummaryDate(rental.start_date, t, locale) }) : t("dateRange", { start: formatSummaryDate(rental.start_date, t, locale), end: formatSummaryDate(rental.end_date, t, locale) })} />
-            <Info icon={CreditCard} label={t("rateAndDeposit")} value={`${rateLabel(rental, t)}${extrasText(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}`} />
+            <Info icon={CreditCard} label={t("rateAndDeposit")} value={`${rateLabel(rental, t)}${extrasText(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}${(detail as any).org_payment?.vat ? `\n${t("vatIncluded", { name: (detail as any).org_payment.vat.name, rate: (detail as any).org_payment.vat.rate })}` : ""}`} />
             {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
             {handedOver ? null : <Info icon={ReceiptText} label={t("firstPaymentDue")} value={paymentDueText(rental, bookingData, t, locale)} />}
             {/* Where and when in one tile, so no tile is left alone on the last row. */}

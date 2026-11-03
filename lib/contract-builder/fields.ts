@@ -25,12 +25,28 @@ export const CONTRACT_BUILDER_PAGES: Readonly<Record<string, string | null>> = {
   "rental-agreement-malaysia": "MY",
   "rental-agreement-philippines": "PH",
   "rental-agreement-laos": "LA",
-  "rental-agreement-cambodia": "KH"
+  "rental-agreement-cambodia": "KH",
+  // Europe (3 Nov 2026).
+  "rental-agreement-uk": "GB",
+  "rental-agreement-ireland": "IE",
+  "rental-agreement-malta": "MT",
+  "rental-agreement-cyprus": "CY",
+  "rental-agreement-greece": "GR",
+  "rental-agreement-spain": "ES",
+  "rental-agreement-portugal": "PT",
+  "rental-agreement-italy": "IT",
+  "rental-agreement-croatia": "HR",
+  "rental-agreement-france": "FR",
+  "rental-agreement-germany": "DE"
 };
 
 export const isContractBuilder = (slug: string) => Object.prototype.hasOwnProperty.call(CONTRACT_BUILDER_PAGES, slug);
 
-export const CONTRACT_COUNTRIES =["TH", "ID", "VN", "MY", "PH", "LA", "KH", "XX"] as const;
+export const CONTRACT_COUNTRIES = [
+  "TH", "ID", "VN", "MY", "PH", "LA", "KH",
+  "GB", "IE", "MT", "CY", "GR", "ES", "PT", "IT", "HR", "FR", "DE",
+  "XX"
+] as const;
 export type ContractCountry = (typeof CONTRACT_COUNTRIES)[number];
 
 /** The lead form's country codes (lowercase) to the agreement's country version; anything else gets the general one. */
@@ -40,8 +56,15 @@ export function contractCountryFor(leadCountry: string | null | undefined): Cont
 }
 
 /** The currency the form suggests (operators can change it: plenty of shops price in USD or THB elsewhere). */
-export const CONTRACT_CURRENCY: Record<ContractCountry, string> = { TH: "THB", ID: "IDR", VN: "VND", MY: "MYR", PH: "PHP", LA: "LAK", KH: "USD", XX: "USD" };
-export const CURRENCIES = ["THB", "IDR", "VND", "MYR", "PHP", "LAK", "KHR", "USD", "EUR", "AUD", "SGD"] as const;
+export const CONTRACT_CURRENCY: Record<ContractCountry, string> = {
+  TH: "THB", ID: "IDR", VN: "VND", MY: "MYR", PH: "PHP", LA: "LAK", KH: "USD",
+  GB: "GBP", IE: "EUR", MT: "EUR", CY: "EUR", GR: "EUR", ES: "EUR", PT: "EUR", IT: "EUR", HR: "EUR", FR: "EUR", DE: "EUR",
+  XX: "USD"
+};
+export const CURRENCIES = ["THB", "IDR", "VND", "MYR", "PHP", "LAK", "KHR", "USD", "EUR", "GBP", "AUD", "SGD"] as const;
+
+/** Countries whose agreement counts distance in miles (the form's mileage labels follow). */
+export const MILES_COUNTRIES: readonly string[] = ["GB"];
 
 type Kind = "text" | "number" | "select" | "textarea";
 export type ContractField = { key: string; kind: Kind; max?: number; options?: readonly string[]; group: "business" | "vehicle" | "prices" | "rules" };

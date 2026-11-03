@@ -44,10 +44,10 @@ function messagesFor(locale: string): Promise<Messages> {
   return pending;
 }
 
-export function StaffMessages({ locale, children }: { locale: string; children: React.ReactNode }) {
+export function StaffMessages({ locale, timeZone, children }: { locale: string; timeZone?: string | null; children: React.ReactNode }) {
   const messages = use(messagesFor(locale));
   return (
-    <NextIntlClientProvider locale={locale} messages={messages} timeZone="Asia/Bangkok">
+    <NextIntlClientProvider locale={locale} messages={messages} timeZone={timeZone || "Asia/Bangkok"}>
       {children}
     </NextIntlClientProvider>
   );

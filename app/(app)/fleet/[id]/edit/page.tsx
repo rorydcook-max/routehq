@@ -18,6 +18,7 @@ import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { CONDITIONS } from "@/lib/vehicle-condition";
 import { longDate } from "@/lib/i18n/dates";
+import { distanceKey } from "@/lib/business-units";
 
 // The wording for this page is in locales/<language>/common.json under "vehicleForm".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -220,7 +221,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             </div>
           </Fold>
           {isOwner ? (
-          <Fold summary={say("valueSummaryEdit")} title={say("valueTitleEdit")}>
+          <Fold summary={say(distanceKey("valueSummaryEdit"))} title={say("valueTitleEdit")}>
             <div className="grid gap-4 sm:grid-cols-2">
               {moneyField("purchasePrice", "purchasePrice", vehicle.purchase_price)}
               {dateField("purchaseDate", "purchaseDate", vehicle.purchase_date)}

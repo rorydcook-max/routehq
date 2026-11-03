@@ -1,6 +1,6 @@
 "use server";
 
-import { businessToday } from "@/lib/business-time";
+import { businessToday, businessTimeZone } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { redirect } from "next/navigation";
@@ -23,6 +23,7 @@ import { said } from "@/lib/i18n/server-text";
 import { earlyStartFor, ensureEarlyStartCharge, requestEarlyWaiver, settleEarlyChoice } from "@/lib/early-start";
 import { applyLateStart, lateStartNote } from "@/lib/late-start";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
+import { businessDistanceUnit } from "@/lib/business-units";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
 
@@ -764,7 +765,7 @@ export async function submitInspection(formData: FormData) {
     // The vehicle is back, so the rental ends today (business time). An
     // open-ended or later end date is closed off and rent scheduled after
     // today is voided, otherwise it would show as owed and later as overdue.
-    const returnDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+    const returnDate = new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone() }).format(new Date());
     const endDate = rental?.end_date && String(rental.end_date).slice(0, 10) < returnDate ? String(rental.end_date).slice(0, 10) : returnDate;
 
     const { error: rentalError } = await supabase
@@ -953,8 +954,8 @@ export async function submitInspection(formData: FormData) {
           : "Handover form completed",
     detail:
       mode === "return"
-        ? `${customerName} returned ${vehicleLabel}. ${odometerReading.toLocaleString()} km recorded.`
-        : `${vehicleLabel} inspected for ${customerName}. ${odometerReading.toLocaleString()} km recorded.`
+        ? `${customerName} returned ${vehicleLabel}. ${odometerReading.toLocaleString()} ${businessDistanceUnit()} recorded.`
+        : `${vehicleLabel} inspected for ${customerName}. ${odometerReading.toLocaleString()} ${businessDistanceUnit()} recorded.`
   });
 
   if ((mode === "delivery" || mode === "return") && rentalId && customerSignature) {

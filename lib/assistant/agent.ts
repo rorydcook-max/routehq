@@ -1,6 +1,7 @@
 import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import type { AskTurn } from "@/lib/ask";
-import { businessToday } from "@/lib/business-time";
+import { businessTimeZone, businessToday } from "@/lib/business-time";
+import { businessDistanceUnit } from "@/lib/business-units";
 import { toolsForRole, type AssistantRole, type ToolName } from "@/lib/assistant/permissions";
 import { runTool, toolSpecs, type Outcome, type ToolContext } from "@/lib/assistant/tools";
 import type { ChatMeta } from "@/lib/chat";
@@ -55,6 +56,8 @@ function systemPrompt(input: AssistantInput, tools: ToolName[]) {
   const tasks = (["add_vehicles", "renew_paperwork", "record_cost", "record_payment", "create_booking"] as ToolName[]).filter(has);
   return [
     "You are the RoveHQ assistant, in the chat of RoveHQ, an app for small vehicle rental businesses (owners and staff, mostly on phones). You are the only assistant: help, figures and tasks are all yours. Never mention other assistants.",
+    // The business's own clock and distance unit (a UK business: Europe/London and miles), recorded when it was loaded.
+    input.role === "visitor" ? "" : `Their time zone is ${businessTimeZone()}. Distances (odometer, services, limits) are in ${businessDistanceUnit() === "mi" ? "miles (mi)" : "kilometres (km)"}.`,
     `Today is ${businessToday()}. Reply in ${input.language}. They are ${ROLE_WORDS[input.role]}, on the page ${input.pathname || "/"}${vehicle ? ` (vehicle ${vehicle})` : ""}${booking ? ` (booking ${booking})` : ""}.`,
     "Always call a tool. Finish with reply, unless another tool finishes the turn.",
     "How to use RoveHQ, features, problems, plans and pricing: call search_help, then reply only from what it returns. Never invent a feature, button or setting. If it doesn't cover the question, say so in one sentence and set handoff.",

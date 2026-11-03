@@ -15,6 +15,7 @@ import { feeOn, getTravelPolicySettings } from "@/lib/travel-policy";
 import { AgreementTerms } from "./agreement-terms";
 import { ContractImportCard } from "./import-card";
 import { currencySymbol } from "@/components/currency-symbol";
+import { distanceKey } from "@/lib/business-units";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -50,7 +51,7 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
   // A fee switched off in Settings shows as such, the way the agreement leaves it out.
   const off = say("tp_offShort");
   const numbers = [
-    { label: say("tp_km"), value: feeOn(policy, "mileage_limit") ? policy.mileage_limit.toLocaleString("en-US") : say("tp_off_mileage_limit") },
+    { label: say(distanceKey("tp_km")), value: feeOn(policy, "mileage_limit") ? policy.mileage_limit.toLocaleString("en-US") : say("tp_off_mileage_limit") },
     { label: say("ag_n_late"), value: feeOn(policy, "late_fee_percentage") ? `${policy.late_fee_percentage}%` : off },
     { label: say("ag_n_depositBack"), value: feeOn(policy, "deposit_return_days") ? say("ag_n_days", { count: policy.deposit_return_days }) : say("tp_off_deposit_return_days") },
     { label: say("ag_n_fuel"), value: feeOn(policy, "fuel_charge_per_increment") ? amount(policy.fuel_charge_per_increment) : off },

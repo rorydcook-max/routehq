@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { browserSafeAssetUrl, createBrandingSignedUrl, parseLegacyBrandingReference } from "@/lib/branding-assets";
+import { agreementCountry } from "@/lib/agreement-language";
 import { buildContractVariables, contractVariableKeys } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate } from "@/lib/default-contract-template";
 import { UPLOADED_TEMPLATE_KEY } from "@/lib/contract-import-template";
@@ -85,6 +86,10 @@ export async function embedLogoInContractVariables(supabase: any, variables: Rec
 }
 
 export function buildSampleContractVariables(organization: any) {
+  // Thailand (or no country yet) keeps the Samui sample; elsewhere the plate, places and currency are neutral.
+  const code = agreementCountry(organization).code;
+  const thai = !code || code === "TH";
+  const place = thai ? "Samui Airport" : "Airport";
   return buildContractVariables({
     organization,
     customer: {
@@ -96,7 +101,7 @@ export function buildSampleContractVariables(organization: any) {
       nationality: "British",
       phone: "+44 7700 900123",
       email: "alex@example.com",
-      address: "Demo hotel, Chaweng",
+      address: thai ? "Demo hotel, Chaweng" : "Demo hotel",
       preferred_locale: organization?.default_locale || "en"
     },
     vehicle: {
@@ -104,7 +109,7 @@ export function buildSampleContractVariables(organization: any) {
       model: "Ranger",
       trim: "WildTrak 2.0L Bi-Turbo 4x4 10AT",
       year: "2018",
-      registration_number: "ขษ 5168",
+      registration_number: thai ? "ขษ 5168" : "AB12 CDE",
       color: "White",
       voluntary_insurance_type: "First-class rental-use",
       specifications: { fuel_type: "diesel" }
@@ -115,14 +120,14 @@ export function buildSampleContractVariables(organization: any) {
       pricing_model: "monthly",
       rental_rate: 23000,
       deposit_amount: 10000,
-      currency: "THB",
+      currency: thai ? "THB" : organization?.currency || "THB",
       is_indefinite: false,
-      delivery_location: "Samui Airport"
+      delivery_location: place
     },
     bookingLink: {
       booking_data: {
         delivery_method: "deliver",
-        delivery_location: "Samui Airport",
+        delivery_location: place,
         delivery_datetime: "2026-05-24T10:00:00+07:00",
         insurance_excess: 10000,
         special_conditions: "No cross-border travel without written approval."

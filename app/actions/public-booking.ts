@@ -27,6 +27,7 @@ import {
   getCustomerExecutedAgreementDownloads
 } from "@/lib/rental-document-customer-signing";
 import { toWallTime, wallTimeToIso, businessToday } from "@/lib/business-time";
+import { licenceCategoriesText } from "@/lib/licence";
 
 // The customer reads these, so a missing field is named the way the form labels it, not by its key.
 const FIELD_WORDS: Record<string, string> = {
@@ -748,6 +749,12 @@ export async function completePublicBooking(formData: FormData) {
         if (result.expiry_date) ocrBookingData.ocr_licence_expiry = result.expiry_date;
       }
     }
+  }
+
+  // Licence categories read from the licence photo (field 9 on EU / UK cards) go on the customer when none are saved.
+  const readCategories = licenceCategoriesText((bookingLink.booking_data as any)?.ocr_licence_categories);
+  if (readCategories) {
+    await supabase.from("customers").update({ license_type: readCategories }).eq("id", customerId).eq("organization_id", organizationId).is("license_type", null);
   }
 
   if (Object.keys(ocrBookingData).length > 0) {

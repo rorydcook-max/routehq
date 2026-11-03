@@ -3,9 +3,10 @@ import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { bookingRules, earliestStart } from "@/lib/booking-rules";
-import { businessToday } from "@/lib/business-time";
+import { businessToday, setBusinessTimeZone } from "@/lib/business-time";
 import { kindFromCategory, type VehicleKind } from "@/lib/vehicle-groups";
 import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
+import { vatSettings, withVat } from "@/lib/regional";
 import { vehiclePhotoUrls } from "@/lib/vehicle-photos";
 import { bookingAddress } from "@/lib/booking-address";
 
@@ -66,6 +67,10 @@ export async function getPublicCatalog(slug: string) {
   if (!organization) return null;
 
   const settings = publicBookingSettings(organization.settings);
+  // Its own clock for the first bookable day, and prices typed before VAT shown and charged with it (Country and units).
+  setBusinessTimeZone(organization.timezone);
+  const vat = vatSettings(organization);
+  const gross = (value: unknown) => Math.round(withVat(Number(value || 0), vat) * 100) / 100;
   if (!settings.enabled) return { enabled: false as const, name: String(organization.name || "") };
   await releaseExpiredHolds(admin, organization.id).catch(() => null);
   const rules = bookingRules(organization.settings);
@@ -111,9 +116,9 @@ export async function getPublicCatalog(slug: string) {
         photoUrl: photosByVehicle.get(vehicle.id)?.[0] || null,
         photoUrls: photosByVehicle.get(vehicle.id) || [],
         details: [specs.transmission, specs.fuel_type, seats > 0 ? `${seats} seats` : null].filter(Boolean).map(String),
-        dailyRate: Number(vehicle.daily_rate || 0),
-        weeklyRate: Number(vehicle.weekly_rate || 0),
-        monthlyRate: Number(vehicle.monthly_rate || 0),
+        dailyRate: gross(vehicle.daily_rate),
+        weeklyRate: gross(vehicle.weekly_rate),
+        monthlyRate: gross(vehicle.monthly_rate),
         deposit: vehicle.deposit_amount === null || vehicle.deposit_amount === undefined ? settings.deposit : Math.max(0, Number(vehicle.deposit_amount) || 0),
         busy: busy.get(vehicle.id) || []
       };
@@ -142,7 +147,7 @@ export async function getPublicCatalog(slug: string) {
     offer: settings.offer,
     /** High-season price rises and paid extras, from Settings. */
     seasons: seasonsFrom(orgSettings),
-    extras: extrasFrom(orgSettings),
+    extras: extrasFrom(orgSettings).map((extra) => ({ ...extra, price: gross(extra.price) })),
     vehicles
   };
 }

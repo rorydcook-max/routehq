@@ -15,6 +15,8 @@ import { paperworkFor } from "@/lib/country-paperwork";
 import { monthsCovered } from "@/lib/cost-spread";
 import type { MatchResult } from "@/lib/transaction-matching";
 import type { TransactionFormOptions, TransactionFormPrefill } from "@/lib/transactions";
+import { businessTimeZone } from "@/lib/business-time";
+import { distanceKey } from "@/lib/business-units";
 
 const MONEY_IN: string[] = ["rental_income", "charge_recovered", "deposit_received", "deposit_forfeited", "deposit_deduction"];
 // Costs a renter can be responsible for. Insurance, tax and finance are the owner's own.
@@ -73,7 +75,7 @@ export function TransactionForm({
   const t = useTranslations("money");
   const say = t as unknown as (key: string, values?: Record<string, string | number>) => string;
   const locale = useLocale();
-  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone() }).format(new Date());
   // A scheduled payment is named here, in the reader's language; anything else keeps the name it came with.
   const matchLabel = (match: MatchResult) =>
     match.kind ? say(`match_${match.kind}`, { amount: `฿${Math.round(match.amount || 0).toLocaleString("en-US")}`, vehicle: match.vehicleName || match.vehicleLabel || "" }) : match.label;
@@ -89,7 +91,7 @@ export function TransactionForm({
   const [amount, setAmount] = useState(prefill?.amount || "");
   // Today in business time: toISOString() is UTC, which is still "yesterday" in Thailand before 7am.
   const [transactionDate, setTransactionDate] = useState(
-    prefill?.transactionDate || new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date())
+    prefill?.transactionDate || new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone() }).format(new Date())
   );
   const [notes, setNotes] = useState(prefill?.notes || "");
   // No vehicle is preselected: a money entry silently booked against the first car in the list is worse than a required field.
@@ -551,10 +553,10 @@ export function TransactionForm({
                 <input className={inputClass} name="serviceNextDate" type="date" />
               </label>
               <label className="block">
-                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("sv_nextKm")}</span>
+                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say(distanceKey("sv_nextKm"))}</span>
                 <input className={inputClass} inputMode="numeric" min="0" name="serviceNextKm" type="number" />
               </label>
-              <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{say("sv_hint")}</p>
+              <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{say(distanceKey("sv_hint"))}</p>
             </div>
           ) : null}
 

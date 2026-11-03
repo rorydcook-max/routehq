@@ -9,6 +9,7 @@ import { updateCustomer, uploadCustomerDocument } from "@/app/actions/customers"
 import { CustomerNotesForm } from "@/app/(app)/customers/[id]/customer-notes-form";
 import { DoNotRent } from "@/app/(app)/customers/[id]/do-not-rent";
 import { ReportToOthers } from "@/app/(app)/customers/[id]/report-to-others";
+import { CustomerPrivacy } from "@/app/(app)/customers/[id]/customer-privacy";
 import { currencySymbol } from "@/components/currency-symbol";
 import { SharedHistory } from "@/components/shared-history";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -26,6 +27,8 @@ import { countriesSorted, customerLanguages, flagForNationality } from "@/lib/cu
 import { getCustomerDetail, getCustomerDocumentCompleteness, type CustomerDetail, refundsOf } from "@/lib/customer-detail";
 import { longDate } from "@/lib/i18n/dates";
 import { getDefaultOrganization } from "@/lib/organization";
+import { LICENCE_CATEGORIES, licenceCategoriesOf } from "@/lib/licence";
+import { orgCountry } from "@/lib/regional";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
@@ -193,7 +196,7 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
   );
 }
 
-function DetailsForm({ customer, organizationId }: { customer: any; organizationId: string }) {
+function DetailsForm({ customer, organizationId, uk = false }: { customer: any; organizationId: string; uk?: boolean }) {
   const cx = useCx();
   const locale = useLocale();
   const day = (value: unknown) => String(value || "").slice(0, 10);
@@ -255,6 +258,26 @@ function DetailsForm({ customer, organizationId }: { customer: any; organization
         <span className={labelClass}>{cx.say("f_licenceCountry")}</span>
         <input className={inputClass} defaultValue={customer.driver_license_country || ""} list="customer-country-options" name="driverLicenseCountry" />
       </label>
+      {/* EU licence categories (field 9 on the card): what they may drive, saved in customers.license_type. */}
+      <fieldset className="block sm:col-span-2">
+        <legend className={labelClass}>{cx.say("f_licenceCategories")}</legend>
+        <input name="licenceCategoriesShown" type="hidden" value="1" />
+        <div className="mt-1 flex flex-wrap gap-2">
+          {LICENCE_CATEGORIES.map((category) => (
+            <label className="flex min-h-10 items-center gap-1.5 rounded-lg border border-[var(--border)] bg-white px-2.5 font-semibold text-[var(--foreground)]" key={category}>
+              <input defaultChecked={licenceCategoriesOf(customer.license_type).includes(category)} name="licenceCategories" type="checkbox" value={category} />
+              {category}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      {uk ? (
+        <label className="block sm:col-span-2">
+          <span className={labelClass}>{cx.say("f_dvlaCode")}</span>
+          <input autoCapitalize="characters" className={inputClass} defaultValue={customer.dvla_check_code || ""} maxLength={12} name="dvlaCheckCode" />
+          <span className="mt-1 block font-medium text-[var(--muted)]">{cx.say("f_dvlaCodeHint")}</span>
+        </label>
+      ) : null}
       <label className="block">
         <span className={labelClass}>{cx.say("f_emName")}</span>
         <input className={inputClass} defaultValue={customer.emergency_contact_name || ""} name="emergencyContactName" />
@@ -498,6 +521,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
     supabase.from("customer_reports").select("id, kind, amount, occurred_on, rental_id, summary, settled_at, settled_note, customer_response, disputed_at").eq("organization_id", organization.id).eq("customer_id", customer.id).is("withdrawn_at", null).order("occurred_on", { ascending: false }),
     getCurrentMembership()
   ]);
+  const privacySay = (await getTranslations("privacy")) as unknown as Say;
   const rentalLabel = (rental: any) => `${[rental.vehicles?.make, rental.vehicles?.model].filter(Boolean).join(" ") || rental.vehicles?.registration_number || "—"} · ${formatDate(rental.start_date, cx)}`;
   const reportableRentals = (detail.rentals as any[]).filter((rental) => isHandedOver(rental.status)).map((rental) => ({ id: rental.id as string, label: rentalLabel(rental) }));
   const ownReports = ((ownReportRows || []) as any[]).map((report) => ({
@@ -681,7 +705,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               content: (
                 <div className="grid items-start gap-3 lg:grid-cols-2">
             <Pane id="details" summary={missingDetails > 0 ? cx.say("d_missing", { count: missingDetails }) : cx.say("d_ok")} title={cx.say("d_title")}>
-              <DetailsForm customer={customer} organizationId={organization.id} />
+              <DetailsForm customer={customer} organizationId={organization.id} uk={orgCountry(organization) === "GB"} />
             </Pane>
                   <div className="grid gap-3">
             <Pane summary={cx.say("ch_summary")} title={cx.say("ch_title")}>
@@ -690,6 +714,12 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             <Pane id="notes" open={Boolean(customer.notes)} summary={customer.notes ? undefined : cx.say("n_none")} title={cx.say("n_title")}>
               <CustomerNotesForm customerId={customer.id} notes={customer.notes || ""} organizationId={organization.id} />
             </Pane>
+            {/* GDPR / PDPA requests from the renter: a copy of their data, or deletion. Owner and managers. */}
+            {["owner", "manager"].includes(String(membership?.role || "")) ? (
+              <Pane id="privacy" title={privacySay("customerTitle")}>
+                <CustomerPrivacy customerId={customer.id} />
+              </Pane>
+            ) : null}
                   </div>
                 </div>
               )

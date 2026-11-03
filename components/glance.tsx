@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import { dateFormat } from "@/lib/i18n/dates";
+import { businessTimeZone } from "@/lib/business-time";
 
 // Small pictures that say one thing at a glance: a ring, a week planner, a pair of bars.
 // Colours carry one meaning each (see "Look G" in globals.css).
@@ -114,7 +115,7 @@ export function RentalTrack({
 /** How far through a rental we are, as one thin bar under "N days left". Red once it runs late. */
 export function ElapsedBar({ start, end, late = false }: { start: string; end: string; late?: boolean }) {
   const day = (iso: string) => new Date(`${iso.slice(0, 10)}T00:00:00Z`).getTime();
-  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone() }).format(new Date());
   const span = Math.max(1, day(end) - day(start));
   const pct = late ? 100 : Math.max(0, Math.min(100, ((day(today) - day(start)) / span) * 100));
   return (

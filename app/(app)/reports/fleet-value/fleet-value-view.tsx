@@ -8,6 +8,7 @@ import type { Valuation } from "@/lib/vehicle-valuation";
 import { VehicleArt } from "@/components/vehicle-art";
 import { VehicleTitle } from "@/components/vehicle-identity";
 import type { VehicleKind } from "@/lib/vehicle-groups";
+import { businessDistanceUnit } from "@/lib/business-units";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -126,7 +127,7 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
                   <VehicleArt vehicleId={row.id} colour={row.colour} kind={row.kind} model={row.model} size="sm" />
                   <span className="min-w-0">
                     <VehicleTitle name={row.name} nameClassName="font-semibold text-[var(--foreground)] group-hover:underline" plate={row.plate} year={row.year} />
-                    {row.mileage ? <span className="mt-0.5 block text-sm tabular-nums text-[var(--muted)]">{`${row.mileage.toLocaleString("en-US")} km`}</span> : null}
+                    {row.mileage ? <span className="mt-0.5 block text-sm tabular-nums text-[var(--muted)]">{`${row.mileage.toLocaleString("en-US")} ${businessDistanceUnit()}`}</span> : null}
                   </span>
                 </Link>
                 <div className="shrink-0 text-right">

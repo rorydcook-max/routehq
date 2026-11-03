@@ -1,5 +1,6 @@
 import { remindRentalCustomerOnce, tellRentalCustomer } from "@/lib/customer-messages";
 import { bookingRules, clashes } from "@/lib/booking-rules";
+import { businessTimeZone } from "@/lib/business-time";
 
 export { clashes };
 import { notifyOperator } from "@/lib/notify-operator";
@@ -117,7 +118,7 @@ export async function retakeHold(admin: any, bookingLink: any): Promise<boolean>
 
 export type EndingHold = { rentalId: string; vehicle: string; who: string; holdUntil: string };
 
-const clock = (iso: string) => new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Bangkok" }).format(new Date(iso));
+const clock = (iso: string) => new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: businessTimeZone() }).format(new Date(iso));
 
 /**
  * Unsigned bookings whose hold runs out within the next few hours, soonest

@@ -10,6 +10,8 @@ import { textDirection } from "@/lib/i18n/locales";
 import { siteLocale, siteLocaleParams } from "@/lib/site/static-page";
 import { themeScript } from "@/lib/theme";
 import { rootMetadata, rootViewport } from "../../../root-metadata";
+import { localizeSitePath } from "@/lib/site/locale-path";
+import { CookieBanner } from "./_components/cookie-banner";
 import { SiteFooter } from "./_components/site-footer";
 import { SiteHeader } from "./_components/site-header";
 import s from "./site.module.css";
@@ -65,6 +67,24 @@ export default async function SiteLayout({ children, params }: { children: React
             <NextIntlClientProvider messages={{ chat: ((messages as Record<string, any>).chat ?? {}) as Record<string, string> }}>
               <ChatLauncher site />
             </NextIntlClientProvider>
+            {/* Cookie consent (GDPR / UK PECR): drawn in the browser only, so the page itself stays the same for everyone. */}
+            <CookieBanner
+              words={{
+                body: t("cookieBody"),
+                accept: t("cookieAccept"),
+                reject: t("cookieReject"),
+                choices: t("cookieChoices"),
+                choicesTitle: t("cookieChoicesTitle"),
+                necessary: t("cookieNecessary"),
+                necessaryBody: t("cookieNecessaryBody"),
+                alwaysOn: t("cookieAlwaysOn"),
+                analytics: t("cookieAnalytics"),
+                analyticsBody: t("cookieAnalyticsBody"),
+                save: t("cookieSave"),
+                policy: t("cookiePolicy"),
+                policyHref: localizeSitePath("/legal/cookies", locale)
+              }}
+            />
           </div>
         </NextIntlClientProvider>
         <ImageShrinker />

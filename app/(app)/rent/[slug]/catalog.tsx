@@ -14,6 +14,7 @@ import { daysBetween, headlineRate, minimumStay, planFor } from "@/lib/rental-es
 import { billingPeriodAmounts } from "@/lib/payment-schedule";
 import { extrasFor, priceExtras, seasonalRate, type Extra, type Season } from "@/lib/price-rules";
 import { isTwoWheeler } from "@/lib/vehicle-groups";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 // The app's standard 44px field: the same height on every public page.
 const inputClass = "mt-1.5 w-full text-base";
@@ -86,7 +87,8 @@ export function Catalog({
   const [isPending, startTransition] = useTransition();
   const [continueHref, setContinueHref] = useState<string | null>(null);
 
-  const money = (value: number) => (currency === "THB" ? `฿${Math.round(value).toLocaleString("en-US")}` : `${currency} ${Math.round(value).toLocaleString("en-US")}`);
+  // Baht as before; pounds and euros with their symbol (£1,250, €45.50).
+  const money = (value: number) => (currency === "THB" ? `฿${Math.round(value).toLocaleString("en-US")}` : formatRegionalMoney(value, currency, "en-GB"));
   // Beside each price, roughly what it is in the renter's own currency (Rory, 2 Nov 2026). They pay in the business's currency;
   // this is a guide. Their pick is remembered on this device.
   const otherCodes = Object.keys(rates).sort();

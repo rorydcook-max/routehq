@@ -6,7 +6,7 @@ updated: 2026-10-28
 fileLabel: "Agreement · English + local language"
 formats: [docx, pdf]
 inside:
-  - "Bilingual: English side by side with Thai, Indonesian, Vietnamese, Malay, Filipino, Lao or Khmer"
+  - "Bilingual: English side by side with Thai, Indonesian, Vietnamese, Malay, Filipino, Lao, Khmer, Greek, Spanish, Portuguese, Italian, Croatian, French or German (English only for the UK, Ireland and Malta)"
   - "Written for each country's rules: licences, helmets, compulsory insurance, ID documents, traffic fines, personal data"
   - "Your logo, business details, vehicle, prices, deposit and rules filled in for you, or left blank to write in"
   - "Cancellation, early return, late return, fuel, mileage, cleaning, smoking and pets"
@@ -34,3 +34,4 @@ Each page explains what that country's version covers and starts the form on it:
 - **Thailand:** [Thailand](/resources/rental-agreement-thailand) · [Phuket](/resources/rental-agreement-phuket) · [Koh Samui](/resources/rental-agreement-koh-samui) · [Chiang Mai](/resources/rental-agreement-chiang-mai)
 - **Indonesia:** [Indonesia](/resources/rental-agreement-indonesia) · [Bali](/resources/rental-agreement-bali)
 - [Vietnam](/resources/rental-agreement-vietnam) · [Malaysia](/resources/rental-agreement-malaysia) · [Philippines](/resources/rental-agreement-philippines) · [Laos](/resources/rental-agreement-laos) · [Cambodia](/resources/rental-agreement-cambodia)
+- **Europe:** [United Kingdom](/resources/rental-agreement-uk) · [Ireland](/resources/rental-agreement-ireland) · [Malta](/resources/rental-agreement-malta) · [Cyprus](/resources/rental-agreement-cyprus) · [Greece](/resources/rental-agreement-greece) · [Spain](/resources/rental-agreement-spain) · [Portugal](/resources/rental-agreement-portugal) · [Italy](/resources/rental-agreement-italy) · [Croatia](/resources/rental-agreement-croatia) · [France](/resources/rental-agreement-france) · [Germany](/resources/rental-agreement-germany)

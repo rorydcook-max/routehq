@@ -8,6 +8,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getDefaultOrganization } from "@/lib/organization";
 import { businessToday, toWallTime } from "@/lib/business-time";
 import { QUIET_ACTIVITY_EVENT_FILTER } from "@/lib/activity-noise";
+import { businessCurrency } from "@/lib/business-units";
+import { formatMoney } from "@/lib/regional";
 
 type DashboardMetrics = ReturnType<typeof calculateDashboardMetrics> & {
   depositsHeld: number;
@@ -354,9 +356,10 @@ function mapTimelineEvent(row: any, vehicleById: Map<string, Vehicle>): Timeline
   };
 }
 
-export const money = (value: number) =>
-  new Intl.NumberFormat("th-TH", {
-    style: "currency",
-    currency: "THB",
-    maximumFractionDigits: 0
-  }).format(value);
+/** Whole amounts in the business's own currency: baht as before, pounds and euros as £1,250 / €1,250. */
+export const money = (value: number) => {
+  const currency = businessCurrency();
+  return currency === "THB"
+    ? new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(value)
+    : formatMoney(Math.round(Number(value) || 0), currency, "en-GB");
+};

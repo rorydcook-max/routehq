@@ -16,6 +16,7 @@ import { ensureDefaultBranch } from "@/lib/branches";
 import { defaultCalendarForLocale } from "@/lib/i18n/calendars";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { distanceKey } from "@/lib/business-units";
 
 // The wording for this page is in locales/<language>/common.json under "vehicleForm".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -108,7 +109,7 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
           <Fold summary={say("datesSummary")} title={say("datesTitle")}>
             <ComplianceFields calendar={preferredCalendar} inputClass={inputClass} preferredLocale={preferredLocale} />
           </Fold>
-          <Fold summary={say("valueSummary")} title={say("valueTitle")}>
+          <Fold summary={say(distanceKey("valueSummary"))} title={say("valueTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className={labelClass}>{say("mileage")}</span>

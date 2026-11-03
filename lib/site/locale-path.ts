@@ -26,7 +26,10 @@ export function isSitePath(path: string) {
     path === "/resources" ||
     path.startsWith("/resources/") ||
     path === "/docs" ||
-    path.startsWith("/docs/")
+    path.startsWith("/docs/") ||
+    // Privacy policy, terms, DPA, sub-processors, cookies (lib/site/legal.ts).
+    path === "/legal" ||
+    path.startsWith("/legal/")
   );
 }
 

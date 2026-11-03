@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { businessCurrency } from "@/lib/business-units";
 
 const CURRENCY_INFO: Record<string, { symbol: string; locale: string }> = {
   THB: { symbol: "฿", locale: "th-TH" },
@@ -44,7 +45,7 @@ function formatAmount(raw: string): string {
 export function MoneyInput({
   name,
   defaultValue = "",
-  currency = "THB",
+  currency = businessCurrency(),
   required = false,
   onValueChange
 }: {

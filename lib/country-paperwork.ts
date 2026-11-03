@@ -5,6 +5,8 @@
  * inspection_expiry_date), so a business that moves country keeps its dates.
  */
 
+import { toCountryCode } from "@/lib/regional";
+
 export type PaperKey = "tax" | "porbor" | "insurance" | "inspection";
 
 export type PaperItem = {
@@ -22,9 +24,16 @@ export type PaperItem = {
   costType: "tax" | "insurance" | "other";
   /** An inspection done at the same time as this renewal, for vehicles older than these ages: its cost is asked for here. */
   inspectionWith?: { local: string; car: number; bike: number };
+  /**
+   * "How to renew" outside Thailand (Thailand has its own step-by-step help): a short note (vehiclePage message key,
+   * with the usual interval) and the official page.
+   */
+  howTo?: { key: string; url?: string };
 };
 
 const INSURANCE: PaperItem = { key: "insurance", nameKey: "c_insurance", costType: "insurance" };
+/** Europe: third-party cover is compulsory everywhere; hire vehicles need a policy that covers rental. */
+const eu = (local?: string): PaperItem => ({ key: "insurance", nameKey: "c_insurance", costType: "insurance", ...(local ? { local } : {}), howTo: { key: "rn_EU_insurance" } });
 
 const BY_COUNTRY: Record<string, PaperItem[]> = {
   // Thailand's inspection (ตรอ.) is done when the road tax is renewed, for cars over 7 years and motorbikes over 5:
@@ -57,6 +66,64 @@ const BY_COUNTRY: Record<string, PaperItem[]> = {
     { key: "porbor", nameKey: "c_compulsory", local: "Bảo hiểm TNDS", costType: "insurance" },
     INSURANCE,
     { key: "inspection", nameKey: "c_inspection", local: "Đăng kiểm", costType: "other" }
+  ],
+  // Europe (3 Nov 2026). Intervals are for private cars unless said; minAge hides an inspection until it is first due
+  // (shown anyway once a date is saved). Sources: GOV.UK, ncts.ie, DGT, IMT, ilportaledellautomobilista.it, gov.gr,
+  // CVH, Cyprus RTD, Transport Malta, service-public.fr, StVZO Anlage VIII (rental cars every 12 months in Germany).
+  GB: [
+    { key: "tax", nameKey: "c_tax", local: "VED", costType: "tax", howTo: { key: "rn_GB_tax", url: "https://www.gov.uk/vehicle-tax" } },
+    eu(),
+    { key: "inspection", nameKey: "c_inspection", local: "MOT", minAge: { car: 2, bike: 2 }, costType: "other", howTo: { key: "rn_GB_inspection", url: "https://www.gov.uk/getting-an-mot" } }
+  ],
+  IE: [
+    { key: "tax", nameKey: "c_tax", local: "Motor tax", costType: "tax", howTo: { key: "rn_IE_tax", url: "https://www.motortax.ie" } },
+    eu(),
+    { key: "inspection", nameKey: "c_inspection", local: "NCT", minAge: { car: 3, bike: 99 }, costType: "other", howTo: { key: "rn_IE_inspection", url: "https://www.ncts.ie" } }
+  ],
+  ES: [
+    { key: "tax", nameKey: "c_tax", local: "IVTM", costType: "tax", howTo: { key: "rn_ES_tax" } },
+    eu("Seguro"),
+    { key: "inspection", nameKey: "c_inspection", local: "ITV", minAge: { car: 3, bike: 3 }, costType: "other", howTo: { key: "rn_ES_inspection", url: "https://www.dgt.es" } }
+  ],
+  PT: [
+    { key: "tax", nameKey: "c_tax", local: "IUC", costType: "tax", howTo: { key: "rn_PT_tax", url: "https://www.portaldasfinancas.gov.pt" } },
+    eu("Seguro"),
+    { key: "inspection", nameKey: "c_inspection", local: "IPO", minAge: { car: 3, bike: 3 }, costType: "other", howTo: { key: "rn_PT_inspection", url: "https://www.imt-ip.pt" } }
+  ],
+  IT: [
+    { key: "tax", nameKey: "c_tax", local: "Bollo auto", costType: "tax", howTo: { key: "rn_IT_tax" } },
+    eu("Assicurazione RC"),
+    { key: "inspection", nameKey: "c_inspection", local: "Revisione", minAge: { car: 3, bike: 3 }, costType: "other", howTo: { key: "rn_IT_inspection", url: "https://www.ilportaledellautomobilista.it" } }
+  ],
+  GR: [
+    { key: "tax", nameKey: "c_tax", local: "Τέλη κυκλοφορίας", costType: "tax", howTo: { key: "rn_GR_tax", url: "https://www.gov.gr" } },
+    eu("Ασφάλεια"),
+    { key: "inspection", nameKey: "c_inspection", local: "ΚΤΕΟ", minAge: { car: 3, bike: 3 }, costType: "other", howTo: { key: "rn_GR_inspection", url: "https://www.gov.gr" } }
+  ],
+  HR: [
+    { key: "tax", nameKey: "c_registration", local: "Registracija", costType: "tax", howTo: { key: "rn_HR_tax" } },
+    eu("Osiguranje"),
+    { key: "inspection", nameKey: "c_inspection", local: "Tehnički pregled", costType: "other", howTo: { key: "rn_HR_inspection", url: "https://www.cvh.hr" } }
+  ],
+  CY: [
+    { key: "tax", nameKey: "c_tax", local: "Road tax", costType: "tax", howTo: { key: "rn_CY_tax" } },
+    eu(),
+    { key: "inspection", nameKey: "c_inspection", local: "MOT", minAge: { car: 3, bike: 3 }, costType: "other", howTo: { key: "rn_CY_inspection" } }
+  ],
+  MT: [
+    { key: "tax", nameKey: "c_tax", local: "Road licence", costType: "tax", howTo: { key: "rn_MT_tax", url: "https://www.transport.gov.mt" } },
+    eu(),
+    { key: "inspection", nameKey: "c_inspection", local: "VRT", minAge: { car: 3, bike: 3 }, costType: "other", howTo: { key: "rn_MT_inspection", url: "https://www.transport.gov.mt" } }
+  ],
+  // France has no yearly road tax for cars.
+  FR: [
+    eu("Assurance"),
+    { key: "inspection", nameKey: "c_inspection", local: "Contrôle technique", minAge: { car: 3, bike: 4 }, costType: "other", howTo: { key: "rn_FR_inspection", url: "https://www.service-public.fr" } }
+  ],
+  DE: [
+    { key: "tax", nameKey: "c_tax", local: "Kfz-Steuer", costType: "tax", howTo: { key: "rn_DE_tax", url: "https://www.zoll.de" } },
+    eu("Versicherung"),
+    { key: "inspection", nameKey: "c_inspection", local: "HU / TÜV", costType: "other", howTo: { key: "rn_DE_inspection", url: "https://www.gesetze-im-internet.de/stvzo_2012/anlage_viii.html" } }
   ]
 };
 
@@ -67,13 +134,9 @@ const DEFAULT: PaperItem[] = [
   { key: "inspection", nameKey: "c_inspection", costType: "other" }
 ];
 
-const NAMES: Record<string, string> = { thailand: "TH", malaysia: "MY", indonesia: "ID", philippines: "PH", vietnam: "VN", "viet nam": "VN" };
-
-/** A two-letter code from the organization's country_code, or a country name ("Thailand"). */
+/** A two-letter code from the organization's country_code, or a country name ("Thailand", "United Kingdom", "España", "UK"). */
 export function countryCode(value: unknown) {
-  const text = String(value || "").trim();
-  if (/^[a-z]{2}$/i.test(text)) return text.toUpperCase();
-  return NAMES[text.toLowerCase()] || "";
+  return toCountryCode(value);
 }
 
 /** The paperwork items for a country, in the order shown. */

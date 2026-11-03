@@ -1,0 +1,99 @@
+/* The cookie notice: a small white card in the bottom corner, a 1px line and the site's soft frame shadow. It never
+   covers the page; on phones it spans the width with the site's 16px gutters. */
+.banner {
+  position: fixed;
+  z-index: 60;
+  inset-inline: 16px;
+  bottom: 16px;
+  max-width: 440px;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--white);
+  color: var(--text);
+  box-shadow: var(--frame-shadow-light);
+}
+@media (min-width: 640px) {
+  .banner {
+    inset-inline: 24px auto;
+    bottom: 24px;
+  }
+}
+.body {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.policy {
+  color: var(--teal-deep);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.equal {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.wide {
+  flex: 1 1 auto;
+}
+.more {
+  flex-basis: 100%;
+  min-height: 40px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.more:hover {
+  color: var(--text);
+}
+.choices {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.choicesTitle {
+  font-size: 15px;
+  font-weight: 600;
+}
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+}
+.row + .row {
+  border-top: 1px solid var(--line);
+}
+.rowTitle {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+.rowBody {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.always {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--teal-deep);
+}
+.switch {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  accent-color: var(--teal-deep);
+}

@@ -216,6 +216,110 @@ export const locationOptions = [
       { name: "North Central Province", towns: ["Anuradhapura", "Polonnaruwa"] },
       { name: "Uva Province", towns: ["Badulla", "Haputale"] }
     ]
+  },
+  // Europe (3 Nov 2026): the places small rental businesses are most often found. Any town can still be typed.
+  {
+    country: "United Kingdom",
+    regions: [
+      { name: "England", towns: ["London", "Manchester", "Birmingham", "Bristol", "Brighton", "Cornwall", "Lake District"] },
+      { name: "Scotland", towns: ["Edinburgh", "Glasgow", "Inverness", "Aberdeen"] },
+      { name: "Wales", towns: ["Cardiff", "Swansea", "Snowdonia"] },
+      { name: "Northern Ireland", towns: ["Belfast", "Derry"] }
+    ]
+  },
+  {
+    country: "Ireland",
+    regions: [
+      { name: "Leinster", towns: ["Dublin", "Dublin Airport", "Kilkenny"] },
+      { name: "Munster", towns: ["Cork", "Shannon", "Killarney", "Limerick"] },
+      { name: "Connacht", towns: ["Galway", "Knock"] }
+    ]
+  },
+  {
+    country: "Spain",
+    regions: [
+      { name: "Canary Islands", towns: ["Tenerife", "Gran Canaria", "Lanzarote", "Fuerteventura", "La Palma"] },
+      { name: "Balearic Islands", towns: ["Mallorca", "Ibiza", "Menorca", "Formentera"] },
+      { name: "Andalusia", towns: ["Málaga", "Marbella", "Seville", "Granada"] },
+      { name: "Catalonia", towns: ["Barcelona", "Girona", "Costa Brava"] },
+      { name: "Valencia", towns: ["Valencia", "Alicante", "Benidorm"] },
+      { name: "Madrid", towns: ["Madrid", "Madrid Airport"] }
+    ]
+  },
+  {
+    country: "Portugal",
+    regions: [
+      { name: "Algarve", towns: ["Faro", "Albufeira", "Lagos", "Portimão"] },
+      { name: "Lisbon", towns: ["Lisbon", "Cascais", "Sintra"] },
+      { name: "Porto", towns: ["Porto"] },
+      { name: "Madeira", towns: ["Funchal"] },
+      { name: "Azores", towns: ["Ponta Delgada"] }
+    ]
+  },
+  {
+    country: "Italy",
+    regions: [
+      { name: "Sicily", towns: ["Catania", "Palermo", "Taormina"] },
+      { name: "Sardinia", towns: ["Cagliari", "Olbia", "Alghero"] },
+      { name: "Campania", towns: ["Naples", "Sorrento", "Amalfi Coast"] },
+      { name: "Lazio", towns: ["Rome"] },
+      { name: "Tuscany", towns: ["Florence", "Pisa"] },
+      { name: "Lombardy", towns: ["Milan", "Lake Como"] }
+    ]
+  },
+  {
+    country: "Greece",
+    regions: [
+      { name: "Crete", towns: ["Heraklion", "Chania", "Rethymno"] },
+      { name: "South Aegean", towns: ["Rhodes", "Santorini", "Mykonos", "Kos", "Naxos", "Paros"] },
+      { name: "Ionian Islands", towns: ["Corfu", "Zakynthos", "Kefalonia", "Lefkada"] },
+      { name: "Attica", towns: ["Athens", "Athens Airport"] },
+      { name: "Central Macedonia", towns: ["Thessaloniki", "Halkidiki"] }
+    ]
+  },
+  {
+    country: "Croatia",
+    regions: [
+      { name: "Split-Dalmatia", towns: ["Split", "Hvar", "Makarska"] },
+      { name: "Dubrovnik-Neretva", towns: ["Dubrovnik", "Korčula"] },
+      { name: "Istria", towns: ["Pula", "Rovinj", "Poreč"] },
+      { name: "Zagreb", towns: ["Zagreb"] },
+      { name: "Zadar", towns: ["Zadar"] }
+    ]
+  },
+  {
+    country: "Cyprus",
+    regions: [
+      { name: "Paphos", towns: ["Paphos", "Coral Bay"] },
+      { name: "Larnaca", towns: ["Larnaca", "Ayia Napa", "Protaras"] },
+      { name: "Limassol", towns: ["Limassol"] },
+      { name: "Nicosia", towns: ["Nicosia"] }
+    ]
+  },
+  {
+    country: "Malta",
+    regions: [
+      { name: "Malta", towns: ["Valletta", "Sliema", "St Julian's", "Mellieħa", "Malta Airport"] },
+      { name: "Gozo", towns: ["Victoria", "Mġarr"] }
+    ]
+  },
+  {
+    country: "France",
+    regions: [
+      { name: "Provence-Alpes-Côte d'Azur", towns: ["Nice", "Cannes", "Marseille"] },
+      { name: "Corsica", towns: ["Ajaccio", "Bastia", "Porto-Vecchio"] },
+      { name: "Île-de-France", towns: ["Paris"] },
+      { name: "Occitanie", towns: ["Montpellier", "Toulouse"] }
+    ]
+  },
+  {
+    country: "Germany",
+    regions: [
+      { name: "Bavaria", towns: ["Munich", "Nuremberg"] },
+      { name: "Berlin", towns: ["Berlin"] },
+      { name: "Hamburg", towns: ["Hamburg"] },
+      { name: "Hesse", towns: ["Frankfurt"] }
+    ]
   }
 ];
 
@@ -235,7 +339,18 @@ export const currencyOptionsByCountry: Record<string, string[]> = {
   Brunei: ["BND", "SGD", "USD"],
   India: ["INR", "USD"],
   Bangladesh: ["BDT", "USD"],
-  "Sri Lanka": ["LKR", "USD"]
+  "Sri Lanka": ["LKR", "USD"],
+  "United Kingdom": ["GBP", "EUR"],
+  Ireland: ["EUR", "GBP"],
+  Spain: ["EUR", "GBP"],
+  Portugal: ["EUR", "GBP"],
+  Italy: ["EUR"],
+  Greece: ["EUR"],
+  Croatia: ["EUR"],
+  Cyprus: ["EUR", "GBP"],
+  Malta: ["EUR"],
+  France: ["EUR"],
+  Germany: ["EUR"]
 };
 
 

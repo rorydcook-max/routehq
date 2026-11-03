@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Download } from "lucide-react";
 import { AdminHeader } from "../admin-nav";
+import { adminRemoveRenter } from "@/app/actions/privacy";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -159,7 +160,20 @@ export default async function RentersPage({ searchParams }: { searchParams: Prom
                       ))}
                     </div>
                   </details>
-                  <p className="mt-2 text-[12px] text-[var(--muted)]">{t("agreed", { date: day(renter.consented_at) })}</p>
+                  <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-[12px] text-[var(--muted)]">{t("agreed", { date: day(renter.consented_at) })}</p>
+                    {/* A renter who asks RoveHQ to delete them (GDPR Art. 17 / PDPA s.33): their copy and history go for good. */}
+                    <details className="text-[13px]">
+                      <summary className="cursor-pointer font-bold text-[var(--danger)]">{t("remove")}</summary>
+                      <form action={adminRemoveRenter} className="mt-1.5 flex flex-wrap items-center gap-2">
+                        <input name="renterId" type="hidden" value={renter.id} />
+                        <span className="text-[var(--foreground-secondary)]">{t("removeConfirm")}</span>
+                        <button className="pressable min-h-9 rounded-full bg-[var(--danger)] px-3 font-bold text-white" type="submit">
+                          {t("removeButton")}
+                        </button>
+                      </form>
+                    </details>
+                  </div>
                 </li>
               );
             })}

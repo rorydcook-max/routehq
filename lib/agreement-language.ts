@@ -8,10 +8,15 @@
  * Small and safe in the browser: the translations themselves live in lib/agreement-localize.ts (server side).
  */
 
-export type SecondLanguage = "id" | "vi" | "ms" | "fil" | "lo" | "km";
+export type SecondLanguage = "id" | "vi" | "ms" | "fil" | "lo" | "km" | "el" | "es" | "pt" | "it" | "hr" | "fr" | "de";
 export type AgreementLanguage = "th" | SecondLanguage | "en";
 
-const LANGUAGE_BY_COUNTRY: Record<string, AgreementLanguage> = { TH: "th", ID: "id", VN: "vi", MY: "ms", PH: "fil", LA: "lo", KH: "km" };
+// Europe (3 Nov 2026): the UK, Ireland and Malta are English only (English is official and the language of business in
+// Malta); Greek serves Greece and Cyprus; Portuguese is European Portuguese.
+const LANGUAGE_BY_COUNTRY: Record<string, AgreementLanguage> = {
+  TH: "th", ID: "id", VN: "vi", MY: "ms", PH: "fil", LA: "lo", KH: "km",
+  GB: "en", IE: "en", MT: "en", CY: "el", GR: "el", ES: "es", PT: "pt", IT: "it", HR: "hr", FR: "fr", DE: "de"
+};
 const COUNTRY_BY_NAME: Record<string, string> = {
   thailand: "TH",
   indonesia: "ID",
@@ -24,9 +29,70 @@ const COUNTRY_BY_NAME: Record<string, string> = {
   "lao pdr": "LA",
   "lao people's democratic republic": "LA",
   cambodia: "KH",
-  kampuchea: "KH"
+  kampuchea: "KH",
+  "united kingdom": "GB",
+  "the united kingdom": "GB",
+  uk: "GB",
+  "great britain": "GB",
+  england: "GB",
+  scotland: "GB",
+  wales: "GB",
+  "northern ireland": "GB",
+  ireland: "IE",
+  "republic of ireland": "IE",
+  malta: "MT",
+  cyprus: "CY",
+  greece: "GR",
+  spain: "ES",
+  portugal: "PT",
+  italy: "IT",
+  croatia: "HR",
+  france: "FR",
+  germany: "DE"
 };
-const COUNTRY_NAME: Record<string, string> = { TH: "Thailand", ID: "Indonesia", VN: "Vietnam", MY: "Malaysia", PH: "the Philippines", LA: "Laos", KH: "Cambodia" };
+const COUNTRY_NAME: Record<string, string> = {
+  TH: "Thailand", ID: "Indonesia", VN: "Vietnam", MY: "Malaysia", PH: "the Philippines", LA: "Laos", KH: "Cambodia",
+  GB: "the United Kingdom", IE: "Ireland", MT: "Malta", CY: "Cyprus", GR: "Greece", ES: "Spain", PT: "Portugal", IT: "Italy",
+  HR: "Croatia", FR: "France", DE: "Germany"
+};
+
+/** EU and EEA countries and the UK: their agreements get the European country clauses (lib/contract-templates/country-clauses.ts). */
+const EUROPE = new Set([
+  "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT",
+  "RO", "SK", "SI", "ES", "SE", "IS", "LI", "NO", "GB"
+]);
+
+export function isEuropeanAgreementCountry(countryCode: string) {
+  return EUROPE.has(String(countryCode || "").toUpperCase());
+}
+
+/** The governing-law wording for a European country, when the business has not set one (or still has Thailand's). */
+export const EUROPEAN_JURISDICTION: Record<string, string> = {
+  GB: "England and Wales", IE: "Ireland", MT: "Malta", CY: "the Republic of Cyprus", GR: "Greece", ES: "Spain", PT: "Portugal",
+  IT: "Italy", HR: "the Republic of Croatia", FR: "France", DE: "the Federal Republic of Germany"
+};
+
+/** Greek serves two countries: the country (accusative, after "στην") and its law, for {{agreement_country_2}} and {{agreement_law_2}}. */
+const GREEK_COUNTRY: Record<string, { name: string; law: string }> = {
+  GR: { name: "Ελλάδα", law: "το ελληνικό δίκαιο" },
+  CY: { name: "Κύπρο", law: "το κυπριακό δίκαιο" }
+};
+
+export function secondCountryWords(countryCode: string) {
+  return GREEK_COUNTRY[String(countryCode || "").toUpperCase()] || { name: "", law: "" };
+}
+
+/**
+ * Kilometres or miles for the agreement's distances. A per-business setting (settings.distance_unit, "km" or "mi")
+ * wins; without one the UK uses miles and everywhere else kilometres.
+ */
+export function agreementDistanceUnit(organization: any, countryCode: string): "km" | "mi" {
+  const settings = organization?.settings || {};
+  const raw = String(settings.distance_unit || organization?.distance_unit || "").toLowerCase();
+  if (raw === "mi" || raw === "mile" || raw === "miles") return "mi";
+  if (raw === "km" || raw === "kilometre" || raw === "kilometres" || raw === "kilometers") return "km";
+  return String(countryCode || "").toUpperCase() === "GB" ? "mi" : "km";
+}
 
 function toCode(value: unknown) {
   const text = String(value || "").trim();
@@ -54,6 +120,7 @@ type Words = {
   period: { once: string; week: string; day: string; month: string };
   due: { once: string; month: string; week: string; day: string; other: string };
   kmPerMonth: string;
+  milesPerMonth: string;
   unlimited: string;
   perDay: string;
   paidExtra: string;
@@ -65,6 +132,7 @@ const WORDS: Record<SecondLanguage, Words> = {
     period: { once: "seluruh masa sewa", week: "minggu", day: "hari", month: "bulan" },
     due: { once: "penuh di muka", month: "pada tanggal yang sama setiap bulan", week: "pada hari yang sama setiap minggu", day: "penuh saat serah terima", other: "sesuai kesepakatan" },
     kmPerMonth: "km per bulan",
+    milesPerMonth: "mil per bulan",
     unlimited: "Tanpa batas",
     perDay: "per hari",
     paidExtra: "layanan tambahan berbayar"
@@ -73,6 +141,7 @@ const WORDS: Record<SecondLanguage, Words> = {
     period: { once: "toàn bộ thời gian thuê", week: "tuần", day: "ngày", month: "tháng" },
     due: { once: "trả đủ trước", month: "vào cùng ngày mỗi tháng", week: "vào cùng thứ mỗi tuần", day: "trả đủ khi nhận xe", other: "theo thỏa thuận" },
     kmPerMonth: "km mỗi tháng",
+    milesPerMonth: "dặm mỗi tháng",
     unlimited: "Không giới hạn",
     perDay: "mỗi ngày",
     paidExtra: "dịch vụ thêm có phí"
@@ -81,6 +150,7 @@ const WORDS: Record<SecondLanguage, Words> = {
     period: { once: "seluruh tempoh sewa", week: "minggu", day: "hari", month: "bulan" },
     due: { once: "penuh secara pendahuluan", month: "pada tarikh yang sama setiap bulan", week: "pada hari yang sama setiap minggu", day: "penuh semasa serahan", other: "seperti yang dipersetujui" },
     kmPerMonth: "km sebulan",
+    milesPerMonth: "batu sebulan",
     unlimited: "Tanpa had",
     perDay: "sehari",
     paidExtra: "perkhidmatan tambahan berbayar"
@@ -89,6 +159,7 @@ const WORDS: Record<SecondLanguage, Words> = {
     period: { once: "buong panahon ng upa", week: "linggo", day: "araw", month: "buwan" },
     due: { once: "nang buo bilang paunang bayad", month: "sa parehong petsa bawat buwan", week: "sa parehong araw bawat linggo", day: "nang buo sa paghahatid", other: "ayon sa napagkasunduan" },
     kmPerMonth: "km bawat buwan",
+    milesPerMonth: "milya bawat buwan",
     unlimited: "Walang limitasyon",
     perDay: "bawat araw",
     paidExtra: "bayad na dagdag na serbisyo"
@@ -97,6 +168,7 @@ const WORDS: Record<SecondLanguage, Words> = {
     period: { once: "ຕະຫຼອດໄລຍະເວລາເຊົ່າ", week: "ອາທິດ", day: "ມື້", month: "ເດືອນ" },
     due: { once: "ເຕັມຈຳນວນລ່ວງໜ້າ", month: "ວັນດຽວກັນຂອງທຸກເດືອນ", week: "ວັນດຽວກັນຂອງທຸກອາທິດ", day: "ເຕັມຈຳນວນເມື່ອຮັບລົດ", other: "ຕາມທີ່ຕົກລົງກັນ" },
     kmPerMonth: "ກມ. ຕໍ່ເດືອນ",
+    milesPerMonth: "ໄມລ໌ ຕໍ່ເດືອນ",
     unlimited: "ບໍ່ຈຳກັດ",
     perDay: "ຕໍ່ມື້",
     paidExtra: "ບໍລິການເສີມ"
@@ -105,9 +177,73 @@ const WORDS: Record<SecondLanguage, Words> = {
     period: { once: "រយៈពេលជួលទាំងមូល", week: "សប្តាហ៍", day: "ថ្ងៃ", month: "ខែ" },
     due: { once: "ពេញចំនួនជាមុន", month: "នៅថ្ងៃដដែលរៀងរាល់ខែ", week: "នៅថ្ងៃដដែលរៀងរាល់សប្តាហ៍", day: "ពេញចំនួនពេលទទួលរថយន្ត", other: "តាមការព្រមព្រៀង" },
     kmPerMonth: "គ.ម. ក្នុងមួយខែ",
+    milesPerMonth: "ម៉ាយ ក្នុងមួយខែ",
     unlimited: "គ្មានកំណត់",
     perDay: "ក្នុងមួយថ្ងៃ",
     paidExtra: "សេវាបន្ថែម"
+  },
+  el: {
+    period: { once: "όλη τη διάρκεια της μίσθωσης", week: "εβδομάδα", day: "ημέρα", month: "μήνα" },
+    due: { once: "ολόκληρο προκαταβολικά", month: "την ίδια ημερομηνία κάθε μήνα", week: "την ίδια ημέρα κάθε εβδομάδα", day: "ολόκληρο κατά την παράδοση", other: "όπως έχει συμφωνηθεί" },
+    kmPerMonth: "χλμ. τον μήνα",
+    milesPerMonth: "μίλια τον μήνα",
+    unlimited: "Απεριόριστα",
+    perDay: "ανά ημέρα",
+    paidExtra: "πρόσθετη υπηρεσία με χρέωση"
+  },
+  es: {
+    period: { once: "todo el periodo de alquiler", week: "semana", day: "día", month: "mes" },
+    due: { once: "íntegramente por adelantado", month: "el mismo día de cada mes", week: "el mismo día de cada semana", day: "íntegramente en la entrega", other: "según lo acordado" },
+    kmPerMonth: "km al mes",
+    milesPerMonth: "millas al mes",
+    unlimited: "Ilimitado",
+    perDay: "por día",
+    paidExtra: "servicio adicional de pago"
+  },
+  pt: {
+    period: { once: "todo o período de aluguer", week: "semana", day: "dia", month: "mês" },
+    due: { once: "na totalidade, antecipadamente", month: "no mesmo dia de cada mês", week: "no mesmo dia de cada semana", day: "na totalidade, na entrega", other: "conforme acordado" },
+    kmPerMonth: "km por mês",
+    milesPerMonth: "milhas por mês",
+    unlimited: "Ilimitada",
+    perDay: "por dia",
+    paidExtra: "serviço adicional pago"
+  },
+  it: {
+    period: { once: "intero periodo di noleggio", week: "settimana", day: "giorno", month: "mese" },
+    due: { once: "per intero in anticipo", month: "lo stesso giorno di ogni mese", week: "lo stesso giorno di ogni settimana", day: "per intero alla consegna", other: "come concordato" },
+    kmPerMonth: "km al mese",
+    milesPerMonth: "miglia al mese",
+    unlimited: "Illimitato",
+    perDay: "al giorno",
+    paidExtra: "servizio aggiuntivo a pagamento"
+  },
+  hr: {
+    period: { once: "cijelom razdoblju najma", week: "tjednu", day: "danu", month: "mjesecu" },
+    due: { once: "u cijelosti unaprijed", month: "istog dana svakog mjeseca", week: "istog dana svakog tjedna", day: "u cijelosti pri predaji", other: "prema dogovoru" },
+    kmPerMonth: "km mjesečno",
+    milesPerMonth: "milja mjesečno",
+    unlimited: "Neograničeno",
+    perDay: "po danu",
+    paidExtra: "dodatna usluga uz naplatu"
+  },
+  fr: {
+    period: { once: "toute la durée de location", week: "semaine", day: "jour", month: "mois" },
+    due: { once: "en totalité d'avance", month: "le même jour chaque mois", week: "le même jour chaque semaine", day: "en totalité à la remise", other: "selon accord" },
+    kmPerMonth: "km par mois",
+    milesPerMonth: "miles par mois",
+    unlimited: "Illimité",
+    perDay: "par jour",
+    paidExtra: "option payante"
+  },
+  de: {
+    period: { once: "gesamte Mietdauer", week: "Woche", day: "Tag", month: "Monat" },
+    due: { once: "vollständig im Voraus", month: "jeweils am selben Tag des Monats", week: "jeweils am selben Wochentag", day: "vollständig bei Übergabe", other: "wie vereinbart" },
+    kmPerMonth: "km pro Monat",
+    milesPerMonth: "Meilen pro Monat",
+    unlimited: "Unbegrenzt",
+    perDay: "pro Tag",
+    paidExtra: "kostenpflichtige Zusatzleistung"
   }
 };
 

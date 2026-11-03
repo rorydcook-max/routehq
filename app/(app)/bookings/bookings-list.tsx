@@ -2,7 +2,7 @@
 
 import { kindFromCategory } from "@/lib/vehicle-groups";
 
-import { businessToday, daysFromToday as businessDaysFromToday } from "@/lib/business-time";
+import { businessToday, daysFromToday as businessDaysFromToday, businessTimeZone } from "@/lib/business-time";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ import { Badge, EmptyState } from "@/components/ui";
 import { VehicleArt } from "@/components/vehicle-art";
 import { flagForNationality } from "@/lib/customer-options";
 import { dateFormat, longDate, shortDate } from "@/lib/i18n/dates";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 /** The words for this screen in the reader's language, and the language itself for dates. */
@@ -37,7 +38,7 @@ const bandFilters = ["on_rent", "starting", "owing"] as const;
 type BandFilter = (typeof bandFilters)[number];
 
 function money(value: unknown, currency = "THB") {
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
+  return currency === "THB" ? new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0)) : formatRegionalMoney(Number(value || 0), currency, "en-GB");
 }
 
 function formatDate(value: string | null | undefined, tx: Tx) {
@@ -172,7 +173,7 @@ function holdState(booking: any, tx: Tx): { ended: boolean; past?: boolean; text
   }
   if (booking.status !== "booked" || !link.hold_until) return null;
   const until = new Date(link.hold_until);
-  const when = dateFormat(tx.locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Bangkok" }).format(until);
+  const when = dateFormat(tx.locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: businessTimeZone() }).format(until);
   return { ended: false, text: tx.say("heldUntil", { when }) };
 }
 

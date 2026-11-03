@@ -1,4 +1,5 @@
 import { TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
+import { businessDistanceUnit } from "@/lib/business-units";
 
 /**
  * Changes the assistant can make for the owner. It never makes them on its
@@ -128,7 +129,7 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
       { label: "Type", value: category.name },
       { label: "Plate", value: plate },
       args.color ? { label: "Colour", value: args.color } : null,
-      args.mileage ? { label: "Mileage", value: `${args.mileage.toLocaleString("en-US")} km` } : null,
+      args.mileage ? { label: "Mileage", value: `${args.mileage.toLocaleString("en-US")} ${businessDistanceUnit()}` } : null,
       args.dailyRate ? { label: "Per day", value: money(args.dailyRate) } : null,
       args.weeklyRate ? { label: "Per week", value: money(args.weeklyRate) } : null,
       args.monthlyRate ? { label: "Per month", value: money(args.monthlyRate) } : null,

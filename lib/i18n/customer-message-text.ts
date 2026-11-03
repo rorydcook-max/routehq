@@ -1,5 +1,6 @@
 import { createTranslator } from "next-intl";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
+import { businessTimeZone } from "@/lib/business-time";
 
 /**
  * The wording of messages sent to customers (reminders, receipts, answers to
@@ -35,7 +36,7 @@ export async function customerMessageText(wanted: string | null | undefined): Pr
     customerMessages: { ...(english.customerMessages || {}), ...(own.customerMessages || {}) },
     customer: { ...(english.customer || {}), ...(own.customer || {}) }
   };
-  const translate = createTranslator({ locale, messages: messages as any, timeZone: "Asia/Bangkok" }) as any;
+  const translate = createTranslator({ locale, messages: messages as any, timeZone: businessTimeZone() }) as any;
   const safe = (path: string, values?: Values) => {
     try {
       return String(translate(path, values));

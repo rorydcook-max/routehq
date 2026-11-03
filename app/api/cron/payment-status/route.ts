@@ -2,6 +2,7 @@ import { sendDailyCustomerReminders } from "@/lib/customer-reminders";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { businessToday } from "@/lib/business-time";
+import { niceMoney } from "@/lib/nice-money";
 import { topUpOpenEndedRent } from "@/lib/open-ended-billing";
 import { releaseExpiredHoldsEverywhere } from "@/lib/booking-holds";
 import { alertLateReturns } from "@/lib/late-returns";
@@ -9,12 +10,14 @@ import { syncAllVehicleStatuses } from "@/lib/vehicle-status";
 import { refreshAllRenters } from "@/lib/renters";
 import { sendTrialNudges } from "@/lib/trial-nudges";
 import { postDueComplianceInstalments } from "@/lib/compliance-billing";
+import { runIdPhotoRetention } from "@/lib/privacy/erase";
 
 // Business-time dates: a UTC date would flag rent as overdue a day early for runs before 07:00 in Thailand.
 const dateOnly = (offsetDays = 0) => businessToday(offsetDays);
 
-function thb(amount: number) {
-  return `THB ${Math.round(amount || 0).toLocaleString()}`;
+// The payment's own currency (a UK business's pounds), not always baht.
+function amountText(amount: number, currency: string | null | undefined) {
+  return niceMoney(amount, currency || "THB");
 }
 
 export async function GET(req: NextRequest) {
@@ -44,6 +47,9 @@ export async function GET(req: NextRequest) {
   const trialNudges = await sendTrialNudges(supabase).catch(() => 0);
   // Insurance or tax paid every month: this month's instalment is added as a cost on its day, until the cover runs out.
   const complianceInstalments = await postDueComplianceInstalments(supabase).catch(() => 0);
+  // Renters' ID photos N months after their last rental (lib/privacy/erase.ts): a dry run that only logs unless
+  // ID_PHOTO_RETENTION=on, and then only for businesses that switched it on. 200 at most per run.
+  const idPhotoRetention = await runIdPhotoRetention(supabase).catch(() => null);
 
   const scheduledResult = await supabase
     .from("rental_payments")
@@ -65,7 +71,7 @@ export async function GET(req: NextRequest) {
     .from("rental_payments")
     .select(
       `
-      id, amount, due_date, rental_id,
+      id, amount, currency, due_date, rental_id,
       rentals!rental_payments_rental_id_fkey(
         id, organization_id, customer_id, vehicle_id,
         customers!rentals_customer_id_fkey(full_name),
@@ -108,7 +114,7 @@ export async function GET(req: NextRequest) {
       title: `Payment due tomorrow - ${customerName}`,
       task_type: "payment_reminder",
       due_at: `${payment.due_date}T09:00:00.000Z`,
-      completion_notes: `${thb(Number(payment.amount || 0))} due for ${vehicleLabel}${plate}`,
+      completion_notes: `${amountText(Number(payment.amount || 0), payment.currency)} due for ${vehicleLabel}${plate}`,
       created_by: null
     });
 
@@ -127,6 +133,7 @@ export async function GET(req: NextRequest) {
     lateReturnAlerts,
     customerReminders,
     trialNudges,
-    complianceInstalments
+    complianceInstalments,
+    idPhotoRetention
   });
 }

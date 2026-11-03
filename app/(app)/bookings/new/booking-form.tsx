@@ -48,6 +48,7 @@ type BookingCustomer = {
   document_status?: string | null;
   do_not_rent?: boolean | null;
   do_not_rent_reason?: string | null;
+  date_of_birth?: string | null;
 };
 
 type BookingShareResult = {
@@ -289,6 +290,15 @@ export function BookingForm({
   // A price typed by hand stays: changing the dates no longer moves it for high seasons.
   const rateTyped = useRef(false);
   const [chosenExtras, setChosenExtras] = useState<string[]>([]);
+  // A young driver fee (Settings › Paid extras) is ticked by itself when the customer is younger than its age on the
+  // first day; it can still be unticked.
+  useEffect(() => {
+    const young = extras.find((extra) => extra.preset === "young_driver");
+    const born = String(selectedCustomer?.date_of_birth || "").slice(0, 10);
+    if (!young || !/^\d{4}-\d{2}-\d{2}$/.test(born) || !startDate) return;
+    const age = Number(startDate.slice(0, 4)) - Number(born.slice(0, 4)) - (startDate.slice(5) < born.slice(5) ? 1 : 0);
+    if (age < (young.minAge || 25)) setChosenExtras((list) => (list.includes(young.id) ? list : [...list, young.id]));
+  }, [selectedCustomer?.id, startDate]); // eslint-disable-line react-hooks/exhaustive-deps
   const [currency, setCurrency] = useState(CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB");
   // Filled from the start when the vehicle is already chosen, so the rate never shows as empty while the page loads.
   const [rentalRate, setRentalRate] = useState(() => {

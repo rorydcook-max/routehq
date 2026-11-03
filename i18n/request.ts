@@ -5,6 +5,8 @@ import { supportedLocaleCodes, type SupportedLocale } from "@/lib/i18n/locales";
 import { signedOutLocale, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
+import { getActiveMembership } from "@/lib/auth/active-organization-server";
+import { businessTimeZone } from "@/lib/business-time";
 
 /**
  * Staff interface language.
@@ -81,6 +83,22 @@ async function resolveLocale(): Promise<SupportedLocale> {
   }
 }
 
+/**
+ * Dates and times written through next-intl follow the signed-in person's business clock (Europe/London for a UK
+ * business), else Thailand's. Customer pages get the business's zone from the page itself (lib/business-time.ts).
+ */
+async function staffTimeZone(): Promise<string> {
+  if (!hasSupabaseEnv()) return businessTimeZone();
+  try {
+    const [supabase, user] = (await Promise.all([createSupabaseServerClient(), getRequestUser()])) as [any, Awaited<ReturnType<typeof getRequestUser>>];
+    if (!user) return businessTimeZone();
+    const { timezone } = await getActiveMembership(supabase, user.id);
+    return timezone || businessTimeZone();
+  } catch {
+    return businessTimeZone();
+  }
+}
+
 async function loadMessages(locale: string): Promise<Messages> {
   try {
     return (await import(`../locales/${locale}/common.json`)).default as Messages;
@@ -122,9 +140,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
     const english = await loadMessages("en");
     return { locale: siteLocale, messages: siteLocale === "en" ? english : merge(english, await loadMessages(siteLocale)), timeZone: "Asia/Bangkok" };
   }
-  const [locale, customerPage] = await Promise.all([resolveLocale(), isCustomerPage()]);
+  const [locale, customerPage, timeZone] = await Promise.all([resolveLocale(), isCustomerPage(), staffTimeZone()]);
   const english = await loadMessages("en");
   const all = locale === "en" ? english : merge(english, await loadMessages(locale));
   const messages = customerPage ? Object.fromEntries(CUSTOMER_NAMESPACES.filter((key) => key in all).map((key) => [key, all[key]])) : all;
-  return { locale, messages, timeZone: "Asia/Bangkok" };
+  return { locale, messages, timeZone };
 });

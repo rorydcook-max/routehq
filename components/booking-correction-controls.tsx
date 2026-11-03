@@ -1,6 +1,6 @@
 "use client";
 
-import { businessToday } from "@/lib/business-time";
+import { businessToday, businessTimeZone } from "@/lib/business-time";
 import { shownError } from "@/lib/error-text";
 import { typedNote } from "@/lib/transaction-notes";
 import { useEffect, useMemo, useState, useTransition } from "react";
@@ -620,7 +620,7 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
               // Say where the payment stands in plain words, not the stored status, and colour it to match:
               // every "Overdue" is red (a stored "pending" past its date used to show an amber "Overdue").
               const due = String(payment.due_date || "").slice(0, 10);
-              const todayHere = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+              const todayHere = new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone() }).format(new Date());
               const [label, tone]: [string, string] =
                 voided || status === "cancelled"
                   ? [tx.say("pc_b_cancelled"), "neutral"]

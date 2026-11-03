@@ -6,6 +6,8 @@ import { AppShell } from "@/components/app-shell";
 import { PageBand } from "@/components/page-band";
 import { PendingButton } from "@/components/pending-button";
 import { PushToggle } from "@/components/push-toggle";
+import { BusinessPrivacy } from "@/components/privacy/business-privacy";
+import { legalUrl } from "@/lib/site/legal-slugs";
 import { ThemePicker } from "@/components/theme-picker";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { defaultCalendarForLocale, supportedCalendarOptions } from "@/lib/i18n/calendars";
@@ -33,8 +35,10 @@ export default async function AccountPage() {
   const supabase = (await createSupabaseServerClient()) as any;
   const [{ data: profile }, { data: organization }] = await Promise.all([
     supabase.from("users").select("full_name, preferred_locale, preferred_calendar").eq("id", membership.userId).maybeSingle(),
-    supabase.from("organizations").select("name, default_locale").eq("id", membership.organizationId).maybeSingle()
+    supabase.from("organizations").select("name, default_locale, settings").eq("id", membership.organizationId).maybeSingle()
   ]);
+  const privacy = (await getTranslations("privacy")) as unknown as Say;
+  const privacySettings = ((organization?.settings as Record<string, any> | null)?.privacy || {}) as { idPhotoMonths?: number; idPhotoAutoDelete?: boolean };
 
   const locale = profile?.preferred_locale || organization?.default_locale || "en";
   const roleLabel = membership.role === "owner" ? say("roleOwner") : membership.role === "manager" ? say("roleManager") : say("roleTeammate");
@@ -115,6 +119,32 @@ export default async function AccountPage() {
           <div className="mt-2">
             <PushToggle />
           </div>
+        </section>
+
+        {/* GDPR / UK GDPR / PDPA (3 Nov 2026): the legal pages for everyone; download, ID-photo retention and delete for the owner. */}
+        <section className="card p-5" id="privacy">
+          <h2 className="card-title">{privacy("title")}</h2>
+          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{privacy("body")}</p>
+          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1">
+            {(
+              [
+                ["privacy", "linkPrivacy"],
+                ["terms", "linkTerms"],
+                ["dpa", "linkDpa"],
+                ["subprocessors", "linkSubprocessors"],
+                ["cookies", "linkCookies"]
+              ] as const
+            ).map(([slug, key]) => (
+              <li key={slug}>
+                <a className="inline-flex min-h-11 items-center font-semibold text-[var(--primary)] underline" href={legalUrl(slug)} rel="noopener noreferrer" target="_blank">
+                  {privacy(key)}
+                </a>
+              </li>
+            ))}
+          </ul>
+          {membership.role === "owner" ? (
+            <BusinessPrivacy autoDelete={Boolean(privacySettings.idPhotoAutoDelete)} businessName={organization?.name || ""} months={Number(privacySettings.idPhotoMonths) || 24} />
+          ) : null}
         </section>
       </div>
     </AppShell>

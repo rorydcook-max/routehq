@@ -3,6 +3,7 @@ import { PageBand } from "@/components/page-band";
 import { getTranslations } from "next-intl/server";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
+import { distanceUnitFor, toKm } from "@/lib/regional";
 import { loadFleetFigures } from "@/lib/fleet-metrics";
 import { publicBookingSettings } from "@/lib/public-catalog";
 import type { RentStyle } from "@/lib/vehicle-investment";
@@ -40,7 +41,8 @@ export default async function RentalCalculatorPage() {
     utilization: figures.get(v.id)?.utilization12 ?? 0,
     monthlyRate: Number(v.monthly_rate || 0),
     year: Number(v.year) || null,
-    mileage: Number(v.mileage) || null
+    // The calculator works in km (used-car research is in km): a business in miles has its readings converted here.
+    mileage: Number(v.mileage) ? Math.round(toKm(Number(v.mileage), distanceUnitFor(organization))) : null
   }));
 
   // Start from how this business already works: what it rents out, and whether by the month or the day.

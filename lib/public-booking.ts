@@ -3,7 +3,9 @@ import { buildContractVariables, extractBodyHtml, renderContractTemplate } from 
 import { getCustomerInspectionReports } from "@/lib/booking-rental-documents";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
 import { bookingRules } from "@/lib/booking-rules";
-import { businessToday } from "@/lib/business-time";
+import { businessToday, setBusinessTimeZone } from "@/lib/business-time";
+import { setBusinessCurrency, setBusinessDistanceUnit } from "@/lib/business-units";
+import { distanceUnitFor, vatSettings } from "@/lib/regional";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { loadPublicRentalAgreementForPage } from "@/lib/rental-document-customer-signing";
@@ -40,7 +42,9 @@ function organizationPaymentSettings(organization: any) {
     upfront_discount_enabled: Boolean(organization?.upfront_discount_enabled),
     upfront_discount_min_periods: Number(organization?.upfront_discount_min_periods ?? 3),
     upfront_discount_rate: organization?.upfront_discount_rate ? Number(organization.upfront_discount_rate) : null,
-    upfront_discount_label: organization?.upfront_discount_label || null
+    upfront_discount_label: organization?.upfront_discount_label || null,
+    // VAT-registered businesses (Settings › Country and units): the booking summary says the prices include VAT.
+    vat: vatSettings(organization).on ? { rate: vatSettings(organization).rate, name: vatSettings(organization).name, number: vatSettings(organization).number } : null
   };
 }
 
@@ -73,10 +77,14 @@ export async function getPublicBookingDetail(token: string) {
   }
 
   // A business RoveHQ has closed (admin console soft delete): its booking links stop working.
-  const { data: linkOrganization } = await supabase.from("organizations").select("deleted_at").eq("id", bookingLink.organization_id).maybeSingle();
+  const { data: linkOrganization } = await supabase.from("organizations").select("deleted_at, timezone, country_code, currency, settings").eq("id", bookingLink.organization_id).maybeSingle();
   if (!linkOrganization || linkOrganization.deleted_at) {
     return { state: "not_found" as PublicBookingState };
   }
+  // The customer's page follows the business's clock and distance unit (lib/business-time.ts, lib/business-units.ts).
+  setBusinessTimeZone(linkOrganization.timezone);
+  setBusinessDistanceUnit(distanceUnitFor(linkOrganization));
+  setBusinessCurrency(linkOrganization.currency);
 
   if (bookingLink.status === "cancelled") {
     // Enough about the business to tell the customer who to contact and where to book again.

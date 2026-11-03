@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
 import { saveExtras, saveSeasons } from "@/app/actions/price-rules";
-import type { Extra, Season } from "@/lib/price-rules";
+import { EXTRA_PRESETS, type Extra, type ExtraPreset, type Season } from "@/lib/price-rules";
 import { dateFormat } from "@/lib/i18n/dates";
 import { InfoTip } from "@/components/info-tip";
 
@@ -12,6 +12,22 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 const field = "mt-1 w-full";
 const small = "text-[12px] font-semibold text-[var(--foreground-secondary)]";
 const newId = () => Math.random().toString(36).slice(2, 10);
+
+/** A ready-made extra as first added: per day or once, for cars or all; the owner fills the price. */
+function readyMade(preset: ExtraPreset, name: string): Extra {
+  const perRental = preset === "cross_border" || preset === "out_of_hours" || preset === "one_way";
+  return {
+    id: newId(),
+    name,
+    price: 0,
+    per: perRental ? "rental" : "day",
+    kind: "all",
+    preset,
+    ...(preset === "damage_waiver" ? { excess: 0 } : {}),
+    ...(preset === "young_driver" ? { minAge: 25 } : {}),
+    ...(preset === "cross_border" ? { countries: "" } : {})
+  };
+}
 
 function useSave(save: () => Promise<{ ok: boolean; error?: string }>) {
   const [pending, start] = useTransition();
@@ -143,8 +159,46 @@ export function ExtrasPanel({ initial, currencySymbol }: { initial: Extra[]; cur
           <button aria-label={say("remove")} className="flex min-h-10 items-center justify-center text-[var(--muted)] hover:text-[var(--danger)]" onClick={() => { save.clear(); setRows((list) => list.filter((item) => item.id !== row.id)); }} type="button">
             <Trash2 size={18} />
           </button>
+          {/* A ready-made extra's own detail: the lower excess, the age, the countries allowed. */}
+          {row.preset === "damage_waiver" ? (
+            <label className="block sm:col-span-2">
+              <span className={small}>
+                {say("xp_excess", { symbol: currencySymbol })} <InfoTip label={say("xp_excess", { symbol: currencySymbol })} text={say("xp_excessTip")} />
+              </span>
+              <input className={field} inputMode="numeric" onChange={(event) => change(row.id, { excess: Number(event.target.value.replace(/[^\d]/g, "")) || 0 })} value={row.excess ? String(row.excess) : ""} />
+            </label>
+          ) : null}
+          {row.preset === "young_driver" ? (
+            <label className="block sm:col-span-2">
+              <span className={small}>{say("xp_minAge")}</span>
+              <input className={field} inputMode="numeric" onChange={(event) => change(row.id, { minAge: Number(event.target.value.replace(/[^\d]/g, "")) || 0 })} value={row.minAge ? String(row.minAge) : ""} />
+            </label>
+          ) : null}
+          {row.preset === "cross_border" ? (
+            <label className="block sm:col-span-3">
+              <span className={small}>{say("xp_countries")}</span>
+              <input className={field} maxLength={200} onChange={(event) => change(row.id, { countries: event.target.value })} placeholder={say("xp_countriesPh")} value={row.countries || ""} />
+            </label>
+          ) : null}
         </div>
       ))}
+      {/* Ready-made extras common in Europe: one tap adds it with a sensible start; the owner sets the price. */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={small}>{say("xp_ready")}</span>
+        {EXTRA_PRESETS.filter((preset) => !rows.some((row) => row.preset === preset))
+          .map((preset) => ({ preset, label: say(`xp_${preset}`) }))
+          .sort((a, b) => a.label.localeCompare(b.label))
+          .map(({ preset, label }) => (
+            <button
+              className="rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-[14px] font-semibold text-[var(--foreground)] hover:border-[var(--primary)]"
+              key={preset}
+              onClick={() => { save.clear(); setRows((list) => [...list, readyMade(preset, label)]); }}
+              type="button"
+            >
+              + {label}
+            </button>
+          ))}
+      </div>
       <div className="flex flex-wrap items-center gap-3">
         <button className="secondary-action pressable" onClick={() => { save.clear(); setRows((list) => [...list, { id: newId(), name: "", price: 0, per: "day", kind: "all" }]); }} type="button">
           <Plus size={16} />

@@ -17,6 +17,7 @@ import type { InspectionContext } from "@/lib/inspection-detail";
 import { earlyStartFor, type EarlyStartChoice } from "@/lib/early-start";
 import { lateStartFor, type LateStartChoice } from "@/lib/late-start";
 import { dateFormat } from "@/lib/i18n/dates";
+import { distanceKey } from "@/lib/business-units";
 
 type DamageItem = {
   id: string;
@@ -662,9 +663,9 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
       // Fill the reading only when staff haven't typed one: never silently replace a number someone entered.
       if (result.odometer_reading && Number(result.confidence || 0) >= 0.65 && !odometerRef.current.trim()) {
         setOdometer(String(result.odometer_reading));
-        setOcrMessage(t("ocrSuggested", { km: Number(result.odometer_reading).toLocaleString() }));
+        setOcrMessage(t(distanceKey("ocrSuggested"), { km: Number(result.odometer_reading).toLocaleString() }));
       } else if (result.odometer_reading) {
-        setOcrMessage(t("ocrPossible", { km: Number(result.odometer_reading).toLocaleString() }));
+        setOcrMessage(t(distanceKey("ocrPossible"), { km: Number(result.odometer_reading).toLocaleString() }));
       } else {
         setOcrMessage(t("ocrUnclear"));
       }
@@ -955,7 +956,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
                 {mode === "return" ? (
                   // Two small facts in regular weight, each kept whole: quieter than the customer's name above.
                   <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-[var(--foreground-secondary)]">
-                    {handoverKm != null ? <span className="whitespace-nowrap tabular-nums">{t("outAtKm", { km: handoverKm.toLocaleString("en-US") })}</span> : null}
+                    {handoverKm != null ? <span className="whitespace-nowrap tabular-nums">{t(distanceKey("outAtKm"), { km: handoverKm.toLocaleString("en-US") })}</span> : null}
                     <span className="whitespace-nowrap">{t("rentalLengthDays", { count: daysBetween(context.rental?.start_date) })}</span>
                   </p>
                 ) : null}
@@ -1061,17 +1062,17 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
           {ocrMessage ? <p className="mt-3 rounded-lg bg-[var(--panel-secondary)] p-3 text-sm font-semibold text-[var(--primary)]">{ocrMessage}</p> : null}
           {mode === "return" && handoverKm != null ? (
             <p className="mt-3 text-sm font-semibold text-[var(--muted)]">
-              <span className="font-mono-data">{t("odometerAtDelivery", { km: handoverKm.toLocaleString("en-US") })}</span>
+              <span className="font-mono-data">{t(distanceKey("odometerAtDelivery"), { km: handoverKm.toLocaleString("en-US") })}</span>
             </p>
           ) : null}
           <label className="mt-4 block">
-            <span className="text-sm font-semibold text-[var(--foreground)]">{t("confirmOdometer")}</span>
+            <span className="text-sm font-semibold text-[var(--foreground)]">{t(distanceKey("confirmOdometer"))}</span>
             <input className={inputClass} inputMode="numeric" min="0" onChange={(event) => setOdometer(event.target.value)} placeholder={t("odometerExample")} type="number" value={odometer} />
           </label>
           {mode === "return" && odometer && handoverKm != null ? (
             <p className="mt-3 rounded-lg bg-white p-3 text-sm font-semibold text-[var(--foreground)]">
               <span className="font-mono-data">
-                {t("drivenDuringRental", { km: Math.max(0, Number(odometer || 0) - handoverKm).toLocaleString("en-US") })}
+                {t(distanceKey("drivenDuringRental"), { km: Math.max(0, Number(odometer || 0) - handoverKm).toLocaleString("en-US") })}
               </span>
             </p>
           ) : (
@@ -1080,13 +1081,13 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
           {odometer && Number(context.vehicle?.mileage || 0) > Number(odometer) ? (
             <p className="mt-3 flex items-start gap-2 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]" role="alert">
               <AlertTriangle className="mt-0.5 shrink-0" size={16} />
-              {t("odometerBelowLast", { km: Number(context.vehicle.mileage).toLocaleString("en-US") })}
+              {t(distanceKey("odometerBelowLast"), { km: Number(context.vehicle.mileage).toLocaleString("en-US") })}
             </p>
           ) : null}
           {odometerJump > 0 ? (
             <p className="mt-3 flex items-start gap-2 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]" role="alert">
               <AlertTriangle className="mt-0.5 shrink-0" size={16} />
-              {t("odometerHuge", { km: odometerJump.toLocaleString("en-US") })}
+              {t(distanceKey("odometerHuge"), { km: odometerJump.toLocaleString("en-US") })}
             </p>
           ) : null}
         </StepShell>
@@ -1366,7 +1367,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
       {step === steps.length - 1 ? (
         <StepShell eyebrow={t("eyebrowReview")} title={mode === "return" ? t("reviewReturn") : mode === "condition_report" ? t("reviewCondition") : t("reviewHandover")}>
           <div className="grid grid-cols-2 gap-3">
-            <SummaryTile icon={Gauge} label={t("odometer")} value={odometer ? t("kmValue", { km: Number(odometer).toLocaleString() }) : t("missing")} />
+            <SummaryTile icon={Gauge} label={t("odometer")} value={odometer ? t(distanceKey("kmValue"), { km: Number(odometer).toLocaleString() }) : t("missing")} />
             <SummaryTile icon={Fuel} label={t("fuel")} value={fuelLabel || t("missing")} />
             <SummaryTile icon={Camera} label={t("photosVideo")} value={videoCaptured ? t("videoCaptured") : t("photoCount", { count: Object.values(sidePhotos).filter(Boolean).length })} />
             <SummaryTile icon={ShieldCheck} label={t("damage")} value={noDamage ? t("noDamageNoted") : t("damageCount", { count: damageItems.length })} />

@@ -14,7 +14,64 @@
  * already being business wall time.
  */
 
+import { cache } from "react";
+
+/** The fallback: businesses without a saved time zone are in Thailand. */
 export const BUSINESS_TIME_ZONE = "Asia/Bangkok";
+
+/**
+ * The signed-in business's own time zone (Europe/London, Europe/Madrid...), so "today", due dates and reminders follow
+ * its clock, not Bangkok's (Rory, 3 Nov 2026). Every helper below defaults to it.
+ *  - On the server it is kept for the one request (React cache): getDefaultOrganization() records it as soon as the
+ *    business is loaded, so pages and saves that load the business first get it without passing it around.
+ *  - In the browser the app shell records it once (BusinessTimeZone in components/app-shell.tsx).
+ * Code that works for several businesses at once (daily summaries, reminders) passes each business's zone itself.
+ */
+const requestZone = cache((): { zone: string | null } => ({ zone: null }));
+/**
+ * Set only by the app shell's client component (rememberPageTimeZone): in the browser, and while that page is drawn on
+ * the server for the first paint (client components run in their own copy of this module there, where React cache
+ * keeps nothing). Server components, saves and routes never read it: they use the request's own zone.
+ */
+let pageZone: string | null = null;
+
+function usable(zone: unknown): string | null {
+  const text = String(zone || "").trim();
+  if (!text) return null;
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: text });
+    return text;
+  } catch {
+    return null;
+  }
+}
+
+/** Record the business's time zone for this server request (server components, saves, routes). */
+export function setBusinessTimeZone(zone: unknown) {
+  const valid = usable(zone);
+  if (!valid) return;
+  try {
+    requestZone().zone = valid;
+  } catch {
+    // Outside a request: nothing to record.
+  }
+}
+
+/** Record it for client components (called while the app shell draws). */
+export function rememberPageTimeZone(zone: unknown) {
+  const valid = usable(zone);
+  if (valid) pageZone = valid;
+}
+
+/** The business's time zone: the one recorded for this request or page, else Bangkok. */
+export function businessTimeZone(): string {
+  if (typeof window !== "undefined") return pageZone || BUSINESS_TIME_ZONE;
+  try {
+    return requestZone().zone || pageZone || BUSINESS_TIME_ZONE;
+  } catch {
+    return pageZone || BUSINESS_TIME_ZONE;
+  }
+}
 
 const HAS_OFFSET = /([zZ]|[+-]\d{2}:?\d{2})$/;
 
@@ -40,7 +97,7 @@ function offsetMinutes(timeZone: string, at: Date) {
 }
 
 /** "2026-09-25T10:00" (business time) -> "2026-09-25T03:00:00.000Z". Returns null for empty or unreadable input. */
-export function wallTimeToIso(value: unknown, timeZone: string = BUSINESS_TIME_ZONE): string | null {
+export function wallTimeToIso(value: unknown, timeZone: string = businessTimeZone()): string | null {
   const text = String(value ?? "").trim();
   if (!text) return null;
   if (HAS_OFFSET.test(text)) {
@@ -59,13 +116,13 @@ export function wallTimeToIso(value: unknown, timeZone: string = BUSINESS_TIME_Z
  * the UTC date, which in Thailand is still yesterday until 07:00 - enough to
  * mark rent due today as overdue or date a payment on the wrong day.
  */
-export function businessToday(offsetDays = 0, timeZone: string = BUSINESS_TIME_ZONE): string {
+export function businessToday(offsetDays = 0, timeZone: string = businessTimeZone()): string {
   const p = zonedParts(new Date(Date.now() + offsetDays * 86_400_000), timeZone);
   return `${p.year}-${p.month}-${p.day}`;
 }
 
 /** Any stored value -> "YYYY-MM-DDTHH:mm" in business time (or the date alone for date-only values). */
-export function toWallTime(value: unknown, timeZone: string = BUSINESS_TIME_ZONE): string {
+export function toWallTime(value: unknown, timeZone: string = businessTimeZone()): string {
   const text = String(value ?? "").trim();
   if (!text) return "";
   if (!HAS_OFFSET.test(text)) return text.slice(0, 16).replace(" ", "T");
@@ -81,7 +138,7 @@ export function toWallTime(value: unknown, timeZone: string = BUSINESS_TIME_ZONE
  * getMonth() and friends on a server running in UTC would otherwise be a day,
  * and at month end a month, behind for the first seven hours of each Thai day.
  */
-export function businessNow(timeZone: string = BUSINESS_TIME_ZONE): Date {
+export function businessNow(timeZone: string = businessTimeZone()): Date {
   const [year, month, day] = businessToday(0, timeZone).split("-").map(Number);
   return new Date(year, month - 1, day, 12, 0, 0, 0);
 }
@@ -91,8 +148,16 @@ export function businessNow(timeZone: string = BUSINESS_TIME_ZONE): Date {
  * readable date. Counted on the calendar, so the answer is the same on a server in UTC and on a phone in
  * Thailand - "new Date()" on each gave different answers for the first seven hours of every day.
  */
-export function daysFromToday(value: unknown, timeZone: string = BUSINESS_TIME_ZONE): number | null {
+export function daysFromToday(value: unknown, timeZone: string = businessTimeZone()): number | null {
   const day = Date.parse(`${toWallTime(value, timeZone).slice(0, 10)}T00:00:00Z`);
   if (Number.isNaN(day)) return null;
   return Math.round((day - Date.parse(`${businessToday(0, timeZone)}T00:00:00Z`)) / 86_400_000);
+}
+
+/** The calendar day ("YYYY-MM-DD") an instant falls on, on the business's clock. */
+export function businessDay(value: Date | string | number = new Date(), timeZone: string = businessTimeZone()): string {
+  const instant = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(instant.getTime())) return "";
+  const p = zonedParts(instant, timeZone);
+  return `${p.year}-${p.month}-${p.day}`;
 }

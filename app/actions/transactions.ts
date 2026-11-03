@@ -8,7 +8,8 @@ import { chargeRenter } from "@/lib/charges";
 import { extrasIncomeTag } from "@/lib/extras";
 import { niceMoney } from "@/lib/nice-money";
 import { currencySymbol } from "@/components/currency-symbol";
-import { businessToday } from "@/lib/business-time";
+import { formatMoney, moneyLocale, orgCountry, vatBreakdown, vatSettings } from "@/lib/regional";
+import { businessToday, businessTimeZone } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { logoUrlToDataUri } from "@/lib/contracts";
@@ -96,7 +97,7 @@ export async function generateReceipt(input: GenerateReceiptInput) {
 
   const { data: organization, error: organizationError } = await supabase
     .from("organizations")
-    .select("id, name, currency, settings, logo_url, business_logo_storage_path, receipt_prefix, receipt_footer_text")
+    .select("id, name, currency, country_code, settings, logo_url, business_logo_storage_path, receipt_prefix, receipt_footer_text, legal_name, registration_or_tax_number, business_address")
     .eq("id", organizationId)
     .maybeSingle();
 
@@ -121,7 +122,7 @@ export async function generateReceipt(input: GenerateReceiptInput) {
   const prefix = String(organization.receipt_prefix || "REC").trim() || "REC";
   const receiptNumber = `${prefix}-${year}-${String((count || 0) + 1).padStart(4, "0")}`;
   const receiptId = crypto.randomUUID();
-  const receiptDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Bangkok" }).format(new Date());
+  const receiptDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: businessTimeZone() }).format(new Date());
   const vehicle = [input.vehicleMakeModel, input.vehiclePlate].filter(Boolean).join(" - ");
   const footerHtml = organization.receipt_footer_text
     ? `<p style="font-size: 12px; color: #717d86; text-align: center; border-top: 1px solid #e3e6e8; padding-top: 12px; margin: 0;">${escapeHtml(organization.receipt_footer_text)}</p>`
@@ -130,6 +131,22 @@ export async function generateReceipt(input: GenerateReceiptInput) {
     ? (organization.settings as Record<string, unknown>)
     : {};
   const logoDataUri = await logoUrlToDataUri(supabase, String(organization.business_logo_storage_path || organizationSettings.business_logo_storage_path || organization.logo_url || ""));
+  // Thailand's receipt is in English and Thai; elsewhere English only. A VAT-registered business shows its VAT number
+  // and the VAT inside the amount paid (Settings › Country and units), which makes the receipt a simplified VAT invoice.
+  const thai = orgCountry(organization) === "TH";
+  const both = (english: string, thaiText: string) => (thai ? `${english} / ${thaiText}` : english);
+  const vat = vatSettings(organization);
+  const vatParts = vatBreakdown(amount, { ...vat, included: true });
+  const amountText = (value: number) => (thai ? `${currencySymbol(organization.currency)}${formatReceiptAmount(value)}` : formatMoney(value, organization.currency, moneyLocale("en", orgCountry(organization))));
+  const methodText = (value: string) => (thai ? formatReceiptMethod(value) : formatReceiptMethod(value).split(" / ")[0]);
+  const row = (label: string, value: string, last = false) =>
+    `<div style="display: flex; justify-content: space-between; padding: 6px 0;${last ? "" : " border-bottom: 1px solid #f1f3f4;"} font-size: 13px;"><span style="color: #717d86;">${escapeHtml(label)}</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(value)}</span></div>`;
+  const vatHtml = vatParts
+    ? `<div style="margin-bottom: 16px; border-top: 1px solid #e3e6e8; padding-top: 8px;">${row("Net", amountText(vatParts.net))}${row(`${vat.name} ${vat.rate}%`, amountText(vatParts.vat))}${row("Total paid", amountText(vatParts.gross), true)}</div>`
+    : "";
+  const sellerHtml = vatParts || !thai
+    ? `<p style="font-size: 12px; color: #454d54; margin: 2px 0 0;">${escapeHtml([organization.legal_name, organization.business_address].filter(Boolean).join(" · "))}</p>${vatParts && vat.number ? `<p style="font-size: 12px; color: #454d54; margin: 2px 0 0;">${escapeHtml(`${vat.name} no. ${vat.number}`)}</p>` : ""}`
+    : "";
   const receiptBrandHtml = logoDataUri
     ? `<img src="${escapeHtml(logoDataUri)}" alt="${escapeHtml(organization.name || "RoveHQ")} logo" style="max-width: 200px; max-height: 80px; object-fit: contain; margin: 0 auto 8px; display: block;" />`
     : `<p style="font-size: 20px; font-weight: 700; color: #1a1d21; margin: 4px 0;">${escapeHtml(organization.name || "RoveHQ")}</p>`;
@@ -137,26 +154,28 @@ export async function generateReceipt(input: GenerateReceiptInput) {
   const receiptHtml = `
 <div style="font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 24px; border: 1px solid #e3e6e8; border-radius: 8px;">
   <div style="text-align: center; margin-bottom: 20px;">
-    <p style="font-size: 11px; color: #717d86; margin: 0; letter-spacing: 0.08em; text-transform: uppercase;">RECEIPT / ใบเสร็จรับเงิน</p>
+    <p style="font-size: 11px; color: #717d86; margin: 0; letter-spacing: 0.08em; text-transform: uppercase;">${thai ? "RECEIPT / ใบเสร็จรับเงิน" : vatParts ? "RECEIPT / VAT INVOICE" : "RECEIPT"}</p>
     ${receiptBrandHtml}
+    ${sellerHtml}
     <p style="font-size: 13px; color: #454d54; margin: 0;">${escapeHtml(receiptNumber)} · ${escapeHtml(receiptDate)}</p>
   </div>
   <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 12px; text-align: center; margin-bottom: 20px;">
-    <p style="font-size: 11px; color: #16a34a; margin: 0; font-weight: 600; letter-spacing: 0.08em;">PAID / ชำระแล้ว</p>
-    <p style="font-size: 28px; font-weight: 700; color: #16a34a; margin: 4px 0;">${currencySymbol(organization.currency)}${formatReceiptAmount(amount)}</p>
-    <p style="font-size: 12px; color: #16a34a; margin: 0;">${escapeHtml(formatReceiptMethod(input.paymentMethod))}</p>
+    <p style="font-size: 11px; color: #16a34a; margin: 0; font-weight: 600; letter-spacing: 0.08em;">${both("PAID", "ชำระแล้ว")}</p>
+    <p style="font-size: 28px; font-weight: 700; color: #16a34a; margin: 4px 0;">${escapeHtml(amountText(amount))}</p>
+    <p style="font-size: 12px; color: #16a34a; margin: 0;">${escapeHtml(methodText(input.paymentMethod))}</p>
   </div>
   <div style="margin-bottom: 16px;">
     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f3f4; font-size: 13px;">
-      <span style="color: #717d86;">Customer / ลูกค้า</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(input.customerName)}</span>
+      <span style="color: #717d86;">${both("Customer", "ลูกค้า")}</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(input.customerName)}</span>
     </div>
     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f3f4; font-size: 13px;">
-      <span style="color: #717d86;">Vehicle / รถ</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(vehicle)}</span>
+      <span style="color: #717d86;">${both("Vehicle", "รถ")}</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(vehicle)}</span>
     </div>
     <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px;">
-      <span style="color: #717d86;">Rental period / ช่วงเวลาเช่า</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(input.rentalPeriod)}</span>
+      <span style="color: #717d86;">${both("Rental period", "ช่วงเวลาเช่า")}</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(input.rentalPeriod)}</span>
     </div>
   </div>
+  ${vatHtml}
   ${footerHtml}
 </div>`;
 
@@ -191,7 +210,10 @@ export async function generateReceipt(input: GenerateReceiptInput) {
     receipt_number: receiptNumber,
     amount,
     payment_method: input.paymentMethod,
-    pdf_url: pdfUrl
+    pdf_url: pdfUrl,
+    // The VAT inside it, kept with the receipt (migration 0119); null when the business doesn't charge VAT.
+    vat_rate: vatParts ? vat.rate : null,
+    vat_amount: vatParts ? vatParts.vat : null
   });
 
   if (receiptError) {

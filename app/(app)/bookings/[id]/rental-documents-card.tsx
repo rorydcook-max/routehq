@@ -1,6 +1,7 @@
 import { Download, FileSignature, ShieldCheck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { dateFormat } from "@/lib/i18n/dates";
+import { businessTimeZone } from "@/lib/business-time";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 import { Badge, Pane } from "@/components/ui";
@@ -14,7 +15,7 @@ function formatSignedAt(value: string, locale: string) {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    timeZone: "Asia/Bangkok"
+    timeZone: businessTimeZone()
   }).format(new Date(value));
 }
 

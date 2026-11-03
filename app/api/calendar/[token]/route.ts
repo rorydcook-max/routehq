@@ -37,7 +37,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
   const clean = String(token || "").replace(/\.ics$/i, "");
   if (!/^[a-f0-9]{32,}$/i.test(clean)) return new Response("Not found", { status: 404 });
   const db = createSupabaseAdminClient() as any;
-  const { data: org } = await db.from("organizations").select("id, name, settings").eq("settings->>calendar_feed_token", clean).maybeSingle();
+  const { data: org } = await db.from("organizations").select("id, name, settings, timezone").eq("settings->>calendar_feed_token", clean).maybeSingle();
   if (!org) return new Response("Not found", { status: 404 });
 
   // From 60 days back, so recent history stays visible, through everything ahead.
@@ -54,7 +54,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
 
   const appUrl = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
   const now = stamp(new Date());
-  const lines: string[] = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//RoveHQ//Bookings//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", `X-WR-CALNAME:${esc(`${org.name || "RoveHQ"} bookings`)}`, "X-WR-TIMEZONE:Asia/Bangkok", "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H"];
+  const lines: string[] = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//RoveHQ//Bookings//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", `X-WR-CALNAME:${esc(`${org.name || "RoveHQ"} bookings`)}`, `X-WR-TIMEZONE:${org.timezone || "Asia/Bangkok"}`, "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H"];
 
   const event = (uid: string, summary: string, date: string, time: string | null, location: string | null, description: string, updated: string | null) => {
     lines.push("BEGIN:VEVENT", `UID:${uid}@rovehq.app`, `DTSTAMP:${updated ? stamp(new Date(updated)) : now}`);

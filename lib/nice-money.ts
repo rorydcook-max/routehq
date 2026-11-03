@@ -1,7 +1,10 @@
-/** 8400 -> "฿8,400" (or "USD 8,400"), for notes and activity text a person reads. */
-export function niceMoney(value: unknown, currency: string | null | undefined = "THB"): string {
+import { businessCurrency } from "@/lib/business-units";
+import { formatMoney } from "@/lib/regional";
+
+/** 8400 -> "฿8,400" (or "£8,400", "€8,400.50"), for notes and activity text a person reads. */
+export function niceMoney(value: unknown, currency: string | null | undefined = businessCurrency()): string {
+  const code = String(currency || businessCurrency()).toUpperCase();
+  if (code !== "THB") return formatMoney(value, code, "en-GB");
   const amount = Math.round(Number(value) || 0);
-  const code = String(currency || "THB").toUpperCase();
-  const number = amount.toLocaleString("en-US");
-  return code === "THB" ? `฿${number}` : `${code} ${number}`;
+  return `฿${amount.toLocaleString("en-US")}`;
 }

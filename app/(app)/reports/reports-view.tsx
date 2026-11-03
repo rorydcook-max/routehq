@@ -21,6 +21,8 @@ import {
 } from "recharts";
 import { ArrowDownRight, ArrowLeftRight, ArrowUpRight, Check, CheckCircle2, ChevronRight, Download, Handshake, LayoutGrid, Lightbulb, List, Loader2, TrendingUp } from "lucide-react";
 import { dateFormat, longDate, sinceDate } from "@/lib/i18n/dates";
+import { currencySymbol } from "@/components/currency-symbol";
+import { businessCurrency } from "@/lib/business-units";
 import { Dot, InOutBars, Ring } from "@/components/glance";
 import { VehicleArt } from "@/components/vehicle-art";
 import { VehicleTitle } from "@/components/vehicle-identity";
@@ -33,11 +35,10 @@ const PRESETS: DatePreset[] = ["this_month", "last_month", "last_3_months", "las
 const CHART_COLORS = ["#008fa3", "#c9711c", "#2f6fb8", "#a0522d", "#6b4c8a", "#c0457a", "#5f8a1e"];
 /** The same seven, warm first, for where money went. Also checked with the validator. */
 const OUT_COLORS = ["#c9711c", "#6b4c8a", "#a0522d", "#2f6fb8", "#c0457a", "#008fa3", "#5f8a1e"];
-const BAHT = "฿";
-
+/** Whole amounts in the business's own currency (฿, £, €), as the rest of the reports write them. */
 export function money(value: number) {
   const rounded = Math.round(Number(value) || 0);
-  return `${rounded < 0 ? "-" : ""}${BAHT}${Math.abs(rounded).toLocaleString("en-US")}`;
+  return `${rounded < 0 ? "-" : ""}${currencySymbol(businessCurrency())}${Math.abs(rounded).toLocaleString("en-US")}`;
 }
 
 const h2 = "card-title";
@@ -351,7 +352,7 @@ function ComparisonPanel({ vehicles, say }: { vehicles: VehicleMetrics[]; say: S
             <BarChart data={barData}>
               <CartesianGrid stroke="#dce3eb" strokeDasharray="3 3" />
               <XAxis dataKey="name" tick={{ fontSize: 14 }} />
-              <YAxis tick={{ fontSize: 14 }} tickFormatter={(value) => `${BAHT}${(value / 1000).toFixed(0)}k`} width={48} />
+              <YAxis tick={{ fontSize: 14 }} tickFormatter={(value) => `${currencySymbol(businessCurrency())}${(value / 1000).toFixed(0)}k`} width={48} />
               <Tooltip formatter={(value) => money(Number(value))} />
               <Legend />
               <Bar isAnimationActive={false} dataKey={inKey} fill="#0e5e6f" radius={[2, 2, 0, 0]} />
@@ -448,7 +449,7 @@ function InsightsPanel({ data, say, locale }: { data: ReportsData; say: Say; loc
   );
 }
 
-export function ReportsView({ data }: { data: ReportsData }) {
+export function ReportsView({ data, vatRate = 0 }: { data: ReportsData; vatRate?: number }) {
   const say = useTranslations("reportsPage") as unknown as Say;
   const moneyT = useTranslations("money");
   const locale = useLocale();
@@ -586,6 +587,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
             <p className={soft}>{say("moneyIn")}</p>
             <p className="flex items-center gap-1.5 text-[20px] font-semibold tabular-nums text-[var(--foreground)]"><Dot color="var(--chart-in)" />{money(data.totalRevenue)}</p>
             {data.refunds > 0 ? <p className={soft}>{say("afterRefunds", { amount: money(data.refunds) })}</p> : null}
+            {vatRate > 0 && data.totalRevenue > 0 ? <p className={soft}>{say("vatInside", { amount: money((data.totalRevenue * vatRate) / (100 + vatRate)), rate: vatRate })}</p> : null}
             <Change change={data.revenueChange} say={say} />
           </div>
           <div className={tile}>

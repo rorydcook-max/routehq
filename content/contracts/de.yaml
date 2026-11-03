@@ -1,0 +1,737 @@
+country: DE
+locale: de
+language: German
+currency: EUR
+prevailing_language:
+  en: the version more favourable to the Renter
+  local: die für den Mieter günstigere Fassung
+local_language:
+  en: German
+  local: Deutsch
+country_name:
+  en: Germany
+  local: Deutschland
+currency_name:
+  en: euro (€)
+  local: Euro (€)
+jurisdiction:
+  en: the Federal Republic of Germany
+  local: Bundesrepublik Deutschland
+court_place:
+  en: the competent court in Germany (for a consumer, at their general place of jurisdiction)
+  local: das zuständige Gericht in Deutschland (für Verbraucher an ihrem allgemeinen Gerichtsstand)
+words:
+  per_day:
+    en: per day
+    local: pro Tag
+  per_week:
+    en: per week
+    local: pro Woche
+  per_month:
+    en: per month
+    local: pro Monat
+  day:
+    en: day
+    local: Tag
+  month:
+    en: month
+    local: Monat
+  days:
+    en: days
+    local: Tage
+  business_days:
+    en: business days after return
+    local: Werktage nach Rückgabe
+  car:
+    en: Car
+    local: Pkw
+  motorbike:
+    en: Motorbike / scooter / quad
+    local: Motorrad / Roller / Quad
+  ins_compulsory:
+    en: Compulsory third-party insurance only
+    local: Nur gesetzliche Kfz-Haftpflichtversicherung
+  ins_third_party:
+    en: Third-party insurance with extended cover (no damage waiver)
+    local: Kfz-Haftpflicht mit erweitertem Schutz (ohne Haftungsfreistellung für Schäden)
+  ins_comprehensive:
+    en: Third-party insurance plus damage waiver (CDW) and theft protection, with the excess shown
+    local: Kfz-Haftpflicht plus Haftungsfreistellung (CDW) und Diebstahlschutz, mit der angegebenen Selbstbeteiligung
+  free:
+    en: Free
+    local: Kostenlos
+  payment_default:
+    en: Card, bank transfer or cash
+    local: Karte, Überweisung oder bar
+  blank_hint:
+    en: (fill in)
+    local: (ausfüllen)
+sources:
+  - url: https://eur-lex.europa.eu/eli/dir/1993/13/oj
+    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favour (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
+  - url: https://eur-lex.europa.eu/eli/dir/2011/83/oj
+    supports: "Consumer Rights Directive 2011/83/EU: total price including all compulsory charges (Arts 5-6); Art 16(l) no withdrawal right for car rental for a specific date or period (charges.1, cancellation.7)."
+  - url: https://commission.europa.eu/topics/consumers/consumer-rights-and-complaints/enforcement-consumer-protection/coordinated-actions/other-travel-services_en
+    supports: "EU consumer authorities (CPC) and the main rental companies, 2017: price transparency, clear insurance and waiver terms, fuel options and fairer damage handling. Basis for charges.1, insurance, fuel and damage.2."
+  - url: https://eur-lex.europa.eu/eli/dir/2009/103/oj
+    supports: "Motor Insurance Directive 2009/103/EC (as amended by 2021/2118): compulsory third-party cover with EU minimum amounts, valid across the EU (insurance.1)."
+  - url: https://eur-lex.europa.eu/eli/dir/2006/126/oj
+    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licences recognised in every member state (renter.2)."
+  - url: https://eur-lex.europa.eu/eli/dir/2015/413/oj
+    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offences, so fines follow foreign renters (fines.1)."
+  - url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    supports: "GDPR: controller duties, lawful bases (contract, legal obligation for giving driver details to authorities, legitimate interest), data subject rights (data.1, data.2)."
+  - url: https://eur-lex.europa.eu/eli/reg/2014/910/oj
+    supports: "eIDAS Regulation Art 25(1): an electronic signature may not be denied legal effect solely because it is electronic (general.8)."
+  - url: https://eur-lex.europa.eu/eli/reg/2008/593/oj
+    supports: "Rome I Regulation Art 6: consumer contracts and mandatory protection of the consumer's own law (general.5, general.7)."
+  - url: https://eur-lex.europa.eu/eli/reg/2012/1215/oj
+    supports: "Brussels I bis Regulation Arts 17-19: a consumer may sue in the courts where they live when the business directs its activities to that country (general.5)."
+  - url: https://www.ccpc.ie/news-and-media/news/article/2026/06/16/consumer-rights-explained--i-think-my-holiday-car-hire-firm-is-trying-to-rip-me-off-what-are-my-rights
+    supports: "CCPC (Irish consumer authority), 2026: damage may be charged only with clear evidence it happened during the rental; renters can ask for inspection reports and a cost breakdown; ECRCS conciliation (damage.2)."
+  - url: https://www.gesetze-im-internet.de/bgb/__305.html
+    supports: "BGB §§ 305-310: control of standard business terms in consumer contracts (general.7)."
+  - url: https://www.gesetze-im-internet.de/bgb/__309.html
+    supports: "BGB § 309 no. 5: a flat-rate damages clause in standard terms is void unless the customer may prove a lower or no loss (general.9_de)."
+  - url: https://www.gesetze-im-internet.de/stvo_2013/__2.html
+    supports: "StVO § 2(3a): winter tyres required in wintry conditions (use.8_de)."
+  - url: https://www.gesetze-im-internet.de/stvg/__25a.html
+    supports: "StVG § 25a: keeper's liability for parking costs where the driver cannot be identified (fines.2)."
+  - url: https://www.gesetze-im-internet.de/fev_2010/__29.html
+    supports: "FeV § 29: foreign licences from outside the EU/EEA valid for six months of residence; translation requirements (renter.2)."
+  - url: https://www.rac.co.uk/drive/travel/country/germany
+    supports: "RAC Germany: children under 12 and 150 cm need a restraint; zero alcohol for drivers under 21 and in their first two years; emissions sticker; no motorway toll for cars; winter tyres when conditions require (use.3, use.4, fines.3_de, use.8_de)."
+  - url: https://www.verbraucher-schlichter.de/
+    supports: Consumer conciliation under the VSBG (general.7).
+title:
+  en: Vehicle Rental Agreement
+  local: Fahrzeugmietvertrag
+subtitle:
+  en: Self-drive car, motorbike, scooter and quad rental. {{country_name}}
+  local: Selbstfahrervermietung von Autos, Motorrädern, Rollern und Quads. {{country_name}}
+footer:
+  en: Vehicle rental agreement · {{business_name}}
+  local: Fahrzeugmietvertrag · {{business_name}}
+page_words:
+  page: Seite
+  of: von
+sections:
+  - id: parties
+    title:
+      en: 1. The parties
+      local: 1. Vertragsparteien
+    fields:
+      - key: business_name
+        en: Owner (rental business)
+        local: Vermieter (Vermietungsunternehmen)
+      - key: business_reg_no
+        en: Company / VAT registration number
+        local: Handelsregister- / USt-IdNr.
+      - key: business_address
+        en: Business address
+        local: Geschäftsadresse
+      - key: business_phone
+        en: Phone / WhatsApp
+        local: Telefon / WhatsApp
+      - key: business_email
+        en: Email
+        local: E-Mail
+    clauses:
+      - id: parties.1
+        en: This agreement is made on {{renter_contract_date}} between the rental business named above (the "Owner") and the person named in section 2 (the "Renter"). Where there is more than one renter or driver, each of them is jointly responsible for every obligation in this agreement.
+        local: Dieser Vertrag wird am {{renter_contract_date}} zwischen dem oben genannten Vermietungsunternehmen (der „Vermieter“) und der in Abschnitt 2 genannten Person (der „Mieter“) geschlossen. Gibt es mehrere Mieter oder Fahrer, haftet jeder von ihnen gesamtschuldnerisch für alle Pflichten aus diesem Vertrag.
+  - id: renter
+    title:
+      en: 2. The Renter and drivers
+      local: 2. Mieter und Fahrer
+    fields:
+      - key: renter_name
+        en: Full name (as on passport or ID)
+        local: Vollständiger Name (wie im Pass oder Ausweis)
+      - key: renter_nationality
+        en: Nationality
+        local: Staatsangehörigkeit
+      - key: renter_dob
+        en: Date of birth
+        local: Geburtsdatum
+      - key: renter_id_no
+        en: Passport or national ID number
+        local: Pass- oder Ausweisnummer
+      - key: renter_home_address
+        en: Home address
+        local: Wohnanschrift
+      - key: renter_local_address
+        en: Address during the rental (hotel / apartment)
+        local: Anschrift während der Miete (Hotel / Ferienwohnung)
+      - key: renter_phone
+        en: Phone / WhatsApp
+        local: Telefon / WhatsApp
+      - key: renter_email
+        en: Email
+        local: E-Mail
+      - key: renter_licence
+        en: Driving licence number, categories and issuing country
+        local: Führerscheinnummer, Klassen und Ausstellungsland
+      - key: renter_licence_expiry
+        en: Licence expiry date / date first issued
+        local: Führerschein gültig bis / erstmals ausgestellt am
+      - key: renter_idp
+        en: International Driving Permit (number / not required)
+        local: Internationaler Führerschein (Nummer / nicht erforderlich)
+      - key: renter_emergency
+        en: Emergency contact (name and phone)
+        local: Notfallkontakt (Name und Telefon)
+      - key: driver2_details
+        en: Additional driver (name, ID, licence), if any
+        local: Zusätzlicher Fahrer (Name, Ausweis, Führerschein), falls vorhanden
+    clauses:
+      - id: renter.1
+        en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
+        local: Der Mieter bestätigt, dass die obigen Angaben wahr und vollständig sind und dass alle Personen, die das Fahrzeug führen werden, hier genannt sind. Nur der Mieter und der genannte zusätzliche Fahrer dürfen das Fahrzeug führen.
+      - id: renter.2
+        en: Every driver must hold a valid driving licence for this class of vehicle (class B for cars; AM, A1, A2 or A for motorcycles; a class B licence with the code 196, available to drivers aged 25 or over after five years and a training course, allows motorcycles up to 125 cc) and carry it while driving. Licences from the EU and EEA are valid. A visitor with a licence from outside the EU and EEA may drive on it for up to six months, with a German translation or International Driving Permit where required.
+        local: Jeder Fahrer muss eine gültige Fahrerlaubnis für diese Fahrzeugklasse besitzen (Klasse B für Pkw; AM, A1, A2 oder A für Motorräder; Klasse B mit der Schlüsselzahl 196, erhältlich ab 25 Jahren nach fünf Jahren Besitz und einer Schulung, erlaubt Motorräder bis 125 cm³) und den Führerschein beim Fahren mitführen. Führerscheine aus der EU und dem EWR sind gültig. Ein Besucher mit einem Führerschein von außerhalb der EU und des EWR darf damit bis zu sechs Monate fahren, mit einer deutschen Übersetzung oder einem Internationalen Führerschein, soweit vorgeschrieben.
+        country: true
+      - id: renter.3
+        en: Each driver must meet the minimum age and the minimum period of holding a full licence that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
+        local: Jeder Fahrer muss das Mindestalter und den Mindestführerscheinbesitz erfüllen, die der Vermieter bei der Buchung genannt hat. Eine Gebühr für junge oder zusätzliche Fahrer steht vor der Unterschrift in diesem Vertrag.
+  - id: vehicle
+    title:
+      en: 3. The vehicle
+      local: 3. Das Fahrzeug
+    fields:
+      - key: vehicle_type_label
+        en: Type
+        local: Art
+      - key: vehicle_make_model
+        en: Make and model
+        local: Marke und Modell
+      - key: vehicle_year
+        en: Year
+        local: Baujahr
+      - key: vehicle_plate
+        en: Registration (plate) number
+        local: Kennzeichen
+      - key: vehicle_colour
+        en: Colour
+        local: Farbe
+      - key: renter_vin
+        en: Chassis / VIN number
+        local: Fahrgestellnummer (FIN)
+      - key: out_odometer
+        en: Odometer at handover
+        local: Kilometerstand bei Übergabe
+      - key: out_fuel
+        en: Fuel / battery level at handover
+        local: Tank- / Akkustand bei Übergabe
+      - key: renter_accessories
+        en: Accessories handed over (helmets, keys, child seat, warning triangle, vest, etc.)
+        local: Übergebenes Zubehör (Helme, Schlüssel, Kindersitz, Warndreieck, Warnweste usw.)
+    clauses:
+      - id: vehicle.1
+        en: The Owner rents the vehicle described above, with the accessories listed, to the Renter for the rental period and on the terms of this agreement. The vehicle remains the property of the Owner at all times.
+        local: Der Vermieter vermietet dem Mieter das beschriebene Fahrzeug mit dem aufgeführten Zubehör für die Mietdauer und zu den Bedingungen dieses Vertrags. Das Fahrzeug bleibt jederzeit Eigentum des Vermieters.
+      - id: vehicle.2
+        en: The Owner confirms that the vehicle is registered, has a valid roadworthiness test where one is required (HU general inspection), and has compulsory motor insurance valid for the whole rental period, and that it is handed over roadworthy, with the documents and safety equipment the law requires to be carried.
+        local: Der Vermieter bestätigt, dass das Fahrzeug zugelassen ist, soweit vorgeschrieben eine gültige Hauptuntersuchung hat (Hauptuntersuchung (HU)), für die gesamte Mietdauer haftpflichtversichert ist und verkehrssicher übergeben wird, mit den gesetzlich mitzuführenden Papieren und Sicherheitsausrüstungen.
+        country: true
+      - id: vehicle.3
+        en: The Owner keeps the vehicle serviced as the manufacturer recommends and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time; if servicing takes more than one day, section 13 applies.
+        local: Der Vermieter wartet das Fahrzeug nach Herstellervorgaben und trägt normale Reparaturen und Verschleiß, sofern dieser Vertrag nichts anderes bestimmt. Bei längeren Mieten vereinbart der Vermieter die Wartung mit dem Mieter zu einem passenden Zeitpunkt; dauert sie länger als einen Tag, gilt Abschnitt 13.
+      - id: vehicle.4
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
+        local: "Während der Miete achtet der Mieter auf den laufenden Zustand: Er prüft, ob Reifen, Licht, Bremsen, Öl und Kühlmittel normal wirken, und nutzt das Fahrzeug nicht, wenn es nicht mehr sicher ist."
+  - id: period
+    title:
+      en: 4. Rental period, pickup and return
+      local: 4. Mietdauer, Übergabe und Rückgabe
+    fields:
+      - key: renter_start
+        en: Start (date and time)
+        local: Beginn (Datum und Uhrzeit)
+      - key: renter_end
+        en: End (date and time)
+        local: Ende (Datum und Uhrzeit)
+      - key: renter_pickup_place
+        en: Pickup / delivery place
+        local: Abhol- / Lieferort
+      - key: renter_return_place
+        en: Return / collection place
+        local: Rückgabe- / Abholort
+    clauses:
+      - id: period.1
+        en: The Renter must return the vehicle at the agreed place, date and time. An extension is valid only when the Owner agrees to it in writing (a message is enough) and the extra rent is paid.
+        local: Der Mieter muss das Fahrzeug am vereinbarten Ort, Datum und zur vereinbarten Uhrzeit zurückgeben. Eine Verlängerung gilt nur, wenn der Vermieter ihr schriftlich zustimmt (eine Nachricht genügt) und die zusätzliche Miete bezahlt ist.
+      - id: period.2
+        if: late_hour_fee
+        en: "Late return: after a grace period of {{late_grace_minutes}} minutes, each started hour costs {{currency}} {{late_hour_fee}}. A return more than {{late_full_day_hours}} hours late is charged as an extra full day at the daily rate."
+        local: "Verspätete Rückgabe: Nach einer Kulanzzeit von {{late_grace_minutes}} Minuten kostet jede angefangene Stunde {{currency}} {{late_hour_fee}}. Eine Verspätung von mehr als {{late_full_day_hours}} Stunden wird als zusätzlicher Tag zum Tagespreis berechnet."
+      - id: period.3
+        unless: late_hour_fee
+        en: "Late return: a return more than one hour late may be charged as an extra day at the daily rate."
+        local: "Verspätete Rückgabe: Eine Verspätung von mehr als einer Stunde kann als zusätzlicher Tag zum Tagespreis berechnet werden."
+      - id: period.4
+        en: If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may report it to the police and recover it, at the Renter's reasonable cost.
+        local: Wird das Fahrzeug nicht zurückgegeben und ist der Mieter 24 Stunden nach Mietende nicht erreichbar, kann der Vermieter dies der Polizei melden und das Fahrzeug auf angemessene Kosten des Mieters zurückholen.
+      - id: period.5
+        when:
+          rate_period: month
+        en: "Rolling monthly rental: where no end date is written above, the rental continues from month to month on the same terms until either party ends it as set out in section 7."
+        local: "Monatlich verlängerte Miete: Ist kein Enddatum angegeben, verlängert sich die Miete zu denselben Bedingungen von Monat zu Monat, bis eine Partei sie nach Abschnitt 7 beendet."
+  - id: charges
+    title:
+      en: 5. Price and payment
+      local: 5. Preis und Zahlung
+    fields:
+      - key: rate_text
+        en: Rental rate
+        local: Mietpreis
+      - key: renter_total
+        en: Total price for this booking (all compulsory charges included)
+        local: Gesamtpreis dieser Buchung (alle Pflichtkosten enthalten)
+      - key: delivery_fee_text
+        en: Delivery / collection fee
+        local: Liefer- / Abholgebühr
+      - key: payment_methods
+        en: Payment methods accepted
+        local: Akzeptierte Zahlungsarten
+    clauses:
+      - id: charges.1
+        en: The Renter pays the price stated above in advance, unless the Owner agrees otherwise in writing. Prices are in {{currency_name}}, include VAT and every charge the Renter must pay (such as location surcharges, road tax and compulsory insurance), and show optional extras separately.
+        local: Der Mieter zahlt den angegebenen Preis im Voraus, sofern der Vermieter nicht schriftlich etwas anderes zusagt. Die Preise sind in {{currency_name}} angegeben, enthalten die Umsatzsteuer und alle vom Mieter zu tragenden Pflichtkosten (etwa Standortzuschläge, Kfz-Steuer und Pflichtversicherung) und weisen optionale Extras gesondert aus.
+      - id: charges.2
+        when:
+          rate_period: month
+        en: "Monthly rentals: rent is paid monthly in advance on the same day each month. If a payment is more than 7 days late and the Owner has reminded the Renter in writing, the Owner may end the rental and collect the vehicle (section 15)."
+        local: "Monatsmieten: Die Miete ist monatlich im Voraus am selben Tag des Monats zu zahlen. Ist eine Zahlung mehr als 7 Tage überfällig und hat der Vermieter schriftlich gemahnt, kann der Vermieter die Miete beenden und das Fahrzeug abholen (Abschnitt 15)."
+      - id: charges.3
+        en: Extras (child seats, delivery, additional drivers, excess reduction, snow chains and similar) cost what is written in this agreement or what the Owner confirmed in writing before the rental.
+        local: Extras (Kindersitze, Lieferung, zusätzliche Fahrer, Reduzierung der Selbstbeteiligung, Schneeketten und Ähnliches) kosten, was in diesem Vertrag steht oder der Vermieter vor der Miete schriftlich bestätigt hat.
+  - id: deposit
+    title:
+      en: 6. Security deposit
+      local: 6. Kaution
+    fields:
+      - key: deposit_text
+        en: Deposit
+        local: Kaution
+      - key: renter_deposit_method
+        en: Paid by (card hold / transfer / cash)
+        local: Gezahlt per (Kartenreservierung / Überweisung / bar)
+      - key: deposit_return_text
+        en: Returned or released within
+        local: Zurückgezahlt oder freigegeben innerhalb von
+    clauses:
+      - id: deposit.1
+        en: "The deposit secures the Renter's obligations: unpaid rent, damage up to the amount the Renter is liable for, fuel, mileage, cleaning, late return, lost keys or accessories and any other amount owed under this agreement."
+        local: "Die Kaution sichert die Pflichten des Mieters: offene Miete, Schäden bis zur Höhe seiner Haftung, Kraftstoff, Kilometer, Reinigung, verspätete Rückgabe, verlorene Schlüssel oder Zubehörteile und alle sonstigen Beträge aus diesem Vertrag."
+      - id: deposit.2
+        en: The Owner returns the deposit (or releases the card hold) after the vehicle has been returned and checked, less only amounts the Renter actually owes under this agreement. Each deduction is listed in writing with photos, receipts or quotes. If the amounts owed are more than the deposit, the Renter pays the difference within 14 days of receiving that list.
+        local: Der Vermieter zahlt die Kaution zurück (oder gibt die Kartenreservierung frei), sobald das Fahrzeug zurückgegeben und geprüft ist, abzüglich nur der Beträge, die der Mieter nach diesem Vertrag tatsächlich schuldet. Jeder Abzug wird schriftlich mit Fotos, Belegen oder Kostenvoranschlägen aufgeführt. Übersteigen die geschuldeten Beträge die Kaution, zahlt der Mieter die Differenz innerhalb von 14 Tagen nach Erhalt dieser Aufstellung.
+      - id: deposit.3
+        en: The Owner does not hold back the deposit to wait for traffic fines. A fine that arrives after the rental is charged as set out in section 14.
+        local: Der Vermieter behält die Kaution nicht ein, um auf Bußgelder zu warten. Ein Bußgeld, das nach der Miete eintrifft, wird nach Abschnitt 14 berechnet.
+      - id: deposit.4
+        en: The Owner will not keep the Renter's passport or identity card as a deposit. The Owner may check them and keep a copy to identify the Renter (section 17).
+        local: Der Vermieter behält den Reisepass oder Personalausweis des Mieters nicht als Sicherheit ein. Er darf sie prüfen und eine Kopie zur Identifizierung aufbewahren (Abschnitt 17).
+  - id: cancellation
+    title:
+      en: 7. Cancellation and early return
+      local: 7. Stornierung und vorzeitige Rückgabe
+    clauses:
+      - id: cancellation.1
+        if: cancel_free_hours
+        en: The Renter may cancel free of charge up to {{cancel_free_hours}} hours before the start time. A later cancellation costs {{cancel_fee_percent}}% of the rent for the booked period (or of the first month on a monthly rental). If the Renter does not arrive at the start time and does not tell the Owner (a no-show), the Owner may keep the amount paid for the first {{no_show_days}} day(s) and release the vehicle.
+        local: Der Mieter kann bis {{cancel_free_hours}} Stunden vor Mietbeginn kostenlos stornieren. Eine spätere Stornierung kostet {{cancel_fee_percent}} % der Miete für den gebuchten Zeitraum (bei Monatsmieten des ersten Monats). Erscheint der Mieter ohne Nachricht nicht zum Mietbeginn, darf der Vermieter den für den ersten Tag bzw. die ersten {{no_show_days}} Tage gezahlten Betrag behalten und über das Fahrzeug verfügen.
+      - id: cancellation.2
+        unless: cancel_free_hours
+        en: "Cancellation by the Renter before the start time: the Owner keeps only a booking payment that the booking confirmation clearly said was non-refundable, and refunds the rest."
+        local: "Stornierung durch den Mieter vor Mietbeginn: Der Vermieter behält nur eine Anzahlung, die in der Buchungsbestätigung klar als nicht erstattbar bezeichnet war, und erstattet den Rest."
+      - id: cancellation.3
+        when:
+          early_return: none
+        en: "Early return: rent for the booked period is not refunded if the Renter returns the vehicle early."
+        local: "Vorzeitige Rückgabe: Die Miete für den gebuchten Zeitraum wird bei vorzeitiger Rückgabe nicht erstattet."
+      - id: cancellation.4
+        when:
+          early_return: prorata
+        en: "Early return: the Owner refunds the rent for the full unused days, less an early-return fee of {{currency}} {{early_return_fee}}. Long-term discounts that no longer apply may be recalculated at the rate for the period actually used."
+        local: "Vorzeitige Rückgabe: Der Vermieter erstattet die Miete für volle ungenutzte Tage, abzüglich einer Gebühr von {{currency}} {{early_return_fee}}. Nicht mehr zutreffende Langzeitrabatte können zum Preis des tatsächlich genutzten Zeitraums neu berechnet werden."
+      - id: cancellation.5
+        when:
+          rate_period: month
+        en: "Monthly rentals: either party may end the rental by giving {{notice_days}} days' written notice. Without notice, the Renter pays rent for the notice period."
+        local: "Monatsmieten: Jede Partei kann die Miete mit einer schriftlichen Frist von {{notice_days}} Tagen beenden. Ohne Kündigungsfrist zahlt der Mieter die Miete für die Frist."
+      - id: cancellation.6
+        en: If the Owner cannot provide the vehicle (or a similar or better one) at the start time, the Renter may cancel and receive a full refund of everything paid.
+        local: Kann der Vermieter das Fahrzeug (oder ein gleichwertiges oder besseres) zum Mietbeginn nicht bereitstellen, kann der Mieter stornieren und erhält alles Gezahlte zurück.
+      - id: cancellation.7
+        en: This rental is for specific dates, so the 14-day right of withdrawal for contracts made online or by phone does not apply (Directive 2011/83/EU, Article 16(l)).
+        local: Diese Miete gilt für bestimmte Termine; das 14-tägige Widerrufsrecht für online oder telefonisch geschlossene Verträge besteht daher nicht (Richtlinie 2011/83/EU, Art. 16 Buchst. l).
+  - id: fuel
+    title:
+      en: 8. Fuel, charging and mileage
+      local: 8. Kraftstoff, Laden und Kilometer
+    clauses:
+      - id: fuel.1
+        when:
+          fuel_policy: same
+        en: "Fuel policy: same-to-same. The vehicle must be returned with at least the fuel (or battery) level it had at handover."
+        local: "Tankregelung: wie übernommen. Das Fahrzeug ist mindestens mit dem Tank- (oder Akku-)stand der Übergabe zurückzugeben."
+      - id: fuel.2
+        when:
+          fuel_policy: full
+        en: "Fuel policy: full-to-full. The vehicle is handed over with a full tank and must be returned full."
+        local: "Tankregelung: voll/voll. Das Fahrzeug wird vollgetankt übergeben und ist vollgetankt zurückzugeben."
+      - id: fuel.3
+        en: Missing fuel is charged at the local pump price for the amount needed{{#if fuel_service_fee}}, plus a refuelling service fee of {{currency}} {{fuel_service_fee}}{{/if}}.
+        local: Fehlender Kraftstoff wird zum örtlichen Tankstellenpreis für die benötigte Menge berechnet{{#if fuel_service_fee}}, zuzüglich einer Betankungsgebühr von {{currency}} {{fuel_service_fee}}{{/if}}.
+      - id: fuel.4
+        if: mileage_limit
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        local: "Inklusivkilometer: {{mileage_limit}} km pro {{mileage_period_label}}. Jeder weitere Kilometer kostet {{currency}} {{excess_km_fee}}."
+      - id: fuel.5
+        unless: mileage_limit
+        en: "Mileage: unlimited, within the permitted area (section 10)."
+        local: "Kilometer: unbegrenzt, innerhalb des erlaubten Fahrgebiets (Abschnitt 10)."
+      - id: fuel.6
+        en: The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15).
+        local: Der Mieter darf Kilometerzähler, Geschwindigkeitsbegrenzer und GPS-Tracker nicht manipulieren. Eine Manipulation ist ein schwerer Vertragsverstoß (Abschnitt 15).
+      - id: fuel.7
+        en: Only the fuel type stated by the manufacturer (or in the vehicle's documents) may be used. If the wrong fuel is put in, the Renter pays the actual, evidenced cost of draining the tank and of any repair it causes.
+        local: Es darf nur der vom Hersteller (oder in den Fahrzeugpapieren) angegebene Kraftstoff verwendet werden. Bei Falschbetankung zahlt der Mieter die tatsächlichen, belegten Kosten für das Abpumpen und für dadurch nötige Reparaturen.
+  - id: use
+    title:
+      en: 9. Safe and lawful use
+      local: 9. Sichere und rechtmäßige Nutzung
+    clauses:
+      - id: use.1
+        en: The Renter must drive or ride carefully, obey all traffic laws, and keep the vehicle locked with the keys removed whenever it is left. Keys must never be left in or on the vehicle.
+        local: Der Mieter muss vorsichtig fahren, alle Verkehrsregeln einhalten und das Fahrzeug beim Verlassen stets abschließen und die Schlüssel abziehen. Schlüssel dürfen nie im oder am Fahrzeug bleiben.
+      - id: use.2
+        when:
+          vehicle_type:
+            - motorbike
+            - ""
+        en: "Motorbikes, scooters and quads: the rider and any passenger must wear a fastened, approved helmet at all times; the Owner provides helmets. No more than one passenger, and only where the vehicle is approved to carry one."
+        local: "Motorräder, Roller und Quads: Fahrer und Sozius müssen stets einen geprüften, geschlossenen Helm tragen; der Vermieter stellt die Helme. Höchstens ein Sozius, und nur wenn das Fahrzeug dafür zugelassen ist."
+        country: true
+      - id: use.3
+        when:
+          vehicle_type:
+            - car
+            - ""
+        en: "Cars: every occupant must wear a seatbelt, and children under 12 years old and under 150 cm must travel in an approved child restraint suited to their weight and height. The number of passengers must not exceed the number of seats."
+        local: "Pkw: Alle Insassen müssen angeschnallt sein, und Kinder unter 12 Jahren und unter 150 cm müssen in einem zugelassenen, ihrem Gewicht und ihrer Größe entsprechenden Kindersitz fahren. Es dürfen nicht mehr Personen mitfahren, als Sitzplätze vorhanden sind."
+        country: true
+      - id: use.4
+        en: "It is forbidden to: drive with alcohol above the legal limit (0.5 per mille; zero for drivers under 21 and in their probationary period) or under the influence of drugs; use a hand-held phone while driving; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        local: "Verboten ist: Fahren mit mehr Alkohol als gesetzlich erlaubt (0,5 Promille; 0,0 Promille für Fahrer unter 21 Jahren und in der Probezeit) oder unter Drogeneinfluss; das Handy beim Fahren in der Hand zu halten; Rennen, Stunts oder Geländefahrten (außer das Fahrzeug ist dafür gedacht und der Vermieter stimmt zu); etwas zu ziehen oder zu schieben; Güter gegen Entgelt, verbotene Waren oder Gefahrgut zu befördern; das Fahrzeug für Fahrdienste, Lieferungen, Fahrschulen oder zur Weitervermietung zu nutzen; Personen fahren zu lassen, die nicht in Abschnitt 2 genannt sind."
+        country: true
+      - id: use.8_de
+        en: In wintry conditions (black ice, snow, slush or frost) the vehicle may only be driven with winter or all-season tyres marked with the Alpine symbol (section 2(3a) StVO). The Owner states what is fitted.
+        local: Bei winterlichen Straßenverhältnissen (Glatteis, Schnee, Schneematsch, Reifglätte) darf das Fahrzeug nur mit Winter- oder Ganzjahresreifen mit Alpine-Symbol gefahren werden (§ 2 Abs. 3a StVO). Der Vermieter gibt die Bereifung an.
+        country: true
+      - id: use.5
+        when:
+          smoking: no
+        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+        local: Rauchen und Dampfen sind im Fahrzeug nicht erlaubt.{{#if smoking_fee}} Ein Verstoß kostet {{currency}} {{smoking_fee}} für die Geruchsbeseitigung.{{/if}}
+      - id: use.6
+        when:
+          pets: no
+        en: Pets and animals are not allowed in or on the vehicle, except assistance animals.
+        local: Tiere sind im Fahrzeug nicht erlaubt, ausgenommen Assistenzhunde.
+      - id: use.7
+        when:
+          pets: fee
+        en: Pets are allowed if they are kept in a carrier or on a seat cover. A pet cleaning fee of {{currency}} {{pet_fee}} applies.
+        local: Haustiere sind in einer Transportbox oder auf einer Schutzdecke erlaubt. Es fällt eine Reinigungsgebühr von {{currency}} {{pet_fee}} an.
+  - id: area
+    title:
+      en: 10. Permitted area
+      local: 10. Erlaubtes Fahrgebiet
+    fields:
+      - key: area_of_use
+        en: The vehicle may be used in
+        local: Das Fahrzeug darf genutzt werden in
+    clauses:
+      - id: area.1
+        en: The vehicle must stay within the permitted area above. Taking it further, on a ferry or to another island, needs the Owner's written permission first, and the Renter pays any ferry fees agreed and any recovery costs caused by breaking this rule.
+        local: Das Fahrzeug muss im oben genannten Fahrgebiet bleiben. Fahrten darüber hinaus, mit der Fähre oder auf eine andere Insel bedürfen vorher der schriftlichen Zustimmung des Vermieters; der Mieter zahlt die vereinbarten Fährkosten und die Rückholkosten, die ein Verstoß gegen diese Regel verursacht.
+      - id: area.2
+        en: The vehicle may leave Germany only with the Owner's prior written permission and the insurance documents the Owner provides. Travel to countries outside the EU, the EEA and Switzerland needs express permission.
+        local: Das Fahrzeug darf Deutschland nur mit vorheriger schriftlicher Zustimmung des Vermieters und mit den von ihm übergebenen Versicherungsunterlagen verlassen. Fahrten in Länder außerhalb der EU, des EWR und der Schweiz bedürfen einer ausdrücklichen Zustimmung.
+        country: true
+      - id: area.3
+        en: The vehicle may be fitted with a GPS tracker, used only for security, recovery and checking that this agreement is kept (section 17). The Renter has been told about it.
+        local: Das Fahrzeug kann mit einem GPS-Tracker ausgestattet sein, der nur der Sicherheit, der Rückholung und der Kontrolle der Vertragseinhaltung dient (Abschnitt 17). Der Mieter wurde darüber informiert.
+  - id: insurance
+    title:
+      en: 11. Insurance and damage waiver
+      local: 11. Versicherung und Haftungsfreistellung
+    fields:
+      - key: insurance_text
+        en: Cover on this vehicle
+        local: Versicherungsschutz dieses Fahrzeugs
+      - key: insurance_excess_text
+        en: Renter's excess (most the Renter pays per incident, if the rules are kept)
+        local: Selbstbeteiligung des Mieters (Höchstbetrag je Schadensfall bei Einhaltung der Regeln)
+    clauses:
+      - id: insurance.1
+        en: The price includes the compulsory motor third-party liability insurance required in Germany, which covers injury and damage the vehicle causes to other people, at least to the minimum amounts set by EU law and the Compulsory Insurance Act (PflVG). It does not cover damage to or theft of the rented vehicle itself.
+        local: Der Preis enthält die in Deutschland vorgeschriebene Kfz-Haftpflichtversicherung, die Personen- und Sachschäden Dritter durch das Fahrzeug mindestens bis zu den durch das EU-Recht und das Pflichtversicherungsgesetz festgelegten Mindestsummen deckt. Sie deckt keine Schäden am Mietfahrzeug selbst und keinen Diebstahl.
+        country: true
+      - id: insurance.2
+        when:
+          insurance_level: comprehensive
+        en: "Damage waiver (CDW) and theft protection: damage to and theft of the rented vehicle are also covered. Per incident, the Renter pays no more than the excess shown above, provided the Renter has kept the rules of this agreement."
+        local: "Haftungsfreistellung (CDW) und Diebstahlschutz: Auch Schäden am Mietfahrzeug und sein Diebstahl sind abgedeckt. Je Schadensfall zahlt der Mieter höchstens die oben genannte Selbstbeteiligung, sofern er die Regeln dieses Vertrags eingehalten hat."
+      - id: insurance.3
+        when:
+          insurance_level: third_party
+        en: "No damage waiver: the vehicle has third-party insurance with extended cover for other people's property, but damage to or theft of the rented vehicle is the Renter's responsibility (section 12), limited to the actual, evidenced cost."
+        local: "Ohne Haftungsfreistellung: Das Fahrzeug hat eine Kfz-Haftpflicht mit erweitertem Schutz für fremdes Eigentum, Schäden am Mietfahrzeug und sein Diebstahl gehen aber zulasten des Mieters (Abschnitt 12), begrenzt auf die tatsächlichen, belegten Kosten."
+      - id: insurance.4
+        when:
+          insurance_level: compulsory
+        en: The vehicle has only the compulsory insurance. Damage to or theft of the rented vehicle is the Renter's responsibility (section 12), limited to the actual, evidenced cost.
+        local: Das Fahrzeug hat nur die gesetzliche Haftpflichtversicherung. Schäden am Mietfahrzeug und sein Diebstahl gehen zulasten des Mieters (Abschnitt 12), begrenzt auf die tatsächlichen, belegten Kosten.
+      - id: insurance.5
+        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
+        local: "Haftungsfreistellung und Versicherung schützen den Mieter nicht, und er zahlt die tatsächlichen Kosten, wenn der Schaden oder Verlust entsteht: beim Fahren unter Alkohol- oder Drogeneinfluss, ohne gültige Fahrerlaubnis für das Fahrzeug, durch einen nicht in Abschnitt 2 genannten Fahrer, außerhalb des erlaubten Gebiets, bei verbotener Nutzung (Abschnitt 9), durch Vorsatz oder grobe Fahrlässigkeit oder wenn die Schlüssel beim Fahrzeug gelassen wurden. Reifen, Felgen, Glas, Unterboden, Innenraum, Schlüssel und Zubehör sind nur abgedeckt, wenn der Vermieter dies schriftlich bestätigt."
+      - id: insurance.6
+        en: Personal belongings left in or on the vehicle are not insured by the Owner, and the Owner is not responsible for their loss or damage except through its own fault.
+        local: Im Fahrzeug zurückgelassene persönliche Gegenstände sind vom Vermieter nicht versichert; er haftet für ihren Verlust oder ihre Beschädigung nur bei eigenem Verschulden.
+      - id: insurance.7
+        en: "Excess reduction: if the Renter buys the Owner's optional excess reduction, the excess is reduced as written in this agreement. Excess insurance bought by the Renter from another company is between the Renter and that insurer: the Renter pays the Owner and claims the amount back from it."
+        local: "Reduzierung der Selbstbeteiligung: Bucht der Mieter die optionale Reduzierung des Vermieters, sinkt die Selbstbeteiligung wie in diesem Vertrag angegeben. Eine vom Mieter bei einem anderen Anbieter abgeschlossene Selbstbeteiligungsversicherung betrifft nur den Mieter und diesen Versicherer: Der Mieter zahlt den Vermieter und lässt sich den Betrag von seinem Versicherer erstatten."
+  - id: damage
+    title:
+      en: 12. Damage, theft and loss
+      local: 12. Schäden, Diebstahl und Verlust
+    clauses:
+      - id: damage.1
+        en: The Renter is responsible for the vehicle from handover until it is returned and checked. The condition at handover is recorded in Annex A with photos; damage not recorded there is treated as new unless it is normal wear and tear.
+        local: Der Mieter ist von der Übergabe bis zur Rückgabe und Prüfung für das Fahrzeug verantwortlich. Der Zustand bei Übergabe wird in Anlage A mit Fotos festgehalten; dort nicht vermerkte Schäden gelten als neu, außer normaler Abnutzung.
+      - id: damage.2
+        en: Damage is charged at its actual, reasonable repair cost, shown by a garage quote or invoice, or at the agreed price in Annex B for listed items, never more than the excess where a damage waiver applies. The Owner sends the Renter any damage charge in writing within 30 days of return, with the photos and the quote or invoice. The Renter may ask for a second quote from a garage the Owner approves within 7 days.
+        local: Schäden werden zu den tatsächlichen, angemessenen Reparaturkosten berechnet, belegt durch Kostenvoranschlag oder Rechnung einer Werkstatt, oder zum vereinbarten Preis aus Anlage B für die dort genannten Positionen, bei Haftungsfreistellung nie über der Selbstbeteiligung. Der Vermieter teilt jede Schadensforderung innerhalb von 30 Tagen nach Rückgabe schriftlich mit Fotos und Kostenvoranschlag oder Rechnung mit. Der Mieter kann innerhalb von 7 Tagen einen zweiten Kostenvoranschlag einer vom Vermieter akzeptierten Werkstatt verlangen.
+      - id: damage.3
+        if: loss_of_use_fee
+        en: While the vehicle cannot be rented because of damage the Renter is responsible for, the Renter pays loss of use of {{currency}} {{loss_of_use_fee}} per day, for up to {{loss_of_use_max_days}} days, within the excess where a damage waiver applies.
+        local: Solange das Fahrzeug wegen eines Schadens, für den der Mieter haftet, nicht vermietet werden kann, zahlt der Mieter einen Nutzungsausfall von {{currency}} {{loss_of_use_fee}} pro Tag, höchstens für {{loss_of_use_max_days}} Tage, bei Haftungsfreistellung innerhalb der Selbstbeteiligung.
+      - id: damage.4
+        en: If the vehicle or its keys are stolen, the Renter must report it to the police at once and give the Owner the police report and the keys. Where the theft happened because the vehicle was left unlocked, with the keys, or outside the permitted area, the Renter pays the vehicle's value as stated in Annex B (or its market value).
+        local: Werden Fahrzeug oder Schlüssel gestohlen, muss der Mieter sofort Anzeige bei der Polizei erstatten und dem Vermieter die Anzeige und die Schlüssel übergeben. Geschah der Diebstahl, weil das Fahrzeug offen, mit Schlüssel oder außerhalb des erlaubten Gebiets abgestellt war, zahlt der Mieter den in Anlage B genannten Fahrzeugwert (oder den Marktwert).
+      - id: damage.5
+        en: Lost keys, remote controls, helmets, documents, number plates and accessories are charged at their replacement cost, plus any locksmith or re-registration cost.
+        local: Verlorene Schlüssel, Fernbedienungen, Helme, Papiere, Kennzeichen und Zubehörteile werden zum Wiederbeschaffungswert berechnet, zuzüglich etwaiger Schlüsseldienst- oder Ummeldekosten.
+  - id: accident
+    title:
+      en: 13. Accidents and breakdowns
+      local: 13. Unfälle und Pannen
+    clauses:
+      - id: accident.1
+        en: "In an accident, the Renter must: make the area safe, wear the reflective vest and set out the warning triangle where required, and call 112 if anyone is hurt; call the Owner straight away on the number in section 1; call the police whenever someone is injured, the other party has no insurance or drives off, or the law requires it; complete and sign a European Accident Statement with the other driver where possible; take photos of all vehicles, plates, the place and any damage; and not admit fault, pay or accept money without the Owner's agreement."
+        local: "Bei einem Unfall muss der Mieter: die Unfallstelle sichern, wo vorgeschrieben die Warnweste anziehen und das Warndreieck aufstellen und bei Verletzten die 112 anrufen; sofort den Vermieter unter der Nummer in Abschnitt 1 anrufen; die Polizei rufen, wenn jemand verletzt ist, der Unfallgegner nicht versichert ist oder flüchtet oder das Gesetz es verlangt; wenn möglich mit dem anderen Fahrer einen Europäischen Unfallbericht ausfüllen und unterschreiben; alle Fahrzeuge, Kennzeichen, die Unfallstelle und Schäden fotografieren; und ohne Zustimmung des Vermieters keine Schuld anerkennen, nichts zahlen und kein Geld annehmen."
+        country: true
+      - id: accident.2
+        en: "Breakdowns: the Renter must stop safely, tell the Owner and follow the Owner's instructions (or call the roadside assistance number the Owner gave). The Renter must not have the vehicle repaired without the Owner's permission, except for minor emergency costs up to {{currency}} {{emergency_repair_limit}}, which the Owner refunds against a receipt."
+        local: "Pannen: Der Mieter muss sicher anhalten, den Vermieter informieren und dessen Anweisungen folgen (oder die angegebene Pannenhilfe-Nummer anrufen). Er darf das Fahrzeug ohne Zustimmung des Vermieters nicht reparieren lassen, außer kleine Notfallkosten bis {{currency}} {{emergency_repair_limit}}, die der Vermieter gegen Beleg erstattet."
+      - id: accident.3
+        en: If the vehicle stops working through no fault of the Renter, the Owner will repair it or provide a similar vehicle within 24 hours of being told where reasonably possible. If the Owner cannot, the Renter may end the rental and receive a refund of the rent for the unused days.
+        local: Fällt das Fahrzeug ohne Verschulden des Mieters aus, repariert der Vermieter es oder stellt, soweit zumutbar, innerhalb von 24 Stunden nach Meldung ein gleichwertiges Fahrzeug. Ist das nicht möglich, kann der Mieter die Miete beenden und erhält die Miete für die ungenutzten Tage zurück.
+      - id: accident.4
+        en: The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe.
+        local: Der Mieter muss Warnleuchten, ungewöhnliche Geräusche, Reifenpannen oder Defekte unverzüglich melden und darf ein unsicheres Fahrzeug nicht weiter benutzen.
+      - id: accident.5
+        en: "Breakdowns caused by misuse: if a fault or damage is caused by the Renter's misuse or negligence (for example ignoring a warning light, the wrong fuel, overloading, towing, racing or driving off-road), and this is shown by a mechanic's report or other evidence, the Renter has no right to a refund for that breakdown and pays the actual, evidenced cost of repair and recovery."
+        local: "Pannen durch Fehlgebrauch: Wird ein Defekt oder Schaden durch Fehlgebrauch oder Fahrlässigkeit des Mieters verursacht (etwa Ignorieren einer Warnleuchte, Falschbetankung, Überladung, Abschleppen, Rennen oder Geländefahrt) und ist dies durch ein Werkstattgutachten oder anders belegt, hat der Mieter für diese Panne keinen Erstattungsanspruch und zahlt die tatsächlichen, belegten Reparatur- und Bergungskosten."
+  - id: fines
+    title:
+      en: 14. Fines, tolls and charges
+      local: 14. Bußgelder, Maut und Gebühren
+    clauses:
+      - id: fines.1
+        en: The Renter pays all traffic and parking fines, tolls, congestion and low-emission-zone charges, towing, impound and clamping costs arising during the rental, including those that reach the Owner after the vehicle is returned{{#if fine_admin_fee}}, plus a handling fee of {{currency}} {{fine_admin_fee}} for each fine or notice the Owner has to handle{{/if}}.
+        local: Der Mieter zahlt alle Verwarnungs- und Bußgelder, Parkgebühren, Mautgebühren, Umweltzonen- und Einfahrtsgebühren, Abschlepp-, Verwahr- und Parkkrallenkosten, die während der Miete entstehen, auch solche, die dem Vermieter nach der Rückgabe zugehen{{#if fine_admin_fee}}, zuzüglich einer Bearbeitungsgebühr von {{currency}} {{fine_admin_fee}} für jeden Bescheid, den der Vermieter bearbeiten muss{{/if}}.
+      - id: fines.2
+        en: If the authorities send the Owner a hearing letter (Anhörungsbogen) or a notice for an offence during the rental, the Owner names the Renter as the driver, and the proceedings continue against the Renter. Parking costs the Owner is charged as keeper (section 25a StVG) are passed to the Renter.
+        local: Erhält der Vermieter für einen Verstoß während der Mietzeit einen Anhörungsbogen oder Bescheid, benennt er den Mieter als Fahrer, und das Verfahren wird gegen den Mieter fortgesetzt. Kosten, die dem Vermieter als Halter für Parkverstöße auferlegt werden (§ 25a StVG), werden an den Mieter weitergegeben.
+        country: true
+      - id: fines.3_de
+        en: Environmental zones (Umweltzonen) require a green emissions sticker, which the Owner provides with the vehicle. German motorways have no toll for cars.
+        local: Umweltzonen erfordern eine grüne Umweltplakette, die der Vermieter mit dem Fahrzeug bereitstellt. Auf deutschen Autobahnen gilt für Pkw keine Maut.
+        country: true
+  - id: termination
+    title:
+      en: 15. Ending the agreement by the Owner
+      local: 15. Kündigung durch den Vermieter
+    clauses:
+      - id: termination.1
+        en: "The Owner may end this agreement and take the vehicle back at once if the Renter: does not pay; gave false details; lets an unnamed person drive; uses the vehicle unlawfully or against section 9; takes it outside the permitted area without permission; tampers with the odometer or tracker; abandons it; or puts the vehicle or other people at serious risk. The Owner then deducts only what the Renter owes under this agreement, including reasonable recovery costs, and refunds the prepaid rent for the days after the vehicle is recovered."
+        local: "Der Vermieter kann diesen Vertrag fristlos kündigen und das Fahrzeug sofort zurücknehmen, wenn der Mieter: nicht zahlt; falsche Angaben gemacht hat; eine nicht genannte Person fahren lässt; das Fahrzeug rechtswidrig oder entgegen Abschnitt 9 nutzt; es ohne Zustimmung aus dem erlaubten Gebiet bringt; Kilometerzähler oder Tracker manipuliert; es zurücklässt; oder das Fahrzeug oder andere Personen ernsthaft gefährdet. Der Vermieter behält dann nur ein, was der Mieter nach diesem Vertrag schuldet, einschließlich angemessener Rückholkosten, und erstattet die vorausbezahlte Miete für die Tage nach der Rücknahme."
+      - id: termination.2
+        en: The Renter must make the vehicle available for collection, and pays reasonable recovery costs where the Owner has to fetch it.
+        local: Der Mieter muss das Fahrzeug zur Abholung bereitstellen und trägt angemessene Rückholkosten, wenn der Vermieter es abholen muss.
+  - id: return
+    title:
+      en: 16. Returning the vehicle
+      local: 16. Rückgabe des Fahrzeugs
+    clauses:
+      - id: return.1
+        en: The vehicle must be returned with its keys, documents and accessories, with the fuel level agreed in section 8, and reasonably clean. Both parties check the vehicle together and record the condition, odometer and fuel in Annex A with photos. If the Renter chooses not to be present, the Owner's dated photos taken at the return are the record, and the Renter receives a copy.
+        local: Das Fahrzeug ist mit Schlüsseln, Papieren und Zubehör, mit dem in Abschnitt 8 vereinbarten Tankstand und in angemessen sauberem Zustand zurückzugeben. Beide Parteien prüfen das Fahrzeug gemeinsam und halten Zustand, Kilometer- und Tankstand in Anlage A mit Fotos fest. Will der Mieter nicht anwesend sein, gelten die datierten Fotos des Vermieters bei der Rückgabe als Protokoll; der Mieter erhält eine Kopie.
+      - id: return.2
+        if: cleaning_fee
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
+        local: Bei übermäßiger Verschmutzung, Sand, Schlamm, Flecken, Essensresten oder Gerüchen im Innenraum fällt eine Reinigungsgebühr von {{currency}} {{cleaning_fee}} an (mehr nur bei nötiger Spezialreinigung, gegen Beleg).
+      - id: return.3
+        unless: cleaning_fee
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+        local: Bei übermäßiger Verschmutzung, Sand, Schlamm, Flecken, Essensresten oder Gerüchen im Innenraum können die angemessenen Reinigungskosten berechnet werden.
+  - id: data
+    title:
+      en: 17. Personal data
+      local: 17. Personenbezogene Daten
+    clauses:
+      - id: data.1
+        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and licence details, copies of documents, vehicle photos and any tracker location data) under the GDPR and the Federal Data Protection Act (BDSG). It uses them to provide this rental, check identity and licence, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
+        local: Der Vermieter ist Verantwortlicher für die personenbezogenen Daten des Mieters und der Fahrer (Name, Kontaktdaten, Ausweis- und Führerscheindaten, Dokumentkopien, Fahrzeugfotos und gegebenenfalls GPS-Standortdaten) nach der Datenschutz-Grundverordnung (DSGVO) und dem BDSG. Er nutzt sie, um die Miete durchzuführen, Identität und Fahrerlaubnis zu prüfen, gesetzliche Pflichten zu erfüllen (Buchhaltung, Bußgelder, Anfragen der Polizei), Schäden und Streitigkeiten abzuwickeln und das Fahrzeug zu schützen. Er speichert sie nur so lange, wie diese Zwecke und das Gesetz es erfordern, schützt sie und verkauft sie nie.
+        country: true
+      - id: data.2
+        en: "The Owner shares data only where needed: with insurers, repairers, the police, courts and the authorities that issue fines (a legal obligation), and with IT providers working for the Owner. The Renter may ask for access to, correction or deletion of, or a copy of their data, may object to processing based on the Owner's legitimate interests, and may complain to the competent data protection supervisory authority."
+        local: "Der Vermieter gibt Daten nur weiter, wenn es nötig ist: an Versicherer, Werkstätten, Polizei, Gerichte und Bußgeldbehörden (gesetzliche Pflicht) sowie an IT-Dienstleister, die für ihn arbeiten. Der Mieter kann Auskunft, Berichtigung, Löschung oder eine Kopie seiner Daten verlangen, einer Verarbeitung auf Grundlage berechtigter Interessen des Vermieters widersprechen und sich bei der zuständigen Datenschutzaufsichtsbehörde beschweren."
+        country: true
+  - id: general
+    title:
+      en: 18. General terms
+      local: 18. Allgemeine Bestimmungen
+    clauses:
+      - id: general.1
+        en: "Messages: notices under this agreement may be sent by phone, message app (such as WhatsApp), SMS or email to the contact details in sections 1 and 2. Messages, call logs and photos exchanged this way may be used as evidence of what was agreed."
+        local: "Mitteilungen: Erklärungen nach diesem Vertrag können per Telefon, Messenger (z. B. WhatsApp), SMS oder E-Mail an die Kontaktdaten in den Abschnitten 1 und 2 gesendet werden. So ausgetauschte Nachrichten, Anrufprotokolle und Fotos können als Nachweis des Vereinbarten dienen."
+      - id: general.2
+        en: "Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, storms, wildfires, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties."
+        local: "Höhere Gewalt: Keine Partei haftet für Verzögerungen oder Ausfälle durch Ereignisse außerhalb ihrer Kontrolle, etwa Naturkatastrophen, Unwetter, Waldbrände, behördliche Anordnungen oder Fährausfälle. Die Miete für Tage, an denen das Fahrzeug deshalb nicht genutzt werden konnte, wird fair zwischen den Parteien vereinbart."
+      - id: general.3
+        en: "Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies."
+        local: "Vollständigkeit: Dieser Vertrag, seine Anlagen und besondere Vereinbarungen bilden die gesamte Vereinbarung. Änderungen gelten nur in Textform (eine Nachricht beider Parteien genügt). Ist eine Bestimmung unwirksam, bleibt der übrige Vertrag wirksam."
+      - id: general.4
+        en: "Language: this agreement is written in English and German. If the versions differ, the meaning more favourable to the Renter applies."
+        local: "Sprache: Dieser Vertrag ist in englischer und deutscher Sprache abgefasst. Weichen die Fassungen voneinander ab, gilt die für den Mieter günstigere Bedeutung."
+        country: true
+      - id: general.5
+        en: "Governing law: this agreement is governed by German law. A Renter who is a consumer may bring claims at their general place of jurisdiction; a consumer living in another EU country may also sue where they live where EU law allows it."
+        local: "Anwendbares Recht: Dieser Vertrag unterliegt deutschem Recht. Ein Mieter, der Verbraucher ist, kann an seinem allgemeinen Gerichtsstand klagen; ein Verbraucher mit Wohnsitz in einem anderen EU-Staat kann auch dort klagen, wo er lebt, soweit das EU-Recht dies zulässt."
+        country: true
+      - id: general.6
+        if: special_terms
+        en: "Special conditions agreed between the parties: {{special_terms}}"
+        local: "Zwischen den Parteien vereinbarte besondere Bedingungen: {{special_terms}}"
+      - id: general.7
+        en: "Consumer rights: nothing in this agreement limits the rights a Renter who is a consumer has under mandatory consumer law, including the rules on unfair terms (German Civil Code, sections 305 to 310). The charges in this agreement are a genuine estimate of the Owner's loss and are never charged twice for the same loss. A dispute may also be taken to a consumer conciliation body (VSBG)."
+        local: "Verbraucherrechte: Dieser Vertrag schränkt keine Rechte ein, die dem Mieter als Verbraucher nach zwingendem Recht zustehen, einschließlich der Regeln über Allgemeine Geschäftsbedingungen (§§ 305 bis 310 BGB). Die Gebühren in diesem Vertrag sind eine realistische Schätzung des Schadens des Vermieters und werden für denselben Schaden nie doppelt berechnet. Streitigkeiten können auch einer Verbraucherschlichtungsstelle (VSBG) vorgelegt werden."
+        country: true
+      - id: general.9_de
+        en: "Flat fees: where this agreement sets a flat fee or fixed price (Annex B, cleaning, loss of use, late return, handling), the Renter may prove that no loss or cost arose or that it is substantially lower than the flat amount (German Civil Code, section 309 no. 5)."
+        local: "Pauschalen: Wo dieser Vertrag einen Pauschalbetrag oder Festpreis vorsieht (Anlage B, Reinigung, Nutzungsausfall, verspätete Rückgabe, Bearbeitung), bleibt dem Mieter der Nachweis gestattet, dass ein Schaden oder Aufwand überhaupt nicht entstanden oder wesentlich niedriger ist als die Pauschale (§ 309 Nr. 5 BGB)."
+        country: true
+      - id: general.8
+        en: "Electronic signature: this agreement may be signed on paper or electronically; both have the same effect (Regulation (EU) No 910/2014 (eIDAS), Article 25)."
+        local: "Elektronische Unterschrift: Dieser Vertrag kann auf Papier oder elektronisch unterschrieben werden; beides hat dieselbe Wirkung (Verordnung (EU) Nr. 910/2014 (eIDAS), Art. 25)."
+  - id: signatures
+    title:
+      en: Signatures
+      local: Unterschriften
+    signature: true
+    clauses:
+      - id: signatures.1
+        en: By signing, the parties confirm they have read and understood this agreement, including Annexes A and B, and agree to it. The Renter confirms they received a copy.
+        local: Mit ihrer Unterschrift bestätigen die Parteien, diesen Vertrag einschließlich der Anlagen A und B gelesen und verstanden zu haben und ihm zuzustimmen. Der Mieter bestätigt den Erhalt einer Ausfertigung.
+    sign_rows:
+      - en: Owner (name, signature, date)
+        local: Vermieter (Name, Unterschrift, Datum)
+      - en: Renter (name, signature, date)
+        local: Mieter (Name, Unterschrift, Datum)
+      - en: Additional driver (name, signature, date)
+        local: Zusätzlicher Fahrer (Name, Unterschrift, Datum)
+  - id: annex_a
+    title:
+      en: "Annex A: Handover and return check"
+      local: "Anlage A: Übergabe- und Rückgabeprotokoll"
+    page_break: true
+    checklist: true
+    clauses:
+      - id: annex_a.1
+        en: Mark existing scratches (S), dents (D), cracks (C) and missing items (M). Take dated photos of all four sides, the dashboard (odometer and fuel), the interior and any damage, at both handover and return.
+        local: Vorhandene Kratzer (K), Dellen (D), Risse (R) und fehlende Teile (F) markieren. Bei Übergabe und Rückgabe datierte Fotos aller vier Seiten, des Armaturenbretts (Kilometer- und Tankstand), des Innenraums und aller Schäden aufnehmen.
+    check_rows:
+      - en: Odometer
+        local: Kilometerstand
+      - en: Fuel / battery level
+        local: Tank- / Akkustand
+      - en: "Body: front / rear / left / right"
+        local: "Karosserie: vorne / hinten / links / rechts"
+      - en: Windscreen, glass, mirrors and lights
+        local: Windschutzscheibe, Scheiben, Spiegel und Leuchten
+      - en: Tyres and wheels
+        local: Reifen und Felgen
+      - en: Interior and seats
+        local: Innenraum und Sitze
+      - en: Keys, documents, warning triangle, vest
+        local: Schlüssel, Papiere, Warndreieck, Warnweste
+      - en: Helmets / child seat / accessories
+        local: Helme / Kindersitz / Zubehör
+      - en: Photos taken (number)
+        local: Aufgenommene Fotos (Anzahl)
+      - en: Owner's and Renter's initials
+        local: Kürzel von Vermieter und Mieter
+    columns:
+      item:
+        en: Item
+        local: Position
+      out:
+        en: At handover
+        local: Bei Übergabe
+      in:
+        en: At return
+        local: Bei Rückgabe
+  - id: annex_b
+    title:
+      en: "Annex B: Damage and replacement price list"
+      local: "Anlage B: Preisliste für Schäden und Ersatz"
+    pricelist: true
+    clauses:
+      - id: annex_b.1
+        en: Agreed prices for common damage and lost items, based on typical repair costs. Damage not listed is charged per section 12. Where a damage waiver applies, the Renter never pays more than the excess.
+        local: Vereinbarte Preise für häufige Schäden und Verluste, auf Grundlage üblicher Reparaturkosten. Nicht aufgeführte Schäden werden nach Abschnitt 12 berechnet. Bei Haftungsfreistellung zahlt der Mieter nie mehr als die Selbstbeteiligung.
+    price_rows:
+      - en: Scratch, per panel (polish / repaint)
+        local: Kratzer, je Teil (polieren / lackieren)
+      - en: Dent, per panel
+        local: Delle, je Teil
+      - en: Windscreen chip / replacement
+        local: "Windschutzscheibe: Steinschlag / Austausch"
+      - en: Mirror
+        local: Spiegel
+      - en: Headlight / tail light / indicator
+        local: Scheinwerfer / Rückleuchte / Blinker
+      - en: Tyre (each)
+        local: Reifen (je Stück)
+      - en: Key / remote
+        local: Schlüssel / Fernbedienung
+      - en: Helmet / child seat
+        local: Helm / Kindersitz
+      - en: Number plate replacement
+        local: Ersatzkennzeichen
+      - en: Vehicle value (for total loss or theft)
+        local: Fahrzeugwert (Totalschaden oder Diebstahl)
+    columns:
+      item:
+        en: Item
+        local: Position
+      price:
+        en: Price
+        local: Preis

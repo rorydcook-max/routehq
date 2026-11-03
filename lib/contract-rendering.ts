@@ -1,6 +1,17 @@
 import { currencySymbol } from "@/components/currency-symbol";
-import { agreementCountry, agreementLanguageFor, agreementWords, secondDueLabel, secondPeriodLabel } from "@/lib/agreement-language";
+import {
+  agreementCountry,
+  agreementDistanceUnit,
+  agreementLanguageFor,
+  agreementWords,
+  EUROPEAN_JURISDICTION,
+  isEuropeanAgreementCountry,
+  secondCountryWords,
+  secondDueLabel,
+  secondPeriodLabel
+} from "@/lib/agreement-language";
 import { toWallTime } from "@/lib/business-time";
+import { extrasAgreementVariables, waiverExcess } from "@/lib/extras";
 import { feeOn, getTravelPolicySettings, type IslandTravelPolicy } from "@/lib/travel-policy";
 
 function escapeHtml(value: unknown) {
@@ -401,6 +412,12 @@ export function buildContractVariables({
   const thai = agreementLanguage === "th";
   const words = agreementWords(agreementLanguage);
   const second = (english: string, thaiText: string, other?: string) => (thai ? `${english} / ${thaiText}` : words && other ? `${english} / ${other}` : english);
+  // Kilometres or miles (the UK, or a business that chose miles): lib/agreement-language.ts agreementDistanceUnit.
+  const miles = agreementDistanceUnit(organization, country.code) === "mi";
+  // A European business still carrying Thailand's default governing law gets its own country's.
+  const europe = isEuropeanAgreementCountry(country.code);
+  const jurisdiction =
+    europe && (!settings.jurisdiction || /thailand/i.test(settings.jurisdiction)) ? EUROPEAN_JURISDICTION[country.code] || country.name : settings.jurisdiction;
   const paidExtras = (Array.isArray(rental?.extras) ? rental.extras : []).map((line: any) => {
     const price = `${Math.round(Number(line?.price || 0)).toLocaleString("en-US")} ${rental?.currency || "THB"}`;
     return `${line?.name} - ${line?.per === "day" ? `${price} ${second("per day", "ต่อวัน", words?.perDay)}` : `${price}`} (${second("paid extra", "บริการเสริม", words?.paidExtra)})`;
@@ -483,7 +500,7 @@ export function buildContractVariables({
     home_territory: settings.home_territory,
     home_territory_type: settings.home_territory_type,
     island_travel_policy: settings.island_travel_policy,
-    jurisdiction: settings.jurisdiction,
+    jurisdiction,
     renter_first_name: name.firstName,
     renter_surname: name.surname,
     renter_full_name: fullName,
@@ -584,7 +601,11 @@ export function buildContractVariables({
     secondary_deposit_amount: formatAmount(settings.secondary_deposit_amount),
     // Distance switched off in Settings = unlimited. The setting is per month, so the agreement says so.
     mileage_limit: feeOn(settings, "mileage_limit")
-      ? second(`${formatAmount(settings.mileage_limit)} km per month`, `${formatAmount(settings.mileage_limit)} กม. ต่อเดือน`, words ? `${formatAmount(settings.mileage_limit)} ${words.kmPerMonth}` : "")
+      ? second(
+          `${formatAmount(settings.mileage_limit)} ${miles ? "miles" : "km"} per month`,
+          `${formatAmount(settings.mileage_limit)} ${miles ? "ไมล์" : "กม."} ต่อเดือน`,
+          words ? `${formatAmount(settings.mileage_limit)} ${miles ? words.milesPerMonth : words.kmPerMonth}` : ""
+        )
       : second("Unlimited", "ไม่จำกัด", words?.unlimited),
     // Each fee switched off in Settings is left out of the agreement (the template checks these).
     fuel_charge_enabled: feeOn(settings, "fuel_charge_per_increment"),
@@ -600,7 +621,8 @@ export function buildContractVariables({
     emergency_repair_limit: formatAmount(settings.emergency_repair_limit),
     deposit_return_days: formatAmount(settings.deposit_return_days),
     insurance_type: optionalText(bookingData.insurance_type || vehicle?.voluntary_insurance_type || "standard rental-use"),
-    insurance_excess: formatAmount(bookingData.insurance_excess || organization?.settings?.insurance_excess || 0),
+    // A damage waiver on the booking lowers the excess to the waiver's amount (lib/extras.ts waiverExcess).
+    insurance_excess: formatAmount(waiverExcess(rental) ?? (bookingData.insurance_excess || organization?.settings?.insurance_excess || 0)),
     contract_date: formatContractDate(new Date().toISOString(), locale),
     included_items: includedItemsHtml(includedItems),
     // Typed by the owner on the booking: plain text only. It used to go into the agreement as raw HTML.
@@ -648,8 +670,17 @@ export function buildContractVariables({
   // What lib/agreement-localize.ts puts in the RoveHQ agreement for a business outside Thailand.
   variables.agreement_language = agreementLanguage;
   variables.agreement_country = country.name || settings.jurisdiction;
+  // Europe and the UK: the country clauses lib/agreement-localize.ts adds are shown on these.
+  variables.agreement_eu_uk = europe;
+  if (europe && country.code) variables[`country_${country.code}`] = true;
+  // Greek serves Greece and Cyprus, so its country and law are filled in ("στην Ελλάδα" / "στην Κύπρο").
+  variables.agreement_country_2 = secondCountryWords(country.code).name;
+  variables.agreement_law_2 = secondCountryWords(country.code).law;
+  variables.distance_unit = miles ? "miles" : "km";
   variables.currency_symbol = currencySymbol(rental?.currency || organization?.currency || "THB");
   variables.billing_period_label_2 = secondPeriodLabel(agreementLanguage, rental?.pricing_model);
+  // Ready-made extras (damage waiver, young driver, additional driver, cross-border, one-way, out of hours) for templates.
+  Object.assign(variables, extrasAgreementVariables(rental, bookingData.insurance_excess || organization?.settings?.insurance_excess || 0, formatAmount));
   variables.payment_due_label_2 = secondDueLabel(agreementLanguage, rental?.pricing_model);
 
   return variables;

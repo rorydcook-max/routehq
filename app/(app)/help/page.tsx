@@ -15,8 +15,8 @@ import { planById } from "@/lib/plans";
 import { importIncluded, isPlatformAdmin, SUPPORT_TOPICS, type SupportTopic } from "@/lib/support";
 import { countWaitingForTeam, listBusinessThreads } from "@/lib/support-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { businessTimeZone } from "@/lib/business-time";
 
-const BANGKOK = "Asia/Bangkok";
 
 export default async function HelpPage({ searchParams }: { searchParams: Promise<{ topic?: string }> }) {
   const [{ topic: askedTopic }, userEmail, organization, membership, t, locale] = await Promise.all([
@@ -35,9 +35,9 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
   const included = importIncluded(org);
   const plan = planById(org.subscription_tier);
   const initialTopic = (SUPPORT_TOPICS as readonly string[]).includes(String(askedTopic)) ? (askedTopic as SupportTopic) : "question";
-  const date = (iso: string) => new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-GB", { timeZone: BANGKOK, day: "numeric", month: "short" }).format(new Date(iso));
+  const date = (iso: string) => new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-GB", { timeZone: businessTimeZone(), day: "numeric", month: "short" }).format(new Date(iso));
   // The time too, so two conversations on the same day with the same subject can be told apart.
-  const time = (iso: string) => new Intl.DateTimeFormat("en-GB", { timeZone: BANGKOK, hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  const time = (iso: string) => new Intl.DateTimeFormat("en-GB", { timeZone: businessTimeZone(), hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   // The how-to guides (the help centre's articles), searchable here before writing to us.
   const guides = docSearchIndex("en").map((entry) => ({ ...entry, video: Boolean(listDocs("en").find((doc) => doc.slug === entry.slug)?.video) }));
 

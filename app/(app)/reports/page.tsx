@@ -5,6 +5,7 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { getReportsData, type DatePreset } from "@/lib/reports";
 import { ReportsView } from "./reports-view";
+import { vatSettings } from "@/lib/regional";
 
 export default async function ReportsPage({
   searchParams
@@ -25,7 +26,8 @@ export default async function ReportsPage({
 
   return (
     <AppShell userEmail={userEmail} hero={<PageBand keepSubtitle subtitle={say("subtitle")} title={say("title")} />}>
-      <ReportsView data={data} />
+      {/* Money in is what customers paid (VAT included); with VAT on, the VAT inside it is shown under it. */}
+      <ReportsView data={data} vatRate={vatSettings(organization).on ? vatSettings(organization).rate : 0} />
     </AppShell>
   );
 }

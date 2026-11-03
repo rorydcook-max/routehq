@@ -1,8 +1,10 @@
 import { getTranslations } from "next-intl/server";
 import { AuthLanguage } from "@/components/auth-language";
 import { RouteHqLogo } from "@/components/brand-logo";
+import { CookieChoicesLink } from "./cookie-choices-link";
 import { Container, SITE_LINKS, SiteLink } from "./site-ui";
 import s from "../site.module.css";
+import l from "../legal/legal.module.css";
 
 /** The website's footer: where to go next, the language (the same choice the sign-in pages keep), and the name. */
 export async function SiteFooter() {
@@ -33,6 +35,13 @@ export async function SiteFooter() {
       ]
     }
   ];
+  const legal = [
+    { href: "/legal/privacy", label: m("legalPrivacy") },
+    { href: "/legal/terms", label: m("legalTerms") },
+    { href: "/legal/dpa", label: m("legalDpa") },
+    { href: "/legal/subprocessors", label: m("legalSubprocessors") },
+    { href: "/legal/cookies", label: m("legalCookies") }
+  ];
   return (
     <footer className={s.footer}>
       <Container>
@@ -58,6 +67,15 @@ export async function SiteFooter() {
             </div>
           ))}
         </div>
+        {/* Legal pages and the cookie choice: on every page, one quiet line (GDPR / UK GDPR / PDPA, 3 Nov 2026). */}
+        <nav aria-label={m("footerLegal")} className={l.legal}>
+          {legal.map((link) => (
+            <SiteLink className={s.footerLink} href={link.href} key={link.href}>
+              {link.label}
+            </SiteLink>
+          ))}
+          <CookieChoicesLink className={s.footerLink} label={m("legalCookieChoices")} />
+        </nav>
         <div className={s.footerBottom}>
           <p>{m("footerCopyright", { year: String(new Date().getFullYear()) })}</p>
           <div className="[&_label]:min-h-11">

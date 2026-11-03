@@ -1,0 +1,721 @@
+country: HR
+locale: hr
+language: Croatian
+currency: EUR
+prevailing_language:
+  en: the version more favourable to the Renter
+  local: verzija povoljnija za Najmoprimca
+local_language:
+  en: Croatian
+  local: hrvatski
+country_name:
+  en: Croatia
+  local: Hrvatska
+currency_name:
+  en: euro (€)
+  local: eurima (€)
+jurisdiction:
+  en: the Republic of Croatia
+  local: Republika Hrvatska
+court_place:
+  en: the competent court in Croatia
+  local: nadležni sud u Republici Hrvatskoj
+words:
+  per_day:
+    en: per day
+    local: po danu
+  per_week:
+    en: per week
+    local: tjedno
+  per_month:
+    en: per month
+    local: mjesečno
+  day:
+    en: day
+    local: danu
+  month:
+    en: month
+    local: mjesecu
+  days:
+    en: days
+    local: dana
+  business_days:
+    en: business days after return
+    local: radnih dana nakon povrata
+  car:
+    en: Car
+    local: Automobil
+  motorbike:
+    en: Motorbike / scooter / quad
+    local: Motocikl / skuter / quad
+  ins_compulsory:
+    en: Compulsory third-party insurance only
+    local: Samo obvezno osiguranje od automobilske odgovornosti
+  ins_third_party:
+    en: Third-party insurance with extended cover (no damage waiver)
+    local: Osiguranje od automobilske odgovornosti s proširenim pokrićem (bez oslobođenja od odgovornosti za štetu)
+  ins_comprehensive:
+    en: Third-party insurance plus damage waiver (CDW) and theft protection, with the excess shown
+    local: Osiguranje od automobilske odgovornosti uz oslobođenje od odgovornosti za štetu (CDW) i zaštitu od krađe, s navedenom franšizom
+  free:
+    en: Free
+    local: Besplatno
+  payment_default:
+    en: Card, bank transfer or cash
+    local: Kartica, bankovni prijenos ili gotovina
+  blank_hint:
+    en: (fill in)
+    local: (upisati)
+sources:
+  - url: https://eur-lex.europa.eu/eli/dir/1993/13/oj
+    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favour (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
+  - url: https://eur-lex.europa.eu/eli/dir/2011/83/oj
+    supports: "Consumer Rights Directive 2011/83/EU: total price including all compulsory charges (Arts 5-6); Art 16(l) no withdrawal right for car rental for a specific date or period (charges.1, cancellation.7)."
+  - url: https://commission.europa.eu/topics/consumers/consumer-rights-and-complaints/enforcement-consumer-protection/coordinated-actions/other-travel-services_en
+    supports: "EU consumer authorities (CPC) and the main rental companies, 2017: price transparency, clear insurance and waiver terms, fuel options and fairer damage handling. Basis for charges.1, insurance, fuel and damage.2."
+  - url: https://eur-lex.europa.eu/eli/dir/2009/103/oj
+    supports: "Motor Insurance Directive 2009/103/EC (as amended by 2021/2118): compulsory third-party cover with EU minimum amounts, valid across the EU (insurance.1)."
+  - url: https://eur-lex.europa.eu/eli/dir/2006/126/oj
+    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licences recognised in every member state (renter.2)."
+  - url: https://eur-lex.europa.eu/eli/dir/2015/413/oj
+    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offences, so fines follow foreign renters (fines.1)."
+  - url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    supports: "GDPR: controller duties, lawful bases (contract, legal obligation for giving driver details to authorities, legitimate interest), data subject rights (data.1, data.2)."
+  - url: https://eur-lex.europa.eu/eli/reg/2014/910/oj
+    supports: "eIDAS Regulation Art 25(1): an electronic signature may not be denied legal effect solely because it is electronic (general.8)."
+  - url: https://eur-lex.europa.eu/eli/reg/2008/593/oj
+    supports: "Rome I Regulation Art 6: consumer contracts and mandatory protection of the consumer's own law (general.5, general.7)."
+  - url: https://eur-lex.europa.eu/eli/reg/2012/1215/oj
+    supports: "Brussels I bis Regulation Arts 17-19: a consumer may sue in the courts where they live when the business directs its activities to that country (general.5)."
+  - url: https://www.ccpc.ie/news-and-media/news/article/2026/06/16/consumer-rights-explained--i-think-my-holiday-car-hire-firm-is-trying-to-rip-me-off-what-are-my-rights
+    supports: "CCPC (Irish consumer authority), 2026: damage may be charged only with clear evidence it happened during the rental; renters can ask for inspection reports and a cost breakdown; ECRCS conciliation (damage.2)."
+  - url: https://www.zakon.hr/z/193/zakon-o-zastiti-potrosaca
+    supports: "Consumer Protection Act (NN 19/22, amended NN 59/26): consumer information and documents in Croatian and Latin script, other languages allowed alongside; unfair terms (general.4, general.7)."
+  - url: https://www.rac.co.uk/drive/travel/country/croatia
+    supports: "RAC Croatia: UK licences need no IDP; reflective jacket, triangle and first-aid kit compulsory; children under 12 not in front; 0.05% limit and zero for drivers up to 24; motorway tolls, no vignette; coast road to Dubrovnik crosses Bosnia and Herzegovina (renter.2, use.3, use.4, use.8_hr, area.2, fines.2)."
+  - url: https://azop.hr/
+    supports: Croatian Personal Data Protection Agency (data.2).
+title:
+  en: Vehicle Rental Agreement
+  local: Ugovor o najmu vozila
+subtitle:
+  en: Self-drive car, motorbike, scooter and quad rental. {{country_name}}
+  local: Najam automobila, motocikala, skutera i quadova bez vozača. {{country_name}}
+footer:
+  en: Vehicle rental agreement · {{business_name}}
+  local: Ugovor o najmu vozila · {{business_name}}
+page_words:
+  page: Stranica
+  of: od
+sections:
+  - id: parties
+    title:
+      en: 1. The parties
+      local: 1. Ugovorne strane
+    fields:
+      - key: business_name
+        en: Owner (rental business)
+        local: Najmodavac (tvrtka za najam)
+      - key: business_reg_no
+        en: Company / VAT registration number
+        local: OIB / MBS
+      - key: business_address
+        en: Business address
+        local: Adresa tvrtke
+      - key: business_phone
+        en: Phone / WhatsApp
+        local: Telefon / WhatsApp
+      - key: business_email
+        en: Email
+        local: E-pošta
+    clauses:
+      - id: parties.1
+        en: This agreement is made on {{renter_contract_date}} between the rental business named above (the "Owner") and the person named in section 2 (the "Renter"). Where there is more than one renter or driver, each of them is jointly responsible for every obligation in this agreement.
+        local: Ovaj ugovor sklapa se dana {{renter_contract_date}} između gore navedene tvrtke za najam („Najmodavac”) i osobe navedene u odjeljku 2 („Najmoprimac”). Ako ima više najmoprimaca ili vozača, svaki od njih solidarno odgovara za sve obveze iz ovog ugovora.
+  - id: renter
+    title:
+      en: 2. The Renter and drivers
+      local: 2. Najmoprimac i vozači
+    fields:
+      - key: renter_name
+        en: Full name (as on passport or ID)
+        local: Ime i prezime (kao u putovnici ili osobnoj iskaznici)
+      - key: renter_nationality
+        en: Nationality
+        local: Državljanstvo
+      - key: renter_dob
+        en: Date of birth
+        local: Datum rođenja
+      - key: renter_id_no
+        en: Passport or national ID number
+        local: Broj putovnice ili osobne iskaznice
+      - key: renter_home_address
+        en: Home address
+        local: Adresa prebivališta
+      - key: renter_local_address
+        en: Address during the rental (hotel / apartment)
+        local: Adresa tijekom najma (hotel / apartman)
+      - key: renter_phone
+        en: Phone / WhatsApp
+        local: Telefon / WhatsApp
+      - key: renter_email
+        en: Email
+        local: E-pošta
+      - key: renter_licence
+        en: Driving licence number, categories and issuing country
+        local: Broj vozačke dozvole, kategorije i država izdavanja
+      - key: renter_licence_expiry
+        en: Licence expiry date / date first issued
+        local: Vozačka dozvola vrijedi do / datum prvog izdavanja
+      - key: renter_idp
+        en: International Driving Permit (number / not required)
+        local: Međunarodna vozačka dozvola (broj / nije potrebna)
+      - key: renter_emergency
+        en: Emergency contact (name and phone)
+        local: Kontakt za hitne slučajeve (ime i telefon)
+      - key: driver2_details
+        en: Additional driver (name, ID, licence), if any
+        local: Dodatni vozač (ime, isprava, vozačka dozvola), ako postoji
+    clauses:
+      - id: renter.1
+        en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
+        local: Najmoprimac potvrđuje da su gornji podaci istiniti i potpuni te da su ovdje navedene sve osobe koje će upravljati vozilom. Vozilom smiju upravljati samo Najmoprimac i navedeni dodatni vozač.
+      - id: renter.2
+        en: Every driver must hold a valid driving licence for this class of vehicle (category B for cars; AM, A1, A2 or A for motorcycles) and carry it while driving. Licences from the EU and EEA are valid; a visitor with another foreign licence must also carry an International Driving Permit where Croatian law requires one.
+        local: Svaki vozač mora imati valjanu vozačku dozvolu za ovu kategoriju vozila (kategorija B za automobile; AM, A1, A2 ili A za motocikle) i nositi je tijekom vožnje. Vozačke dozvole iz EU-a i EGP-a vrijede; posjetitelj s drugom stranom dozvolom mora imati i međunarodnu vozačku dozvolu kada to propisuje hrvatsko pravo.
+        country: true
+      - id: renter.3
+        en: Each driver must meet the minimum age and the minimum period of holding a full licence that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
+        local: Svaki vozač mora ispunjavati minimalnu dob i minimalno razdoblje posjedovanja vozačke dozvole koje je Najmodavac naveo pri rezervaciji. Svaka naknada za mladog ili dodatnog vozača navedena je u ovom ugovoru prije potpisa.
+  - id: vehicle
+    title:
+      en: 3. The vehicle
+      local: 3. Vozilo
+    fields:
+      - key: vehicle_type_label
+        en: Type
+        local: Vrsta
+      - key: vehicle_make_model
+        en: Make and model
+        local: Marka i model
+      - key: vehicle_year
+        en: Year
+        local: Godina
+      - key: vehicle_plate
+        en: Registration (plate) number
+        local: Registarska oznaka
+      - key: vehicle_colour
+        en: Colour
+        local: Boja
+      - key: renter_vin
+        en: Chassis / VIN number
+        local: Broj šasije (VIN)
+      - key: out_odometer
+        en: Odometer at handover
+        local: Kilometraža pri predaji
+      - key: out_fuel
+        en: Fuel / battery level at handover
+        local: Razina goriva / baterije pri predaji
+      - key: renter_accessories
+        en: Accessories handed over (helmets, keys, child seat, warning triangle, vest, etc.)
+        local: Predana oprema (kacige, ključevi, dječja sjedalica, trokut, prsluk itd.)
+    clauses:
+      - id: vehicle.1
+        en: The Owner rents the vehicle described above, with the accessories listed, to the Renter for the rental period and on the terms of this agreement. The vehicle remains the property of the Owner at all times.
+        local: Najmodavac daje Najmoprimcu u najam opisano vozilo s navedenom opremom za razdoblje najma i pod uvjetima ovog ugovora. Vozilo je u svakom trenutku vlasništvo Najmodavca.
+      - id: vehicle.2
+        en: The Owner confirms that the vehicle is registered, has a valid roadworthiness test where one is required (roadworthiness test (tehnički pregled)), and has compulsory motor insurance valid for the whole rental period, and that it is handed over roadworthy, with the documents and safety equipment the law requires to be carried.
+        local: Najmodavac potvrđuje da je vozilo registrirano, da ima valjani tehnički pregled kada je propisan (tehnički pregled) i obvezno osiguranje za cijelo razdoblje najma te da se predaje tehnički ispravno, s ispravama i sigurnosnom opremom koje zakon propisuje.
+        country: true
+      - id: vehicle.3
+        en: The Owner keeps the vehicle serviced as the manufacturer recommends and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time; if servicing takes more than one day, section 13 applies.
+        local: Najmodavac održava vozilo prema uputama proizvođača i snosi uobičajene mehaničke popravke i trošenje, osim ako ovaj ugovor ne određuje drukčije. Kod duljih najmova Najmodavac dogovara servis s Najmoprimcem u prikladno vrijeme; ako traje dulje od jednog dana, primjenjuje se odjeljak 13.
+      - id: vehicle.4
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
+        local: "Tijekom najma Najmoprimac brine o svakodnevnom stanju vozila: provjerava izgledaju li gume, svjetla, kočnice, ulje i rashladna tekućina uobičajeno te ne upravlja vozilom ako više nije sigurno."
+  - id: period
+    title:
+      en: 4. Rental period, pickup and return
+      local: 4. Razdoblje najma, preuzimanje i povrat
+    fields:
+      - key: renter_start
+        en: Start (date and time)
+        local: Početak (datum i vrijeme)
+      - key: renter_end
+        en: End (date and time)
+        local: Završetak (datum i vrijeme)
+      - key: renter_pickup_place
+        en: Pickup / delivery place
+        local: Mjesto preuzimanja / dostave
+      - key: renter_return_place
+        en: Return / collection place
+        local: Mjesto povrata / preuzimanja
+    clauses:
+      - id: period.1
+        en: The Renter must return the vehicle at the agreed place, date and time. An extension is valid only when the Owner agrees to it in writing (a message is enough) and the extra rent is paid.
+        local: Najmoprimac mora vratiti vozilo na dogovorenom mjestu, datuma i u vrijeme koje je dogovoreno. Produljenje vrijedi samo ako ga Najmodavac pisano prihvati (dovoljna je poruka) i ako je dodatna najamnina plaćena.
+      - id: period.2
+        if: late_hour_fee
+        en: "Late return: after a grace period of {{late_grace_minutes}} minutes, each started hour costs {{currency}} {{late_hour_fee}}. A return more than {{late_full_day_hours}} hours late is charged as an extra full day at the daily rate."
+        local: "Kasni povrat: nakon tolerancije od {{late_grace_minutes}} minuta svaki započeti sat stoji {{currency}} {{late_hour_fee}}. Kašnjenje dulje od {{late_full_day_hours}} sati naplaćuje se kao dodatni dan po dnevnoj cijeni."
+      - id: period.3
+        unless: late_hour_fee
+        en: "Late return: a return more than one hour late may be charged as an extra day at the daily rate."
+        local: "Kasni povrat: kašnjenje dulje od jednog sata može se naplatiti kao dodatni dan po dnevnoj cijeni."
+      - id: period.4
+        en: If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may report it to the police and recover it, at the Renter's reasonable cost.
+        local: Ako vozilo nije vraćeno, a Najmoprimac nije dostupan 24 sata nakon završetka najma, Najmodavac to može prijaviti policiji i preuzeti vozilo, uz razumne troškove Najmoprimca.
+      - id: period.5
+        when:
+          rate_period: month
+        en: "Rolling monthly rental: where no end date is written above, the rental continues from month to month on the same terms until either party ends it as set out in section 7."
+        local: "Mjesečni najam koji se produljuje: ako nije naveden datum završetka, najam se nastavlja iz mjeseca u mjesec pod istim uvjetima dok ga jedna strana ne okonča prema odjeljku 7."
+  - id: charges
+    title:
+      en: 5. Price and payment
+      local: 5. Cijena i plaćanje
+    fields:
+      - key: rate_text
+        en: Rental rate
+        local: Cijena najma
+      - key: renter_total
+        en: Total price for this booking (all compulsory charges included)
+        local: Ukupna cijena ove rezervacije (sa svim obveznim troškovima)
+      - key: delivery_fee_text
+        en: Delivery / collection fee
+        local: Naknada za dostavu / preuzimanje
+      - key: payment_methods
+        en: Payment methods accepted
+        local: Prihvaćeni načini plaćanja
+    clauses:
+      - id: charges.1
+        en: The Renter pays the price stated above in advance, unless the Owner agrees otherwise in writing. Prices are in {{currency_name}}, include VAT and every charge the Renter must pay (such as location surcharges, road tax and compulsory insurance), and show optional extras separately.
+        local: Najmoprimac plaća navedenu cijenu unaprijed, osim ako Najmodavac pisano ne pristane drukčije. Cijene su iskazane u {{currency_name}}, uključuju PDV i sve troškove koje Najmoprimac mora platiti (npr. naknade za lokaciju, cestovne pristojbe i obvezno osiguranje), a neobvezni dodaci iskazani su zasebno.
+      - id: charges.2
+        when:
+          rate_period: month
+        en: "Monthly rentals: rent is paid monthly in advance on the same day each month. If a payment is more than 7 days late and the Owner has reminded the Renter in writing, the Owner may end the rental and collect the vehicle (section 15)."
+        local: "Mjesečni najmovi: najamnina se plaća mjesečno unaprijed istog dana u mjesecu. Ako plaćanje kasni više od 7 dana i Najmodavac ga je pisano zatražio, Najmodavac može okončati najam i preuzeti vozilo (odjeljak 15)."
+      - id: charges.3
+        en: Extras (child seats, delivery, additional drivers, excess reduction, snow chains and similar) cost what is written in this agreement or what the Owner confirmed in writing before the rental.
+        local: Dodaci (dječje sjedalice, dostava, dodatni vozači, smanjenje franšize, lanci za snijeg i slično) stoje koliko je navedeno u ovom ugovoru ili koliko je Najmodavac pisano potvrdio prije najma.
+  - id: deposit
+    title:
+      en: 6. Security deposit
+      local: 6. Jamčevina
+    fields:
+      - key: deposit_text
+        en: Deposit
+        local: Jamčevina
+      - key: renter_deposit_method
+        en: Paid by (card hold / transfer / cash)
+        local: Plaćena putem (rezervacija na kartici / prijenos / gotovina)
+      - key: deposit_return_text
+        en: Returned or released within
+        local: Vraća se ili oslobađa u roku od
+    clauses:
+      - id: deposit.1
+        en: "The deposit secures the Renter's obligations: unpaid rent, damage up to the amount the Renter is liable for, fuel, mileage, cleaning, late return, lost keys or accessories and any other amount owed under this agreement."
+        local: "Jamčevina osigurava obveze Najmoprimca: neplaćenu najamninu, štetu do iznosa za koji odgovara, gorivo, kilometražu, čišćenje, kasni povrat, izgubljene ključeve ili opremu i svaki drugi iznos dug po ovom ugovoru."
+      - id: deposit.2
+        en: The Owner returns the deposit (or releases the card hold) after the vehicle has been returned and checked, less only amounts the Renter actually owes under this agreement. Each deduction is listed in writing with photos, receipts or quotes. If the amounts owed are more than the deposit, the Renter pays the difference within 14 days of receiving that list.
+        local: Najmodavac vraća jamčevinu (ili oslobađa rezervaciju na kartici) nakon povrata i pregleda vozila, umanjenu samo za iznose koje Najmoprimac stvarno duguje po ovom ugovoru. Svaki odbitak pisano se navodi uz fotografije, račune ili ponude. Ako dugovani iznosi premašuju jamčevinu, Najmoprimac plaća razliku u roku od 14 dana od primitka tog popisa.
+      - id: deposit.3
+        en: The Owner does not hold back the deposit to wait for traffic fines. A fine that arrives after the rental is charged as set out in section 14.
+        local: Najmodavac ne zadržava jamčevinu radi čekanja prometnih kazni. Kazna koja stigne nakon najma naplaćuje se prema odjeljku 14.
+      - id: deposit.4
+        en: The Owner will not keep the Renter's passport or identity card as a deposit. The Owner may check them and keep a copy to identify the Renter (section 17).
+        local: Najmodavac neće zadržati putovnicu ni osobnu iskaznicu Najmoprimca kao jamstvo. Smije ih provjeriti i zadržati presliku radi identifikacije (odjeljak 17).
+  - id: cancellation
+    title:
+      en: 7. Cancellation and early return
+      local: 7. Otkaz i prijevremeni povrat
+    clauses:
+      - id: cancellation.1
+        if: cancel_free_hours
+        en: The Renter may cancel free of charge up to {{cancel_free_hours}} hours before the start time. A later cancellation costs {{cancel_fee_percent}}% of the rent for the booked period (or of the first month on a monthly rental). If the Renter does not arrive at the start time and does not tell the Owner (a no-show), the Owner may keep the amount paid for the first {{no_show_days}} day(s) and release the vehicle.
+        local: Najmoprimac može besplatno otkazati do {{cancel_free_hours}} sati prije početka. Kasniji otkaz stoji {{cancel_fee_percent}} % najamnine za rezervirano razdoblje (ili za prvi mjesec kod mjesečnog najma). Ako se Najmoprimac ne pojavi u vrijeme početka i ne javi se, Najmodavac može zadržati iznos plaćen za prvi dan ili prve {{no_show_days}} dane i raspolagati vozilom.
+      - id: cancellation.2
+        unless: cancel_free_hours
+        en: "Cancellation by the Renter before the start time: the Owner keeps only a booking payment that the booking confirmation clearly said was non-refundable, and refunds the rest."
+        local: "Otkaz Najmoprimca prije početka: Najmodavac zadržava samo predujam za koji je potvrda rezervacije jasno navela da se ne vraća, a ostatak vraća."
+      - id: cancellation.3
+        when:
+          early_return: none
+        en: "Early return: rent for the booked period is not refunded if the Renter returns the vehicle early."
+        local: "Prijevremeni povrat: najamnina za rezervirano razdoblje ne vraća se ako Najmoprimac ranije vrati vozilo."
+      - id: cancellation.4
+        when:
+          early_return: prorata
+        en: "Early return: the Owner refunds the rent for the full unused days, less an early-return fee of {{currency}} {{early_return_fee}}. Long-term discounts that no longer apply may be recalculated at the rate for the period actually used."
+        local: "Prijevremeni povrat: Najmodavac vraća najamninu za pune neiskorištene dane, umanjenu za naknadu od {{currency}} {{early_return_fee}}. Popusti za dugi najam koji više ne vrijede mogu se preračunati po cijeni za stvarno iskorišteno razdoblje."
+      - id: cancellation.5
+        when:
+          rate_period: month
+        en: "Monthly rentals: either party may end the rental by giving {{notice_days}} days' written notice. Without notice, the Renter pays rent for the notice period."
+        local: "Mjesečni najmovi: svaka strana može okončati najam uz pisani otkazni rok od {{notice_days}} dana. Bez otkaznog roka Najmoprimac plaća najamninu za otkazni rok."
+      - id: cancellation.6
+        en: If the Owner cannot provide the vehicle (or a similar or better one) at the start time, the Renter may cancel and receive a full refund of everything paid.
+        local: Ako Najmodavac u vrijeme početka ne može osigurati vozilo (ili slično ili bolje), Najmoprimac može otkazati i dobiti povrat cjelokupnog plaćenog iznosa.
+      - id: cancellation.7
+        en: This rental is for specific dates, so the 14-day right of withdrawal for contracts made online or by phone does not apply (Directive 2011/83/EU, Article 16(l)).
+        local: Ovaj najam ugovoren je za određene datume, pa se pravo na jednostrani raskid u roku od 14 dana za ugovore sklopljene putem interneta ili telefona ne primjenjuje (Direktiva 2011/83/EU, članak 16. točka (l)).
+  - id: fuel
+    title:
+      en: 8. Fuel, charging and mileage
+      local: 8. Gorivo, punjenje i kilometraža
+    clauses:
+      - id: fuel.1
+        when:
+          fuel_policy: same
+        en: "Fuel policy: same-to-same. The vehicle must be returned with at least the fuel (or battery) level it had at handover."
+        local: "Pravilo za gorivo: ista razina. Vozilo se mora vratiti s najmanje onom razinom goriva (ili baterije) koju je imalo pri predaji."
+      - id: fuel.2
+        when:
+          fuel_policy: full
+        en: "Fuel policy: full-to-full. The vehicle is handed over with a full tank and must be returned full."
+        local: "Pravilo za gorivo: puno-puno. Vozilo se predaje s punim spremnikom i mora se vratiti puno."
+      - id: fuel.3
+        en: Missing fuel is charged at the local pump price for the amount needed{{#if fuel_service_fee}}, plus a refuelling service fee of {{currency}} {{fuel_service_fee}}{{/if}}.
+        local: Gorivo koje nedostaje naplaćuje se po lokalnoj cijeni na crpki za potrebnu količinu{{#if fuel_service_fee}}, uz naknadu za uslugu točenja od {{currency}} {{fuel_service_fee}}{{/if}}.
+      - id: fuel.4
+        if: mileage_limit
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        local: "Uključena kilometraža: {{mileage_limit}} km po {{mileage_period_label}}. Svaki dodatni kilometar stoji {{currency}} {{excess_km_fee}}."
+      - id: fuel.5
+        unless: mileage_limit
+        en: "Mileage: unlimited, within the permitted area (section 10)."
+        local: "Kilometraža: neograničena, unutar dopuštenog područja (odjeljak 10)."
+      - id: fuel.6
+        en: The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15).
+        local: Najmoprimac ne smije dirati brojač kilometara, graničnik brzine ni GPS uređaj. Manipulacija je teška povreda ugovora (odjeljak 15).
+      - id: fuel.7
+        en: Only the fuel type stated by the manufacturer (or in the vehicle's documents) may be used. If the wrong fuel is put in, the Renter pays the actual, evidenced cost of draining the tank and of any repair it causes.
+        local: Smije se koristiti samo gorivo koje je naveo proizvođač (ili koje je navedeno u ispravama vozila). Ako se natoči pogrešno gorivo, Najmoprimac plaća stvarni, dokazani trošak pražnjenja spremnika i svih popravaka koje to uzrokuje.
+  - id: use
+    title:
+      en: 9. Safe and lawful use
+      local: 9. Sigurna i zakonita uporaba
+    clauses:
+      - id: use.1
+        en: The Renter must drive or ride carefully, obey all traffic laws, and keep the vehicle locked with the keys removed whenever it is left. Keys must never be left in or on the vehicle.
+        local: Najmoprimac mora voziti oprezno, poštovati sve prometne propise i vozilo uvijek ostaviti zaključano i bez ključeva. Ključevi nikada ne smiju ostati u vozilu ili na njemu.
+      - id: use.2
+        when:
+          vehicle_type:
+            - motorbike
+            - ""
+        en: "Motorbikes, scooters and quads: the rider and any passenger must wear a fastened, approved helmet at all times; the Owner provides helmets. No more than one passenger, and only where the vehicle is approved to carry one."
+        local: "Motocikli, skuteri i quadovi: vozač i suvozač moraju cijelo vrijeme nositi homologiranu, zakopčanu kacigu; kacige osigurava Najmodavac. Najviše jedan suvozač, i to samo ako je vozilo homologirano za njegov prijevoz."
+        country: true
+      - id: use.3
+        when:
+          vehicle_type:
+            - car
+            - ""
+        en: "Cars: every occupant must wear a seatbelt, and children under 12 years old (who must sit in the back, except a baby in a rear-facing seat with the airbag switched off) must travel in an approved child restraint suited to their weight and height. The number of passengers must not exceed the number of seats."
+        local: "Automobili: svi putnici moraju biti vezani, a djeca mlađa od 12 godina (koja moraju sjediti straga, osim bebe u sjedalici okrenutoj unatrag uz isključen zračni jastuk) moraju se voziti u homologiranoj dječjoj sjedalici primjerenoj njihovoj težini i visini. Broj putnika ne smije biti veći od broja sjedala."
+        country: true
+      - id: use.4
+        en: "It is forbidden to: drive with alcohol above the legal limit (0.5 g/kg; zero for drivers under 25, new drivers and professional drivers) or under the influence of drugs; use a hand-held phone while driving; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        local: "Zabranjeno je: upravljati vozilom s alkoholom iznad zakonske granice (0,50 g/kg; 0,00 g/kg za vozače mlađe od 25 godina, vozače početnike i profesionalne vozače) ili pod utjecajem droga; držati mobitel u ruci tijekom vožnje; utrkivati se, izvoditi vratolomije ili voziti izvan ceste (osim ako je vozilo za to namijenjeno i Najmodavac se složio); vući ili gurati bilo što; prevoziti robu uz naplatu, nedopuštenu robu ili opasne terete; koristiti vozilo za taksi prijevoz, dostavu, autoškolu ili ga iznajmljivati drugima; dopustiti upravljanje osobi koja nije navedena u odjeljku 2."
+        country: true
+      - id: use.8_hr
+        en: Dipped headlights must be used in daylight during winter time (from the last Sunday in October to the last Sunday in March). A reflective vest, warning triangle and first-aid kit must be in the vehicle.
+        local: Kratka svjetla moraju biti upaljena i danju tijekom zimskog računanja vremena (od posljednje nedjelje u listopadu do posljednje nedjelje u ožujku). U vozilu moraju biti reflektirajući prsluk, sigurnosni trokut i prva pomoć.
+        country: true
+      - id: use.5
+        when:
+          smoking: no
+        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+        local: Pušenje i korištenje e-cigareta u vozilu nije dopušteno.{{#if smoking_fee}} Kršenje ovog pravila stoji {{currency}} {{smoking_fee}} za uklanjanje mirisa.{{/if}}
+      - id: use.6
+        when:
+          pets: no
+        en: Pets and animals are not allowed in or on the vehicle, except assistance animals.
+        local: Kućni ljubimci i životinje nisu dopušteni u vozilu, osim pasa pomagača.
+      - id: use.7
+        when:
+          pets: fee
+        en: Pets are allowed if they are kept in a carrier or on a seat cover. A pet cleaning fee of {{currency}} {{pet_fee}} applies.
+        local: Kućni ljubimci dopušteni su u transporteru ili na zaštitnom pokrivaču. Primjenjuje se naknada za čišćenje od {{currency}} {{pet_fee}}.
+  - id: area
+    title:
+      en: 10. Permitted area
+      local: 10. Dopušteno područje
+    fields:
+      - key: area_of_use
+        en: The vehicle may be used in
+        local: Vozilo se smije koristiti na području
+    clauses:
+      - id: area.1
+        en: The vehicle must stay within the permitted area above. Taking it further, on a ferry or to another island, needs the Owner's written permission first, and the Renter pays any ferry fees agreed and any recovery costs caused by breaking this rule.
+        local: Vozilo mora ostati unutar gore navedenog dopuštenog područja. Za vožnju dalje, trajektom ili na drugi otok potrebno je prethodno pisano odobrenje Najmodavca, a Najmoprimac plaća dogovorene trajektne karte i troškove povrata vozila uzrokovane kršenjem ovog pravila.
+      - id: area.2
+        en: The vehicle may leave Croatia only with the Owner's prior written permission and the insurance documents (Green Card where needed) the Owner provides. Driving through Bosnia and Herzegovina, including the Neum corridor on the coast road to Dubrovnik, counts as leaving Croatia. Ferry travel to the islands is allowed within the permitted area (section 10).
+        local: Vozilo smije napustiti Hrvatsku samo uz prethodno pisano odobrenje Najmodavca i s dokumentima osiguranja (zelena karta kada je potrebna) koje on preda. Vožnja kroz Bosnu i Hercegovinu, uključujući koridor kod Neuma na obalnoj cesti prema Dubrovniku, smatra se napuštanjem Hrvatske. Prijevoz trajektom na otoke dopušten je unutar dopuštenog područja (odjeljak 10).
+        country: true
+      - id: area.3
+        en: The vehicle may be fitted with a GPS tracker, used only for security, recovery and checking that this agreement is kept (section 17). The Renter has been told about it.
+        local: Vozilo može imati GPS uređaj koji se koristi samo radi sigurnosti, povrata vozila i provjere poštivanja ovog ugovora (odjeljak 17). Najmoprimac je o tome obaviješten.
+  - id: insurance
+    title:
+      en: 11. Insurance and damage waiver
+      local: 11. Osiguranje i oslobođenje od odgovornosti
+    fields:
+      - key: insurance_text
+        en: Cover on this vehicle
+        local: Pokriće ovog vozila
+      - key: insurance_excess_text
+        en: Renter's excess (most the Renter pays per incident, if the rules are kept)
+        local: Franšiza Najmoprimca (najviše što plaća po šteti ako poštuje pravila)
+    clauses:
+      - id: insurance.1
+        en: The price includes the compulsory motor third-party liability insurance required in Croatia, which covers injury and damage the vehicle causes to other people, at least to the minimum amounts set by EU law. It does not cover damage to or theft of the rented vehicle itself.
+        local: Cijena uključuje obvezno osiguranje od automobilske odgovornosti propisano u Hrvatskoj, koje pokriva tjelesne ozljede i materijalnu štetu koju vozilo prouzroči trećima, najmanje do minimalnih iznosa koje propisuje pravo EU-a. Ne pokriva oštećenje ni krađu samog unajmljenog vozila.
+        country: true
+      - id: insurance.2
+        when:
+          insurance_level: comprehensive
+        en: "Damage waiver (CDW) and theft protection: damage to and theft of the rented vehicle are also covered. Per incident, the Renter pays no more than the excess shown above, provided the Renter has kept the rules of this agreement."
+        local: "Oslobođenje od odgovornosti za štetu (CDW) i zaštita od krađe: pokriveni su i oštećenje i krađa unajmljenog vozila. Po šteti Najmoprimac ne plaća više od navedene franšize, pod uvjetom da je poštovao pravila ovog ugovora."
+      - id: insurance.3
+        when:
+          insurance_level: third_party
+        en: "No damage waiver: the vehicle has third-party insurance with extended cover for other people's property, but damage to or theft of the rented vehicle is the Renter's responsibility (section 12), limited to the actual, evidenced cost."
+        local: "Bez oslobođenja od odgovornosti: vozilo ima osiguranje od automobilske odgovornosti s proširenim pokrićem za tuđu imovinu, ali za oštećenje ili krađu unajmljenog vozila odgovara Najmoprimac (odjeljak 12), do stvarnog, dokazanog troška."
+      - id: insurance.4
+        when:
+          insurance_level: compulsory
+        en: The vehicle has only the compulsory insurance. Damage to or theft of the rented vehicle is the Renter's responsibility (section 12), limited to the actual, evidenced cost.
+        local: Vozilo ima samo obvezno osiguranje. Za oštećenje ili krađu unajmljenog vozila odgovara Najmoprimac (odjeljak 12), do stvarnog, dokazanog troška.
+      - id: insurance.5
+        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
+        local: "Oslobođenje od odgovornosti i osiguranje ne štite Najmoprimca, koji plaća stvarni trošak, kada šteta ili gubitak nastanu: pri vožnji pod utjecajem alkohola ili droga, bez valjane vozačke dozvole za vozilo, kada vozi osoba koja nije navedena u odjeljku 2, izvan dopuštenog područja, tijekom zabranjene uporabe (odjeljak 9), namjerno ili zbog krajnje nepažnje, ili kada su ključevi ostavljeni u vozilu. Gume, naplatci, stakla, podvozje, unutrašnjost, ključevi i oprema pokriveni su samo ako to Najmodavac pisano navede."
+      - id: insurance.6
+        en: Personal belongings left in or on the vehicle are not insured by the Owner, and the Owner is not responsible for their loss or damage except through its own fault.
+        local: Osobne stvari ostavljene u vozilu Najmodavac ne osigurava i ne odgovara za njihov gubitak ili oštećenje, osim ako ga je sam skrivio.
+      - id: insurance.7
+        en: "Excess reduction: if the Renter buys the Owner's optional excess reduction, the excess is reduced as written in this agreement. Excess insurance bought by the Renter from another company is between the Renter and that insurer: the Renter pays the Owner and claims the amount back from it."
+        local: "Smanjenje franšize: ako Najmoprimac kupi neobvezno smanjenje franšize kod Najmodavca, franšiza se smanjuje kako je navedeno u ovom ugovoru. Osiguranje franšize koje Najmoprimac kupi kod drugog društva odnos je između Najmoprimca i tog osiguratelja: Najmoprimac plaća Najmodavcu i traži povrat od svog osiguratelja."
+  - id: damage
+    title:
+      en: 12. Damage, theft and loss
+      local: 12. Oštećenje, krađa i gubitak
+    clauses:
+      - id: damage.1
+        en: The Renter is responsible for the vehicle from handover until it is returned and checked. The condition at handover is recorded in Annex A with photos; damage not recorded there is treated as new unless it is normal wear and tear.
+        local: Najmoprimac odgovara za vozilo od predaje do povrata i pregleda. Stanje pri predaji bilježi se u Prilogu A s fotografijama; oštećenja koja ondje nisu zabilježena smatraju se novima, osim uobičajenog trošenja.
+      - id: damage.2
+        en: Damage is charged at its actual, reasonable repair cost, shown by a garage quote or invoice, or at the agreed price in Annex B for listed items, never more than the excess where a damage waiver applies. The Owner sends the Renter any damage charge in writing within 30 days of return, with the photos and the quote or invoice. The Renter may ask for a second quote from a garage the Owner approves within 7 days.
+        local: Oštećenja se naplaćuju po stvarnom, razumnom trošku popravka, dokazanom ponudom ili računom servisa, ili po dogovorenoj cijeni iz Priloga B za navedene stavke, a nikada iznad franšize kada vrijedi oslobođenje od odgovornosti. Najmodavac pisano obavještava Najmoprimca o svakom zahtjevu za naknadu štete u roku od 30 dana od povrata, uz fotografije i ponudu ili račun. Najmoprimac u roku od 7 dana može zatražiti drugu ponudu servisa koji Najmodavac prihvati.
+      - id: damage.3
+        if: loss_of_use_fee
+        en: While the vehicle cannot be rented because of damage the Renter is responsible for, the Renter pays loss of use of {{currency}} {{loss_of_use_fee}} per day, for up to {{loss_of_use_max_days}} days, within the excess where a damage waiver applies.
+        local: Dok se vozilo ne može iznajmljivati zbog oštećenja za koje odgovara Najmoprimac, on plaća naknadu za gubitak korištenja od {{currency}} {{loss_of_use_fee}} po danu, najviše {{loss_of_use_max_days}} dana, unutar franšize kada vrijedi oslobođenje od odgovornosti.
+      - id: damage.4
+        en: If the vehicle or its keys are stolen, the Renter must report it to the police at once and give the Owner the police report and the keys. Where the theft happened because the vehicle was left unlocked, with the keys, or outside the permitted area, the Renter pays the vehicle's value as stated in Annex B (or its market value).
+        local: Ako su vozilo ili ključevi ukradeni, Najmoprimac to mora odmah prijaviti policiji i predati Najmodavcu policijski zapisnik i ključeve. Ako je do krađe došlo jer je vozilo ostavljeno otključano, s ključevima ili izvan dopuštenog područja, Najmoprimac plaća vrijednost vozila navedenu u Prilogu B (ili tržišnu vrijednost).
+      - id: damage.5
+        en: Lost keys, remote controls, helmets, documents, number plates and accessories are charged at their replacement cost, plus any locksmith or re-registration cost.
+        local: Izgubljeni ključevi, daljinski upravljači, kacige, isprave, registarske pločice i oprema naplaćuju se po trošku zamjene, uz eventualne troškove bravara ili ponovne registracije.
+  - id: accident
+    title:
+      en: 13. Accidents and breakdowns
+      local: 13. Prometne nezgode i kvarovi
+    clauses:
+      - id: accident.1
+        en: "In an accident, the Renter must: make the area safe, wear the reflective vest and set out the warning triangle where required, and call 112 if anyone is hurt; call the Owner straight away on the number in section 1; call the police whenever someone is injured, the other party has no insurance or drives off, or the law requires it; complete and sign a European Accident Statement with the other driver where possible; take photos of all vehicles, plates, the place and any damage; and not admit fault, pay or accept money without the Owner's agreement."
+        local: "U slučaju prometne nezgode Najmoprimac mora: osigurati mjesto nezgode, odjenuti reflektirajući prsluk i postaviti sigurnosni trokut kada je to propisano te nazvati 112 ako ima ozlijeđenih; odmah nazvati Najmodavca na broj iz odjeljka 1; pozvati policiju uvijek kada ima ozlijeđenih, kada druga strana nema osiguranje ili pobjegne ili kada to zakon zahtijeva; kada je moguće, s drugim vozačem ispuniti i potpisati Europsko izvješće o prometnoj nezgodi; fotografirati sva vozila, registarske oznake, mjesto i oštećenja; te bez suglasnosti Najmodavca ne priznavati krivnju, ne plaćati i ne primati novac."
+        country: true
+      - id: accident.2
+        en: "Breakdowns: the Renter must stop safely, tell the Owner and follow the Owner's instructions (or call the roadside assistance number the Owner gave). The Renter must not have the vehicle repaired without the Owner's permission, except for minor emergency costs up to {{currency}} {{emergency_repair_limit}}, which the Owner refunds against a receipt."
+        local: "Kvarovi: Najmoprimac se mora sigurno zaustaviti, obavijestiti Najmodavca i slijediti njegove upute (ili nazvati dani broj pomoći na cesti). Ne smije dati popraviti vozilo bez dopuštenja Najmodavca, osim manjih hitnih troškova do {{currency}} {{emergency_repair_limit}}, koje Najmodavac vraća uz račun."
+      - id: accident.3
+        en: If the vehicle stops working through no fault of the Renter, the Owner will repair it or provide a similar vehicle within 24 hours of being told where reasonably possible. If the Owner cannot, the Renter may end the rental and receive a refund of the rent for the unused days.
+        local: Ako vozilo prestane raditi bez krivnje Najmoprimca, Najmodavac će ga popraviti ili osigurati slično vozilo u roku od 24 sata od obavijesti, kada je to razumno moguće. Ako ne može, Najmoprimac može okončati najam i dobiti povrat najamnine za neiskorištene dane.
+      - id: accident.4
+        en: The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe.
+        local: Najmoprimac mora odmah prijaviti svako upozoravajuće svjetlo, neobičan zvuk, probušenu gumu ili kvar i ne smije nastaviti koristiti nesigurno vozilo.
+      - id: accident.5
+        en: "Breakdowns caused by misuse: if a fault or damage is caused by the Renter's misuse or negligence (for example ignoring a warning light, the wrong fuel, overloading, towing, racing or driving off-road), and this is shown by a mechanic's report or other evidence, the Renter has no right to a refund for that breakdown and pays the actual, evidenced cost of repair and recovery."
+        local: "Kvarovi zbog nepravilne uporabe: ako je kvar ili oštećenje prouzročeno nepravilnom uporabom ili nepažnjom Najmoprimca (npr. zanemarivanje upozoravajućeg svjetla, pogrešno gorivo, preopterećenje, vuča, utrke ili vožnja izvan ceste) i to dokazuje izvješće servisa ili drugi dokaz, Najmoprimac nema pravo na povrat za taj kvar i plaća stvarni, dokazani trošak popravka i izvlačenja."
+  - id: fines
+    title:
+      en: 14. Fines, tolls and charges
+      local: 14. Kazne, cestarine i naknade
+    clauses:
+      - id: fines.1
+        en: The Renter pays all traffic and parking fines, tolls, congestion and low-emission-zone charges, towing, impound and clamping costs arising during the rental, including those that reach the Owner after the vehicle is returned{{#if fine_admin_fee}}, plus a handling fee of {{currency}} {{fine_admin_fee}} for each fine or notice the Owner has to handle{{/if}}.
+        local: Najmoprimac plaća sve prometne kazne i kazne za parkiranje, cestarine, naknade za zone niskih emisija, troškove premještanja, čuvanja i blokiranja vozila nastale tijekom najma, uključujući one koje Najmodavcu stignu nakon povrata{{#if fine_admin_fee}}, uz naknadu za obradu od {{currency}} {{fine_admin_fee}} za svaku kaznu ili obavijest koju Najmodavac mora obraditi{{/if}}.
+      - id: fines.2
+        en: Fines for offences during the rental are the driver's. Where the police or another authority ask, the Owner will give the Renter's details so the fine is issued to the Renter. Motorway tolls are paid at toll stations or electronically; unpaid tolls are charged to the Renter.
+        local: Kazne za prekršaje počinjene tijekom najma snosi vozač. Kada to zatraže policija ili drugo tijelo, Najmodavac će dostaviti podatke Najmoprimca kako bi se kazna izrekla Najmoprimcu. Cestarina na autocestama plaća se na naplatnim postajama ili elektronički; neplaćena cestarina naplaćuje se Najmoprimcu.
+        country: true
+  - id: termination
+    title:
+      en: 15. Ending the agreement by the Owner
+      local: 15. Raskid ugovora od strane Najmodavca
+    clauses:
+      - id: termination.1
+        en: "The Owner may end this agreement and take the vehicle back at once if the Renter: does not pay; gave false details; lets an unnamed person drive; uses the vehicle unlawfully or against section 9; takes it outside the permitted area without permission; tampers with the odometer or tracker; abandons it; or puts the vehicle or other people at serious risk. The Owner then deducts only what the Renter owes under this agreement, including reasonable recovery costs, and refunds the prepaid rent for the days after the vehicle is recovered."
+        local: "Najmodavac može raskinuti ovaj ugovor i odmah preuzeti vozilo ako Najmoprimac: ne plati; je dao lažne podatke; dopusti upravljanje osobi koja nije navedena; koristi vozilo nezakonito ili protivno odjeljku 9; odveze ga izvan dopuštenog područja bez odobrenja; dira brojač kilometara ili GPS uređaj; napusti vozilo; ili ozbiljno ugrozi vozilo ili druge osobe. Najmodavac tada zadržava samo ono što mu Najmoprimac duguje po ovom ugovoru, uključujući razumne troškove povrata vozila, i vraća plaćenu najamninu za dane nakon preuzimanja."
+      - id: termination.2
+        en: The Renter must make the vehicle available for collection, and pays reasonable recovery costs where the Owner has to fetch it.
+        local: Najmoprimac mora vozilo učiniti dostupnim za preuzimanje i plaća razumne troškove kada ga Najmodavac mora sam doći preuzeti.
+  - id: return
+    title:
+      en: 16. Returning the vehicle
+      local: 16. Povrat vozila
+    clauses:
+      - id: return.1
+        en: The vehicle must be returned with its keys, documents and accessories, with the fuel level agreed in section 8, and reasonably clean. Both parties check the vehicle together and record the condition, odometer and fuel in Annex A with photos. If the Renter chooses not to be present, the Owner's dated photos taken at the return are the record, and the Renter receives a copy.
+        local: Vozilo se mora vratiti s ključevima, ispravama i opremom, s razinom goriva dogovorenom u odjeljku 8 i razumno čisto. Obje strane zajedno pregledavaju vozilo i bilježe stanje, kilometražu i gorivo u Prilogu A s fotografijama. Ako Najmoprimac odluči ne biti prisutan, datirane fotografije Najmodavca snimljene pri povratu služe kao zapisnik, a Najmoprimac dobiva presliku.
+      - id: return.2
+        if: cleaning_fee
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
+        local: Za vozilo vraćeno s pretjeranom prljavštinom, pijeskom, blatom, mrljama, ostacima hrane ili neugodnim mirisom u unutrašnjosti naplaćuje se čišćenje od {{currency}} {{cleaning_fee}} (više samo ako je potrebno specijalističko čišćenje, uz račun).
+      - id: return.3
+        unless: cleaning_fee
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+        local: Za vozilo vraćeno s pretjeranom prljavštinom, pijeskom, blatom, mrljama, ostacima hrane ili neugodnim mirisom u unutrašnjosti može se naplatiti razuman trošak čišćenja.
+  - id: data
+    title:
+      en: 17. Personal data
+      local: 17. Osobni podaci
+    clauses:
+      - id: data.1
+        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and licence details, copies of documents, vehicle photos and any tracker location data) under the GDPR. It uses them to provide this rental, check identity and licence, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
+        local: Najmodavac je voditelj obrade osobnih podataka Najmoprimca i vozača (ime, kontakt podaci, podaci iz isprave i vozačke dozvole, preslike isprava, fotografije vozila i eventualni podaci o lokaciji GPS uređaja) prema Općoj uredbi o zaštiti podataka (GDPR). Koristi ih za pružanje ovog najma, provjeru identiteta i vozačke dozvole, ispunjavanje zakonskih obveza (računovodstvo, kazne, zahtjevi policije), rješavanje šteta i sporova te zaštitu vozila. Čuva ih samo onoliko koliko to zahtijevaju te svrhe i zakon, štiti ih i nikada ih ne prodaje.
+        country: true
+      - id: data.2
+        en: "The Owner shares data only where needed: with insurers, repairers, the police, courts and the authorities that issue fines (a legal obligation), and with IT providers working for the Owner. The Renter may ask for access to, correction or deletion of, or a copy of their data, may object to processing based on the Owner's legitimate interests, and may complain to the Croatian Personal Data Protection Agency (AZOP)."
+        local: "Najmodavac podatke dijeli samo kada je to potrebno: s osigurateljima, servisima, policijom, sudovima i tijelima koja izriču kazne (zakonska obveza) te s IT pružateljima usluga koji rade za njega. Najmoprimac može zatražiti pristup, ispravak, brisanje ili presliku svojih podataka, prigovoriti obradi koja se temelji na legitimnom interesu Najmodavca i podnijeti pritužbu Agenciji za zaštitu osobnih podataka (AZOP)."
+        country: true
+  - id: general
+    title:
+      en: 18. General terms
+      local: 18. Opće odredbe
+    clauses:
+      - id: general.1
+        en: "Messages: notices under this agreement may be sent by phone, message app (such as WhatsApp), SMS or email to the contact details in sections 1 and 2. Messages, call logs and photos exchanged this way may be used as evidence of what was agreed."
+        local: "Obavijesti: obavijesti po ovom ugovoru mogu se slati telefonom, aplikacijom za poruke (npr. WhatsApp), SMS-om ili e-poštom na kontakte iz odjeljaka 1 i 2. Poruke, popisi poziva i fotografije razmijenjeni na taj način mogu služiti kao dokaz dogovorenog."
+      - id: general.2
+        en: "Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, storms, wildfires, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties."
+        local: "Viša sila: nijedna strana ne odgovara za kašnjenje ili neispunjenje uzrokovano događajima izvan njezine kontrole, kao što su prirodne katastrofe, nevremena, šumski požari, odluke vlasti ili otkazivanje trajekata. Najamnina za dane u kojima se vozilo zbog toga nije moglo koristiti dogovara se pravično među stranama."
+      - id: general.3
+        en: "Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies."
+        local: "Cjelovitost: ovaj ugovor, njegovi prilozi i posebni uvjeti čine cjelokupan sporazum. Izmjene vrijede samo u pisanom obliku (dovoljna je poruka obiju strana). Ako se neka odredba proglasi nevaljanom, ostatak ostaje na snazi."
+      - id: general.4
+        en: "Language: this agreement is written in English and Croatian. If the versions differ, the meaning more favourable to the Renter applies."
+        local: "Jezik: ovaj ugovor sastavljen je na engleskom i hrvatskom jeziku. Ako se verzije razlikuju, primjenjuje se značenje povoljnije za Najmoprimca."
+        country: true
+      - id: general.5
+        en: "Governing law: this agreement is governed by Croatian law and disputes are decided by the competent court in Croatia. A Renter who is a consumer living in another EU country may also sue where they live where EU law allows it."
+        local: "Mjerodavno pravo: na ovaj ugovor primjenjuje se hrvatsko pravo, a sporove rješava nadležni sud u Republici Hrvatskoj. Najmoprimac potrošač koji živi u drugoj državi EU-a može tužiti i ondje gdje živi, kada to dopušta pravo EU-a."
+        country: true
+      - id: general.6
+        if: special_terms
+        en: "Special conditions agreed between the parties: {{special_terms}}"
+        local: "Posebni uvjeti dogovoreni među stranama: {{special_terms}}"
+      - id: general.7
+        en: "Consumer rights: nothing in this agreement limits the rights a Renter who is a consumer has under mandatory consumer law, including the rules on unfair terms (Consumer Protection Act (Official Gazette 19/22) and Directive 93/13/EEC). The charges in this agreement are a genuine estimate of the Owner's loss and are never charged twice for the same loss. A dispute may also be taken to an approved consumer ADR body."
+        local: "Prava potrošača: ništa u ovom ugovoru ne ograničava prava koja Najmoprimcu kao potrošaču daju prisilni propisi, uključujući pravila o nepoštenim ugovornim odredbama (Zakon o zaštiti potrošača (NN 19/22) i Direktiva 93/13/EEZ). Naknade iz ovog ugovora stvarna su procjena štete Najmodavca i nikada se ne naplaćuju dvaput za istu štetu. Spor se može podnijeti i tijelu za alternativno rješavanje potrošačkih sporova."
+        country: true
+      - id: general.8
+        en: "Electronic signature: this agreement may be signed on paper or electronically; both have the same effect (Regulation (EU) No 910/2014 (eIDAS), Article 25)."
+        local: "Elektronički potpis: ovaj ugovor može se potpisati na papiru ili elektronički; oba načina imaju isti učinak (Uredba (EU) br. 910/2014 (eIDAS), članak 25.)."
+  - id: signatures
+    title:
+      en: Signatures
+      local: Potpisi
+    signature: true
+    clauses:
+      - id: signatures.1
+        en: By signing, the parties confirm they have read and understood this agreement, including Annexes A and B, and agree to it. The Renter confirms they received a copy.
+        local: Potpisom strane potvrđuju da su pročitale i razumjele ovaj ugovor, uključujući Priloge A i B, te da su s njim suglasne. Najmoprimac potvrđuje da je primio primjerak.
+    sign_rows:
+      - en: Owner (name, signature, date)
+        local: Najmodavac (ime, potpis, datum)
+      - en: Renter (name, signature, date)
+        local: Najmoprimac (ime, potpis, datum)
+      - en: Additional driver (name, signature, date)
+        local: Dodatni vozač (ime, potpis, datum)
+  - id: annex_a
+    title:
+      en: "Annex A: Handover and return check"
+      local: "Prilog A: Zapisnik o predaji i povratu"
+    page_break: true
+    checklist: true
+    clauses:
+      - id: annex_a.1
+        en: Mark existing scratches (S), dents (D), cracks (C) and missing items (M). Take dated photos of all four sides, the dashboard (odometer and fuel), the interior and any damage, at both handover and return.
+        local: Označite postojeće ogrebotine (O), udubljenja (U), pukotine (P) i dijelove koji nedostaju (N). Snimite datirane fotografije sve četiri strane, ploče s instrumentima (kilometraža i gorivo), unutrašnjosti i svih oštećenja, pri predaji i pri povratu.
+    check_rows:
+      - en: Odometer
+        local: Kilometraža
+      - en: Fuel / battery level
+        local: Razina goriva / baterije
+      - en: "Body: front / rear / left / right"
+        local: "Karoserija: sprijeda / straga / lijevo / desno"
+      - en: Windscreen, glass, mirrors and lights
+        local: Vjetrobransko staklo, stakla, retrovizori i svjetla
+      - en: Tyres and wheels
+        local: Gume i naplatci
+      - en: Interior and seats
+        local: Unutrašnjost i sjedala
+      - en: Keys, documents, warning triangle, vest
+        local: Ključevi, isprave, trokut, prsluk
+      - en: Helmets / child seat / accessories
+        local: Kacige / dječja sjedalica / oprema
+      - en: Photos taken (number)
+        local: Snimljene fotografije (broj)
+      - en: Owner's and Renter's initials
+        local: Inicijali Najmodavca i Najmoprimca
+    columns:
+      item:
+        en: Item
+        local: Stavka
+      out:
+        en: At handover
+        local: Pri predaji
+      in:
+        en: At return
+        local: Pri povratu
+  - id: annex_b
+    title:
+      en: "Annex B: Damage and replacement price list"
+      local: "Prilog B: Cjenik oštećenja i zamjene"
+    pricelist: true
+    clauses:
+      - id: annex_b.1
+        en: Agreed prices for common damage and lost items, based on typical repair costs. Damage not listed is charged per section 12. Where a damage waiver applies, the Renter never pays more than the excess.
+        local: Dogovorene cijene za uobičajena oštećenja i gubitke, na temelju uobičajenih troškova popravka. Oštećenja koja nisu navedena naplaćuju se prema odjeljku 12. Kada vrijedi oslobođenje od odgovornosti, Najmoprimac nikada ne plaća više od franšize.
+    price_rows:
+      - en: Scratch, per panel (polish / repaint)
+        local: Ogrebotina, po dijelu (poliranje / lakiranje)
+      - en: Dent, per panel
+        local: Udubljenje, po dijelu
+      - en: Windscreen chip / replacement
+        local: "Vjetrobransko staklo: oštećenje / zamjena"
+      - en: Mirror
+        local: Retrovizor
+      - en: Headlight / tail light / indicator
+        local: Prednje / stražnje svjetlo / pokazivač smjera
+      - en: Tyre (each)
+        local: Guma (po komadu)
+      - en: Key / remote
+        local: Ključ / daljinski upravljač
+      - en: Helmet / child seat
+        local: Kaciga / dječja sjedalica
+      - en: Number plate replacement
+        local: Zamjena registarske pločice
+      - en: Vehicle value (for total loss or theft)
+        local: Vrijednost vozila (potpuna šteta ili krađa)
+    columns:
+      item:
+        en: Item
+        local: Stavka
+      price:
+        en: Price
+        local: Cijena

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildDocumentStoragePath } from "@/services/documents/storage-path";
+import { cleanDvlaCode, licenceCategoriesText } from "@/lib/licence";
 const contactMethods = ["whatsapp", "messenger", "line", "telegram", "sms", "email", "phone"];
 
 function optionalString(formData: FormData, key: string) {
@@ -347,6 +348,9 @@ export async function updateCustomer(formData: FormData) {
   if (formData.has("driverLicenseNumber")) updates.driver_license_number = optionalString(formData, "driverLicenseNumber");
   if (formData.has("driverLicenseExpiry")) updates.driver_license_expiry = optionalString(formData, "driverLicenseExpiry");
   if (formData.has("driverLicenseCountry")) updates.driver_license_country = optionalString(formData, "driverLicenseCountry");
+  // EU licence categories (AM, A1, A2, A, B, BE...) and, for UK businesses, the DVLA check code.
+  if (formData.has("licenceCategoriesShown")) updates.license_type = licenceCategoriesText(formData.getAll("licenceCategories")) || null;
+  if (formData.has("dvlaCheckCode")) updates.dvla_check_code = cleanDvlaCode(formData.get("dvlaCheckCode")) || null;
   if (formData.has("emergencyContactName")) updates.emergency_contact_name = optionalString(formData, "emergencyContactName");
   if (formData.has("emergencyContactPhone")) updates.emergency_contact_phone = fullPhone(formData, "emergencyPhoneCountryCode", "emergencyContactPhone");
   if (notes !== undefined) updates.notes = notes;

@@ -13,7 +13,7 @@ import { SettingsTabs } from "@/app/(app)/settings/settings-tabs";
 import { isEmailConfigured } from "@/lib/email";
 import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { dateFormat } from "@/lib/i18n/dates";
+import { dateFormat, displayNamesLocale } from "@/lib/i18n/dates";
 import { disconnectLine, updateLineSettings, updateUpfrontDiscountSettings } from "@/app/actions/settings";
 import { BranchList } from "@/app/(app)/settings/branch-list";
 import { ContractsBrandingSection } from "@/app/(app)/settings/contracts-branding-section";
@@ -42,6 +42,8 @@ import { customerMessagesOn, remindersOff } from "@/lib/customer-messages";
 import { bookingRules } from "@/lib/booking-rules";
 import { publicBookingSettings } from "@/lib/public-catalog";
 import { TravelPolicyForm } from "@/app/(app)/settings/travel-policy-form";
+import { RegionalPanel } from "@/app/(app)/settings/regional-panel";
+import { defaultTimeZone, distanceUnitFor, orgCountry, vatSettings } from "@/lib/regional";
 import { AppShell } from "@/components/app-shell";
 import { PageBand, bandTab } from "@/components/page-band";
 import { PendingButton } from "@/components/pending-button";
@@ -54,6 +56,7 @@ import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { getDefaultOrganization, getTravelPolicySettings, getVehicleCategories } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { businessTimeZone } from "@/lib/business-time";
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
@@ -212,6 +215,22 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const currencyName = organization.currency === "THB" ? say("currencyThb") : organization.currency;
   const zoneName = organization.timezone === "Asia/Bangkok" ? say("zoneBangkok") : organization.timezone.replace("_", " ");
   const money = currencySymbol(organization.currency);
+  // Country and units (Settings › Rentals): what the business saved, else its country's usual choices.
+  const regionalVat = vatSettings(organization);
+  const regionalInitial = {
+    country: orgCountry(organization),
+    timezone: organization.timezone || defaultTimeZone(orgCountry(organization)),
+    currency: organization.currency || "THB",
+    distanceUnit: distanceUnitFor(organization),
+    vat: { registered: regionalVat.on, number: regionalVat.number, rate: regionalVat.rate, included: regionalVat.included }
+  };
+  const countryLabel = (() => {
+    try {
+      return new Intl.DisplayNames([displayNamesLocale(locale)], { type: "region" }).of(regionalInitial.country) || regionalInitial.country;
+    } catch {
+      return regionalInitial.country;
+    }
+  })();
 
   return (
     <AppShell
@@ -326,6 +345,17 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       {tab === "rentals" ? (
         <div className="grid items-start gap-4 lg:grid-cols-2">
           <div className="space-y-4">
+            <div className="space-y-3">
+              <h2 className={groupHeading}>{say("grp_region")}</h2>
+            <Fold
+              id="region"
+              summary={[regionalInitial.country ? countryLabel : "", regionalInitial.currency, say(regionalInitial.distanceUnit === "mi" ? "reg_mi" : "reg_km"), regionalVat.on ? say("vat_summary", { rate: regionalVat.rate }) : ""].filter(Boolean).join(" · ")}
+              title={say("reg_title")}
+            >
+              <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("reg_body")}</p>
+              <RegionalPanel initial={regionalInitial} />
+            </Fold>
+            </div>
             <div className="space-y-3">
               <h2 className={groupHeading}>{say("grp_paid")}</h2>
             <Fold id="payment-methods" summary={paymentSummary} title={say("pay_title")}>
@@ -624,8 +654,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                         </td>
                         <td className="px-4 py-2 text-[var(--muted)]">
                           {msg.sent_at
-                            ? dateFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(msg.sent_at))
-                            : dateFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(msg.created_at))}
+                            ? dateFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: businessTimeZone() }).format(new Date(msg.sent_at))
+                            : dateFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: businessTimeZone() }).format(new Date(msg.created_at))}
                         </td>
                       </tr>
                     ))}

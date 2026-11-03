@@ -15,6 +15,8 @@ import { formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime, businessToday } from "@/lib/business-time";
 import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places";
 import { displayNamesLocale } from "@/lib/i18n/dates";
+import { legalUrl } from "@/lib/site/legal-slugs";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 declare global {
   interface Window {
@@ -384,7 +386,7 @@ const PAYMENT_METHODS: {
 // ─── PromptPay QR payload (EMVCo / Bank of Thailand standard) ─────────────────
 
 function formatMoney(amount: number, currency = "THB"): string {
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
+  return currency === "THB" ? new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(amount || 0)) : formatRegionalMoney(amount, currency, "en-GB");
 }
 
 // The business's today: the vehicle is handed over where the business is, and the page then reads the same on the server and on the phone.
@@ -962,6 +964,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             <summary className="cursor-pointer font-semibold text-[var(--primary)] hover:underline">{t("offersDetailsLabel")}</summary>
             <p className="mt-1 leading-snug text-[var(--muted)]">{t("offersDetails")}</p>
           </details>
+          <a className="ms-8 mt-2 inline-block font-semibold text-[var(--primary)] underline" href={legalUrl("privacy")} rel="noopener noreferrer" target="_blank">
+            {t("privacyLink", { business: detail.organizationName })}
+          </a>
         </div>
       </section>
     );
@@ -1561,6 +1566,12 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             <p className="mt-1 leading-snug text-[var(--muted)]">{t("offersDetails")}</p>
           </details>
         ) : null}
+        {/* GDPR / PDPA: how the business (controller) and RoveHQ (its processor, and controller of the optional list) use their information. */}
+        <p className="mt-2 px-1 text-sm">
+          <a className="font-semibold text-[var(--primary)] underline" href={legalUrl("privacy")} rel="noopener noreferrer" target="_blank">
+            {t("privacyLink", { business: detail.organizationName })}
+          </a>
+        </p>
         {error ? <p className="mt-4 rounded-xl bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
         <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending || !pageLive} key={readyToSign ? "sign" : "review"} type="submit">
           {isPending ? (

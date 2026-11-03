@@ -3,6 +3,7 @@ import { localizeAgreementTemplate } from "@/lib/agreement-localize";
 import { buildContractVariables, renderContractTemplate } from "@/lib/contract-rendering";
 import { embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { calculateRentalDocumentContentHash, stableJsonStringify } from "@/lib/rental-documents";
+import { waiverExcess } from "@/lib/extras";
 
 export type RentalDocumentTemplateAdapterResult = {
   renderedHtml: string;
@@ -129,7 +130,9 @@ export async function renderRentalAgreementDraftTemplate({
   variables.delivery_fee = rental?.delivery_fee == null ? "" : clean(rental.delivery_fee);
   variables.collection_fee = rental?.collection_fee == null ? "" : clean(rental.collection_fee);
   variables.cancellation_admin_fee = rental?.cancellation_admin_fee == null ? "" : clean(rental.cancellation_admin_fee);
-  variables.insurance_excess_amount = rental?.insurance_excess == null ? "" : clean(rental.insurance_excess);
+  // A damage waiver extra on the booking lowers the excess to the waiver's amount (Settings › Paid extras).
+  const waived = waiverExcess(rental);
+  variables.insurance_excess_amount = waived !== null ? clean(waived) : rental?.insurance_excess == null ? "" : clean(rental.insurance_excess);
   variables.mileage_allowance_amount = rental?.mileage_allowance == null ? "" : clean(rental.mileage_allowance);
   variables.excess_mileage_rate_amount = rental?.excess_mileage_rate == null ? "" : clean(rental.excess_mileage_rate);
   variables.permitted_territory = clean(bookingLink?.booking_data?.permitted_territory || organization?.settings?.permitted_territory || organization?.settings?.home_territory);

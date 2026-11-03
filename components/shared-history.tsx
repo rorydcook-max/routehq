@@ -4,6 +4,7 @@ import { MessageSquareQuote, ShieldAlert, ShieldCheck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { HistoryReport } from "@/lib/customer-history-kinds";
 import { dateFormat } from "@/lib/i18n/dates";
+import { businessTimeZone } from "@/lib/business-time";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -19,7 +20,7 @@ export function SharedHistory({ reports, compact = false }: { reports: HistoryRe
   if (!reports.length) return null;
   const month = (iso: string) => dateFormat(locale, { month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso.slice(0, 10)}T00:00:00Z`));
   // "28 May 2026", as dates read everywhere else in the app (not the American "May 28").
-  const day = (iso: string) => dateFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Bangkok" }).format(new Date(iso));
+  const day = (iso: string) => dateFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: businessTimeZone() }).format(new Date(iso));
   const live = reports.filter((report) => !report.settledAt);
   const businesses = new Set(live.map((report) => report.business)).size;
   const warn = live.length > 0;

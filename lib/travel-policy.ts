@@ -47,7 +47,40 @@ export const jurisdictionByCountry: Record<string, string> = {
   Singapore: "the Republic of Singapore",
   Vietnam: "the Socialist Republic of Vietnam",
   Australia: "Australia",
-  "United Kingdom": "England and Wales"
+  "United Kingdom": "England and Wales",
+  // The business location stores a country code, so codes are listed too (an Indonesian business with only a
+  // location set was getting Thailand's governing law).
+  TH: "the Kingdom of Thailand",
+  ID: "the Republic of Indonesia",
+  PH: "the Republic of the Philippines",
+  MY: "Malaysia",
+  SG: "the Republic of Singapore",
+  VN: "the Socialist Republic of Vietnam",
+  LA: "the Lao People's Democratic Republic",
+  KH: "the Kingdom of Cambodia",
+  AU: "Australia",
+  // Europe (3 Nov 2026).
+  Ireland: "Ireland",
+  Malta: "Malta",
+  Cyprus: "the Republic of Cyprus",
+  Greece: "Greece",
+  Spain: "Spain",
+  Portugal: "Portugal",
+  Italy: "Italy",
+  Croatia: "the Republic of Croatia",
+  France: "France",
+  Germany: "the Federal Republic of Germany",
+  GB: "England and Wales",
+  IE: "Ireland",
+  MT: "Malta",
+  CY: "the Republic of Cyprus",
+  GR: "Greece",
+  ES: "Spain",
+  PT: "Portugal",
+  IT: "Italy",
+  HR: "the Republic of Croatia",
+  FR: "France",
+  DE: "the Federal Republic of Germany"
 };
 
 export const travelPolicyDefaults: TravelPolicySettings = {

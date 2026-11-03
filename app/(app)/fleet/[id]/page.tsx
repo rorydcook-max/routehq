@@ -41,6 +41,7 @@ import { activityTitle, tidyDetail, visibleActivity } from "@/lib/activity-displ
 import { businessToday, businessNow, toWallTime } from "@/lib/business-time";
 import { longDate, dateFormat } from "@/lib/i18n/dates";
 import { hasLoan, loanFigures } from "@/lib/vehicle-loan";
+import { distanceKey } from "@/lib/business-units";
 
 // The wording for this page is in locales/<language>/common.json under "vehiclePage".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -111,7 +112,7 @@ function getComplianceItems(detail: VehicleDetail, tx: Vx) {
   // The paperwork the business's country asks for (local names after the plain one), then upkeep.
   const twoWheeler = isTwoWheeler(kindFromCategory(detail.category));
   const age = vehicleAgeOf(vehicle);
-  const items: Array<{ key: string; name: string; date: any; cost: any; monthly?: boolean; paperwork?: boolean; inspection?: string; icon: typeof ShieldCheck }> = paperworkFor(detail.country)
+  const items: Array<{ key: string; name: string; date: any; cost: any; monthly?: boolean; paperwork?: boolean; inspection?: string; howTo?: { key: string; url?: string }; icon: typeof ShieldCheck }> = paperworkFor(detail.country)
     .filter((item) => paperApplies(item, age, twoWheeler, compliance[paperField(item.key)]))
     .map((item) => {
       const field = paperField(item.key);
@@ -124,6 +125,7 @@ function getComplianceItems(detail: VehicleDetail, tx: Vx) {
         paperwork: true,
         // Thailand: an older vehicle's inspection is done with the road tax; its cost is asked for in the same renewal.
         inspection: item.inspectionWith && (age === null || age > (twoWheeler ? item.inspectionWith.bike : item.inspectionWith.car)) ? item.inspectionWith.local : undefined,
+        howTo: item.howTo,
         icon: ShieldCheck
       };
     });
@@ -292,7 +294,7 @@ function Glance({ detail, isOwner }: { detail: VehicleDetail; isOwner: boolean }
       </a>
       <a className={tile} href="#checks">
         <span className="tile-title">{tx.say("g_mileage")}</span>
-        <span className={`${value} text-[var(--foreground)]`}>{tx.say("km", { km: Number(detail.vehicle.mileage || 0).toLocaleString("en-US") })}</span>
+        <span className={`${value} text-[var(--foreground)]`}>{tx.say(distanceKey("km"), { km: Number(detail.vehicle.mileage || 0).toLocaleString("en-US") })}</span>
         <span className={`mt-auto font-semibold ${byDamage ? toneText.amber : toneText.neutral}`}>
           {/* "Good · checked 3 Oct 2026", or just "Last checked 3 Oct 2026"; never "Condition not set · 3 Oct". */}
           {condition?.value
@@ -466,6 +468,18 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
               {thai && (item.key === "tax" || item.key === "porbor" || item.key === "insurance") && item.date && (daysUntil(item.date) ?? 999) <= 90 ? (
                 <RenewalHelp details={paperDetails} kind={item.key} partner={item.key === "tax" ? null : partners[item.key]} porborDaysLeft={porborDaysLeft} twoWheeler={twoWheeler} vehicleAge={vehicleAge} />
               ) : null}
+              {/* Outside Thailand: the usual interval and the official page (lib/country-paperwork.ts). */}
+              {!thai && item.howTo && (!item.date || (daysUntil(item.date) ?? 999) <= 90) ? (
+                <details className="mt-2.5 rounded-lg border border-[var(--border)] bg-white px-3 py-2">
+                  <summary className="cursor-pointer font-bold text-[var(--primary)]">{tx.say("rn_how")}</summary>
+                  <p className="mt-2 text-[15px] font-medium text-[var(--foreground-secondary)]">{tx.say(item.howTo.key)}</p>
+                  {item.howTo.url ? (
+                    <a className="secondary-action pressable mt-2 min-h-9 px-3 text-[14px]" href={item.howTo.url} rel="noreferrer" target="_blank">
+                      {tx.say("rn_official")}
+                    </a>
+                  ) : null}
+                </details>
+              ) : null}
               <details className="mt-2.5">
                 <summary className="cursor-pointer font-bold text-[var(--primary)]">{item.date ? tx.say("cs_renewed") : tx.say("cs_addDate")}</summary>
                 <RenewalForm
@@ -575,7 +589,7 @@ function InspectionsSection({ detail }: { detail: VehicleDetail }) {
           {older.map((inspection) => (
             <details className="rounded-xl bg-[var(--panel-secondary)] p-3.5" key={inspection.id}>
               <summary className="cursor-pointer font-bold text-[var(--foreground)]">
-                {kindName(inspection)} · {formatDate(inspection.inspected_at, tx)} · {tx.say("km", { km: Number(inspection.odometer_reading || inspection.mileage || 0).toLocaleString("en-US") })}
+                {kindName(inspection)} · {formatDate(inspection.inspected_at, tx)} · {tx.say(distanceKey("km"), { km: Number(inspection.odometer_reading || inspection.mileage || 0).toLocaleString("en-US") })}
               </summary>
               <div className="mt-3">
                 <InspectionViewer inspection={inspection} />
@@ -686,9 +700,9 @@ function MaintenanceSection({ detail, organizationId, currency }: { detail: Vehi
       id="maintenance"
       summary={
         compliance.next_service_date
-          ? tx.say("m_summaryNext", { date: nextKm ? tx.say("sv_nextBoth", { date: formatDate(compliance.next_service_date, tx), km: km(nextKm) }) : formatDate(compliance.next_service_date, tx) })
+          ? tx.say("m_summaryNext", { date: nextKm ? tx.say(distanceKey("sv_nextBoth"), { date: formatDate(compliance.next_service_date, tx), km: km(nextKm) }) : formatDate(compliance.next_service_date, tx) })
           : nextKm
-            ? tx.say("m_summaryNext", { date: tx.say("sv_kmOnly", { km: km(nextKm) }) })
+            ? tx.say("m_summaryNext", { date: tx.say(distanceKey("sv_kmOnly"), { km: km(nextKm) }) })
             : tx.say("m_summaryNone")
       }
       title={tx.say("m_title")}
@@ -699,24 +713,24 @@ function MaintenanceSection({ detail, organizationId, currency }: { detail: Vehi
           <p className="font-semibold text-[var(--muted)]">{tx.say("m_nextLabel")}</p>
           <p className="mt-0.5 font-bold text-[var(--foreground)]">
             {compliance.next_service_date && nextKm
-              ? tx.say("sv_nextBoth", { date: formatDate(compliance.next_service_date, tx), km: km(nextKm) })
+              ? tx.say(distanceKey("sv_nextBoth"), { date: formatDate(compliance.next_service_date, tx), km: km(nextKm) })
               : compliance.next_service_date
                 ? formatDate(compliance.next_service_date, tx)
                 : nextKm
-                  ? tx.say("m_atKm", { km: km(nextKm) })
+                  ? tx.say(distanceKey("m_atKm"), { km: km(nextKm) })
                   : tx.say("m_notYet")}
           </p>
-          {kmLeft !== null ? <p className={`font-medium ${kmLeft < 0 ? "text-[var(--danger)]" : kmLeft <= 500 ? "text-[var(--warning)]" : "text-[var(--foreground-secondary)]"}`}>{kmLeft < 0 ? tx.say("sv_kmOver", { km: km(-kmLeft) }) : tx.say("sv_kmLeft", { km: km(kmLeft) })}</p> : null}
+          {kmLeft !== null ? <p className={`font-medium ${kmLeft < 0 ? "text-[var(--danger)]" : kmLeft <= 500 ? "text-[var(--warning)]" : "text-[var(--foreground-secondary)]"}`}>{kmLeft < 0 ? tx.say(distanceKey("sv_kmOver"), { km: km(-kmLeft) }) : tx.say(distanceKey("sv_kmLeft"), { km: km(kmLeft) })}</p> : null}
         </div>
         <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
           <p className="font-semibold text-[var(--muted)]">{tx.say("m_last")}</p>
           <p className="mt-0.5 font-bold text-[var(--foreground)]">{compliance.last_service_date ? formatDate(compliance.last_service_date, tx) : tx.say("m_notYet")}</p>
-          {compliance.last_service_mileage ? <p className="font-medium text-[var(--foreground-secondary)]">{tx.say("km", { km: km(compliance.last_service_mileage) })}</p> : null}
+          {compliance.last_service_mileage ? <p className="font-medium text-[var(--foreground-secondary)]">{tx.say(distanceKey("km"), { km: km(compliance.last_service_mileage) })}</p> : null}
         </div>
         <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
           <p className="font-semibold text-[var(--muted)]">{tx.say("m_lastOil")}</p>
           <p className="mt-0.5 font-bold text-[var(--foreground)]">{compliance.last_oil_change_date ? formatDate(compliance.last_oil_change_date, tx) : tx.say("m_notYet")}</p>
-          {compliance.last_oil_change_mileage ? <p className="font-medium text-[var(--foreground-secondary)]">{tx.say("km", { km: km(compliance.last_oil_change_mileage) })}</p> : null}
+          {compliance.last_oil_change_mileage ? <p className="font-medium text-[var(--foreground-secondary)]">{tx.say(distanceKey("km"), { km: km(compliance.last_oil_change_mileage) })}</p> : null}
         </div>
       </div>
       <details className="mt-3 scroll-mt-4" id="log-service">
@@ -761,10 +775,10 @@ function MaintenanceSection({ detail, organizationId, currency }: { detail: Vehi
             <input className={inputClass} name="nextDueDate" type="date" />
           </label>
           <label className="block">
-            <span className={labelClass}>{tx.say("m_nextKm")}</span>
+            <span className={labelClass}>{tx.say(distanceKey("m_nextKm"))}</span>
             <input className={inputClass} inputMode="numeric" min="0" name="nextDueMileage" type="number" />
           </label>
-          <p className="text-[14px] text-[var(--muted)] sm:col-span-2">{tx.say("m_hintBoth")}</p>
+          <p className="text-[14px] text-[var(--muted)] sm:col-span-2">{tx.say(distanceKey("m_hintBoth"))}</p>
           <label className="block sm:col-span-2">
             <span className={labelClass}>{tx.say("m_receipt")}</span>
             <input className="mt-1 w-full" name="receiptFile" type="file" />
@@ -791,7 +805,7 @@ function MaintenanceSection({ detail, organizationId, currency }: { detail: Vehi
                     {(event as any).oil_changed && event.event_type !== "oil_change" ? <span className="ml-2 rounded-full bg-[var(--primary-light)] px-2 py-0.5 text-[13px] font-bold text-[var(--primary)]">{tx.say("m_oil")}</span> : null}
                   </p>
                   <p className="font-medium text-[var(--foreground-secondary)]">
-                    {[formatDate(event.service_date, tx), event.mileage ? tx.say("km", { km: Number(event.mileage).toLocaleString("en-US") }) : null, event.supplier || null].filter(Boolean).join(" · ")}
+                    {[formatDate(event.service_date, tx), event.mileage ? tx.say(distanceKey("km"), { km: Number(event.mileage).toLocaleString("en-US") }) : null, event.supplier || null].filter(Boolean).join(" · ")}
                   </p>
                 </div>
                 {event.cost ? <span className="shrink-0 text-[16px] font-bold tabular-nums text-[var(--foreground)]">{money(event.cost)}</span> : null}
@@ -888,7 +902,7 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
             const note = typedNote(transaction.notes);
             const extra = [
               transaction.supplier ? tx.say("x_paidTo", { name: transaction.supplier }) : null,
-              transaction.mileage ? tx.say("x_mileage", { km: Number(transaction.mileage).toLocaleString("en-US") }) : null,
+              transaction.mileage ? tx.say(distanceKey("x_mileage"), { km: Number(transaction.mileage).toLocaleString("en-US") }) : null,
               transaction.receipt_document_id ? tx.say("x_receipt") : null
             ].filter(Boolean);
             return (
@@ -940,7 +954,7 @@ function RentalHistorySection({ detail }: { detail: VehicleDetail }) {
                     <p className="text-[16px] font-bold text-[var(--foreground)]">{rental.customers?.full_name || tx.say("customer")}</p>
                     <p className="font-medium text-[var(--foreground-secondary)]">
                       {rental.end_date ? tx.say("h_range", { from: formatDate(rental.start_date, tx), to: formatDate(rental.end_date, tx) }) : tx.say("h_ongoing", { from: formatDate(rental.start_date, tx) })}
-                      {rental.km_driven ? ` · ${tx.say("h_km", { km: Number(rental.km_driven).toLocaleString("en-US") })}` : ""}
+                      {rental.km_driven ? ` · ${tx.say(distanceKey("h_km"), { km: Number(rental.km_driven).toLocaleString("en-US") })}` : ""}
                     </p>
                   </div>
                   <Badge tone={["active", "due_soon", "extended"].includes(rental.status) ? "blue" : rental.status === "completed" ? "green" : rental.status === "overdue" || rental.status === "cancelled" ? "red" : "amber"}>{statusName(rental.status)}</Badge>
@@ -1112,13 +1126,13 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
   const gearbox = String(specs.transmission || "").trim();
   const nextService = [
     compliance.next_service_date ? longDate(String(compliance.next_service_date).slice(0, 10), tx.locale) : "",
-    Number(compliance.next_service_mileage) > 0 ? tx.say("km", { km: Number(compliance.next_service_mileage).toLocaleString("en-US") }) : ""
+    Number(compliance.next_service_mileage) > 0 ? tx.say(distanceKey("km"), { km: Number(compliance.next_service_mileage).toLocaleString("en-US") }) : ""
   ]
     .filter(Boolean)
     .join(" · ");
   const headerFacts = (
     [
-      [tx.say("hf_mileage"), Number(vehicle.mileage) > 0 ? tx.say("km", { km: Number(vehicle.mileage).toLocaleString("en-US") }) : ""],
+      [tx.say("hf_mileage"), Number(vehicle.mileage) > 0 ? tx.say(distanceKey("km"), { km: Number(vehicle.mileage).toLocaleString("en-US") }) : ""],
       [tx.say("hf_nextService"), nextService],
       [tx.say("hf_deposit"), Number((vehicle as any).deposit_amount) > 0 ? money((vehicle as any).deposit_amount) : ""],
       [tx.say("hf_gearbox"), /^(at|auto)/i.test(gearbox) ? tx.say("hf_auto") : /^(mt|man)/i.test(gearbox) ? tx.say("hf_manual") : gearbox],

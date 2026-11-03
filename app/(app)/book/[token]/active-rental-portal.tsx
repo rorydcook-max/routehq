@@ -12,6 +12,7 @@ import { submitCustomerPortalAction } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 import { planFor, quoteStay, type Rates } from "@/lib/rental-estimate";
 import { PortalPayments } from "./portal-payments";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 type OpenEndedOffer = { monthlyRate: number; firstDue: string };
 type ActionType = "extension_request" | "return_confirmation" | "problem_report" | "question";
@@ -92,11 +93,11 @@ export function ActiveRentalPortal({
       const result = await submitCustomerPortalAction(formData);
       const extension = result.extension;
       if (extension?.applied && extension.openEnded) {
-        const amount = `${extension.currency === "THB" ? "฿" : `${extension.currency} `}${extension.amount.toLocaleString("en-US")}`;
+        const amount = extension.currency === "THB" ? `฿${extension.amount.toLocaleString("en-US")}` : formatRegionalMoney(extension.amount, extension.currency, "en-GB");
         setConfirmation(t("nowOpenEnded", { amount, date: niceDate(extension.dueDate, locale) }));
         router.refresh();
       } else if (extension?.applied) {
-        const amount = `${extension.currency === "THB" ? "฿" : `${extension.currency} `}${extension.amount.toLocaleString("en-US")}`;
+        const amount = extension.currency === "THB" ? `฿${extension.amount.toLocaleString("en-US")}` : formatRegionalMoney(extension.amount, extension.currency, "en-GB");
         setConfirmation(`${t("nowRunsUntil", { date: niceDate(extension.newEndDate, locale) })}${extension.amount > 0 ? ` ${t("extraDaysDue", { amount, date: niceDate(extension.dueDate, locale) })}` : ""}`);
         router.refresh();
       } else {

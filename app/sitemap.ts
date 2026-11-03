@@ -5,6 +5,7 @@ import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { allGuideSlugs, allResourceSlugs, getGuide, getResource, GUIDE_CATEGORIES, guideLocales, listGuides, resourceLocales } from "@/lib/site/content";
 import { DEFAULT_SITE_LOCALE, hreflangFor } from "@/lib/site/locale-path";
 import { listDocs, loadPublishedArticles } from "@/lib/site/docs";
+import { listLegalDocs } from "@/lib/site/legal";
 import { siteUrl } from "@/lib/site/seo";
 
 /**
@@ -46,6 +47,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // The help centre: English for now (every language's address shows it, with the English one as canonical).
   add("/docs", ["en"], built, 0.7);
   for (const doc of listDocs("en")) add(`/docs/${doc.slug}`, ["en"], doc.updated || built.toISOString().slice(0, 10), 0.6);
+  // Legal pages: English text for every language, so only the English addresses are listed.
+  add("/legal", supportedLocaleCodes, built, 0.3);
+  for (const doc of listLegalDocs("en")) add(`/legal/${doc.slug}`, ["en"], doc.updated || built.toISOString().slice(0, 10), 0.3);
   for (const slug of allResourceSlugs()) {
     const locales = resourceLocales(slug);
     let lastModified: Date | string = built;

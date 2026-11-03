@@ -1,4 +1,4 @@
-import { businessToday } from "@/lib/business-time";
+import { businessDay, businessToday } from "@/lib/business-time";
 import { customerPaymentLabel } from "@/lib/payment-labels";
 import { receiptOf, signedReceiptUrls } from "@/lib/payment-receipts";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -50,7 +50,6 @@ export type TaskListItem = {
   request?: string | null;
 };
 
-const bangkokDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" });
 
 function paymentTitle(metadata: any) {
   const type = String(metadata?.type || "");
@@ -207,7 +206,7 @@ export async function getTaskList(
       title: requestTitles[String(row.action_type)] || "Customer request",
       taskType: "admin",
       dueAt: row.created_at,
-      dueDate: row.created_at ? bangkokDate.format(new Date(row.created_at)) : null,
+      dueDate: row.created_at ? businessDay(row.created_at) : null,
       completedAt: null,
       vehicleId: rental?.vehicleId || null,
       rentalId: row.rental_id,
@@ -232,7 +231,7 @@ export async function getTaskList(
       title: row.title,
       taskType: row.task_type,
       dueAt: row.due_at,
-      dueDate: row.due_at ? bangkokDate.format(new Date(row.due_at)) : null,
+      dueDate: row.due_at ? businessDay(row.due_at) : null,
       completedAt: row.completed_at,
       vehicleId: row.vehicle_id,
       rentalId: row.rental_id,

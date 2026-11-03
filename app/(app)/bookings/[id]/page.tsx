@@ -50,9 +50,11 @@ import { PendingAmendmentCard } from "@/app/(app)/bookings/[id]/pending-amendmen
 import { LoosePaymentsCard } from "@/app/(app)/bookings/[id]/loose-payments-card";
 import { loosePaymentsFor } from "@/lib/loose-payments";
 import { businessSignatureOf, getBookingRentalDocuments, renterSignatureOf, type BookingRentalDocument } from "@/lib/booking-rental-documents";
+import { distanceKey } from "@/lib/business-units";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 function money(value: unknown, currency = "THB") {
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
+  return currency === "THB" ? new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0)) : formatRegionalMoney(Number(value || 0), currency, "en-GB");
 }
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -1284,12 +1286,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   label={tx.say("mileage")}
                   value={
                     rental.mileage_at_delivery == null && rental.mileage_at_return != null
-                      ? tx.say("kmAtReturn", { km: Number(rental.mileage_at_return).toLocaleString("en-US") })
+                      ? tx.say(distanceKey("kmAtReturn"), { km: Number(rental.mileage_at_return).toLocaleString("en-US") })
                       : rental.mileage_at_delivery == null
                         ? isCancelled ? tx.say("neverHandedOver") : isClosed ? tx.say("notRecorded") : tx.say("recordedAtHandover")
                         : rental.mileage_at_return == null
-                          ? tx.say("kmAtHandover", { km: Number(rental.mileage_at_delivery).toLocaleString("en-US") })
-                          : `${tx.say("kmDriven", { km: Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString("en-US") })} · ${Number(rental.mileage_at_delivery).toLocaleString()} → ${Number(rental.mileage_at_return).toLocaleString("en-US")}`
+                          ? tx.say(distanceKey("kmAtHandover"), { km: Number(rental.mileage_at_delivery).toLocaleString("en-US") })
+                          : `${tx.say(distanceKey("kmDriven"), { km: Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString("en-US") })} · ${Number(rental.mileage_at_delivery).toLocaleString()} → ${Number(rental.mileage_at_return).toLocaleString("en-US")}`
                   }
                 />
                 {deliveryInspection ? (

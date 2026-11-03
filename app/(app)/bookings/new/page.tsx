@@ -10,6 +10,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
 import { loadBusyPeriods } from "@/lib/rental-conflicts";
 import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
+import { vatSettings, withVat } from "@/lib/regional";
 import { BookingForm } from "./booking-form";
 
 type SearchParams = {
@@ -62,7 +63,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
       .order("created_at", { ascending: false }),
     supabase
       .from("customers")
-      .select("id, full_name, phone, nationality, document_status, do_not_rent, do_not_rent_reason")
+      .select("id, full_name, phone, nationality, document_status, do_not_rent, do_not_rent_reason, date_of_birth")
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
       .order("created_at", { ascending: false }),
@@ -80,6 +81,9 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
   // Which kind each vehicle is, so the form can show a scooter as a scooter and offer a helmet, not a car seat.
   const { data: categoryRows } = await supabase.from("vehicle_categories").select("id, code");
   const categoryCodes = new Map<string, string>((categoryRows || []).map((row: any) => [row.id, row.code]));
+  // Prices typed before VAT (Settings › Country and units): the booking charges them with VAT added.
+  const vat = vatSettings(organizationDetails || organization);
+  const gross = (value: unknown) => Math.round(withVat(Number(value || 0), vat) * 100) / 100;
   const normalizedVehicles = (vehicles || []).map((vehicle: any) => ({
     ...vehicle,
     category_code: categoryCodes.get(vehicle.category_id) || null,
@@ -87,10 +91,10 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
     included_items: Array.isArray(vehicle.metadata?.included_items) ? (vehicle.metadata.included_items as unknown[]).map(String) : null,
     metadata: undefined,
     year: vehicle.year ? Number(vehicle.year) : null,
-    daily_rate: Number(vehicle.daily_rate || 0),
-    weekly_rate: Number(vehicle.weekly_rate || 0),
+    daily_rate: gross(vehicle.daily_rate),
+    weekly_rate: gross(vehicle.weekly_rate),
     deposit_amount: vehicle.deposit_amount === null || vehicle.deposit_amount === undefined ? null : Number(vehicle.deposit_amount),
-    monthly_rate: Number(vehicle.monthly_rate || 0)
+    monthly_rate: gross(vehicle.monthly_rate)
   }));
 
   return (
@@ -126,7 +130,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
         ) : (
           <BookingForm
             busyPeriods={busyPeriods}
-            extras={extrasFrom(organizationDetails?.settings)}
+            extras={extrasFrom(organizationDetails?.settings).map((extra) => ({ ...extra, price: gross(extra.price) }))}
             seasons={seasonsFrom(organizationDetails?.settings)}
             customers={customers || []}
             defaultCurrency={organization.currency || "THB"}

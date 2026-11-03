@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { ensureOnboardingChecklist, markOnboardingStep } from "@/lib/onboarding";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { timeZoneForPlace, toCountryCode } from "@/lib/regional";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -73,6 +74,9 @@ export async function saveBusinessProfile(formData: FormData) {
       onboarding_completed_at: new Date().toISOString(),
       currency,
       supported_currencies: Array.from(new Set([currency, "THB", "USD"])),
+      // The country as a code and its clock (the Canaries, Madeira and the Azores keep their own): due dates,
+      // "today", paperwork names, miles or km and VAT all follow it (lib/regional.ts).
+      ...(toCountryCode(country) ? { country_code: toCountryCode(country), timezone: timeZoneForPlace(country, region, town) } : {}),
       settings: {
         ...settings,
         ...(businessPhone ? { business_phone: businessPhone } : {}),

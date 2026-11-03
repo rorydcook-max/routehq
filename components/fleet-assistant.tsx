@@ -68,7 +68,8 @@ async function keptPhotos(chatId: string): Promise<File[]> {
 /** Speech to text in the browser's own engine, in the person's language. */
 const SPEECH_LANG: Record<string, string> = {
   en: "en-GB", th: "th-TH", de: "de-DE", es: "es-ES", fr: "fr-FR", fil: "fil-PH", he: "he-IL", hi: "hi-IN", id: "id-ID", ja: "ja-JP", ko: "ko-KR",
-  lo: "lo-LA", ms: "ms-MY", my: "my-MM", nb: "nb-NO", pt: "pt-PT", ru: "ru-RU", si: "si-LK", sv: "sv-SE", ta: "ta-IN", vi: "vi-VN", zh: "zh-CN", "zh-TW": "zh-TW"
+  lo: "lo-LA", ms: "ms-MY", my: "my-MM", nb: "nb-NO", pt: "pt-PT", ru: "ru-RU", si: "si-LK", sv: "sv-SE", ta: "ta-IN", vi: "vi-VN", zh: "zh-CN", "zh-TW": "zh-TW",
+  el: "el-GR", hr: "hr-HR", it: "it-IT", nl: "nl-NL", pl: "pl-PL"
 };
 
 function toDataUrl(file: File) {

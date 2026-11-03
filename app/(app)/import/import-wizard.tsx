@@ -11,6 +11,7 @@ import { IMPORT_FIELD_GROUPS, IMPORT_FIELDS } from "@/lib/import/fields";
 import type { ImportPreview, PreviewCustomer, PreviewRental, PreviewTransaction, PreviewVehicle, Problem } from "@/lib/import/preview";
 import { previewCounts } from "@/lib/import/preview";
 import { answerQuestion, importQuestions, type ImportQuestion } from "@/lib/import/questions";
+import { distanceKey } from "@/lib/business-units";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -741,7 +742,7 @@ function VehicleCard({ vehicle, onChange, t }: { vehicle: PreviewVehicle; onChan
           <input className={smallInput} inputMode="numeric" maxLength={4} onChange={(event) => onChange({ year: event.target.value ? Number(event.target.value) : null })} value={vehicle.year ?? ""} />
         </label>
         <label className="block text-xs font-semibold text-[var(--muted)]">
-          {t("c_mileage")}
+          {t(distanceKey("c_mileage"))}
           <input className={smallInput} inputMode="numeric" onChange={(event) => onChange({ mileage: event.target.value ? Number(event.target.value) : null })} value={vehicle.mileage ?? ""} />
         </label>
         <label className="block text-xs font-semibold text-[var(--muted)]">

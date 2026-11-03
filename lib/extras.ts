@@ -124,3 +124,39 @@ export function extrasSummary(rental: any, payments: any[], transactions: any[])
 export function round(value: number) {
   return Math.round(Number(value || 0) * 100) / 100;
 }
+
+/**
+ * The excess once a damage waiver extra is on the booking (Settings › Paid extras, ready-made "Damage waiver"):
+ * the lower amount set on the waiver. Null when the booking has no waiver, so the standard excess stands.
+ */
+export function waiverExcess(rental: any): number | null {
+  const waiver = activeExtrasLines(rental).find((line: any) => line.preset === "damage_waiver");
+  return waiver ? Math.max(0, Number((waiver as any).excess) || 0) : null;
+}
+
+/**
+ * Agreement variables from the booking's ready-made extras, for contract templates (lib/contract-rendering.ts):
+ *   damage_waiver (true/false), damage_waiver_excess, standard_insurance_excess,
+ *   young_driver (true/false), young_driver_age, additional_driver, cross_border, cross_border_countries,
+ *   one_way, out_of_hours (true/false).
+ * insurance_excess itself is the waiver's lower amount when there is a waiver (see waiverExcess).
+ */
+export function extrasAgreementVariables(rental: any, standardExcess: unknown, format: (value: unknown) => string): Record<string, string | boolean> {
+  const lines = activeExtrasLines(rental) as Array<ExtrasLine & { preset?: string; excess?: number; minAge?: number; countries?: string }>;
+  const find = (preset: string) => lines.find((line) => line.preset === preset);
+  const waiver = find("damage_waiver");
+  const young = find("young_driver");
+  const cross = find("cross_border");
+  return {
+    damage_waiver: Boolean(waiver),
+    damage_waiver_excess: waiver ? format(waiver.excess || 0) : "",
+    standard_insurance_excess: format(standardExcess || 0),
+    young_driver: Boolean(young),
+    young_driver_age: young?.minAge ? String(young.minAge) : "",
+    additional_driver: Boolean(find("additional_driver")),
+    cross_border: Boolean(cross),
+    cross_border_countries: cross?.countries ? String(cross.countries) : "",
+    one_way: Boolean(find("one_way")),
+    out_of_hours: Boolean(find("out_of_hours"))
+  };
+}

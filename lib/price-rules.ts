@@ -14,8 +14,28 @@
 
 export type Season = { id: string; name: string; from: string; to: string; pct: number; monthly: boolean };
 export type ExtraKind = "all" | "car" | "bike";
-export type Extra = { id: string; name: string; price: number; per: "day" | "rental"; kind: ExtraKind };
-export type ChosenExtra = { id: string; name: string; price: number; per: "day" | "rental"; amount: number };
+/**
+ * Ready-made extras common in Europe (Rory, 3 Nov 2026), switched on with a price in Settings like any other extra:
+ *   damage_waiver     - lowers the renter's excess to `excess` (the agreement shows the lower amount)
+ *   young_driver      - for drivers under `minAge`; ticked by itself on the booking form when the driver is younger
+ *   additional_driver, out_of_hours (delivery or collection), one_way
+ *   cross_border      - taking the vehicle to `countries`
+ */
+export type ExtraPreset = "damage_waiver" | "young_driver" | "additional_driver" | "cross_border" | "out_of_hours" | "one_way";
+export const EXTRA_PRESETS: ExtraPreset[] = ["additional_driver", "cross_border", "damage_waiver", "one_way", "out_of_hours", "young_driver"];
+export type Extra = { id: string; name: string; price: number; per: "day" | "rental"; kind: ExtraKind; preset?: ExtraPreset; excess?: number; minAge?: number; countries?: string };
+export type ChosenExtra = { id: string; name: string; price: number; per: "day" | "rental"; amount: number; preset?: ExtraPreset; excess?: number; minAge?: number; countries?: string };
+
+/** The preset's own details, kept on the booking's extras lines so the agreement can use them. */
+function presetDetails(raw: any): Pick<Extra, "preset" | "excess" | "minAge" | "countries"> {
+  const preset = EXTRA_PRESETS.includes(raw?.preset) ? (raw.preset as ExtraPreset) : undefined;
+  if (!preset) return {};
+  const out: Pick<Extra, "preset" | "excess" | "minAge" | "countries"> = { preset };
+  if (preset === "damage_waiver") out.excess = Math.max(0, Math.round(Number(raw?.excess) || 0));
+  if (preset === "young_driver") out.minAge = Math.max(16, Math.min(30, Math.round(Number(raw?.minAge) || 25)));
+  if (preset === "cross_border") out.countries = String(raw?.countries || "").trim().slice(0, 200);
+  return out;
+}
 
 const MMDD = /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 const asObject = (value: unknown) => (value && typeof value === "object" ? (value as Record<string, any>) : {});
@@ -45,7 +65,8 @@ export function extrasFrom(settings: unknown): Extra[] {
       name: String(raw?.name || "").trim().slice(0, 60),
       price: Math.max(0, Math.round(Number(raw?.price) || 0)),
       per: raw?.per === "rental" ? ("rental" as const) : ("day" as const),
-      kind: (["car", "bike"].includes(raw?.kind) ? raw.kind : "all") as ExtraKind
+      kind: (["car", "bike"].includes(raw?.kind) ? raw.kind : "all") as ExtraKind,
+      ...presetDetails(raw)
     }))
     .filter((extra) => extra.name && extra.price > 0)
     .slice(0, 30);
@@ -119,14 +140,15 @@ export function priceExtras(chosen: Extra[], days: number | null): { lines: Chos
   let upfront = 0;
   let monthly = 0;
   for (const extra of chosen) {
+    const details = presetDetails(extra);
     if (extra.per === "rental") {
-      lines.push({ id: extra.id, name: extra.name, price: extra.price, per: "rental", amount: extra.price });
+      lines.push({ id: extra.id, name: extra.name, price: extra.price, per: "rental", amount: extra.price, ...details });
       upfront += extra.price;
     } else if (days === null) {
-      lines.push({ id: extra.id, name: extra.name, price: extra.price, per: "day", amount: extra.price * 30 });
+      lines.push({ id: extra.id, name: extra.name, price: extra.price, per: "day", amount: extra.price * 30, ...details });
       monthly += extra.price * 30;
     } else {
-      lines.push({ id: extra.id, name: extra.name, price: extra.price, per: "day", amount: extra.price * Math.max(1, days) });
+      lines.push({ id: extra.id, name: extra.name, price: extra.price, per: "day", amount: extra.price * Math.max(1, days), ...details });
       upfront += extra.price * Math.max(1, days);
     }
   }

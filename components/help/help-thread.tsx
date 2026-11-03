@@ -2,11 +2,11 @@ import { getTranslations } from "next-intl/server";
 import { FileText } from "lucide-react";
 import { fileSizeLabel } from "@/lib/support-shared";
 import type { SupportMessageRow } from "@/lib/support-data";
+import { businessTimeZone } from "@/lib/business-time";
 
-const BANGKOK = "Asia/Bangkok";
 
 function when(iso: string, locale: string) {
-  return new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-GB", { timeZone: BANGKOK, day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  return new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-GB", { timeZone: businessTimeZone(), day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
 
 /** The messages in one Help conversation. `side` decides which bubbles are "mine". */

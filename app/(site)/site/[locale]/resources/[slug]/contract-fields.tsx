@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { CONTRACT_CURRENCY, CONTRACT_DEFAULTS, CURRENCIES, contractCountryFor } from "@/lib/contract-builder/fields";
+import { CONTRACT_CURRENCY, CONTRACT_DEFAULTS, CURRENCIES, MILES_COUNTRIES, contractCountryFor } from "@/lib/contract-builder/fields";
 import s from "../../site.module.css";
 import c from "../../content.module.css";
 
@@ -18,10 +18,12 @@ export function ContractFields({ words, country }: { words: Words; country: stri
   const [currency, setCurrency] = useState<string | null>(null);
   const shownCurrency = currency || CONTRACT_CURRENCY[contractCountryFor(country)];
   const w = (key: string) => words[key] || key;
+  // The UK agreement counts miles, so its mileage fields say so (the agreement itself is worded per country).
+  const miles = MILES_COUNTRIES.includes(String(country || "").toUpperCase());
 
-  const text = (key: string, opts: { type?: string; inputMode?: "numeric" | "decimal" | "email" | "tel"; placeholder?: string; wide?: boolean } = {}) => (
+  const text = (key: string, opts: { type?: string; inputMode?: "numeric" | "decimal" | "email" | "tel"; placeholder?: string; wide?: boolean; label?: string } = {}) => (
     <label className={`${s.field} ${opts.wide ? c.cbWide : ""}`} key={key}>
-      <span className={s.fieldLabel}>{w(`cb_${key}`)}</span>
+      <span className={s.fieldLabel}>{w(opts.label || `cb_${key}`)}</span>
       <input
         className={s.input}
         inputMode={opts.inputMode}
@@ -32,9 +34,9 @@ export function ContractFields({ words, country }: { words: Words; country: stri
       />
     </label>
   );
-  const money = (key: string) => text(key, { inputMode: "decimal", placeholder: shownCurrency });
+  const money = (key: string, label?: string) => text(key, { inputMode: "decimal", placeholder: shownCurrency, label });
   // A skipped number falls back to the agreement's default, so show it as the placeholder.
-  const number = (key: string) => text(key, { inputMode: "numeric", placeholder: CONTRACT_DEFAULTS[key] });
+  const number = (key: string, label?: string) => text(key, { inputMode: "numeric", placeholder: CONTRACT_DEFAULTS[key], label });
   const select = (key: string, options: readonly string[], opts: { blank?: boolean; value?: string; onChange?: (value: string) => void } = {}) => (
     <label className={s.field} key={key}>
       <span className={s.fieldLabel}>{w(`cb_${key}`)}</span>
@@ -109,9 +111,9 @@ export function ContractFields({ words, country }: { words: Words; country: stri
           <legend>{w("cbGroupRules")}</legend>
           {select("fuel_policy", ["same", "full"])}
           {money("fuel_service_fee")}
-          {number("mileage_limit")}
+          {number("mileage_limit", miles ? "cb_mileage_limit_mi" : undefined)}
           {select("mileage_period", ["day", "month"])}
-          {money("excess_km_fee")}
+          {money("excess_km_fee", miles ? "cb_excess_km_fee_mi" : undefined)}
           {money("late_hour_fee")}
           {number("late_grace_minutes")}
           {number("late_full_day_hours")}

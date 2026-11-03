@@ -268,5 +268,19 @@
   "Payment saved.": "Đã lưu thanh toán.",
   "Open the booking": "Mở đơn đặt",
   "Booking saved. Send this link so they can check and sign:": "Đã lưu đơn đặt. Gửi link này để khách kiểm tra và ký:",
-  "Booking saved. Send this link to your customer:": "Đã lưu đơn đặt. Gửi link này cho khách:"
+  "Booking saved. Send this link to your customer:": "Đã lưu đơn đặt. Gửi link này cho khách:",
+  "Only the owner can do this.": "Chỉ chủ sở hữu mới làm được việc này.",
+  "This business could not be found.": "Không tìm thấy doanh nghiệp này.",
+  "Type the business name exactly to confirm.": "Nhập chính xác tên doanh nghiệp để xác nhận.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "Bộ phận hỗ trợ RoveHQ không thể xóa doanh nghiệp. Hãy nhờ chủ sở hữu thực hiện.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Chưa thể xóa doanh nghiệp. Vui lòng liên hệ hỗ trợ và chúng tôi sẽ làm giúp bạn.",
+  "This business could not be deleted. Please try again or contact support.": "Không thể xóa doanh nghiệp này. Vui lòng thử lại hoặc liên hệ hỗ trợ.",
+  "Only an owner or manager can do this.": "Chỉ chủ sở hữu hoặc quản lý mới làm được việc này.",
+  "This customer could not be found.": "Không tìm thấy khách hàng này.",
+  "Finish or cancel their open bookings first.": "Hãy hoàn tất hoặc hủy các đặt xe đang mở của họ trước.",
+  "Deleting a customer isn't available yet. Please contact support.": "Chưa thể xóa khách hàng. Vui lòng liên hệ hỗ trợ.",
+  "This customer could not be deleted. Please try again.": "Không thể xóa khách hàng này. Vui lòng thử lại.",
+  "Choose between 1 and 120 months.": "Chọn từ 1 đến 120 tháng.",
+  "We couldn't save that. Please try again.": "Không lưu được. Vui lòng thử lại.",
+  "Please pick a country.": "Vui lòng chọn quốc gia."
 }

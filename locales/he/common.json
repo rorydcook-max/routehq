@@ -125,7 +125,9 @@
     "bkTitle": "הזמנות",
     "bkAll": "כל ההזמנות",
     "emailVerified": "האימייל אומת. תודה!",
-    "emailLinkOld": "הלינק פג תוקף. לחץ על \"אימות אימייל\" כדי לקבל לינק חדש."
+    "emailLinkOld": "הלינק פג תוקף. לחץ על \"אימות אימייל\" כדי לקבל לינק חדש.",
+    "kmToGoMi": "נותרו {km} מייל",
+    "kmOverMi": "חריגה של {km} מייל"
   },
   "vehicles": {
     "addVehicle": "הוספת רכב"
@@ -389,7 +391,16 @@
     "lateOptTodayDetailMoves": "כל מועדי התשלום נדחים ב{days, plural, one {יום אחד} two {יומיים} other {־# ימים}}",
     "lateOptTodayDetailPlain": "חזרה ב־{date} כפי שהוזמן",
     "lateOptTodayTitle": "התחלת השכירות היום",
-    "outAtKm": "יצא ב־{km} km"
+    "outAtKm": "יצא ב־{km} km",
+    "confirmOdometerMi": "קריאת מד המרחק (מייל)",
+    "ocrSuggestedMi": "הצעה מהתמונה: {km} מייל.",
+    "ocrPossibleMi": "קריאה אפשרית: {km} מייל. כדאי להשוות למד המרחק.",
+    "odometerBelowLastMi": "נמוך מהקריאה האחרונה ({km} מייל). כדאי לבדוק.",
+    "drivenDuringRentalMi": "נסיעה מאז המסירה: {km} מייל",
+    "odometerAtDeliveryMi": "במסירה: {km} מייל",
+    "kmValueMi": "{km} מייל",
+    "odometerHugeMi": "{km} מייל יותר מהקריאה האחרונה. כדאי לבדוק.",
+    "outAtKmMi": "יצא ב-{km} מייל"
   },
   "translation": {
     "translatedFrom": "תורגם מ-{language}",
@@ -890,7 +901,9 @@
     "offersDetails": "השם שלי, פרטי הקשר, האזרחות והשפה, והיסטוריית ההשכרות שלי: היכן ומתי אני שוכר/ת, הרכב, כמה אני משלם/ת, תוספות, קילומטראז', פיקדון ונזק. RoveHQ עשויה לשלוח לי הודעות או אימיילים עם הצעות כמו הסעות משדה התעופה, טיולים וכרטיסי SIM. ביטול האפשרות מוחק את העותק של RoveHQ.",
     "bookedUntil": "מוזמן עד {date}",
     "noneFree": "אין רכב זמין מ־{start}.",
-    "noneFreeEarliest": "אין רכב זמין מ־{start}. המוקדם ביותר הוא {date} ({vehicle})."
+    "noneFreeEarliest": "אין רכב זמין מ־{start}. המוקדם ביותר הוא {date} ({vehicle}).",
+    "privacyLink": "איך {business} ו-RoveHQ משתמשים במידע שלך",
+    "vatIncluded": "המחירים כוללים {name} בשיעור {rate}%"
   },
   "customerMessages": {
     "hi": "שלום {name},",
@@ -1595,7 +1608,9 @@
     "coverFrom": "מכסה מ-",
     "coverTo": "מכסה עד",
     "coverHint": "שולם לשנה או יותר? הוסיפו תאריכים וחלק ייספר בכל חודש.",
-    "coverUpdateCar": "לעדכן גם את {name} של הרכב לפוג ב-{date}"
+    "coverUpdateCar": "לעדכן גם את {name} של הרכב לפוג ב-{date}",
+    "sv_nextKmMi": "הטיפול הבא (מייל)",
+    "sv_hintMi": "אפשר להגדיר תאריך, קילומטראז' במייל או את שניהם. המוקדם מביניהם קובע את המועד."
   },
   "booking": {
     "open": "פתח",
@@ -2482,7 +2497,10 @@
     "remind_openingWhatsApp": "פותחים את WhatsApp עם התזכורת",
     "remind_nothingOwed": "אין חוב על ההזמנה הזו",
     "remind_notFound": "לא מצאנו את ההזמנה הזו",
-    "remind_signedOut": "נא להתחבר שוב"
+    "remind_signedOut": "נא להתחבר שוב",
+    "kmAtReturnMi": "{km} מייל בהחזרה",
+    "kmAtHandoverMi": "{km} מייל במסירה",
+    "kmDrivenMi": "{km} מייל נסיעה"
   },
   "newBooking": {
     "docsSelfie": "תמונה של הלקוח",
@@ -3250,7 +3268,40 @@
     "f_monthlyHint": "{amount} יתווספו להוצאות שלך כל חודש עד {date}.",
     "cs_monthly": "{amount} לחודש",
     "f_inspectionCost": "עלות הבדיקה ({name})",
-    "f_inspectionHint": "רכבים ישנים נבדקים בחידוש האגרה (מכוניות מעל 7 שנים, אופנועים מעל 5). השאירו ריק אם לא צריך."
+    "f_inspectionHint": "רכבים ישנים נבדקים בחידוש האגרה (מכוניות מעל 7 שנים, אופנועים מעל 5). השאירו ריק אם לא צריך.",
+    "m_hintBothMi": "אפשר להגדיר תאריך, קילומטראז' במייל או את שניהם. המוקדם מביניהם קובע את המועד.",
+    "sv_nextBothMi": "{date} או {km} מייל, המוקדם מביניהם",
+    "sv_kmOnlyMi": "ב-{km} מייל",
+    "sv_kmLeftMi": "נותרו {km} מייל",
+    "sv_kmOverMi": "חריגה של {km} מייל",
+    "kmMi": "{km} מייל",
+    "m_atKmMi": "ב-{km} מייל",
+    "m_nextKmMi": "המועד הבא ב- (מייל)",
+    "x_mileageMi": "קילומטראז' {km} מייל",
+    "h_kmMi": "{km} מייל נסיעה",
+    "rn_official": "דף רשמי",
+    "rn_EU_insurance": "ביטוח צד ג' הוא חובה. רכב להשכרה צריך פוליסה שמכסה השכרה ללא נהג.",
+    "rn_GB_tax": "משלמים אונליין ל-12 או 6 חודשים, או חודשית בהוראת קבע (Direct Debit). צריך את רישיון הרכב V5C או מכתב תזכורת.",
+    "rn_GB_inspection": "MOT: לראשונה בגיל 3 שנים, ואז כל שנה. אפשר לבצע עד חודש מוקדם ולשמור על אותו תאריך.",
+    "rn_IE_tax": "Motor tax: משלמים אונליין ל-3, 6 או 12 חודשים. צריך את פרטי הביטוח.",
+    "rn_IE_inspection": "NCT: מגיל 4 שנים כל שנתיים, ומגיל 10 כל שנה.",
+    "rn_ES_tax": "IVTM (impuesto de circulación): משולם פעם בשנה לעירייה שבה הרכב רשום.",
+    "rn_ES_inspection": "ITV: רכבים פרטיים מגיל 4 שנים כל שנתיים, ומגיל 10 כל שנה. רכבי השכרה עשויים להזדקק לבדיקה בתדירות גבוהה יותר: כדאי לשאול בתחנת ה-ITV.",
+    "rn_PT_tax": "IUC: משולם פעם בשנה, בחודש הרישום הראשון של הרכב, ב-Portal das Finanças.",
+    "rn_PT_inspection": "IPO: מגיל 4 שנים כל שנתיים, ומגיל 8 כל שנה. ברכבי השכרה זה עשוי להיות שונה: כדאי לבדוק מול IMT.",
+    "rn_IT_tax": "Bollo auto: משולם פעם בשנה לאזור שלך, אונליין דרך pagoPA.",
+    "rn_IT_inspection": "Revisione: 4 שנים אחרי הרישום הראשון, ואז כל שנתיים.",
+    "rn_GR_tax": "Τέλη κυκλοφορίας (אגרת רכב): משולמת פעם בשנה ב-gov.gr (myCAR).",
+    "rn_GR_inspection": "ΚΤΕΟ: 4 שנים אחרי הרישום הראשון, ואז כל שנתיים.",
+    "rn_HR_tax": "Registracija: מתחדש כל שנה, יחד עם הבדיקה הטכנית.",
+    "rn_HR_inspection": "Tehnički pregled: בדרך כלל כל שנה, בתחנת בדיקת רכב (CVH).",
+    "rn_CY_tax": "אגרת רכב: מתחדשת כל שנה או כל 6 חודשים, אונליין מול Road Transport Department.",
+    "rn_CY_inspection": "MOT: 4 שנים אחרי הרישום הראשון, ואז כל שנתיים. רכבי השכרה עשויים להזדקק לבדיקה כל שנה.",
+    "rn_MT_tax": "Road licence: מתחדש כל שנה, אונליין מול Transport Malta.",
+    "rn_MT_inspection": "VRT: 4 שנים אחרי הרישום הראשון, ואז כל שנתיים.",
+    "rn_FR_inspection": "Contrôle technique: מכוניות 4 שנים אחרי הרישום הראשון, ואז כל שנתיים. אופנועים: אחרי 5 שנים, ואז כל 3.",
+    "rn_DE_tax": "Kfz-Steuer: נגבה פעם בשנה בהוראת קבע על ידי המכס (Zoll).",
+    "rn_DE_inspection": "HU (TÜV): מכוניות 3 שנים אחרי הרישום הראשון, ואז כל שנתיים. רכבי השכרה ללא נהג: כל 12 חודשים."
   },
   "customerPage": {
     "back": "לקוחות",
@@ -3395,7 +3446,11 @@
     "g_owesDetail": "לתשלום היום או קודם",
     "g_balance": "יתרה",
     "g_docsMissingList": "חסר: {list}",
-    "g_docsOf": "{count} מתוך 3"
+    "g_docsOf": "{count} מתוך 3",
+    "h_kmMi": "{km} מייל נסיעה",
+    "f_licenceCategories": "דרגות רישיון",
+    "f_dvlaCode": "קוד בדיקת DVLA",
+    "f_dvlaCodeHint": "הנהג מפיק אותו ב-gov.uk/view-driving-licence. הוא בתוקף 21 יום."
   },
   "vehicleForm": {
     "addTitle": "הוספת רכב",
@@ -3568,7 +3623,9 @@
     "qp_add": "הוספה",
     "backSetup": "הגדרה",
     "quickSubtitle": "רק הבסיס. צריך רק סוג, יצרן ודגם.",
-    "quickLater": "תאריכי טסט וביטוח, קילומטראז', הלוואות ועוד ניתן להוסיף בהמשך דרך ניהול הצי."
+    "quickLater": "תאריכי טסט וביטוח, קילומטראז', הלוואות ועוד ניתן להוסיף בהמשך דרך ניהול הצי.",
+    "valueSummaryMi": "קילומטראז' נוכחי, מחיר הקנייה, השווי",
+    "valueSummaryEditMi": "מחיר קנייה, שווי, קילומטראז' בקנייה"
   },
   "bookingEdit": {
     "booking": "הזמנה",
@@ -4335,7 +4392,48 @@
     "ag_lang_ms": "מלאית",
     "ag_lang_fil": "פיליפינית",
     "ag_lang_lo": "לאית",
-    "ag_lang_km": "חמרית"
+    "ag_lang_km": "חמרית",
+    "tp_kmMi": "מיילים מותרים בחודש",
+    "grp_region": "מדינה ויחידות",
+    "reg_title": "מדינה ויחידות",
+    "reg_body": "אזור הזמן, המטבע, יחידת המרחק והמס שלך. בחירת מדינה ממלאת את ההגדרות המקובלות.",
+    "reg_country": "מדינה",
+    "reg_zone": "אזור זמן",
+    "reg_currency": "מטבע",
+    "reg_distance": "מרחק",
+    "reg_distanceTip": "משמש לקריאות מד המרחק, טיפולים ומגבלות מרחק. שינוי לא ממיר קריאות שכבר נשמרו.",
+    "reg_km": "קילומטרים (ק\"מ)",
+    "reg_mi": "מיילים (mi)",
+    "vat_on": "רשום/ה למע\"מ או מס מכירה",
+    "vat_onTip": "הקבלות יציגו את מספר העוסק שלך ואת המע\"מ בכל סכום.",
+    "vat_number": "מספר עוסק או מספר מס",
+    "vat_rate": "שיעור מע\"מ (%)",
+    "vat_included": "המחירים שלי כוללים מע\"מ",
+    "vat_includedTip": "מופעל: המחירים שמזינים הם מה שהלקוח משלם, כולל מע\"מ. כבוי: RoveHQ מוסיפה מע\"מ למחירי הרכבים ולתוספות כשמתבצעת הזמנה.",
+    "vat_summary": "מע\"מ {rate}%",
+    "vat_note_ie": "השכרת רכב לפחות מ-5 שבועות בתוך 12 חודשים: 13.5%. השכרה ארוכה יותר: 23%.",
+    "vat_note_es": "האיים הקנריים: IGIC (7%) במקום IVA.",
+    "vat_note_pt": "מדיירה 22%, האיים האזוריים 16%.",
+    "vat_note_gr": "בחלק מהאיים השיעור נמוך יותר. כדאי לבדוק את שלך.",
+    "xp_ready": "מוכנים מראש:",
+    "xp_additional_driver": "נהג נוסף",
+    "xp_cross_border": "אישור לחציית גבול",
+    "xp_damage_waiver": "הפחתת השתתפות עצמית",
+    "xp_one_way": "דמי החזרה במקום אחר",
+    "xp_out_of_hours": "מסירה או איסוף מחוץ לשעות הפעילות",
+    "xp_young_driver": "תוספת נהג צעיר",
+    "xp_excess": "השתתפות עצמית עם ההפחתה ({symbol})",
+    "xp_excessTip": "הסכום המרבי שהשוכר משלם על נזק אם בחר בהפחתה. מופיע בהסכם במקום ההשתתפות העצמית הרגילה.",
+    "xp_minAge": "לנהגים מתחת לגיל",
+    "xp_countries": "מדינות מותרות",
+    "xp_countriesPh": "למשל צרפת, פורטוגל",
+    "ag_lang_el": "יוונית",
+    "ag_lang_es": "ספרדית",
+    "ag_lang_pt": "פורטוגזית",
+    "ag_lang_it": "איטלקית",
+    "ag_lang_hr": "קרואטית",
+    "ag_lang_fr": "צרפתית",
+    "ag_lang_de": "גרמנית"
   },
   "accountPage": {
     "roleOwner": "בעלים",
@@ -4539,7 +4637,8 @@
     "afterRefunds": "אחרי {amount} שהוחזרו",
     "refundsTitle": "הוחזר ללקוחות",
     "refundsHint": "החזרים יורדים מההכנסות. הם לא עלות שוטפת.",
-    "refundsHintExtras": "החזרים יורדים מההכנסות, כולל {amount} עבור תוספות. הם לא עלות שוטפת."
+    "refundsHintExtras": "החזרים יורדים מההכנסות, כולל {amount} עבור תוספות. הם לא עלות שוטפת.",
+    "vatInside": "כולל מע\"מ בסך {amount} ({rate}%)"
   },
   "auth": {
     "signInTitle": "התחברות",
@@ -4803,7 +4902,8 @@
     "checksLeft": "{count, plural, one {נשארה # בדיקת רכישה} other {נשארו # בדיקות רכישה}} בתקופת החיוב הזו",
     "checksUsedUp": "אין יותר בדיקות רכישה עד {date}. כלי רכב שנבדקו קודם עדיין זמינים.",
     "checksPaidOnly": "בדיקות רכישה חדשות זמינות בתוכניות בתשלום. כלי רכב שנבדקו קודם עדיין זמינים.",
-    "checksUpgrade": "שדרוג"
+    "checksUpgrade": "שדרוג",
+    "mileageMi": "מיילים עד כה"
   },
   "importer": {
     "dt_vehicles": "רכבים",
@@ -5046,7 +5146,9 @@
     "cnt_transactions": "{count, plural, one {רישום כספי אחד} other {# רישומים כספיים}}",
     "cnt_vehicles": "{count, plural, one {רכב אחד} other {# רכבים}}",
     "imported": "יובא",
-    "readNeeds": "בחרו קובץ, הוסיפו תמונות או הדביקו קישור קודם."
+    "readNeeds": "בחרו קובץ, הוסיפו תמונות או הדביקו קישור קודם.",
+    "f_current_mileageMi": "קילומטראז' נוכחי (מייל)",
+    "c_mileageMi": "קילומטראז' (מייל)"
   },
   "errorPages": {
     "notFoundTitle": "לא מצאנו את העמוד הזה",
@@ -5288,7 +5390,50 @@
     "liveBody": "שאלו כל דבר, שלחו קבצים או דברו עם נציג מצוות RoveHQ.",
     "liveButton": "פתיחת צ'אט חי",
     "fromAssistant": "העוזר של RoveHQ",
-    "contentSubtitle": "מאמרים, שאלות נפוצות, סרטונים ומשאבים שאנשים ביקשו מהעוזר, או שהוא לא ידע לענות עליהם. שום דבר לא מתפרסם עד שתאשרו."
+    "contentSubtitle": "מאמרים, שאלות נפוצות, סרטונים ומשאבים שאנשים ביקשו מהעוזר, או שהוא לא ידע לענות עליהם. שום דבר לא מתפרסם עד שתאשרו.",
+    "contentTitle": "בקשות לתוכן עזרה",
+    "contentCollate": "איסוף שאלות חדשות",
+    "contentCollating": "אוסף…",
+    "contentCollated": "{questions} שאלות חדשות: {created} בקשות חדשות, {merged} נוספו לבקשות קיימות.",
+    "contentNothingNew": "אין שאלות חדשות לאיסוף.",
+    "contentSection_suggested": "הצעות",
+    "contentSection_drafted": "טיוטות — ממתינות לאישור",
+    "contentSection_approved": "אושרו להכנה (סרטונים ומשאבים)",
+    "contentSection_closed": "פורסמו ונדחו",
+    "contentEmpty_suggested": "אין הצעות. אפשר לאסוף שאלות חדשות כדי לבדוק אם יש עוד.",
+    "contentEmpty_drafted": "אין טיוטות ממתינות.",
+    "contentEmpty_approved": "אין סרטונים או משאבים להכנה.",
+    "contentEmpty_closed": "עדיין אין כלום.",
+    "contentKind_article": "מאמר",
+    "contentKind_faq": "שאלה נפוצה",
+    "contentKind_video": "סרטון",
+    "contentKind_resource": "משאב",
+    "contentStatus_published": "פורסם",
+    "contentStatus_rejected": "נדחה",
+    "contentAsked": "נשאל {count, plural, one {פעם אחת} two {פעמיים} other {# פעמים}}",
+    "contentFor": "עבור",
+    "contentQuestions": "השאלות ({count})",
+    "contentAskedOn": "נשאל בדף {page}",
+    "contentDraft": "כתיבת טיוטה",
+    "contentRedraft": "כתיבה מחדש",
+    "contentDrafting": "כותב…",
+    "contentApprove": "אישור ופרסום",
+    "contentApproveConfirm": "לפרסם את זה במרכז העזרה עכשיו?",
+    "contentApproveMake": "אישור להכנה",
+    "contentMarkMade": "סימון כמוכן",
+    "contentEdit": "עריכת טיוטה",
+    "contentSave": "שמירת טיוטה",
+    "contentCancel": "ביטול",
+    "contentReject": "דחייה",
+    "contentRejectConfirm": "לדחות את הבקשה הזו?",
+    "contentDraftTitle": "כותרת",
+    "contentDraftBody": "מאמר (Markdown)",
+    "contentFaqQ": "שאלה",
+    "contentFaqA": "תשובה",
+    "contentPreview": "תצוגה מקדימה",
+    "contentCheckNote": "כל מה שמסומן [check] צריך אישור (והסרת הסימון) לפני הפרסום.",
+    "contentNoDraftNeeded": "סרטונים ומשאבים מכין הצוות: יש לאשר כדי להוסיף לרשימת ההכנה.",
+    "contentView": "הצגה במרכז העזרה"
   },
   "inspectStart": {
     "titleOut": "מסירת רכב",
@@ -5418,7 +5563,10 @@
     "yes": "כן",
     "no": "לא",
     "agreed": "אישר ב‑{date}",
-    "empty": "עדיין אין שוכרים. הם יופיעו כאן כשמישהו יסמן \"שיתוף המידע שלי עם RoveHQ\" בהזמנה שלו."
+    "empty": "עדיין אין שוכרים. הם יופיעו כאן כשמישהו יסמן \"שיתוף המידע שלי עם RoveHQ\" בהזמנה שלו.",
+    "remove": "הסרה מהרשימה",
+    "removeConfirm": "מוחק את השוכר הזה ואת היסטוריית ההשכרות שלו מהרשימה של RoveHQ. אי אפשר לבטל.",
+    "removeButton": "הסרה"
   },
   "site": {
     "skipToContent": "דילוג לתוכן",
@@ -5641,7 +5789,19 @@
     "mockAvailable": "זמין",
     "mockPerDay": "{amount} ליום",
     "mockQrPay": "תשלום QR",
-    "inclImport": "ייבוא חינם של הרשומות הקיימות שלכם"
+    "inclImport": "ייבוא חינם של הרשומות הקיימות שלכם",
+    "cookieBody": "אנחנו משתמשים בעוגיות הכרחיות כדי להפעיל את האתר. באישורך, נשתמש גם בעוגיות ניתוח כדי לראות אילו דפים עוזרים.",
+    "cookieAccept": "אישור",
+    "cookieReject": "דחייה",
+    "cookieChoices": "בחירות",
+    "cookieChoicesTitle": "בחירת עוגיות",
+    "cookieNecessary": "הכרחיות בהחלט",
+    "cookieNecessaryBody": "שפה, ערכת נושא והתחברות.",
+    "cookieAlwaysOn": "פעילות תמיד",
+    "cookieAnalytics": "ניתוח נתונים",
+    "cookieAnalyticsBody": "Google Analytics, לספירת ביקורים.",
+    "cookieSave": "שמירת הבחירות",
+    "cookiePolicy": "מדיניות עוגיות"
   },
   "businessClosed": {
     "title": "העסק הזה נסגר",
@@ -6072,7 +6232,21 @@
     "docsRelated": "מאמרים קשורים",
     "docsAll": "כל המאמרים",
     "metaDocsTitle": "מרכז העזרה: איך משתמשים ב-RoveHQ",
-    "metaDocsDescription": "מדריכים וסרטונים ל-RoveHQ: רכבים, הזמנות, הסכמים, מסירות, תשלומים, הוצאות, דוחות ומסמכים."
+    "metaDocsDescription": "מדריכים וסרטונים ל-RoveHQ: רכבים, הזמנות, הסכמים, מסירות, תשלומים, הוצאות, דוחות ומסמכים.",
+    "footerLegal": "משפטי",
+    "legalPrivacy": "פרטיות",
+    "legalTerms": "תנאים",
+    "legalDpa": "עיבוד נתונים",
+    "legalSubprocessors": "מעבדי משנה",
+    "legalCookies": "עוגיות",
+    "legalCookieChoices": "בחירת עוגיות",
+    "legalIndexTitle": "מידע משפטי ופרטיות",
+    "legalIndexBody": "איך RoveHQ מטפלת במידע, התנאים לעסקי השכרה והפרטים לתיעוד שלך.",
+    "legalNotReviewed": "נכתב על ידי RoveHQ על סמך הנחיות ציבוריות (ICO, EDPB, הנציבות האירופית, PDPC בתאילנד). לא נבדק על ידי עורך דין.",
+    "legalEnglishOnly": "בינתיים הדף הזה זמין באנגלית.",
+    "legalUpdated": "עודכן לאחרונה {date}",
+    "cb_mileage_limit_mi": "מגבלת מיילים (ריק = ללא הגבלה)",
+    "cb_excess_km_fee_mi": "חיוב לכל מייל נוסף"
   },
   "gallery": {
     "open": "פתיחת תמונה",
@@ -6387,5 +6561,36 @@
     "sRecordCost": "רישום הוצאה",
     "choose": "בחירה",
     "save": "שמירה"
+  },
+  "privacy": {
+    "title": "הנתונים והפרטיות שלך",
+    "body": "איך RoveHQ מטפלת במידע, ומה הזכויות שלך.",
+    "linkPrivacy": "מדיניות פרטיות",
+    "linkTerms": "תנאי שימוש",
+    "linkDpa": "הסכם עיבוד נתונים",
+    "linkSubprocessors": "מעבדי משנה",
+    "linkCookies": "מדיניות עוגיות",
+    "exportTitle": "הורדת כל הנתונים שלך",
+    "exportBody": "רכבים, לקוחות, הזמנות, תשלומים, הכנסות והוצאות, והמסמכים שלך עם קישורי הורדה (בתוקף 7 ימים).",
+    "exportButton": "הורדה (JSON)",
+    "retentionTitle": "תמונות מזהות של שוכרים",
+    "retentionBody": "מחיקה אוטומטית של תמונות דרכון, רישיון וסלפי אחרי ההשכרה האחרונה של השוכר. הסכמים חתומים נשמרים.",
+    "retentionOn": "מחיקה אוטומטית של תמונות מזהות",
+    "retentionMonths": "חודשים אחרי ההשכרה האחרונה",
+    "retentionSave": "שמירה",
+    "retentionSaved": "נשמר",
+    "deleteTitle": "מחיקת העסק",
+    "deleteBody": "מוחק הכול לצמיתות: רכבים, לקוחות, הזמנות, תשלומים, מסמכים והסכמים חתומים.",
+    "deleteHint": "אי אפשר לבטל את הפעולה. אם צריך את הנתונים, כדאי להוריד אותם קודם. תוכנית בתשלום מסתיימת ללא החזר.",
+    "deleteType": "יש להקליד {name} לאישור",
+    "deleteButton": "מחיקת העסק",
+    "deleteConfirm": "מחיקת הכול",
+    "deleteCancel": "ביטול",
+    "customerTitle": "בקשות פרטיות",
+    "customerBody": "כשהשוכר מבקש עותק של הנתונים שלו, או שימחקו אותם.",
+    "customerExport": "ייצוא הנתונים של הלקוח",
+    "customerDelete": "מחיקת הלקוח",
+    "customerDeleteBody": "מוחק את הפרטים, התמונות המזהות וההודעות שלו. הזמנות, תשלומים והסכמים חתומים נשארים בתור \"לקוח שנמחק\" לצורכי הנהלת החשבונות שלך.",
+    "customerDeleteConfirm": "מחיקת הנתונים שלו"
   }
 }

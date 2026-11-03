@@ -125,7 +125,9 @@
     "bkTitle": "Réservations",
     "bkAll": "Toutes les réservations",
     "emailVerified": "E-mail vérifié. Merci !",
-    "emailLinkOld": "Ce lien a expiré. Appuyez sur « Vérifiez votre e-mail » pour en recevoir un nouveau."
+    "emailLinkOld": "Ce lien a expiré. Appuyez sur « Vérifiez votre e-mail » pour en recevoir un nouveau.",
+    "kmToGoMi": "Encore {km} miles",
+    "kmOverMi": "{km} miles de dépassement"
   },
   "settings": {
     "contractsBranding": {
@@ -383,7 +385,16 @@
     "lateOptTodayDetailMoves": "Chaque date de paiement est décalée de {days, plural, one {# jour} many {# jours} other {# jours}}",
     "lateOptTodayDetailPlain": "Retour le {date} comme prévu",
     "lateOptTodayTitle": "Démarrer la location aujourd'hui",
-    "outAtKm": "Sortie à {km} km"
+    "outAtKm": "Sortie à {km} km",
+    "confirmOdometerMi": "Relevé du compteur (miles)",
+    "ocrSuggestedMi": "Suggéré d'après la photo : {km} miles.",
+    "ocrPossibleMi": "Relevé possible : {km} miles. Vérifiez-le sur le compteur.",
+    "odometerBelowLastMi": "Inférieur au dernier relevé ({km} miles). Veuillez le vérifier.",
+    "drivenDuringRentalMi": "Parcouru depuis la remise : {km} miles",
+    "odometerAtDeliveryMi": "À la remise : {km} miles",
+    "kmValueMi": "{km} miles",
+    "odometerHugeMi": "{km} miles de plus que le dernier relevé. Veuillez le vérifier.",
+    "outAtKmMi": "Sorti à {km} miles"
   },
   "vehicles": {
     "addVehicle": "Ajouter un véhicule"
@@ -890,7 +901,9 @@
     "offersDetails": "Mon nom, mes coordonnées, ma nationalité, ma langue et mon historique de location : où et quand je loue, le véhicule, ce que je paye, les options, le kilométrage, la caution et la franchise. RoveHQ peut m'envoyer des messages ou des e-mails avec des offres telles que des transferts aéroport, des excursions et des cartes SIM. Désactiver cette option supprime la copie de RoveHQ.",
     "bookedUntil": "Réservé jusqu'au {date}",
     "noneFree": "Rien n'est disponible à partir du {start}.",
-    "noneFreeEarliest": "Rien n'est disponible à partir du {start}. Le plus tôt est le {date} ({vehicle})."
+    "noneFreeEarliest": "Rien n'est disponible à partir du {start}. Le plus tôt est le {date} ({vehicle}).",
+    "privacyLink": "Comment {business} et RoveHQ utilisent vos informations",
+    "vatIncluded": "Prix incluant {name} à {rate} %"
   },
   "customerMessages": {
     "hi": "Bonjour {name},",
@@ -1595,7 +1608,9 @@
     "coverFrom": "Couvre du",
     "coverTo": "Couvre jusqu'au",
     "coverHint": "Payé pour un an ou plus ? Ajoutez les dates et une part sera comptée chaque mois.",
-    "coverUpdateCar": "Mettre aussi {name} du véhicule à échéance le {date}"
+    "coverUpdateCar": "Mettre aussi {name} du véhicule à échéance le {date}",
+    "sv_nextKmMi": "Prochain entretien (miles)",
+    "sv_hintMi": "Indiquez une date, un nombre de miles ou les deux. Le premier atteint détermine l'échéance."
   },
   "booking": {
     "open": "Ouvert",
@@ -2482,7 +2497,10 @@
     "remind_openingWhatsApp": "Ouverture de WhatsApp avec le rappel",
     "remind_nothingOwed": "Rien n’est dû sur cette réservation",
     "remind_notFound": "Réservation introuvable",
-    "remind_signedOut": "Veuillez vous reconnecter"
+    "remind_signedOut": "Veuillez vous reconnecter",
+    "kmAtReturnMi": "{km} miles au retour",
+    "kmAtHandoverMi": "{km} miles à la remise",
+    "kmDrivenMi": "{km} miles parcourus"
   },
   "newBooking": {
     "docsSelfie": "Photo du client",
@@ -3250,7 +3268,40 @@
     "f_monthlyHint": "{amount} ajoutés à vos dépenses chaque mois jusqu'au {date}.",
     "cs_monthly": "{amount} par mois",
     "f_inspectionCost": "Coût du contrôle ({name})",
-    "f_inspectionHint": "Les véhicules plus anciens sont contrôlés au renouvellement de la taxe (voitures de plus de 7 ans, motos de plus de 5). Laissez vide si inutile."
+    "f_inspectionHint": "Les véhicules plus anciens sont contrôlés au renouvellement de la taxe (voitures de plus de 7 ans, motos de plus de 5). Laissez vide si inutile.",
+    "m_hintBothMi": "Indiquez une date, un nombre de miles ou les deux. Le premier atteint détermine l'échéance.",
+    "sv_nextBothMi": "{date} ou {km} miles, selon ce qui arrive en premier",
+    "sv_kmOnlyMi": "à {km} miles",
+    "sv_kmLeftMi": "Encore {km} miles",
+    "sv_kmOverMi": "{km} miles de dépassement",
+    "kmMi": "{km} miles",
+    "m_atKmMi": "À {km} miles",
+    "m_nextKmMi": "Prochaine échéance à (miles)",
+    "x_mileageMi": "Compteur {km} miles",
+    "h_kmMi": "{km} miles parcourus",
+    "rn_official": "Page officielle",
+    "rn_EU_insurance": "L'assurance responsabilité civile est obligatoire. Un véhicule de location doit avoir une police couvrant la location sans chauffeur.",
+    "rn_GB_tax": "Payez en ligne pour 12 ou 6 mois, ou chaque mois par prélèvement (Direct Debit). Il vous faut le certificat V5C ou une lettre de rappel.",
+    "rn_GB_inspection": "MOT : la première à 3 ans, puis chaque année. Vous pouvez la faire jusqu'à un mois en avance en gardant la même date.",
+    "rn_IE_tax": "Motor tax : payez en ligne pour 3, 6 ou 12 mois. Il vous faut les informations d'assurance.",
+    "rn_IE_inspection": "NCT : à partir de 4 ans tous les 2 ans, puis chaque année à partir de 10 ans.",
+    "rn_ES_tax": "IVTM (impuesto de circulación) : payé une fois par an à la mairie où le véhicule est immatriculé.",
+    "rn_ES_inspection": "ITV : voitures particulières à partir de 4 ans tous les 2 ans, chaque année à partir de 10 ans. Les voitures de location peuvent en avoir besoin plus souvent : renseignez-vous auprès de votre centre ITV.",
+    "rn_PT_tax": "IUC : payé une fois par an, le mois de la première immatriculation, sur le Portal das Finanças.",
+    "rn_PT_inspection": "IPO : à partir de 4 ans tous les 2 ans, chaque année à partir de 8 ans. Les voitures de location peuvent différer : vérifiez auprès de l'IMT.",
+    "rn_IT_tax": "Bollo auto : payé une fois par an à votre région, en ligne via pagoPA.",
+    "rn_IT_inspection": "Revisione : 4 ans après la première immatriculation, puis tous les 2 ans.",
+    "rn_GR_tax": "Τέλη κυκλοφορίας (taxe de circulation) : payée une fois par an sur gov.gr (myCAR).",
+    "rn_GR_inspection": "ΚΤΕΟ : 4 ans après la première immatriculation, puis tous les 2 ans.",
+    "rn_HR_tax": "Registracija : renouvelée chaque année, avec le contrôle technique.",
+    "rn_HR_inspection": "Tehnički pregled : en général chaque année, dans un centre de contrôle (CVH).",
+    "rn_CY_tax": "Taxe de circulation : renouvelée chaque année ou tous les 6 mois, en ligne auprès du Road Transport Department.",
+    "rn_CY_inspection": "MOT : 4 ans après la première immatriculation, puis tous les 2 ans. Les voitures de location peuvent en avoir besoin chaque année.",
+    "rn_MT_tax": "Road licence : renouvelée chaque année, en ligne auprès de Transport Malta.",
+    "rn_MT_inspection": "VRT : 4 ans après la première immatriculation, puis tous les 2 ans.",
+    "rn_FR_inspection": "Contrôle technique : voitures 4 ans après la première immatriculation, puis tous les 2 ans. Motos : à 5 ans, puis tous les 3 ans.",
+    "rn_DE_tax": "Kfz-Steuer : prélevée une fois par an par les douanes (Zoll).",
+    "rn_DE_inspection": "HU (TÜV) : voitures 3 ans après la première immatriculation, puis tous les 2 ans. Voitures de location sans chauffeur : tous les 12 mois."
   },
   "customerPage": {
     "back": "Clients",
@@ -3395,7 +3446,11 @@
     "g_owesDetail": "dû aujourd’hui ou avant",
     "g_balance": "Solde",
     "g_docsMissingList": "Manquant : {list}",
-    "g_docsOf": "{count} sur 3"
+    "g_docsOf": "{count} sur 3",
+    "h_kmMi": "{km} miles parcourus",
+    "f_licenceCategories": "Catégories du permis",
+    "f_dvlaCode": "Code de vérification DVLA",
+    "f_dvlaCodeHint": "Le conducteur le crée sur gov.uk/view-driving-licence. Il est valable 21 jours."
   },
   "vehicleForm": {
     "addTitle": "Ajouter un véhicule",
@@ -3568,7 +3623,9 @@
     "qp_add": "Ajouter",
     "backSetup": "Configuration",
     "quickSubtitle": "Juste l'essentiel. Seuls le type, la marque et le modèle sont requis.",
-    "quickLater": "Les dates de contrôle technique et d'assurance, le kilométrage, le prêt et plus encore pourront être ajoutés plus tard dans Flotte."
+    "quickLater": "Les dates de contrôle technique et d'assurance, le kilométrage, le prêt et plus encore pourront être ajoutés plus tard dans Flotte.",
+    "valueSummaryMi": "Compteur actuel, prix payé, valeur actuelle",
+    "valueSummaryEditMi": "Prix d'achat, valeur, compteur à l'achat"
   },
   "bookingEdit": {
     "booking": "Réservation",
@@ -4335,7 +4392,48 @@
     "ag_lang_ms": "Malais",
     "ag_lang_fil": "Filipino",
     "ag_lang_lo": "Lao",
-    "ag_lang_km": "Khmer"
+    "ag_lang_km": "Khmer",
+    "tp_kmMi": "Miles autorisés par mois",
+    "grp_region": "Pays et unités",
+    "reg_title": "Pays et unités",
+    "reg_body": "Votre fuseau horaire, devise, unité de distance et taxes. Choisir un pays remplit les réglages habituels.",
+    "reg_country": "Pays",
+    "reg_zone": "Fuseau horaire",
+    "reg_currency": "Devise",
+    "reg_distance": "Distance",
+    "reg_distanceTip": "Utilisée pour les relevés du compteur, les entretiens et les limites de distance. La modifier ne convertit pas les relevés déjà enregistrés.",
+    "reg_km": "Kilomètres (km)",
+    "reg_mi": "Miles (mi)",
+    "vat_on": "Assujetti à la TVA ou à une taxe sur les ventes",
+    "vat_onTip": "Les reçus affichent alors votre numéro de TVA et la TVA de chaque montant.",
+    "vat_number": "Numéro de TVA ou fiscal",
+    "vat_rate": "Taux de TVA (%)",
+    "vat_included": "Mes prix incluent la TVA",
+    "vat_includedTip": "Activé : les prix saisis sont ceux que paie le client, TVA comprise. Désactivé : RoveHQ ajoute la TVA aux prix des véhicules et aux options lors d'une réservation.",
+    "vat_summary": "TVA {rate} %",
+    "vat_note_ie": "Location de voiture de moins de 5 semaines sur 12 mois : 13,5 %. Location plus longue : 23 %.",
+    "vat_note_es": "Îles Canaries : IGIC (7 %) au lieu de l'IVA.",
+    "vat_note_pt": "Madère 22 %, Açores 16 %.",
+    "vat_note_gr": "Certaines îles ont un taux réduit. Vérifiez le vôtre.",
+    "xp_ready": "Prêts à l'emploi :",
+    "xp_additional_driver": "Conducteur supplémentaire",
+    "xp_cross_border": "Autorisation de sortie du territoire",
+    "xp_damage_waiver": "Rachat de franchise",
+    "xp_one_way": "Frais d'aller simple",
+    "xp_out_of_hours": "Livraison ou récupération hors horaires",
+    "xp_young_driver": "Frais jeune conducteur",
+    "xp_excess": "Franchise avec le rachat ({symbol})",
+    "xp_excessTip": "Le montant maximum que le locataire paie en cas de dommages s'il prend le rachat de franchise. Il figure au contrat à la place de la franchise habituelle.",
+    "xp_minAge": "Pour les conducteurs de moins de (âge)",
+    "xp_countries": "Pays autorisés",
+    "xp_countriesPh": "ex. France, Portugal",
+    "ag_lang_el": "Grec",
+    "ag_lang_es": "Espagnol",
+    "ag_lang_pt": "Portugais",
+    "ag_lang_it": "Italien",
+    "ag_lang_hr": "Croate",
+    "ag_lang_fr": "Français",
+    "ag_lang_de": "Allemand"
   },
   "accountPage": {
     "roleOwner": "Propriétaire",
@@ -4539,7 +4637,8 @@
     "afterRefunds": "après {amount} restitués",
     "refundsTitle": "Restitué aux clients",
     "refundsHint": "Les remboursements se déduisent des entrées. Ce ne sont pas des frais de fonctionnement.",
-    "refundsHintExtras": "Les remboursements se déduisent des entrées, dont {amount} pour les options. Ce ne sont pas des frais de fonctionnement."
+    "refundsHintExtras": "Les remboursements se déduisent des entrées, dont {amount} pour les options. Ce ne sont pas des frais de fonctionnement.",
+    "vatInside": "Dont TVA de {amount} ({rate} %)"
   },
   "auth": {
     "signInTitle": "Connexion",
@@ -4803,7 +4902,8 @@
     "checksLeft": "Il vous reste {count, plural, one {# vérification d'achat} other {# vérifications d'achat}} pour cette période de facturation",
     "checksUsedUp": "Plus de vérifications d'achat jusqu'au {date}. Les véhicules déjà vérifiés restent accessibles.",
     "checksPaidOnly": "Les nouvelles vérifications d'achat sont réservées aux offres payantes. Les véhicules déjà vérifiés restent accessibles.",
-    "checksUpgrade": "Mettre à niveau"
+    "checksUpgrade": "Mettre à niveau",
+    "mileageMi": "Miles parcourus"
   },
   "importer": {
     "dt_vehicles": "Véhicules",
@@ -5046,7 +5146,9 @@
     "cnt_transactions": "{count, plural, one {# écriture financière} many {# écritures financières} other {# écritures financières}}",
     "cnt_vehicles": "{count, plural, one {# véhicule} many {# véhicules} other {# véhicules}}",
     "imported": "Importé",
-    "readNeeds": "Choisissez d'abord un fichier, ajoutez des photos ou collez un lien."
+    "readNeeds": "Choisissez d'abord un fichier, ajoutez des photos ou collez un lien.",
+    "f_current_mileageMi": "Compteur actuel (miles)",
+    "c_mileageMi": "Compteur (miles)"
   },
   "errorPages": {
     "notFoundTitle": "Page introuvable",
@@ -5288,7 +5390,50 @@
     "liveBody": "Posez vos questions, envoyez des fichiers ou parlez à une personne de l'équipe RoveHQ.",
     "liveButton": "Ouvrir le chat en direct",
     "fromAssistant": "Assistant RoveHQ",
-    "contentSubtitle": "Articles, FAQ, vidéos et ressources demandés à l'assistant, ou auxquels il n'a pas su répondre. Rien n'est publié sans votre approbation."
+    "contentSubtitle": "Articles, FAQ, vidéos et ressources demandés à l'assistant, ou auxquels il n'a pas su répondre. Rien n'est publié sans votre approbation.",
+    "contentTitle": "Demandes de contenu d'aide",
+    "contentCollate": "Regrouper les nouvelles questions",
+    "contentCollating": "Regroupement…",
+    "contentCollated": "{questions} nouvelles questions : {created} nouvelles demandes, {merged} ajoutées à des demandes existantes.",
+    "contentNothingNew": "Aucune nouvelle question à regrouper.",
+    "contentSection_suggested": "Suggérées",
+    "contentSection_drafted": "Brouillons — en attente de validation",
+    "contentSection_approved": "Validées à réaliser (vidéos et ressources)",
+    "contentSection_closed": "Publiées et refusées",
+    "contentEmpty_suggested": "Aucune suggestion. Regroupez les nouvelles questions pour en chercher d'autres.",
+    "contentEmpty_drafted": "Aucun brouillon en attente.",
+    "contentEmpty_approved": "Aucune vidéo ni ressource à réaliser.",
+    "contentEmpty_closed": "Rien pour l'instant.",
+    "contentKind_article": "Article",
+    "contentKind_faq": "FAQ",
+    "contentKind_video": "Vidéo",
+    "contentKind_resource": "Ressource",
+    "contentStatus_published": "Publié",
+    "contentStatus_rejected": "Refusé",
+    "contentAsked": "Posée {count, plural, one {# fois} other {# fois}}",
+    "contentFor": "Pour",
+    "contentQuestions": "Les questions ({count})",
+    "contentAskedOn": "posée sur {page}",
+    "contentDraft": "Rédiger",
+    "contentRedraft": "Rédiger à nouveau",
+    "contentDrafting": "Rédaction…",
+    "contentApprove": "Valider et publier",
+    "contentApproveConfirm": "Publier dans le centre d'aide maintenant ?",
+    "contentApproveMake": "Valider pour réalisation",
+    "contentMarkMade": "Marquer comme réalisé",
+    "contentEdit": "Modifier le brouillon",
+    "contentSave": "Enregistrer le brouillon",
+    "contentCancel": "Annuler",
+    "contentReject": "Refuser",
+    "contentRejectConfirm": "Refuser cette demande ?",
+    "contentDraftTitle": "Titre",
+    "contentDraftBody": "Article (Markdown)",
+    "contentFaqQ": "Question",
+    "contentFaqA": "Réponse",
+    "contentPreview": "Aperçu",
+    "contentCheckNote": "Tout ce qui est marqué [check] doit être confirmé (et la marque retirée) avant publication.",
+    "contentNoDraftNeeded": "Les vidéos et ressources sont réalisées par l'équipe : validez pour l'ajouter à la liste à réaliser.",
+    "contentView": "Voir dans le centre d'aide"
   },
   "inspectStart": {
     "titleOut": "Remettre un véhicule",
@@ -5418,7 +5563,10 @@
     "yes": "Oui",
     "no": "Non",
     "agreed": "Accepté le {date}",
-    "empty": "Aucun locataire pour l'instant. Ils apparaissent ici lorsque quelqu'un coche « Partager mes informations avec RoveHQ » lors de sa réservation."
+    "empty": "Aucun locataire pour l'instant. Ils apparaissent ici lorsque quelqu'un coche « Partager mes informations avec RoveHQ » lors de sa réservation.",
+    "remove": "Retirer de la liste",
+    "removeConfirm": "Supprime ce locataire et son historique de location de la liste de RoveHQ. Action irréversible.",
+    "removeButton": "Retirer"
   },
   "site": {
     "skipToContent": "Aller au contenu",
@@ -5641,7 +5789,19 @@
     "mockAvailable": "Disponible",
     "mockPerDay": "{amount} par jour",
     "mockQrPay": "Paiement QR",
-    "inclImport": "Import gratuit de vos données existantes"
+    "inclImport": "Import gratuit de vos données existantes",
+    "cookieBody": "Nous utilisons des cookies nécessaires au fonctionnement de ce site. Avec votre accord, nous utiliserions aussi des cookies d'analyse pour voir quelles pages sont utiles.",
+    "cookieAccept": "Accepter",
+    "cookieReject": "Refuser",
+    "cookieChoices": "Paramétrer",
+    "cookieChoicesTitle": "Choix des cookies",
+    "cookieNecessary": "Strictement nécessaires",
+    "cookieNecessaryBody": "Langue, thème et connexion.",
+    "cookieAlwaysOn": "Toujours actifs",
+    "cookieAnalytics": "Analyse",
+    "cookieAnalyticsBody": "Google Analytics, pour compter les visites.",
+    "cookieSave": "Enregistrer mes choix",
+    "cookiePolicy": "Politique relative aux cookies"
   },
   "businessClosed": {
     "title": "Cette entreprise a été fermée",
@@ -6072,7 +6232,21 @@
     "docsRelated": "Articles liés",
     "docsAll": "Tous les articles",
     "metaDocsTitle": "Centre d'aide : comment utiliser RoveHQ",
-    "metaDocsDescription": "Guides et vidéos pour RoveHQ : véhicules, réservations, contrats, remises de véhicule, paiements, dépenses, rapports et papiers."
+    "metaDocsDescription": "Guides et vidéos pour RoveHQ : véhicules, réservations, contrats, remises de véhicule, paiements, dépenses, rapports et papiers.",
+    "footerLegal": "Mentions légales",
+    "legalPrivacy": "Confidentialité",
+    "legalTerms": "Conditions",
+    "legalDpa": "Traitement des données",
+    "legalSubprocessors": "Sous-traitants",
+    "legalCookies": "Cookies",
+    "legalCookieChoices": "Choix des cookies",
+    "legalIndexTitle": "Mentions légales et confidentialité",
+    "legalIndexBody": "Comment RoveHQ traite les informations, les conditions pour les loueurs et les informations à conserver.",
+    "legalNotReviewed": "Rédigé par RoveHQ à partir de recommandations publiques (ICO, CEPD, Commission européenne, PDPC thaïlandaise). Non relu par un avocat.",
+    "legalEnglishOnly": "Cette page est en anglais pour le moment.",
+    "legalUpdated": "Dernière mise à jour : {date}",
+    "cb_mileage_limit_mi": "Limite en miles (vide = illimité)",
+    "cb_excess_km_fee_mi": "Frais par mile supplémentaire"
   },
   "gallery": {
     "open": "Ouvrir la photo",
@@ -6387,5 +6561,36 @@
     "sRecordCost": "Enregistrer une dépense",
     "choose": "Choisir",
     "save": "Enregistrer"
+  },
+  "privacy": {
+    "title": "Vos données et votre vie privée",
+    "body": "Comment RoveHQ traite les informations, et vos droits.",
+    "linkPrivacy": "Politique de confidentialité",
+    "linkTerms": "Conditions d'utilisation",
+    "linkDpa": "Accord de traitement des données",
+    "linkSubprocessors": "Sous-traitants",
+    "linkCookies": "Politique relative aux cookies",
+    "exportTitle": "Télécharger toutes vos données",
+    "exportBody": "Véhicules, clients, réservations, paiements, recettes et dépenses, et vos documents avec liens de téléchargement (valables 7 jours).",
+    "exportButton": "Télécharger (JSON)",
+    "retentionTitle": "Photos d'identité des locataires",
+    "retentionBody": "Supprimer automatiquement les photos de passeport, de permis et les selfies après la dernière location d'un locataire. Les contrats signés sont conservés.",
+    "retentionOn": "Supprimer automatiquement les photos d'identité",
+    "retentionMonths": "Mois après la dernière location",
+    "retentionSave": "Enregistrer",
+    "retentionSaved": "Enregistré",
+    "deleteTitle": "Supprimer cette entreprise",
+    "deleteBody": "Supprime tout définitivement : véhicules, clients, réservations, paiements, documents et contrats signés.",
+    "deleteHint": "Action irréversible. Téléchargez vos données avant si vous en avez besoin. Un abonnement payant prend fin sans remboursement.",
+    "deleteType": "Saisissez {name} pour confirmer",
+    "deleteButton": "Supprimer cette entreprise",
+    "deleteConfirm": "Tout supprimer",
+    "deleteCancel": "Annuler",
+    "customerTitle": "Demandes liées à la vie privée",
+    "customerBody": "Quand ce locataire demande une copie de ses données ou leur suppression.",
+    "customerExport": "Exporter les données de ce client",
+    "customerDelete": "Supprimer ce client",
+    "customerDeleteBody": "Supprime ses coordonnées, photos d'identité et messages. Les réservations, paiements et contrats signés restent sous « Client supprimé » pour votre comptabilité.",
+    "customerDeleteConfirm": "Supprimer ses données"
   }
 }

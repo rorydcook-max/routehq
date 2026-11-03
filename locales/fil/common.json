@@ -125,7 +125,9 @@
     "bkTitle": "Mga booking",
     "bkAll": "Lahat ng booking",
     "emailVerified": "Na-verify na ang email. Salamat!",
-    "emailLinkOld": "Nag-expire na ang link na iyon. I-tap ang \"I-verify ang iyong email\" para kumuha ng bago."
+    "emailLinkOld": "Nag-expire na ang link na iyon. I-tap ang \"I-verify ang iyong email\" para kumuha ng bago.",
+    "kmToGoMi": "{km} mi pa",
+    "kmOverMi": "Sobra ng {km} mi"
   },
   "vehicles": {
     "addVehicle": "Magdagdag ng sasakyan"
@@ -389,7 +391,16 @@
     "lateOptTodayDetailMoves": "Uusog nang {days, plural, one {# araw} other {# araw}} ang bawat petsa ng bayad",
     "lateOptTodayDetailPlain": "Babalik {date} gaya ng naka-book",
     "lateOptTodayTitle": "Simulan ang upa ngayon",
-    "outAtKm": "Lumabas sa {km} km"
+    "outAtKm": "Lumabas sa {km} km",
+    "confirmOdometerMi": "Reading ng odometer (milya)",
+    "ocrSuggestedMi": "Mungkahi mula sa litrato: {km} mi.",
+    "ocrPossibleMi": "Posibleng reading: {km} mi. Ikumpara ito sa odometer.",
+    "odometerBelowLastMi": "Mas mababa sa huling reading ({km} mi). Pakisuri.",
+    "drivenDuringRentalMi": "Naibiyahe mula sa handover: {km} mi",
+    "odometerAtDeliveryMi": "Sa handover: {km} mi",
+    "kmValueMi": "{km} mi",
+    "odometerHugeMi": "{km} mi na mas mataas sa huling reading. Pakisuri.",
+    "outAtKmMi": "Inilabas sa {km} mi"
   },
   "translation": {
     "translatedFrom": "Isinalin mula sa {language}",
@@ -890,7 +901,9 @@
     "offersDetails": "Ang aking pangalan, mga detalye sa pakikipag-ugnayan, nasyonalidad at wika, at ang aking kasaysayan ng pag-upa: saan at kailan ako umuupa, ang sasakyan, ang binabayaran ko, mga extra, mileage, deposit at pinsala. Maaaring magmensahe o mag-email sa akin ang RoveHQ ng mga alok tulad ng mga pagsundo sa paliparan, mga paglilibot at mga SIM card. Ang pag-off nito ay magtatanggal sa kopya ng RoveHQ.",
     "bookedUntil": "Naka-book hanggang {date}",
     "noneFree": "Walang available mula {start}.",
-    "noneFreeEarliest": "Walang available mula {start}. Ang pinakamaaga ay {date} ({vehicle})."
+    "noneFreeEarliest": "Walang available mula {start}. Ang pinakamaaga ay {date} ({vehicle}).",
+    "privacyLink": "Paano ginagamit ng {business} at RoveHQ ang iyong impormasyon",
+    "vatIncluded": "Kasama na sa presyo ang {name} na {rate}%"
   },
   "customerMessages": {
     "hi": "Kumusta {name},",
@@ -1529,7 +1542,9 @@
     "coverFrom": "Saklaw mula",
     "coverTo": "Saklaw hanggang",
     "coverHint": "Binayaran para sa isang taon o higit pa? Ilagay ang mga petsa at bibilangin ang bahagi bawat buwan.",
-    "coverUpdateCar": "Itakda rin ang {name} ng sasakyan na mag-expire sa {date}"
+    "coverUpdateCar": "Itakda rin ang {name} ng sasakyan na mag-expire sa {date}",
+    "sv_nextKmMi": "Susunod na service (milya)",
+    "sv_hintMi": "Maglagay ng petsa, mileage o pareho. Kung alin ang maunang dumating, iyon ang due."
   },
   "booking": {
     "open": "Buksan",
@@ -2416,7 +2431,10 @@
     "remind_openingWhatsApp": "Binubuksan ang WhatsApp kasama ang paalala",
     "remind_nothingOwed": "Walang balanse sa booking na ito",
     "remind_notFound": "Hindi namin mahanap ang booking na ito",
-    "remind_signedOut": "Mag-sign in ulit"
+    "remind_signedOut": "Mag-sign in ulit",
+    "kmAtReturnMi": "{km} mi sa pagbalik",
+    "kmAtHandoverMi": "{km} mi sa handover",
+    "kmDrivenMi": "{km} mi ang naibiyahe"
   },
   "newBooking": {
     "docsSelfie": "Litrato ng customer",
@@ -3184,7 +3202,40 @@
     "f_monthlyHint": "{amount} ang idadagdag sa iyong gastos bawat buwan hanggang {date}.",
     "cs_monthly": "{amount} kada buwan",
     "f_inspectionCost": "Gastos sa inspeksyon ({name})",
-    "f_inspectionHint": "Ang mas lumang sasakyan ay iniinspeksyon kapag nire-renew ang road tax (kotse na lampas 7 taon, motor na lampas 5). Iwanang blangko kung hindi kailangan."
+    "f_inspectionHint": "Ang mas lumang sasakyan ay iniinspeksyon kapag nire-renew ang road tax (kotse na lampas 7 taon, motor na lampas 5). Iwanang blangko kung hindi kailangan.",
+    "m_hintBothMi": "Maglagay ng petsa, mileage o pareho. Kung alin ang maunang dumating, iyon ang due.",
+    "sv_nextBothMi": "{date} o {km} mi, kung alin ang mauna",
+    "sv_kmOnlyMi": "sa {km} mi",
+    "sv_kmLeftMi": "{km} mi pa",
+    "sv_kmOverMi": "Sobra ng {km} mi",
+    "kmMi": "{km} mi",
+    "m_atKmMi": "Sa {km} mi",
+    "m_nextKmMi": "Susunod na due sa (milya)",
+    "x_mileageMi": "Mileage {km} mi",
+    "h_kmMi": "{km} mi ang naibiyahe",
+    "rn_official": "Opisyal na page",
+    "rn_EU_insurance": "Sapilitan ang third-party cover. Kailangan ng paupahang sasakyan ng policy na sumasaklaw sa self-drive rental.",
+    "rn_GB_tax": "Magbayad ng tax online para sa 12 o 6 na buwan, o buwanan sa Direct Debit. Kailangan ang V5C log book o reminder letter.",
+    "rn_GB_inspection": "MOT: una sa edad na 3 taon, pagkatapos ay taon-taon. Puwedeng gawin hanggang isang buwan nang maaga at mananatili ang petsa.",
+    "rn_IE_tax": "Motor tax: magbayad online para sa 3, 6 o 12 buwan. Kailangan ang detalye ng insurance.",
+    "rn_IE_inspection": "NCT: mula 4 na taon tuwing 2 taon, pagkatapos ay taon-taon mula 10 taon.",
+    "rn_ES_tax": "IVTM (impuesto de circulación): binabayaran isang beses kada taon sa town hall kung saan rehistrado ang sasakyan.",
+    "rn_ES_inspection": "ITV: pribadong kotse mula 4 na taon tuwing 2 taon, taon-taon mula 10. Maaaring mas madalas para sa paupahang kotse: magtanong sa iyong ITV station.",
+    "rn_PT_tax": "IUC: binabayaran isang beses kada taon, sa buwan ng unang rehistro ng sasakyan, sa Portal das Finanças.",
+    "rn_PT_inspection": "IPO: mula 4 na taon tuwing 2 taon, taon-taon mula 8. Maaaring iba para sa paupahang kotse: alamin sa IMT.",
+    "rn_IT_tax": "Bollo auto: binabayaran isang beses kada taon sa iyong rehiyon, online gamit ang pagoPA.",
+    "rn_IT_inspection": "Revisione: 4 na taon matapos ang unang rehistro, pagkatapos ay tuwing 2 taon.",
+    "rn_GR_tax": "Τέλη κυκλοφορίας (road tax): binabayaran isang beses kada taon sa gov.gr (myCAR).",
+    "rn_GR_inspection": "ΚΤΕΟ: 4 na taon matapos ang unang rehistro, pagkatapos ay tuwing 2 taon.",
+    "rn_HR_tax": "Registracija: nire-renew taon-taon, kasabay ng technical inspection.",
+    "rn_HR_inspection": "Tehnički pregled: karaniwang taon-taon, sa vehicle inspection station (CVH).",
+    "rn_CY_tax": "Road tax: nire-renew taon-taon o tuwing 6 na buwan, online sa Road Transport Department.",
+    "rn_CY_inspection": "MOT: 4 na taon matapos ang unang rehistro, pagkatapos ay tuwing 2 taon. Maaaring taon-taon para sa paupahang kotse.",
+    "rn_MT_tax": "Road licence: nire-renew taon-taon, online sa Transport Malta.",
+    "rn_MT_inspection": "VRT: 4 na taon matapos ang unang rehistro, pagkatapos ay tuwing 2 taon.",
+    "rn_FR_inspection": "Contrôle technique: kotse 4 na taon matapos ang unang rehistro, pagkatapos ay tuwing 2 taon. Motorsiklo: 5 taon, pagkatapos ay tuwing 3.",
+    "rn_DE_tax": "Kfz-Steuer: kinukuha isang beses kada taon sa direct debit ng customs (Zoll).",
+    "rn_DE_inspection": "HU (TÜV): kotse 3 taon matapos ang unang rehistro, pagkatapos ay tuwing 2 taon. Self-drive na paupahang kotse: tuwing 12 buwan."
   },
   "customerPage": {
     "back": "Mga customer",
@@ -3329,7 +3380,11 @@
     "g_owesDetail": "due ngayon o mas maaga",
     "g_balance": "Balanse",
     "g_docsMissingList": "Kulang: {list}",
-    "g_docsOf": "{count} sa 3"
+    "g_docsOf": "{count} sa 3",
+    "h_kmMi": "{km} mi ang naibiyahe",
+    "f_licenceCategories": "Mga kategorya ng lisensya",
+    "f_dvlaCode": "DVLA check code",
+    "f_dvlaCodeHint": "Ginagawa ito ng driver sa gov.uk/view-driving-licence. Valid ito nang 21 araw."
   },
   "vehicleForm": {
     "addTitle": "Magdagdag ng sasakyan",
@@ -3502,7 +3557,9 @@
     "qp_add": "Idagdag",
     "backSetup": "Setup",
     "quickSubtitle": "Mga pangunahing detalye lang. Uri, tatak at modelo lang ang kailangan.",
-    "quickLater": "Ang mga petsa ng buwis at insurance, mileage, utang at iba pa ay puwedeng idagdag mamaya mula sa Fleet."
+    "quickLater": "Ang mga petsa ng buwis at insurance, mileage, utang at iba pa ay puwedeng idagdag mamaya mula sa Fleet.",
+    "valueSummaryMi": "Mileage ngayon, ibinayad mo, halaga nito ngayon",
+    "valueSummaryEditMi": "Presyo ng bili, halaga, mileage noong binili"
   },
   "bookingEdit": {
     "booking": "Booking",
@@ -4269,7 +4326,48 @@
     "ag_lang_ms": "Malay",
     "ag_lang_fil": "Filipino",
     "ag_lang_lo": "Lao",
-    "ag_lang_km": "Khmer"
+    "ag_lang_km": "Khmer",
+    "tp_kmMi": "Milyang pinapayagan kada buwan",
+    "grp_region": "Bansa at mga unit",
+    "reg_title": "Bansa at mga unit",
+    "reg_body": "Ang iyong time zone, pera, distansya at buwis. Kapag pumili ng bansa, mapupunan ang mga karaniwang pagpipilian.",
+    "reg_country": "Bansa",
+    "reg_zone": "Time zone",
+    "reg_currency": "Pera",
+    "reg_distance": "Distansya",
+    "reg_distanceTip": "Ginagamit para sa odometer reading, service at limit ng distansya. Hindi nako-convert ang mga reading na naka-save na kapag binago ito.",
+    "reg_km": "Kilometro (km)",
+    "reg_mi": "Milya (mi)",
+    "vat_on": "Rehistrado sa VAT o sales tax",
+    "vat_onTip": "Ipapakita sa resibo ang iyong VAT number at ang VAT sa bawat halaga.",
+    "vat_number": "VAT o tax number (TIN)",
+    "vat_rate": "VAT rate (%)",
+    "vat_included": "Kasama na ang VAT sa mga presyo ko",
+    "vat_includedTip": "On: ang presyong tina-type mo ang babayaran ng customer, kasama ang VAT. Off: idinadagdag ng RoveHQ ang VAT sa presyo ng sasakyan at extras kapag may booking.",
+    "vat_summary": "VAT {rate}%",
+    "vat_note_ie": "Car hire na wala pang 5 linggo sa loob ng 12 buwan: 13.5%. Mas mahabang hire: 23%.",
+    "vat_note_es": "Canary Islands: IGIC (7%) sa halip na IVA.",
+    "vat_note_pt": "Madeira 22%, Azores 16%.",
+    "vat_note_gr": "May mga isla na mas mababa ang rate. Alamin ang sa iyo.",
+    "xp_ready": "Handa na:",
+    "xp_additional_driver": "Karagdagang driver",
+    "xp_cross_border": "Pahintulot tumawid ng border",
+    "xp_damage_waiver": "Damage waiver",
+    "xp_one_way": "One-way fee",
+    "xp_out_of_hours": "Delivery o pick-up sa labas ng oras",
+    "xp_young_driver": "Bayad para sa batang driver",
+    "xp_excess": "Excess kapag may waiver ({symbol})",
+    "xp_excessTip": "Pinakamalaking babayaran ng umuupa para sa sira kapag kinuha ang waiver. Ilalagay ito sa kasunduan sa halip ng karaniwang excess.",
+    "xp_minAge": "Para sa driver na wala pang (edad)",
+    "xp_countries": "Mga pinapayagang bansa",
+    "xp_countriesPh": "hal. France, Portugal",
+    "ag_lang_el": "Greek",
+    "ag_lang_es": "Spanish",
+    "ag_lang_pt": "Portuguese",
+    "ag_lang_it": "Italian",
+    "ag_lang_hr": "Croatian",
+    "ag_lang_fr": "French",
+    "ag_lang_de": "German"
   },
   "accountPage": {
     "roleOwner": "May-ari",
@@ -4473,7 +4571,8 @@
     "afterRefunds": "matapos ibalik ang {amount}",
     "refundsTitle": "Ibinalik sa customer",
     "refundsHint": "Ibinabawas ang refund sa pumasok na pera. Hindi ito regular na gastos.",
-    "refundsHintExtras": "Ibinabawas ang refund sa pumasok na pera, kasama ang {amount} para sa extra. Hindi ito regular na gastos."
+    "refundsHintExtras": "Ibinabawas ang refund sa pumasok na pera, kasama ang {amount} para sa extra. Hindi ito regular na gastos.",
+    "vatInside": "Kasama ang VAT na {amount} ({rate}%)"
   },
   "auth": {
     "signInTitle": "Mag-sign in",
@@ -4737,7 +4836,8 @@
     "checksLeft": "{count, plural, one {# purchase check} other {# purchase check}} na lang ang natitira ngayong billing period",
     "checksUsedUp": "Wala nang purchase check hanggang {date}. Mabubuksan pa rin ang mga sasakyang na-check dati.",
     "checksPaidOnly": "Nasa mga bayad na plan ang mga bagong purchase check. Mabubuksan pa rin ang mga sasakyang na-check dati.",
-    "checksUpgrade": "Mag-upgrade"
+    "checksUpgrade": "Mag-upgrade",
+    "mileageMi": "Milya sa ngayon"
   },
   "importer": {
     "dt_vehicles": "Mga sasakyan",
@@ -4980,7 +5080,9 @@
     "cnt_transactions": "{count, plural, one {# talaan ng pera} other {# talaan ng pera}}",
     "cnt_vehicles": "{count, plural, one {# sasakyan} other {# sasakyan}}",
     "imported": "Na-import",
-    "readNeeds": "Pumili muna ng file, magdagdag ng litrato o mag-paste ng link."
+    "readNeeds": "Pumili muna ng file, magdagdag ng litrato o mag-paste ng link.",
+    "f_current_mileageMi": "Kasalukuyang mileage (milya)",
+    "c_mileageMi": "Mileage (milya)"
   },
   "errorPages": {
     "notFoundTitle": "Hindi namin mahanap ang page na iyan",
@@ -5222,7 +5324,50 @@
     "liveBody": "Magtanong ng kahit ano, magpadala ng mga file, o makipag-usap sa isang tao mula sa RoveHQ team.",
     "liveButton": "Buksan ang live chat",
     "fromAssistant": "RoveHQ assistant",
-    "contentSubtitle": "Mga artikulo, FAQ, video at resource na hiniling ng mga tao sa assistant, o hindi nito nasagot. Walang mapa-publish hangga't hindi mo inaaprubahan."
+    "contentSubtitle": "Mga artikulo, FAQ, video at resource na hiniling ng mga tao sa assistant, o hindi nito nasagot. Walang mapa-publish hangga't hindi mo inaaprubahan.",
+    "contentTitle": "Mga request para sa help content",
+    "contentCollate": "Tipunin ang mga bagong tanong",
+    "contentCollating": "Tinitipon…",
+    "contentCollated": "{questions} bagong tanong: {created} bagong request, {merged} idinagdag sa mga dati na.",
+    "contentNothingNew": "Walang bagong tanong na titipunin.",
+    "contentSection_suggested": "Mungkahi",
+    "contentSection_drafted": "Na-draft — naghihintay ng approval",
+    "contentSection_approved": "Aprubadong gawin (video at resources)",
+    "contentSection_closed": "Nai-publish at tinanggihan",
+    "contentEmpty_suggested": "Walang mungkahi. Tipunin ang mga bagong tanong para tumingin pa.",
+    "contentEmpty_drafted": "Walang draft na naghihintay.",
+    "contentEmpty_approved": "Walang video o resource na gagawin.",
+    "contentEmpty_closed": "Wala pa.",
+    "contentKind_article": "Artikulo",
+    "contentKind_faq": "FAQ",
+    "contentKind_video": "Video",
+    "contentKind_resource": "Resource",
+    "contentStatus_published": "Nai-publish",
+    "contentStatus_rejected": "Tinanggihan",
+    "contentAsked": "Naitanong nang {count, plural, one {# beses} other {# beses}}",
+    "contentFor": "Para sa",
+    "contentQuestions": "Ang mga tanong ({count})",
+    "contentAskedOn": "itinanong sa {page}",
+    "contentDraft": "Mag-draft",
+    "contentRedraft": "Mag-draft ulit",
+    "contentDrafting": "Sinusulat…",
+    "contentApprove": "Aprubahan at i-publish",
+    "contentApproveConfirm": "I-publish na ito sa help centre?",
+    "contentApproveMake": "Aprubahang gawin",
+    "contentMarkMade": "Markahang nagawa",
+    "contentEdit": "I-edit ang draft",
+    "contentSave": "I-save ang draft",
+    "contentCancel": "Kanselahin",
+    "contentReject": "Tanggihan",
+    "contentRejectConfirm": "Tanggihan ang request na ito?",
+    "contentDraftTitle": "Pamagat",
+    "contentDraftBody": "Artikulo (Markdown)",
+    "contentFaqQ": "Tanong",
+    "contentFaqA": "Sagot",
+    "contentPreview": "Preview",
+    "contentCheckNote": "Anumang may markang [check] ay kailangang kumpirmahin (at alisin ang marka) bago i-publish.",
+    "contentNoDraftNeeded": "Ang team ang gumagawa ng video at resources: aprubahan ito para mailagay sa listahan ng gagawin.",
+    "contentView": "Tingnan sa help centre"
   },
   "inspectStart": {
     "titleOut": "Mag-handover ng sasakyan",
@@ -5352,7 +5497,10 @@
     "yes": "Oo",
     "no": "Hindi",
     "agreed": "Pumayag noong {date}",
-    "empty": "Wala pang umuupa. Lalabas sila rito kapag may nag-tick ng \"Ibahagi ang aking impormasyon sa RoveHQ\" sa kanilang booking."
+    "empty": "Wala pang umuupa. Lalabas sila rito kapag may nag-tick ng \"Ibahagi ang aking impormasyon sa RoveHQ\" sa kanilang booking.",
+    "remove": "Alisin sa listahan",
+    "removeConfirm": "Buburahin ang umuupang ito at ang kanyang rental history sa listahan ng RoveHQ. Hindi na maibabalik.",
+    "removeButton": "Alisin"
   },
   "site": {
     "skipToContent": "Lumaktaw sa nilalaman",
@@ -5575,7 +5723,19 @@
     "mockAvailable": "Available",
     "mockPerDay": "{amount} bawat araw",
     "mockQrPay": "QR payment",
-    "inclImport": "Libreng import ng mga record mo ngayon"
+    "inclImport": "Libreng import ng mga record mo ngayon",
+    "cookieBody": "Gumagamit kami ng kinakailangang cookies para gumana ang site na ito. Kung papayag ka, gagamit din kami ng analytics cookies para makita kung aling mga page ang nakakatulong.",
+    "cookieAccept": "Tanggapin",
+    "cookieReject": "Tanggihan",
+    "cookieChoices": "Mga pagpipilian",
+    "cookieChoicesTitle": "Mga pagpipilian sa cookie",
+    "cookieNecessary": "Talagang kailangan",
+    "cookieNecessaryBody": "Wika, theme at sign-in.",
+    "cookieAlwaysOn": "Laging naka-on",
+    "cookieAnalytics": "Analytics",
+    "cookieAnalyticsBody": "Google Analytics, para bilangin ang mga pagbisita.",
+    "cookieSave": "I-save ang mga pinili",
+    "cookiePolicy": "Cookie policy"
   },
   "businessClosed": {
     "title": "Isinara ang negosyong ito",
@@ -6006,7 +6166,21 @@
     "docsRelated": "Kaugnay na mga artikulo",
     "docsAll": "Lahat ng artikulo",
     "metaDocsTitle": "Help center: paano gamitin ang RoveHQ",
-    "metaDocsDescription": "Mga gabay at video para sa RoveHQ: sasakyan, booking, kasunduan, handover, bayad, gastos, ulat at papeles."
+    "metaDocsDescription": "Mga gabay at video para sa RoveHQ: sasakyan, booking, kasunduan, handover, bayad, gastos, ulat at papeles.",
+    "footerLegal": "Legal",
+    "legalPrivacy": "Privacy",
+    "legalTerms": "Terms",
+    "legalDpa": "Data processing",
+    "legalSubprocessors": "Mga sub-processor",
+    "legalCookies": "Cookies",
+    "legalCookieChoices": "Mga pagpipilian sa cookie",
+    "legalIndexTitle": "Legal at privacy",
+    "legalIndexBody": "Paano hinahawakan ng RoveHQ ang impormasyon, ang mga tuntunin para sa rental business, at mga detalye para sa iyong records.",
+    "legalNotReviewed": "Isinulat ng RoveHQ mula sa pampublikong gabay (ICO, EDPB, European Commission, Thai PDPC). Hindi pa nasuri ng abogado.",
+    "legalEnglishOnly": "Nasa English muna ang page na ito.",
+    "legalUpdated": "Huling na-update {date}",
+    "cb_mileage_limit_mi": "Limit ng mileage sa milya (blangko = walang limit)",
+    "cb_excess_km_fee_mi": "Singil kada sobrang milya"
   },
   "gallery": {
     "open": "Buksan ang litrato",
@@ -6319,5 +6493,36 @@
     "sRecordCost": "Magtala ng gastos",
     "choose": "Pumili",
     "save": "I-save"
+  },
+  "privacy": {
+    "title": "Ang iyong data at privacy",
+    "body": "Paano hinahawakan ng RoveHQ ang impormasyon, at ang iyong mga karapatan.",
+    "linkPrivacy": "Privacy policy",
+    "linkTerms": "Terms of service",
+    "linkDpa": "Data processing agreement",
+    "linkSubprocessors": "Mga sub-processor",
+    "linkCookies": "Cookie policy",
+    "exportTitle": "I-download ang lahat ng iyong data",
+    "exportBody": "Mga sasakyan, customer, booking, bayad, pumapasok at lumalabas na pera, at iyong mga dokumento na may download link (valid nang 7 araw).",
+    "exportButton": "I-download (JSON)",
+    "retentionTitle": "Mga ID photo ng umuupa",
+    "retentionBody": "Awtomatikong burahin ang litrato ng passport, lisensya at selfie pagkatapos ng huling rental ng umuupa. Mananatili ang mga pinirmahang kasunduan.",
+    "retentionOn": "Awtomatikong burahin ang ID photo",
+    "retentionMonths": "Buwan matapos ang huling rental",
+    "retentionSave": "I-save",
+    "retentionSaved": "Na-save",
+    "deleteTitle": "Burahin ang negosyong ito",
+    "deleteBody": "Permanenteng buburahin ang lahat: sasakyan, customer, booking, bayad, dokumento at pinirmahang kasunduan.",
+    "deleteHint": "Hindi na ito maibabalik. I-download muna ang iyong data kung kailangan mo. Matatapos ang bayad na plan nang walang refund.",
+    "deleteType": "I-type ang {name} para kumpirmahin",
+    "deleteButton": "Burahin ang negosyong ito",
+    "deleteConfirm": "Burahin lahat",
+    "deleteCancel": "Kanselahin",
+    "customerTitle": "Mga privacy request",
+    "customerBody": "Kapag humingi ang umuupang ito ng kopya ng kanyang data, o na burahin siya.",
+    "customerExport": "I-export ang data ng customer na ito",
+    "customerDelete": "Burahin ang customer na ito",
+    "customerDeleteBody": "Buburahin ang kanyang detalye, ID photo at mensahe. Mananatili ang booking, bayad at pinirmahang kasunduan bilang \"Binurang customer\" para sa iyong accounts.",
+    "customerDeleteConfirm": "Burahin ang kanyang data"
   }
 }

@@ -125,7 +125,9 @@
     "bkTitle": "预订",
     "bkAll": "全部预订",
     "emailVerified": "邮箱已验证，谢谢！",
-    "emailLinkOld": "该链接已失效。请点击“验证您的邮箱”获取新链接。"
+    "emailLinkOld": "该链接已失效。请点击“验证您的邮箱”获取新链接。",
+    "kmToGoMi": "还剩 {km} 英里",
+    "kmOverMi": "超出 {km} 英里"
   },
   "settings": {
     "contractsBranding": {
@@ -389,7 +391,16 @@
     "lateOptTodayDetailMoves": "每个付款日期顺延 {days} 天",
     "lateOptTodayDetailPlain": "按预订于 {date} 还车",
     "lateOptTodayTitle": "今天开始计租",
-    "outAtKm": "出车时 {km} km"
+    "outAtKm": "出车时 {km} km",
+    "confirmOdometerMi": "里程表读数（英里）",
+    "ocrSuggestedMi": "根据照片识别为 {km} 英里。",
+    "ocrPossibleMi": "可能的读数：{km} 英里。请与里程表核对。",
+    "odometerBelowLastMi": "低于上次读数（{km} 英里），请检查。",
+    "drivenDuringRentalMi": "交车后已行驶：{km} 英里",
+    "odometerAtDeliveryMi": "交车时：{km} 英里",
+    "kmValueMi": "{km} 英里",
+    "odometerHugeMi": "比上次读数多 {km} 英里，请检查。",
+    "outAtKmMi": "出车时 {km} 英里"
   },
   "translation": {
     "translatedFrom": "翻译自{language}",
@@ -890,7 +901,9 @@
     "offersDetails": "我的姓名、联系方式、国籍和语言，以及我的租车历史：租车地点和时间、车型、付款金额、附加服务、里程、押金和车损免责。RoveHQ 可能会向我发送或通过电子邮件发送机场接送、旅游和电话卡等优惠。关闭此功能将删除 RoveHQ 的副本。",
     "bookedUntil": "已预订至 {date}",
     "noneFree": "自 {start} 起暂无可租车辆。",
-    "noneFreeEarliest": "自 {start} 起暂无可租车辆。最早可租日期为 {date}（{vehicle}）。"
+    "noneFreeEarliest": "自 {start} 起暂无可租车辆。最早可租日期为 {date}（{vehicle}）。",
+    "privacyLink": "{business} 和 RoveHQ 如何使用您的信息",
+    "vatIncluded": "价格已含 {name}（{rate}%）"
   },
   "customerMessages": {
     "hi": "{name}，您好！",
@@ -1595,7 +1608,9 @@
     "coverFrom": "开始日期",
     "coverTo": "结束日期",
     "coverHint": "一次付了一年或更久？填上日期，每月会按比例计入。",
-    "coverUpdateCar": "同时把车辆的{name}到期日改为 {date}"
+    "coverUpdateCar": "同时把车辆的{name}到期日改为 {date}",
+    "sv_nextKmMi": "下次保养里程（英里）",
+    "sv_hintMi": "可设置日期、里程或两者。以先到者为准。"
   },
   "booking": {
     "open": "开放",
@@ -2482,7 +2497,10 @@
     "remind_openingWhatsApp": "正在打开 WhatsApp 发送提醒",
     "remind_nothingOwed": "此预订没有待付款项",
     "remind_notFound": "找不到此预订",
-    "remind_signedOut": "请重新登录"
+    "remind_signedOut": "请重新登录",
+    "kmAtReturnMi": "还车时 {km} 英里",
+    "kmAtHandoverMi": "交车时 {km} 英里",
+    "kmDrivenMi": "已行驶 {km} 英里"
   },
   "newBooking": {
     "docsSelfie": "客户照片",
@@ -3250,7 +3268,40 @@
     "f_monthlyHint": "到 {date} 为止，每月在成本中加入 {amount}。",
     "cs_monthly": "每月 {amount}",
     "f_inspectionCost": "年检费用（{name}）",
-    "f_inspectionHint": "较旧的车辆在续缴车辆税时年检（汽车超过 7 年，摩托车超过 5 年）。不需要就留空。"
+    "f_inspectionHint": "较旧的车辆在续缴车辆税时年检（汽车超过 7 年，摩托车超过 5 年）。不需要就留空。",
+    "m_hintBothMi": "可设置日期、里程或两者。以先到者为准。",
+    "sv_nextBothMi": "{date} 或 {km} 英里，以先到者为准",
+    "sv_kmOnlyMi": "在 {km} 英里时",
+    "sv_kmLeftMi": "还剩 {km} 英里",
+    "sv_kmOverMi": "超出 {km} 英里",
+    "kmMi": "{km} 英里",
+    "m_atKmMi": "{km} 英里时",
+    "m_nextKmMi": "下次到期里程（英里）",
+    "x_mileageMi": "里程 {km} 英里",
+    "h_kmMi": "已行驶 {km} 英里",
+    "rn_official": "官方页面",
+    "rn_EU_insurance": "第三者责任险为强制险。出租车辆需要投保涵盖自驾租赁的保险。",
+    "rn_GB_tax": "可在网上缴纳 12 个月或 6 个月的车辆税，或通过直接借记按月缴纳。需要 V5C 车辆登记证或提醒信。",
+    "rn_GB_inspection": "MOT：车龄满 3 年首检，之后每年一次。可最多提前一个月检验，到期日不变。",
+    "rn_IE_tax": "车辆税：可在网上缴纳 3、6 或 12 个月。需要保险信息。",
+    "rn_IE_inspection": "NCT：车龄满 4 年起每 2 年一次，满 10 年起每年一次。",
+    "rn_ES_tax": "IVTM（impuesto de circulación）：每年向车辆登记地的市政府缴纳一次。",
+    "rn_ES_inspection": "ITV：私家车满 4 年起每 2 年一次，满 10 年起每年一次。租赁车辆可能需要更频繁检验，请咨询您的 ITV 检测站。",
+    "rn_PT_tax": "IUC：每年在车辆首次登记的月份于 Portal das Finanças 缴纳一次。",
+    "rn_PT_inspection": "IPO：满 4 年起每 2 年一次，满 8 年起每年一次。租赁车辆可能不同，请向 IMT 确认。",
+    "rn_IT_tax": "Bollo auto：每年向所在大区缴纳一次，可通过 pagoPA 在线支付。",
+    "rn_IT_inspection": "Revisione：首次登记 4 年后检验，之后每 2 年一次。",
+    "rn_GR_tax": "Τέλη κυκλοφορίας（道路税）：每年在 gov.gr（myCAR）缴纳一次。",
+    "rn_GR_inspection": "ΚΤΕΟ：首次登记 4 年后检验，之后每 2 年一次。",
+    "rn_HR_tax": "Registracija：每年与技术检验一起续期。",
+    "rn_HR_inspection": "Tehnički pregled：通常每年一次，在车辆检测站（CVH）进行。",
+    "rn_CY_tax": "道路税：每年或每 6 个月通过道路交通部在线续期。",
+    "rn_CY_inspection": "MOT：首次登记 4 年后检验，之后每 2 年一次。租赁车辆可能需要每年检验。",
+    "rn_MT_tax": "道路许可证：每年通过 Transport Malta 在线续期。",
+    "rn_MT_inspection": "VRT：首次登记 4 年后检验，之后每 2 年一次。",
+    "rn_FR_inspection": "Contrôle technique：汽车首次登记 4 年后检验，之后每 2 年一次。摩托车：5 年后，之后每 3 年一次。",
+    "rn_DE_tax": "Kfz-Steuer：由海关（Zoll）每年通过直接借记扣缴一次。",
+    "rn_DE_inspection": "HU（TÜV）：汽车首次登记 3 年后检验，之后每 2 年一次。自驾租赁车辆：每 12 个月一次。"
   },
   "customerPage": {
     "back": "客户",
@@ -3395,7 +3446,11 @@
     "g_owesDetail": "今天或之前到期",
     "g_balance": "余额",
     "g_docsMissingList": "缺少 {list}",
-    "g_docsOf": "{count} / 3"
+    "g_docsOf": "{count} / 3",
+    "h_kmMi": "已行驶 {km} 英里",
+    "f_licenceCategories": "驾照类别",
+    "f_dvlaCode": "DVLA 核查码",
+    "f_dvlaCodeHint": "由驾驶人在 gov.uk/view-driving-licence 生成，有效期 21 天。"
   },
   "vehicleForm": {
     "addTitle": "添加车辆",
@@ -3568,7 +3623,9 @@
     "qp_add": "添加",
     "backSetup": "设置",
     "quickSubtitle": "只需基本信息。仅需填写车辆类型、品牌和型号。",
-    "quickLater": "税费、保险日期、里程、贷款等信息以后可以在车队中补充。"
+    "quickLater": "税费、保险日期、里程、贷款等信息以后可以在车队中补充。",
+    "valueSummaryMi": "当前里程、购买价格、当前价值",
+    "valueSummaryEditMi": "购买价格、价值、购买时里程"
   },
   "bookingEdit": {
     "booking": "预订",
@@ -4335,7 +4392,48 @@
     "ag_lang_ms": "马来语",
     "ag_lang_fil": "菲律宾语",
     "ag_lang_lo": "老挝语",
-    "ag_lang_km": "高棉语"
+    "ag_lang_km": "高棉语",
+    "tp_kmMi": "每月允许里程（英里）",
+    "grp_region": "国家和单位",
+    "reg_title": "国家和单位",
+    "reg_body": "您的时区、货币、距离单位和税务。选择国家后会自动填入常用设置。",
+    "reg_country": "国家",
+    "reg_zone": "时区",
+    "reg_currency": "货币",
+    "reg_distance": "距离",
+    "reg_distanceTip": "用于里程表读数、保养和里程限制。更改后不会转换已保存的读数。",
+    "reg_km": "公里（km）",
+    "reg_mi": "英里（mi）",
+    "vat_on": "已登记增值税或销售税",
+    "vat_onTip": "收据将显示您的增值税号以及每笔金额中的增值税。",
+    "vat_number": "增值税号或税号",
+    "vat_rate": "增值税税率（%）",
+    "vat_included": "我的价格含增值税",
+    "vat_includedTip": "开启：您输入的价格就是客户支付的价格，已含增值税。关闭：预订时 RoveHQ 会在车辆价格和附加项上加收增值税。",
+    "vat_summary": "增值税 {rate}%",
+    "vat_note_ie": "12 个月内租车不超过 5 周：13.5%。更长租期：23%。",
+    "vat_note_es": "加那利群岛：适用 IGIC（7%）而非 IVA。",
+    "vat_note_pt": "马德拉 22%，亚速尔群岛 16%。",
+    "vat_note_gr": "部分岛屿税率较低，请核实您所在地区。",
+    "xp_ready": "现成选项：",
+    "xp_additional_driver": "附加驾驶人",
+    "xp_cross_border": "跨境许可",
+    "xp_damage_waiver": "车损豁免",
+    "xp_one_way": "异地还车费",
+    "xp_out_of_hours": "非营业时间送车或取车",
+    "xp_young_driver": "年轻驾驶人费用",
+    "xp_excess": "选择豁免后的自付额（{symbol}）",
+    "xp_excessTip": "租车人选择豁免后需为车损承担的最高金额。合同上将以此代替常规自付额。",
+    "xp_minAge": "适用于未满此年龄的驾驶人",
+    "xp_countries": "允许的国家",
+    "xp_countriesPh": "例如：法国、葡萄牙",
+    "ag_lang_el": "希腊语",
+    "ag_lang_es": "西班牙语",
+    "ag_lang_pt": "葡萄牙语",
+    "ag_lang_it": "意大利语",
+    "ag_lang_hr": "克罗地亚语",
+    "ag_lang_fr": "法语",
+    "ag_lang_de": "德语"
   },
   "accountPage": {
     "roleOwner": "所有者",
@@ -4539,7 +4637,8 @@
     "afterRefunds": "扣除已退还的 {amount} 后",
     "refundsTitle": "退还给客户",
     "refundsHint": "退款从收入中扣除，不算运营成本。",
-    "refundsHintExtras": "退款从收入中扣除，其中附加项 {amount}。不算运营成本。"
+    "refundsHintExtras": "退款从收入中扣除，其中附加项 {amount}。不算运营成本。",
+    "vatInside": "含增值税 {amount}（{rate}%）"
   },
   "auth": {
     "signInTitle": "登录",
@@ -4803,7 +4902,8 @@
     "checksLeft": "本计费周期剩余 {count, plural, one {# 次购车评估} other {# 次购车评估}}",
     "checksUsedUp": "{date} 前已无购车评估次数。之前评估过的车辆仍可打开。",
     "checksPaidOnly": "新的购车评估需付费方案。之前评估过的车辆仍可打开。",
-    "checksUpgrade": "升级"
+    "checksUpgrade": "升级",
+    "mileageMi": "目前里程（英里）"
   },
   "importer": {
     "dt_vehicles": "车辆",
@@ -5046,7 +5146,9 @@
     "cnt_transactions": "{count} 条收支记录",
     "cnt_vehicles": "{count} 辆车",
     "imported": "已导入",
-    "readNeeds": "请先选择文件、添加照片或粘贴链接。"
+    "readNeeds": "请先选择文件、添加照片或粘贴链接。",
+    "f_current_mileageMi": "当前里程（英里）",
+    "c_mileageMi": "里程（英里）"
   },
   "errorPages": {
     "notFoundTitle": "找不到该页面",
@@ -5288,7 +5390,50 @@
     "liveBody": "随便问，发送文件，或与 RoveHQ 团队的真人交谈。",
     "liveButton": "打开在线聊天",
     "fromAssistant": "RoveHQ 助手",
-    "contentSubtitle": "用户向助手索要的，或助手无法回答的文章、常见问题、视频和资料。在您批准之前不会发布任何内容。"
+    "contentSubtitle": "用户向助手索要的，或助手无法回答的文章、常见问题、视频和资料。在您批准之前不会发布任何内容。",
+    "contentTitle": "帮助内容请求",
+    "contentCollate": "整理新问题",
+    "contentCollating": "正在整理…",
+    "contentCollated": "{questions} 个新问题：新建 {created} 个请求，{merged} 个并入现有请求。",
+    "contentNothingNew": "没有需要整理的新问题。",
+    "contentSection_suggested": "建议",
+    "contentSection_drafted": "已起草 — 等待批准",
+    "contentSection_approved": "已批准制作（视频和资料）",
+    "contentSection_closed": "已发布和已拒绝",
+    "contentEmpty_suggested": "暂无建议。整理新问题以查看更多。",
+    "contentEmpty_drafted": "没有待处理的草稿。",
+    "contentEmpty_approved": "没有需要制作的视频或资料。",
+    "contentEmpty_closed": "暂无内容。",
+    "contentKind_article": "文章",
+    "contentKind_faq": "常见问题",
+    "contentKind_video": "视频",
+    "contentKind_resource": "资料",
+    "contentStatus_published": "已发布",
+    "contentStatus_rejected": "已拒绝",
+    "contentAsked": "被问 {count, plural, other {# 次}}",
+    "contentFor": "针对",
+    "contentQuestions": "相关问题（{count}）",
+    "contentAskedOn": "提问页面：{page}",
+    "contentDraft": "起草",
+    "contentRedraft": "重新起草",
+    "contentDrafting": "正在撰写…",
+    "contentApprove": "批准并发布",
+    "contentApproveConfirm": "现在将此内容发布到帮助中心吗？",
+    "contentApproveMake": "批准制作",
+    "contentMarkMade": "标记为已制作",
+    "contentEdit": "编辑草稿",
+    "contentSave": "保存草稿",
+    "contentCancel": "取消",
+    "contentReject": "拒绝",
+    "contentRejectConfirm": "拒绝此请求？",
+    "contentDraftTitle": "标题",
+    "contentDraftBody": "文章（Markdown）",
+    "contentFaqQ": "问题",
+    "contentFaqA": "回答",
+    "contentPreview": "预览",
+    "contentCheckNote": "发布前，所有标有 [check] 的内容都需要确认（并删除该标记）。",
+    "contentNoDraftNeeded": "视频和资料由团队制作：批准后会加入待制作列表。",
+    "contentView": "在帮助中心查看"
   },
   "inspectStart": {
     "titleOut": "交车",
@@ -5418,7 +5563,10 @@
     "yes": "是",
     "no": "否",
     "agreed": "{date} 同意",
-    "empty": "暂无租客。当有人在预订时勾选“与 RoveHQ 共享我的信息”后，会显示在这里。"
+    "empty": "暂无租客。当有人在预订时勾选“与 RoveHQ 共享我的信息”后，会显示在这里。",
+    "remove": "从列表中移除",
+    "removeConfirm": "将从 RoveHQ 的列表中删除此租车人及其租车记录。无法撤销。",
+    "removeButton": "移除"
   },
   "site": {
     "skipToContent": "跳到正文",
@@ -5641,7 +5789,19 @@
     "mockAvailable": "可租",
     "mockPerDay": "每天 {amount}",
     "mockQrPay": "二维码付款",
-    "inclImport": "免费导入您现有的记录"
+    "inclImport": "免费导入您现有的记录",
+    "cookieBody": "我们使用必要的 Cookie 来运行本网站。经您同意，我们还会使用分析 Cookie 来了解哪些页面有帮助。",
+    "cookieAccept": "接受",
+    "cookieReject": "拒绝",
+    "cookieChoices": "选项",
+    "cookieChoicesTitle": "Cookie 选项",
+    "cookieNecessary": "必要",
+    "cookieNecessaryBody": "语言、主题和登录。",
+    "cookieAlwaysOn": "始终开启",
+    "cookieAnalytics": "分析",
+    "cookieAnalyticsBody": "Google Analytics，用于统计访问量。",
+    "cookieSave": "保存选择",
+    "cookiePolicy": "Cookie 政策"
   },
   "businessClosed": {
     "title": "此商家已关闭",
@@ -6072,7 +6232,21 @@
     "docsRelated": "相关文章",
     "docsAll": "全部文章",
     "metaDocsTitle": "帮助中心：如何使用 RoveHQ",
-    "metaDocsDescription": "RoveHQ 指南和视频：车辆、预订、合同、交车、收款、成本、报表和证件。"
+    "metaDocsDescription": "RoveHQ 指南和视频：车辆、预订、合同、交车、收款、成本、报表和证件。",
+    "footerLegal": "法律",
+    "legalPrivacy": "隐私",
+    "legalTerms": "条款",
+    "legalDpa": "数据处理",
+    "legalSubprocessors": "子处理方",
+    "legalCookies": "Cookie",
+    "legalCookieChoices": "Cookie 选项",
+    "legalIndexTitle": "法律与隐私",
+    "legalIndexBody": "RoveHQ 如何处理信息、面向租车企业的条款，以及供您存档的详细信息。",
+    "legalNotReviewed": "由 RoveHQ 根据公开指引（ICO、EDPB、欧盟委员会、泰国 PDPC）撰写，未经律师审核。",
+    "legalEnglishOnly": "本页面目前仅提供英文版。",
+    "legalUpdated": "最后更新于 {date}",
+    "cb_mileage_limit_mi": "里程限制（英里，留空表示不限）",
+    "cb_excess_km_fee_mi": "每超出一英里的费用"
   },
   "gallery": {
     "open": "打开照片",
@@ -6387,5 +6561,36 @@
     "sRecordCost": "记录支出",
     "choose": "选择",
     "save": "保存"
+  },
+  "privacy": {
+    "title": "您的数据与隐私",
+    "body": "RoveHQ 如何处理信息，以及您的权利。",
+    "linkPrivacy": "隐私政策",
+    "linkTerms": "服务条款",
+    "linkDpa": "数据处理协议",
+    "linkSubprocessors": "子处理方",
+    "linkCookies": "Cookie 政策",
+    "exportTitle": "下载您的全部数据",
+    "exportBody": "车辆、客户、预订、付款、收支记录，以及附带下载链接的文件（链接有效期 7 天）。",
+    "exportButton": "下载（JSON）",
+    "retentionTitle": "租车人身份证件照片",
+    "retentionBody": "在租车人最后一次租车后自动删除护照、驾照和自拍照片。已签署的合同会保留。",
+    "retentionOn": "自动删除证件照片",
+    "retentionMonths": "最后一次租车后的月数",
+    "retentionSave": "保存",
+    "retentionSaved": "已保存",
+    "deleteTitle": "删除此商家",
+    "deleteBody": "永久删除所有内容：车辆、客户、预订、付款、文件和已签署的合同。",
+    "deleteHint": "此操作无法撤销。如有需要，请先下载您的数据。付费套餐将终止且不予退款。",
+    "deleteType": "输入 {name} 以确认",
+    "deleteButton": "删除此商家",
+    "deleteConfirm": "全部删除",
+    "deleteCancel": "取消",
+    "customerTitle": "隐私请求",
+    "customerBody": "当此租车人要求获取其数据副本或要求删除时使用。",
+    "customerExport": "导出此客户的数据",
+    "customerDelete": "删除此客户",
+    "customerDeleteBody": "删除其个人信息、证件照片和消息。预订、付款和已签署的合同会以“已删除客户”的名义保留，供您记账使用。",
+    "customerDeleteConfirm": "删除其数据"
   }
 }

@@ -125,7 +125,9 @@
     "bkTitle": "Pemesanan",
     "bkAll": "Semua pemesanan",
     "emailVerified": "Email terverifikasi. Terima kasih!",
-    "emailLinkOld": "Tautan tersebut sudah kedaluwarsa. Ketuk \"Verifikasi email Anda\" untuk mendapatkan yang baru."
+    "emailLinkOld": "Tautan tersebut sudah kedaluwarsa. Ketuk \"Verifikasi email Anda\" untuk mendapatkan yang baru.",
+    "kmToGoMi": "{km} mil lagi",
+    "kmOverMi": "lebih {km} mil"
   },
   "settings": {
     "contractsBranding": {
@@ -389,7 +391,16 @@
     "lateOptTodayDetailMoves": "Setiap tanggal pembayaran mundur {days} hari",
     "lateOptTodayDetailPlain": "Kembali {date} sesuai pemesanan",
     "lateOptTodayTitle": "Mulai sewa hari ini",
-    "outAtKm": "Keluar di {km} km"
+    "outAtKm": "Keluar di {km} km",
+    "confirmOdometerMi": "Angka odometer (mil)",
+    "ocrSuggestedMi": "Saran dari foto: {km} mil.",
+    "ocrPossibleMi": "Kemungkinan angka: {km} mil. Cocokkan dengan odometer.",
+    "odometerBelowLastMi": "Lebih rendah dari angka terakhir ({km} mil). Mohon periksa.",
+    "drivenDuringRentalMi": "Jarak sejak serah terima: {km} mil",
+    "odometerAtDeliveryMi": "Saat serah terima: {km} mil",
+    "kmValueMi": "{km} mil",
+    "odometerHugeMi": "{km} mil lebih tinggi dari angka terakhir. Mohon periksa.",
+    "outAtKmMi": "Keluar di {km} mil"
   },
   "translation": {
     "translatedFrom": "Diterjemahkan dari {language}",
@@ -890,7 +901,9 @@
     "offersDetails": "Nama saya, detail kontak, kewarganegaraan dan bahasa, serta riwayat sewa saya: tempat dan waktu saya menyewa, kendaraan, yang saya bayar, ekstra, jarak tempuh, deposit, dan kerusakan. RoveHQ dapat mengirimkan pesan atau email berisi penawaran seperti transfer bandara, tur, dan kartu SIM. Mematikan ini akan menghapus salinan RoveHQ.",
     "bookedUntil": "Dipesan hingga {date}",
     "noneFree": "Tidak ada yang tersedia mulai {start}.",
-    "noneFreeEarliest": "Tidak ada yang tersedia mulai {start}. Paling cepat {date} ({vehicle})."
+    "noneFreeEarliest": "Tidak ada yang tersedia mulai {start}. Paling cepat {date} ({vehicle}).",
+    "privacyLink": "Cara {business} dan RoveHQ menggunakan data Anda",
+    "vatIncluded": "Harga sudah termasuk {name} {rate}%"
   },
   "customerMessages": {
     "hi": "Halo {name},",
@@ -1595,7 +1608,9 @@
     "coverFrom": "Berlaku dari",
     "coverTo": "Berlaku sampai",
     "coverHint": "Dibayar untuk setahun atau lebih? Isi tanggalnya, lalu dihitung sebagian setiap bulan.",
-    "coverUpdateCar": "Atur juga {name} kendaraan berakhir pada {date}"
+    "coverUpdateCar": "Atur juga {name} kendaraan berakhir pada {date}",
+    "sv_nextKmMi": "Servis berikutnya (mil)",
+    "sv_hintMi": "Atur tanggal, jarak tempuh, atau keduanya. Mana yang tercapai lebih dulu, itulah jatuh temponya."
   },
   "booking": {
     "open": "Buka",
@@ -2482,7 +2497,10 @@
     "remind_openingWhatsApp": "Membuka WhatsApp dengan pengingat",
     "remind_nothingOwed": "Tidak ada tagihan untuk booking ini",
     "remind_notFound": "Booking ini tidak ditemukan",
-    "remind_signedOut": "Silakan masuk lagi"
+    "remind_signedOut": "Silakan masuk lagi",
+    "kmAtReturnMi": "{km} mil saat kembali",
+    "kmAtHandoverMi": "{km} mil saat serah terima",
+    "kmDrivenMi": "{km} mil ditempuh"
   },
   "newBooking": {
     "docsSelfie": "Foto pelanggan",
@@ -3250,7 +3268,40 @@
     "f_monthlyHint": "{amount} ditambahkan ke biaya Anda setiap bulan sampai {date}.",
     "cs_monthly": "{amount} per bulan",
     "f_inspectionCost": "Biaya uji ({name})",
-    "f_inspectionHint": "Kendaraan lama diuji saat pajak diperpanjang (mobil lebih dari 7 tahun, motor lebih dari 5). Kosongkan jika tidak perlu."
+    "f_inspectionHint": "Kendaraan lama diuji saat pajak diperpanjang (mobil lebih dari 7 tahun, motor lebih dari 5). Kosongkan jika tidak perlu.",
+    "m_hintBothMi": "Atur tanggal, jarak tempuh, atau keduanya. Mana yang tercapai lebih dulu, itulah jatuh temponya.",
+    "sv_nextBothMi": "{date} atau {km} mil, mana yang lebih dulu",
+    "sv_kmOnlyMi": "di {km} mil",
+    "sv_kmLeftMi": "{km} mil lagi",
+    "sv_kmOverMi": "lebih {km} mil",
+    "kmMi": "{km} mil",
+    "m_atKmMi": "Di {km} mil",
+    "m_nextKmMi": "Jatuh tempo berikutnya di (mil)",
+    "x_mileageMi": "Jarak tempuh {km} mil",
+    "h_kmMi": "{km} mil ditempuh",
+    "rn_official": "Halaman resmi",
+    "rn_EU_insurance": "Asuransi pihak ketiga wajib. Kendaraan sewa perlu polis yang menanggung sewa lepas kunci.",
+    "rn_GB_tax": "Bayar pajak online untuk 12 atau 6 bulan, atau bulanan lewat Direct Debit. Perlu buku registrasi V5C atau surat pengingat.",
+    "rn_GB_inspection": "MOT: pertama saat umur 3 tahun, lalu setiap tahun. Bisa dilakukan hingga sebulan lebih awal dengan tanggal yang sama.",
+    "rn_IE_tax": "Pajak kendaraan: bayar online untuk 3, 6 atau 12 bulan. Perlu data asuransi.",
+    "rn_IE_inspection": "NCT: mulai umur 4 tahun setiap 2 tahun, lalu setiap tahun mulai umur 10 tahun.",
+    "rn_ES_tax": "IVTM (impuesto de circulación): dibayar setahun sekali ke balai kota tempat kendaraan terdaftar.",
+    "rn_ES_inspection": "ITV: mobil pribadi mulai umur 4 tahun setiap 2 tahun, setiap tahun mulai umur 10. Mobil sewa bisa lebih sering: tanyakan ke stasiun ITV Anda.",
+    "rn_PT_tax": "IUC: dibayar setahun sekali, pada bulan kendaraan pertama terdaftar, di Portal das Finanças.",
+    "rn_PT_inspection": "IPO: mulai umur 4 tahun setiap 2 tahun, setiap tahun mulai umur 8. Mobil sewa bisa berbeda: cek ke IMT.",
+    "rn_IT_tax": "Bollo auto: dibayar setahun sekali ke wilayah Anda, online lewat pagoPA.",
+    "rn_IT_inspection": "Revisione: 4 tahun setelah registrasi pertama, lalu setiap 2 tahun.",
+    "rn_GR_tax": "Τέλη κυκλοφορίας (pajak jalan): dibayar setahun sekali di gov.gr (myCAR).",
+    "rn_GR_inspection": "ΚΤΕΟ: 4 tahun setelah registrasi pertama, lalu setiap 2 tahun.",
+    "rn_HR_tax": "Registracija: diperpanjang setiap tahun, bersamaan dengan uji teknis.",
+    "rn_HR_inspection": "Tehnički pregled: biasanya setiap tahun, di stasiun uji kendaraan (CVH).",
+    "rn_CY_tax": "Pajak jalan: diperpanjang setiap tahun atau 6 bulan, online di Road Transport Department.",
+    "rn_CY_inspection": "MOT: 4 tahun setelah registrasi pertama, lalu setiap 2 tahun. Mobil sewa bisa wajib setiap tahun.",
+    "rn_MT_tax": "Izin jalan: diperpanjang setiap tahun, online di Transport Malta.",
+    "rn_MT_inspection": "VRT: 4 tahun setelah registrasi pertama, lalu setiap 2 tahun.",
+    "rn_FR_inspection": "Contrôle technique: mobil 4 tahun setelah registrasi pertama, lalu setiap 2 tahun. Motor: 5 tahun, lalu setiap 3 tahun.",
+    "rn_DE_tax": "Kfz-Steuer: ditarik setahun sekali lewat debit otomatis oleh bea cukai (Zoll).",
+    "rn_DE_inspection": "HU (TÜV): mobil 3 tahun setelah registrasi pertama, lalu setiap 2 tahun. Mobil sewa lepas kunci: setiap 12 bulan."
   },
   "customerPage": {
     "back": "Pelanggan",
@@ -3395,7 +3446,11 @@
     "g_owesDetail": "jatuh tempo hari ini atau sebelumnya",
     "g_balance": "Saldo",
     "g_docsMissingList": "Kurang {list}",
-    "g_docsOf": "{count} dari 3"
+    "g_docsOf": "{count} dari 3",
+    "h_kmMi": "{km} mil ditempuh",
+    "f_licenceCategories": "Golongan SIM",
+    "f_dvlaCode": "Kode cek DVLA",
+    "f_dvlaCodeHint": "Pengemudi membuatnya di gov.uk/view-driving-licence. Berlaku 21 hari."
   },
   "vehicleForm": {
     "addTitle": "Tambah kendaraan",
@@ -3568,7 +3623,9 @@
     "qp_add": "Tambah",
     "backSetup": "Pengaturan",
     "quickSubtitle": "Yang dasar saja. Hanya jenis, merek, dan model yang wajib.",
-    "quickLater": "Tanggal pajak & asuransi, kilometer, cicilan, dan lainnya bisa ditambahkan nanti di menu Armada."
+    "quickLater": "Tanggal pajak & asuransi, kilometer, cicilan, dan lainnya bisa ditambahkan nanti di menu Armada.",
+    "valueSummaryMi": "Jarak tempuh sekarang, harga beli, nilai saat ini",
+    "valueSummaryEditMi": "Harga beli, nilai, jarak tempuh saat dibeli"
   },
   "bookingEdit": {
     "booking": "Pemesanan",
@@ -4335,7 +4392,48 @@
     "ag_lang_ms": "Bahasa Melayu",
     "ag_lang_fil": "Bahasa Filipino",
     "ag_lang_lo": "Bahasa Laos",
-    "ag_lang_km": "Bahasa Khmer"
+    "ag_lang_km": "Bahasa Khmer",
+    "tp_kmMi": "Mil yang diizinkan per bulan",
+    "grp_region": "Negara dan satuan",
+    "reg_title": "Negara dan satuan",
+    "reg_body": "Zona waktu, mata uang, jarak, dan pajak Anda. Memilih negara akan mengisi pilihan yang umum.",
+    "reg_country": "Negara",
+    "reg_zone": "Zona waktu",
+    "reg_currency": "Mata uang",
+    "reg_distance": "Jarak",
+    "reg_distanceTip": "Dipakai untuk angka odometer, servis, dan batas jarak. Mengubahnya tidak mengonversi angka yang sudah tersimpan.",
+    "reg_km": "Kilometer (km)",
+    "reg_mi": "Mil (mi)",
+    "vat_on": "Terdaftar PPN atau pajak penjualan",
+    "vat_onTip": "Struk akan menampilkan nomor PPN Anda dan PPN di setiap jumlah.",
+    "vat_number": "Nomor PPN atau NPWP",
+    "vat_rate": "Tarif PPN (%)",
+    "vat_included": "Harga saya sudah termasuk PPN",
+    "vat_includedTip": "Aktif: harga yang Anda ketik adalah yang dibayar pelanggan, sudah termasuk PPN. Nonaktif: RoveHQ menambahkan PPN ke harga kendaraan dan tambahan saat booking dibuat.",
+    "vat_summary": "PPN {rate}%",
+    "vat_note_ie": "Sewa mobil di bawah 5 minggu dalam 12 bulan: 13,5%. Sewa lebih lama: 23%.",
+    "vat_note_es": "Kepulauan Canary: IGIC (7%) sebagai ganti IVA.",
+    "vat_note_pt": "Madeira 22%, Azores 16%.",
+    "vat_note_gr": "Beberapa pulau punya tarif lebih rendah. Cek tarif Anda.",
+    "xp_ready": "Siap pakai:",
+    "xp_additional_driver": "Pengemudi tambahan",
+    "xp_cross_border": "Izin lintas negara",
+    "xp_damage_waiver": "Pembebasan biaya kerusakan",
+    "xp_one_way": "Biaya satu arah",
+    "xp_out_of_hours": "Antar atau jemput di luar jam kerja",
+    "xp_young_driver": "Biaya pengemudi muda",
+    "xp_excess": "Risiko sendiri dengan pembebasan ({symbol})",
+    "xp_excessTip": "Jumlah maksimal yang dibayar penyewa untuk kerusakan jika mengambil pembebasan ini. Dicantumkan di perjanjian sebagai ganti risiko sendiri biasa.",
+    "xp_minAge": "Untuk pengemudi di bawah (usia)",
+    "xp_countries": "Negara yang diizinkan",
+    "xp_countriesPh": "mis. Prancis, Portugal",
+    "ag_lang_el": "Yunani",
+    "ag_lang_es": "Spanyol",
+    "ag_lang_pt": "Portugis",
+    "ag_lang_it": "Italia",
+    "ag_lang_hr": "Kroasia",
+    "ag_lang_fr": "Prancis",
+    "ag_lang_de": "Jerman"
   },
   "accountPage": {
     "roleOwner": "Pemilik",
@@ -4539,7 +4637,8 @@
     "afterRefunds": "setelah {amount} dikembalikan",
     "refundsTitle": "Dikembalikan ke pelanggan",
     "refundsHint": "Pengembalian dana mengurangi uang masuk. Ini bukan biaya operasional.",
-    "refundsHintExtras": "Pengembalian dana mengurangi uang masuk, termasuk {amount} untuk tambahan. Ini bukan biaya operasional."
+    "refundsHintExtras": "Pengembalian dana mengurangi uang masuk, termasuk {amount} untuk tambahan. Ini bukan biaya operasional.",
+    "vatInside": "Termasuk PPN {amount} ({rate}%)"
   },
   "auth": {
     "signInTitle": "Masuk",
@@ -4803,7 +4902,8 @@
     "checksLeft": "Sisa {count, plural, one {# cek pembelian} other {# cek pembelian}} di periode tagihan ini",
     "checksUsedUp": "Cek pembelian habis sampai {date}. Kendaraan yang sudah dicek tetap bisa dibuka.",
     "checksPaidOnly": "Cek pembelian baru tersedia di paket berbayar. Kendaraan yang sudah dicek tetap bisa dibuka.",
-    "checksUpgrade": "Upgrade"
+    "checksUpgrade": "Upgrade",
+    "mileageMi": "Mil sejauh ini"
   },
   "importer": {
     "dt_vehicles": "Kendaraan",
@@ -5046,7 +5146,9 @@
     "cnt_transactions": "{count} catatan keuangan",
     "cnt_vehicles": "{count} kendaraan",
     "imported": "Diimpor",
-    "readNeeds": "Pilih file, tambahkan foto, atau tempel tautan terlebih dahulu."
+    "readNeeds": "Pilih file, tambahkan foto, atau tempel tautan terlebih dahulu.",
+    "f_current_mileageMi": "Jarak tempuh saat ini (mil)",
+    "c_mileageMi": "Jarak tempuh (mil)"
   },
   "errorPages": {
     "notFoundTitle": "Halaman itu tidak ditemukan",
@@ -5288,7 +5390,50 @@
     "liveBody": "Tanyakan apa saja, kirim file, atau bicara dengan orang dari tim RoveHQ.",
     "liveButton": "Buka live chat",
     "fromAssistant": "Asisten RoveHQ",
-    "contentSubtitle": "Artikel, FAQ, video, dan sumber daya yang diminta orang kepada asisten, atau yang tidak bisa dijawabnya. Tidak ada yang diterbitkan sebelum Anda menyetujuinya."
+    "contentSubtitle": "Artikel, FAQ, video, dan sumber daya yang diminta orang kepada asisten, atau yang tidak bisa dijawabnya. Tidak ada yang diterbitkan sebelum Anda menyetujuinya.",
+    "contentTitle": "Permintaan konten bantuan",
+    "contentCollate": "Kumpulkan pertanyaan baru",
+    "contentCollating": "Mengumpulkan…",
+    "contentCollated": "{questions} pertanyaan baru: {created} permintaan baru, {merged} ditambahkan ke yang sudah ada.",
+    "contentNothingNew": "Tidak ada pertanyaan baru untuk dikumpulkan.",
+    "contentSection_suggested": "Disarankan",
+    "contentSection_drafted": "Sudah didraf — menunggu persetujuan",
+    "contentSection_approved": "Disetujui untuk dibuat (video dan sumber)",
+    "contentSection_closed": "Dipublikasikan dan ditolak",
+    "contentEmpty_suggested": "Tidak ada saran. Kumpulkan pertanyaan baru untuk mencari lagi.",
+    "contentEmpty_drafted": "Tidak ada draf yang menunggu.",
+    "contentEmpty_approved": "Tidak ada video atau sumber untuk dibuat.",
+    "contentEmpty_closed": "Belum ada.",
+    "contentKind_article": "Artikel",
+    "contentKind_faq": "FAQ",
+    "contentKind_video": "Video",
+    "contentKind_resource": "Sumber",
+    "contentStatus_published": "Dipublikasikan",
+    "contentStatus_rejected": "Ditolak",
+    "contentAsked": "Ditanyakan {count, plural, other {# kali}}",
+    "contentFor": "Untuk",
+    "contentQuestions": "Pertanyaan ({count})",
+    "contentAskedOn": "ditanyakan di {page}",
+    "contentDraft": "Buat draf",
+    "contentRedraft": "Draf ulang",
+    "contentDrafting": "Menulis…",
+    "contentApprove": "Setujui & publikasikan",
+    "contentApproveConfirm": "Publikasikan ini ke pusat bantuan sekarang?",
+    "contentApproveMake": "Setujui untuk dibuat",
+    "contentMarkMade": "Tandai sudah dibuat",
+    "contentEdit": "Edit draf",
+    "contentSave": "Simpan draf",
+    "contentCancel": "Batal",
+    "contentReject": "Tolak",
+    "contentRejectConfirm": "Tolak permintaan ini?",
+    "contentDraftTitle": "Judul",
+    "contentDraftBody": "Artikel (Markdown)",
+    "contentFaqQ": "Pertanyaan",
+    "contentFaqA": "Jawaban",
+    "contentPreview": "Pratinjau",
+    "contentCheckNote": "Bagian bertanda [check] perlu dipastikan (dan tandanya dihapus) sebelum dipublikasikan.",
+    "contentNoDraftNeeded": "Video dan sumber dibuat oleh tim: setujui untuk memasukkannya ke daftar yang akan dibuat.",
+    "contentView": "Lihat di pusat bantuan"
   },
   "inspectStart": {
     "titleOut": "Serahkan kendaraan",
@@ -5418,7 +5563,10 @@
     "yes": "Ya",
     "no": "Tidak",
     "agreed": "Disetujui pada {date}",
-    "empty": "Belum ada penyewa. Mereka muncul di sini saat seseorang mencentang \"Bagikan informasi saya dengan RoveHQ\" pada pemesanannya."
+    "empty": "Belum ada penyewa. Mereka muncul di sini saat seseorang mencentang \"Bagikan informasi saya dengan RoveHQ\" pada pemesanannya.",
+    "remove": "Hapus dari daftar",
+    "removeConfirm": "Menghapus penyewa ini dan riwayat sewanya dari daftar RoveHQ. Tidak bisa dibatalkan.",
+    "removeButton": "Hapus"
   },
   "site": {
     "skipToContent": "Langsung ke konten",
@@ -5641,7 +5789,19 @@
     "mockAvailable": "Tersedia",
     "mockPerDay": "{amount} per hari",
     "mockQrPay": "Pembayaran QR",
-    "inclImport": "Impor gratis data Anda yang sudah ada"
+    "inclImport": "Impor gratis data Anda yang sudah ada",
+    "cookieBody": "Kami memakai cookie yang diperlukan agar situs ini berjalan. Dengan izin Anda, kami juga memakai cookie analitik untuk melihat halaman mana yang membantu.",
+    "cookieAccept": "Terima",
+    "cookieReject": "Tolak",
+    "cookieChoices": "Pilihan",
+    "cookieChoicesTitle": "Pilihan cookie",
+    "cookieNecessary": "Benar-benar diperlukan",
+    "cookieNecessaryBody": "Bahasa, tema, dan login.",
+    "cookieAlwaysOn": "Selalu aktif",
+    "cookieAnalytics": "Analitik",
+    "cookieAnalyticsBody": "Google Analytics, untuk menghitung kunjungan.",
+    "cookieSave": "Simpan pilihan",
+    "cookiePolicy": "Kebijakan cookie"
   },
   "businessClosed": {
     "title": "Usaha ini telah ditutup",
@@ -6072,7 +6232,21 @@
     "docsRelated": "Artikel terkait",
     "docsAll": "Semua artikel",
     "metaDocsTitle": "Pusat bantuan: cara memakai RoveHQ",
-    "metaDocsDescription": "Panduan dan video RoveHQ: kendaraan, pemesanan, perjanjian, serah terima, pembayaran, biaya, laporan, dan dokumen."
+    "metaDocsDescription": "Panduan dan video RoveHQ: kendaraan, pemesanan, perjanjian, serah terima, pembayaran, biaya, laporan, dan dokumen.",
+    "footerLegal": "Legal",
+    "legalPrivacy": "Privasi",
+    "legalTerms": "Ketentuan",
+    "legalDpa": "Pemrosesan data",
+    "legalSubprocessors": "Subprosesor",
+    "legalCookies": "Cookie",
+    "legalCookieChoices": "Pilihan cookie",
+    "legalIndexTitle": "Legal dan privasi",
+    "legalIndexBody": "Cara RoveHQ menangani data, ketentuan untuk bisnis rental, dan detail untuk arsip Anda.",
+    "legalNotReviewed": "Ditulis oleh RoveHQ berdasarkan panduan publik (ICO, EDPB, Komisi Eropa, PDPC Thailand). Belum ditinjau oleh pengacara.",
+    "legalEnglishOnly": "Halaman ini untuk sementara hanya dalam bahasa Inggris.",
+    "legalUpdated": "Terakhir diperbarui {date}",
+    "cb_mileage_limit_mi": "Batas jarak dalam mil (kosong = tanpa batas)",
+    "cb_excess_km_fee_mi": "Biaya per mil tambahan"
   },
   "gallery": {
     "open": "Buka foto",
@@ -6387,5 +6561,36 @@
     "sRecordCost": "Catat biaya",
     "choose": "Pilih",
     "save": "Simpan"
+  },
+  "privacy": {
+    "title": "Data dan privasi Anda",
+    "body": "Cara RoveHQ menangani data, dan hak-hak Anda.",
+    "linkPrivacy": "Kebijakan privasi",
+    "linkTerms": "Ketentuan layanan",
+    "linkDpa": "Perjanjian pemrosesan data",
+    "linkSubprocessors": "Subprosesor",
+    "linkCookies": "Kebijakan cookie",
+    "exportTitle": "Unduh semua data Anda",
+    "exportBody": "Kendaraan, pelanggan, booking, pembayaran, uang masuk dan keluar, serta dokumen Anda dengan tautan unduhan (berlaku 7 hari).",
+    "exportButton": "Unduh (JSON)",
+    "retentionTitle": "Foto identitas penyewa",
+    "retentionBody": "Hapus foto paspor, SIM, dan selfie secara otomatis setelah sewa terakhir penyewa. Perjanjian yang sudah ditandatangani tetap disimpan.",
+    "retentionOn": "Hapus foto identitas otomatis",
+    "retentionMonths": "Bulan setelah sewa terakhir",
+    "retentionSave": "Simpan",
+    "retentionSaved": "Tersimpan",
+    "deleteTitle": "Hapus bisnis ini",
+    "deleteBody": "Menghapus semuanya secara permanen: kendaraan, pelanggan, booking, pembayaran, dokumen, dan perjanjian yang ditandatangani.",
+    "deleteHint": "Tidak bisa dibatalkan. Unduh data Anda dulu jika perlu. Paket berbayar berakhir tanpa pengembalian dana.",
+    "deleteType": "Ketik {name} untuk konfirmasi",
+    "deleteButton": "Hapus bisnis ini",
+    "deleteConfirm": "Hapus semuanya",
+    "deleteCancel": "Batal",
+    "customerTitle": "Permintaan privasi",
+    "customerBody": "Saat penyewa ini meminta salinan datanya, atau minta datanya dihapus.",
+    "customerExport": "Ekspor data pelanggan ini",
+    "customerDelete": "Hapus pelanggan ini",
+    "customerDeleteBody": "Menghapus detail, foto identitas, dan pesan mereka. Booking, pembayaran, dan perjanjian yang ditandatangani tetap ada sebagai \"Pelanggan dihapus\" untuk pembukuan Anda.",
+    "customerDeleteConfirm": "Hapus data mereka"
   }
 }

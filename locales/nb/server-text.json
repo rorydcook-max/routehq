@@ -268,5 +268,19 @@
   "Payment saved.": "Betalingen er lagret.",
   "Open the booking": "Åpne bookingen",
   "Booking saved. Send this link so they can check and sign:": "Bookingen er lagret. Send denne lenken så kunden kan sjekke og signere:",
-  "Booking saved. Send this link to your customer:": "Bookingen er lagret. Send denne lenken til kunden din:"
+  "Booking saved. Send this link to your customer:": "Bookingen er lagret. Send denne lenken til kunden din:",
+  "Only the owner can do this.": "Bare eieren kan gjøre dette.",
+  "This business could not be found.": "Fant ikke denne bedriften.",
+  "Type the business name exactly to confirm.": "Skriv bedriftsnavnet nøyaktig for å bekrefte.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "RoveHQ-støtte kan ikke slette en bedrift. Be eieren gjøre det.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Sletting av bedrift er ikke tilgjengelig ennå. Kontakt støtte, så gjør vi det for deg.",
+  "This business could not be deleted. Please try again or contact support.": "Kunne ikke slette denne bedriften. Prøv igjen eller kontakt støtte.",
+  "Only an owner or manager can do this.": "Bare en eier eller leder kan gjøre dette.",
+  "This customer could not be found.": "Fant ikke denne kunden.",
+  "Finish or cancel their open bookings first.": "Fullfør eller avbestill kundens åpne bookinger først.",
+  "Deleting a customer isn't available yet. Please contact support.": "Sletting av kunde er ikke tilgjengelig ennå. Kontakt støtte.",
+  "This customer could not be deleted. Please try again.": "Kunne ikke slette denne kunden. Prøv igjen.",
+  "Choose between 1 and 120 months.": "Velg mellom 1 og 120 måneder.",
+  "We couldn't save that. Please try again.": "Vi kunne ikke lagre det. Prøv igjen.",
+  "Please pick a country.": "Velg et land."
 }

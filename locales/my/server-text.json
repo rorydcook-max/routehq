@@ -268,5 +268,19 @@
   "Payment saved.": "ငွေပေးချေမှု သိမ်းပြီးပါပြီ။",
   "Open the booking": "ဘိုကင်ကို ဖွင့်ရန်",
   "Booking saved. Send this link so they can check and sign:": "ဘိုကင် သိမ်းပြီးပါပြီ။ စစ်ဆေးပြီး လက်မှတ်ထိုးနိုင်ရန် ဤလင့်ခ်ကို ပို့ပါ-",
-  "Booking saved. Send this link to your customer:": "ဘိုကင် သိမ်းပြီးပါပြီ။ ဤလင့်ခ်ကို သင့်ဖောက်သည်ထံ ပို့ပါ-"
+  "Booking saved. Send this link to your customer:": "ဘိုကင် သိမ်းပြီးပါပြီ။ ဤလင့်ခ်ကို သင့်ဖောက်သည်ထံ ပို့ပါ-",
+  "Only the owner can do this.": "ပိုင်ရှင်သာ ဤအရာကို လုပ်နိုင်သည်။",
+  "This business could not be found.": "ဤလုပ်ငန်းကို ရှာမတွေ့ပါ။",
+  "Type the business name exactly to confirm.": "အတည်ပြုရန် လုပ်ငန်းအမည်ကို အတိအကျ ရိုက်ပါ။",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "RoveHQ အကူအညီဌာနက လုပ်ငန်းကို ဖျက်၍ မရပါ။ ပိုင်ရှင်ကို ဖျက်ခိုင်းပါ။",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "လုပ်ငန်းဖျက်ခြင်းကို မရရှိနိုင်သေးပါ။ အကူအညီဌာနကို ဆက်သွယ်ပါ၊ ကျွန်ုပ်တို့ လုပ်ပေးပါမည်။",
+  "This business could not be deleted. Please try again or contact support.": "ဤလုပ်ငန်းကို ဖျက်၍ မရပါ။ ထပ်ကြိုးစားပါ သို့မဟုတ် အကူအညီဌာနကို ဆက်သွယ်ပါ။",
+  "Only an owner or manager can do this.": "ပိုင်ရှင် သို့မဟုတ် မန်နေဂျာသာ ဤအရာကို လုပ်နိုင်သည်။",
+  "This customer could not be found.": "ဤဖောက်သည်ကို ရှာမတွေ့ပါ။",
+  "Finish or cancel their open bookings first.": "၎င်းတို့၏ ဖွင့်ထားသော ဘိုကင်များကို အရင် ပြီးဆုံးစေပါ သို့မဟုတ် ပယ်ဖျက်ပါ။",
+  "Deleting a customer isn't available yet. Please contact support.": "ဖောက်သည်ဖျက်ခြင်းကို မရရှိနိုင်သေးပါ။ အကူအညီဌာနကို ဆက်သွယ်ပါ။",
+  "This customer could not be deleted. Please try again.": "ဤဖောက်သည်ကို ဖျက်၍ မရပါ။ ထပ်ကြိုးစားပါ။",
+  "Choose between 1 and 120 months.": "1 မှ 120 လအတွင်း ရွေးပါ။",
+  "We couldn't save that. Please try again.": "သိမ်း၍ မရပါ။ ထပ်ကြိုးစားပါ။",
+  "Please pick a country.": "နိုင်ငံတစ်ခု ရွေးပါ။"
 }

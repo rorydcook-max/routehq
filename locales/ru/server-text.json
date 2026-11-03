@@ -268,5 +268,19 @@
   "Payment saved.": "Оплата сохранена.",
   "Open the booking": "Открыть бронирование",
   "Booking saved. Send this link so they can check and sign:": "Бронирование сохранено. Отправьте эту ссылку, чтобы клиент проверил и подписал:",
-  "Booking saved. Send this link to your customer:": "Бронирование сохранено. Отправьте эту ссылку клиенту:"
+  "Booking saved. Send this link to your customer:": "Бронирование сохранено. Отправьте эту ссылку клиенту:",
+  "Only the owner can do this.": "Это может сделать только владелец.",
+  "This business could not be found.": "Этот бизнес не найден.",
+  "Type the business name exactly to confirm.": "Для подтверждения введите название бизнеса точно.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "Поддержка RoveHQ не может удалить бизнес. Попросите об этом владельца.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Удаление бизнеса пока недоступно. Обратитесь в поддержку, и мы сделаем это за вас.",
+  "This business could not be deleted. Please try again or contact support.": "Не удалось удалить этот бизнес. Попробуйте ещё раз или обратитесь в поддержку.",
+  "Only an owner or manager can do this.": "Это может сделать только владелец или менеджер.",
+  "This customer could not be found.": "Этот клиент не найден.",
+  "Finish or cancel their open bookings first.": "Сначала завершите или отмените открытые бронирования клиента.",
+  "Deleting a customer isn't available yet. Please contact support.": "Удаление клиента пока недоступно. Обратитесь в поддержку.",
+  "This customer could not be deleted. Please try again.": "Не удалось удалить этого клиента. Попробуйте ещё раз.",
+  "Choose between 1 and 120 months.": "Выберите от 1 до 120 месяцев.",
+  "We couldn't save that. Please try again.": "Не удалось сохранить. Попробуйте ещё раз.",
+  "Please pick a country.": "Выберите страну."
 }

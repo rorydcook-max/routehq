@@ -125,7 +125,9 @@
     "bkTitle": "Đặt xe",
     "bkAll": "Tất cả đặt xe",
     "emailVerified": "Đã xác thực email. Cảm ơn bạn!",
-    "emailLinkOld": "Liên kết đó đã hết hạn. Chạm vào \"Xác thực email\" để lấy liên kết mới."
+    "emailLinkOld": "Liên kết đó đã hết hạn. Chạm vào \"Xác thực email\" để lấy liên kết mới.",
+    "kmToGoMi": "Còn {km} dặm",
+    "kmOverMi": "Vượt {km} dặm"
   },
   "settings": {
     "contractsBranding": {
@@ -383,7 +385,16 @@
     "lateOptTodayDetailMoves": "Mọi ngày thanh toán lùi lại {days} ngày",
     "lateOptTodayDetailPlain": "Trả xe {date} như đã đặt",
     "lateOptTodayTitle": "Bắt đầu tính tiền thuê từ hôm nay",
-    "outAtKm": "Giao xe ở {km} km"
+    "outAtKm": "Giao xe ở {km} km",
+    "confirmOdometerMi": "Số đồng hồ công-tơ-mét (dặm)",
+    "ocrSuggestedMi": "Gợi ý từ ảnh: {km} dặm.",
+    "ocrPossibleMi": "Có thể là: {km} dặm. Hãy đối chiếu với đồng hồ.",
+    "odometerBelowLastMi": "Thấp hơn số lần trước ({km} dặm). Vui lòng kiểm tra.",
+    "drivenDuringRentalMi": "Đã chạy từ lúc giao xe: {km} dặm",
+    "odometerAtDeliveryMi": "Lúc giao xe: {km} dặm",
+    "kmValueMi": "{km} dặm",
+    "odometerHugeMi": "Cao hơn số lần trước {km} dặm. Vui lòng kiểm tra.",
+    "outAtKmMi": "Xuất xe ở {km} dặm"
   },
   "vehicles": {
     "addVehicle": "Thêm xe"
@@ -890,7 +901,9 @@
     "offersDetails": "Tên, thông tin liên hệ, quốc tịch và ngôn ngữ, lịch sử thuê xe: địa điểm và thời gian thuê, loại xe, số tiền thanh toán, phụ phí, quãng đường, tiền đặt cọc và mức miễn bồi thường thiệt hại. RoveHQ có thể nhắn tin hoặc gửi email các ưu đãi như đưa đón sân bay, tour du lịch và thẻ SIM. Tắt tính năng này sẽ xóa bản sao của RoveHQ.",
     "bookedUntil": "Đã được đặt đến {date}",
     "noneFree": "Không còn xe trống từ {start}.",
-    "noneFreeEarliest": "Không còn xe trống từ {start}. Sớm nhất là {date} ({vehicle})."
+    "noneFreeEarliest": "Không còn xe trống từ {start}. Sớm nhất là {date} ({vehicle}).",
+    "privacyLink": "{business} và RoveHQ sử dụng thông tin của bạn như thế nào",
+    "vatIncluded": "Giá đã bao gồm {name} {rate}%"
   },
   "customerMessages": {
     "hi": "Chào {name},",
@@ -1595,7 +1608,9 @@
     "coverFrom": "Áp dụng từ",
     "coverTo": "Áp dụng đến",
     "coverHint": "Trả cho một năm trở lên? Thêm ngày để chia đều vào mỗi tháng.",
-    "coverUpdateCar": "Đặt luôn {name} của xe hết hạn ngày {date}"
+    "coverUpdateCar": "Đặt luôn {name} của xe hết hạn ngày {date}",
+    "sv_nextKmMi": "Bảo dưỡng tiếp theo (dặm)",
+    "sv_hintMi": "Đặt ngày, số dặm hoặc cả hai. Mốc nào đến trước thì đến hạn."
   },
   "booking": {
     "open": "Mở",
@@ -2482,7 +2497,10 @@
     "remind_openingWhatsApp": "Đang mở WhatsApp kèm lời nhắc",
     "remind_nothingOwed": "Đơn đặt này không còn khoản nào phải trả",
     "remind_notFound": "Không tìm thấy đơn đặt này",
-    "remind_signedOut": "Vui lòng đăng nhập lại"
+    "remind_signedOut": "Vui lòng đăng nhập lại",
+    "kmAtReturnMi": "{km} dặm lúc trả xe",
+    "kmAtHandoverMi": "{km} dặm lúc giao xe",
+    "kmDrivenMi": "Đã chạy {km} dặm"
   },
   "newBooking": {
     "docsSelfie": "Ảnh khách hàng",
@@ -3250,7 +3268,40 @@
     "f_monthlyHint": "Cộng {amount} vào chi phí mỗi tháng đến {date}.",
     "cs_monthly": "{amount} mỗi tháng",
     "f_inspectionCost": "Phí kiểm định ({name})",
-    "f_inspectionHint": "Xe cũ được kiểm định khi gia hạn thuế (ô tô trên 7 năm, xe máy trên 5 năm). Để trống nếu không cần."
+    "f_inspectionHint": "Xe cũ được kiểm định khi gia hạn thuế (ô tô trên 7 năm, xe máy trên 5 năm). Để trống nếu không cần.",
+    "m_hintBothMi": "Đặt ngày, số dặm hoặc cả hai. Mốc nào đến trước thì đến hạn.",
+    "sv_nextBothMi": "{date} hoặc {km} dặm, tùy mốc nào đến trước",
+    "sv_kmOnlyMi": "ở {km} dặm",
+    "sv_kmLeftMi": "Còn {km} dặm",
+    "sv_kmOverMi": "Vượt {km} dặm",
+    "kmMi": "{km} dặm",
+    "m_atKmMi": "Ở {km} dặm",
+    "m_nextKmMi": "Lần tới đến hạn ở (dặm)",
+    "x_mileageMi": "Số dặm {km} dặm",
+    "h_kmMi": "Đã chạy {km} dặm",
+    "rn_official": "Trang chính thức",
+    "rn_EU_insurance": "Bảo hiểm trách nhiệm dân sự là bắt buộc. Xe cho thuê cần hợp đồng bảo hiểm bao gồm thuê xe tự lái.",
+    "rn_GB_tax": "Đóng thuế trực tuyến cho 12 hoặc 6 tháng, hoặc hằng tháng qua Direct Debit. Cần sổ đăng ký V5C hoặc thư nhắc.",
+    "rn_GB_inspection": "MOT: lần đầu khi xe được 3 năm, sau đó hằng năm. Có thể làm sớm tối đa một tháng mà vẫn giữ ngày cũ.",
+    "rn_IE_tax": "Thuế xe: đóng trực tuyến cho 3, 6 hoặc 12 tháng. Cần thông tin bảo hiểm.",
+    "rn_IE_inspection": "NCT: từ 4 năm tuổi thì 2 năm một lần, từ 10 năm tuổi thì hằng năm.",
+    "rn_ES_tax": "IVTM (impuesto de circulación): đóng mỗi năm một lần cho tòa thị chính nơi xe đăng ký.",
+    "rn_ES_inspection": "ITV: xe con cá nhân từ 4 năm tuổi thì 2 năm một lần, từ 10 năm thì hằng năm. Xe cho thuê có thể cần thường xuyên hơn: hỏi trạm ITV của bạn.",
+    "rn_PT_tax": "IUC: đóng mỗi năm một lần, vào tháng xe đăng ký lần đầu, trên Portal das Finanças.",
+    "rn_PT_inspection": "IPO: từ 4 năm tuổi thì 2 năm một lần, từ 8 năm thì hằng năm. Xe cho thuê có thể khác: kiểm tra với IMT.",
+    "rn_IT_tax": "Bollo auto: đóng mỗi năm một lần cho vùng của bạn, trực tuyến qua pagoPA.",
+    "rn_IT_inspection": "Revisione: 4 năm sau lần đăng ký đầu, sau đó 2 năm một lần.",
+    "rn_GR_tax": "Τέλη κυκλοφορίας (thuế đường bộ): đóng mỗi năm một lần trên gov.gr (myCAR).",
+    "rn_GR_inspection": "ΚΤΕΟ: 4 năm sau lần đăng ký đầu, sau đó 2 năm một lần.",
+    "rn_HR_tax": "Registracija: gia hạn hằng năm, cùng lúc với kiểm định kỹ thuật.",
+    "rn_HR_inspection": "Tehnički pregled: thường hằng năm, tại trạm kiểm định xe (CVH).",
+    "rn_CY_tax": "Thuế đường bộ: gia hạn hằng năm hoặc 6 tháng, trực tuyến với Road Transport Department.",
+    "rn_CY_inspection": "MOT: 4 năm sau lần đăng ký đầu, sau đó 2 năm một lần. Xe cho thuê có thể cần hằng năm.",
+    "rn_MT_tax": "Giấy phép lưu hành: gia hạn hằng năm, trực tuyến với Transport Malta.",
+    "rn_MT_inspection": "VRT: 4 năm sau lần đăng ký đầu, sau đó 2 năm một lần.",
+    "rn_FR_inspection": "Contrôle technique: ô tô 4 năm sau lần đăng ký đầu, sau đó 2 năm một lần. Xe máy: 5 năm, sau đó 3 năm một lần.",
+    "rn_DE_tax": "Kfz-Steuer: hải quan (Zoll) tự động trừ tài khoản mỗi năm một lần.",
+    "rn_DE_inspection": "HU (TÜV): ô tô 3 năm sau lần đăng ký đầu, sau đó 2 năm một lần. Xe cho thuê tự lái: 12 tháng một lần."
   },
   "customerPage": {
     "back": "Khách hàng",
@@ -3395,7 +3446,11 @@
     "g_owesDetail": "đến hạn hôm nay hoặc trước đó",
     "g_balance": "Số dư",
     "g_docsMissingList": "Thiếu {list}",
-    "g_docsOf": "{count}/3"
+    "g_docsOf": "{count}/3",
+    "h_kmMi": "Đã chạy {km} dặm",
+    "f_licenceCategories": "Hạng bằng lái",
+    "f_dvlaCode": "Mã kiểm tra DVLA",
+    "f_dvlaCodeHint": "Tài xế tạo mã tại gov.uk/view-driving-licence. Mã có hiệu lực 21 ngày."
   },
   "vehicleForm": {
     "addTitle": "Thêm xe",
@@ -3568,7 +3623,9 @@
     "qp_add": "Thêm",
     "backSetup": "Thiết lập",
     "quickSubtitle": "Chỉ các thông tin cơ bản. Chỉ cần loại xe, hãng và dòng xe.",
-    "quickLater": "Ngày đóng thuế, bảo hiểm, số km, khoản vay và thông tin khác có thể thêm sau ở phần Đội xe."
+    "quickLater": "Ngày đóng thuế, bảo hiểm, số km, khoản vay và thông tin khác có thể thêm sau ở phần Đội xe.",
+    "valueSummaryMi": "Số dặm hiện tại, giá đã mua, giá trị hiện tại",
+    "valueSummaryEditMi": "Giá mua, giá trị, số dặm lúc mua"
   },
   "bookingEdit": {
     "booking": "Đơn đặt xe",
@@ -4335,7 +4392,48 @@
     "ag_lang_ms": "tiếng Mã Lai",
     "ag_lang_fil": "tiếng Filipino",
     "ag_lang_lo": "tiếng Lào",
-    "ag_lang_km": "tiếng Khmer"
+    "ag_lang_km": "tiếng Khmer",
+    "tp_kmMi": "Số dặm cho phép mỗi tháng",
+    "grp_region": "Quốc gia và đơn vị",
+    "reg_title": "Quốc gia và đơn vị",
+    "reg_body": "Múi giờ, tiền tệ, khoảng cách và thuế của bạn. Chọn quốc gia sẽ tự điền các lựa chọn thông dụng.",
+    "reg_country": "Quốc gia",
+    "reg_zone": "Múi giờ",
+    "reg_currency": "Tiền tệ",
+    "reg_distance": "Khoảng cách",
+    "reg_distanceTip": "Dùng cho số đồng hồ, bảo dưỡng và giới hạn quãng đường. Thay đổi sẽ không quy đổi các số đã lưu.",
+    "reg_km": "Ki-lô-mét (km)",
+    "reg_mi": "Dặm (mi)",
+    "vat_on": "Đã đăng ký thuế GTGT (VAT) hoặc thuế bán hàng",
+    "vat_onTip": "Hóa đơn sẽ hiển thị mã số thuế và VAT trong từng khoản.",
+    "vat_number": "Mã số VAT hoặc mã số thuế",
+    "vat_rate": "Thuế suất VAT (%)",
+    "vat_included": "Giá của tôi đã gồm VAT",
+    "vat_includedTip": "Bật: giá bạn nhập là số khách trả, đã gồm VAT. Tắt: RoveHQ cộng VAT vào giá xe và dịch vụ thêm khi có đặt xe.",
+    "vat_summary": "VAT {rate}%",
+    "vat_note_ie": "Thuê xe dưới 5 tuần trong 12 tháng: 13,5%. Thuê lâu hơn: 23%.",
+    "vat_note_es": "Quần đảo Canary: IGIC (7%) thay cho IVA.",
+    "vat_note_pt": "Madeira 22%, Azores 16%.",
+    "vat_note_gr": "Một số đảo có thuế suất thấp hơn. Hãy kiểm tra nơi của bạn.",
+    "xp_ready": "Có sẵn:",
+    "xp_additional_driver": "Tài xế thêm",
+    "xp_cross_border": "Cho phép qua biên giới",
+    "xp_damage_waiver": "Miễn trừ thiệt hại",
+    "xp_one_way": "Phí một chiều",
+    "xp_out_of_hours": "Giao hoặc nhận xe ngoài giờ",
+    "xp_young_driver": "Phí tài xế trẻ",
+    "xp_excess": "Mức tự chịu khi có miễn trừ ({symbol})",
+    "xp_excessTip": "Số tiền tối đa người thuê trả cho hư hỏng khi chọn miễn trừ. Mức này ghi trong hợp đồng thay cho mức tự chịu thông thường.",
+    "xp_minAge": "Cho tài xế dưới (tuổi)",
+    "xp_countries": "Các nước được phép",
+    "xp_countriesPh": "vd: Pháp, Bồ Đào Nha",
+    "ag_lang_el": "Tiếng Hy Lạp",
+    "ag_lang_es": "Tiếng Tây Ban Nha",
+    "ag_lang_pt": "Tiếng Bồ Đào Nha",
+    "ag_lang_it": "Tiếng Ý",
+    "ag_lang_hr": "Tiếng Croatia",
+    "ag_lang_fr": "Tiếng Pháp",
+    "ag_lang_de": "Tiếng Đức"
   },
   "accountPage": {
     "roleOwner": "Chủ sở hữu",
@@ -4539,7 +4637,8 @@
     "afterRefunds": "sau khi hoàn trả {amount}",
     "refundsTitle": "Đã hoàn trả cho khách",
     "refundsHint": "Tiền hoàn trả được trừ vào tiền vào. Đây không phải chi phí vận hành.",
-    "refundsHintExtras": "Tiền hoàn trả được trừ vào tiền vào, gồm {amount} cho dịch vụ thêm. Đây không phải chi phí vận hành."
+    "refundsHintExtras": "Tiền hoàn trả được trừ vào tiền vào, gồm {amount} cho dịch vụ thêm. Đây không phải chi phí vận hành.",
+    "vatInside": "Đã gồm VAT {amount} ({rate}%)"
   },
   "auth": {
     "signInTitle": "Đăng nhập",
@@ -4803,7 +4902,8 @@
     "checksLeft": "Còn {count, plural, one {# lượt kiểm tra trước khi mua} other {# lượt kiểm tra trước khi mua}} trong kỳ thanh toán này",
     "checksUsedUp": "Hết lượt kiểm tra trước khi mua đến {date}. Các xe đã kiểm tra vẫn mở được.",
     "checksPaidOnly": "Lượt kiểm tra trước khi mua mới chỉ có ở gói trả phí. Các xe đã kiểm tra vẫn mở được.",
-    "checksUpgrade": "Nâng cấp"
+    "checksUpgrade": "Nâng cấp",
+    "mileageMi": "Số dặm đến nay"
   },
   "importer": {
     "dt_vehicles": "Xe",
@@ -5046,7 +5146,9 @@
     "cnt_transactions": "{count} bản ghi thu chi",
     "cnt_vehicles": "{count} xe",
     "imported": "Đã nhập",
-    "readNeeds": "Hãy chọn tệp, thêm ảnh hoặc dán liên kết trước."
+    "readNeeds": "Hãy chọn tệp, thêm ảnh hoặc dán liên kết trước.",
+    "f_current_mileageMi": "Số dặm hiện tại (dặm)",
+    "c_mileageMi": "Số dặm (dặm)"
   },
   "errorPages": {
     "notFoundTitle": "Không tìm thấy trang đó",
@@ -5288,7 +5390,50 @@
     "liveBody": "Hỏi bất cứ điều gì, gửi tệp, hoặc nói chuyện với một người trong đội ngũ RoveHQ.",
     "liveButton": "Mở chat trực tiếp",
     "fromAssistant": "Trợ lý RoveHQ",
-    "contentSubtitle": "Bài viết, câu hỏi thường gặp, video và tài liệu mà người dùng đã yêu cầu trợ lý, hoặc trợ lý không trả lời được. Không có gì được đăng cho đến khi bạn phê duyệt."
+    "contentSubtitle": "Bài viết, câu hỏi thường gặp, video và tài liệu mà người dùng đã yêu cầu trợ lý, hoặc trợ lý không trả lời được. Không có gì được đăng cho đến khi bạn phê duyệt.",
+    "contentTitle": "Yêu cầu nội dung trợ giúp",
+    "contentCollate": "Tổng hợp câu hỏi mới",
+    "contentCollating": "Đang tổng hợp…",
+    "contentCollated": "{questions} câu hỏi mới: {created} yêu cầu mới, {merged} được thêm vào yêu cầu có sẵn.",
+    "contentNothingNew": "Không có câu hỏi mới để tổng hợp.",
+    "contentSection_suggested": "Đề xuất",
+    "contentSection_drafted": "Đã soạn — chờ duyệt",
+    "contentSection_approved": "Đã duyệt để làm (video và tài liệu)",
+    "contentSection_closed": "Đã đăng và đã từ chối",
+    "contentEmpty_suggested": "Chưa có đề xuất. Tổng hợp câu hỏi mới để xem thêm.",
+    "contentEmpty_drafted": "Không có bản nháp đang chờ.",
+    "contentEmpty_approved": "Không có video hay tài liệu cần làm.",
+    "contentEmpty_closed": "Chưa có gì.",
+    "contentKind_article": "Bài viết",
+    "contentKind_faq": "Câu hỏi thường gặp",
+    "contentKind_video": "Video",
+    "contentKind_resource": "Tài liệu",
+    "contentStatus_published": "Đã đăng",
+    "contentStatus_rejected": "Đã từ chối",
+    "contentAsked": "Được hỏi {count, plural, other {# lần}}",
+    "contentFor": "Dành cho",
+    "contentQuestions": "Các câu hỏi ({count})",
+    "contentAskedOn": "hỏi tại {page}",
+    "contentDraft": "Soạn nháp",
+    "contentRedraft": "Soạn lại",
+    "contentDrafting": "Đang viết…",
+    "contentApprove": "Duyệt & đăng",
+    "contentApproveConfirm": "Đăng nội dung này lên trung tâm trợ giúp ngay?",
+    "contentApproveMake": "Duyệt để làm",
+    "contentMarkMade": "Đánh dấu đã làm",
+    "contentEdit": "Sửa bản nháp",
+    "contentSave": "Lưu bản nháp",
+    "contentCancel": "Hủy",
+    "contentReject": "Từ chối",
+    "contentRejectConfirm": "Từ chối yêu cầu này?",
+    "contentDraftTitle": "Tiêu đề",
+    "contentDraftBody": "Bài viết (Markdown)",
+    "contentFaqQ": "Câu hỏi",
+    "contentFaqA": "Câu trả lời",
+    "contentPreview": "Xem trước",
+    "contentCheckNote": "Mọi chỗ đánh dấu [check] cần được xác nhận (và xóa dấu) trước khi đăng.",
+    "contentNoDraftNeeded": "Video và tài liệu do đội ngũ làm: hãy duyệt để đưa vào danh sách cần làm.",
+    "contentView": "Xem trong trung tâm trợ giúp"
   },
   "inspectStart": {
     "titleOut": "Giao xe",
@@ -5418,7 +5563,10 @@
     "yes": "Có",
     "no": "Không",
     "agreed": "Đồng ý ngày {date}",
-    "empty": "Chưa có người thuê. Họ sẽ hiện ở đây khi ai đó đánh dấu \"Chia sẻ thông tin của tôi với RoveHQ\" khi đặt xe."
+    "empty": "Chưa có người thuê. Họ sẽ hiện ở đây khi ai đó đánh dấu \"Chia sẻ thông tin của tôi với RoveHQ\" khi đặt xe.",
+    "remove": "Xóa khỏi danh sách",
+    "removeConfirm": "Xóa người thuê này và lịch sử thuê của họ khỏi danh sách của RoveHQ. Không thể hoàn tác.",
+    "removeButton": "Xóa"
   },
   "site": {
     "skipToContent": "Chuyển đến nội dung",
@@ -5641,7 +5789,19 @@
     "mockAvailable": "Còn trống",
     "mockPerDay": "{amount} một ngày",
     "mockQrPay": "Thanh toán QR",
-    "inclImport": "Nhập miễn phí hồ sơ hiện có của bạn"
+    "inclImport": "Nhập miễn phí hồ sơ hiện có của bạn",
+    "cookieBody": "Chúng tôi dùng cookie cần thiết để vận hành trang này. Nếu bạn đồng ý, chúng tôi cũng dùng cookie phân tích để biết trang nào hữu ích.",
+    "cookieAccept": "Đồng ý",
+    "cookieReject": "Từ chối",
+    "cookieChoices": "Tùy chọn",
+    "cookieChoicesTitle": "Tùy chọn cookie",
+    "cookieNecessary": "Thực sự cần thiết",
+    "cookieNecessaryBody": "Ngôn ngữ, giao diện và đăng nhập.",
+    "cookieAlwaysOn": "Luôn bật",
+    "cookieAnalytics": "Phân tích",
+    "cookieAnalyticsBody": "Google Analytics, để đếm lượt truy cập.",
+    "cookieSave": "Lưu tùy chọn",
+    "cookiePolicy": "Chính sách cookie"
   },
   "businessClosed": {
     "title": "Doanh nghiệp này đã bị đóng",
@@ -6072,7 +6232,21 @@
     "docsRelated": "Bài viết liên quan",
     "docsAll": "Tất cả bài viết",
     "metaDocsTitle": "Trung tâm trợ giúp: cách dùng RoveHQ",
-    "metaDocsDescription": "Hướng dẫn và video RoveHQ: xe, đặt xe, hợp đồng, giao nhận xe, thanh toán, chi phí, báo cáo và giấy tờ."
+    "metaDocsDescription": "Hướng dẫn và video RoveHQ: xe, đặt xe, hợp đồng, giao nhận xe, thanh toán, chi phí, báo cáo và giấy tờ.",
+    "footerLegal": "Pháp lý",
+    "legalPrivacy": "Quyền riêng tư",
+    "legalTerms": "Điều khoản",
+    "legalDpa": "Xử lý dữ liệu",
+    "legalSubprocessors": "Bên xử lý phụ",
+    "legalCookies": "Cookie",
+    "legalCookieChoices": "Tùy chọn cookie",
+    "legalIndexTitle": "Pháp lý và quyền riêng tư",
+    "legalIndexBody": "Cách RoveHQ xử lý thông tin, điều khoản cho doanh nghiệp cho thuê và thông tin để bạn lưu hồ sơ.",
+    "legalNotReviewed": "Do RoveHQ soạn dựa trên hướng dẫn công khai (ICO, EDPB, Ủy ban châu Âu, PDPC Thái Lan). Chưa được luật sư xem xét.",
+    "legalEnglishOnly": "Trang này hiện chỉ có tiếng Anh.",
+    "legalUpdated": "Cập nhật lần cuối {date}",
+    "cb_mileage_limit_mi": "Giới hạn quãng đường theo dặm (để trống = không giới hạn)",
+    "cb_excess_km_fee_mi": "Phí mỗi dặm vượt"
   },
   "gallery": {
     "open": "Mở ảnh",
@@ -6387,5 +6561,36 @@
     "sRecordCost": "Ghi chi phí",
     "choose": "Chọn",
     "save": "Lưu"
+  },
+  "privacy": {
+    "title": "Dữ liệu và quyền riêng tư của bạn",
+    "body": "Cách RoveHQ xử lý thông tin và quyền của bạn.",
+    "linkPrivacy": "Chính sách quyền riêng tư",
+    "linkTerms": "Điều khoản dịch vụ",
+    "linkDpa": "Thỏa thuận xử lý dữ liệu",
+    "linkSubprocessors": "Bên xử lý phụ",
+    "linkCookies": "Chính sách cookie",
+    "exportTitle": "Tải xuống toàn bộ dữ liệu",
+    "exportBody": "Xe, khách hàng, đặt xe, thanh toán, thu chi và tài liệu của bạn kèm liên kết tải xuống (hiệu lực 7 ngày).",
+    "exportButton": "Tải xuống (JSON)",
+    "retentionTitle": "Ảnh giấy tờ của người thuê",
+    "retentionBody": "Tự động xóa ảnh hộ chiếu, bằng lái và ảnh selfie sau lần thuê cuối của người thuê. Hợp đồng đã ký vẫn được giữ.",
+    "retentionOn": "Tự động xóa ảnh giấy tờ",
+    "retentionMonths": "Số tháng sau lần thuê cuối",
+    "retentionSave": "Lưu",
+    "retentionSaved": "Đã lưu",
+    "deleteTitle": "Xóa doanh nghiệp này",
+    "deleteBody": "Xóa vĩnh viễn mọi thứ: xe, khách hàng, đặt xe, thanh toán, tài liệu và hợp đồng đã ký.",
+    "deleteHint": "Không thể hoàn tác. Hãy tải dữ liệu xuống trước nếu cần. Gói trả phí sẽ kết thúc và không hoàn tiền.",
+    "deleteType": "Nhập {name} để xác nhận",
+    "deleteButton": "Xóa doanh nghiệp này",
+    "deleteConfirm": "Xóa tất cả",
+    "deleteCancel": "Hủy",
+    "customerTitle": "Yêu cầu về quyền riêng tư",
+    "customerBody": "Khi người thuê này yêu cầu bản sao dữ liệu của họ, hoặc yêu cầu xóa.",
+    "customerExport": "Xuất dữ liệu của khách hàng này",
+    "customerDelete": "Xóa khách hàng này",
+    "customerDeleteBody": "Xóa thông tin, ảnh giấy tờ và tin nhắn của họ. Đặt xe, thanh toán và hợp đồng đã ký vẫn được giữ dưới tên \"Khách hàng đã xóa\" cho sổ sách của bạn.",
+    "customerDeleteConfirm": "Xóa dữ liệu của họ"
   }
 }

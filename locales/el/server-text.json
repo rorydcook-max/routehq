@@ -268,5 +268,19 @@
   "Payment saved.": "Η πληρωμή αποθηκεύτηκε.",
   "Open the booking": "Άνοιγμα κράτησης",
   "Booking saved. Send this link so they can check and sign:": "Η κράτηση αποθηκεύτηκε. Στείλτε αυτόν τον σύνδεσμο για έλεγχο και υπογραφή:",
-  "Booking saved. Send this link to your customer:": "Η κράτηση αποθηκεύτηκε. Στείλτε αυτόν τον σύνδεσμο στον πελάτη σας:"
+  "Booking saved. Send this link to your customer:": "Η κράτηση αποθηκεύτηκε. Στείλτε αυτόν τον σύνδεσμο στον πελάτη σας:",
+  "Only the owner can do this.": "Μόνο ο ιδιοκτήτης μπορεί να το κάνει αυτό.",
+  "This business could not be found.": "Η επιχείρηση δεν βρέθηκε.",
+  "Type the business name exactly to confirm.": "Πληκτρολογήστε ακριβώς το όνομα της επιχείρησης για επιβεβαίωση.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "Η υποστήριξη της RoveHQ δεν μπορεί να διαγράψει μια επιχείρηση. Ζητήστε από τον ιδιοκτήτη να το κάνει.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Η διαγραφή επιχείρησης δεν είναι ακόμη διαθέσιμη. Επικοινωνήστε με την υποστήριξη και θα το κάνουμε εμείς για εσάς.",
+  "This business could not be deleted. Please try again or contact support.": "Δεν ήταν δυνατή η διαγραφή της επιχείρησης. Δοκιμάστε ξανά ή επικοινωνήστε με την υποστήριξη.",
+  "Only an owner or manager can do this.": "Μόνο ο ιδιοκτήτης ή ο διαχειριστής μπορεί να το κάνει αυτό.",
+  "This customer could not be found.": "Ο πελάτης δεν βρέθηκε.",
+  "Finish or cancel their open bookings first.": "Ολοκληρώστε ή ακυρώστε πρώτα τις ανοιχτές κρατήσεις του.",
+  "Deleting a customer isn't available yet. Please contact support.": "Η διαγραφή πελάτη δεν είναι ακόμη διαθέσιμη. Επικοινωνήστε με την υποστήριξη.",
+  "This customer could not be deleted. Please try again.": "Δεν ήταν δυνατή η διαγραφή του πελάτη. Δοκιμάστε ξανά.",
+  "Choose between 1 and 120 months.": "Επιλέξτε από 1 έως 120 μήνες.",
+  "We couldn't save that. Please try again.": "Δεν ήταν δυνατή η αποθήκευση. Δοκιμάστε ξανά.",
+  "Please pick a country.": "Επιλέξτε χώρα."
 }

@@ -125,7 +125,9 @@
     "bkTitle": "Bestillinger",
     "bkAll": "Alle bestillinger",
     "emailVerified": "E-post bekreftet. Takk!",
-    "emailLinkOld": "Den lenken har utløpt. Trykk på \"Bekreft e-postadressen din\" for å få en ny."
+    "emailLinkOld": "Den lenken har utløpt. Trykk på \"Bekreft e-postadressen din\" for å få en ny.",
+    "kmToGoMi": "{km} miles igjen",
+    "kmOverMi": "{km} miles over"
   },
   "vehicles": {
     "addVehicle": "Legg til kjøretøy"
@@ -389,7 +391,16 @@
     "lateOptTodayDetailMoves": "Alle betalingsdatoer flyttes {days, plural, one {# dag} other {# dager}} senere",
     "lateOptTodayDetailPlain": "Tilbake {date} som bestilt",
     "lateOptTodayTitle": "Start leien i dag",
-    "outAtKm": "Ut ved {km} km"
+    "outAtKm": "Ut ved {km} km",
+    "confirmOdometerMi": "Kilometerstand (miles)",
+    "ocrSuggestedMi": "Forslag fra bildet: {km} miles.",
+    "ocrPossibleMi": "Mulig avlesning: {km} miles. Sjekk mot telleren.",
+    "odometerBelowLastMi": "Lavere enn forrige avlesning ({km} miles). Sjekk den.",
+    "drivenDuringRentalMi": "Kjørt siden overlevering: {km} miles",
+    "odometerAtDeliveryMi": "Ved overlevering: {km} miles",
+    "kmValueMi": "{km} miles",
+    "odometerHugeMi": "{km} miles mer enn forrige avlesning. Sjekk den.",
+    "outAtKmMi": "Ut ved {km} miles"
   },
   "translation": {
     "translatedFrom": "Oversatt fra {language}",
@@ -890,7 +901,9 @@
     "offersDetails": "Navnet mitt, kontaktinformasjon, nasjonalitet og språk, samt leiehistorikken min: hvor og når jeg leier, kjøretøyet, hva jeg betaler, tillegg, kjørelengde, depositum og skader. RoveHQ kan sende meg meldinger eller e-poster med tilbud som flyplasstransport, turer og SIM-kort. Å slå av dette sletter RoveHQs kopi.",
     "bookedUntil": "Bestilt til {date}",
     "noneFree": "Ingenting er ledig fra {start}.",
-    "noneFreeEarliest": "Ingenting er ledig fra {start}. Tidligst er {date} ({vehicle})."
+    "noneFreeEarliest": "Ingenting er ledig fra {start}. Tidligst er {date} ({vehicle}).",
+    "privacyLink": "Hvordan {business} og RoveHQ bruker opplysningene dine",
+    "vatIncluded": "Prisene inkluderer {name} på {rate} %"
   },
   "customerMessages": {
     "hi": "Hei {name},",
@@ -1555,7 +1568,9 @@
     "coverFrom": "Dekker fra",
     "coverTo": "Dekker til",
     "coverHint": "Betalt for ett år eller mer? Legg inn datoene, så telles en andel hver måned.",
-    "coverUpdateCar": "Sett også kjøretøyets {name} til å utløpe {date}"
+    "coverUpdateCar": "Sett også kjøretøyets {name} til å utløpe {date}",
+    "sv_nextKmMi": "Neste service (miles)",
+    "sv_hintMi": "Angi en dato, en stand eller begge. Det som kommer først, avgjør når den forfaller."
   },
   "booking": {
     "open": "Åpen",
@@ -2442,7 +2457,10 @@
     "remind_openingWhatsApp": "Åpner WhatsApp med påminnelsen",
     "remind_nothingOwed": "Det er ingenting utestående på denne bookingen",
     "remind_notFound": "Vi fant ikke denne bookingen",
-    "remind_signedOut": "Logg inn på nytt"
+    "remind_signedOut": "Logg inn på nytt",
+    "kmAtReturnMi": "{km} miles ved retur",
+    "kmAtHandoverMi": "{km} miles ved overlevering",
+    "kmDrivenMi": "{km} miles kjørt"
   },
   "newBooking": {
     "docsSelfie": "Bilde av kunden",
@@ -3210,7 +3228,40 @@
     "f_monthlyHint": "{amount} legges til kostnadene dine hver måned frem til {date}.",
     "cs_monthly": "{amount} i måneden",
     "f_inspectionCost": "Kontrollkostnad ({name})",
-    "f_inspectionHint": "Eldre kjøretøy kontrolleres når veiavgiften fornyes (biler over 7 år, motorsykler over 5). La stå tomt om det ikke trengs."
+    "f_inspectionHint": "Eldre kjøretøy kontrolleres når veiavgiften fornyes (biler over 7 år, motorsykler over 5). La stå tomt om det ikke trengs.",
+    "m_hintBothMi": "Angi en dato, en stand eller begge. Det som kommer først, avgjør når den forfaller.",
+    "sv_nextBothMi": "{date} eller {km} miles, det som kommer først",
+    "sv_kmOnlyMi": "ved {km} miles",
+    "sv_kmLeftMi": "{km} miles igjen",
+    "sv_kmOverMi": "{km} miles over",
+    "kmMi": "{km} miles",
+    "m_atKmMi": "Ved {km} miles",
+    "m_nextKmMi": "Neste ved (miles)",
+    "x_mileageMi": "Stand {km} miles",
+    "h_kmMi": "{km} miles kjørt",
+    "rn_official": "Offisiell side",
+    "rn_EU_insurance": "Ansvarsforsikring er påbudt. Et leiekjøretøy trenger en forsikring som dekker utleie uten sjåfør.",
+    "rn_GB_tax": "Betal på nett for 12 eller 6 måneder, eller månedlig med avtalegiro (Direct Debit). Du trenger vognkortet V5C eller et påminnelsesbrev.",
+    "rn_GB_inspection": "MOT: første gang ved 3 år, deretter hvert år. Du kan ta den inntil en måned tidligere og beholde samme dato.",
+    "rn_IE_tax": "Motor tax: betal på nett for 3, 6 eller 12 måneder. Du trenger forsikringsopplysningene.",
+    "rn_IE_inspection": "NCT: fra 4 år annethvert år, deretter hvert år fra 10 år.",
+    "rn_ES_tax": "IVTM (impuesto de circulación): betales én gang i året til kommunen der kjøretøyet er registrert.",
+    "rn_ES_inspection": "ITV: privatbiler fra 4 år annethvert år, hvert år fra 10. Leiebiler kan trenge det oftere: spør ITV-stasjonen din.",
+    "rn_PT_tax": "IUC: betales én gang i året, i måneden kjøretøyet først ble registrert, på Portal das Finanças.",
+    "rn_PT_inspection": "IPO: fra 4 år annethvert år, hvert år fra 8. Leiebiler kan ha andre regler: sjekk med IMT.",
+    "rn_IT_tax": "Bollo auto: betales én gang i året til regionen din, på nett med pagoPA.",
+    "rn_IT_inspection": "Revisione: 4 år etter første registrering, deretter annethvert år.",
+    "rn_GR_tax": "Τέλη κυκλοφορίας (veiavgift): betales én gang i året på gov.gr (myCAR).",
+    "rn_GR_inspection": "ΚΤΕΟ: 4 år etter første registrering, deretter annethvert år.",
+    "rn_HR_tax": "Registracija: fornyes hvert år, sammen med den tekniske kontrollen.",
+    "rn_HR_inspection": "Tehnički pregled: vanligvis hvert år, på en kontrollstasjon (CVH).",
+    "rn_CY_tax": "Veiavgift: fornyes hvert år eller hver 6. måned, på nett hos Road Transport Department.",
+    "rn_CY_inspection": "MOT: 4 år etter første registrering, deretter annethvert år. Leiebiler kan trenge det hvert år.",
+    "rn_MT_tax": "Road licence: fornyes hvert år, på nett hos Transport Malta.",
+    "rn_MT_inspection": "VRT: 4 år etter første registrering, deretter annethvert år.",
+    "rn_FR_inspection": "Contrôle technique: biler 4 år etter første registrering, deretter annethvert år. Motorsykler: etter 5 år, deretter hvert 3.",
+    "rn_DE_tax": "Kfz-Steuer: trekkes én gang i året med avtalegiro av tollvesenet (Zoll).",
+    "rn_DE_inspection": "HU (TÜV): biler 3 år etter første registrering, deretter annethvert år. Leiebiler uten sjåfør: hver 12. måned."
   },
   "customerPage": {
     "back": "Kunder",
@@ -3355,7 +3406,11 @@
     "g_owesDetail": "forfalt i dag eller tidligere",
     "g_balance": "Saldo",
     "g_docsMissingList": "Mangler: {list}",
-    "g_docsOf": "{count} av 3"
+    "g_docsOf": "{count} av 3",
+    "h_kmMi": "{km} miles kjørt",
+    "f_licenceCategories": "Førerkortklasser",
+    "f_dvlaCode": "DVLA-kontrollkode",
+    "f_dvlaCodeHint": "Sjåføren lager den på gov.uk/view-driving-licence. Den varer i 21 dager."
   },
   "vehicleForm": {
     "addTitle": "Legg til kjøretøy",
@@ -3528,7 +3583,9 @@
     "qp_add": "Legg til",
     "backSetup": "Oppsett",
     "quickSubtitle": "Bare det essensielle. Kun type, merke og modell er nødvendig.",
-    "quickLater": "Avgift- og forsikringsdatoer, kilometerstand, lån og mer kan legges til senere under Flåte."
+    "quickLater": "Avgift- og forsikringsdatoer, kilometerstand, lån og mer kan legges til senere under Flåte.",
+    "valueSummaryMi": "Stand nå, hva du betalte, hva den er verdt",
+    "valueSummaryEditMi": "Kjøpspris, verdi, stand ved kjøp"
   },
   "bookingEdit": {
     "booking": "Bestilling",
@@ -4295,7 +4352,48 @@
     "ag_lang_ms": "malayisk",
     "ag_lang_fil": "filippinsk",
     "ag_lang_lo": "laotisk",
-    "ag_lang_km": "khmer"
+    "ag_lang_km": "khmer",
+    "tp_kmMi": "Tillatte miles per måned",
+    "grp_region": "Land og enheter",
+    "reg_title": "Land og enheter",
+    "reg_body": "Tidssone, valuta, avstand og skatt. Når du velger et land, fylles de vanlige valgene ut.",
+    "reg_country": "Land",
+    "reg_zone": "Tidssone",
+    "reg_currency": "Valuta",
+    "reg_distance": "Avstand",
+    "reg_distanceTip": "Brukes til kilometerstand, service og avstandsgrenser. Endring regner ikke om avlesninger som allerede er lagret.",
+    "reg_km": "Kilometer (km)",
+    "reg_mi": "Miles (mi)",
+    "vat_on": "Registrert for mva. eller omsetningsavgift",
+    "vat_onTip": "Kvitteringer viser da mva.-nummeret ditt og mva. i hvert beløp.",
+    "vat_number": "Mva.- eller organisasjonsnummer",
+    "vat_rate": "Mva.-sats (%)",
+    "vat_included": "Prisene mine inkluderer mva.",
+    "vat_includedTip": "På: prisene du skriver inn, er det kunden betaler, inkl. mva. Av: RoveHQ legger mva. til kjøretøypriser og tillegg når en booking gjøres.",
+    "vat_summary": "Mva. {rate} %",
+    "vat_note_ie": "Bilutleie under 5 uker i løpet av 12 måneder: 13,5 %. Lengre leie: 23 %.",
+    "vat_note_es": "Kanariøyene: IGIC (7 %) i stedet for IVA.",
+    "vat_note_pt": "Madeira 22 %, Asorene 16 %.",
+    "vat_note_gr": "Noen øyer har lavere sats. Sjekk din.",
+    "xp_ready": "Ferdige:",
+    "xp_additional_driver": "Ekstra sjåfør",
+    "xp_cross_border": "Tillatelse til å kjøre utenlands",
+    "xp_damage_waiver": "Egenandelsreduksjon",
+    "xp_one_way": "Enveisgebyr",
+    "xp_out_of_hours": "Levering eller henting utenom åpningstid",
+    "xp_young_driver": "Gebyr for unge sjåfører",
+    "xp_excess": "Egenandel med reduksjon ({symbol})",
+    "xp_excessTip": "Det meste leietakeren betaler for skade hvis de velger egenandelsreduksjon. Står i avtalen i stedet for vanlig egenandel.",
+    "xp_minAge": "For sjåfører under (alder)",
+    "xp_countries": "Tillatte land",
+    "xp_countriesPh": "f.eks. Frankrike, Portugal",
+    "ag_lang_el": "Gresk",
+    "ag_lang_es": "Spansk",
+    "ag_lang_pt": "Portugisisk",
+    "ag_lang_it": "Italiensk",
+    "ag_lang_hr": "Kroatisk",
+    "ag_lang_fr": "Fransk",
+    "ag_lang_de": "Tysk"
   },
   "accountPage": {
     "roleOwner": "Eier",
@@ -4499,7 +4597,8 @@
     "afterRefunds": "etter {amount} tilbakebetalt",
     "refundsTitle": "Tilbakebetalt til kunder",
     "refundsHint": "Refusjoner trekkes fra inntektene. De er ikke en driftskostnad.",
-    "refundsHintExtras": "Refusjoner trekkes fra inntektene, inkl. {amount} for tillegg. De er ikke en driftskostnad."
+    "refundsHintExtras": "Refusjoner trekkes fra inntektene, inkl. {amount} for tillegg. De er ikke en driftskostnad.",
+    "vatInside": "Inkl. mva. på {amount} ({rate} %)"
   },
   "auth": {
     "signInTitle": "Logg inn",
@@ -4763,7 +4862,8 @@
     "checksLeft": "{count, plural, one {# kjøpssjekk} other {# kjøpssjekker}} igjen denne faktureringsperioden",
     "checksUsedUp": "Ingen kjøpssjekker igjen før {date}. Kjøretøy du har sjekket før, kan fortsatt åpnes.",
     "checksPaidOnly": "Nye kjøpssjekker er med i betalte abonnementer. Kjøretøy du har sjekket før, kan fortsatt åpnes.",
-    "checksUpgrade": "Oppgrader"
+    "checksUpgrade": "Oppgrader",
+    "mileageMi": "Miles så langt"
   },
   "importer": {
     "dt_vehicles": "Kjøretøy",
@@ -5006,7 +5106,9 @@
     "cnt_transactions": "{count, plural, one {# betalingspost} other {# betalingsposter}}",
     "cnt_vehicles": "{count, plural, one {# kjøretøy} other {# kjøretøy}}",
     "imported": "Importert",
-    "readNeeds": "Velg en fil, legg til bilder eller lim inn en lenke først."
+    "readNeeds": "Velg en fil, legg til bilder eller lim inn en lenke først.",
+    "f_current_mileageMi": "Nåværende stand (miles)",
+    "c_mileageMi": "Stand (miles)"
   },
   "errorPages": {
     "notFoundTitle": "Vi fant ikke den siden",
@@ -5288,7 +5390,50 @@
     "liveBody": "Spør om hva som helst, send filer, eller snakk med en person fra RoveHQ-teamet.",
     "liveButton": "Åpne live-chat",
     "fromAssistant": "RoveHQ-assistent",
-    "contentSubtitle": "Artikler, vanlige spørsmål, videoer og ressurser folk har bedt assistenten om, eller som den ikke kunne svare på. Ingenting publiseres før du godkjenner det."
+    "contentSubtitle": "Artikler, vanlige spørsmål, videoer og ressurser folk har bedt assistenten om, eller som den ikke kunne svare på. Ingenting publiseres før du godkjenner det.",
+    "contentTitle": "Forespørsler om hjelpeinnhold",
+    "contentCollate": "Samle nye spørsmål",
+    "contentCollating": "Samler…",
+    "contentCollated": "{questions} nye spørsmål: {created} nye forespørsler, {merged} lagt til eksisterende.",
+    "contentNothingNew": "Ingen nye spørsmål å samle.",
+    "contentSection_suggested": "Foreslått",
+    "contentSection_drafted": "Utkast – venter på godkjenning",
+    "contentSection_approved": "Godkjent for laging (videoer og ressurser)",
+    "contentSection_closed": "Publisert og avvist",
+    "contentEmpty_suggested": "Ingen forslag. Samle nye spørsmål for å se etter flere.",
+    "contentEmpty_drafted": "Ingen utkast venter.",
+    "contentEmpty_approved": "Ingen videoer eller ressurser å lage.",
+    "contentEmpty_closed": "Ingenting ennå.",
+    "contentKind_article": "Artikkel",
+    "contentKind_faq": "Vanlig spørsmål",
+    "contentKind_video": "Video",
+    "contentKind_resource": "Ressurs",
+    "contentStatus_published": "Publisert",
+    "contentStatus_rejected": "Avvist",
+    "contentAsked": "Spurt {count, plural, one {# gang} other {# ganger}}",
+    "contentFor": "For",
+    "contentQuestions": "Spørsmålene ({count})",
+    "contentAskedOn": "spurt på {page}",
+    "contentDraft": "Lag utkast",
+    "contentRedraft": "Lag nytt utkast",
+    "contentDrafting": "Skriver…",
+    "contentApprove": "Godkjenn og publiser",
+    "contentApproveConfirm": "Publisere dette i hjelpesenteret nå?",
+    "contentApproveMake": "Godkjenn for laging",
+    "contentMarkMade": "Merk som laget",
+    "contentEdit": "Rediger utkast",
+    "contentSave": "Lagre utkast",
+    "contentCancel": "Avbryt",
+    "contentReject": "Avvis",
+    "contentRejectConfirm": "Avvise denne forespørselen?",
+    "contentDraftTitle": "Tittel",
+    "contentDraftBody": "Artikkel (Markdown)",
+    "contentFaqQ": "Spørsmål",
+    "contentFaqA": "Svar",
+    "contentPreview": "Forhåndsvisning",
+    "contentCheckNote": "Alt som er merket [check], må bekreftes (og merket fjernes) før du publiserer.",
+    "contentNoDraftNeeded": "Videoer og ressurser lages av teamet: godkjenn for å sette den på lagelisten.",
+    "contentView": "Vis i hjelpesenteret"
   },
   "inspectStart": {
     "titleOut": "Lever ut et kjøretøy",
@@ -5418,7 +5563,10 @@
     "yes": "Ja",
     "no": "Nei",
     "agreed": "Samtykket {date}",
-    "empty": "Ingen leietakere ennå. De vises her når noen krysser av for «Del opplysningene mine med RoveHQ» i bestillingen sin."
+    "empty": "Ingen leietakere ennå. De vises her når noen krysser av for «Del opplysningene mine med RoveHQ» i bestillingen sin.",
+    "remove": "Fjern fra listen",
+    "removeConfirm": "Sletter denne leietakeren og leiehistorikken deres fra RoveHQs liste. Kan ikke angres.",
+    "removeButton": "Fjern"
   },
   "site": {
     "skipToContent": "Hopp til innholdet",
@@ -5641,7 +5789,19 @@
     "mockAvailable": "Ledig",
     "mockPerDay": "{amount} per dag",
     "mockQrPay": "QR-betaling",
-    "inclImport": "Gratis import av eksisterende opplysninger"
+    "inclImport": "Gratis import av eksisterende opplysninger",
+    "cookieBody": "Vi bruker nødvendige informasjonskapsler for å drive nettstedet. Hvis du sier ja, bruker vi også analysekapsler for å se hvilke sider som hjelper.",
+    "cookieAccept": "Godta",
+    "cookieReject": "Avvis",
+    "cookieChoices": "Valg",
+    "cookieChoicesTitle": "Valg for informasjonskapsler",
+    "cookieNecessary": "Strengt nødvendige",
+    "cookieNecessaryBody": "Språk, tema og innlogging.",
+    "cookieAlwaysOn": "Alltid på",
+    "cookieAnalytics": "Analyse",
+    "cookieAnalyticsBody": "Google Analytics, for å telle besøk.",
+    "cookieSave": "Lagre valg",
+    "cookiePolicy": "Retningslinjer for informasjonskapsler"
   },
   "businessClosed": {
     "title": "Dette firmaet er stengt",
@@ -6072,7 +6232,21 @@
     "docsRelated": "Relaterte artikler",
     "docsAll": "Alle artikler",
     "metaDocsTitle": "Hjelpesenter: slik bruker du RoveHQ",
-    "metaDocsDescription": "Guider og videoer for RoveHQ: kjøretøy, bestillinger, avtaler, overleveringer, betalinger, kostnader, rapporter og papirer."
+    "metaDocsDescription": "Guider og videoer for RoveHQ: kjøretøy, bestillinger, avtaler, overleveringer, betalinger, kostnader, rapporter og papirer.",
+    "footerLegal": "Juridisk",
+    "legalPrivacy": "Personvern",
+    "legalTerms": "Vilkår",
+    "legalDpa": "Databehandling",
+    "legalSubprocessors": "Underdatabehandlere",
+    "legalCookies": "Informasjonskapsler",
+    "legalCookieChoices": "Valg for informasjonskapsler",
+    "legalIndexTitle": "Juridisk og personvern",
+    "legalIndexBody": "Hvordan RoveHQ behandler opplysninger, vilkårene for utleiebedrifter og detaljene for dine arkiver.",
+    "legalNotReviewed": "Skrevet av RoveHQ ut fra offentlig veiledning (ICO, EDPB, EU-kommisjonen, Thailands PDPC). Ikke gjennomgått av en advokat.",
+    "legalEnglishOnly": "Denne siden er foreløpig på engelsk.",
+    "legalUpdated": "Sist oppdatert {date}",
+    "cb_mileage_limit_mi": "Grense i miles (tomt = ubegrenset)",
+    "cb_excess_km_fee_mi": "Gebyr per ekstra mile"
   },
   "gallery": {
     "open": "Åpne bilde",
@@ -6387,5 +6561,36 @@
     "sRecordCost": "Registrer en kostnad",
     "choose": "Velg",
     "save": "Lagre"
+  },
+  "privacy": {
+    "title": "Dine data og personvern",
+    "body": "Hvordan RoveHQ behandler opplysninger, og rettighetene dine.",
+    "linkPrivacy": "Personvernerklæring",
+    "linkTerms": "Vilkår for bruk",
+    "linkDpa": "Databehandleravtale",
+    "linkSubprocessors": "Underdatabehandlere",
+    "linkCookies": "Retningslinjer for informasjonskapsler",
+    "exportTitle": "Last ned alle dataene dine",
+    "exportBody": "Kjøretøy, kunder, bookinger, betalinger, inntekter og utgifter, og dokumentene dine med nedlastingslenker (gyldige i 7 dager).",
+    "exportButton": "Last ned (JSON)",
+    "retentionTitle": "Leietakeres ID-bilder",
+    "retentionBody": "Slett bilder av pass, førerkort og selfie automatisk etter leietakerens siste leie. Signerte avtaler beholdes.",
+    "retentionOn": "Slett ID-bilder automatisk",
+    "retentionMonths": "Måneder etter siste leie",
+    "retentionSave": "Lagre",
+    "retentionSaved": "Lagret",
+    "deleteTitle": "Slett denne bedriften",
+    "deleteBody": "Fjerner alt for godt: kjøretøy, kunder, bookinger, betalinger, dokumenter og signerte avtaler.",
+    "deleteHint": "Dette kan ikke angres. Last ned dataene dine først hvis du trenger dem. Et betalt abonnement avsluttes uten refusjon.",
+    "deleteType": "Skriv {name} for å bekrefte",
+    "deleteButton": "Slett denne bedriften",
+    "deleteConfirm": "Slett alt",
+    "deleteCancel": "Avbryt",
+    "customerTitle": "Personvernforespørsler",
+    "customerBody": "Når denne leietakeren ber om en kopi av dataene sine eller om å bli slettet.",
+    "customerExport": "Eksporter kundens data",
+    "customerDelete": "Slett denne kunden",
+    "customerDeleteBody": "Fjerner opplysningene, ID-bildene og meldingene deres. Bookinger, betalinger og signerte avtaler blir værende som «Slettet kunde» for regnskapet ditt.",
+    "customerDeleteConfirm": "Slett dataene deres"
   }
 }

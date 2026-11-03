@@ -125,7 +125,9 @@
     "bkTitle": "予約",
     "bkAll": "すべての予約",
     "emailVerified": "メールアドレスが確認されました。ありがとうございます！",
-    "emailLinkOld": "そのリンクの有効期限が切れています。「メールアドレスを確認」をタップして新しいリンクを取得してください。"
+    "emailLinkOld": "そのリンクの有効期限が切れています。「メールアドレスを確認」をタップして新しいリンクを取得してください。",
+    "kmToGoMi": "残り {km} マイル",
+    "kmOverMi": "{km} マイル超過"
   },
   "settings": {
     "contractsBranding": {
@@ -389,7 +391,16 @@
     "lateOptTodayDetailMoves": "すべての支払日が {days} 日後ろにずれます",
     "lateOptTodayDetailPlain": "予約どおり {date} 返却",
     "lateOptTodayTitle": "今日から賃料を開始",
-    "outAtKm": "貸出時 {km} km"
+    "outAtKm": "貸出時 {km} km",
+    "confirmOdometerMi": "走行距離計の値（マイル）",
+    "ocrSuggestedMi": "写真から {km} マイルと読み取りました。",
+    "ocrPossibleMi": "読み取り候補：{km} マイル。走行距離計と照らし合わせてください。",
+    "odometerBelowLastMi": "前回の値（{km} マイル）より少なくなっています。確認してください。",
+    "drivenDuringRentalMi": "引き渡し後の走行距離：{km} マイル",
+    "odometerAtDeliveryMi": "引き渡し時：{km} マイル",
+    "kmValueMi": "{km} マイル",
+    "odometerHugeMi": "前回の値より {km} マイル多くなっています。確認してください。",
+    "outAtKmMi": "貸出時 {km} マイル"
   },
   "translation": {
     "translatedFrom": "{language}から翻訳",
@@ -890,7 +901,9 @@
     "offersDetails": "氏名、連絡先、国籍、言語、およびレンタル履歴（レンタルの場所と時期、車両、支払額、オプション、走行距離、保証金、損傷）。RoveHQ から空港送迎、ツアー、SIM カードなどのお得な情報がメッセージやメールで届くことがあります。オフにすると RoveHQ が保持する情報は削除されます。",
     "bookedUntil": "{date} まで予約済み",
     "noneFree": "{start} からの空きはありません。",
-    "noneFreeEarliest": "{start} からの空きはありません。最短は {date}（{vehicle}）です。"
+    "noneFreeEarliest": "{start} からの空きはありません。最短は {date}（{vehicle}）です。",
+    "privacyLink": "{business} と RoveHQ によるお客様の情報の利用について",
+    "vatIncluded": "価格には {name}（{rate}%）が含まれています"
   },
   "customerMessages": {
     "hi": "{name} 様",
@@ -1555,7 +1568,9 @@
     "coverFrom": "開始日",
     "coverTo": "終了日",
     "coverHint": "1年分以上をまとめて支払った場合は、日付を入れると毎月按分されます。",
-    "coverUpdateCar": "車両の{name}の期限も{date}に更新する"
+    "coverUpdateCar": "車両の{name}の期限も{date}に更新する",
+    "sv_nextKmMi": "次回点検の走行距離（マイル）",
+    "sv_hintMi": "日付、走行距離、またはその両方を設定します。早く来た方が期限になります。"
   },
   "booking": {
     "open": "開く",
@@ -2442,7 +2457,10 @@
     "remind_openingWhatsApp": "リマインダーを入れて WhatsApp を開いています",
     "remind_nothingOwed": "この予約に未払いはありません",
     "remind_notFound": "この予約が見つかりませんでした",
-    "remind_signedOut": "もう一度ログインしてください"
+    "remind_signedOut": "もう一度ログインしてください",
+    "kmAtReturnMi": "返却時 {km} マイル",
+    "kmAtHandoverMi": "引き渡し時 {km} マイル",
+    "kmDrivenMi": "走行 {km} マイル"
   },
   "newBooking": {
     "docsSelfie": "顧客の顔写真",
@@ -3210,7 +3228,40 @@
     "f_monthlyHint": "{date}まで毎月{amount}が費用に加算されます。",
     "cs_monthly": "月{amount}",
     "f_inspectionCost": "検査費用（{name}）",
-    "f_inspectionHint": "古い車両は税の更新時に検査します（車は7年超、バイクは5年超）。不要なら空欄のままで。"
+    "f_inspectionHint": "古い車両は税の更新時に検査します（車は7年超、バイクは5年超）。不要なら空欄のままで。",
+    "m_hintBothMi": "日付、走行距離、またはその両方を設定します。早く来た方が期限になります。",
+    "sv_nextBothMi": "{date} または {km} マイルのいずれか早い方",
+    "sv_kmOnlyMi": "{km} マイル時",
+    "sv_kmLeftMi": "残り {km} マイル",
+    "sv_kmOverMi": "{km} マイル超過",
+    "kmMi": "{km} マイル",
+    "m_atKmMi": "{km} マイル時",
+    "m_nextKmMi": "次回期限の走行距離（マイル）",
+    "x_mileageMi": "走行距離 {km} マイル",
+    "h_kmMi": "走行 {km} マイル",
+    "rn_official": "公式ページ",
+    "rn_EU_insurance": "対人・対物賠償保険は加入必須です。レンタル車両にはセルフドライブのレンタルを補償する保険が必要です。",
+    "rn_GB_tax": "自動車税は 12 か月分または 6 か月分をオンラインで、または口座引き落としで毎月支払えます。V5C（車検証）または通知書が必要です。",
+    "rn_GB_inspection": "MOT：初回は車齢 3 年、その後は毎年。最大 1 か月前から受検でき、期限日は変わりません。",
+    "rn_IE_tax": "自動車税：3、6、12 か月分をオンラインで支払えます。保険の情報が必要です。",
+    "rn_IE_inspection": "NCT：車齢 4 年から 2 年ごと、10 年からは毎年。",
+    "rn_ES_tax": "IVTM（impuesto de circulación）：車両を登録している市役所に年 1 回支払います。",
+    "rn_ES_inspection": "ITV：自家用車は車齢 4 年から 2 年ごと、10 年からは毎年。レンタカーはより頻繁に必要な場合があります。ITV 検査場に確認してください。",
+    "rn_PT_tax": "IUC：車両の初度登録月に、Portal das Finanças で年 1 回支払います。",
+    "rn_PT_inspection": "IPO：車齢 4 年から 2 年ごと、8 年からは毎年。レンタカーは異なる場合があります。IMT に確認してください。",
+    "rn_IT_tax": "Bollo auto：年 1 回、州に pagoPA でオンライン払いします。",
+    "rn_IT_inspection": "Revisione：初度登録から 4 年後、その後は 2 年ごと。",
+    "rn_GR_tax": "Τέλη κυκλοφορίας（自動車税）：年 1 回 gov.gr（myCAR）で支払います。",
+    "rn_GR_inspection": "ΚΤΕΟ：初度登録から 4 年後、その後は 2 年ごと。",
+    "rn_HR_tax": "Registracija：毎年、車検と一緒に更新します。",
+    "rn_HR_inspection": "Tehnički pregled：通常は毎年、車両検査場（CVH）で受けます。",
+    "rn_CY_tax": "自動車税：毎年または 6 か月ごとに、道路交通局でオンライン更新します。",
+    "rn_CY_inspection": "MOT：初度登録から 4 年後、その後は 2 年ごと。レンタカーは毎年必要な場合があります。",
+    "rn_MT_tax": "道路ライセンス：毎年 Transport Malta でオンライン更新します。",
+    "rn_MT_inspection": "VRT：初度登録から 4 年後、その後は 2 年ごと。",
+    "rn_FR_inspection": "Contrôle technique：自動車は初度登録から 4 年後、その後は 2 年ごと。バイクは 5 年後、その後は 3 年ごと。",
+    "rn_DE_tax": "Kfz-Steuer：税関（Zoll）が年 1 回口座引き落としで徴収します。",
+    "rn_DE_inspection": "HU（TÜV）：自動車は初度登録から 3 年後、その後は 2 年ごと。セルフドライブのレンタカーは 12 か月ごと。"
   },
   "customerPage": {
     "back": "お客様",
@@ -3355,7 +3406,11 @@
     "g_owesDetail": "本日以前が期限",
     "g_balance": "残高",
     "g_docsMissingList": "不足：{list}",
-    "g_docsOf": "{count}/3"
+    "g_docsOf": "{count}/3",
+    "h_kmMi": "走行 {km} マイル",
+    "f_licenceCategories": "免許の種類",
+    "f_dvlaCode": "DVLA 確認コード",
+    "f_dvlaCodeHint": "運転者が gov.uk/view-driving-licence で発行します。有効期間は 21 日です。"
   },
   "vehicleForm": {
     "addTitle": "車両を追加",
@@ -3528,7 +3583,9 @@
     "qp_add": "追加",
     "backSetup": "設定",
     "quickSubtitle": "基本情報のみ。タイプ、メーカー、モデルのみ必要です。",
-    "quickLater": "税金や保険の期限、走行距離、ローンなどは後からフリート管理で追加できます。"
+    "quickLater": "税金や保険の期限、走行距離、ローンなどは後からフリート管理で追加できます。",
+    "valueSummaryMi": "現在の走行距離、購入価格、現在の価値",
+    "valueSummaryEditMi": "購入価格、価値、購入時の走行距離"
   },
   "bookingEdit": {
     "booking": "予約",
@@ -4295,7 +4352,48 @@
     "ag_lang_ms": "マレー語",
     "ag_lang_fil": "フィリピン語",
     "ag_lang_lo": "ラオ語",
-    "ag_lang_km": "クメール語"
+    "ag_lang_km": "クメール語",
+    "tp_kmMi": "月間の走行距離上限（マイル）",
+    "grp_region": "国と単位",
+    "reg_title": "国と単位",
+    "reg_body": "タイムゾーン、通貨、距離、税金の設定です。国を選ぶと一般的な設定が入力されます。",
+    "reg_country": "国",
+    "reg_zone": "タイムゾーン",
+    "reg_currency": "通貨",
+    "reg_distance": "距離",
+    "reg_distanceTip": "走行距離計の値、点検、距離制限に使われます。変更しても保存済みの値は換算されません。",
+    "reg_km": "キロメートル（km）",
+    "reg_mi": "マイル（mi）",
+    "vat_on": "VAT（付加価値税）または売上税に登録済み",
+    "vat_onTip": "領収書に VAT 番号と各金額に含まれる VAT が表示されます。",
+    "vat_number": "VAT 番号または税番号",
+    "vat_rate": "VAT 税率（%）",
+    "vat_included": "価格は VAT 込み",
+    "vat_includedTip": "オン：入力した価格がお客様の支払額（VAT 込み）になります。オフ：予約時に RoveHQ が車両価格とオプションに VAT を加算します。",
+    "vat_summary": "VAT {rate}%",
+    "vat_note_ie": "12 か月で 5 週間未満のレンタル：13.5%。それより長いレンタル：23%。",
+    "vat_note_es": "カナリア諸島：IVA ではなく IGIC（7%）。",
+    "vat_note_pt": "マデイラ 22%、アゾレス 16%。",
+    "vat_note_gr": "一部の島は税率が低くなっています。ご確認ください。",
+    "xp_ready": "用意済み：",
+    "xp_additional_driver": "追加運転者",
+    "xp_cross_border": "国境越えの許可",
+    "xp_damage_waiver": "免責補償",
+    "xp_one_way": "乗り捨て料金",
+    "xp_out_of_hours": "営業時間外の配車・回収",
+    "xp_young_driver": "若年運転者料金",
+    "xp_excess": "免責補償加入時の自己負担額（{symbol}）",
+    "xp_excessTip": "免責補償に加入した借り手が損害に対して支払う上限額です。契約書では通常の自己負担額の代わりに記載されます。",
+    "xp_minAge": "対象となる運転者の年齢（未満）",
+    "xp_countries": "許可する国",
+    "xp_countriesPh": "例：フランス、ポルトガル",
+    "ag_lang_el": "ギリシャ語",
+    "ag_lang_es": "スペイン語",
+    "ag_lang_pt": "ポルトガル語",
+    "ag_lang_it": "イタリア語",
+    "ag_lang_hr": "クロアチア語",
+    "ag_lang_fr": "フランス語",
+    "ag_lang_de": "ドイツ語"
   },
   "accountPage": {
     "roleOwner": "オーナー",
@@ -4499,7 +4597,8 @@
     "afterRefunds": "返金{amount}差し引き後",
     "refundsTitle": "顧客への返金",
     "refundsHint": "返金は収入から差し引かれます。運営費ではありません。",
-    "refundsHintExtras": "返金は収入から差し引かれます（オプション分{amount}を含む）。運営費ではありません。"
+    "refundsHintExtras": "返金は収入から差し引かれます（オプション分{amount}を含む）。運営費ではありません。",
+    "vatInside": "VAT {amount}（{rate}%）を含む"
   },
   "auth": {
     "signInTitle": "ログイン",
@@ -4763,7 +4862,8 @@
     "checksLeft": "今回の請求期間の残り：{count, plural, one {購入チェック#回} other {購入チェック#回}}",
     "checksUsedUp": "{date}まで購入チェックは残っていません。以前チェックした車両は引き続き開けます。",
     "checksPaidOnly": "新しい購入チェックは有料プランでご利用いただけます。以前チェックした車両は引き続き開けます。",
-    "checksUpgrade": "アップグレード"
+    "checksUpgrade": "アップグレード",
+    "mileageMi": "現在までの走行距離（マイル）"
   },
   "importer": {
     "dt_vehicles": "車両",
@@ -5006,7 +5106,9 @@
     "cnt_transactions": "入出金記録 {count} 件",
     "cnt_vehicles": "車両 {count} 台",
     "imported": "インポート済み",
-    "readNeeds": "先にファイルを選ぶか、写真を追加するか、リンクを貼り付けてください。"
+    "readNeeds": "先にファイルを選ぶか、写真を追加するか、リンクを貼り付けてください。",
+    "f_current_mileageMi": "現在の走行距離（マイル）",
+    "c_mileageMi": "走行距離（マイル）"
   },
   "errorPages": {
     "notFoundTitle": "ページが見つかりませんでした",
@@ -5288,7 +5390,50 @@
     "liveBody": "何でも質問したり、ファイルを送ったり、RoveHQチームの担当者と話したりできます。",
     "liveButton": "ライブチャットを開く",
     "fromAssistant": "RoveHQ アシスタント",
-    "contentSubtitle": "利用者がアシスタントに求めた、またはアシスタントが答えられなかった記事・FAQ・動画・資料です。承認するまで公開されません。"
+    "contentSubtitle": "利用者がアシスタントに求めた、またはアシスタントが答えられなかった記事・FAQ・動画・資料です。承認するまで公開されません。",
+    "contentTitle": "ヘルプコンテンツのリクエスト",
+    "contentCollate": "新しい質問をまとめる",
+    "contentCollating": "まとめています…",
+    "contentCollated": "新しい質問 {questions} 件：新規リクエスト {created} 件、既存に追加 {merged} 件。",
+    "contentNothingNew": "まとめる新しい質問はありません。",
+    "contentSection_suggested": "提案",
+    "contentSection_drafted": "下書き済み — 承認待ち",
+    "contentSection_approved": "制作承認済み（動画・資料）",
+    "contentSection_closed": "公開済み・却下",
+    "contentEmpty_suggested": "提案はありません。新しい質問をまとめて確認してください。",
+    "contentEmpty_drafted": "承認待ちの下書きはありません。",
+    "contentEmpty_approved": "制作する動画や資料はありません。",
+    "contentEmpty_closed": "まだありません。",
+    "contentKind_article": "記事",
+    "contentKind_faq": "よくある質問",
+    "contentKind_video": "動画",
+    "contentKind_resource": "資料",
+    "contentStatus_published": "公開済み",
+    "contentStatus_rejected": "却下",
+    "contentAsked": "{count, plural, other {# 回}}質問されました",
+    "contentFor": "対象",
+    "contentQuestions": "質問（{count}）",
+    "contentAskedOn": "{page} で質問",
+    "contentDraft": "下書きを作成",
+    "contentRedraft": "下書きを作り直す",
+    "contentDrafting": "作成中…",
+    "contentApprove": "承認して公開",
+    "contentApproveConfirm": "今すぐヘルプセンターに公開しますか？",
+    "contentApproveMake": "制作を承認",
+    "contentMarkMade": "制作済みにする",
+    "contentEdit": "下書きを編集",
+    "contentSave": "下書きを保存",
+    "contentCancel": "キャンセル",
+    "contentReject": "却下",
+    "contentRejectConfirm": "このリクエストを却下しますか？",
+    "contentDraftTitle": "タイトル",
+    "contentDraftBody": "記事（Markdown）",
+    "contentFaqQ": "質問",
+    "contentFaqA": "回答",
+    "contentPreview": "プレビュー",
+    "contentCheckNote": "[check] の付いた箇所は、公開前に確認して印を消す必要があります。",
+    "contentNoDraftNeeded": "動画と資料はチームが制作します。承認すると制作リストに追加されます。",
+    "contentView": "ヘルプセンターで見る"
   },
   "inspectStart": {
     "titleOut": "車両を引き渡す",
@@ -5418,7 +5563,10 @@
     "yes": "はい",
     "no": "いいえ",
     "agreed": "{date}に同意",
-    "empty": "まだ借り手はいません。予約時に「自分の情報を RoveHQ と共有する」にチェックした方がここに表示されます。"
+    "empty": "まだ借り手はいません。予約時に「自分の情報を RoveHQ と共有する」にチェックした方がここに表示されます。",
+    "remove": "リストから削除",
+    "removeConfirm": "この借り手とレンタル履歴を RoveHQ のリストから削除します。元に戻せません。",
+    "removeButton": "削除"
   },
   "site": {
     "skipToContent": "本文へスキップ",
@@ -5641,7 +5789,19 @@
     "mockAvailable": "空きあり",
     "mockPerDay": "1日 {amount}",
     "mockQrPay": "QR 決済",
-    "inclImport": "既存の記録を無料でインポート"
+    "inclImport": "既存の記録を無料でインポート",
+    "cookieBody": "このサイトの運営に必要な Cookie を使用しています。同意いただければ、どのページが役立っているかを知るための分析 Cookie も使用します。",
+    "cookieAccept": "同意する",
+    "cookieReject": "拒否する",
+    "cookieChoices": "設定",
+    "cookieChoicesTitle": "Cookie の設定",
+    "cookieNecessary": "必須",
+    "cookieNecessaryBody": "言語、テーマ、ログイン。",
+    "cookieAlwaysOn": "常にオン",
+    "cookieAnalytics": "分析",
+    "cookieAnalyticsBody": "訪問数を数えるための Google Analytics。",
+    "cookieSave": "設定を保存",
+    "cookiePolicy": "Cookie ポリシー"
   },
   "businessClosed": {
     "title": "この事業者は閉鎖されました",
@@ -6072,7 +6232,21 @@
     "docsRelated": "関連記事",
     "docsAll": "すべての記事",
     "metaDocsTitle": "ヘルプセンター：RoveHQの使い方",
-    "metaDocsDescription": "RoveHQのガイドと動画：車両、予約、契約、引き渡し、支払い、経費、レポート、書類。"
+    "metaDocsDescription": "RoveHQのガイドと動画：車両、予約、契約、引き渡し、支払い、経費、レポート、書類。",
+    "footerLegal": "法的情報",
+    "legalPrivacy": "プライバシー",
+    "legalTerms": "規約",
+    "legalDpa": "データ処理",
+    "legalSubprocessors": "サブプロセッサー",
+    "legalCookies": "Cookie",
+    "legalCookieChoices": "Cookie の設定",
+    "legalIndexTitle": "法的情報とプライバシー",
+    "legalIndexBody": "RoveHQ の情報の取り扱い、レンタル事業者向けの規約、記録用の詳細情報。",
+    "legalNotReviewed": "公的なガイダンス（ICO、EDPB、欧州委員会、タイ PDPC）をもとに RoveHQ が作成しました。弁護士の確認は受けていません。",
+    "legalEnglishOnly": "このページは現在英語のみです。",
+    "legalUpdated": "最終更新日：{date}",
+    "cb_mileage_limit_mi": "走行距離の上限（マイル、空欄 = 無制限）",
+    "cb_excess_km_fee_mi": "超過 1 マイルあたりの料金"
   },
   "gallery": {
     "open": "写真を開く",
@@ -6387,5 +6561,36 @@
     "sRecordCost": "費用を記録",
     "choose": "選択",
     "save": "保存"
+  },
+  "privacy": {
+    "title": "データとプライバシー",
+    "body": "RoveHQ の情報の取り扱いと、あなたの権利について。",
+    "linkPrivacy": "プライバシーポリシー",
+    "linkTerms": "利用規約",
+    "linkDpa": "データ処理契約",
+    "linkSubprocessors": "サブプロセッサー",
+    "linkCookies": "Cookie ポリシー",
+    "exportTitle": "すべてのデータをダウンロード",
+    "exportBody": "車両、顧客、予約、支払い、入出金、ダウンロードリンク付きの書類（リンクの有効期間は 7 日間）。",
+    "exportButton": "ダウンロード（JSON）",
+    "retentionTitle": "借り手の身分証写真",
+    "retentionBody": "借り手の最後のレンタル後に、パスポート、免許証、自撮り写真を自動で削除します。署名済みの契約書は残ります。",
+    "retentionOn": "身分証写真を自動で削除",
+    "retentionMonths": "最後のレンタルからの月数",
+    "retentionSave": "保存",
+    "retentionSaved": "保存しました",
+    "deleteTitle": "このビジネスを削除",
+    "deleteBody": "車両、顧客、予約、支払い、書類、署名済みの契約書など、すべてを完全に削除します。",
+    "deleteHint": "元に戻せません。必要な場合は先にデータをダウンロードしてください。有料プランは返金なしで終了します。",
+    "deleteType": "確認のため {name} と入力してください",
+    "deleteButton": "このビジネスを削除",
+    "deleteConfirm": "すべて削除",
+    "deleteCancel": "キャンセル",
+    "customerTitle": "プライバシーに関するリクエスト",
+    "customerBody": "この借り手からデータのコピーや削除を求められたときに使います。",
+    "customerExport": "この顧客のデータをエクスポート",
+    "customerDelete": "この顧客を削除",
+    "customerDeleteBody": "個人情報、身分証写真、メッセージを削除します。予約、支払い、署名済みの契約書は会計のため「削除された顧客」として残ります。",
+    "customerDeleteConfirm": "データを削除"
   }
 }

@@ -268,5 +268,19 @@
   "Payment saved.": "கட்டணம் சேமிக்கப்பட்டது.",
   "Open the booking": "முன்பதிவைத் திற",
   "Booking saved. Send this link so they can check and sign:": "முன்பதிவு சேமிக்கப்பட்டது. அவர் சரிபார்த்துக் கையெழுத்திட இந்த இணைப்பை அனுப்புங்கள்:",
-  "Booking saved. Send this link to your customer:": "முன்பதிவு சேமிக்கப்பட்டது. இந்த இணைப்பை உங்கள் வாடிக்கையாளருக்கு அனுப்புங்கள்:"
+  "Booking saved. Send this link to your customer:": "முன்பதிவு சேமிக்கப்பட்டது. இந்த இணைப்பை உங்கள் வாடிக்கையாளருக்கு அனுப்புங்கள்:",
+  "Only the owner can do this.": "உரிமையாளர் மட்டுமே இதைச் செய்ய முடியும்.",
+  "This business could not be found.": "இந்த வணிகத்தைக் கண்டுபிடிக்க முடியவில்லை.",
+  "Type the business name exactly to confirm.": "உறுதிசெய்ய வணிகப் பெயரைச் சரியாக உள்ளிடவும்.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "RoveHQ ஆதரவுக் குழுவால் வணிகத்தை நீக்க முடியாது. உரிமையாளரிடம் செய்யச் சொல்லுங்கள்.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "வணிகத்தை நீக்கும் வசதி இன்னும் கிடைக்கவில்லை. ஆதரவுக் குழுவைத் தொடர்புகொள்ளுங்கள், நாங்கள் உங்களுக்காகச் செய்வோம்.",
+  "This business could not be deleted. Please try again or contact support.": "இந்த வணிகத்தை நீக்க முடியவில்லை. மீண்டும் முயலவும் அல்லது ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
+  "Only an owner or manager can do this.": "உரிமையாளர் அல்லது மேலாளர் மட்டுமே இதைச் செய்ய முடியும்.",
+  "This customer could not be found.": "இந்த வாடிக்கையாளரைக் கண்டுபிடிக்க முடியவில்லை.",
+  "Finish or cancel their open bookings first.": "முதலில் அவரது திறந்த முன்பதிவுகளை முடிக்கவும் அல்லது ரத்துசெய்யவும்.",
+  "Deleting a customer isn't available yet. Please contact support.": "வாடிக்கையாளரை நீக்கும் வசதி இன்னும் கிடைக்கவில்லை. ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
+  "This customer could not be deleted. Please try again.": "இந்த வாடிக்கையாளரை நீக்க முடியவில்லை. மீண்டும் முயலவும்.",
+  "Choose between 1 and 120 months.": "1 முதல் 120 மாதங்களுக்குள் தேர்ந்தெடுக்கவும்.",
+  "We couldn't save that. Please try again.": "அதைச் சேமிக்க முடியவில்லை. மீண்டும் முயலவும்.",
+  "Please pick a country.": "ஒரு நாட்டைத் தேர்ந்தெடுக்கவும்."
 }

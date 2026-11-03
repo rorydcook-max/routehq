@@ -268,5 +268,19 @@
   "Payment saved.": "पेमेंट सेव हो गया।",
   "Open the booking": "बुकिंग खोलें",
   "Booking saved. Send this link so they can check and sign:": "बुकिंग सेव हो गई। यह लिंक भेजें ताकि वे जांचकर साइन कर सकें:",
-  "Booking saved. Send this link to your customer:": "बुकिंग सेव हो गई। यह लिंक अपने ग्राहक को भेजें:"
+  "Booking saved. Send this link to your customer:": "बुकिंग सेव हो गई। यह लिंक अपने ग्राहक को भेजें:",
+  "Only the owner can do this.": "यह केवल मालिक कर सकता है।",
+  "This business could not be found.": "यह व्यवसाय नहीं मिला।",
+  "Type the business name exactly to confirm.": "पुष्टि के लिए व्यवसाय का नाम बिल्कुल सही लिखें।",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "RoveHQ सपोर्ट व्यवसाय नहीं हटा सकता। मालिक से इसे करने को कहें।",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "व्यवसाय हटाना अभी उपलब्ध नहीं है। कृपया सपोर्ट से संपर्क करें, हम आपके लिए कर देंगे।",
+  "This business could not be deleted. Please try again or contact support.": "यह व्यवसाय हटाया नहीं जा सका। कृपया फिर से कोशिश करें या सपोर्ट से संपर्क करें।",
+  "Only an owner or manager can do this.": "यह केवल मालिक या मैनेजर कर सकता है।",
+  "This customer could not be found.": "यह ग्राहक नहीं मिला।",
+  "Finish or cancel their open bookings first.": "पहले उनकी खुली बुकिंग पूरी या रद्द करें।",
+  "Deleting a customer isn't available yet. Please contact support.": "ग्राहक हटाना अभी उपलब्ध नहीं है। कृपया सपोर्ट से संपर्क करें।",
+  "This customer could not be deleted. Please try again.": "यह ग्राहक हटाया नहीं जा सका। कृपया फिर से कोशिश करें।",
+  "Choose between 1 and 120 months.": "1 से 120 महीने के बीच चुनें।",
+  "We couldn't save that. Please try again.": "हम इसे सहेज नहीं सके। कृपया फिर से कोशिश करें।",
+  "Please pick a country.": "कृपया एक देश चुनें।"
 }

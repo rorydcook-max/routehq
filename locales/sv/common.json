@@ -125,7 +125,9 @@
     "bkTitle": "Bokningar",
     "bkAll": "Alla bokningar",
     "emailVerified": "E-postadressen har verifierats. Tack!",
-    "emailLinkOld": "Länken har löpt ut. Tryck på \"Verifiera din e-postadress\" för att få en ny."
+    "emailLinkOld": "Länken har löpt ut. Tryck på \"Verifiera din e-postadress\" för att få en ny.",
+    "kmToGoMi": "{km} miles kvar",
+    "kmOverMi": "{km} miles över"
   },
   "vehicles": {
     "addVehicle": "Lägg till fordon"
@@ -389,7 +391,16 @@
     "lateOptTodayDetailMoves": "Alla betalningsdatum flyttas {days, plural, one {# dag} other {# dagar}} framåt",
     "lateOptTodayDetailPlain": "Tillbaka {date} enligt bokningen",
     "lateOptTodayTitle": "Starta hyran i dag",
-    "outAtKm": "Ut vid {km} km"
+    "outAtKm": "Ut vid {km} km",
+    "confirmOdometerMi": "Mätarställning (miles)",
+    "ocrSuggestedMi": "Förslag från fotot: {km} miles.",
+    "ocrPossibleMi": "Möjlig avläsning: {km} miles. Jämför med mätaren.",
+    "odometerBelowLastMi": "Lägre än senaste avläsningen ({km} miles). Kontrollera den.",
+    "drivenDuringRentalMi": "Kört sedan överlämningen: {km} miles",
+    "odometerAtDeliveryMi": "Vid överlämning: {km} miles",
+    "kmValueMi": "{km} miles",
+    "odometerHugeMi": "{km} miles mer än senaste avläsningen. Kontrollera den.",
+    "outAtKmMi": "Ut vid {km} miles"
   },
   "translation": {
     "translatedFrom": "Översatt från {language}",
@@ -890,7 +901,9 @@
     "offersDetails": "Mitt namn, mina kontaktuppgifter, min nationalitet och mitt språk samt min hyreshistorik: var och när jag hyr, fordonet, vad jag betalar, tillval, körsträcka, deposition och skador. RoveHQ kan skicka meddelanden eller e-post med erbjudanden som flygplatstransfer, utflykter och SIM-kort. Stänger jag av detta raderas RoveHQ:s kopia.",
     "bookedUntil": "Bokad till {date}",
     "noneFree": "Inget är ledigt från {start}.",
-    "noneFreeEarliest": "Inget är ledigt från {start}. Tidigast är {date} ({vehicle})."
+    "noneFreeEarliest": "Inget är ledigt från {start}. Tidigast är {date} ({vehicle}).",
+    "privacyLink": "Hur {business} och RoveHQ använder dina uppgifter",
+    "vatIncluded": "Priserna inkluderar {name} på {rate} %"
   },
   "customerMessages": {
     "hi": "Hej {name},",
@@ -1555,7 +1568,9 @@
     "coverFrom": "Gäller från",
     "coverTo": "Gäller till",
     "coverHint": "Betalat för ett år eller mer? Lägg till datumen så räknas en andel varje månad.",
-    "coverUpdateCar": "Ställ även in fordonets {name} att gå ut {date}"
+    "coverUpdateCar": "Ställ även in fordonets {name} att gå ut {date}",
+    "sv_nextKmMi": "Nästa service (miles)",
+    "sv_hintMi": "Ange ett datum, en mätarställning eller båda. Det som inträffar först avgör när det är dags."
   },
   "booking": {
     "open": "Öppen",
@@ -2442,7 +2457,10 @@
     "remind_openingWhatsApp": "Öppnar WhatsApp med påminnelsen",
     "remind_nothingOwed": "Inget är obetalt på den här bokningen",
     "remind_notFound": "Vi hittade inte den här bokningen",
-    "remind_signedOut": "Logga in igen"
+    "remind_signedOut": "Logga in igen",
+    "kmAtReturnMi": "{km} miles vid återlämning",
+    "kmAtHandoverMi": "{km} miles vid överlämning",
+    "kmDrivenMi": "{km} miles körda"
   },
   "newBooking": {
     "docsSelfie": "Foto på kunden",
@@ -3210,7 +3228,40 @@
     "f_monthlyHint": "{amount} läggs till dina kostnader varje månad till {date}.",
     "cs_monthly": "{amount} i månaden",
     "f_inspectionCost": "Besiktningskostnad ({name})",
-    "f_inspectionHint": "Äldre fordon besiktas när fordonsskatten förnyas (bilar över 7 år, motorcyklar över 5). Lämna tomt om det inte behövs."
+    "f_inspectionHint": "Äldre fordon besiktas när fordonsskatten förnyas (bilar över 7 år, motorcyklar över 5). Lämna tomt om det inte behövs.",
+    "m_hintBothMi": "Ange ett datum, en mätarställning eller båda. Det som inträffar först avgör när det är dags.",
+    "sv_nextBothMi": "{date} eller {km} miles, det som kommer först",
+    "sv_kmOnlyMi": "vid {km} miles",
+    "sv_kmLeftMi": "{km} miles kvar",
+    "sv_kmOverMi": "{km} miles över",
+    "kmMi": "{km} miles",
+    "m_atKmMi": "Vid {km} miles",
+    "m_nextKmMi": "Nästa vid (miles)",
+    "x_mileageMi": "Mätarställning {km} miles",
+    "h_kmMi": "{km} miles körda",
+    "rn_official": "Officiell sida",
+    "rn_EU_insurance": "Trafikförsäkring är obligatorisk. Ett hyrfordon behöver en försäkring som täcker uthyrning utan förare.",
+    "rn_GB_tax": "Betala online för 12 eller 6 månader, eller månadsvis via autogiro (Direct Debit). Du behöver registreringsbeviset V5C eller ett påminnelsebrev.",
+    "rn_GB_inspection": "MOT: första gången vid 3 års ålder, sedan varje år. Du kan göra den upp till en månad tidigare och behålla samma datum.",
+    "rn_IE_tax": "Motor tax: betala online för 3, 6 eller 12 månader. Du behöver försäkringsuppgifterna.",
+    "rn_IE_inspection": "NCT: från 4 års ålder vartannat år, sedan varje år från 10 års ålder.",
+    "rn_ES_tax": "IVTM (impuesto de circulación): betalas en gång om året till kommunen där fordonet är registrerat.",
+    "rn_ES_inspection": "ITV: privatbilar från 4 års ålder vartannat år, varje år från 10. Hyrbilar kan behöva det oftare: fråga din ITV-station.",
+    "rn_PT_tax": "IUC: betalas en gång om året, i den månad fordonet först registrerades, på Portal das Finanças.",
+    "rn_PT_inspection": "IPO: från 4 års ålder vartannat år, varje år från 8. Hyrbilar kan skilja sig: kolla med IMT.",
+    "rn_IT_tax": "Bollo auto: betalas en gång om året till din region, online via pagoPA.",
+    "rn_IT_inspection": "Revisione: 4 år efter första registrering, sedan vartannat år.",
+    "rn_GR_tax": "Τέλη κυκλοφορίας (fordonsskatt): betalas en gång om året på gov.gr (myCAR).",
+    "rn_GR_inspection": "ΚΤΕΟ: 4 år efter första registrering, sedan vartannat år.",
+    "rn_HR_tax": "Registracija: förnyas varje år, tillsammans med besiktningen.",
+    "rn_HR_inspection": "Tehnički pregled: oftast varje år, på en besiktningsstation (CVH).",
+    "rn_CY_tax": "Fordonsskatt: förnyas varje år eller var 6:e månad, online hos Road Transport Department.",
+    "rn_CY_inspection": "MOT: 4 år efter första registrering, sedan vartannat år. Hyrbilar kan behöva det varje år.",
+    "rn_MT_tax": "Road licence: förnyas varje år, online hos Transport Malta.",
+    "rn_MT_inspection": "VRT: 4 år efter första registrering, sedan vartannat år.",
+    "rn_FR_inspection": "Contrôle technique: bilar 4 år efter första registrering, sedan vartannat år. Motorcyklar: efter 5 år, sedan var 3:e.",
+    "rn_DE_tax": "Kfz-Steuer: dras en gång om året via autogiro av tullen (Zoll).",
+    "rn_DE_inspection": "HU (TÜV): bilar 3 år efter första registrering, sedan vartannat år. Hyrbilar utan förare: var 12:e månad."
   },
   "customerPage": {
     "back": "Kunder",
@@ -3355,7 +3406,11 @@
     "g_owesDetail": "förfaller idag eller tidigare",
     "g_balance": "Saldo",
     "g_docsMissingList": "Saknas: {list}",
-    "g_docsOf": "{count} av 3"
+    "g_docsOf": "{count} av 3",
+    "h_kmMi": "{km} miles körda",
+    "f_licenceCategories": "Körkortsbehörigheter",
+    "f_dvlaCode": "DVLA-kontrollkod",
+    "f_dvlaCodeHint": "Föraren skapar den på gov.uk/view-driving-licence. Den gäller i 21 dagar."
   },
   "vehicleForm": {
     "addTitle": "Lägg till fordon",
@@ -3528,7 +3583,9 @@
     "qp_add": "Lägg till",
     "backSetup": "Konfiguration",
     "quickSubtitle": "Bara det grundläggande. Endast typ, märke och modell behövs.",
-    "quickLater": "Skatte- och försäkringsdatum, mätarställning, lån med mera kan läggas till senare under Flotta."
+    "quickLater": "Skatte- och försäkringsdatum, mätarställning, lån med mera kan läggas till senare under Flotta.",
+    "valueSummaryMi": "Mätarställning nu, vad du betalade, vad den är värd",
+    "valueSummaryEditMi": "Inköpspris, värde, mätarställning vid köp"
   },
   "bookingEdit": {
     "booking": "Bokning",
@@ -4295,7 +4352,48 @@
     "ag_lang_ms": "malajiska",
     "ag_lang_fil": "filippinska",
     "ag_lang_lo": "laotiska",
-    "ag_lang_km": "khmer"
+    "ag_lang_km": "khmer",
+    "tp_kmMi": "Tillåtna miles per månad",
+    "grp_region": "Land och enheter",
+    "reg_title": "Land och enheter",
+    "reg_body": "Din tidszon, valuta, avståndsenhet och skatt. När du väljer ett land fylls de vanliga valen i.",
+    "reg_country": "Land",
+    "reg_zone": "Tidszon",
+    "reg_currency": "Valuta",
+    "reg_distance": "Avstånd",
+    "reg_distanceTip": "Används för mätarställningar, service och avståndsgränser. Att ändra det räknar inte om redan sparade avläsningar.",
+    "reg_km": "Kilometer (km)",
+    "reg_mi": "Miles (mi)",
+    "vat_on": "Momsregistrerad",
+    "vat_onTip": "Kvitton visar då ditt momsregistreringsnummer och momsen i varje belopp.",
+    "vat_number": "Momsregistreringsnummer",
+    "vat_rate": "Momssats (%)",
+    "vat_included": "Mina priser inkluderar moms",
+    "vat_includedTip": "På: priserna du skriver är vad kunden betalar, moms inräknad. Av: RoveHQ lägger till moms på fordonspriser och tillval när en bokning görs.",
+    "vat_summary": "Moms {rate} %",
+    "vat_note_ie": "Biluthyrning kortare än 5 veckor på 12 månader: 13,5 %. Längre hyra: 23 %.",
+    "vat_note_es": "Kanarieöarna: IGIC (7 %) i stället för IVA.",
+    "vat_note_pt": "Madeira 22 %, Azorerna 16 %.",
+    "vat_note_gr": "Vissa öar har en lägre sats. Kolla din.",
+    "xp_ready": "Färdiga:",
+    "xp_additional_driver": "Extra förare",
+    "xp_cross_border": "Tillstånd att köra utomlands",
+    "xp_damage_waiver": "Självriskreducering",
+    "xp_one_way": "Enkelresavgift",
+    "xp_out_of_hours": "Leverans eller hämtning utanför öppettid",
+    "xp_young_driver": "Avgift för ung förare",
+    "xp_excess": "Självrisk med reducering ({symbol})",
+    "xp_excessTip": "Det mesta hyrestagaren betalar för skador om hen väljer självriskreducering. Står i avtalet i stället för den vanliga självrisken.",
+    "xp_minAge": "För förare under (ålder)",
+    "xp_countries": "Tillåtna länder",
+    "xp_countriesPh": "t.ex. Frankrike, Portugal",
+    "ag_lang_el": "Grekiska",
+    "ag_lang_es": "Spanska",
+    "ag_lang_pt": "Portugisiska",
+    "ag_lang_it": "Italienska",
+    "ag_lang_hr": "Kroatiska",
+    "ag_lang_fr": "Franska",
+    "ag_lang_de": "Tyska"
   },
   "accountPage": {
     "roleOwner": "Ägare",
@@ -4499,7 +4597,8 @@
     "afterRefunds": "efter {amount} återbetalt",
     "refundsTitle": "Återbetalt till kunder",
     "refundsHint": "Återbetalningar dras från intäkterna. De är inte en driftskostnad.",
-    "refundsHintExtras": "Återbetalningar dras från intäkterna, inkl. {amount} för tillägg. De är inte en driftskostnad."
+    "refundsHintExtras": "Återbetalningar dras från intäkterna, inkl. {amount} för tillägg. De är inte en driftskostnad.",
+    "vatInside": "Inklusive moms på {amount} ({rate} %)"
   },
   "auth": {
     "signInTitle": "Logga in",
@@ -4763,7 +4862,8 @@
     "checksLeft": "{count, plural, one {# köpkontroll} other {# köpkontroller}} kvar den här faktureringsperioden",
     "checksUsedUp": "Inga köpkontroller kvar förrän {date}. Fordon du redan kontrollerat går fortfarande att öppna.",
     "checksPaidOnly": "Nya köpkontroller ingår i betalplanerna. Fordon du redan kontrollerat går fortfarande att öppna.",
-    "checksUpgrade": "Uppgradera"
+    "checksUpgrade": "Uppgradera",
+    "mileageMi": "Miles hittills"
   },
   "importer": {
     "dt_vehicles": "Fordon",
@@ -5006,7 +5106,9 @@
     "cnt_transactions": "{count, plural, one {# betalningspost} other {# betalningsposter}}",
     "cnt_vehicles": "{count, plural, one {# fordon} other {# fordon}}",
     "imported": "Importerat",
-    "readNeeds": "Välj en fil, lägg till foton eller klistra in en länk först."
+    "readNeeds": "Välj en fil, lägg till foton eller klistra in en länk först.",
+    "f_current_mileageMi": "Nuvarande mätarställning (miles)",
+    "c_mileageMi": "Mätarställning (miles)"
   },
   "errorPages": {
     "notFoundTitle": "Vi hittade inte den sidan",
@@ -5288,7 +5390,50 @@
     "liveBody": "Fråga vad som helst, skicka filer eller prata med någon i RoveHQ-teamet.",
     "liveButton": "Öppna livechatt",
     "fromAssistant": "RoveHQ-assistent",
-    "contentSubtitle": "Artiklar, vanliga frågor, videor och resurser som folk bett assistenten om, eller som den inte kunde svara på. Inget publiceras förrän du godkänner det."
+    "contentSubtitle": "Artiklar, vanliga frågor, videor och resurser som folk bett assistenten om, eller som den inte kunde svara på. Inget publiceras förrän du godkänner det.",
+    "contentTitle": "Förfrågningar om hjälpinnehåll",
+    "contentCollate": "Samla nya frågor",
+    "contentCollating": "Samlar…",
+    "contentCollated": "{questions} nya frågor: {created} nya förfrågningar, {merged} tillagda till befintliga.",
+    "contentNothingNew": "Inga nya frågor att samla.",
+    "contentSection_suggested": "Föreslagna",
+    "contentSection_drafted": "Utkast – väntar på godkännande",
+    "contentSection_approved": "Godkända att göra (videor och resurser)",
+    "contentSection_closed": "Publicerade och avvisade",
+    "contentEmpty_suggested": "Inga förslag. Samla nya frågor för att leta efter fler.",
+    "contentEmpty_drafted": "Inga utkast väntar.",
+    "contentEmpty_approved": "Inga videor eller resurser att göra.",
+    "contentEmpty_closed": "Inget än.",
+    "contentKind_article": "Artikel",
+    "contentKind_faq": "Vanlig fråga",
+    "contentKind_video": "Video",
+    "contentKind_resource": "Resurs",
+    "contentStatus_published": "Publicerad",
+    "contentStatus_rejected": "Avvisad",
+    "contentAsked": "Ställd {count, plural, one {# gång} other {# gånger}}",
+    "contentFor": "För",
+    "contentQuestions": "Frågorna ({count})",
+    "contentAskedOn": "ställd på {page}",
+    "contentDraft": "Skriv utkast",
+    "contentRedraft": "Skriv om",
+    "contentDrafting": "Skriver…",
+    "contentApprove": "Godkänn och publicera",
+    "contentApproveConfirm": "Publicera detta i hjälpcentret nu?",
+    "contentApproveMake": "Godkänn att göra",
+    "contentMarkMade": "Markera som klar",
+    "contentEdit": "Redigera utkast",
+    "contentSave": "Spara utkast",
+    "contentCancel": "Avbryt",
+    "contentReject": "Avvisa",
+    "contentRejectConfirm": "Avvisa den här förfrågan?",
+    "contentDraftTitle": "Rubrik",
+    "contentDraftBody": "Artikel (Markdown)",
+    "contentFaqQ": "Fråga",
+    "contentFaqA": "Svar",
+    "contentPreview": "Förhandsgranska",
+    "contentCheckNote": "Allt som är markerat [check] måste bekräftas (och markeringen tas bort) innan du publicerar.",
+    "contentNoDraftNeeded": "Videor och resurser görs av teamet: godkänn för att lägga till den på att göra-listan.",
+    "contentView": "Visa i hjälpcentret"
   },
   "inspectStart": {
     "titleOut": "Lämna ut ett fordon",
@@ -5418,7 +5563,10 @@
     "yes": "Ja",
     "no": "Nej",
     "agreed": "Godkänt den {date}",
-    "empty": "Inga hyresgäster ännu. De visas här när någon kryssar i ”Dela mina uppgifter med RoveHQ” i sin bokning."
+    "empty": "Inga hyresgäster ännu. De visas här när någon kryssar i ”Dela mina uppgifter med RoveHQ” i sin bokning.",
+    "remove": "Ta bort från listan",
+    "removeConfirm": "Tar bort den här hyrestagaren och hens hyreshistorik från RoveHQ:s lista. Kan inte ångras.",
+    "removeButton": "Ta bort"
   },
   "site": {
     "skipToContent": "Hoppa till innehållet",
@@ -5641,7 +5789,19 @@
     "mockAvailable": "Ledig",
     "mockPerDay": "{amount} per dag",
     "mockQrPay": "QR-betalning",
-    "inclImport": "Gratis import av dina befintliga uppgifter"
+    "inclImport": "Gratis import av dina befintliga uppgifter",
+    "cookieBody": "Vi använder nödvändiga cookies för att driva webbplatsen. Om du godkänner använder vi även analyscookies för att se vilka sidor som hjälper.",
+    "cookieAccept": "Godkänn",
+    "cookieReject": "Avvisa",
+    "cookieChoices": "Inställningar",
+    "cookieChoicesTitle": "Cookieinställningar",
+    "cookieNecessary": "Absolut nödvändiga",
+    "cookieNecessaryBody": "Språk, tema och inloggning.",
+    "cookieAlwaysOn": "Alltid på",
+    "cookieAnalytics": "Analys",
+    "cookieAnalyticsBody": "Google Analytics, för att räkna besök.",
+    "cookieSave": "Spara val",
+    "cookiePolicy": "Cookiepolicy"
   },
   "businessClosed": {
     "title": "Det här företaget har stängts",
@@ -6072,7 +6232,21 @@
     "docsRelated": "Relaterade artiklar",
     "docsAll": "Alla artiklar",
     "metaDocsTitle": "Hjälpcenter: så använder du RoveHQ",
-    "metaDocsDescription": "Guider och videor för RoveHQ: fordon, bokningar, avtal, överlämningar, betalningar, kostnader, rapporter och papper."
+    "metaDocsDescription": "Guider och videor för RoveHQ: fordon, bokningar, avtal, överlämningar, betalningar, kostnader, rapporter och papper.",
+    "footerLegal": "Juridiskt",
+    "legalPrivacy": "Integritet",
+    "legalTerms": "Villkor",
+    "legalDpa": "Personuppgiftsbehandling",
+    "legalSubprocessors": "Underbiträden",
+    "legalCookies": "Cookies",
+    "legalCookieChoices": "Cookieinställningar",
+    "legalIndexTitle": "Juridik och integritet",
+    "legalIndexBody": "Hur RoveHQ hanterar information, villkoren för uthyrningsföretag och uppgifterna för dina register.",
+    "legalNotReviewed": "Skrivet av RoveHQ utifrån offentlig vägledning (ICO, EDPB, Europeiska kommissionen, Thailands PDPC). Inte granskat av en jurist.",
+    "legalEnglishOnly": "Den här sidan finns på engelska tills vidare.",
+    "legalUpdated": "Senast uppdaterad {date}",
+    "cb_mileage_limit_mi": "Gräns i miles (tomt = obegränsat)",
+    "cb_excess_km_fee_mi": "Avgift per extra mile"
   },
   "gallery": {
     "open": "Öppna foto",
@@ -6387,5 +6561,36 @@
     "sRecordCost": "Registrera en kostnad",
     "choose": "Välj",
     "save": "Spara"
+  },
+  "privacy": {
+    "title": "Dina uppgifter och integritet",
+    "body": "Hur RoveHQ hanterar information, och dina rättigheter.",
+    "linkPrivacy": "Integritetspolicy",
+    "linkTerms": "Användarvillkor",
+    "linkDpa": "Personuppgiftsbiträdesavtal",
+    "linkSubprocessors": "Underbiträden",
+    "linkCookies": "Cookiepolicy",
+    "exportTitle": "Ladda ner alla dina uppgifter",
+    "exportBody": "Fordon, kunder, bokningar, betalningar, intäkter och kostnader, och dina dokument med nedladdningslänkar (giltiga i 7 dagar).",
+    "exportButton": "Ladda ner (JSON)",
+    "retentionTitle": "Hyrestagares ID-foton",
+    "retentionBody": "Radera foton av pass, körkort och selfie automatiskt efter hyrestagarens senaste hyra. Signerade avtal sparas.",
+    "retentionOn": "Radera ID-foton automatiskt",
+    "retentionMonths": "Månader efter senaste hyran",
+    "retentionSave": "Spara",
+    "retentionSaved": "Sparat",
+    "deleteTitle": "Radera det här företaget",
+    "deleteBody": "Tar bort allt för gott: fordon, kunder, bokningar, betalningar, dokument och signerade avtal.",
+    "deleteHint": "Det går inte att ångra. Ladda ner dina uppgifter först om du behöver dem. En betald plan avslutas utan återbetalning.",
+    "deleteType": "Skriv {name} för att bekräfta",
+    "deleteButton": "Radera det här företaget",
+    "deleteConfirm": "Radera allt",
+    "deleteCancel": "Avbryt",
+    "customerTitle": "Integritetsförfrågningar",
+    "customerBody": "När den här hyrestagaren ber om en kopia av sina uppgifter eller om att bli raderad.",
+    "customerExport": "Exportera kundens uppgifter",
+    "customerDelete": "Radera den här kunden",
+    "customerDeleteBody": "Tar bort kundens uppgifter, ID-foton och meddelanden. Bokningar, betalningar och signerade avtal finns kvar som \"Raderad kund\" för din bokföring.",
+    "customerDeleteConfirm": "Radera uppgifterna"
   }
 }

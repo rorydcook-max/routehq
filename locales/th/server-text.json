@@ -375,5 +375,19 @@
   "Payment saved.": "บันทึกการรับเงินแล้ว",
   "Open the booking": "เปิดการจอง",
   "Booking saved. Send this link so they can check and sign:": "บันทึกการจองแล้ว ส่งลิงก์นี้ให้ลูกค้าตรวจและเซ็น:",
-  "Booking saved. Send this link to your customer:": "บันทึกการจองแล้ว ส่งลิงก์นี้ให้ลูกค้า:"
+  "Booking saved. Send this link to your customer:": "บันทึกการจองแล้ว ส่งลิงก์นี้ให้ลูกค้า:",
+  "Only the owner can do this.": "เฉพาะเจ้าของเท่านั้นที่ทำได้",
+  "This business could not be found.": "ไม่พบธุรกิจนี้",
+  "Type the business name exactly to confirm.": "พิมพ์ชื่อธุรกิจให้ตรงทุกตัวอักษรเพื่อยืนยัน",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "ฝ่ายสนับสนุน RoveHQ ลบธุรกิจไม่ได้ โปรดให้เจ้าของเป็นผู้ลบ",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "ยังลบธุรกิจไม่ได้ในขณะนี้ โปรดติดต่อฝ่ายสนับสนุน แล้วเราจะดำเนินการให้",
+  "This business could not be deleted. Please try again or contact support.": "ลบธุรกิจนี้ไม่สำเร็จ โปรดลองอีกครั้งหรือติดต่อฝ่ายสนับสนุน",
+  "Only an owner or manager can do this.": "เฉพาะเจ้าของหรือผู้จัดการเท่านั้นที่ทำได้",
+  "This customer could not be found.": "ไม่พบลูกค้ารายนี้",
+  "Finish or cancel their open bookings first.": "โปรดปิดหรือยกเลิกการจองที่ค้างอยู่ของลูกค้าก่อน",
+  "Deleting a customer isn't available yet. Please contact support.": "ยังลบลูกค้าไม่ได้ในขณะนี้ โปรดติดต่อฝ่ายสนับสนุน",
+  "This customer could not be deleted. Please try again.": "ลบลูกค้ารายนี้ไม่สำเร็จ โปรดลองอีกครั้ง",
+  "Choose between 1 and 120 months.": "เลือกระหว่าง 1 ถึง 120 เดือน",
+  "We couldn't save that. Please try again.": "บันทึกไม่สำเร็จ โปรดลองอีกครั้ง",
+  "Please pick a country.": "โปรดเลือกประเทศ"
 }

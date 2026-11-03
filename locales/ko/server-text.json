@@ -268,5 +268,19 @@
   "Payment saved.": "결제가 저장되었습니다.",
   "Open the booking": "예약 열기",
   "Booking saved. Send this link so they can check and sign:": "예약이 저장되었습니다. 고객이 확인하고 서명할 수 있도록 이 링크를 보내세요:",
-  "Booking saved. Send this link to your customer:": "예약이 저장되었습니다. 이 링크를 고객에게 보내세요:"
+  "Booking saved. Send this link to your customer:": "예약이 저장되었습니다. 이 링크를 고객에게 보내세요:",
+  "Only the owner can do this.": "소유자만 할 수 있어요.",
+  "This business could not be found.": "이 사업체를 찾을 수 없어요.",
+  "Type the business name exactly to confirm.": "확인하려면 사업체 이름을 정확히 입력하세요.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "RoveHQ 지원팀은 사업체를 삭제할 수 없어요. 소유자에게 요청하세요.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "사업체 삭제는 아직 지원되지 않아요. 지원팀에 문의하시면 대신 처리해 드릴게요.",
+  "This business could not be deleted. Please try again or contact support.": "이 사업체를 삭제할 수 없어요. 다시 시도하거나 지원팀에 문의하세요.",
+  "Only an owner or manager can do this.": "소유자나 관리자만 할 수 있어요.",
+  "This customer could not be found.": "이 고객을 찾을 수 없어요.",
+  "Finish or cancel their open bookings first.": "먼저 진행 중인 예약을 완료하거나 취소하세요.",
+  "Deleting a customer isn't available yet. Please contact support.": "고객 삭제는 아직 지원되지 않아요. 지원팀에 문의하세요.",
+  "This customer could not be deleted. Please try again.": "이 고객을 삭제할 수 없어요. 다시 시도하세요.",
+  "Choose between 1 and 120 months.": "1~120개월 중에서 선택하세요.",
+  "We couldn't save that. Please try again.": "저장하지 못했어요. 다시 시도하세요.",
+  "Please pick a country.": "국가를 선택하세요."
 }

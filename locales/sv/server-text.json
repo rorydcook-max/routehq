@@ -268,5 +268,19 @@
   "Payment saved.": "Betalningen är sparad.",
   "Open the booking": "Öppna bokningen",
   "Booking saved. Send this link so they can check and sign:": "Bokningen är sparad. Skicka den här länken så att kunden kan kontrollera och skriva under:",
-  "Booking saved. Send this link to your customer:": "Bokningen är sparad. Skicka den här länken till din kund:"
+  "Booking saved. Send this link to your customer:": "Bokningen är sparad. Skicka den här länken till din kund:",
+  "Only the owner can do this.": "Bara ägaren kan göra det här.",
+  "This business could not be found.": "Företaget hittades inte.",
+  "Type the business name exactly to confirm.": "Skriv företagets namn exakt för att bekräfta.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "RoveHQ:s support kan inte radera ett företag. Be ägaren göra det.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Det går inte att radera ett företag än. Kontakta supporten så gör vi det åt dig.",
+  "This business could not be deleted. Please try again or contact support.": "Företaget kunde inte raderas. Försök igen eller kontakta supporten.",
+  "Only an owner or manager can do this.": "Bara en ägare eller chef kan göra det här.",
+  "This customer could not be found.": "Kunden hittades inte.",
+  "Finish or cancel their open bookings first.": "Avsluta eller avboka kundens öppna bokningar först.",
+  "Deleting a customer isn't available yet. Please contact support.": "Det går inte att radera en kund än. Kontakta supporten.",
+  "This customer could not be deleted. Please try again.": "Kunden kunde inte raderas. Försök igen.",
+  "Choose between 1 and 120 months.": "Välj mellan 1 och 120 månader.",
+  "We couldn't save that. Please try again.": "Det gick inte att spara. Försök igen.",
+  "Please pick a country.": "Välj ett land."
 }

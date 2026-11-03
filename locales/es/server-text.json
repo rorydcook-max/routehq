@@ -268,5 +268,19 @@
   "Payment saved.": "Pago guardado.",
   "Open the booking": "Abrir la reserva",
   "Booking saved. Send this link so they can check and sign:": "Reserva guardada. Envía este enlace para que la revisen y firmen:",
-  "Booking saved. Send this link to your customer:": "Reserva guardada. Envía este enlace a tu cliente:"
+  "Booking saved. Send this link to your customer:": "Reserva guardada. Envía este enlace a tu cliente:",
+  "Only the owner can do this.": "Solo el propietario puede hacer esto.",
+  "This business could not be found.": "No se encontró este negocio.",
+  "Type the business name exactly to confirm.": "Escribe el nombre exacto del negocio para confirmar.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "El soporte de RoveHQ no puede eliminar un negocio. Pídeselo al propietario.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Todavía no se puede eliminar un negocio. Contacta con soporte y lo haremos por ti.",
+  "This business could not be deleted. Please try again or contact support.": "No se pudo eliminar este negocio. Inténtalo de nuevo o contacta con soporte.",
+  "Only an owner or manager can do this.": "Solo un propietario o gerente puede hacer esto.",
+  "This customer could not be found.": "No se encontró este cliente.",
+  "Finish or cancel their open bookings first.": "Primero finaliza o cancela sus reservas abiertas.",
+  "Deleting a customer isn't available yet. Please contact support.": "Todavía no se puede eliminar un cliente. Contacta con soporte.",
+  "This customer could not be deleted. Please try again.": "No se pudo eliminar este cliente. Inténtalo de nuevo.",
+  "Choose between 1 and 120 months.": "Elige entre 1 y 120 meses.",
+  "We couldn't save that. Please try again.": "No pudimos guardarlo. Inténtalo de nuevo.",
+  "Please pick a country.": "Elige un país."
 }

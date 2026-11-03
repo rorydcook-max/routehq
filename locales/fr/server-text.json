@@ -268,5 +268,19 @@
   "Payment saved.": "Paiement enregistré.",
   "Open the booking": "Ouvrir la réservation",
   "Booking saved. Send this link so they can check and sign:": "Réservation enregistrée. Envoyez ce lien pour que le client vérifie et signe :",
-  "Booking saved. Send this link to your customer:": "Réservation enregistrée. Envoyez ce lien à votre client :"
+  "Booking saved. Send this link to your customer:": "Réservation enregistrée. Envoyez ce lien à votre client :",
+  "Only the owner can do this.": "Seul le propriétaire peut faire cela.",
+  "This business could not be found.": "Cette entreprise est introuvable.",
+  "Type the business name exactly to confirm.": "Saisissez exactement le nom de l'entreprise pour confirmer.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "Le support RoveHQ ne peut pas supprimer une entreprise. Demandez au propriétaire de le faire.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "La suppression d'une entreprise n'est pas encore disponible. Contactez le support et nous la ferons pour vous.",
+  "This business could not be deleted. Please try again or contact support.": "Impossible de supprimer cette entreprise. Veuillez réessayer ou contacter le support.",
+  "Only an owner or manager can do this.": "Seul un propriétaire ou un responsable peut faire cela.",
+  "This customer could not be found.": "Ce client est introuvable.",
+  "Finish or cancel their open bookings first.": "Terminez ou annulez d'abord ses réservations en cours.",
+  "Deleting a customer isn't available yet. Please contact support.": "La suppression d'un client n'est pas encore disponible. Veuillez contacter le support.",
+  "This customer could not be deleted. Please try again.": "Impossible de supprimer ce client. Veuillez réessayer.",
+  "Choose between 1 and 120 months.": "Choisissez entre 1 et 120 mois.",
+  "We couldn't save that. Please try again.": "Impossible d'enregistrer. Veuillez réessayer.",
+  "Please pick a country.": "Veuillez choisir un pays."
 }

@@ -268,5 +268,19 @@
   "Payment saved.": "Zahlung gespeichert.",
   "Open the booking": "Buchung öffnen",
   "Booking saved. Send this link so they can check and sign:": "Buchung gespeichert. Senden Sie diesen Link, damit der Kunde prüfen und unterschreiben kann:",
-  "Booking saved. Send this link to your customer:": "Buchung gespeichert. Senden Sie diesen Link an Ihren Kunden:"
+  "Booking saved. Send this link to your customer:": "Buchung gespeichert. Senden Sie diesen Link an Ihren Kunden:",
+  "Only the owner can do this.": "Nur der Inhaber kann das tun.",
+  "This business could not be found.": "Dieses Unternehmen wurde nicht gefunden.",
+  "Type the business name exactly to confirm.": "Geben Sie zur Bestätigung den Namen des Unternehmens genau ein.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "Der RoveHQ-Support kann kein Unternehmen löschen. Bitten Sie den Inhaber darum.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Das Löschen eines Unternehmens ist noch nicht verfügbar. Bitte wenden Sie sich an den Support, wir erledigen das für Sie.",
+  "This business could not be deleted. Please try again or contact support.": "Dieses Unternehmen konnte nicht gelöscht werden. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support.",
+  "Only an owner or manager can do this.": "Nur ein Inhaber oder Manager kann das tun.",
+  "This customer could not be found.": "Dieser Kunde wurde nicht gefunden.",
+  "Finish or cancel their open bookings first.": "Schließen Sie zuerst die offenen Buchungen ab oder stornieren Sie sie.",
+  "Deleting a customer isn't available yet. Please contact support.": "Das Löschen eines Kunden ist noch nicht verfügbar. Bitte wenden Sie sich an den Support.",
+  "This customer could not be deleted. Please try again.": "Dieser Kunde konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
+  "Choose between 1 and 120 months.": "Wählen Sie zwischen 1 und 120 Monaten.",
+  "We couldn't save that. Please try again.": "Das konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+  "Please pick a country.": "Bitte wählen Sie ein Land."
 }

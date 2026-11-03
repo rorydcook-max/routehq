@@ -125,7 +125,9 @@
     "bkTitle": "예약",
     "bkAll": "전체 예약",
     "emailVerified": "이메일이 인증되었습니다. 감사합니다!",
-    "emailLinkOld": "만료된 링크입니다. 새 링크를 받으려면 \"이메일 인증\"을 탭하세요."
+    "emailLinkOld": "만료된 링크입니다. 새 링크를 받으려면 \"이메일 인증\"을 탭하세요.",
+    "kmToGoMi": "{km}마일 남음",
+    "kmOverMi": "{km}마일 초과"
   },
   "vehicles": {
     "addVehicle": "차량 추가"
@@ -389,7 +391,16 @@
     "lateOptTodayDetailMoves": "모든 결제일이 {days}일 늦춰져요",
     "lateOptTodayDetailPlain": "예약대로 {date} 반납",
     "lateOptTodayTitle": "오늘부터 대여료 시작",
-    "outAtKm": "출고 시 {km} km"
+    "outAtKm": "출고 시 {km} km",
+    "confirmOdometerMi": "주행거리계 수치(마일)",
+    "ocrSuggestedMi": "사진에서 {km}마일로 읽었어요.",
+    "ocrPossibleMi": "예상 수치: {km}마일. 주행거리계와 비교해 확인하세요.",
+    "odometerBelowLastMi": "지난 수치({km}마일)보다 낮아요. 확인해 주세요.",
+    "drivenDuringRentalMi": "인도 후 주행: {km}마일",
+    "odometerAtDeliveryMi": "인도 시: {km}마일",
+    "kmValueMi": "{km}마일",
+    "odometerHugeMi": "지난 수치보다 {km}마일 많아요. 확인해 주세요.",
+    "outAtKmMi": "출고 시 {km}마일"
   },
   "translation": {
     "translatedFrom": "{language}에서 번역됨",
@@ -890,7 +901,9 @@
     "chgr_other": "기타 비용",
     "bookedUntil": "{date}까지 예약됨",
     "noneFree": "{start}부터 이용 가능한 차량이 없어요.",
-    "noneFreeEarliest": "{start}부터 이용 가능한 차량이 없어요. 가장 빠른 날짜는 {date}({vehicle})예요."
+    "noneFreeEarliest": "{start}부터 이용 가능한 차량이 없어요. 가장 빠른 날짜는 {date}({vehicle})예요.",
+    "privacyLink": "{business} 및 RoveHQ의 개인정보 이용 방법",
+    "vatIncluded": "가격에 {name} {rate}% 포함"
   },
   "customerMessages": {
     "hi": "{name}님, 안녕하세요.",
@@ -1555,7 +1568,9 @@
     "coverFrom": "보장 시작",
     "coverTo": "보장 종료",
     "coverHint": "1년 이상 한 번에 냈나요? 날짜를 넣으면 매달 나눠서 계산돼요.",
-    "coverUpdateCar": "차량의 {name} 만료일도 {date}로 바꾸기"
+    "coverUpdateCar": "차량의 {name} 만료일도 {date}로 바꾸기",
+    "sv_nextKmMi": "다음 정비 주행거리(마일)",
+    "sv_hintMi": "날짜, 주행거리 또는 둘 다 설정하세요. 먼저 도래하는 시점이 기한이에요."
   },
   "booking": {
     "open": "열기",
@@ -2442,7 +2457,10 @@
     "remind_openingWhatsApp": "알림을 담아 WhatsApp을 여는 중이에요",
     "remind_nothingOwed": "이 예약에는 미납 금액이 없어요",
     "remind_notFound": "이 예약을 찾을 수 없어요",
-    "remind_signedOut": "다시 로그인해 주세요"
+    "remind_signedOut": "다시 로그인해 주세요",
+    "kmAtReturnMi": "반납 시 {km}마일",
+    "kmAtHandoverMi": "인도 시 {km}마일",
+    "kmDrivenMi": "{km}마일 주행"
   },
   "newBooking": {
     "docsSelfie": "고객 사진",
@@ -3210,7 +3228,40 @@
     "f_monthlyHint": "{date}까지 매달 {amount}이 비용에 추가돼요.",
     "cs_monthly": "월 {amount}",
     "f_inspectionCost": "검사 비용 ({name})",
-    "f_inspectionHint": "오래된 차량은 자동차세 갱신 때 검사해요 (자동차 7년 초과, 오토바이 5년 초과). 필요 없으면 비워 두세요."
+    "f_inspectionHint": "오래된 차량은 자동차세 갱신 때 검사해요 (자동차 7년 초과, 오토바이 5년 초과). 필요 없으면 비워 두세요.",
+    "m_hintBothMi": "날짜, 주행거리 또는 둘 다 설정하세요. 먼저 도래하는 시점이 기한이에요.",
+    "sv_nextBothMi": "{date} 또는 {km}마일 중 먼저 도래하는 때",
+    "sv_kmOnlyMi": "{km}마일에",
+    "sv_kmLeftMi": "{km}마일 남음",
+    "sv_kmOverMi": "{km}마일 초과",
+    "kmMi": "{km}마일",
+    "m_atKmMi": "{km}마일 시점",
+    "m_nextKmMi": "다음 기한 주행거리(마일)",
+    "x_mileageMi": "주행거리 {km}마일",
+    "h_kmMi": "{km}마일 주행",
+    "rn_official": "공식 페이지",
+    "rn_EU_insurance": "대인·대물 책임보험은 의무예요. 렌터카는 자가운전 렌털을 보장하는 보험이 필요해요.",
+    "rn_GB_tax": "자동차세는 온라인으로 12개월 또는 6개월분을 내거나 자동이체로 매월 낼 수 있어요. V5C 등록증이나 안내문이 필요해요.",
+    "rn_GB_inspection": "MOT: 차령 3년에 첫 검사, 이후 매년. 최대 한 달 일찍 받아도 기한일은 그대로예요.",
+    "rn_IE_tax": "자동차세: 온라인으로 3, 6, 12개월분을 낼 수 있어요. 보험 정보가 필요해요.",
+    "rn_IE_inspection": "NCT: 차령 4년부터 2년마다, 10년부터는 매년.",
+    "rn_ES_tax": "IVTM(impuesto de circulación): 차량이 등록된 시청에 1년에 한 번 내요.",
+    "rn_ES_inspection": "ITV: 자가용은 차령 4년부터 2년마다, 10년부터 매년. 렌터카는 더 자주 필요할 수 있으니 ITV 검사소에 문의하세요.",
+    "rn_PT_tax": "IUC: 차량을 처음 등록한 달에 Portal das Finanças에서 1년에 한 번 내요.",
+    "rn_PT_inspection": "IPO: 차령 4년부터 2년마다, 8년부터 매년. 렌터카는 다를 수 있으니 IMT에 확인하세요.",
+    "rn_IT_tax": "Bollo auto: 1년에 한 번 주 정부에 pagoPA로 온라인 납부해요.",
+    "rn_IT_inspection": "Revisione: 최초 등록 4년 후, 이후 2년마다.",
+    "rn_GR_tax": "Τέλη κυκλοφορίας(자동차세): 1년에 한 번 gov.gr(myCAR)에서 내요.",
+    "rn_GR_inspection": "ΚΤΕΟ: 최초 등록 4년 후, 이후 2년마다.",
+    "rn_HR_tax": "Registracija: 매년 기술 검사와 함께 갱신해요.",
+    "rn_HR_inspection": "Tehnički pregled: 보통 매년, 차량 검사소(CVH)에서 받아요.",
+    "rn_CY_tax": "자동차세: 매년 또는 6개월마다 도로교통부에서 온라인으로 갱신해요.",
+    "rn_CY_inspection": "MOT: 최초 등록 4년 후, 이후 2년마다. 렌터카는 매년 필요할 수 있어요.",
+    "rn_MT_tax": "도로 면허: 매년 Transport Malta에서 온라인으로 갱신해요.",
+    "rn_MT_inspection": "VRT: 최초 등록 4년 후, 이후 2년마다.",
+    "rn_FR_inspection": "Contrôle technique: 승용차는 최초 등록 4년 후, 이후 2년마다. 오토바이는 5년 후, 이후 3년마다.",
+    "rn_DE_tax": "Kfz-Steuer: 세관(Zoll)이 1년에 한 번 자동이체로 징수해요.",
+    "rn_DE_inspection": "HU(TÜV): 승용차는 최초 등록 3년 후, 이후 2년마다. 자가운전 렌터카는 12개월마다."
   },
   "customerPage": {
     "back": "고객",
@@ -3355,7 +3406,11 @@
     "g_owesDetail": "오늘까지 기한",
     "g_balance": "잔액",
     "g_docsMissingList": "누락: {list}",
-    "g_docsOf": "{count}/3"
+    "g_docsOf": "{count}/3",
+    "h_kmMi": "{km}마일 주행",
+    "f_licenceCategories": "면허 종류",
+    "f_dvlaCode": "DVLA 확인 코드",
+    "f_dvlaCodeHint": "운전자가 gov.uk/view-driving-licence에서 만들어요. 21일간 유효해요."
   },
   "vehicleForm": {
     "addTitle": "차량 추가",
@@ -3528,7 +3583,9 @@
     "qp_add": "추가",
     "backSetup": "설정",
     "quickSubtitle": "기본 정보만 입력하세요. 차량 종류, 제조사, 모델만 있으면 돼요.",
-    "quickLater": "세금 및 보험일, 주행거리, 대출 정보 등은 나중에 '차량 관리'에서 추가할 수 있어요."
+    "quickLater": "세금 및 보험일, 주행거리, 대출 정보 등은 나중에 '차량 관리'에서 추가할 수 있어요.",
+    "valueSummaryMi": "현재 주행거리, 구입 가격, 현재 가치",
+    "valueSummaryEditMi": "구입 가격, 가치, 구입 시 주행거리"
   },
   "bookingEdit": {
     "booking": "예약",
@@ -4295,7 +4352,48 @@
     "ag_lang_ms": "말레이어",
     "ag_lang_fil": "필리핀어",
     "ag_lang_lo": "라오어",
-    "ag_lang_km": "크메르어"
+    "ag_lang_km": "크메르어",
+    "tp_kmMi": "월 허용 주행거리(마일)",
+    "grp_region": "국가 및 단위",
+    "reg_title": "국가 및 단위",
+    "reg_body": "시간대, 통화, 거리, 세금 설정이에요. 국가를 고르면 일반적인 설정이 채워져요.",
+    "reg_country": "국가",
+    "reg_zone": "시간대",
+    "reg_currency": "통화",
+    "reg_distance": "거리",
+    "reg_distanceTip": "주행거리계 수치, 정비, 거리 제한에 사용돼요. 바꿔도 이미 저장된 수치는 변환되지 않아요.",
+    "reg_km": "킬로미터(km)",
+    "reg_mi": "마일(mi)",
+    "vat_on": "부가가치세 또는 판매세 등록 사업자",
+    "vat_onTip": "영수증에 부가가치세 번호와 금액별 부가가치세가 표시돼요.",
+    "vat_number": "부가가치세 번호 또는 세금 번호",
+    "vat_rate": "부가가치세율(%)",
+    "vat_included": "가격에 부가가치세 포함",
+    "vat_includedTip": "켜기: 입력한 가격이 고객이 내는 금액이에요(부가가치세 포함). 끄기: 예약 시 RoveHQ가 차량 가격과 추가 옵션에 부가가치세를 더해요.",
+    "vat_summary": "부가가치세 {rate}%",
+    "vat_note_ie": "12개월 내 5주 미만 렌털: 13.5%. 더 긴 렌털: 23%.",
+    "vat_note_es": "카나리아 제도: IVA 대신 IGIC(7%).",
+    "vat_note_pt": "마데이라 22%, 아조레스 16%.",
+    "vat_note_gr": "일부 섬은 세율이 낮아요. 확인하세요.",
+    "xp_ready": "기본 제공:",
+    "xp_additional_driver": "추가 운전자",
+    "xp_cross_border": "국경 통과 허가",
+    "xp_damage_waiver": "차량 손해 면책",
+    "xp_one_way": "편도 반납 요금",
+    "xp_out_of_hours": "영업시간 외 배차 또는 회수",
+    "xp_young_driver": "젊은 운전자 요금",
+    "xp_excess": "면책 가입 시 자기부담금({symbol})",
+    "xp_excessTip": "면책에 가입한 임차인이 손상에 대해 최대로 내는 금액이에요. 계약서에 일반 자기부담금 대신 표시돼요.",
+    "xp_minAge": "적용 운전자 나이(미만)",
+    "xp_countries": "허용 국가",
+    "xp_countriesPh": "예: 프랑스, 포르투갈",
+    "ag_lang_el": "그리스어",
+    "ag_lang_es": "스페인어",
+    "ag_lang_pt": "포르투갈어",
+    "ag_lang_it": "이탈리아어",
+    "ag_lang_hr": "크로아티아어",
+    "ag_lang_fr": "프랑스어",
+    "ag_lang_de": "독일어"
   },
   "accountPage": {
     "roleOwner": "대표",
@@ -4499,7 +4597,8 @@
     "afterRefunds": "{amount} 환불 후",
     "refundsTitle": "고객에게 환불한 금액",
     "refundsHint": "환불은 수입에서 차감돼요. 운영 비용이 아니에요.",
-    "refundsHintExtras": "환불은 수입에서 차감되며, 추가 옵션 {amount}이 포함돼요. 운영 비용이 아니에요."
+    "refundsHintExtras": "환불은 수입에서 차감되며, 추가 옵션 {amount}이 포함돼요. 운영 비용이 아니에요.",
+    "vatInside": "부가가치세 {amount}({rate}%) 포함"
   },
   "auth": {
     "signInTitle": "로그인",
@@ -4763,7 +4862,8 @@
     "checksLeft": "이번 결제 기간에 {count, plural, one {구매 점검 #회} other {구매 점검 #회}} 남음",
     "checksUsedUp": "{date}까지 남은 구매 점검이 없습니다. 이전에 점검한 차량은 계속 열람할 수 있습니다.",
     "checksPaidOnly": "새 구매 점검은 유료 요금제에서 이용할 수 있습니다. 이전에 점검한 차량은 계속 열람할 수 있습니다.",
-    "checksUpgrade": "업그레이드"
+    "checksUpgrade": "업그레이드",
+    "mileageMi": "현재까지 주행거리(마일)"
   },
   "importer": {
     "dt_vehicles": "차량",
@@ -5006,7 +5106,9 @@
     "cnt_transactions": "입출금 기록 {count}건",
     "cnt_vehicles": "차량 {count}대",
     "imported": "가져옴",
-    "readNeeds": "먼저 파일을 선택하거나 사진을 추가하거나 링크를 붙여 넣으세요."
+    "readNeeds": "먼저 파일을 선택하거나 사진을 추가하거나 링크를 붙여 넣으세요.",
+    "f_current_mileageMi": "현재 주행거리(마일)",
+    "c_mileageMi": "주행거리(마일)"
   },
   "errorPages": {
     "notFoundTitle": "페이지를 찾을 수 없어요",
@@ -5288,7 +5390,50 @@
     "liveBody": "무엇이든 물어보고, 파일을 보내거나, RoveHQ 팀 담당자와 이야기하세요.",
     "liveButton": "실시간 채팅 열기",
     "fromAssistant": "RoveHQ 어시스턴트",
-    "contentSubtitle": "사용자가 어시스턴트에게 요청했거나 어시스턴트가 답하지 못한 문서, FAQ, 동영상, 자료입니다. 승인하기 전에는 아무것도 게시되지 않습니다."
+    "contentSubtitle": "사용자가 어시스턴트에게 요청했거나 어시스턴트가 답하지 못한 문서, FAQ, 동영상, 자료입니다. 승인하기 전에는 아무것도 게시되지 않습니다.",
+    "contentTitle": "도움말 콘텐츠 요청",
+    "contentCollate": "새 질문 모으기",
+    "contentCollating": "모으는 중…",
+    "contentCollated": "새 질문 {questions}개: 새 요청 {created}개, 기존 요청에 {merged}개 추가.",
+    "contentNothingNew": "모을 새 질문이 없어요.",
+    "contentSection_suggested": "제안됨",
+    "contentSection_drafted": "초안 작성됨 — 승인 대기",
+    "contentSection_approved": "제작 승인됨(동영상 및 자료)",
+    "contentSection_closed": "게시됨 및 거절됨",
+    "contentEmpty_suggested": "제안된 항목이 없어요. 새 질문을 모아 더 확인하세요.",
+    "contentEmpty_drafted": "대기 중인 초안이 없어요.",
+    "contentEmpty_approved": "제작할 동영상이나 자료가 없어요.",
+    "contentEmpty_closed": "아직 없어요.",
+    "contentKind_article": "문서",
+    "contentKind_faq": "자주 묻는 질문",
+    "contentKind_video": "동영상",
+    "contentKind_resource": "자료",
+    "contentStatus_published": "게시됨",
+    "contentStatus_rejected": "거절됨",
+    "contentAsked": "{count, plural, other {#번}} 질문됨",
+    "contentFor": "대상",
+    "contentQuestions": "질문({count})",
+    "contentAskedOn": "{page}에서 질문",
+    "contentDraft": "초안 작성",
+    "contentRedraft": "다시 작성",
+    "contentDrafting": "작성 중…",
+    "contentApprove": "승인 및 게시",
+    "contentApproveConfirm": "지금 도움말 센터에 게시할까요?",
+    "contentApproveMake": "제작 승인",
+    "contentMarkMade": "제작 완료로 표시",
+    "contentEdit": "초안 편집",
+    "contentSave": "초안 저장",
+    "contentCancel": "취소",
+    "contentReject": "거절",
+    "contentRejectConfirm": "이 요청을 거절할까요?",
+    "contentDraftTitle": "제목",
+    "contentDraftBody": "문서(Markdown)",
+    "contentFaqQ": "질문",
+    "contentFaqA": "답변",
+    "contentPreview": "미리 보기",
+    "contentCheckNote": "[check] 표시가 있는 부분은 게시 전에 확인하고 표시를 지워야 해요.",
+    "contentNoDraftNeeded": "동영상과 자료는 팀이 제작해요. 승인하면 제작 목록에 추가돼요.",
+    "contentView": "도움말 센터에서 보기"
   },
   "inspectStart": {
     "titleOut": "차량 인도",
@@ -5418,7 +5563,10 @@
     "yes": "예",
     "no": "아니요",
     "agreed": "{date} 동의함",
-    "empty": "아직 대여자가 없어요. 예약 시 \"내 정보를 RoveHQ와 공유\"에 체크한 분이 여기에 표시돼요."
+    "empty": "아직 대여자가 없어요. 예약 시 \"내 정보를 RoveHQ와 공유\"에 체크한 분이 여기에 표시돼요.",
+    "remove": "목록에서 삭제",
+    "removeConfirm": "이 임차인과 렌털 기록을 RoveHQ 목록에서 삭제해요. 되돌릴 수 없어요.",
+    "removeButton": "삭제"
   },
   "site": {
     "skipToContent": "본문으로 건너뛰기",
@@ -5641,7 +5789,19 @@
     "mockAvailable": "이용 가능",
     "mockPerDay": "하루 {amount}",
     "mockQrPay": "QR 결제",
-    "inclImport": "기존 기록 무료 가져오기"
+    "inclImport": "기존 기록 무료 가져오기",
+    "cookieBody": "이 사이트 운영에 필요한 쿠키를 사용해요. 동의하시면 어떤 페이지가 도움이 되는지 보기 위해 분석 쿠키도 사용해요.",
+    "cookieAccept": "동의",
+    "cookieReject": "거부",
+    "cookieChoices": "설정",
+    "cookieChoicesTitle": "쿠키 설정",
+    "cookieNecessary": "필수",
+    "cookieNecessaryBody": "언어, 테마, 로그인.",
+    "cookieAlwaysOn": "항상 켜짐",
+    "cookieAnalytics": "분석",
+    "cookieAnalyticsBody": "방문 수를 세기 위한 Google Analytics.",
+    "cookieSave": "설정 저장",
+    "cookiePolicy": "쿠키 정책"
   },
   "businessClosed": {
     "title": "이 업체는 폐쇄되었어요",
@@ -6072,7 +6232,21 @@
     "docsRelated": "관련 글",
     "docsAll": "모든 글",
     "metaDocsTitle": "도움말 센터: RoveHQ 사용법",
-    "metaDocsDescription": "RoveHQ 안내와 동영상: 차량, 예약, 계약, 인도, 결제, 비용, 보고서, 서류."
+    "metaDocsDescription": "RoveHQ 안내와 동영상: 차량, 예약, 계약, 인도, 결제, 비용, 보고서, 서류.",
+    "footerLegal": "법적 고지",
+    "legalPrivacy": "개인정보",
+    "legalTerms": "약관",
+    "legalDpa": "데이터 처리",
+    "legalSubprocessors": "하위 처리자",
+    "legalCookies": "쿠키",
+    "legalCookieChoices": "쿠키 설정",
+    "legalIndexTitle": "법적 고지 및 개인정보",
+    "legalIndexBody": "RoveHQ의 정보 처리 방식, 렌털 사업자 약관, 기록용 세부 정보.",
+    "legalNotReviewed": "공개 지침(ICO, EDPB, 유럽연합 집행위원회, 태국 PDPC)을 바탕으로 RoveHQ가 작성했어요. 변호사 검토를 거치지 않았어요.",
+    "legalEnglishOnly": "이 페이지는 현재 영어로만 제공돼요.",
+    "legalUpdated": "최종 업데이트: {date}",
+    "cb_mileage_limit_mi": "주행거리 제한(마일, 비워 두면 무제한)",
+    "cb_excess_km_fee_mi": "초과 1마일당 요금"
   },
   "gallery": {
     "open": "사진 열기",
@@ -6387,5 +6561,36 @@
     "sRecordCost": "비용 기록",
     "choose": "선택",
     "save": "저장"
+  },
+  "privacy": {
+    "title": "내 데이터와 개인정보",
+    "body": "RoveHQ의 정보 처리 방식과 사용자의 권리.",
+    "linkPrivacy": "개인정보 처리방침",
+    "linkTerms": "서비스 약관",
+    "linkDpa": "데이터 처리 계약",
+    "linkSubprocessors": "하위 처리자",
+    "linkCookies": "쿠키 정책",
+    "exportTitle": "모든 데이터 다운로드",
+    "exportBody": "차량, 고객, 예약, 결제, 입출금, 다운로드 링크가 포함된 문서(링크는 7일간 유효).",
+    "exportButton": "다운로드(JSON)",
+    "retentionTitle": "임차인 신분증 사진",
+    "retentionBody": "임차인의 마지막 렌털 후 여권, 면허증, 셀카 사진을 자동으로 삭제해요. 서명된 계약서는 남아요.",
+    "retentionOn": "신분증 사진 자동 삭제",
+    "retentionMonths": "마지막 렌털 후 개월 수",
+    "retentionSave": "저장",
+    "retentionSaved": "저장됨",
+    "deleteTitle": "이 사업체 삭제",
+    "deleteBody": "차량, 고객, 예약, 결제, 문서, 서명된 계약서 등 모든 것을 영구 삭제해요.",
+    "deleteHint": "되돌릴 수 없어요. 필요하면 먼저 데이터를 다운로드하세요. 유료 요금제는 환불 없이 종료돼요.",
+    "deleteType": "확인하려면 {name}을(를) 입력하세요",
+    "deleteButton": "이 사업체 삭제",
+    "deleteConfirm": "모두 삭제",
+    "deleteCancel": "취소",
+    "customerTitle": "개인정보 요청",
+    "customerBody": "이 임차인이 데이터 사본이나 삭제를 요청할 때 사용해요.",
+    "customerExport": "이 고객 데이터 내보내기",
+    "customerDelete": "이 고객 삭제",
+    "customerDeleteBody": "개인 정보, 신분증 사진, 메시지를 삭제해요. 예약, 결제, 서명된 계약서는 회계를 위해 \"삭제된 고객\"으로 남아요.",
+    "customerDeleteConfirm": "데이터 삭제"
   }
 }

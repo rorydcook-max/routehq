@@ -268,5 +268,19 @@
   "Payment saved.": "התשלום נשמר.",
   "Open the booking": "פתיחת ההזמנה",
   "Booking saved. Send this link so they can check and sign:": "ההזמנה נשמרה. שלחו את הקישור הזה כדי שהלקוח יבדוק ויחתום:",
-  "Booking saved. Send this link to your customer:": "ההזמנה נשמרה. שלחו את הקישור הזה ללקוח:"
+  "Booking saved. Send this link to your customer:": "ההזמנה נשמרה. שלחו את הקישור הזה ללקוח:",
+  "Only the owner can do this.": "רק הבעלים יכול לעשות את זה.",
+  "This business could not be found.": "העסק לא נמצא.",
+  "Type the business name exactly to confirm.": "יש להקליד את שם העסק בדיוק כדי לאשר.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "התמיכה של RoveHQ לא יכולה למחוק עסק. יש לבקש מהבעלים לעשות זאת.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "מחיקת עסק עדיין לא זמינה. אפשר לפנות לתמיכה ואנחנו נעשה זאת עבורך.",
+  "This business could not be deleted. Please try again or contact support.": "לא ניתן היה למחוק את העסק. אפשר לנסות שוב או לפנות לתמיכה.",
+  "Only an owner or manager can do this.": "רק בעלים או מנהל יכולים לעשות את זה.",
+  "This customer could not be found.": "הלקוח לא נמצא.",
+  "Finish or cancel their open bookings first.": "קודם צריך לסיים או לבטל את ההזמנות הפתוחות שלו.",
+  "Deleting a customer isn't available yet. Please contact support.": "מחיקת לקוח עדיין לא זמינה. אפשר לפנות לתמיכה.",
+  "This customer could not be deleted. Please try again.": "לא ניתן היה למחוק את הלקוח. אפשר לנסות שוב.",
+  "Choose between 1 and 120 months.": "יש לבחור בין 1 ל-120 חודשים.",
+  "We couldn't save that. Please try again.": "לא הצלחנו לשמור. אפשר לנסות שוב.",
+  "Please pick a country.": "יש לבחור מדינה."
 }

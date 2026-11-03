@@ -268,5 +268,19 @@
   "Payment saved.": "ගෙවීම සුරැකුණා.",
   "Open the booking": "වෙන්කිරීම විවෘත කරන්න",
   "Booking saved. Send this link so they can check and sign:": "වෙන්කිරීම සුරැකුණා. ඔවුන්ට පරීක්ෂා කර අත්සන් කිරීමට මෙම link එක යවන්න:",
-  "Booking saved. Send this link to your customer:": "වෙන්කිරීම සුරැකුණා. මෙම link එක ඔබේ පාරිභෝගිකයාට යවන්න:"
+  "Booking saved. Send this link to your customer:": "වෙන්කිරීම සුරැකුණා. මෙම link එක ඔබේ පාරිභෝගිකයාට යවන්න:",
+  "Only the owner can do this.": "මෙය කළ හැක්කේ හිමිකරුට පමණි.",
+  "This business could not be found.": "මෙම ව්‍යාපාරය සොයාගත නොහැකි විය.",
+  "Type the business name exactly to confirm.": "තහවුරු කිරීමට ව්‍යාපාරයේ නම නිවැරදිව ටයිප් කරන්න.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "RoveHQ සහාය කණ්ඩායමට ව්‍යාපාරයක් මැකිය නොහැක. එය කරන ලෙස හිමිකරුගෙන් ඉල්ලන්න.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "ව්‍යාපාරයක් මැකීම තවම ලබා ගත නොහැක. කරුණාකර සහාය කණ්ඩායම අමතන්න, අපි එය ඔබ වෙනුවෙන් කරන්නෙමු.",
+  "This business could not be deleted. Please try again or contact support.": "මෙම ව්‍යාපාරය මැකිය නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න හෝ සහාය කණ්ඩායම අමතන්න.",
+  "Only an owner or manager can do this.": "මෙය කළ හැක්කේ හිමිකරුට හෝ කළමනාකරුට පමණි.",
+  "This customer could not be found.": "මෙම පාරිභෝගිකයා සොයාගත නොහැකි විය.",
+  "Finish or cancel their open bookings first.": "පළමුව ඔවුන්ගේ විවෘත වෙන්කිරීම් අවසන් කරන්න හෝ අවලංගු කරන්න.",
+  "Deleting a customer isn't available yet. Please contact support.": "පාරිභෝගිකයෙකු මැකීම තවම ලබා ගත නොහැක. කරුණාකර සහාය කණ්ඩායම අමතන්න.",
+  "This customer could not be deleted. Please try again.": "මෙම පාරිභෝගිකයා මැකිය නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+  "Choose between 1 and 120 months.": "මාස 1 සිට 120 දක්වා තෝරන්න.",
+  "We couldn't save that. Please try again.": "අපට එය සුරැකිය නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+  "Please pick a country.": "කරුණාකර රටක් තෝරන්න."
 }

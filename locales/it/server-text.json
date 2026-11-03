@@ -268,5 +268,19 @@
   "Payment saved.": "Pagamento salvato.",
   "Open the booking": "Apri la prenotazione",
   "Booking saved. Send this link so they can check and sign:": "Prenotazione salvata. Invia questo link per farla controllare e firmare:",
-  "Booking saved. Send this link to your customer:": "Prenotazione salvata. Invia questo link al tuo cliente:"
+  "Booking saved. Send this link to your customer:": "Prenotazione salvata. Invia questo link al tuo cliente:",
+  "Only the owner can do this.": "Solo il titolare può farlo.",
+  "This business could not be found.": "Attività non trovata.",
+  "Type the business name exactly to confirm.": "Scrivi esattamente il nome dell'attività per confermare.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "L'assistenza RoveHQ non può eliminare un'attività. Chiedi al titolare di farlo.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "L'eliminazione di un'attività non è ancora disponibile. Contatta l'assistenza e lo faremo noi per te.",
+  "This business could not be deleted. Please try again or contact support.": "Impossibile eliminare l'attività. Riprova o contatta l'assistenza.",
+  "Only an owner or manager can do this.": "Solo il titolare o un manager può farlo.",
+  "This customer could not be found.": "Cliente non trovato.",
+  "Finish or cancel their open bookings first.": "Prima completa o annulla le sue prenotazioni aperte.",
+  "Deleting a customer isn't available yet. Please contact support.": "L'eliminazione di un cliente non è ancora disponibile. Contatta l'assistenza.",
+  "This customer could not be deleted. Please try again.": "Impossibile eliminare il cliente. Riprova.",
+  "Choose between 1 and 120 months.": "Scegli tra 1 e 120 mesi.",
+  "We couldn't save that. Please try again.": "Non è stato possibile salvare. Riprova.",
+  "Please pick a country.": "Scegli un paese."
 }

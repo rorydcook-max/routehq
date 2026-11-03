@@ -268,5 +268,19 @@
   "Payment saved.": "Betaling opgeslagen.",
   "Open the booking": "Boeking openen",
   "Booking saved. Send this link so they can check and sign:": "Boeking opgeslagen. Stuur deze link zodat ze kunnen controleren en ondertekenen:",
-  "Booking saved. Send this link to your customer:": "Boeking opgeslagen. Stuur deze link naar je klant:"
+  "Booking saved. Send this link to your customer:": "Boeking opgeslagen. Stuur deze link naar je klant:",
+  "Only the owner can do this.": "Alleen de eigenaar kan dit doen.",
+  "This business could not be found.": "Dit bedrijf is niet gevonden.",
+  "Type the business name exactly to confirm.": "Typ de bedrijfsnaam precies over om te bevestigen.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "RoveHQ-support kan geen bedrijf verwijderen. Vraag de eigenaar om dit te doen.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Een bedrijf verwijderen is nog niet mogelijk. Neem contact op met support, dan doen wij het voor je.",
+  "This business could not be deleted. Please try again or contact support.": "Dit bedrijf kon niet worden verwijderd. Probeer het opnieuw of neem contact op met support.",
+  "Only an owner or manager can do this.": "Alleen een eigenaar of manager kan dit doen.",
+  "This customer could not be found.": "Deze klant is niet gevonden.",
+  "Finish or cancel their open bookings first.": "Rond eerst de openstaande boekingen af of annuleer ze.",
+  "Deleting a customer isn't available yet. Please contact support.": "Een klant verwijderen is nog niet mogelijk. Neem contact op met support.",
+  "This customer could not be deleted. Please try again.": "Deze klant kon niet worden verwijderd. Probeer het opnieuw.",
+  "Choose between 1 and 120 months.": "Kies tussen 1 en 120 maanden.",
+  "We couldn't save that. Please try again.": "Opslaan is niet gelukt. Probeer het opnieuw.",
+  "Please pick a country.": "Kies een land."
 }

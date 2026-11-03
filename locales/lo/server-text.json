@@ -268,5 +268,19 @@
   "Payment saved.": "ບັນທຶກການຊຳລະແລ້ວ.",
   "Open the booking": "ເປີດການຈອງ",
   "Booking saved. Send this link so they can check and sign:": "ບັນທຶກການຈອງແລ້ວ. ສົ່ງລິ້ງນີ້ເພື່ອໃຫ້ລູກຄ້າກວດເບິ່ງ ແລະ ເຊັນ:",
-  "Booking saved. Send this link to your customer:": "ບັນທຶກການຈອງແລ້ວ. ສົ່ງລິ້ງນີ້ໃຫ້ລູກຄ້າຂອງທ່ານ:"
+  "Booking saved. Send this link to your customer:": "ບັນທຶກການຈອງແລ້ວ. ສົ່ງລິ້ງນີ້ໃຫ້ລູກຄ້າຂອງທ່ານ:",
+  "Only the owner can do this.": "ສະເພາະເຈົ້າຂອງເທົ່ານັ້ນທີ່ເຮັດໄດ້.",
+  "This business could not be found.": "ບໍ່ພົບທຸລະກິດນີ້.",
+  "Type the business name exactly to confirm.": "ພິມຊື່ທຸລະກິດໃຫ້ຖືກຕ້ອງທຸກຕົວອັກສອນເພື່ອຢືນຢັນ.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "ຝ່າຍຊ່ວຍເຫຼືອ RoveHQ ລຶບທຸລະກິດບໍ່ໄດ້. ກະລຸນາໃຫ້ເຈົ້າຂອງເປັນຜູ້ລຶບ.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "ຍັງລຶບທຸລະກິດບໍ່ໄດ້ໃນຕອນນີ້. ກະລຸນາຕິດຕໍ່ຝ່າຍຊ່ວຍເຫຼືອ ແລ້ວພວກເຮົາຈະດຳເນີນການໃຫ້.",
+  "This business could not be deleted. Please try again or contact support.": "ລຶບທຸລະກິດນີ້ບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່ ຫຼື ຕິດຕໍ່ຝ່າຍຊ່ວຍເຫຼືອ.",
+  "Only an owner or manager can do this.": "ສະເພາະເຈົ້າຂອງ ຫຼື ຜູ້ຈັດການເທົ່ານັ້ນທີ່ເຮັດໄດ້.",
+  "This customer could not be found.": "ບໍ່ພົບລູກຄ້ານີ້.",
+  "Finish or cancel their open bookings first.": "ກະລຸນາປິດ ຫຼື ຍົກເລີກການຈອງທີ່ຄ້າງຢູ່ຂອງລູກຄ້າກ່ອນ.",
+  "Deleting a customer isn't available yet. Please contact support.": "ຍັງລຶບລູກຄ້າບໍ່ໄດ້ໃນຕອນນີ້. ກະລຸນາຕິດຕໍ່ຝ່າຍຊ່ວຍເຫຼືອ.",
+  "This customer could not be deleted. Please try again.": "ລຶບລູກຄ້ານີ້ບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່.",
+  "Choose between 1 and 120 months.": "ເລືອກລະຫວ່າງ 1 ຫາ 120 ເດືອນ.",
+  "We couldn't save that. Please try again.": "ບັນທຶກບໍ່ສຳເລັດ. ກະລຸນາລອງໃໝ່.",
+  "Please pick a country.": "ກະລຸນາເລືອກປະເທດ."
 }

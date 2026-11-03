@@ -268,5 +268,19 @@
   "Payment saved.": "Na-save ang bayad.",
   "Open the booking": "Buksan ang booking",
   "Booking saved. Send this link so they can check and sign:": "Na-save ang booking. Ipadala ang link na ito para matingnan nila at mapirmahan:",
-  "Booking saved. Send this link to your customer:": "Na-save ang booking. Ipadala ang link na ito sa customer mo:"
+  "Booking saved. Send this link to your customer:": "Na-save ang booking. Ipadala ang link na ito sa customer mo:",
+  "Only the owner can do this.": "Ang may-ari lang ang puwedeng gumawa nito.",
+  "This business could not be found.": "Hindi mahanap ang negosyong ito.",
+  "Type the business name exactly to confirm.": "I-type nang eksakto ang pangalan ng negosyo para kumpirmahin.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "Hindi puwedeng magbura ng negosyo ang RoveHQ support. Hilingin sa may-ari na gawin ito.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Hindi pa available ang pagbura ng negosyo. Makipag-ugnayan sa support at kami na ang gagawa nito para sa iyo.",
+  "This business could not be deleted. Please try again or contact support.": "Hindi mabura ang negosyong ito. Subukan ulit o makipag-ugnayan sa support.",
+  "Only an owner or manager can do this.": "Ang may-ari o manager lang ang puwedeng gumawa nito.",
+  "This customer could not be found.": "Hindi mahanap ang customer na ito.",
+  "Finish or cancel their open bookings first.": "Tapusin o kanselahin muna ang kanyang mga bukas na booking.",
+  "Deleting a customer isn't available yet. Please contact support.": "Hindi pa available ang pagbura ng customer. Makipag-ugnayan sa support.",
+  "This customer could not be deleted. Please try again.": "Hindi mabura ang customer na ito. Subukan ulit.",
+  "Choose between 1 and 120 months.": "Pumili mula 1 hanggang 120 buwan.",
+  "We couldn't save that. Please try again.": "Hindi namin iyon ma-save. Subukan ulit.",
+  "Please pick a country.": "Pumili ng bansa."
 }

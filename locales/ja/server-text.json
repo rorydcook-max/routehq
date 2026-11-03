@@ -268,5 +268,19 @@
   "Payment saved.": "支払いを保存しました。",
   "Open the booking": "予約を開く",
   "Booking saved. Send this link so they can check and sign:": "予約を保存しました。お客様が確認・署名できるよう、このリンクを送ってください：",
-  "Booking saved. Send this link to your customer:": "予約を保存しました。このリンクをお客様に送ってください："
+  "Booking saved. Send this link to your customer:": "予約を保存しました。このリンクをお客様に送ってください：",
+  "Only the owner can do this.": "この操作はオーナーのみ行えます。",
+  "This business could not be found.": "このビジネスが見つかりませんでした。",
+  "Type the business name exactly to confirm.": "確認のため、ビジネス名を正確に入力してください。",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "RoveHQ サポートはビジネスを削除できません。オーナーに依頼してください。",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "ビジネスの削除はまだご利用いただけません。サポートにご連絡いただければ、代わりに対応します。",
+  "This business could not be deleted. Please try again or contact support.": "このビジネスを削除できませんでした。もう一度お試しいただくか、サポートにご連絡ください。",
+  "Only an owner or manager can do this.": "この操作はオーナーまたはマネージャーのみ行えます。",
+  "This customer could not be found.": "この顧客が見つかりませんでした。",
+  "Finish or cancel their open bookings first.": "先に進行中の予約を完了またはキャンセルしてください。",
+  "Deleting a customer isn't available yet. Please contact support.": "顧客の削除はまだご利用いただけません。サポートにご連絡ください。",
+  "This customer could not be deleted. Please try again.": "この顧客を削除できませんでした。もう一度お試しください。",
+  "Choose between 1 and 120 months.": "1〜120 か月の間で選んでください。",
+  "We couldn't save that. Please try again.": "保存できませんでした。もう一度お試しください。",
+  "Please pick a country.": "国を選んでください。"
 }

@@ -268,5 +268,19 @@
   "Payment saved.": "Bayaran disimpan.",
   "Open the booking": "Buka tempahan",
   "Booking saved. Send this link so they can check and sign:": "Tempahan disimpan. Hantar pautan ini supaya mereka boleh semak dan tandatangan:",
-  "Booking saved. Send this link to your customer:": "Tempahan disimpan. Hantar pautan ini kepada pelanggan anda:"
+  "Booking saved. Send this link to your customer:": "Tempahan disimpan. Hantar pautan ini kepada pelanggan anda:",
+  "Only the owner can do this.": "Hanya pemilik boleh melakukan ini.",
+  "This business could not be found.": "Perniagaan ini tidak ditemui.",
+  "Type the business name exactly to confirm.": "Taip nama perniagaan dengan tepat untuk mengesahkan.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "Sokongan RoveHQ tidak boleh memadam perniagaan. Minta pemilik melakukannya.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Pemadaman perniagaan belum tersedia. Sila hubungi sokongan dan kami akan melakukannya untuk anda.",
+  "This business could not be deleted. Please try again or contact support.": "Perniagaan ini tidak dapat dipadam. Sila cuba lagi atau hubungi sokongan.",
+  "Only an owner or manager can do this.": "Hanya pemilik atau pengurus boleh melakukan ini.",
+  "This customer could not be found.": "Pelanggan ini tidak ditemui.",
+  "Finish or cancel their open bookings first.": "Selesaikan atau batalkan tempahan terbuka mereka dahulu.",
+  "Deleting a customer isn't available yet. Please contact support.": "Pemadaman pelanggan belum tersedia. Sila hubungi sokongan.",
+  "This customer could not be deleted. Please try again.": "Pelanggan ini tidak dapat dipadam. Sila cuba lagi.",
+  "Choose between 1 and 120 months.": "Pilih antara 1 hingga 120 bulan.",
+  "We couldn't save that. Please try again.": "Kami tidak dapat menyimpannya. Sila cuba lagi.",
+  "Please pick a country.": "Sila pilih negara."
 }

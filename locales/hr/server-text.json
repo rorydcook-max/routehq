@@ -268,5 +268,19 @@
   "Payment saved.": "Uplata spremljena.",
   "Open the booking": "Otvori rezervaciju",
   "Booking saved. Send this link so they can check and sign:": "Rezervacija spremljena. Pošaljite ovu poveznicu kako bi klijent provjerio i potpisao:",
-  "Booking saved. Send this link to your customer:": "Rezervacija spremljena. Pošaljite ovu poveznicu klijentu:"
+  "Booking saved. Send this link to your customer:": "Rezervacija spremljena. Pošaljite ovu poveznicu klijentu:",
+  "Only the owner can do this.": "Ovo može učiniti samo vlasnik.",
+  "This business could not be found.": "Tvrtka nije pronađena.",
+  "Type the business name exactly to confirm.": "Za potvrdu točno upišite naziv tvrtke.",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "Podrška RoveHQ-a ne može izbrisati tvrtku. Zamolite vlasnika da to učini.",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "Brisanje tvrtke još nije dostupno. Obratite se podršci i mi ćemo to učiniti za Vas.",
+  "This business could not be deleted. Please try again or contact support.": "Tvrtku nije bilo moguće izbrisati. Pokušajte ponovno ili se obratite podršci.",
+  "Only an owner or manager can do this.": "Ovo može učiniti samo vlasnik ili voditelj.",
+  "This customer could not be found.": "Kupac nije pronađen.",
+  "Finish or cancel their open bookings first.": "Najprije završite ili otkažite njegove otvorene rezervacije.",
+  "Deleting a customer isn't available yet. Please contact support.": "Brisanje kupca još nije dostupno. Obratite se podršci.",
+  "This customer could not be deleted. Please try again.": "Kupca nije bilo moguće izbrisati. Pokušajte ponovno.",
+  "Choose between 1 and 120 months.": "Odaberite između 1 i 120 mjeseci.",
+  "We couldn't save that. Please try again.": "Spremanje nije uspjelo. Pokušajte ponovno.",
+  "Please pick a country.": "Odaberite državu."
 }

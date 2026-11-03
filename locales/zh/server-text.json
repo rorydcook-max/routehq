@@ -268,5 +268,19 @@
   "Payment saved.": "收款已保存。",
   "Open the booking": "打开预订",
   "Booking saved. Send this link so they can check and sign:": "预订已保存。发送此链接，让客户核对并签名：",
-  "Booking saved. Send this link to your customer:": "预订已保存。将此链接发给你的客户："
+  "Booking saved. Send this link to your customer:": "预订已保存。将此链接发给你的客户：",
+  "Only the owner can do this.": "只有所有者可以执行此操作。",
+  "This business could not be found.": "找不到此商家。",
+  "Type the business name exactly to confirm.": "请准确输入商家名称以确认。",
+  "RoveHQ support can't delete a business. Ask the owner to do it.": "RoveHQ 支持团队无法删除商家。请让所有者操作。",
+  "Deleting a business isn't available yet. Please contact support and we'll do it for you.": "暂不支持删除商家。请联系支持团队，我们会为您处理。",
+  "This business could not be deleted. Please try again or contact support.": "无法删除此商家。请重试或联系支持团队。",
+  "Only an owner or manager can do this.": "只有所有者或经理可以执行此操作。",
+  "This customer could not be found.": "找不到此客户。",
+  "Finish or cancel their open bookings first.": "请先完成或取消其未结束的预订。",
+  "Deleting a customer isn't available yet. Please contact support.": "暂不支持删除客户。请联系支持团队。",
+  "This customer could not be deleted. Please try again.": "无法删除此客户。请重试。",
+  "Choose between 1 and 120 months.": "请选择 1 到 120 个月。",
+  "We couldn't save that. Please try again.": "无法保存。请重试。",
+  "Please pick a country.": "请选择一个国家。"
 }

@@ -343,7 +343,7 @@ export function AskBox({ variant, support = false }: { variant: "sidebar" | "ico
                 </div>
               )}
             </div>
-            <p className="border-t border-[var(--border)] px-4 py-2 text-[11px] text-[var(--muted)]">{support ? t("askFooterSupport") : t("askFooter")}</p>
+            <p className="border-t border-[var(--border)] px-4 py-2 text-[11px] text-[var(--muted)]">{support || turns[turns.length - 1]?.support ? t("askFooterSupport") : t("askFooter")}</p>
           </div>
         </div>
       ) : null}

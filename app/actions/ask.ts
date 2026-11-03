@@ -23,7 +23,8 @@ function isSupportQuestion(text: string) {
   const asked = String(text || "").trim();
   return (
     /\b(how (do|can|should) (i|we|you)|how to|where (is|are|do|can|does)|can i|could i|what does .{1,40} mean|why (can'?t|cannot|isn'?t|doesn'?t|won'?t|don'?t)|set ?up|turn (on|off)|switch (on|off)|enable|disable|connect|not working|doesn'?t work|isn'?t working|won'?t (load|save|open|work)|error|help|tutorial|guide|explain how)\b/i.test(asked) ||
-    /(ทำยังไง|ทำอย่างไร|ตั้งค่า|อยู่ตรงไหน|ใช้ยังไง|ใช้อย่างไร|เปิดใช้|วิธี|ช่วยด้วย|ไม่ทำงาน|ใช้ไม่ได้)/.test(asked)
+    // "…ยังไง / …อย่างไร" (how do I…) at the end of a Thai sentence is how most how-to questions are asked.
+    /(ทำยังไง|ทำอย่างไร|ตั้งค่า|อยู่ตรงไหน|ใช้ยังไง|ใช้อย่างไร|เปิดใช้|วิธี|ช่วยด้วย|ไม่ทำงาน|ใช้ไม่ได้|ยังไง\s*[?]?$|อย่างไร\s*[?]?$|ตรงไหน|ที่ไหน|เปิดยังไง|ปิดยังไง)/.test(asked)
   );
 }
 

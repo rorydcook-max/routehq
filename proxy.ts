@@ -34,6 +34,31 @@ async function resolveBookingSite(target: { label: string } | { host: string }, 
   }
 }
 
+// Help articles approved from the content queue live in the database, not in content/docs: their slugs, remembered
+// for a minute, so those pages answer 200 rather than 404 (they always showed; only the status was wrong).
+let publishedDocs: { slugs: Set<string>; at: number } | null = null;
+async function publishedDocSlugs(): Promise<Set<string>> {
+  if (publishedDocs && Date.now() - publishedDocs.at < 60_000) return publishedDocs.slugs;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  let slugs = publishedDocs?.slugs || new Set<string>();
+  if (url && key) {
+    try {
+      const response = await fetch(`${url}/rest/v1/rpc/published_help_slugs`, {
+        method: "POST",
+        headers: { apikey: key, authorization: `Bearer ${key}`, "content-type": "application/json" },
+        body: "{}"
+      });
+      const rows = response.ok ? await response.json() : null;
+      if (Array.isArray(rows)) slugs = new Set(rows.map((row) => String(typeof row === "string" ? row : row?.published_help_slugs || "")));
+    } catch {
+      // Keep the last list: a slow database shouldn't turn real pages into 404s.
+    }
+  }
+  publishedDocs = { slugs, at: Date.now() };
+  return slugs;
+}
+
 const GUIDE_TOPICS = new Set(["starting", "legal", "operations", "money", "marketing"]);
 
 /** Whether a website address names a guide, resource or guide topic that has no page (lib/site/content.ts reads the same files). */
@@ -151,7 +176,9 @@ export async function proxy(request: NextRequest) {
   };
   // A guide, resource or topic that does not exist (in this language): the page shows "not found", and the answer
   // says 404 from the start (the app's root loading screen would otherwise have streamed a 200 already).
-  const contentMissing = isSitePage && missingSiteContent(sitePath, prefixLocale || DEFAULT_SITE_LOCALE);
+  let contentMissing = isSitePage && missingSiteContent(sitePath, prefixLocale || DEFAULT_SITE_LOCALE);
+  const docSlug = contentMissing ? sitePath.match(/^\/docs\/([a-z0-9]+(?:-[a-z0-9]+)*)$/)?.[1] : undefined;
+  if (docSlug && (await publishedDocSlugs()).has(docSlug)) contentMissing = false;
   /** Carry on to the page: a website page's internal address (see above). */
   const pass = () =>
     contentMissing

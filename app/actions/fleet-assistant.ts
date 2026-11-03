@@ -90,7 +90,10 @@ export type DraftPaperwork = {
   /** tax, porbor (compulsory insurance), insurance or inspection. */
   kind: string;
   coverFrom?: string | null;
+  /** YYYY-MM-DD; empty when the date on the document couldn't be read (the owner types it in). */
   coverTo: string;
+  /** What the document said, when it couldn't be read as a date ("15/03/6?"), shown as a hint. */
+  coverToText?: string;
   cost?: number | null;
   /** Paid every month rather than once for the whole cover. */
   monthly?: boolean;
@@ -104,8 +107,30 @@ export type DraftPaperwork = {
   vehicleName?: string;
 };
 
-/** A Thai Buddhist year (2569) read off a document, as the Gregorian year. */
-const gregorian = (day: string | null) => (day && Number(day.slice(0, 4)) > 2400 ? `${Number(day.slice(0, 4)) - 543}${day.slice(4)}` : day);
+/**
+ * A date read off a document, as YYYY-MM-DD in the Western calendar, or null when it can't be read.
+ * Thai documents use Buddhist years (2569 = 2026), often shortened to two digits ("15/03/69"); a two-digit year is
+ * read whichever way lands nearest today, since cover dates are always within a few years of now. Accepts
+ * 2026-03-15, 69-03-15, 15/03/2569, 15/03/69, 15.03.2026.
+ */
+function paperDay(value: unknown, today = new Date()): string | null {
+  const text = String(value || "").trim();
+  let y: number, m: number, d: number;
+  let match = text.match(/^(\d{2}|\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (match) [y, m, d] = [Number(match[1]), Number(match[2]), Number(match[3])];
+  else if ((match = text.match(/^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{2}|\d{4})$/))) [d, m, y] = [Number(match[1]), Number(match[2]), Number(match[3])];
+  else return null;
+  if (y < 100) {
+    // Two digits: either 20yy, or a Buddhist 25yy (= 19yy + 57).
+    const now = today.getUTCFullYear();
+    const western = 2000 + y;
+    const buddhist = 2500 + y - 543;
+    y = Math.abs(western - now) <= Math.abs(buddhist - now) ? western : buddhist;
+  } else if (y > 2400) y -= 543;
+  if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1990 || y > 2100) return null;
+  const iso = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  return Number.isNaN(Date.parse(`${iso}T00:00:00Z`)) ? null : iso;
+}
 
 function cleanPaperwork(items: unknown, vehicleIds: Set<string>, kinds: string[] = ["tax", "porbor", "insurance", "inspection"]): DraftPaperwork[] {
   if (!Array.isArray(items)) return [];
@@ -113,8 +138,10 @@ function cleanPaperwork(items: unknown, vehicleIds: Set<string>, kinds: string[]
     .map((item: any) => ({
       vehicleId: String(item?.vehicleId || ""),
       kind: String(item?.kind || ""),
-      coverFrom: gregorian(isoDay(item?.coverFrom)),
-      coverTo: gregorian(isoDay(item?.coverTo)) || "",
+      coverFrom: paperDay(item?.coverFrom),
+      // An end date that couldn't be read is kept empty, not dropped: the owner types it in before saving.
+      coverTo: paperDay(item?.coverTo) || "",
+      coverToText: paperDay(item?.coverTo) ? undefined : String(item?.coverTo || "").trim().slice(0, 30) || undefined,
       cost: Number(item?.cost) > 0 ? Math.round(Number(item.cost) * 100) / 100 : null,
       monthly: item?.monthly === true,
       note: String(item?.note || "").trim().slice(0, 120) || undefined,
@@ -122,7 +149,7 @@ function cleanPaperwork(items: unknown, vehicleIds: Set<string>, kinds: string[]
       inspectionCost: item?.kind === "tax" && Number(item?.inspectionCost) > 0 ? Number(item.inspectionCost) : null
     }))
     // Only the kinds this country keeps a date for: in Thailand an inspection has no date of its own (it goes with the tax).
-    .filter((item) => vehicleIds.has(item.vehicleId) && kinds.includes(item.kind) && item.coverTo)
+    .filter((item) => vehicleIds.has(item.vehicleId) && kinds.includes(item.kind))
     .slice(0, 40);
 }
 
@@ -194,7 +221,7 @@ export async function askFleetAssistant(input: {
     "When several identical vehicles match and they haven't said which, don't ask: pick one not already rented and say which (by plate if it has one).",
     "A rental's vehicleId must be one of the ids listed. Never put a vehicle in rentals that is only in the new-vehicle list; ask them to tap Add first. Nothing is saved until they tap the Add button under the list, so never say you have added or recorded anything; say it's ready to add. Ask one short question at a time.",
     `PAPERWORK: a photo of an insurance policy, cover note, compulsory insurance certificate, road tax receipt or tax disc, or inspection certificate (or them telling you they renewed one) is a renewal for a vehicle already in the fleet, never a new vehicle. The kinds for this business: ${papers.map((item) => `${item.key} = ${item.key === "porbor" ? "compulsory insurance" : item.key === "insurance" ? "voluntary insurance" : item.key === "tax" ? "road tax or registration" : "vehicle inspection"}${item.local ? ` (${item.local})` : ""}`).join("; ")}.`,
-    "For each one: vehicleId (match the plate printed on it to the fleet list; if no plate matches, ask which vehicle), kind, coverFrom and coverTo (the first and last day it is valid, YYYY-MM-DD Gregorian: Thai documents use Buddhist years, subtract 543), cost (the total paid, or the monthly amount if it is paid monthly), monthly (true only if it says it is paid in monthly instalments), note (insurer and policy number, a few words), photo (the number of the photo it is in). Never invent a date or amount; ask for what isn't printed.",
+    "For each one: vehicleId (match the plate printed on it to the fleet list; if no plate matches, ask which vehicle), kind, coverFrom and coverTo (the first and last day it is valid, YYYY-MM-DD Gregorian: Thai documents use Buddhist years, subtract 543; if the year is printed with two digits or you can't tell which calendar it is, copy the date exactly as printed, e.g. 15/03/69, and the app works it out; if you can't read the end date at all, still include the entry with coverTo as an empty string and say in your reply that the owner should type the date), cost (the total paid, or the monthly amount if it is paid monthly), monthly (true only if it says it is paid in monthly instalments), note (insurer and policy number, a few words), photo (the number of the photo it is in). Never invent a date or amount; ask for what isn't printed.",
     // Only where the inspection is paid with the road tax (Thailand's ตรอ.); elsewhere (PUSPAKOM, KIR) it has its own date and entry.
     taxInspection
       ? `The inspection (${taxInspection.local}) is done with the road tax for cars over ${taxInspection.car} years and bikes over ${taxInspection.bike}, so an inspection receipt is part of the tax renewal: put its cost in inspectionCost on the tax entry, never a separate entry, and never use the kind "inspection".`
@@ -453,13 +480,14 @@ export async function addAssistantVehicles(draft: DraftVehicle[]): Promise<{ ok:
 }
 
 export type ShownTurn = AssistantTurn & { links?: boolean };
-export type SavedConversation = { id: string; title: string; shown: ShownTurn[]; turns: AssistantTurn[]; draft: DraftVehicle[]; rentals: DraftRental[]; updatedAt: string };
+export type SavedConversation = { id: string; title: string; shown: ShownTurn[]; turns: AssistantTurn[]; draft: DraftVehicle[]; rentals: DraftRental[]; paperwork: DraftPaperwork[]; updatedAt: string };
 
 /**
  * Keeps an assistant chat (Rory, 2 Nov 2026: a reload lost the conversation, and earlier chats couldn't be found).
- * Text only: photos aren't kept. Returns the chat's id, made on the first save.
+ * Text and the drafts, including paperwork read from documents (Rory, 3 Nov 2026). Photos stay on the device
+ * (components/fleet-assistant.tsx keeps them in the browser). Returns the chat's id, made on the first save.
  */
-export async function saveAssistantConversation(input: { id?: string | null; shown: ShownTurn[]; turns: AssistantTurn[]; draft: DraftVehicle[]; rentals: DraftRental[] }): Promise<{ id: string | null }> {
+export async function saveAssistantConversation(input: { id?: string | null; shown: ShownTurn[]; turns: AssistantTurn[]; draft: DraftVehicle[]; rentals: DraftRental[]; paperwork?: DraftPaperwork[] }): Promise<{ id: string | null }> {
   const [organization, user] = await Promise.all([getDefaultOrganization(), getRequestUser()]);
   if (!user) return { id: null };
   const admin = createSupabaseAdminClient() as any;
@@ -474,6 +502,7 @@ export async function saveAssistantConversation(input: { id?: string | null; sho
     turns: (input.turns || []).slice(-40).map((turn) => ({ role: turn.role, text: String(turn.text || "").slice(0, 8000) })),
     draft: clean(input.draft),
     rentals: Array.isArray(input.rentals) ? input.rentals.slice(0, 60) : [],
+    paperwork: Array.isArray(input.paperwork) ? input.paperwork.slice(0, 40) : [],
     updated_at: new Date().toISOString()
   };
   if (input.id) {
@@ -507,5 +536,5 @@ export async function loadAssistantConversation(id: string): Promise<SavedConver
   const admin = createSupabaseAdminClient() as any;
   const { data } = await admin.from("assistant_conversations").select("*").eq("id", id).eq("organization_id", organization.id).eq("user_id", user.id).maybeSingle();
   if (!data) return null;
-  return { id: data.id, title: data.title || "", shown: data.shown || [], turns: data.turns || [], draft: data.draft || [], rentals: data.rentals || [], updatedAt: data.updated_at };
+  return { id: data.id, title: data.title || "", shown: data.shown || [], turns: data.turns || [], draft: data.draft || [], rentals: data.rentals || [], paperwork: Array.isArray(data.paperwork) ? data.paperwork : [], updatedAt: data.updated_at };
 }

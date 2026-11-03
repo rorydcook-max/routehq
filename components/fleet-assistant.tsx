@@ -22,6 +22,47 @@ import { dateFormat } from "@/lib/i18n/dates";
 
 type Photo = { file: File; url: string };
 
+/**
+ * A chat's photos, kept in this browser (IndexedDB) by chat id. The chat's text and drafts are saved on the server,
+ * but photos of policies and registration books aren't uploaded until the owner saves, so this is what lets a
+ * document photo still go with its renewal after a reload. Private windows and blocked storage simply keep nothing.
+ */
+const PHOTO_DB = "rovehq-assistant";
+function photoStore(mode: IDBTransactionMode): Promise<IDBObjectStore | null> {
+  return new Promise((resolve) => {
+    try {
+      const open = indexedDB.open(PHOTO_DB, 1);
+      open.onupgradeneeded = () => open.result.createObjectStore("photos");
+      open.onsuccess = () => resolve(open.result.transaction("photos", mode).objectStore("photos"));
+      open.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+async function keepPhotos(chatId: string, photos: Photo[]) {
+  if (!photos.length) return;
+  const store = await photoStore("readwrite");
+  try {
+    store?.put(photos.map((photo) => photo.file), chatId);
+  } catch {
+    // Nothing kept; the renewals still save, without the document photo.
+  }
+}
+async function keptPhotos(chatId: string): Promise<File[]> {
+  const store = await photoStore("readonly");
+  if (!store) return [];
+  return new Promise((resolve) => {
+    try {
+      const request = store.get(chatId);
+      request.onsuccess = () => resolve(Array.isArray(request.result) ? (request.result as File[]) : []);
+      request.onerror = () => resolve([]);
+    } catch {
+      resolve([]);
+    }
+  });
+}
+
 /** Speech to text in the browser's own engine, in the person's language. */
 const SPEECH_LANG: Record<string, string> = {
   en: "en-GB", th: "th-TH", de: "de-DE", es: "es-ES", fr: "fr-FR", fil: "fil-PH", he: "he-IL", hi: "hi-IN", id: "id-ID", ja: "ja-JP", ko: "ko-KR",
@@ -77,7 +118,8 @@ export function FleetAssistant({
   const [rentals, setRentals] = useState<DraftRental[]>(initial?.rentals || []);
   const [addingRentals, setAddingRentals] = useState(false);
   // Renewed paperwork read from photos of policies and tax receipts (Rory, 2 Nov 2026): saved as renewals on Save.
-  const [paperwork, setPaperwork] = useState<DraftPaperwork[]>([]);
+  // Kept with the chat (Rory, 3 Nov 2026: a reload lost them); anything wrong is removed with the ✕.
+  const [paperwork, setPaperwork] = useState<DraftPaperwork[]>(initial?.paperwork || []);
   const [savingPapers, setSavingPapers] = useState(false);
   const [draft, setDraft] = useState<DraftVehicle[]>(initial?.draft || []);
   // Every chat is kept (Rory, 2 Nov 2026: a reload lost it): saved a moment after anything changes.
@@ -90,8 +132,10 @@ export function FleetAssistant({
         shown: shownTurns.map(({ role, text, links }) => ({ role, text, links })),
         turns,
         draft,
-        rentals
+        rentals,
+        paperwork
       }).catch(() => ({ id: null }));
+      if (saved.id) void keepPhotos(saved.id, photosRef.current);
       if (saved.id && saved.id !== conversationId.current) {
         conversationId.current = saved.id;
         if (rememberInUrl) {
@@ -102,8 +146,22 @@ export function FleetAssistant({
       }
     }, 600);
     return () => window.clearTimeout(timer);
-  }, [shownTurns, turns, draft, rentals, rememberInUrl]);
+  }, [shownTurns, turns, draft, rentals, paperwork, rememberInUrl]);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const photosRef = useRef<Photo[]>([]);
+  photosRef.current = photos;
+  // The photos sent earlier in this chat, kept on this device, so a document photo still goes with its renewal after a reload.
+  useEffect(() => {
+    if (!initial?.id) return;
+    let cancelled = false;
+    void keptPhotos(initial.id).then((files) => {
+      if (cancelled || !files.length) return;
+      setPhotos((list) => (list.length ? list : files.map((file) => ({ file, url: URL.createObjectURL(file) }))));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [initial?.id]);
   const [pending, setPending] = useState<Photo[]>([]);
   const [text, setText] = useState("");
   const [thinking, setThinking] = useState(false);
@@ -450,9 +508,26 @@ export function FleetAssistant({
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold text-[var(--foreground)]">{paperNames?.[item.kind] || t(`paper_${item.kind}` as never)} · {item.vehicleName || t("unnamed")}</p>
+                  {!item.coverTo ? (
+                    // The date on the document couldn't be read: asked for here rather than the item being dropped.
+                    <label className="mt-1 block">
+                      <span className="block text-[13px] font-semibold text-[var(--warning)]">
+                        {t("paperNoDate")}
+                        {item.coverToText ? ` ${t("paperPrinted", { text: item.coverToText })}` : ""}
+                      </span>
+                      <input
+                        className="mt-1 h-9 w-full max-w-[200px] rounded-lg border border-[var(--border)] bg-white px-2 text-[14px]"
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setPaperwork((list) => list.map((entry, i) => (i === index ? { ...entry, coverTo: value } : entry)));
+                        }}
+                        type="date"
+                      />
+                    </label>
+                  ) : null}
                   <p className="truncate text-[13px] text-[var(--muted)]">
                     {[
-                      t("paperUntil", { date: dateFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${item.coverTo}T00:00:00Z`)) }),
+                      item.coverTo ? t("paperUntil", { date: dateFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${item.coverTo}T00:00:00Z`)) }) : "",
                       item.cost ? (item.monthly ? t("perMonth", { price: money(item.cost) }) : money(item.cost)) : "",
                       item.inspectionCost ? t("paperInspection", { price: money(item.inspectionCost) }) : "",
                       item.note || ""
@@ -461,16 +536,27 @@ export function FleetAssistant({
                       .join(" · ")}
                   </p>
                 </div>
-                <button aria-label={t("remove")} className="pressable flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--muted)]" onClick={() => setPaperwork((list) => list.filter((_, i) => i !== index))} type="button">
+                <button
+                  aria-label={t("remove")}
+                  className="pressable flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--muted)]"
+                  onClick={() => {
+                    setPaperwork((list) => list.filter((_, i) => i !== index));
+                    // Told to the model (not shown), so it doesn't put a wrong reading back on the list next turn.
+                    setTurns((list) => [...list, { role: "assistant", text: `The owner removed the ${item.kind} entry for ${item.vehicleName || item.vehicleId} as wrong; do not list it again unless they ask.` }]);
+                  }}
+                  title={t("paperDismiss")}
+                  type="button"
+                >
                   <X size={16} />
                 </button>
               </li>
             ))}
           </ul>
-          <button className="primary-action pressable mt-3 w-full justify-center" disabled={savingPapers} onClick={() => void savePaperwork()} type="button">
+          <button className="primary-action pressable mt-3 w-full justify-center" disabled={savingPapers || paperwork.some((item) => !item.coverTo)} onClick={() => void savePaperwork()} type="button">
             {savingPapers ? <Loader2 className="animate-spin" size={18} /> : null}
-            {savingPapers ? t("adding") : t("paperSave", { count: paperwork.length })}
+            {savingPapers ? t("adding") : paperwork.some((item) => !item.coverTo) ? t("paperNeedDates") : t("paperSave", { count: paperwork.length })}
           </button>
+          <p className="mt-2 px-1 text-[12px] text-[var(--muted)]">{t("paperCheck")}</p>
         </div>
       ) : null}
 

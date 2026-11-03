@@ -1,18 +1,22 @@
 ---
 title: "Get help from RoveHQ"
-description: "Find a how-to guide, write to the RoveHQ team, send files, read replies, and choose how we get back to you."
+description: "Ask the assistant, find a how-to guide, or write to the RoveHQ team and send files. Every reply comes back here in RoveHQ."
 category: account
 order: 5
 appPath: "/help"
-related: ["getting-started", "import-a-spreadsheet", "plans-and-billing"]
-updated: 2026-11-02
+related: ["getting-started", "ask-anything", "import-a-spreadsheet", "plans-and-billing"]
+updated: 2026-11-03
 ---
 
 Tap **Help** at the bottom of the menu (on a phone, under **More**).
 
+## Ask the assistant
+
+Type a question in **Ask the assistant** at the top of the Help page (or in **Ask anything…** on any page), like "How do I take a deposit?". The answer comes from the guides, with a link to the full one. If it can't answer, tap **Send this to the RoveHQ team** and it becomes a conversation with us below.
+
 ## Find a guide
 
-**How-to guides** is at the top of the Help page. Type in **Search the guides**, or open a section. Guides open in a new tab, so you keep your place.
+Under **How-to guides**, type in **Search the guides**, or open a section. Guides open in a new tab, so you keep your place.
 
 Stuck on a screen? Tap **Help with this page** at the bottom of the menu (on a phone, the **?** at the top) to open the guide for that screen.
 
@@ -27,20 +31,6 @@ Want us to set up your data? Choose **Bring in my data** and send your spreadshe
 
 ## Read replies
 
-Your messages are under **Your conversations**. Each shows **Waiting for us**, **Replied** or **Resolved**. A dot means a new reply. You also get an alert when we answer.
+We always reply here in RoveHQ, and you get an alert when we do. Your messages are under **Your conversations**. Each shows **Waiting for us**, **Replied** or **Resolved**. A dot means a new reply.
 
 Open a conversation to **Send reply**. When it's sorted, tap **Mark as resolved**. Need it again? Write in it or tap **Open again**.
-
-## Choose how we get back to you
-
-We always reply in **Help**. To hear from us somewhere else too:
-
-1. Under **How should we get back to you?**, pick **WhatsApp**, **LINE** or **Email** (or **Here in RoveHQ** only).
-2. Check your number, LINE ID or email.
-3. Tap **Save**.
-
-Only the owner can change this.
-
-## Message us directly
-
-Under **Rather chat?** you can reach us on WhatsApp, LINE or email. Writing in **Help** keeps your files and answers with your business.

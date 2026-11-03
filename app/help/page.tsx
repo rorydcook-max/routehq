@@ -1,11 +1,10 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ChevronRight, Mail, MessageCircle } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { AskBox } from "@/components/ask-box";
 import { PageBand } from "@/components/page-band";
-import { HelpPreference } from "@/components/help/help-actions";
 import { HelpCompose } from "@/components/help/help-compose";
 import { HelpGuides } from "@/components/help/help-guides";
 import { DOC_CATEGORIES, docSearchIndex, listDocs } from "@/lib/site/docs";
@@ -13,7 +12,7 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { planById } from "@/lib/plans";
-import { importIncluded, isPlatformAdmin, supportContacts, supportPreference, SUPPORT_TOPICS, type SupportTopic } from "@/lib/support";
+import { importIncluded, isPlatformAdmin, SUPPORT_TOPICS, type SupportTopic } from "@/lib/support";
 import { countWaitingForTeam, listBusinessThreads } from "@/lib/support-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -31,8 +30,6 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
   const supabase = (await createSupabaseServerClient()) as any;
   const [threads, team] = await Promise.all([listBusinessThreads(supabase, organization.id), isPlatformAdmin(supabase, membership?.userId)]);
   const waiting = team ? await countWaitingForTeam() : 0;
-  const contacts = supportContacts();
-  const preference = supportPreference(organization.settings);
   const org = organization as any;
   const included = importIncluded(org);
   const plan = planById(org.subscription_tier);
@@ -40,15 +37,13 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
   const date = (iso: string) => new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-GB", { timeZone: BANGKOK, day: "numeric", month: "short" }).format(new Date(iso));
   // The time too, so two conversations on the same day with the same subject can be told apart.
   const time = (iso: string) => new Intl.DateTimeFormat("en-GB", { timeZone: BANGKOK, hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
-  const hasDirect = Boolean(contacts.whatsappUrl || contacts.lineUrl || contacts.email);
   // The how-to guides (the help centre's articles), searchable here before writing to us.
   const guides = docSearchIndex("en").map((entry) => ({ ...entry, video: Boolean(listDocs("en").find((doc) => doc.slug === entry.slug)?.video) }));
 
   return (
     <AppShell hero={<PageBand keepSubtitle subtitle={t("subtitle")} title={t("title")} />} userEmail={userEmail}>
-      {/* Full content width like To do and Inbox: writing and conversations on the left, how we reach you on a right rail. One column on phones. */}
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
-      <div className="min-w-0 space-y-4">
+      {/* Support happens here only (Rory, 3 Nov 2026): no WhatsApp/LINE/email options, every reply is a Help conversation. */}
+      <div className="min-w-0 max-w-5xl space-y-4">
 
         {team ? (
           <Link className="card pressable flex items-center gap-3 p-4" href={"/help/team" as Route}>
@@ -113,49 +108,6 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
             <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{t("noConversations")}</p>
           )}
         </section>
-      </div>
-
-      <aside className="min-w-0 space-y-4">
-        <section className="card p-5">
-          <h2 className="card-title">{t("prefTitle")}</h2>
-          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("prefBody")}</p>
-          <div className="mt-3">
-            <HelpPreference
-              canEdit={membership?.role === "owner"}
-              channel={preference.channel}
-              handle={preference.handle}
-              suggestions={{ whatsapp: String(org.whatsapp || org.business_phone || ""), line: String(org.line_id || ""), email: String(org.business_email || userEmail || "") }}
-            />
-          </div>
-        </section>
-
-        {hasDirect ? (
-          <section className="card p-5">
-            <h2 className="card-title">{t("directTitle")}</h2>
-            <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("directBody")}</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {contacts.whatsappUrl ? (
-                <a className="secondary-action pressable" href={contacts.whatsappUrl} rel="noreferrer" target="_blank">
-                  <MessageCircle size={17} />
-                  WhatsApp
-                </a>
-              ) : null}
-              {contacts.lineUrl ? (
-                <a className="secondary-action pressable" href={contacts.lineUrl} rel="noreferrer" target="_blank">
-                  <MessageCircle size={17} />
-                  LINE {contacts.line}
-                </a>
-              ) : null}
-              {contacts.email ? (
-                <a className="secondary-action pressable" href={`mailto:${contacts.email}`}>
-                  <Mail size={17} />
-                  {contacts.email}
-                </a>
-              ) : null}
-            </div>
-          </section>
-        ) : null}
-      </aside>
       </div>
     </AppShell>
   );

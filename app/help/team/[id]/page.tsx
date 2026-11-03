@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ExternalLink } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { BackLink } from "@/components/ui";
 import { HelpStatusButton } from "@/components/help/help-actions";
@@ -12,7 +11,7 @@ import { formatPlanPrice } from "@/lib/plan-currency";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
-import { isPlatformAdmin, replyLinkFor } from "@/lib/support";
+import { isPlatformAdmin } from "@/lib/support";
 import { loadThread } from "@/lib/support-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -40,7 +39,6 @@ export default async function HelpTeamConversationPage({ params }: { params: Pro
         })
       }
     : null;
-  const outside = business.preference.channel !== "app" ? replyLinkFor(business.preference.channel, business.preference.handle, business.preference.channel === "email" ? `RoveHQ: ${thread.subject}` : "") : null;
 
   return (
     <AppShell userEmail={userEmail}>
@@ -60,19 +58,7 @@ export default async function HelpTeamConversationPage({ params }: { params: Pro
           <p className="font-medium text-[var(--foreground-secondary)]">
             <span className="font-bold text-[var(--foreground)]">{t("teamImport")}</span> {business.importIncluded ? t("teamImportIncluded") : t("teamImportNot")}
           </p>
-          <p className="font-medium text-[var(--foreground-secondary)] sm:col-span-2">
-            <span className="font-bold text-[var(--foreground)]">{t("teamPrefers")}</span> {t(`channel_${business.preference.channel}`)}
-            {business.preference.handle ? ` · ${business.preference.handle}` : ""}
-          </p>
-          <p className="font-medium text-[var(--foreground-secondary)] sm:col-span-2">
-            {[business.phone, business.email, business.lineId ? `LINE ${business.lineId}` : ""].filter(Boolean).join(" · ")}
-          </p>
-          {outside ? (
-            <a className="secondary-action pressable w-fit" href={outside} rel="noreferrer" target="_blank">
-              <ExternalLink size={17} />
-              {t("teamReplyOn", { channel: t(`channel_${business.preference.channel}`) })}
-            </a>
-          ) : null}
+          {/* Replies go in this conversation only (Rory, 3 Nov 2026); the business sees them in Help and gets an alert. */}
         </section>
 
         {planRequest ? (

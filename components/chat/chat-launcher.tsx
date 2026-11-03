@@ -117,6 +117,32 @@ export function ChatLauncher({ site = false, owner }: { site?: boolean; owner?: 
     };
   }, [disabled, pathname]);
 
+  // Out of the way while reading (Rory, 3 Nov 2026: it mustn't sit over content): tucked away while scrolling down,
+  // back on scrolling up, when the scroll stops for a moment, or near the bottom of the page (where the page's
+  // extra bottom space keeps the last rows clear of it).
+  const [tucked, setTucked] = useState(false);
+  useEffect(() => {
+    if (disabled) return;
+    let last = 0;
+    let idle = 0;
+    const scroller = (event: Event) => {
+      const target = event.target instanceof HTMLElement && event.target.scrollHeight > event.target.clientHeight + 4 ? event.target : document.scrollingElement;
+      if (!target || target.closest?.("[data-chat-root]")) return;
+      const top = target.scrollTop;
+      const nearEnd = target.scrollHeight - top - target.clientHeight < 120;
+      if (top > last + 6 && !nearEnd && top > 80) setTucked(true);
+      else if (top < last - 6 || nearEnd) setTucked(false);
+      last = top;
+      window.clearTimeout(idle);
+      idle = window.setTimeout(() => setTucked(false), 1400);
+    };
+    window.addEventListener("scroll", scroller, { passive: true, capture: true });
+    return () => {
+      window.clearTimeout(idle);
+      window.removeEventListener("scroll", scroller, { capture: true });
+    };
+  }, [disabled, pathname]);
+
   // Ctrl/⌘+K opens it from anywhere (it used to open the old "Ask anything" box); a second press closes it.
   useEffect(() => {
     if (disabled) return;
@@ -164,7 +190,7 @@ export function ChatLauncher({ site = false, owner }: { site?: boolean; owner?: 
 
   if (disabled) return null;
   const bottom = place.lift > 0 ? `${place.lift}px` : `calc(${BASE}px + env(safe-area-inset-bottom))`;
-  const hidden = !open && (place.modal || place.keyboard);
+  const hidden = !open && (place.modal || place.keyboard || (tucked && !unread));
   // On a computer the panel sits just above the button.
   const panelBottom = Math.max(place.lift, BASE) + SIZE + GAP;
 

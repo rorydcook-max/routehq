@@ -2144,3 +2144,6 @@ details[open] > summary:not([class*="flex"]):not([class*="grid"]):not(:has(svg, 
     padding-right: 40px;
   }
 }
+
+/* The website's footer ends with room for the chat button, so its last links are never under it. */
+body:has(.chat-launcher) footer { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }

@@ -230,8 +230,9 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
     );
   };
 
+  // Bottom space so the last rows can scroll clear of the chat button (and, on phones, the tab bar under it).
   return (
-    <div className={`min-h-screen lg:pb-0 ${onFocusedFlow ? "focused-flow pb-24" : "pb-28"}`}>
+    <div className={`min-h-screen lg:pb-24 ${onFocusedFlow ? "focused-flow pb-24" : "pb-44"}`}>
       <BrandStyle colour={brand?.colour} />
       <aside className="app-sidebar fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
         <div className="mb-3 flex items-center px-2 pt-1">

@@ -1,3 +1,5 @@
+import Link from "next/link";
+import type { Route } from "next";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, SectionHeader } from "@/components/ui";
@@ -86,23 +88,53 @@ function candidateSpecs(candidate: any) {
 }
 
 
+const PAGE_SIZE = 8;
+
 /** RoveHQ admin console: the shared makes, models and trims every business picks from, and operators' suggestions. */
-export default async function AdminCatalogPage() {
+export default async function AdminCatalogPage({ searchParams }: { searchParams: Promise<{ tab?: string; page?: string; view?: string }> }) {
   await requirePlatformAdmin();
+  // Open and done suggestions in separate tabs, 8 to a page, or everything in one long list (Rory, 3 Nov 2026).
+  const params = await searchParams;
+  const tab = params.tab === "done" ? "done" : "open";
+  const longList = params.view === "list";
+  const pageNumber = Math.max(1, Number.parseInt(String(params.page || "1"), 10) || 1);
   const supabase = (await createSupabaseServerClient()) as any;
+  const submissionsQuery = supabase
+    .from("vehicle_catalog_submissions")
+    .select("id, status, make_name, model_name, trim_name, category_code, year_from, year_to, notes, research_status, research_payload, created_at", { count: "exact" })
+    .order("created_at", { ascending: false });
+  const filteredQuery = tab === "open" ? submissionsQuery.eq("status", "pending_review") : submissionsQuery.neq("status", "pending_review");
+  const pagedQuery = longList ? filteredQuery.limit(200) : filteredQuery.range((pageNumber - 1) * PAGE_SIZE, pageNumber * PAGE_SIZE - 1);
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
-  const [categories, { data: vehicleMakes }, { data: vehicleModels }, { data: recentTrims }, catalogSubmissionsResult] = await Promise.all([
+  const [categories, { data: vehicleMakes }, { data: vehicleModels }, { data: recentTrims }, catalogSubmissionsResult, openCountResult, doneCountResult] = await Promise.all([
     getVehicleCategories(organization.id),
     supabase.from("vehicle_makes").select("id, name, slug, origin_country, logo_url, sort_order, is_active").eq("is_active", true).order("sort_order", { ascending: true }).order("name", { ascending: true }),
     supabase.from("vehicle_models").select("id, make_id, name, category_code, body_type, is_active").eq("is_active", true).order("name", { ascending: true }),
     supabase.from("vehicle_trims").select("id, model_id, name, year_from, year_to, engine_cc, transmission, fuel_type, seating_capacity, drivetrain, created_at").eq("is_active", true).order("created_at", { ascending: false }).limit(12),
-    supabase.from("vehicle_catalog_submissions").select("id, status, make_name, model_name, trim_name, category_code, year_from, year_to, notes, research_status, research_payload, created_at").order("created_at", { ascending: false }).limit(20)
+    pagedQuery,
+    supabase.from("vehicle_catalog_submissions").select("id", { count: "exact", head: true }).eq("status", "pending_review"),
+    supabase.from("vehicle_catalog_submissions").select("id", { count: "exact", head: true }).neq("status", "pending_review")
   ]);
   const typedVehicleMakes = (vehicleMakes || []) as VehicleMakeSetting[];
   const typedVehicleModels = (vehicleModels || []) as VehicleModelSetting[];
   const typedRecentTrims = (recentTrims || []) as VehicleTrimSetting[];
   const typedCatalogSubmissions = (catalogSubmissionsResult.data || []) as VehicleCatalogSubmissionSetting[];
-  const waiting = typedCatalogSubmissions.filter((submission) => submission.status === "pending_review").length;
+  const waiting = Number(openCountResult.count || 0);
+  const doneCount = Number(doneCountResult.count || 0);
+  const tabTotal = Number(catalogSubmissionsResult.count || 0);
+  const pageCount = longList ? 1 : Math.max(1, Math.ceil(tabTotal / PAGE_SIZE));
+  const href = (next: { tab?: string; page?: number; view?: string }) => {
+    const query = new URLSearchParams();
+    const nextTab = next.tab ?? tab;
+    if (nextTab !== "open") query.set("tab", nextTab);
+    const nextView = next.view ?? (longList ? "list" : "");
+    if (nextView) query.set("view", nextView);
+    if (!nextView && next.page && next.page > 1) query.set("page", String(next.page));
+    const text = query.toString();
+    return `/platform/catalog${text ? `?${text}` : ""}#suggestions`;
+  };
+  const pill = (active: boolean) =>
+    `rounded-full px-3 py-1.5 text-sm font-bold ${active ? "bg-[var(--primary)] text-white" : "border border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`;
   const makeMap = new Map<string, VehicleMakeSetting>(typedVehicleMakes.map((make) => [make.id, make]));
   const modelMap = new Map<string, VehicleModelSetting>(typedVehicleModels.map((model) => [model.id, model]));
 
@@ -115,14 +147,30 @@ export default async function AdminCatalogPage() {
       />
       <div className="card p-4">
           <div className="mt-3">
-            <div className="rounded-lg border border-[var(--border)] bg-white p-3">
-              <SectionHeader eyebrow="Review queue" title="Recent suggestions" />
+            <div className="rounded-lg border border-[var(--border)] bg-white p-3" id="suggestions">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <SectionHeader eyebrow="Review queue" title="Operator suggestions" />
+                {waiting > 0 ? <span className="rounded-full bg-[var(--warning-light)] px-3 py-1 text-sm font-bold text-[var(--warning)]">{waiting} to review</span> : null}
+              </div>
               <p className="mt-2 text-xs text-[var(--muted)]">
-                These are captured automatically when an operator saves a vehicle using a custom make, model, or trim.
+                Captured when an operator saves a vehicle with a make, model or trim that isn't in the catalogue.
               </p>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap gap-2">
+                  <Link className={pill(tab === "open")} href={href({ tab: "open", page: 1 }) as Route}>
+                    Open · {waiting}
+                  </Link>
+                  <Link className={pill(tab === "done")} href={href({ tab: "done", page: 1 }) as Route}>
+                    Done · {doneCount}
+                  </Link>
+                </div>
+                <Link className="text-sm font-bold text-[var(--primary)]" href={href({ view: longList ? "" : "list", page: 1 }) as Route}>
+                  {longList ? "Show 8 at a time" : "Show as one long list"}
+                </Link>
+              </div>
               <div className="mt-4 space-y-3">
                 {typedCatalogSubmissions.length === 0 ? (
-                  <p className="rounded-lg border border-dashed border-[var(--border)] p-3 text-sm text-[var(--muted)]">No catalog suggestions yet.</p>
+                  <p className="rounded-lg border border-dashed border-[var(--border)] p-3 text-sm text-[var(--muted)]">{tab === "open" ? "Nothing waiting for review." : "No reviewed suggestions yet."}</p>
                 ) : (
                   typedCatalogSubmissions.map((submission) => (
                     <div className="rounded-lg border border-[var(--border)] p-3" key={submission.id}>
@@ -137,7 +185,7 @@ export default async function AdminCatalogPage() {
                               .join(" / ") || "Details pending"}
                           </p>
                         </div>
-                        <Badge tone={submission.status === "pending_review" ? "amber" : "green"}>{submission.status.replace(/_/g, " ")}</Badge>
+                        <Badge tone={submission.status === "pending_review" ? "amber" : submission.status === "rejected" ? "red" : "green"}>{submission.status.replace(/_/g, " ")}</Badge>
                       </div>
                       {submission.notes ? <p className="mt-2 text-xs text-[var(--muted)]">{submission.notes}</p> : null}
                       {submission.status === "pending_review" ? (
@@ -257,6 +305,27 @@ export default async function AdminCatalogPage() {
                   ))
                 )}
               </div>
+              {!longList && pageCount > 1 ? (
+                <nav aria-label="Suggestion pages" className="mt-4 flex flex-wrap items-center justify-between gap-2">
+                  {pageNumber > 1 ? (
+                    <Link className={pill(false)} href={href({ page: pageNumber - 1 }) as Route}>
+                      ← Previous
+                    </Link>
+                  ) : (
+                    <span />
+                  )}
+                  <span className="text-sm font-semibold text-[var(--muted)]">
+                    Page {Math.min(pageNumber, pageCount)} of {pageCount} · {tabTotal} {tab === "open" ? "open" : "done"}
+                  </span>
+                  {pageNumber < pageCount ? (
+                    <Link className={pill(false)} href={href({ page: pageNumber + 1 }) as Route}>
+                      Next →
+                    </Link>
+                  ) : (
+                    <span />
+                  )}
+                </nav>
+              ) : null}
             </div>
           </div>
 

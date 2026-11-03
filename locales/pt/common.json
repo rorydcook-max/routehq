@@ -1097,8 +1097,8 @@
     "setup_reminders": "Ativar lembretes automáticos",
     "setup_booking_page": "Partilhar página de reservas",
     "setupShared": "Link copiado. Coloque-o no Facebook, Google Maps e LINE.",
-    "quick_askAssistant": "Falar com o assistente",
-    "quick_askAssistant_hint": "Adicione veículos ou aluguéis atuais por chat, voz ou fotos",
+    "quick_askAssistant": "Adicionar por chat",
+    "quick_askAssistant_hint": "Veículos ou alugueres em curso, por mensagem ou foto",
     "askExample7": "Como cobro um depósito caução?",
     "askExample8": "Onde ativo a reserva online?",
     "askHowTo": "Como faço para…?",
@@ -4160,7 +4160,7 @@
     "ag_n_law": "Lei aplicável",
     "ag_sampleTitle": "O que o cliente vê",
     "ag_sampleBody": "Uma reserva fictícia. Seus termos aparecem perto do final.",
-    "ag_sampleOpen": "Abrir o exemplo em tamanho real",
+    "ag_sampleOpen": "Abrir em tamanho real",
     "sig_back": "Voltar",
     "sig_pageTitle": "Sua assinatura",
     "sig_pageBody": "Os clientes assinam no celular. Adicione sua assinatura uma vez.",
@@ -4486,7 +4486,20 @@
     "extra_bodyTip": "Oferecidos no formulário e na página de reserva, somados ao primeiro pagamento e listados no contrato.",
     "b_brandTip": "Links de reserva, a página de assinatura, a página da reserva do cliente, recibos e contratos.",
     "pn_bodyTip": "Só as empresas da rede se veem.",
-    "ag_subtitleOwn": "As novas reservas usam o seu próprio contrato. Tudo o que acrescentar abaixo fica no fim dele."
+    "ag_subtitleOwn": "As novas reservas usam o seu próprio contrato. Tudo o que acrescentar abaixo fica no fim dele.",
+    "ag_intro": "Este é o contrato que os seus clientes assinam. Altere os valores e acrescente os seus próprios termos abaixo.",
+    "ag_introOwn": "Os seus clientes assinam o seu próprio contrato. Os seus termos abaixo são acrescentados no fim.",
+    "ag_ownAgreement": "O seu próprio contrato",
+    "ag_languages": "Em inglês e {language}",
+    "ag_languagesEn": "Em inglês",
+    "ag_languagesTip": "Os contratos estão sempre em inglês e na língua do país da sua empresa. Uma reserva de exemplo preenche os dados.",
+    "ag_lang_th": "tailandês",
+    "ag_lang_id": "indonésio",
+    "ag_lang_vi": "vietnamita",
+    "ag_lang_ms": "malaio",
+    "ag_lang_fil": "filipino",
+    "ag_lang_lo": "laosiano",
+    "ag_lang_km": "khmer"
   },
   "accountPage": {
     "roleOwner": "Proprietário",
@@ -4969,7 +4982,11 @@
     "ownRateAged": "O seu {year} {model} aluga por {amount} por mês. Tendo em conta a diferença de idade, este custaria cerca de {adjusted}.",
     "b_serviceSplit": "{count, plural, one {# revisão} other {# revisões}} por ano a cerca de {each}, mais {reserve} para pneus e imprevistos.",
     "limitReached": "Já usou as {count} verificações de veículos do seu plano este mês. Os veículos verificados anteriormente continuam a abrir de imediato. Mais verificações no próximo mês, ou num plano maior.",
-    "rentFromOwnAged": "Com base no seu {model} {year} a {amount} por mês, considerando a diferença de idade."
+    "rentFromOwnAged": "Com base no seu {model} {year} a {amount} por mês, considerando a diferença de idade.",
+    "checksLeft": "{count, plural, one {Resta # verificação de compra} other {Restam # verificações de compra}} neste período de faturação",
+    "checksUsedUp": "Sem verificações de compra até {date}. Os veículos já verificados continuam disponíveis.",
+    "checksPaidOnly": "As novas verificações de compra estão nos planos pagos. Os veículos já verificados continuam disponíveis.",
+    "checksUpgrade": "Mudar de plano"
   },
   "importer": {
     "dt_vehicles": "Veículos",
@@ -6426,7 +6443,14 @@
     "paperPrinted": "(Está escrito \"{text}\".)",
     "paperNeedDates": "Adicione as datas que faltam para salvar",
     "paperCheck": "Confira cada um com o documento. Toque em ✕ para remover o que estiver errado.",
-    "paperDismiss": "Não está certo? Remova"
+    "paperDismiss": "Não está certo? Remova",
+    "edit": "Editar",
+    "fieldMake": "Marca",
+    "fieldModel": "Modelo",
+    "fieldYear": "Ano",
+    "fieldPlate": "Matrícula",
+    "fieldMonthly": "Por mês",
+    "fieldDaily": "Por dia"
   },
   "setupRequest": {
     "title": "Nós configuramos por si",
@@ -6551,7 +6575,13 @@
     "v_vehicle_make_model": "Marca e modelo do veículo",
     "optionalTitle": "Prefere o seu próprio contrato?",
     "optionalBody": "Opcional. Só se preferir manter o contrato que já usa: os clientes assinam o seu em vez do nosso.",
-    "optionalOpen": "Carregar o meu próprio contrato"
+    "optionalOpen": "Carregar o meu próprio contrato",
+    "panelTitle": "Tem o seu próprio contrato?",
+    "panelBody": "Carregue-o e os clientes passam a assinar o seu.",
+    "panelButton": "Carregar o seu contrato",
+    "activeTitle": "Está a usar o seu próprio contrato",
+    "activeShort": "As novas reservas usam «{title}». Os contratos já assinados ficam como estavam.",
+    "draftShort": "O ficheiro que carregou ainda não está em uso."
   },
   "chat": {
     "launcher": "Converse com a RoveHQ",
@@ -6629,6 +6659,9 @@
     "sConnectWhatsApp": "Como conecto o WhatsApp?",
     "sConnectLine": "Como conecto o LINE?",
     "sLeastMoney": "Qual veículo rende menos?",
-    "sNextSixMonths": "Que receita posso esperar nos próximos 6 meses?"
+    "sNextSixMonths": "Que receita posso esperar nos próximos 6 meses?",
+    "sending": "A enviar…",
+    "preparing": "A preparar as fotos…",
+    "reading": "A ler…"
   }
 }

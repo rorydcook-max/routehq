@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { localizeAgreementTemplate } from "@/lib/agreement-localize";
 import { browserSafeAssetUrl, createBrandingSignedUrl, parseLegacyBrandingReference } from "@/lib/branding-assets";
 import { buildContractVariables, contractVariableKeys, renderContractTemplate } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate } from "@/lib/default-contract-template";
@@ -324,7 +325,7 @@ export async function getContractGenerationContext(supabase: any, rentalId?: str
   const template = await ensureDefaultContractTemplate(supabase, rental.organization_id);
   const templateHtml = template.content_html || template.body || defaultRentalContractTemplate;
   const variables = await embedLogoInContractVariables(supabase, buildContractVariables({ organization, customer, vehicle, rental, bookingLink }));
-  const html = renderContractTemplate(templateHtml, variables);
+  const html = renderContractTemplate(localizeAgreementTemplate(templateHtml, String(variables.agreement_language || "")), variables);
   const { htmlToPdf } = await import("@/lib/html-to-pdf");
   const pdfBytes = await htmlToPdf(html);
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { Eye, Plus, Trash2 } from "lucide-react";
+import { Languages, Maximize2, Plus, Trash2 } from "lucide-react";
 import { saveAgreementTerms } from "@/app/actions/contracts";
+import { InfoTip } from "@/components/info-tip";
 import { PendingButton } from "@/components/pending-button";
 import { ownerTermsHtml, renderContractTemplate } from "@/lib/contract-rendering";
 
@@ -17,10 +18,12 @@ const soft = "font-medium text-[var(--foreground-secondary)]";
  * The owner's side of the rental agreement, with nothing technical in it.
  *
  * RoveHQ writes the agreement: the layout, the standard terms in English and
- * Thai, and the details of each booking. The owner adds their own terms as
- * plain sentences, one box each, and sees the result straight away. The page
- * used to be an editor for the agreement's raw HTML, and what was saved there
- * was replaced by the standard wording the next time it was opened.
+ * the business location's language, and the details of each booking. The page
+ * leads with the agreement itself (Rory, 3 Nov 2026: owners should see straight
+ * away that there is a ready agreement, that they can change it, and that they
+ * can upload their own), with the upload panel (`side`) beside it. Below: the
+ * numbers it uses and the owner's own terms, plain sentences shown in the
+ * agreement as they type. `templateHtml` arrives already localized (server side).
  */
 export function AgreementTerms({
   organizationId,
@@ -28,7 +31,10 @@ export function AgreementTerms({
   numbers,
   numbersHref,
   templateHtml,
-  sampleData
+  sampleData,
+  languageLabel,
+  languageTip,
+  side
 }: {
   organizationId: string;
   initialTerms: string[];
@@ -36,11 +42,14 @@ export function AgreementTerms({
   numbersHref: string;
   templateHtml: string;
   sampleData: Record<string, unknown>;
+  languageLabel: string;
+  languageTip?: string;
+  side?: ReactNode;
 }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const [terms, setTerms] = useState<string[]>(initialTerms.length ? initialTerms : [""]);
   const filled = terms.map((term) => term.trim()).filter(Boolean);
-  const preview = useMemo(() => renderContractTemplate(templateHtml, { ...sampleData, owner_extra_terms: ownerTermsHtml(filled) }), [templateHtml, sampleData, filled.join("\n\u0000")]); // eslint-disable-line react-hooks/exhaustive-deps
+  const preview = useMemo(() => withScreenMargin(renderContractTemplate(templateHtml, { ...sampleData, owner_extra_terms: ownerTermsHtml(filled) })), [templateHtml, sampleData, filled.join("\n\u0000")]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function openSample() {
     const url = URL.createObjectURL(new Blob([preview], { type: "text/html" }));
@@ -49,7 +58,50 @@ export function AgreementTerms({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
+      {/* The agreement first, as the page's hero, with the upload panel beside it on a computer. On a phone the panel
+          sits between the agreement's header and the agreement itself (grid order), so both are seen right away. */}
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-x-5">
+        <div className="flex flex-wrap items-center justify-between gap-2 lg:col-start-1 lg:row-start-1">
+          <p className="flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]">
+            <Languages aria-hidden size={18} />
+            {languageLabel}
+            {languageTip ? <InfoTip label={languageLabel} text={languageTip} /> : null}
+          </p>
+          <button className="secondary-action pressable" onClick={openSample} type="button">
+            <Maximize2 size={18} />
+            {say("ag_sampleOpen")}
+          </button>
+        </div>
+        {side ? <div className="lg:sticky lg:top-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">{side}</div> : null}
+        <div className="lg:col-start-1 lg:row-start-2">
+          <SampleFrame html={preview} loadingLabel={say("ag_sampleLoading")} title={say("ag_sampleTitle")} />
+        </div>
+      </div>
+
+      <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+      {/* No numbers when the owner's own uploaded agreement is in use: its amounts are in their own wording. */}
+      {numbers.length ? (
+      <section className="card p-4">
+        <h2 className={`${h2} flex items-center gap-1.5`}>
+          {say("ag_numbersTitle")}
+          <InfoTip label={say("ag_numbersTitle")} text={say("ag_numbersBody")} />
+        </h2>
+        {/* Label and value side by side on one row each, with dividers so they're easy to match up. */}
+        <dl className="mt-3 divide-y divide-[var(--border)] border-y border-[var(--border)]">
+          {numbers.map((row) => (
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 py-2.5" key={row.label}>
+              <dt className={soft}>{row.label}</dt>
+              <dd className="text-right font-semibold text-[var(--foreground)]">{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <a className="secondary-action pressable mt-4 w-full sm:w-auto" href={numbersHref}>
+          {say("ag_numbersChange")}
+        </a>
+      </section>
+      ) : null}
+
       <section className="card p-4">
         <h2 className={h2}>{say("ag_ownTitle")}</h2>
         <p className={`mt-1 ${soft}`}>{say("ag_ownBody")}</p>
@@ -98,38 +150,15 @@ export function AgreementTerms({
           </PendingButton>
         </form>
       </section>
-
-      {/* No numbers when the owner's own uploaded agreement is in use: its amounts are in their own wording. */}
-      {numbers.length ? (
-      <section className="card p-4">
-        <h2 className={h2}>{say("ag_numbersTitle")}</h2>
-        <p className={`mt-1 ${soft}`}>{say("ag_numbersBody")}</p>
-        {/* Label and value side by side on one row each, with dividers so they're easy to match up. */}
-        <dl className="mt-3 divide-y divide-[var(--border)] border-y border-[var(--border)]">
-          {numbers.map((row) => (
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 py-2.5 sm:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]" key={row.label}>
-              <dt className={soft}>{row.label}</dt>
-              <dd className="text-right font-semibold text-[var(--foreground)] sm:text-left">{row.value}</dd>
-            </div>
-          ))}
-        </dl>
-        <a className="secondary-action pressable mt-4 w-full sm:w-auto" href={numbersHref}>
-          {say("ag_numbersChange")}
-        </a>
-      </section>
-      ) : null}
-
-      <section className="card scroll-mt-4 p-4" id="sample">
-        <h2 className={h2}>{say("ag_sampleTitle")}</h2>
-        <p className={`mt-1 ${soft}`}>{say("ag_sampleBody")}</p>
-        <button className="secondary-action pressable mt-3 w-full sm:w-auto" onClick={openSample} type="button">
-          <Eye size={18} />
-          {say("ag_sampleOpen")}
-        </button>
-        <SampleFrame html={preview} loadingLabel={say("ag_sampleLoading")} title={say("ag_sampleTitle")} />
-      </section>
+      </div>
     </div>
   );
+}
+
+/** The agreement has no page margin on screen (the PDF gets its A4 margins from @page): give the preview some room. */
+function withScreenMargin(html: string) {
+  const style = "<style>@media screen { body { padding: 24px 28px; } } @media screen and (max-width: 520px) { body { padding: 14px; } }</style>";
+  return html.includes("</head>") ? html.replace("</head>", `${style}</head>`) : `${style}${html}`;
 }
 
 /**
@@ -147,7 +176,7 @@ function SampleFrame({ html, title, loadingLabel }: { html: string; title: strin
   useEffect(() => setMounted(true), []);
 
   return (
-    <div className="relative mt-3 h-[560px] overflow-hidden rounded-xl bg-white ring-1 ring-[var(--border)]">
+    <div className="relative h-[520px] overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-[var(--border)] lg:h-[calc(100vh-10rem)] lg:min-h-[640px]">
       {!loaded ? (
         <div aria-busy="true" aria-label={loadingLabel} className="absolute inset-0 animate-pulse space-y-3 p-6" role="status">
           <div className="h-8 w-40 rounded-lg bg-[var(--panel-secondary)]" />

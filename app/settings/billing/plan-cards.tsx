@@ -17,7 +17,6 @@ function differences(plan: Plan, say: Say, number: (value: number) => string): s
   const lines: string[] = [];
   lines.push(plan.team === null ? say("pl_teamUnlimited") : say("pl_team", { count: plan.team }));
   lines.push(say("pl_reads", { count: number(plan.documentReads) }));
-  lines.push(say("pl_lookups", { count: number(plan.comparisonLookups) }));
   if (plan.accountingExport) lines.push(say("pl_export"));
   if (plan.severalLocations) lines.push(say("pl_locations"));
   if (plan.whiteLabel) lines.push(say("pl_whiteLabel"));

@@ -1137,8 +1137,8 @@
     "setup_reminders": "Pasang peringatan automatik",
     "setup_booking_page": "Kongsi halaman tempahan anda",
     "setupShared": "Pautan disalin. Letakkan pada halaman Facebook, Google Maps dan LINE anda.",
-    "quick_askAssistant": "Beritahu pembantu",
-    "quick_askAssistant_hint": "Tambah kenderaan atau sewaan semasa melalui sembang, suara atau foto",
+    "quick_askAssistant": "Tambah melalui chat",
+    "quick_askAssistant_hint": "Kenderaan atau sewaan semasa, melalui mesej atau foto",
     "askExample7": "Bagaimana cara mengambil deposit?",
     "askExample8": "Di mana saya hidupkan tempahan dalam talian?",
     "askHowTo": "Bagaimana cara…?",
@@ -4200,7 +4200,7 @@
     "ag_n_law": "Undang-undang yang terpakai",
     "ag_sampleTitle": "Apa yang pelanggan lihat",
     "ag_sampleBody": "Tempahan rekaan. Terma anda muncul berhampiran hujung.",
-    "ag_sampleOpen": "Buka contoh dalam saiz penuh",
+    "ag_sampleOpen": "Buka saiz penuh",
     "sig_back": "Kembali",
     "sig_pageTitle": "Tandatangan anda",
     "sig_pageBody": "Pelanggan tandatangan di telefon mereka. Tambah tandatangan anda sekali sahaja.",
@@ -4526,7 +4526,20 @@
     "extra_bodyTip": "Ditawarkan dalam borang dan halaman tempahan, ditambah ke bayaran pertama dan disenaraikan dalam perjanjian.",
     "b_brandTip": "Pautan tempahan, halaman tandatangan, halaman tempahan pelanggan, resit dan perjanjian.",
     "pn_bodyTip": "Hanya perniagaan dalam rangkaian boleh melihat satu sama lain.",
-    "ag_subtitleOwn": "Tempahan baharu menggunakan perjanjian anda sendiri. Apa sahaja yang anda tambah di bawah diletakkan di hujungnya."
+    "ag_subtitleOwn": "Tempahan baharu menggunakan perjanjian anda sendiri. Apa sahaja yang anda tambah di bawah diletakkan di hujungnya.",
+    "ag_intro": "Ini perjanjian yang ditandatangani oleh pelanggan anda. Ubah angka dan tambah terma anda sendiri di bawah.",
+    "ag_introOwn": "Pelanggan anda menandatangani perjanjian anda sendiri. Terma anda di bawah ditambah di bahagian akhir.",
+    "ag_ownAgreement": "Perjanjian anda sendiri",
+    "ag_languages": "Dalam bahasa Inggeris dan {language}",
+    "ag_languagesEn": "Dalam bahasa Inggeris",
+    "ag_languagesTip": "Perjanjian sentiasa dalam bahasa Inggeris dan bahasa lokasi perniagaan anda. Tempahan contoh akan mengisi butirannya.",
+    "ag_lang_th": "Bahasa Thai",
+    "ag_lang_id": "Bahasa Indonesia",
+    "ag_lang_vi": "Bahasa Vietnam",
+    "ag_lang_ms": "Bahasa Melayu",
+    "ag_lang_fil": "Bahasa Filipino",
+    "ag_lang_lo": "Bahasa Lao",
+    "ag_lang_km": "Bahasa Khmer"
   },
   "accountPage": {
     "roleOwner": "Pemilik",
@@ -5009,7 +5022,11 @@
     "ownRateAged": "{year} {model} anda disewakan pada harga {amount} sebulan. Mengambil kira perbezaan usia, yang ini adalah sekitar {adjusted}.",
     "b_serviceSplit": "{count, plural, one {# servis} other {# servis}} setahun pada harga kira-kira {each}, ditambah {reserve} untuk tayar dan kos luar jangka.",
     "limitReached": "Anda telah menggunakan {count} pemeriksaan kenderaan untuk bulan ini dalam pelan anda. Kenderaan yang diperiksa sebelum ini masih boleh dibuka serta-merta. Pemeriksaan lanjut pada bulan depan, atau tingkatkan pelan anda.",
-    "rentFromOwnAged": "Berdasarkan {model} {year} anda pada {amount} sebulan, mengambil kira perbezaan usia kenderaan."
+    "rentFromOwnAged": "Berdasarkan {model} {year} anda pada {amount} sebulan, mengambil kira perbezaan usia kenderaan.",
+    "checksLeft": "Baki {count, plural, one {# semakan pembelian} other {# semakan pembelian}} untuk tempoh bil ini",
+    "checksUsedUp": "Tiada lagi semakan pembelian sehingga {date}. Kenderaan yang disemak sebelum ini masih boleh dibuka.",
+    "checksPaidOnly": "Semakan pembelian baharu hanya untuk pelan berbayar. Kenderaan yang disemak sebelum ini masih boleh dibuka.",
+    "checksUpgrade": "Naik taraf"
   },
   "importer": {
     "dt_vehicles": "Kenderaan",
@@ -6426,7 +6443,14 @@
     "paperPrinted": "(Tertulis \"{text}\".)",
     "paperNeedDates": "Tambah tarikh yang tiada untuk simpan",
     "paperCheck": "Semak setiap satu dengan dokumen. Ketik ✕ untuk buang yang salah.",
-    "paperDismiss": "Tidak betul? Buang"
+    "paperDismiss": "Tidak betul? Buang",
+    "edit": "Edit",
+    "fieldMake": "Jenama",
+    "fieldModel": "Model",
+    "fieldYear": "Tahun",
+    "fieldPlate": "Nombor plat",
+    "fieldMonthly": "Sebulan",
+    "fieldDaily": "Sehari"
   },
   "setupRequest": {
     "title": "Kami akan sediakannya untuk anda",
@@ -6551,7 +6575,13 @@
     "v_vehicle_make_model": "Jenama dan model kenderaan",
     "optionalTitle": "Lebih suka kontrak sendiri?",
     "optionalBody": "Pilihan. Hanya jika anda mahu terus menggunakan perjanjian sedia ada: pelanggan akan menandatangani perjanjian anda, bukan kami.",
-    "optionalOpen": "Muat naik kontrak saya sendiri"
+    "optionalOpen": "Muat naik kontrak saya sendiri",
+    "panelTitle": "Ada kontrak sendiri?",
+    "panelBody": "Muat naik dan pelanggan akan menandatangani kontrak anda.",
+    "panelButton": "Muat naik kontrak anda",
+    "activeTitle": "Anda menggunakan perjanjian anda sendiri",
+    "activeShort": "Tempahan baharu menggunakan \"{title}\". Perjanjian yang sudah ditandatangani kekal seperti asal.",
+    "draftShort": "Muat naik anda belum digunakan lagi."
   },
   "chat": {
     "launcher": "Sembang dengan RoveHQ",
@@ -6629,6 +6659,9 @@
     "sConnectWhatsApp": "Bagaimana nak sambungkan WhatsApp?",
     "sConnectLine": "Bagaimana nak sambungkan LINE?",
     "sLeastMoney": "Kenderaan mana paling kurang untung?",
-    "sNextSixMonths": "Berapa pendapatan saya dalam 6 bulan akan datang?"
+    "sNextSixMonths": "Berapa pendapatan saya dalam 6 bulan akan datang?",
+    "sending": "Menghantar.",
+    "preparing": "Menyediakan foto.",
+    "reading": "Membaca."
   }
 }

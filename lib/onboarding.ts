@@ -5,7 +5,8 @@ export const onboardingSteps = [
   // the world, then what online bookings need, then the rest.
   { step: "business_profile", label: "Business profile complete", href: "/onboarding" },
   { step: "first_vehicle", label: "Add your vehicles", href: "/onboarding?step=2" },
-  { step: "current_rentals", label: "Add who's renting now", href: "/fleet/assistant" },
+  // Told to the chat (the fleet assistant is part of it): ?chat=1 opens it on Fleet.
+  { step: "current_rentals", label: "Add who's renting now", href: "/fleet?chat=1" },
   { step: "reminders", label: "Turn on automatic reminders", href: "/settings?tab=messaging" },
   { step: "booking_page", label: "Share your booking page", href: "#booking-page" },
   // Without these the customer is stopped at the last step of their booking link.

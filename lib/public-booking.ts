@@ -1,3 +1,4 @@
+import { localizeAgreementTemplate } from "@/lib/agreement-localize";
 import { buildContractVariables, extractBodyHtml, renderContractTemplate } from "@/lib/contract-rendering";
 import { getCustomerInspectionReports } from "@/lib/booking-rental-documents";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
@@ -286,7 +287,7 @@ export async function getPublicBookingDetail(token: string) {
       }
     : organization;
   const renderedContract = renderContractTemplate(
-    contractTemplate,
+    localizeAgreementTemplate(contractTemplate, String(contractVariables.agreement_language || "")),
     contractVariables
   );
   const documentStart = renderedContract.search(/<!doctype\s+html|<html(?:\s|>)/i);

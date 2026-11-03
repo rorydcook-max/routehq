@@ -32,7 +32,7 @@ export type Plan = {
   team: number | null;
   /** Passport and licence reads a month. */
   documentReads: number;
-  /** Rental Vehicle Comparison Calculator lookups a month. */
+  /** Purchase checks (fresh calculator look-ups) a billing period. Never advertised: see lib/purchase-checks.ts. */
   comparisonLookups: number;
   accountingExport: boolean;
   severalLocations: boolean;
@@ -53,10 +53,10 @@ export const TRIAL_DAYS = 30;
 export const OVER_LIMIT_GRACE_DAYS = 14;
 
 export const PLANS: Plan[] = [
-  { id: "free", monthly: 0, cars: 2, motorbikes: 5, extraCar: 0, extraMotorbike: 0, team: 1, documentReads: 10, comparisonLookups: 2, accountingExport: false, severalLocations: false, whiteLabel: false, customDomain: false, setupService: false, prioritySupport: false },
+  { id: "free", monthly: 0, cars: 2, motorbikes: 5, extraCar: 0, extraMotorbike: 0, team: 1, documentReads: 10, comparisonLookups: 0, accountingExport: false, severalLocations: false, whiteLabel: false, customDomain: false, setupService: false, prioritySupport: false },
   { id: "starter", monthly: 490, cars: 5, motorbikes: 10, extraCar: 0, extraMotorbike: 0, team: 2, documentReads: 50, comparisonLookups: 10, accountingExport: true, severalLocations: false, whiteLabel: false, customDomain: false, setupService: false, prioritySupport: false },
-  { id: "pro", monthly: 990, cars: 15, motorbikes: 25, extraCar: 0, extraMotorbike: 0, team: null, documentReads: 300, comparisonLookups: 50, accountingExport: true, severalLocations: true, whiteLabel: true, customDomain: false, setupService: true, prioritySupport: false },
-  { id: "business", monthly: 1490, cars: null, motorbikes: null, extraCar: 40, extraMotorbike: 15, team: null, documentReads: 1000, comparisonLookups: 200, accountingExport: true, severalLocations: true, whiteLabel: true, customDomain: true, setupService: true, prioritySupport: true }
+  { id: "pro", monthly: 990, cars: 15, motorbikes: 25, extraCar: 0, extraMotorbike: 0, team: null, documentReads: 300, comparisonLookups: 20, accountingExport: true, severalLocations: true, whiteLabel: true, customDomain: false, setupService: true, prioritySupport: false },
+  { id: "business", monthly: 1490, cars: null, motorbikes: null, extraCar: 40, extraMotorbike: 15, team: null, documentReads: 1000, comparisonLookups: 50, accountingExport: true, severalLocations: true, whiteLabel: true, customDomain: true, setupService: true, prioritySupport: true }
 ];
 
 const PRO = PLANS[2];

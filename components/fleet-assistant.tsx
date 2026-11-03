@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Check, Loader2, Mic, Send, Sparkles, Square, X } from "lucide-react";
+import { Camera, Loader2, Mic, Send, Sparkles, Square, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -19,7 +19,8 @@ import type { Route } from "next";
 import { renewVehicleCompliance, uploadVehiclePhotos } from "@/app/actions/vehicles";
 import { compressImage } from "@/lib/direct-upload-client";
 import { takeHandedFiles } from "@/components/chat/chat-handoff";
-import { dateFormat } from "@/lib/i18n/dates";
+import { PaperworkDrafts, RentalDrafts, VehicleDrafts } from "@/components/fleet-drafts";
+import { dismissNote, vehicleKey, withoutAdded } from "@/lib/fleet-chat";
 
 type Photo = { file: File; url: string };
 
@@ -181,8 +182,6 @@ export function FleetAssistant({
     bottom.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [shownTurns, thinking]);
 
-  const money = (value?: number | null) => (value ? `${currency === "THB" ? "฿" : `${currency} `}${Math.round(value).toLocaleString("en-US")}` : "");
-
   async function pick(files: File[]) {
     const room = 4 - pending.length;
     const added: Photo[] = [];
@@ -222,7 +221,7 @@ export function FleetAssistant({
     }
     setTurns([...nextTurns, { role: "assistant", text: result.reply }]);
     setShownTurns((list) => [...list, { role: "assistant", text: result.reply }]);
-    setDraft(withoutAdded(result.draft));
+    setDraft(withoutAdded(result.draft, addedKeys.current));
     setRentals(result.rentals);
     setPaperwork(result.paperwork || []);
   }
@@ -264,16 +263,6 @@ export function FleetAssistant({
 
   // Vehicles already added stay out of the list, even if the model repeats them from earlier in the chat.
   const addedKeys = useRef<string[]>([]);
-  const vehicleKey = (vehicle: DraftVehicle) => [vehicle.make, vehicle.model, vehicle.year, vehicle.plate].map((part) => String(part ?? "").trim().toLowerCase()).join("|");
-  function withoutAdded(list: DraftVehicle[]) {
-    const left = [...addedKeys.current];
-    return list.filter((vehicle) => {
-      const at = left.indexOf(vehicleKey(vehicle));
-      if (at === -1) return true;
-      left.splice(at, 1);
-      return false;
-    });
-  }
 
   function toggleMic() {
     if (listening) {
@@ -348,9 +337,6 @@ export function FleetAssistant({
     if (result.failed.length) setShownTurns((list) => [...list, { role: "assistant", text: t("rentalsFailed", { names: result.failed.join(", ") }) }]);
   }
 
-  const when = (iso?: string | null) => (iso ? new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`)) : "");
-  const per = (rental: DraftRental) => (rental.rate ? t(rental.ratePeriod === "day" ? "perDay" : rental.ratePeriod === "week" ? "perWeek" : "perMonth", { price: money(rental.rate) }) : "");
-  const readyCount = draft.filter((vehicle) => vehicle.make && vehicle.model).length;
   const suggestions: Array<{ label: string; text?: string; photo?: boolean }> = [
     { label: t("sugSheet"), text: t("sugSheetText") },
     { label: t("sugPhoto"), photo: true },
@@ -437,134 +423,48 @@ export function FleetAssistant({
 
       {draft.length ? (
         <div className="border-t border-[var(--border)] px-3 py-3">
-          <p className="px-1 text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]">{t("listTitle", { count: draft.length })}</p>
-          <ul className="mt-2 space-y-1.5">
-            {draft.map((vehicle, index) => (
-              <li className="flex items-center gap-2.5 rounded-xl bg-[var(--panel-secondary)] px-3 py-2" key={index}>
-                {vehicle.photos?.[0] && photos[vehicle.photos[0] - 1] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" src={photos[vehicle.photos[0] - 1].url} />
-                ) : (
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--panel)] text-[var(--muted)]">
-                    <Check size={16} />
-                  </span>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-[var(--foreground)]">{[vehicle.make, vehicle.model, vehicle.variant, vehicle.year].filter(Boolean).join(" ") || t("unnamed")}</p>
-                  <p className="truncate text-[13px] text-[var(--muted)]">
-                    {[vehicle.plate, vehicle.colour, vehicle.monthlyRate ? t("perMonth", { price: money(vehicle.monthlyRate) }) : vehicle.dailyRate ? t("perDay", { price: money(vehicle.dailyRate) }) : ""].filter(Boolean).join(" · ") || t("noDetails")}
-                  </p>
-                </div>
-                <button aria-label={t("remove")} className="pressable flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--muted)]" onClick={() => setDraft((list) => list.filter((_, i) => i !== index))} type="button">
-                  <X size={16} />
-                </button>
-              </li>
-            ))}
-          </ul>
-          <button className="primary-action pressable mt-3 w-full justify-center" disabled={!readyCount || adding} onClick={() => void addAll()} type="button">
-            {adding ? <Loader2 className="animate-spin" size={18} /> : null}
-            {adding ? t("adding") : t("addButton", { count: readyCount })}
-          </button>
+          <VehicleDrafts
+            adding={adding}
+            currency={currency}
+            draft={draft}
+            onAdd={() => void addAll()}
+            onEdit={(index, vehicle) => setDraft((list) => list.map((entry, i) => (i === index ? vehicle : entry)))}
+            onRemove={(index) => setDraft((list) => list.filter((_, i) => i !== index))}
+            photoUrl={(number) => photos[number - 1]?.url}
+          />
         </div>
       ) : null}
 
       {rentals.length ? (
         <div className="border-t border-[var(--border)] px-3 py-3">
-          <p className="px-1 text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]">{t("rentalsTitle", { count: rentals.length })}</p>
-          <ul className="mt-2 space-y-1.5">
-            {rentals.map((rental, index) => (
-              <li className="rounded-xl bg-[var(--panel-secondary)] px-3 py-2" key={index}>
-                <div className="flex items-start gap-2">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-[var(--foreground)]">{rental.customerName} · {rental.vehicleName || t("unnamed")}</p>
-                    <p className="text-[13px] text-[var(--muted)]">
-                      {[per(rental), rental.nextPaymentDate ? t("nextPay", { date: when(rental.nextPaymentDate) }) : rental.endDate ? t("dueBack", { date: when(rental.endDate) }) : "", rental.depositHeld ? t("deposit", { price: money(rental.depositHeld) }) : ""].filter(Boolean).join(" · ") || t("noDetails")}
-                    </p>
-                  </div>
-                  <button aria-label={t("remove")} className="pressable flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--muted)]" onClick={() => setRentals((list) => list.filter((_, i) => i !== index))} type="button">
-                    <X size={16} />
-                  </button>
-                </div>
-                {/* Reminders for this customer: on unless the owner says no. */}
-                <label className="mt-1.5 flex items-center gap-2 text-[13px] font-semibold text-[var(--foreground-secondary)]">
-                  <input checked={rental.remind !== false} className="h-4 w-4" onChange={(event) => setRentals((list) => list.map((entry, i) => (i === index ? { ...entry, remind: event.target.checked } : entry)))} type="checkbox" />
-                  {rental.endDate && !rental.nextPaymentDate ? t("remindReturn") : t("remindRent")}
-                </label>
-              </li>
-            ))}
-          </ul>
-          <button className="primary-action pressable mt-3 w-full justify-center" disabled={addingRentals} onClick={() => void addRentals()} type="button">
-            {addingRentals ? <Loader2 className="animate-spin" size={18} /> : null}
-            {addingRentals ? t("adding") : t("addRentals", { count: rentals.length })}
-          </button>
+          <RentalDrafts
+            adding={addingRentals}
+            currency={currency}
+            onAdd={() => void addRentals()}
+            onRemind={(index, remind) => setRentals((list) => list.map((entry, i) => (i === index ? { ...entry, remind } : entry)))}
+            onRemove={(index) => setRentals((list) => list.filter((_, i) => i !== index))}
+            rentals={rentals}
+          />
         </div>
       ) : null}
 
       {paperwork.length ? (
         <div className="border-t border-[var(--border)] px-3 py-3">
-          <p className="px-1 text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]">{t("paperTitle", { count: paperwork.length })}</p>
-          <ul className="mt-2 space-y-1.5">
-            {paperwork.map((item, index) => (
-              <li className="flex items-center gap-2.5 rounded-xl bg-[var(--panel-secondary)] px-3 py-2" key={index}>
-                {item.photo && photos[item.photo - 1] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" src={photos[item.photo - 1].url} />
-                ) : (
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--panel)] text-[var(--muted)]">
-                    <Check size={16} />
-                  </span>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-[var(--foreground)]">{paperNames?.[item.kind] || t(`paper_${item.kind}` as never)} · {item.vehicleName || t("unnamed")}</p>
-                  {!item.coverTo ? (
-                    // The date on the document couldn't be read: asked for here rather than the item being dropped.
-                    <label className="mt-1 block">
-                      <span className="block text-[13px] font-semibold text-[var(--warning)]">
-                        {t("paperNoDate")}
-                        {item.coverToText ? ` ${t("paperPrinted", { text: item.coverToText })}` : ""}
-                      </span>
-                      <input
-                        className="mt-1 h-9 w-full max-w-[200px] rounded-lg border border-[var(--border)] bg-white px-2 text-[14px]"
-                        onChange={(event) => {
-                          const value = event.target.value;
-                          setPaperwork((list) => list.map((entry, i) => (i === index ? { ...entry, coverTo: value } : entry)));
-                        }}
-                        type="date"
-                      />
-                    </label>
-                  ) : null}
-                  <p className="truncate text-[13px] text-[var(--muted)]">
-                    {[
-                      item.coverTo ? t("paperUntil", { date: dateFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${item.coverTo}T00:00:00Z`)) }) : "",
-                      item.cost ? (item.monthly ? t("perMonth", { price: money(item.cost) }) : money(item.cost)) : "",
-                      item.inspectionCost ? t("paperInspection", { price: money(item.inspectionCost) }) : "",
-                      item.note || ""
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
-                </div>
-                <button
-                  aria-label={t("remove")}
-                  className="pressable flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--muted)]"
-                  onClick={() => {
-                    setPaperwork((list) => list.filter((_, i) => i !== index));
-                    // Told to the model (not shown), so it doesn't put a wrong reading back on the list next turn.
-                    setTurns((list) => [...list, { role: "assistant", text: `The owner removed the ${item.kind} entry for ${item.vehicleName || item.vehicleId} as wrong; do not list it again unless they ask.` }]);
-                  }}
-                  title={t("paperDismiss")}
-                  type="button"
-                >
-                  <X size={16} />
-                </button>
-              </li>
-            ))}
-          </ul>
-          <button className="primary-action pressable mt-3 w-full justify-center" disabled={savingPapers || paperwork.some((item) => !item.coverTo)} onClick={() => void savePaperwork()} type="button">
-            {savingPapers ? <Loader2 className="animate-spin" size={18} /> : null}
-            {savingPapers ? t("adding") : paperwork.some((item) => !item.coverTo) ? t("paperNeedDates") : t("paperSave", { count: paperwork.length })}
-          </button>
-          <p className="mt-2 px-1 text-[12px] text-[var(--muted)]">{t("paperCheck")}</p>
+          <PaperworkDrafts
+            currency={currency}
+            onDate={(index, coverTo) => setPaperwork((list) => list.map((entry, i) => (i === index ? { ...entry, coverTo } : entry)))}
+            onDismiss={(index) => {
+              const item = paperwork[index];
+              setPaperwork((list) => list.filter((_, i) => i !== index));
+              // Told to the model (not shown), so it doesn't put a wrong reading back on the list next turn.
+              if (item) setTurns((list) => [...list, { role: "assistant", text: dismissNote(item) }]);
+            }}
+            onSave={() => void savePaperwork()}
+            paperNames={paperNames}
+            paperwork={paperwork}
+            photoUrl={(number) => photos[number - 1]?.url}
+            saving={savingPapers}
+          />
         </div>
       ) : null}
 

@@ -1137,8 +1137,8 @@
     "setup_reminders": "Bật nhắc nhở tự động",
     "setup_booking_page": "Chia sẻ trang đặt xe",
     "setupShared": "Đã sao chép liên kết. Hãy dán lên trang Facebook, Google Maps và LINE của bạn.",
-    "quick_askAssistant": "Nói với trợ lý",
-    "quick_askAssistant_hint": "Thêm xe hoặc hợp đồng đang thuê bằng chat, giọng nói hoặc ảnh",
+    "quick_askAssistant": "Thêm qua chat",
+    "quick_askAssistant_hint": "Xe hoặc lượt thuê hiện tại, qua tin nhắn hoặc ảnh",
     "askExample7": "Làm sao để thu tiền đặt cọc?",
     "askExample8": "Bật đặt xe trực tuyến ở đâu?",
     "askHowTo": "Làm sao để…?",
@@ -4200,7 +4200,7 @@
     "ag_n_law": "Luật áp dụng",
     "ag_sampleTitle": "Những gì khách nhìn thấy",
     "ag_sampleBody": "Một đơn đặt mẫu. Điều khoản của bạn hiện gần cuối.",
-    "ag_sampleOpen": "Mở bản mẫu toàn màn hình",
+    "ag_sampleOpen": "Mở kích thước đầy đủ",
     "sig_back": "Quay lại",
     "sig_pageTitle": "Chữ ký của bạn",
     "sig_pageBody": "Khách ký trên điện thoại. Bạn chỉ cần thêm chữ ký một lần.",
@@ -4526,7 +4526,20 @@
     "extra_bodyTip": "Hiện trên form đặt xe và trang đặt xe, cộng vào lần thanh toán đầu và ghi trong hợp đồng.",
     "b_brandTip": "Link đặt xe, trang ký, trang đặt xe của khách, biên nhận và hợp đồng.",
     "pn_bodyTip": "Chỉ các doanh nghiệp trong mạng lưới mới thấy nhau.",
-    "ag_subtitleOwn": "Các đặt xe mới dùng hợp đồng của riêng bạn. Những gì bạn thêm bên dưới sẽ nằm ở cuối hợp đồng."
+    "ag_subtitleOwn": "Các đặt xe mới dùng hợp đồng của riêng bạn. Những gì bạn thêm bên dưới sẽ nằm ở cuối hợp đồng.",
+    "ag_intro": "Đây là hợp đồng khách hàng của bạn sẽ ký. Sửa các con số và thêm điều khoản riêng của bạn bên dưới.",
+    "ag_introOwn": "Khách hàng sẽ ký hợp đồng riêng của bạn. Các điều khoản bên dưới sẽ được thêm vào cuối.",
+    "ag_ownAgreement": "Hợp đồng riêng của bạn",
+    "ag_languages": "Bằng tiếng Anh và {language}",
+    "ag_languagesEn": "Bằng tiếng Anh",
+    "ag_languagesTip": "Hợp đồng luôn có tiếng Anh và ngôn ngữ của nơi bạn kinh doanh. Một lượt đặt mẫu sẽ điền sẵn thông tin.",
+    "ag_lang_th": "tiếng Thái",
+    "ag_lang_id": "tiếng Indonesia",
+    "ag_lang_vi": "tiếng Việt",
+    "ag_lang_ms": "tiếng Mã Lai",
+    "ag_lang_fil": "tiếng Filipino",
+    "ag_lang_lo": "tiếng Lào",
+    "ag_lang_km": "tiếng Khmer"
   },
   "accountPage": {
     "roleOwner": "Chủ sở hữu",
@@ -5009,7 +5022,11 @@
     "ownRateAged": "Chiếc {model} {year} của bạn cho thuê với giá {amount} mỗi tháng. Sau khi tính đến chênh lệch năm sản xuất, chiếc này sẽ vào khoảng {adjusted}.",
     "b_serviceSplit": "{count, plural, one {# lần bảo dưỡng} other {# lần bảo dưỡng}} mỗi năm, khoảng {each} mỗi lần, cộng thêm {reserve} cho lốp xe và các chi phí phát sinh.",
     "limitReached": "Bạn đã dùng hết {count} lượt kiểm tra xe trong tháng này theo gói của mình. Các xe đã kiểm tra trước đó vẫn mở ngay lập tức. Lượt kiểm tra mới sẽ có vào tháng sau, hoặc bạn có thể nâng cấp lên gói lớn hơn.",
-    "rentFromOwnAged": "Dựa trên chiếc {model} đời {year} của bạn với giá {amount} mỗi tháng, đã tính đến chênh lệch tuổi xe."
+    "rentFromOwnAged": "Dựa trên chiếc {model} đời {year} của bạn với giá {amount} mỗi tháng, đã tính đến chênh lệch tuổi xe.",
+    "checksLeft": "Còn {count, plural, one {# lượt kiểm tra trước khi mua} other {# lượt kiểm tra trước khi mua}} trong kỳ thanh toán này",
+    "checksUsedUp": "Hết lượt kiểm tra trước khi mua đến {date}. Các xe đã kiểm tra vẫn mở được.",
+    "checksPaidOnly": "Lượt kiểm tra trước khi mua mới chỉ có ở gói trả phí. Các xe đã kiểm tra vẫn mở được.",
+    "checksUpgrade": "Nâng cấp"
   },
   "importer": {
     "dt_vehicles": "Xe",
@@ -6426,7 +6443,14 @@
     "paperPrinted": "(Ghi là \"{text}\".)",
     "paperNeedDates": "Thêm các ngày còn thiếu để lưu",
     "paperCheck": "Đối chiếu từng mục với giấy tờ. Nhấn ✕ để xóa mục sai.",
-    "paperDismiss": "Không đúng? Xóa"
+    "paperDismiss": "Không đúng? Xóa",
+    "edit": "Sửa",
+    "fieldMake": "Hãng xe",
+    "fieldModel": "Mẫu xe",
+    "fieldYear": "Năm",
+    "fieldPlate": "Biển số",
+    "fieldMonthly": "Mỗi tháng",
+    "fieldDaily": "Mỗi ngày"
   },
   "setupRequest": {
     "title": "Chúng tôi sẽ cài đặt giúp bạn",
@@ -6551,7 +6575,13 @@
     "v_vehicle_make_model": "Hãng và mẫu xe",
     "optionalTitle": "Muốn dùng hợp đồng của riêng bạn?",
     "optionalBody": "Không bắt buộc. Chỉ khi bạn muốn tiếp tục dùng hợp đồng hiện có: khách hàng sẽ ký hợp đồng của bạn thay vì của chúng tôi.",
-    "optionalOpen": "Tải lên hợp đồng của tôi"
+    "optionalOpen": "Tải lên hợp đồng của tôi",
+    "panelTitle": "Bạn có hợp đồng riêng?",
+    "panelBody": "Tải lên để khách hàng ký hợp đồng của bạn.",
+    "panelButton": "Tải hợp đồng lên",
+    "activeTitle": "Bạn đang dùng hợp đồng riêng",
+    "activeShort": "Các lượt đặt mới dùng “{title}”. Hợp đồng đã ký vẫn giữ nguyên.",
+    "draftShort": "Tệp bạn tải lên chưa được sử dụng."
   },
   "chat": {
     "launcher": "Chat với RoveHQ",
@@ -6629,6 +6659,9 @@
     "sConnectWhatsApp": "Làm sao kết nối WhatsApp?",
     "sConnectLine": "Làm sao kết nối LINE?",
     "sLeastMoney": "Xe nào kiếm ít tiền nhất?",
-    "sNextSixMonths": "Thu nhập dự kiến 6 tháng tới là bao nhiêu?"
+    "sNextSixMonths": "Thu nhập dự kiến 6 tháng tới là bao nhiêu?",
+    "sending": "Đang gửi…",
+    "preparing": "Đang chuẩn bị ảnh…",
+    "reading": "Đang đọc…"
   }
 }

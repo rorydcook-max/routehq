@@ -7,6 +7,8 @@ import { loadFleetFigures } from "@/lib/fleet-metrics";
 import { publicBookingSettings } from "@/lib/public-catalog";
 import type { RentStyle } from "@/lib/vehicle-investment";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { checksLeft, type ChecksLeft } from "@/lib/purchase-checks";
 import { CalculatorClient } from "./calculator-client";
 import type { FleetVehicle, SavedCalc } from "./calculator-client";
 
@@ -15,7 +17,7 @@ export default async function RentalCalculatorPage() {
   const supabase = (await createSupabaseServerClient()) as any;
   const t = await getTranslations("calc");
 
-  const [{ data: vehiclesData }, figures, { data: savedData }] = await Promise.all([
+  const [{ data: vehiclesData }, figures, { data: savedData }, checks] = await Promise.all([
     supabase.from("vehicles").select("id, make, model, year, mileage, registration_number, monthly_rate").eq("organization_id", organization.id).is("deleted_at", null),
     loadFleetFigures(supabase, organization.id).catch(() => new Map()),
     supabase
@@ -23,7 +25,11 @@ export default async function RentalCalculatorPage() {
       .select("id, vehicle_make, vehicle_model, vehicle_year, vehicle_trim, purchase_price, recommendation, results, created_at")
       .eq("organisation_id", organization.id)
       .order("created_at", { ascending: false })
-      .limit(12)
+      .limit(12),
+    // Purchase checks left this billing period (shown only when few are left).
+    Promise.resolve()
+      .then(() => checksLeft(createSupabaseAdminClient(), organization.id))
+      .catch((): ChecksLeft => null)
   ]);
 
   const fleetVehicles: FleetVehicle[] = (vehiclesData || []).map((v: any) => ({
@@ -45,6 +51,7 @@ export default async function RentalCalculatorPage() {
   return (
     <AppShell hero={<PageBand keepSubtitle subtitle={t("subtitle")} title={t("title")} />} userEmail={userEmail}>
       <CalculatorClient
+        checks={checks}
         currency={organization.currency || "THB"}
         defaultCategory={defaultCategory}
         defaultStyle={defaultStyle}

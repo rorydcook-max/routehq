@@ -335,7 +335,7 @@ export default async function AdminBusinessPage({ params, searchParams }: { para
               <input className="mt-1 w-full" defaultValue={custom?.docReads ?? ""} inputMode="numeric" min={0} name="docReads" placeholder={`Plan: ${plan.documentReads.toLocaleString("en-GB")}`} type="number" />
             </label>
             <label className="!mb-0">
-              Look-ups a month
+              Purchase checks a billing period
               <input className="mt-1 w-full" defaultValue={custom?.lookups ?? ""} inputMode="numeric" min={0} name="lookups" placeholder={`Plan: ${plan.comparisonLookups.toLocaleString("en-GB")}`} type="number" />
             </label>
             {(

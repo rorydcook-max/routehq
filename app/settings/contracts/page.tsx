@@ -3,6 +3,8 @@ import { AppShell } from "@/components/app-shell";
 import { BackLink } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getCurrentMembership } from "@/lib/auth/roles";
+import { organizationAgreementLanguage } from "@/lib/agreement-language";
+import { localizeAgreementTemplate } from "@/lib/agreement-localize";
 import { UPLOADED_TEMPLATE_KEY } from "@/lib/contract-import-template";
 import { agreementExtraTerms } from "@/lib/contract-rendering";
 import { buildSampleContractVariables, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
@@ -71,28 +73,35 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
       />
     ) : null;
 
+  // English plus the business location's language; the RoveHQ wording is localized here so the browser gets one language pair.
+  const language = organizationAgreementLanguage(organization);
+  const templateHtml = localizeAgreementTemplate(String(template.content_html || template.body || ""), language);
+  const languageLabel = usingUploaded
+    ? say("ag_ownAgreement")
+    : language === "en"
+      ? say("ag_languagesEn")
+      : say("ag_languages", { language: say(`ag_lang_${language}`) });
+
   return (
     <AppShell userEmail={userEmail}>
-      <div className="page-form">
+      <div className="w-full max-w-6xl">
         <div className="page-hero mb-4">
           <BackLink href="/settings?tab=business" label={say("title")} />
           <h1 className="page-title">{say("ag_title")}</h1>
-          <p className="page-subtitle page-subtitle-keep mt-1">{say(usingUploaded ? "ag_subtitleOwn" : "ag_subtitle")}</p>
+          <p className="page-subtitle page-subtitle-keep mt-1">{say(usingUploaded ? "ag_introOwn" : "ag_intro")}</p>
         </div>
-
-        {/* An uploaded agreement in use leads the page; otherwise the upload is an optional extra at the end. */}
-        {importCard && (usingUploaded || handoffFile) ? <div className="mb-3">{importCard}</div> : null}
 
         <AgreementTerms
           initialTerms={agreementExtraTerms(organization.settings)}
+          languageLabel={languageLabel}
+          languageTip={usingUploaded ? undefined : say("ag_languagesTip")}
           numbers={usingUploaded ? [] : numbers}
           numbersHref="/settings?tab=rentals#travel"
           organizationId={organization.id}
           sampleData={sampleData}
-          templateHtml={String(template.content_html || template.body || "")}
+          side={importCard}
+          templateHtml={templateHtml}
         />
-
-        {importCard && !usingUploaded && !handoffFile ? <div className="mt-3">{importCard}</div> : null}
       </div>
     </AppShell>
   );

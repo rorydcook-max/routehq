@@ -2,8 +2,12 @@
 
 import { cookies } from "next/headers";
 import { after } from "next/server";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { askFleetAssistant, type AssistantTurn } from "@/app/actions/fleet-assistant";
 import { answerQuestion, type AskTurn } from "@/lib/ask";
+import { paperworkFor } from "@/lib/country-paperwork";
+import { FLEET_ROLES, isFleetText, withoutAdded, type ChatFleet } from "@/lib/fleet-chat";
+import { getDefaultOrganization } from "@/lib/organization";
 import {
   VISITOR_COOKIE,
   chatFolder,
@@ -59,9 +63,11 @@ async function ensureWho(): Promise<ChatWho> {
 }
 
 /** What the panel needs to pick its starters: signed in or not, and whether they're the owner (records questions). */
-export async function chatContext(): Promise<{ signedIn: boolean; owner: boolean }> {
+export async function chatContext(): Promise<{ signedIn: boolean; owner: boolean; organizationId?: string; fleet?: boolean }> {
   const who = await chatWho();
-  return { signedIn: who?.kind === "member", owner: who?.kind === "member" && who.role === "owner" };
+  if (who?.kind !== "member") return { signedIn: false, owner: false };
+  // The business and whether they may add vehicles: the fleet cards' Add and Save send them with the photos.
+  return { signedIn: true, owner: who.role === "owner", organizationId: who.organizationId, fleet: mayUseFleet(who) };
 }
 
 /** Signed upload links for the chat's files, straight from the phone to storage, in this person's own folder. */
@@ -182,7 +188,9 @@ function withPageContext(text: string, pathname: string | null) {
  * One message from the chat panel. The first one creates the chat. Then, in order:
  * - handed over already: it goes to the team, no AI reply;
  * - asks for a person (in words, or the Talk to a person chip): hand over;
- * - has files: say where they go, with a card to that screen (the file handed over where it can be);
+ * - vehicle photos, blue books, policies, tax receipts, "add a 2022 Honda Click", a Google Sheet of vehicles: the fleet
+ *   assistant, right here, its drafts as cards in the chat (fleetTurn, below);
+ * - other files: say where they go, with a card to that screen (the file handed over where it can be);
  * - an owner's question about their business: the records assistant (proposals confirmed with confirmAssistantAction);
  * - anything else, any teammate, any visitor: the help-centre assistant, logged for the content queue as before.
  */
@@ -191,7 +199,7 @@ export async function chatSend(input: {
   text: string;
   files?: Array<{ path: string; name?: string; type?: string; size?: number }>;
   pathname?: string | null;
-  route?: "records" | "support" | null;
+  route?: "records" | "support" | "fleet" | null;
   action?: ChatActionChip | null;
 }): Promise<ChatResult> {
   try {
@@ -226,13 +234,33 @@ export async function chatSend(input: {
       return finish();
     }
 
+    // Already talking to the fleet assistant (cards open, a question asked): photos and follow-ups go straight back to
+    // it, without a look at what the photo is. How-to questions still go to the help-centre assistant.
+    const fleetAllowed = mayUseFleet(who);
+    const fleetOngoing = fleetAllowed && input.route !== "support" && input.route !== "records" && (await inFleetConversation(admin, thread.id));
+
     if (files.length) {
       // The chip they picked ("Record a receipt") says what the files are; "handoff" was dealt with above.
       const chosen: ChatFileKind | null = input.action || null;
-      const kind = await classifyFiles(admin, files, text, chosen);
+      const imagesOnly = files.every((file) => file.type.startsWith("image/"));
+      const kind = fleetOngoing && imagesOnly && !chosen ? "vehicle" : await classifyFiles(admin, files, text, chosen);
+      // Vehicle photos, blue books, policies and tax receipts: read right here by the fleet assistant (one assistant
+      // for everything, Rory 3 Nov 2026), its drafts shown as cards in the chat.
+      if (kind === "vehicle" && fleetAllowed) {
+        await fleetTurn(admin, thread, who, text, files, userMessage.id);
+        return finish();
+      }
       const reply = replyForFiles(kind, files, who, pathname);
       const action = reply.action ? { ...reply.action, label: await said(reply.action.label) } : undefined;
       await addMessage(admin, thread, who, { body: await said(reply.body), fromAssistant: true, meta: { action, offerHandoff: reply.offerHandoff } });
+      return finish();
+    }
+
+    // "Add a 2022 Honda Click, plate 1กก 1234", a Google Sheet of vehicles, a reply to the fleet assistant's question.
+    // A question of their own ("who owes me money?") mid-way still goes to the records or help assistant.
+    const ownQuestion = /^(who|what|when|which|why|how|where|does|do|can)\b/i.test(text) && !isFleetText(text);
+    if (fleetAllowed && input.route !== "support" && input.route !== "records" && !isHowTo(text) && (input.route === "fleet" || isFleetText(text) || (fleetOngoing && !ownQuestion))) {
+      await fleetTurn(admin, thread, who, text, [], userMessage.id);
       return finish();
     }
 
@@ -359,4 +387,195 @@ export async function chatMarkProposal(input: { threadId: string; messageId: str
   const meta = { ...(message.meta || {}), proposalState: input.state === "done" ? "done" : "cancelled", proposalResult: input.state === "done" ? input.result : undefined };
   await admin.from("support_messages").update({ meta }).eq("id", message.id);
   return { ok: true };
+}
+
+/* ------------------------------------------------------------------------------------------------------------------
+ * The fleet assistant in the chat (lib/fleet-chat.ts). One assistant for everything: vehicle and paperwork photos,
+ * "add a 2022 Honda Click", a Google Sheet of vehicles, who's renting now. askFleetAssistant does the reading; its
+ * lists are kept in the meta of the chat's latest fleet reply, and the panel shows them as cards under it.
+ * ------------------------------------------------------------------------------------------------------------------ */
+
+const emptyFleet = (): ChatFleet => ({ draft: [], rentals: [], paperwork: [], photos: [], notes: [], added: [] });
+
+/** The chat's latest fleet reply and its lists (empty lists when the fleet assistant hasn't been used in it yet). */
+async function latestFleet(admin: any, threadId: string): Promise<{ messageId: string | null; fleet: ChatFleet }> {
+  const { data } = await admin
+    .from("support_messages")
+    .select("id, meta")
+    .eq("thread_id", threadId)
+    .eq("from_assistant", true)
+    .not("meta->fleet", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const fleet = data?.meta?.fleet;
+  return fleet && typeof fleet === "object" ? { messageId: data.id, fleet: { ...emptyFleet(), ...fleet } } : { messageId: null, fleet: emptyFleet() };
+}
+
+/** Whether the chat's last assistant reply was the fleet assistant's: a follow-up ("the plate is 1กก 1234") goes back to it. */
+async function inFleetConversation(admin: any, threadId: string) {
+  const { data } = await admin.from("support_messages").select("meta").eq("thread_id", threadId).eq("from_assistant", true).order("created_at", { ascending: false }).limit(1).maybeSingle();
+  return Boolean(data?.meta?.fleet || data?.meta?.fleetDone);
+}
+
+/** Whoever may add vehicles here: a member with a fleet role (the same rule as the vehicles table). */
+function mayUseFleet(who: ChatWho) {
+  return who.kind === "member" && FLEET_ROLES.includes(who.role);
+}
+
+/** Photos from the support bucket as data URLs for the model. The browser already shrank them (about 1600 px JPEG). */
+async function photoDataUrls(admin: any, files: SupportAttachment[]) {
+  const urls: string[] = [];
+  const used: string[] = [];
+  for (const file of files.filter((item) => /^image\/(jpeg|png|webp)$/.test(item.type)).slice(0, 4)) {
+    try {
+      const { data } = await admin.storage.from(SUPPORT_BUCKET).download(file.path);
+      if (!data) continue;
+      const bytes = Buffer.from(await data.arrayBuffer());
+      if (bytes.length > 6 * 1024 * 1024) continue;
+      urls.push(`data:${file.type};base64,${bytes.toString("base64")}`);
+      used.push(file.path);
+    } catch {
+      // A photo that can't be read is skipped; the rest still go.
+    }
+  }
+  return { urls, used };
+}
+
+/** Each paperwork kind's name as the vehicle page shows it in this business's country ("Road tax (LKM)"). */
+async function paperNamesFor() {
+  try {
+    const [organization, tv] = await Promise.all([getDefaultOrganization(), getTranslations("vehiclePage")]);
+    const country = (organization as any).country_code || (organization as any).settings?.main_location?.country;
+    return {
+      currency: String(organization.currency || "THB"),
+      paperNames: Object.fromEntries(paperworkFor(country).map((item) => [item.key, `${tv(item.nameKey as never)}${item.local ? ` (${item.local})` : ""}`])) as Record<string, string>
+    };
+  } catch {
+    return { currency: "THB", paperNames: {} as Record<string, string> };
+  }
+}
+
+/** One turn of the fleet assistant: what they wrote and any photos, with the chat so far. The reply carries the lists. */
+async function fleetTurn(admin: any, thread: any, who: ChatWho, text: string, files: SupportAttachment[], userMessageId: string) {
+  const { fleet } = await latestFleet(admin, thread.id);
+  const { urls, used } = await photoDataUrls(admin, files);
+  if (files.length && !urls.length) {
+    // A PDF or a photo type the model can't read: say what to send instead.
+    await addMessage(admin, thread, who, { body: await said("I can read photos (JPEG or PNG). Take a photo of the page and send it here."), fromAssistant: true, meta: { fleetDone: true } });
+    return;
+  }
+  const history = await historyFor(admin, thread.id, userMessageId);
+  const turns: AssistantTurn[] = [
+    ...history.map((turn) => ({ role: turn.role, text: turn.content })),
+    ...(fleet.notes || []).slice(-10).map((note) => ({ role: "assistant" as const, text: note })),
+    // The cards can be corrected by hand: what's on them now wins over what was typed earlier in the chat.
+    ...(fleet.draft.length || fleet.paperwork.length || fleet.rentals.length
+      ? [{ role: "assistant" as const, text: "The lists below are as the owner left them on screen; they may have corrected details by hand. Keep their values unless they now say otherwise." }]
+      : []),
+    { role: "user", text: text || "(photos)" }
+  ];
+  const locale = await getLocale().catch(() => "en");
+  const [result, names] = await Promise.all([
+    askFleetAssistant({ turns, images: urls, photosBefore: fleet.photos.length, draft: fleet.draft, rentals: fleet.rentals, paperwork: fleet.paperwork, locale }).catch(() => ({ ok: false as const, error: "failed" })),
+    paperNamesFor()
+  ]);
+  if (!result.ok) {
+    const body = result.error === "unavailable" ? "The assistant isn't available right now. Please try again later." : "Sorry, I couldn't read that. Please try again.";
+    await addMessage(admin, thread, who, { body: await said(body), fromAssistant: true, meta: { error: true, offerHandoff: true } });
+    return;
+  }
+  const next: ChatFleet = {
+    ...fleet,
+    draft: withoutAdded(result.draft, fleet.added),
+    rentals: result.rentals,
+    paperwork: result.paperwork,
+    photos: [...fleet.photos, ...used].slice(-60),
+    currency: names.currency,
+    paperNames: names.paperNames
+  };
+  await addMessage(admin, thread, who, { body: result.reply || (await said("Done.")), fromAssistant: true, meta: { fleet: next } });
+}
+
+/** Keeps the cards' lists as the owner left them (a detail corrected, a wrong renewal dismissed). */
+async function fleetMessageFor(admin: any, who: ChatWho | null, threadId: string, messageId: string) {
+  if (!who || who.kind !== "member") return null;
+  const thread = await loadChatThread(admin, threadId, who);
+  if (!thread) return null;
+  const { data: message } = await admin.from("support_messages").select("id, meta").eq("id", messageId).eq("thread_id", thread.id).eq("from_assistant", true).maybeSingle();
+  if (!message?.meta?.fleet) return null;
+  return { thread, message };
+}
+
+function cleanFleet(previous: ChatFleet, next: Partial<ChatFleet>): ChatFleet {
+  return {
+    ...previous,
+    draft: Array.isArray(next.draft) ? next.draft.slice(0, 60) : previous.draft,
+    rentals: Array.isArray(next.rentals) ? next.rentals.slice(0, 60) : previous.rentals,
+    paperwork: Array.isArray(next.paperwork) ? next.paperwork.slice(0, 40) : previous.paperwork,
+    notes: Array.isArray(next.notes) ? next.notes.map((note) => String(note).slice(0, 600)).slice(-20) : previous.notes,
+    added: Array.isArray(next.added) ? next.added.map((key) => String(key).slice(0, 200)).slice(-120) : previous.added,
+    // The photos are the chat's own; never taken from the browser.
+    photos: previous.photos
+  };
+}
+
+export async function chatFleetUpdate(input: { threadId: string; messageId: string; fleet: Partial<ChatFleet> }): Promise<{ ok: boolean }> {
+  const who = await chatWho();
+  const admin = createSupabaseAdminClient() as any;
+  const found = await fleetMessageFor(admin, who, input.threadId, input.messageId);
+  if (!found) return { ok: false };
+  const fleet = cleanFleet({ ...emptyFleet(), ...found.message.meta.fleet }, input.fleet || {});
+  await admin.from("support_messages").update({ meta: { ...found.message.meta, fleet } }).eq("id", found.message.id);
+  return { ok: true };
+}
+
+/**
+ * After the cards' Add or Save worked (the browser did the adding with addAssistantVehicles, renewVehicleCompliance or
+ * addAssistantRentals, which check everything again): the lists as they are now, and a short reply saying it's done,
+ * with the next question, so the chat carries on from there.
+ */
+export async function chatFleetDone(input: {
+  threadId: string;
+  messageId: string;
+  fleet: Partial<ChatFleet>;
+  done: { kind: "vehicles" | "paperwork" | "rentals"; count: number; failed?: string[]; reminders?: boolean };
+}): Promise<ChatResult> {
+  try {
+    const who = await chatWho();
+    const admin = createSupabaseAdminClient() as any;
+    const found = await fleetMessageFor(admin, who, input.threadId, input.messageId);
+    if (!found || !who) return { ok: false, error: await said("This conversation was not found.") };
+    const fleet = cleanFleet({ ...emptyFleet(), ...found.message.meta.fleet }, input.fleet || {});
+    await admin.from("support_messages").update({ meta: { ...found.message.meta, fleet } }).eq("id", found.message.id);
+    const count = Math.max(0, Math.round(Number(input.done.count) || 0));
+    const failed = (input.done.failed || []).map((name) => String(name).slice(0, 80)).slice(0, 10);
+    const parts: string[] = [];
+    const links: Array<{ label: string; href: string }> = [];
+    if (input.done.kind === "vehicles") {
+      if (count) {
+        parts.push(count === 1 ? await said("Added 1 vehicle to your fleet.") : await said(`Added ${count} vehicles to your fleet.`));
+        parts.push(count === 1 ? await said("Is anyone renting it now? Tell me who, what they pay and when.") : await said("Is anyone renting them now? Tell me who, what they pay and when."));
+        links.push({ label: await said("Open Fleet"), href: "/fleet" });
+      }
+      if (failed.length || !count) parts.push(await said("Some vehicles couldn't be added. Check them and try again."));
+    } else if (input.done.kind === "paperwork") {
+      if (count) parts.push(count === 1 ? await said("Saved 1 renewal: the date and cost are updated.") : await said(`Saved ${count} renewals: the dates and costs are updated.`));
+      if (failed.length) parts.push(await said(`Couldn't save: ${failed.join(", ")}`));
+    } else {
+      if (count) {
+        parts.push(count === 1 ? await said("Added 1 rental. What's due shows on your dashboard.") : await said(`Added ${count} rentals. What's due shows on your dashboard.`));
+        if (input.done.reminders) {
+          links.push({ label: await said("Connect LINE or WhatsApp"), href: "/settings?tab=messaging" });
+          links.push({ label: await said("Add payment details"), href: "/settings?tab=rentals#payment-methods" });
+        }
+      }
+      if (failed.length) parts.push(await said(`Couldn't add: ${failed.join(", ")}`));
+    }
+    const reply = await addMessage(admin, found.thread, who, { body: parts.join(" "), fromAssistant: true, meta: { fleetDone: true, links: links.length ? links : undefined } });
+    return { ok: true, thread: threadInfo(found.thread), messages: await chatMessages(admin, found.thread.id, new Date(Date.parse(reply.created_at) - 1).toISOString()) };
+  } catch (error) {
+    console.warn("[chat] fleet done failed:", error instanceof Error ? error.message : error);
+    return { ok: false, error: await said("Could not send. Please try again.") };
+  }
 }

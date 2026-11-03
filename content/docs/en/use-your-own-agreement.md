@@ -18,8 +18,8 @@ If you already have a contract you've used for years, you can keep using it. Upl
 ## Upload it
 
 1. **Settings** > **Business** > **Rental agreement**.
-2. Under **Use your own agreement**, choose a PDF, a Word file (.docx) or photos of the pages (up to 10).
-3. Tap **Upload and read it**. Reading takes a minute or two.
+2. Beside the agreement, under **Have your own contract?**, tap **Upload your contract**.
+3. Choose a PDF, a Word file (.docx) or photos of the pages (up to 10). Reading starts straight away and takes a minute or two.
 
 Photos work best taken flat, in good light, one page per photo.
 
@@ -41,8 +41,8 @@ If your business is in Thailand, RoveHQ checks your contract against the 2025 re
 
 ## Start using it
 
-Tap **Use this agreement for new bookings**. From then on every new booking uses your agreement. Customers sign it the same way, and you countersign with your saved signature. **Your own terms** are still added at the end; the numbers under **Change these numbers** apply only to the RoveHQ agreement.
+Tap **Use this agreement for new bookings**. From then on every new booking uses your agreement, and **Rental agreement** shows yours instead of the RoveHQ one. Customers sign it the same way, and you countersign with your saved signature. **Your own terms** are still added at the end; **Your numbers in the agreement** apply only to the RoveHQ agreement, so they're hidden.
 
-Upload a newer version later and it waits as a draft until you choose it, so what's in use never changes by surprise.
+To change it later, tap **Review or edit it**. Upload a newer version with **Upload a different agreement**: it waits as a draft until you choose it, so what's in use never changes by surprise. Left a draft unfinished? Tap **Carry on checking it**.
 
 Changed your mind? Tap **Go back to the RoveHQ agreement**. Your upload is kept, so you can switch again later.

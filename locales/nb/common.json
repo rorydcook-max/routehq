@@ -1097,8 +1097,8 @@
     "setup_reminders": "Slå på automatiske påminnelser",
     "setup_booking_page": "Del bestillingssiden din",
     "setupShared": "Lenke kopiert. Del den på Facebook-siden din, Google Maps og LINE.",
-    "quick_askAssistant": "Fortell assistenten",
-    "quick_askAssistant_hint": "Legg til kjøretøy eller pågående utleie via chat, stemme eller bilder",
+    "quick_askAssistant": "Legg til via chat",
+    "quick_askAssistant_hint": "Kjøretøy eller pågående utleier, via melding eller bilde",
     "askExample7": "Hvordan tar jeg depositum?",
     "askExample8": "Hvor slår jeg på nettbooking?",
     "askHowTo": "Hvordan…?",
@@ -4160,7 +4160,7 @@
     "ag_n_law": "Gjeldende lov",
     "ag_sampleTitle": "Hva kunden ser",
     "ag_sampleBody": "En oppdiktet booking. Vilkårene dine vises mot slutten.",
-    "ag_sampleOpen": "Åpne eksempelet i full størrelse",
+    "ag_sampleOpen": "Åpne i full størrelse",
     "sig_back": "Tilbake",
     "sig_pageTitle": "Din signatur",
     "sig_pageBody": "Kundene signerer på mobilen. Legg til signaturen din én gang.",
@@ -4486,7 +4486,20 @@
     "extra_bodyTip": "Tilbys i bookingskjemaet og på bookingsiden, legges til første betaling og står i avtalen.",
     "b_brandTip": "Bookinglenker, signeringssiden, bookingsiden deres, kvitteringer og avtaler.",
     "pn_bodyTip": "Bare bedrifter i nettverket ser hverandre.",
-    "ag_subtitleOwn": "Nye bestillinger bruker din egen avtale. Alt du legger til nedenfor havner til slutt i den."
+    "ag_subtitleOwn": "Nye bestillinger bruker din egen avtale. Alt du legger til nedenfor havner til slutt i den.",
+    "ag_intro": "Dette er avtalen kundene dine signerer. Endre tallene og legg til egne vilkår nedenfor.",
+    "ag_introOwn": "Kundene dine signerer din egen avtale. Dine egne vilkår nedenfor legges til på slutten.",
+    "ag_ownAgreement": "Din egen avtale",
+    "ag_languages": "På engelsk og {language}",
+    "ag_languagesEn": "På engelsk",
+    "ag_languagesTip": "Avtalene er alltid på engelsk og på språket der bedriften din holder til. En eksempelbestilling fyller inn detaljene.",
+    "ag_lang_th": "thai",
+    "ag_lang_id": "indonesisk",
+    "ag_lang_vi": "vietnamesisk",
+    "ag_lang_ms": "malayisk",
+    "ag_lang_fil": "filippinsk",
+    "ag_lang_lo": "laotisk",
+    "ag_lang_km": "khmer"
   },
   "accountPage": {
     "roleOwner": "Eier",
@@ -4969,7 +4982,11 @@
     "ownRateAged": "Din {year} {model} leies ut for {amount} i måneden. Tatt i betraktning aldersforskjellen, ville denne ligge på omtrent {adjusted}.",
     "b_serviceSplit": "{count, plural, one {# service} other {# tjenester}} i året til ca. {each}, pluss {reserve} til dekk og uforutsette utgifter.",
     "limitReached": "Du har brukt denne månedens {count} kjøretøykontroller i abonnementet ditt. Kjøretøy sjekket før, åpner seg fortsatt med en gang. Flere kontroller neste måned, eller på en større plan.",
-    "rentFromOwnAged": "Ut fra din {model} fra {year} til {amount} i måneden, justert for aldersforskjellen."
+    "rentFromOwnAged": "Ut fra din {model} fra {year} til {amount} i måneden, justert for aldersforskjellen.",
+    "checksLeft": "{count, plural, one {# kjøpssjekk} other {# kjøpssjekker}} igjen denne faktureringsperioden",
+    "checksUsedUp": "Ingen kjøpssjekker igjen før {date}. Kjøretøy du har sjekket før, kan fortsatt åpnes.",
+    "checksPaidOnly": "Nye kjøpssjekker er med i betalte abonnementer. Kjøretøy du har sjekket før, kan fortsatt åpnes.",
+    "checksUpgrade": "Oppgrader"
   },
   "importer": {
     "dt_vehicles": "Kjøretøy",
@@ -6426,7 +6443,14 @@
     "paperPrinted": "(Det står «{text}».)",
     "paperNeedDates": "Legg til manglende datoer for å lagre",
     "paperCheck": "Sjekk hver av dem mot dokumentet. Trykk ✕ for å fjerne en som er feil.",
-    "paperDismiss": "Ikke riktig? Fjern den"
+    "paperDismiss": "Ikke riktig? Fjern den",
+    "edit": "Rediger",
+    "fieldMake": "Merke",
+    "fieldModel": "Modell",
+    "fieldYear": "År",
+    "fieldPlate": "Registreringsnummer",
+    "fieldMonthly": "Per måned",
+    "fieldDaily": "Per dag"
   },
   "setupRequest": {
     "title": "Vi ordner det for deg",
@@ -6551,7 +6575,13 @@
     "v_vehicle_make_model": "Kjøretøyets merke og modell",
     "optionalTitle": "Vil du heller bruke din egen kontrakt?",
     "optionalBody": "Valgfritt. Bare hvis du vil beholde avtalen du allerede bruker: da signerer kundene din i stedet for vår.",
-    "optionalOpen": "Last opp min egen kontrakt"
+    "optionalOpen": "Last opp min egen kontrakt",
+    "panelTitle": "Har du din egen kontrakt?",
+    "panelBody": "Last den opp, så signerer kundene din i stedet.",
+    "panelButton": "Last opp kontrakten din",
+    "activeTitle": "Du bruker din egen avtale",
+    "activeShort": "Nye bestillinger bruker «{title}». Signerte avtaler forblir som de var.",
+    "draftShort": "Opplastingen din er ikke i bruk ennå."
   },
   "chat": {
     "launcher": "Chat med RoveHQ",
@@ -6629,6 +6659,9 @@
     "sConnectWhatsApp": "Hvordan kobler jeg til WhatsApp?",
     "sConnectLine": "Hvordan kobler jeg til LINE?",
     "sLeastMoney": "Hvilket kjøretøy tjener minst?",
-    "sNextSixMonths": "Hvilke inntekter kan jeg vente de neste 6 månedene?"
+    "sNextSixMonths": "Hvilke inntekter kan jeg vente de neste 6 månedene?",
+    "sending": "Sender …",
+    "preparing": "Klargjør bilder …",
+    "reading": "Leser …"
   }
 }

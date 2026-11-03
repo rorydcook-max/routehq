@@ -1097,8 +1097,8 @@
     "setup_reminders": "Aktivera automatiska påminnelser",
     "setup_booking_page": "Dela din bokningssida",
     "setupShared": "Länk kopierad. Lägg upp den på din Facebook-sida, Google Maps och LINE.",
-    "quick_askAssistant": "Berätta för assistenten",
-    "quick_askAssistant_hint": "Lägg till fordon eller pågående hyror via chatt, röst eller foton",
+    "quick_askAssistant": "Lägg till via chatt",
+    "quick_askAssistant_hint": "Fordon eller pågående uthyrningar, via meddelande eller foto",
     "askExample7": "Hur tar jag en deposition?",
     "askExample8": "Var slår jag på onlinebokning?",
     "askHowTo": "Hur gör jag…?",
@@ -4160,7 +4160,7 @@
     "ag_n_law": "Tillämplig lag",
     "ag_sampleTitle": "Vad kunden ser",
     "ag_sampleBody": "En påhittad bokning. Dina villkor visas mot slutet.",
-    "ag_sampleOpen": "Öppna exemplet i full storlek",
+    "ag_sampleOpen": "Öppna i full storlek",
     "sig_back": "Tillbaka",
     "sig_pageTitle": "Din signatur",
     "sig_pageBody": "Kunderna skriver under i mobilen. Lägg till din namnteckning en gång.",
@@ -4486,7 +4486,20 @@
     "extra_bodyTip": "Erbjuds i bokningsformuläret och på bokningssidan, läggs till första betalningen och listas i avtalet.",
     "b_brandTip": "Bokningslänkar, signeringssidan, deras bokningssida, kvitton och avtal.",
     "pn_bodyTip": "Bara företag i nätverket ser varandra.",
-    "ag_subtitleOwn": "Nya bokningar använder ditt eget avtal. Allt du lägger till nedan hamnar i slutet av det."
+    "ag_subtitleOwn": "Nya bokningar använder ditt eget avtal. Allt du lägger till nedan hamnar i slutet av det.",
+    "ag_intro": "Det här är avtalet som dina kunder skriver under. Ändra siffrorna och lägg till egna villkor nedan.",
+    "ag_introOwn": "Dina kunder skriver under ditt eget avtal. Dina egna villkor nedan läggs till i slutet.",
+    "ag_ownAgreement": "Ditt eget avtal",
+    "ag_languages": "På engelska och {language}",
+    "ag_languagesEn": "På engelska",
+    "ag_languagesTip": "Avtalen är alltid på engelska och på språket där ditt företag finns. En exempelbokning fyller i uppgifterna.",
+    "ag_lang_th": "thailändska",
+    "ag_lang_id": "indonesiska",
+    "ag_lang_vi": "vietnamesiska",
+    "ag_lang_ms": "malajiska",
+    "ag_lang_fil": "filippinska",
+    "ag_lang_lo": "laotiska",
+    "ag_lang_km": "khmer"
   },
   "accountPage": {
     "roleOwner": "Ägare",
@@ -4969,7 +4982,11 @@
     "ownRateAged": "Din {year} {model} hyrs ut för {amount} i månaden. Med hänsyn till åldersskillnaden skulle den här ligga på ungefär {adjusted}.",
     "b_serviceSplit": "{count, plural, one {# service} other {# servicer}} per år à ungefär {each}, plus {reserve} till däck och oväntade utgifter.",
     "limitReached": "Du har använt månadens {count} fordonskontroller i din plan. Fordon som kontrollerats tidigare öppnas fortfarande direkt. Fler kontroller nästa månad, eller med en större plan.",
-    "rentFromOwnAged": "Utifrån din {model} från {year} för {amount} i månaden, justerat för åldersskillnaden."
+    "rentFromOwnAged": "Utifrån din {model} från {year} för {amount} i månaden, justerat för åldersskillnaden.",
+    "checksLeft": "{count, plural, one {# köpkontroll} other {# köpkontroller}} kvar den här faktureringsperioden",
+    "checksUsedUp": "Inga köpkontroller kvar förrän {date}. Fordon du redan kontrollerat går fortfarande att öppna.",
+    "checksPaidOnly": "Nya köpkontroller ingår i betalplanerna. Fordon du redan kontrollerat går fortfarande att öppna.",
+    "checksUpgrade": "Uppgradera"
   },
   "importer": {
     "dt_vehicles": "Fordon",
@@ -6426,7 +6443,14 @@
     "paperPrinted": "(Det står ”{text}”.)",
     "paperNeedDates": "Lägg till saknade datum för att spara",
     "paperCheck": "Kontrollera var och en mot dokumentet. Tryck på ✕ för att ta bort en som är fel.",
-    "paperDismiss": "Stämmer inte? Ta bort den"
+    "paperDismiss": "Stämmer inte? Ta bort den",
+    "edit": "Redigera",
+    "fieldMake": "Märke",
+    "fieldModel": "Modell",
+    "fieldYear": "År",
+    "fieldPlate": "Registreringsnummer",
+    "fieldMonthly": "Per månad",
+    "fieldDaily": "Per dag"
   },
   "setupRequest": {
     "title": "Vi ordnar det åt dig",
@@ -6551,7 +6575,13 @@
     "v_vehicle_make_model": "Fordonets märke och modell",
     "optionalTitle": "Vill du hellre använda ditt eget avtal?",
     "optionalBody": "Valfritt. Bara om du vill behålla avtalet du redan använder: då signerar kunderna ditt i stället för vårt.",
-    "optionalOpen": "Ladda upp mitt eget avtal"
+    "optionalOpen": "Ladda upp mitt eget avtal",
+    "panelTitle": "Har du ett eget avtal?",
+    "panelBody": "Ladda upp det så skriver kunderna under ditt i stället.",
+    "panelButton": "Ladda upp ditt avtal",
+    "activeTitle": "Du använder ditt eget avtal",
+    "activeShort": "Nya bokningar använder ”{title}”. Underskrivna avtal förblir som de var.",
+    "draftShort": "Din uppladdning används inte än."
   },
   "chat": {
     "launcher": "Chatta med RoveHQ",
@@ -6629,6 +6659,9 @@
     "sConnectWhatsApp": "Hur kopplar jag WhatsApp?",
     "sConnectLine": "Hur kopplar jag LINE?",
     "sLeastMoney": "Vilket fordon drar in minst pengar?",
-    "sNextSixMonths": "Vilka intäkter kan jag vänta mig de kommande 6 månaderna?"
+    "sNextSixMonths": "Vilka intäkter kan jag vänta mig de kommande 6 månaderna?",
+    "sending": "Skickar …",
+    "preparing": "Förbereder foton …",
+    "reading": "Läser …"
   }
 }

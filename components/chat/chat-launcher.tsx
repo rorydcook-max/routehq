@@ -117,31 +117,25 @@ export function ChatLauncher({ site = false, owner }: { site?: boolean; owner?: 
     };
   }, [disabled, pathname]);
 
-  // Out of the way while reading (Rory, 3 Nov 2026: it mustn't sit over content): tucked away while scrolling down,
-  // back on scrolling up, when the scroll stops for a moment, or near the bottom of the page (where the page's
-  // extra bottom space keeps the last rows clear of it).
-  const [tucked, setTucked] = useState(false);
+  // It stays put while scrolling (Rory, 3 Nov 2026: on his iPhone it vanished when scrolling down). Pages end with
+  // extra bottom space (app-shell's pb-44 / lg:pb-24, the website footer's padding), so the last rows scroll clear of it.
+
+  // ?chat=1 opens the chat, ?chat=photos opens it ready for vehicle photos: where the old fleet assistant page and its
+  // links now land. Checked on each page and every so often (a redirect to the same page doesn't change the path).
   useEffect(() => {
     if (disabled) return;
-    let last = 0;
-    let idle = 0;
-    const scroller = (event: Event) => {
-      const target = event.target instanceof HTMLElement && event.target.scrollHeight > event.target.clientHeight + 4 ? event.target : document.scrollingElement;
-      if (!target || target.closest?.("[data-chat-root]")) return;
-      const top = target.scrollTop;
-      const nearEnd = target.scrollHeight - top - target.clientHeight < 120;
-      if (top > last + 6 && !nearEnd && top > 80) setTucked(true);
-      else if (top < last - 6 || nearEnd) setTucked(false);
-      last = top;
-      window.clearTimeout(idle);
-      idle = window.setTimeout(() => setTucked(false), 1400);
+    const check = () => {
+      const url = new URL(window.location.href);
+      const asked = url.searchParams.get("chat");
+      if (!asked) return;
+      url.searchParams.delete("chat");
+      window.history.replaceState(window.history.state, "", url.toString());
+      show(asked === "photos" ? { action: "vehicle" } : {});
     };
-    window.addEventListener("scroll", scroller, { passive: true, capture: true });
-    return () => {
-      window.clearTimeout(idle);
-      window.removeEventListener("scroll", scroller, { capture: true });
-    };
-  }, [disabled, pathname]);
+    check();
+    const timer = window.setInterval(check, 700);
+    return () => window.clearInterval(timer);
+  }, [disabled, pathname, show]);
 
   // Ctrl/⌘+K opens it from anywhere (it used to open the old "Ask anything" box); a second press closes it.
   useEffect(() => {
@@ -190,7 +184,7 @@ export function ChatLauncher({ site = false, owner }: { site?: boolean; owner?: 
 
   if (disabled) return null;
   const bottom = place.lift > 0 ? `${place.lift}px` : `calc(${BASE}px + env(safe-area-inset-bottom))`;
-  const hidden = !open && (place.modal || place.keyboard || (tucked && !unread));
+  const hidden = !open && (place.modal || place.keyboard);
   // On a computer the panel sits just above the button.
   const panelBottom = Math.max(place.lift, BASE) + SIZE + GAP;
 

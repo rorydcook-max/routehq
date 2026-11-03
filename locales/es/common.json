@@ -1080,8 +1080,8 @@
     "setup_reminders": "Activar recordatorios automáticos",
     "setup_booking_page": "Compartir página de reservas",
     "setupShared": "Enlace copiado. Pégalo en tu página de Facebook, Google Maps y LINE.",
-    "quick_askAssistant": "Decir al asistente",
-    "quick_askAssistant_hint": "Agrega vehículos o alquileres actuales por chat, voz o fotos"
+    "quick_askAssistant": "Añadir por chat",
+    "quick_askAssistant_hint": "Vehículos o alquileres en curso, por mensaje o foto"
   },
   "todo": {
     "eyebrow": "Pendientes",
@@ -4134,7 +4134,7 @@
     "ag_n_law": "Ley aplicable",
     "ag_sampleTitle": "Lo que ve el cliente",
     "ag_sampleBody": "Una reserva inventada. Tus condiciones aparecen cerca del final.",
-    "ag_sampleOpen": "Abrir la muestra a tamaño completo",
+    "ag_sampleOpen": "Ver a tamaño completo",
     "sig_back": "Atrás",
     "sig_pageTitle": "Su firma",
     "sig_pageBody": "Los clientes firman en su móvil. Añade tu firma una sola vez.",
@@ -4245,7 +4245,6 @@
     "pl_team": "{count, plural, one {# cuenta de equipo} other {# cuentas de equipo}}",
     "pl_teamUnlimited": "Cuentas de equipo ilimitadas",
     "pl_reads": "{count} escaneos de identificación al mes",
-    "pl_lookups": "{count} comprobaciones de compra al mes",
     "pl_export": "Exportación contable",
     "pl_locations": "Más de una ubicación",
     "pl_whiteLabel": "Su logo en la app, sin \"Powered by RoveHQ\", su propia dirección de reservas (sutienda.rovehq.io)",
@@ -4460,7 +4459,20 @@
     "extra_bodyTip": "Se ofrecen en el formulario y la página de reserva, se suman al primer pago y aparecen en el contrato.",
     "b_brandTip": "Enlaces de reserva, la página de firma, su página de reserva, recibos y contratos.",
     "pn_bodyTip": "Solo los negocios de la red se ven entre sí.",
-    "ag_subtitleOwn": "Las nuevas reservas usan tu propio contrato. Todo lo que añadas abajo va al final."
+    "ag_subtitleOwn": "Las nuevas reservas usan tu propio contrato. Todo lo que añadas abajo va al final.",
+    "ag_intro": "Este es el contrato que firman tus clientes. Edita las cifras y añade tus propias condiciones abajo.",
+    "ag_introOwn": "Tus clientes firman tu propio contrato. Las condiciones que añadas abajo se incluyen al final.",
+    "ag_ownAgreement": "Tu propio contrato",
+    "ag_languages": "Inglés y {language}",
+    "ag_languagesEn": "Inglés",
+    "ag_languagesTip": "Los contratos siempre están en inglés y en el idioma del país de tu negocio. Una reserva de ejemplo rellena los datos.",
+    "ag_lang_th": "Tailandés",
+    "ag_lang_id": "Indonesio",
+    "ag_lang_vi": "Vietnamita",
+    "ag_lang_ms": "Malayo",
+    "ag_lang_fil": "Filipino",
+    "ag_lang_lo": "Lao",
+    "ag_lang_km": "Jemer"
   },
   "accountPage": {
     "roleOwner": "Propietario",
@@ -4942,8 +4954,11 @@
     "needMore": "Elija marca y modelo e introduzca el precio para continuar.",
     "ownRateAged": "Tu {model} del {year} se alquila por {amount} al mes. Teniendo en cuenta la diferencia de antigüedad, este saldría por unos {adjusted}.",
     "b_serviceSplit": "{count, plural, one {# revisión} other {# revisiones}} al año a unos {each}, más {reserve} para neumáticos y imprevistos.",
-    "limitReached": "Has usado las {count} revisiones de vehículos de tu plan este mes. Los vehículos ya revisados se abren al instante. Más revisiones el próximo mes o con un plan superior.",
-    "rentFromOwnAged": "Según tu {model} de {year} a {amount} al mes, teniendo en cuenta la diferencia de antigüedad."
+    "rentFromOwnAged": "Según tu {model} de {year} a {amount} al mes, teniendo en cuenta la diferencia de antigüedad.",
+    "checksLeft": "{count, plural, one {Te queda # verificación de compra} other {Te quedan # verificaciones de compra}} en este periodo de facturación",
+    "checksUsedUp": "No te quedan verificaciones de compra hasta el {date}. Los vehículos verificados antes siguen disponibles.",
+    "checksPaidOnly": "Las nuevas verificaciones de compra son para planes de pago. Los vehículos verificados antes siguen disponibles.",
+    "checksUpgrade": "Mejorar plan"
   },
   "importer": {
     "dt_vehicles": "Vehículos",
@@ -6360,7 +6375,14 @@
     "paperPrinted": "(Dice \"{text}\".)",
     "paperNeedDates": "Añade las fechas que faltan para guardar",
     "paperCheck": "Compara cada uno con el documento. Toca ✕ para quitar el que esté mal.",
-    "paperDismiss": "¿No es correcto? Quítalo"
+    "paperDismiss": "¿No es correcto? Quítalo",
+    "edit": "Editar",
+    "fieldMake": "Marca",
+    "fieldModel": "Modelo",
+    "fieldYear": "Año",
+    "fieldPlate": "Matrícula",
+    "fieldMonthly": "Al mes",
+    "fieldDaily": "Al día"
   },
   "setupRequest": {
     "title": "Te lo configuramos",
@@ -6485,7 +6507,13 @@
     "v_vehicle_make_model": "Marca y modelo del vehículo",
     "optionalTitle": "¿Prefieres tu propio contrato?",
     "optionalBody": "Opcional. Solo si prefieres seguir usando tu contrato: los clientes firmarán el tuyo en lugar del nuestro.",
-    "optionalOpen": "Subir mi propio contrato"
+    "optionalOpen": "Subir mi propio contrato",
+    "panelTitle": "¿Tienes tu propio contrato?",
+    "panelBody": "Súbelo y tus clientes firmarán el tuyo.",
+    "panelButton": "Subir tu contrato",
+    "activeTitle": "Estás usando tu propio contrato",
+    "activeShort": "Las nuevas reservas usan «{title}». Los contratos ya firmados no cambian.",
+    "draftShort": "Tu archivo subido aún no está en uso."
   },
   "chat": {
     "launcher": "Chatea con RoveHQ",
@@ -6561,6 +6589,9 @@
     "sConnectWhatsApp": "¿Cómo conecto WhatsApp?",
     "sConnectLine": "¿Cómo conecto LINE?",
     "sLeastMoney": "¿Qué vehículo gana menos dinero?",
-    "sNextSixMonths": "¿Qué ingresos tendré en los próximos 6 meses?"
+    "sNextSixMonths": "¿Qué ingresos tendré en los próximos 6 meses?",
+    "sending": "Enviando.",
+    "preparing": "Preparando fotos.",
+    "reading": "Leyendo."
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
@@ -8,11 +8,12 @@ import { useTranslations } from "next-intl";
 import { ArrowRight, BookOpen, Check, Copy, FileText, History, LifeBuoy, Paperclip, Plus, Send, UserRound, X } from "lucide-react";
 import { confirmAssistantAction } from "@/app/actions/ask";
 import { chatContext, chatHandoff, chatLoad, chatMarkProposal, chatPoll, chatSend, chatSetEmail, chatThreads, prepareChatUploads } from "@/app/actions/chat";
+import { ChatFleetCards } from "@/components/chat/chat-fleet-cards";
 import { handFiles } from "@/components/chat/chat-handoff";
 import { setPendingReceipt } from "@/components/receipt-handoff";
 import type { ChatAttachment, ChatMessage, ChatMeta, ChatThreadInfo } from "@/lib/chat";
 import { CHAT_ACCEPT, CHAT_MAX_FILES, chatSuggestions, type ChatActionChip, type ChatChip } from "@/lib/chat-suggestions";
-import { uploadFormFiles } from "@/lib/direct-upload-client";
+import { compressImage, startEarlyUpload, uploadFormFiles } from "@/lib/direct-upload-client";
 import { SUPPORT_BUCKET, fileSizeLabel } from "@/lib/support-shared";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -58,7 +59,8 @@ async function fileFrom(attachment: ChatAttachment): Promise<File | null> {
 
 /**
  * The live chat panel: a 400×640 panel above the chat button on computers, a full-screen sheet on phones. It starts
- * with the assistant (records questions for owners, how-to for everyone, files sent to the right screen) and hands
+ * with the assistant (records questions for owners, how-to for everyone, vehicle and paperwork photos read right here
+ * by the fleet assistant with its drafts as cards, other files sent to the right screen) and hands
  * over to the RoveHQ team on "Talk to a person". Team replies arrive by polling every 5 seconds while it's open.
  */
 export function ChatPanel({
@@ -82,7 +84,7 @@ export function ChatPanel({
 }) {
   const t = useTranslations("chat") as unknown as Say;
   const router = useRouter();
-  const [context, setContext] = useState<{ signedIn: boolean; owner: boolean }>({ signedIn: !site, owner: Boolean(ownerHint) });
+  const [context, setContext] = useState<{ signedIn: boolean; owner: boolean; organizationId?: string; fleet?: boolean }>({ signedIn: !site, owner: Boolean(ownerHint) });
   const [threadId, setThreadId] = useState("");
   const [thread, setThread] = useState<ChatThreadInfo | null>(null);
   const [messages, setMessages] = useState<Shown[]>([]);
@@ -98,7 +100,8 @@ export function ChatPanel({
   const [emailState, setEmailState] = useState<"idle" | "saving" | "saved">("idle");
   const [proposalBusy, setProposalBusy] = useState<string | null>(null);
   const [proposalError, setProposalError] = useState<Record<string, string>>({});
-  const [desktop, setDesktop] = useState(false);
+  // Read at once (the panel only mounts in the browser), so a computer never gets the phone layout for a moment.
+  const [desktop, setDesktop] = useState(() => typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches);
   const panel = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const picker = useRef<HTMLInputElement>(null);
@@ -106,6 +109,7 @@ export function ChatPanel({
   const list = useRef<HTMLDivElement>(null);
   // The files sent from this page, by storage path: handed straight to the next screen without downloading them again.
   const localFiles = useRef(new Map<string, File>());
+  const localUrls = useRef(new Map<string, string>());
   const loaded = useRef(false);
   const lastRequest = useRef(0);
 
@@ -149,21 +153,93 @@ export function ChatPanel({
     if (open) window.setTimeout(() => input.current?.focus(), 30);
   }, [open]);
 
-  useEffect(() => {
-    end.current?.scrollIntoView({ block: "end" });
-  }, [messages, busy, open]);
+  /*
+   * Following the conversation (Rory, 3 Nov 2026: on his iPhone, after sending a photo he couldn't scroll down to the
+   * reply). The list follows new messages while the reader is at the bottom, and stops the moment they scroll up.
+   * Only the list's own scrollTop is set: scrollIntoView also scrolled the page behind the panel on iOS. Nothing is
+   * moved while a finger is on the list, so a programmatic jump never fights an iOS swipe.
+   */
+  const stick = useRef(true);
+  const touching = useRef(false);
+  const lastTop = useRef(0);
+  const toBottom = useCallback(() => {
+    const box = list.current;
+    if (box && !touching.current) box.scrollTop = box.scrollHeight;
+  }, []);
+  // Only moving up lets go: a photo loading under our own jump to the bottom must not count as "they scrolled away".
+  const onListScroll = useCallback(() => {
+    const box = list.current;
+    if (!box) return;
+    const fromBottom = box.scrollHeight - box.scrollTop - box.clientHeight;
+    if (fromBottom < 80) stick.current = true;
+    else if (box.scrollTop < lastTop.current - 4) stick.current = false;
+    lastTop.current = box.scrollTop;
+  }, []);
+  // Their own message always brings them back down; anything else only if they were there.
+  const lastMine = messages[messages.length - 1]?.role === "user";
+  useLayoutEffect(() => {
+    if (!open) return;
+    if (lastMine) stick.current = true;
+    if (stick.current) toBottom();
+  }, [messages, busy, open, lastMine, toBottom]);
 
-  // A reply keeps growing after it lands (the video's poster, a photo): stay at the bottom unless they've scrolled up.
+  // A message keeps growing after it lands (a photo loading, the video's poster, the cards), and the list itself
+  // changes size when the phone keyboard opens: stay at the bottom while they're following.
   useEffect(() => {
     const box = list.current;
     const inner = box?.firstElementChild;
     if (!open || !box || !inner || typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(() => {
-      if (box.scrollHeight - box.scrollTop - box.clientHeight < 240) box.scrollTop = box.scrollHeight;
+      if (stick.current) toBottom();
     });
     observer.observe(inner);
+    observer.observe(box);
     return () => observer.disconnect();
-  }, [open]);
+  }, [open, toBottom]);
+
+  /*
+   * Phones (Rory, 3 Nov 2026: tapping the message box pushed the whole panel up and showed the page behind it).
+   * iOS Safari doesn't shrink fixed elements for the keyboard: it scrolls the page under them instead. So while the
+   * panel is open it is sized to the visual viewport (the part above the keyboard) and follows its offset, and the
+   * page behind is pinned in place (position: fixed on body, its scroll position put back on close).
+   */
+  const [viewport, setViewport] = useState<{ height: number; top: number; keyboard: boolean } | null>(null);
+  useEffect(() => {
+    if (!open || desktop) return;
+    const visual = window.visualViewport;
+    const update = () => {
+      if (!visual) return;
+      // Reading innerHeight here, not once: it changes as Safari's toolbars show and hide.
+      setViewport({ height: visual.height, top: visual.offsetTop, keyboard: window.innerHeight - visual.height > 150 });
+    };
+    update();
+    visual?.addEventListener("resize", update);
+    visual?.addEventListener("scroll", update);
+    const body = document.body.style;
+    const root = document.documentElement.style;
+    const saved = { position: body.position, top: body.top, left: body.left, right: body.right, width: body.width, overflow: body.overflow, overscroll: root.overscrollBehavior };
+    const scrollY = window.scrollY;
+    body.position = "fixed";
+    body.top = `-${scrollY}px`;
+    body.left = "0";
+    body.right = "0";
+    body.width = "100%";
+    body.overflow = "hidden";
+    root.overscrollBehavior = "none";
+    return () => {
+      visual?.removeEventListener("resize", update);
+      visual?.removeEventListener("scroll", update);
+      body.position = saved.position;
+      body.top = saved.top;
+      body.left = saved.left;
+      body.right = saved.right;
+      body.width = saved.width;
+      body.overflow = saved.overflow;
+      root.overscrollBehavior = saved.overscroll;
+      window.scrollTo(0, scrollY);
+      setViewport(null);
+    };
+  }, [open, desktop]);
 
   // New team replies while it's open: every 5 seconds, paused while the tab is in the background. Only once the
   // chat is with the team: the assistant answers in the same call, so there's nothing to poll for before that.
@@ -215,8 +291,8 @@ export function ChatPanel({
     setMessages((list) => (replaceAll ? result.messages : [...list.filter((message) => !message.pending && !result.messages.some((fresh) => fresh.id === message.id)), ...result.messages]));
   }
 
-  async function send(options: { prompt?: string; route?: "records" | "support"; action?: ChatActionChip | null } = {}) {
-    if (busy) return;
+  async function send(options: { prompt?: string; route?: "records" | "support" | "fleet"; action?: ChatActionChip | null } = {}) {
+    if (busy || (options.prompt === undefined && preparing)) return;
     const body = (options.prompt ?? text).trim();
     const sending = options.prompt !== undefined ? [] : files;
     if (!body && !sending.length) return;
@@ -245,8 +321,18 @@ export function ChatPanel({
         sending.forEach((file) => form.append("file", file));
         const ready = await uploadFormFiles(form, prepareChatUploads, (done, total) => setProgress(t("uploading", { done, total })), SUPPORT_BUCKET);
         uploaded = JSON.parse(String(ready.get("uploadedFiles") || "[]"));
-        // Same order as sent: remember each original so it can be handed over without a download.
-        uploaded.forEach((file, index) => sending[index] && localFiles.current.set(file.path, sending[index]));
+        // Remember each file and its on-screen preview by where it went, so it's handed over without a download and
+        // the photo doesn't load again when the saved message replaces this one. Ones sent early come back first,
+        // so they're matched by name and size rather than by position.
+        const left = sending.map((file, index) => ({ file, url: temp.attachments[index]?.url || null }));
+        uploaded.forEach((file) => {
+          let at = left.findIndex((item) => item.file.name === file.name && item.file.size === file.size);
+          if (at === -1) at = left.findIndex((item) => item.file.name === file.name);
+          const match = left.splice(at === -1 ? 0 : at, 1)[0];
+          if (!match) return;
+          localFiles.current.set(file.path, match.file);
+          if (match.url) localUrls.current.set(file.path, match.url);
+        });
         setProgress(null);
       }
       const result = await chatSend({ threadId: threadId || null, text: body, files: uploaded, pathname, route: options.route ?? null, action });
@@ -314,12 +400,23 @@ export function ChatPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, request]);
 
-  function addFiles(list: FileList | null) {
+  /**
+   * Picked files: photos shrunk to about 1600 px JPEG (a 3–5 MB phone photo becomes ~300 KB) and sent to storage
+   * straight away, while they write their message, so Send only has to wait for whatever hasn't finished yet.
+   */
+  const [preparing, setPreparing] = useState(0);
+  async function addFiles(list: FileList | null) {
     if (!list) return;
-    const picked = Array.from(list);
-    setFiles((current) => [...current, ...picked].slice(0, CHAT_MAX_FILES));
+    const picked = Array.from(list).slice(0, Math.max(0, CHAT_MAX_FILES - files.length));
     if (picker.current) picker.current.value = "";
-    input.current?.focus();
+    if (!picked.length) return;
+    setPreparing((count) => count + picked.length);
+    const ready = await Promise.all(picked.map((file) => compressImage(file, 1600, 0.78).catch(() => file)));
+    setPreparing((count) => Math.max(0, count - picked.length));
+    ready.forEach((file) => startEarlyUpload("file", file, prepareChatUploads, SUPPORT_BUCKET));
+    setFiles((current) => [...current, ...ready].slice(0, CHAT_MAX_FILES));
+    // A computer goes back to the box; on a phone that would pop the keyboard up over the photos just picked.
+    if (desktop) input.current?.focus();
   }
 
   /** The card under a files reply: opens the right screen and hands the file over where that screen can take it. */
@@ -373,6 +470,17 @@ export function ChatPanel({
     setMessages((list) => list.map((message) => (message.id === id ? { ...message, meta: { ...message.meta, ...changes } } : message)));
   }
 
+  /** A photo sent in this chat, by its storage path: the preview from this page, else the stored copy. */
+  const photoUrl = (path: string) => localUrls.current.get(path) || messages.flatMap((message) => message.attachments).find((file) => file.path === path)?.url || null;
+  const photoFile = async (path: string) => {
+    const local = localFiles.current.get(path);
+    if (local) return local;
+    const attachment = messages.flatMap((message) => message.attachments).find((file) => file.path === path);
+    return attachment ? fileFrom(attachment) : null;
+  };
+  // The fleet assistant's cards show under its latest reply only: that one holds the lists as they are now.
+  const fleetMessageId = [...messages].reverse().find((message) => message.meta.fleet)?.id || null;
+
   async function saveEmail() {
     if (!threadId || emailState === "saving") return;
     setEmailState("saving");
@@ -402,7 +510,7 @@ export function ChatPanel({
       className={
         desktop
           ? "fixed z-[56] flex w-[400px] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)] shadow-[0_24px_60px_-20px_rgba(16,38,43,0.45)]"
-          : "fixed inset-0 z-[56] flex flex-col bg-[var(--panel)] text-[var(--foreground)]"
+          : "fixed inset-x-0 z-[56] flex flex-col overflow-hidden overscroll-none bg-[var(--panel)] text-[var(--foreground)]"
       }
       data-chat-root=""
       ref={panel}
@@ -410,10 +518,20 @@ export function ChatPanel({
       style={
         desktop
           ? { right: "max(16px, env(safe-area-inset-right))", bottom: desktopBottom, height: `min(640px, calc(100dvh - ${desktopBottom + 24}px))` }
-          : { paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)" }
+          : {
+              // Exactly the visible part of the screen, above the keyboard when it's up (see the viewport effect).
+              top: viewport ? viewport.top : 0,
+              height: viewport ? viewport.height : "100dvh",
+              paddingTop: "env(safe-area-inset-top)",
+              // With the keyboard up the home-bar gap is under the keyboard: the box sits right on top of it.
+              paddingBottom: viewport?.keyboard ? 0 : "env(safe-area-inset-bottom)",
+              paddingLeft: "env(safe-area-inset-left)",
+              paddingRight: "env(safe-area-inset-right)"
+            }
       }
     >
-      <header className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3">
+      {/* touch-none: dragging on the header can't pull the page behind along (iOS ignores overflow on body for that). */}
+      <header className="flex touch-none items-center gap-2 border-b border-[var(--border)] px-4 py-3">
         <p className="min-w-0 flex-1 truncate text-[17px] font-bold">{t("title")}</p>
         {messages.length ? (
           <button aria-label={t("newChat")} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--foreground-secondary)] hover:bg-[var(--panel-secondary)]" onClick={startNew} title={t("newChat")} type="button">
@@ -431,7 +549,22 @@ export function ChatPanel({
         </button>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4" aria-live="polite" ref={list}>
+      <div
+        aria-live="polite"
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 [-webkit-overflow-scrolling:touch]"
+        onScroll={onListScroll}
+        onTouchEnd={() => {
+          touching.current = false;
+          onListScroll();
+        }}
+        onTouchCancel={() => {
+          touching.current = false;
+        }}
+        onTouchStart={() => {
+          touching.current = true;
+        }}
+        ref={list}
+      >
        <div>
         {messages.length === 0 ? (
           <div>
@@ -488,18 +621,18 @@ export function ChatPanel({
                           : message.meta.error
                             ? "bg-[var(--danger-light)] text-[var(--danger)]"
                             : "bg-[var(--panel-secondary)]"
-                    } ${message.pending ? "opacity-70" : ""}`}
+                    } ${message.pending ? "opacity-80" : ""} ${message.meta.fleet && message.id === fleetMessageId ? "w-full" : ""}`}
                   >
                     {mine ? null : <p className="text-[12px] font-semibold text-[var(--muted)]">{name}</p>}
                     {message.body ? <p className="whitespace-pre-line [overflow-wrap:anywhere] text-[15px] leading-relaxed">{emphasised(message.body)}</p> : null}
                     {message.attachments.length ? (
                       <ul className="mt-2 grid gap-1.5">
                         {message.attachments.map((file) =>
-                          file.type.startsWith("image/") && file.url ? (
+                          file.type.startsWith("image/") && (localUrls.current.get(file.path) || file.url) ? (
                             <li key={file.path}>
-                              <a href={file.url} rel="noreferrer" target="_blank">
+                              <a href={file.url || localUrls.current.get(file.path)} rel="noreferrer" target="_blank">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img alt={file.name} className="max-h-40 rounded-xl object-cover" src={file.url} />
+                                <img alt={file.name} className="max-h-40 rounded-xl object-cover" src={localUrls.current.get(file.path) || file.url || ""} />
                               </a>
                             </li>
                           ) : (
@@ -513,6 +646,24 @@ export function ChatPanel({
                           )
                         )}
                       </ul>
+                    ) : null}
+                    {message.pending && message.attachments.length ? (
+                      // The photos show at once; this says they're on their way.
+                      <p className="mt-1.5 flex items-center gap-1.5 text-[12px] font-semibold text-white/85">
+                        <span aria-hidden="true" className="h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                        {progress || t("sending")}
+                      </p>
+                    ) : null}
+                    {message.meta.fleet && message.id === fleetMessageId && threadId ? (
+                      <ChatFleetCards
+                        message={message}
+                        onFleet={(fleet) => patchMeta(message.id, { fleet })}
+                        onMerge={(result) => merge(result)}
+                        organizationId={context.organizationId}
+                        photoFile={photoFile}
+                        photoUrl={photoUrl}
+                        threadId={threadId}
+                      />
                     ) : null}
                     {message.meta.proposal ? <ProposalCard busy={proposalBusy === message.id} error={proposalError[message.id]} message={message} onCancel={() => cancelProposal(message)} onConfirm={() => void confirmProposal(message)} onLink={linkClick} say={t} /> : null}
                     {message.meta.links?.length ? (
@@ -556,7 +707,7 @@ export function ChatPanel({
                 </li>
               );
             })}
-            {busy && !progress && !human ? <li className="animate-pulse text-[14px] text-[var(--muted)]">{t("thinking")}</li> : null}
+            {busy && !progress && !human ? <li className="animate-pulse text-[14px] text-[var(--muted)]">{messages[messages.length - 1]?.pending && messages[messages.length - 1].attachments.length ? t("reading") : t("thinking")}</li> : null}
           </ol>
         )}
         {/* Visitors can leave an email so we can tell them a reply is waiting (optional). Signed-in people have the
@@ -620,15 +771,15 @@ export function ChatPanel({
           </ul>
         ) : null}
         <div className="flex items-end gap-2">
-          <input accept={CHAT_ACCEPT} className="hidden" multiple onChange={(event) => addFiles(event.target.files)} ref={picker} tabIndex={-1} type="file" />
+          <input accept={CHAT_ACCEPT} className="hidden" multiple onChange={(event) => void addFiles(event.target.files)} ref={picker} tabIndex={-1} type="file" />
           <button aria-label={t("attach")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--panel-secondary)] text-[var(--primary)] disabled:opacity-50" disabled={busy || files.length >= CHAT_MAX_FILES} onClick={() => picker.current?.click()} title={t("attach")} type="button">
             <Paperclip size={19} />
           </button>
           <label className="min-w-0 flex-1">
             <span className="sr-only">{t("placeholder")}</span>
             <textarea
+              // Never disabled while sending: on a phone that closed the keyboard and jolted the panel.
               className="block max-h-32 min-h-11 w-full resize-none rounded-2xl border border-[var(--border)] bg-[var(--panel)] px-3.5 py-2.5 text-[16px] leading-snug"
-              disabled={busy}
               onChange={(event) => setText(event.target.value)}
               onKeyDown={(event) => {
                 // Enter sends on a computer; Shift+Enter (and the phone's return key) adds a line.
@@ -643,11 +794,11 @@ export function ChatPanel({
               value={text}
             />
           </label>
-          <button aria-label={t("send")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-white disabled:opacity-40" disabled={busy || (!text.trim() && !files.length)} type="submit">
+          <button aria-label={t("send")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-white disabled:opacity-40" disabled={busy || preparing > 0 || (!text.trim() && !files.length)} type="submit">
             <Send size={18} />
           </button>
         </div>
-        {progress ? <p className="mt-1.5 text-[13px] font-medium text-[var(--muted)]">{progress}</p> : null}
+        {preparing ? <p className="mt-1.5 text-[13px] font-medium text-[var(--muted)]">{t("preparing")}</p> : null}
         {error ? <p className="mt-1.5 text-[13px] font-semibold text-[var(--danger)]">{error}</p> : null}
       </form>
     </div>

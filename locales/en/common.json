@@ -1080,8 +1080,8 @@
     "setup_reminders": "Turn on automatic reminders",
     "setup_booking_page": "Share your booking page",
     "setupShared": "Link copied. Put it on your Facebook page, Google Maps and LINE.",
-    "quick_askAssistant": "Tell the assistant",
-    "quick_askAssistant_hint": "Add vehicles or current rentals by chat, voice or photos"
+    "quick_askAssistant": "Add by chat",
+    "quick_askAssistant_hint": "Vehicles or current rentals, by message or photo"
   },
   "todo": {
     "eyebrow": "To do",
@@ -4113,6 +4113,19 @@
     "ag_title": "Rental agreement",
     "ag_subtitle": "Ready to use: RoveHQ's agreement in English and Thai, filled in from each booking. Just add your own terms and numbers.",
     "ag_subtitleOwn": "New bookings use your own agreement. Anything you add below goes at the end of it.",
+    "ag_intro": "This is the agreement your customers sign. Edit the numbers and add your own terms below.",
+    "ag_introOwn": "Your customers sign your own agreement. Your own terms below are added at the end.",
+    "ag_ownAgreement": "Your own agreement",
+    "ag_languages": "In English and {language}",
+    "ag_languagesEn": "In English",
+    "ag_languagesTip": "Agreements are always in English and the language of your business location. A sample booking fills in the details.",
+    "ag_lang_th": "Thai",
+    "ag_lang_id": "Indonesian",
+    "ag_lang_vi": "Vietnamese",
+    "ag_lang_ms": "Malay",
+    "ag_lang_fil": "Filipino",
+    "ag_lang_lo": "Lao",
+    "ag_lang_km": "Khmer",
     "ag_ownTitle": "Your own terms",
     "ag_ownBody": "One plain sentence each, in any language. Added at the end, numbered.",
     "ag_term": "Term {number}",
@@ -4135,7 +4148,7 @@
     "ag_n_law": "Law that applies",
     "ag_sampleTitle": "What the customer sees",
     "ag_sampleBody": "A made-up booking. Your terms appear near the end.",
-    "ag_sampleOpen": "Open the sample full size",
+    "ag_sampleOpen": "Open full size",
     "sig_back": "Back",
     "sig_pageTitle": "Your signature",
     "sig_pageBody": "Customers sign on their phone. Add your signature once.",
@@ -4259,7 +4272,6 @@
     "pl_team": "{count, plural, one {# team account} other {# team accounts}}",
     "pl_teamUnlimited": "Unlimited team accounts",
     "pl_reads": "{count} ID scans a month",
-    "pl_lookups": "{count} purchase checks a month",
     "pl_export": "Accounting export",
     "pl_locations": "More than one location",
     "pl_whiteLabel": "Your logo in the app, no \"Powered by RoveHQ\", your own booking address (yourshop.rovehq.io)",
@@ -4942,7 +4954,10 @@
     "needMore": "Choose a make and model and enter the price to continue.",
     "ownRateAged": "Your {year} {model} rents for {amount} a month. Allowing for the age difference, this one would be about {adjusted}.",
     "b_serviceSplit": "{count, plural, one {# service} other {# services}} a year at about {each}, plus {reserve} for tyres and surprises.",
-    "limitReached": "You've used this month's {count} vehicle checks on your plan. Vehicles checked before still open straight away. More checks next month, or on a bigger plan.",
+    "checksLeft": "{count, plural, one {# purchase check} other {# purchase checks}} left this billing period",
+    "checksUsedUp": "No purchase checks left until {date}. Vehicles checked before still open.",
+    "checksPaidOnly": "New purchase checks are on paid plans. Vehicles checked before still open.",
+    "checksUpgrade": "Upgrade",
     "rentFromOwnAged": "From your {year} {model} at {amount} a month, allowing for the age difference."
   },
   "importer": {
@@ -6403,7 +6418,14 @@
     "paperPrinted": "(It says \"{text}\".)",
     "paperNeedDates": "Add the missing dates to save",
     "paperCheck": "Check each one against the document. Tap ✕ to remove one that's wrong.",
-    "paperDismiss": "Not right? Remove it"
+    "paperDismiss": "Not right? Remove it",
+    "edit": "Edit",
+    "fieldMake": "Make",
+    "fieldModel": "Model",
+    "fieldYear": "Year",
+    "fieldPlate": "Plate",
+    "fieldMonthly": "Per month",
+    "fieldDaily": "Per day"
   },
   "setupRequest": {
     "title": "We'll set it up for you",
@@ -6528,7 +6550,13 @@
     "v_contract_date": "Agreement date",
     "optionalTitle": "Prefer your own contract?",
     "optionalBody": "Optional. Only if you'd rather keep the agreement you already use: customers then sign yours instead of ours.",
-    "optionalOpen": "Upload my own contract"
+    "optionalOpen": "Upload my own contract",
+    "panelTitle": "Have your own contract?",
+    "panelBody": "Upload it and customers sign yours instead.",
+    "panelButton": "Upload your contract",
+    "activeTitle": "You're using your own agreement",
+    "activeShort": "New bookings use \"{title}\". Signed agreements stay as they were.",
+    "draftShort": "Your upload isn't in use yet."
   },
   "chat": {
     "launcher": "Chat with RoveHQ",
@@ -6604,6 +6632,9 @@
     "sConnectWhatsApp": "How do I connect WhatsApp?",
     "sConnectLine": "How do I connect LINE?",
     "sLeastMoney": "Which vehicle makes the least money?",
-    "sNextSixMonths": "What income can I expect over the next 6 months?"
+    "sNextSixMonths": "What income can I expect over the next 6 months?",
+    "sending": "Sending.",
+    "preparing": "Preparing photos.",
+    "reading": "Reading."
   }
 }

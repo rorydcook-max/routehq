@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { FileUp, Loader2 } from "lucide-react";
 import { chooseRoveAgreement, importContractFromChat, prepareContractImportUploads, startContractImport } from "@/app/actions/contract-import";
+import { InfoTip } from "@/components/info-tip";
 import { DOCX_TYPE, IMPORT_MAX_PAGES } from "@/lib/contract-import-template";
 import { uploadFormFiles } from "@/lib/direct-upload-client";
 import { SUPPORT_BUCKET } from "@/lib/support-shared";
@@ -22,9 +23,10 @@ function typed(file: File) {
 }
 
 /**
- * "Use your own agreement" on Settings › Rental agreement (owner only). Upload a PDF, a Word file or photos of the
- * pages; RoveHQ reads it and opens the review screen. When the owner came from the chat widget with a contract
- * already sent there (?file=...), reading starts straight away.
+ * The side panel of Settings › Rental agreement (owner only, Rory 3 Nov 2026): "Have your own contract? Upload it".
+ * Choosing the file starts the upload; RoveHQ reads it and opens the review screen. While the owner's own agreement
+ * is in use, the panel says so, with "Review or edit it" and "Go back to the RoveHQ agreement". When the owner came
+ * from the chat widget with a contract already sent there (?file=...), reading starts straight away.
  */
 export function ContractImportCard({
   active,
@@ -37,14 +39,12 @@ export function ContractImportCard({
 }) {
   const say = useTranslations("contractImport") as unknown as Say;
   const router = useRouter();
-  const [files, setFiles] = useState<File[]>([]);
   const [stage, setStage] = useState<"idle" | "uploading" | "reading">("idle");
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
   const [switching, startSwitch] = useTransition();
   const startedHandoff = useRef(false);
-  // Uploading is optional: while the RoveHQ agreement is in use, the form stays folded away until asked for.
-  const [open, setOpen] = useState(Boolean(active || draft || handoffFile));
+  const input = useRef<HTMLInputElement>(null);
 
   function openReview(id: string) {
     router.push(`/settings/contracts/import/${id}` as Route);
@@ -69,24 +69,15 @@ export function ContractImportCard({
       });
   }, [handoffFile]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function choose(list: FileList | null) {
+  /** Checks the picked files, then uploads them straight away (one tap: pick the file, RoveHQ reads it). */
+  async function choose(list: FileList | null) {
     setError("");
-    const picked = Array.from(list || []).map(typed);
-    const single = picked.find((file) => file.type === "application/pdf" || file.type === DOCX_TYPE);
-    if (single && picked.length > 1) {
-      setError(say("oneFile"));
-      return;
-    }
-    if (picked.length > IMPORT_MAX_PAGES) {
-      setError(say("tooMany", { count: IMPORT_MAX_PAGES }));
-      return;
-    }
-    setFiles(picked);
-  }
-
-  async function upload() {
+    const files = Array.from(list || []).map(typed);
+    if (input.current) input.current.value = "";
     if (!files.length) return;
-    setError("");
+    const single = files.find((file) => file.type === "application/pdf" || file.type === DOCX_TYPE);
+    if (single && files.length > 1) return setError(say("oneFile"));
+    if (files.length > IMPORT_MAX_PAGES) return setError(say("tooMany", { count: IMPORT_MAX_PAGES }));
     setStage("uploading");
     try {
       const form = new FormData();
@@ -106,27 +97,26 @@ export function ContractImportCard({
   }
 
   const busy = stage !== "idle";
-
-  if (!open) {
-    return (
-      <section className="card p-4">
-        <h2 className="card-title">{say("optionalTitle")}</h2>
-        <p className={`mt-1 ${soft}`}>{say("optionalBody")}</p>
-        <button className="secondary-action pressable mt-3 w-full sm:w-auto" onClick={() => setOpen(true)} type="button">
-          <FileUp size={18} />
-          {say("optionalOpen")}
-        </button>
-      </section>
-    );
-  }
+  const picker = (
+    <input
+      accept={`application/pdf,.pdf,${DOCX_TYPE},.docx,image/*`}
+      className="sr-only"
+      disabled={busy}
+      multiple
+      onChange={(event) => choose(event.target.files)}
+      ref={input}
+      tabIndex={-1}
+      type="file"
+    />
+  );
 
   return (
-    <section className="card p-4">
-      <h2 className="card-title">{active ? say("title") : say("optionalTitle")}</h2>
+    <section className="card p-4" aria-live="polite">
       {active ? (
         <>
-          <p className={`mt-1 ${soft}`}>{say("activeBody", { title: active.title || say("yourAgreement") })}</p>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <h2 className="card-title">{say("activeTitle")}</h2>
+          <p className={`mt-1 ${soft}`}>{say("activeShort", { title: active.title || say("yourAgreement") })}</p>
+          <div className="mt-3 flex flex-col gap-2">
             <button className="secondary-action pressable" onClick={() => openReview(active.id)} type="button">
               {say("review")}
             </button>
@@ -142,53 +132,52 @@ export function ContractImportCard({
               }
               type="button"
             >
+              {switching ? <Loader2 className="animate-spin" size={18} /> : null}
               {say("goBack")}
             </button>
           </div>
         </>
       ) : (
-        <p className={`mt-1 ${soft}`}>{say("body")}</p>
+        <>
+          <h2 className="card-title flex items-center gap-1.5">
+            {say("panelTitle")}
+            <InfoTip label={say("panelTitle")} text={say("hint", { count: IMPORT_MAX_PAGES })} />
+          </h2>
+          <p className={`mt-1 ${soft}`}>{say("panelBody")}</p>
+        </>
       )}
 
-      {draft ? (
+      {busy ? (
+        <p className="mt-3 flex items-center gap-2 font-semibold" role="status">
+          <Loader2 className="shrink-0 animate-spin" size={18} />
+          {stage === "uploading" ? progress || say("uploading") : say("reading")}
+        </p>
+      ) : (
+        <button
+          className={`${active ? "mt-2 w-full px-1 font-bold text-[var(--primary)]" : "primary-action mt-3 w-full"} pressable flex min-h-11 items-center justify-center gap-1.5`}
+          onClick={() => input.current?.click()}
+          type="button"
+        >
+          <FileUp size={18} />
+          {active ? say("uploadAnother") : say("panelButton")}
+        </button>
+      )}
+      {picker}
+
+      {draft && !busy ? (
         <p className={`mt-3 text-sm ${soft}`}>
-          {say("draftWaiting", { title: draft.title || say("yourAgreement") })}{" "}
+          {say("draftShort")}{" "}
           <button className="font-bold text-[var(--primary)] underline" onClick={() => openReview(draft.id)} type="button">
             {say("draftOpen")}
           </button>
         </p>
       ) : null}
 
-      <div className="mt-3 space-y-3">
-        <label className="block">
-          <span className="font-semibold text-[var(--foreground-secondary)]">{active ? say("uploadAnother") : say("chooseLabel")}</span>
-          <input
-            accept={`application/pdf,.pdf,${DOCX_TYPE},.docx,image/*`}
-            className="mt-1 block w-full"
-            disabled={busy}
-            multiple
-            onChange={(event) => choose(event.target.files)}
-            type="file"
-          />
-        </label>
-        <p className={`text-sm ${soft}`}>{say("hint", { count: IMPORT_MAX_PAGES })}</p>
-        {files.length ? <p className="text-sm">{files.map((file) => file.name).join(", ")}</p> : null}
-        {busy ? (
-          <p aria-live="polite" className="flex items-center gap-2 font-semibold" role="status">
-            <Loader2 className="animate-spin" size={18} />
-            {stage === "uploading" ? progress || say("uploading") : say("reading")}
-          </p>
-        ) : null}
-        {error ? (
-          <p className="font-semibold text-[var(--danger)]" role="alert">
-            {error}
-          </p>
-        ) : null}
-        <button className="primary-action pressable w-full sm:w-auto" disabled={busy || !files.length} onClick={upload} type="button">
-          <FileUp size={18} />
-          {say("upload")}
-        </button>
-      </div>
+      {error ? (
+        <p className="mt-3 font-semibold text-[var(--danger)]" role="alert">
+          {error}
+        </p>
+      ) : null}
     </section>
   );
 }

@@ -143,8 +143,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                   {t("import")}
                 </Link>
               ) : null}
-              {/* The Assistant button moved into the live chat (3 Nov 2026): "Add vehicles from photos" there opens the
-                  fleet assistant with the photos. The assistant page itself stays (/fleet/assistant). */}
+              {/* The Assistant button moved into the live chat (3 Nov 2026): "Add vehicles from photos" there reads the
+                  photos in the chat itself. /fleet/assistant now opens the chat. */}
               <Link aria-label={t("addVehicle")} className="band-action pressable inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-[var(--band-action)] font-bold text-[var(--band-action-ink)] sm:px-4" href="/fleet/new">
                 <Plus size={16} />
                 <span className="hidden sm:inline">{t("addVehicle")}</span>

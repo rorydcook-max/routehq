@@ -1137,8 +1137,8 @@
     "setup_reminders": "开启自动提醒",
     "setup_booking_page": "分享您的预订页面",
     "setupShared": "链接已复制。请将其发布到您的 Facebook 页面、Google 地图和 LINE 上。",
-    "quick_askAssistant": "告诉助手",
-    "quick_askAssistant_hint": "通过聊天、语音或照片添加车辆或当前租赁",
+    "quick_askAssistant": "通过聊天添加",
+    "quick_askAssistant_hint": "车辆或当前租约，发消息或照片即可",
     "askExample7": "如何收取押金？",
     "askExample8": "在哪里开启在线预订？",
     "askHowTo": "如何……？",
@@ -4199,7 +4199,7 @@
     "ag_n_law": "适用法律",
     "ag_sampleTitle": "客户看到的界面",
     "ag_sampleBody": "虚拟的预订示例。您的条款会显示在末尾附近。",
-    "ag_sampleOpen": "全屏打开示例",
+    "ag_sampleOpen": "查看大图",
     "sig_back": "返回",
     "sig_pageTitle": "您的签名",
     "sig_pageBody": "客户在手机上签署。您只需添加一次签名。",
@@ -4526,7 +4526,20 @@
     "extra_bodyTip": "在预订表单和预订页面上提供，计入首笔付款，并列在协议上。",
     "b_brandTip": "预订链接、签署页面、客户预订页面、收据和协议。",
     "pn_bodyTip": "只有网络内的商家才能互相看到。",
-    "ag_subtitleOwn": "新预订使用您自己的协议。您在下方添加的内容会放在协议末尾。"
+    "ag_subtitleOwn": "新预订使用您自己的协议。您在下方添加的内容会放在协议末尾。",
+    "ag_intro": "这是客户要签署的协议。可在下方修改数字并添加你自己的条款。",
+    "ag_introOwn": "客户将签署你自己的协议。你在下方填写的条款会添加在末尾。",
+    "ag_ownAgreement": "你自己的协议",
+    "ag_languages": "英语和{language}",
+    "ag_languagesEn": "英语",
+    "ag_languagesTip": "协议始终使用英语和你营业所在地的语言。示例预订会填入具体信息。",
+    "ag_lang_th": "泰语",
+    "ag_lang_id": "印尼语",
+    "ag_lang_vi": "越南语",
+    "ag_lang_ms": "马来语",
+    "ag_lang_fil": "菲律宾语",
+    "ag_lang_lo": "老挝语",
+    "ag_lang_km": "高棉语"
   },
   "accountPage": {
     "roleOwner": "所有者",
@@ -5009,7 +5022,11 @@
     "ownRateAged": "您的{year}年{model}每月租金为{amount}。考虑到车龄差异，这辆车大约为{adjusted}。",
     "b_serviceSplit": "每年{count, plural, one {#次保养} other {#次保养}}，每次约{each}，另加{reserve}用于轮胎和意外支出。",
     "limitReached": "您本月套餐内的{count}次车辆检测已用完。之前检测过的车辆仍可直接打开。下月可再次检测，或升级到更高套餐。",
-    "rentFromOwnAged": "参考您的 {year} 款 {model}，每月 {amount}，已考虑车龄差异。"
+    "rentFromOwnAged": "参考您的 {year} 款 {model}，每月 {amount}，已考虑车龄差异。",
+    "checksLeft": "本计费周期剩余 {count, plural, one {# 次购车评估} other {# 次购车评估}}",
+    "checksUsedUp": "{date} 前已无购车评估次数。之前评估过的车辆仍可打开。",
+    "checksPaidOnly": "新的购车评估需付费方案。之前评估过的车辆仍可打开。",
+    "checksUpgrade": "升级"
   },
   "importer": {
     "dt_vehicles": "车辆",
@@ -6426,7 +6443,14 @@
     "paperPrinted": "（上面写着“{text}”。）",
     "paperNeedDates": "请补全缺少的日期后保存",
     "paperCheck": "请逐项与文件核对。点击 ✕ 删除错误的项目。",
-    "paperDismiss": "不对？删除"
+    "paperDismiss": "不对？删除",
+    "edit": "编辑",
+    "fieldMake": "品牌",
+    "fieldModel": "型号",
+    "fieldYear": "年份",
+    "fieldPlate": "车牌",
+    "fieldMonthly": "每月",
+    "fieldDaily": "每天"
   },
   "setupRequest": {
     "title": "我们来帮您设置",
@@ -6551,7 +6575,13 @@
     "v_vehicle_make_model": "车辆品牌和型号",
     "optionalTitle": "更想用自己的合同？",
     "optionalBody": "可选。只有在您想继续使用现有合同时才需要：客户将签署您的合同，而不是我们的。",
-    "optionalOpen": "上传我自己的合同"
+    "optionalOpen": "上传我自己的合同",
+    "panelTitle": "有自己的合同？",
+    "panelBody": "上传后，客户将改签你的合同。",
+    "panelButton": "上传你的合同",
+    "activeTitle": "你正在使用自己的协议",
+    "activeShort": "新预订将使用“{title}”。已签署的协议保持不变。",
+    "draftShort": "你上传的文件尚未启用。"
   },
   "chat": {
     "launcher": "与 RoveHQ 聊天",
@@ -6629,6 +6659,9 @@
     "sConnectWhatsApp": "怎么连接 WhatsApp？",
     "sConnectLine": "怎么连接 LINE？",
     "sLeastMoney": "哪辆车赚得最少？",
-    "sNextSixMonths": "未来 6 个月预计收入多少？"
+    "sNextSixMonths": "未来 6 个月预计收入多少？",
+    "sending": "正在发送…",
+    "preparing": "正在准备照片…",
+    "reading": "正在读取…"
   }
 }

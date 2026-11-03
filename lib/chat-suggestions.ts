@@ -41,8 +41,11 @@ function pick(path: string, site: boolean): ChatChip[] {
   if (site) return [ask("sCost"), ask("sImportSheet"), ask("sCustomersSign")];
 
   if (path === "/" || path === "/tasks") return [ask("sOwesMe", "records"), ask("sDueWeek", "records"), ...HOW_TO.slice(0, 2)];
+  // "Add vehicles from photos" opens the file picker; the photos are read in the chat itself (the fleet assistant).
   if (path === "/fleet") return [act("sVehiclePhotos", "vehicle"), act("sRenewPolicy", "vehicle"), act("sImportSpreadsheet", "spreadsheet", true), ask("sAddVehicleHow")];
+  if (path === "/fleet/new" || path === "/fleet/import") return [act("sVehiclePhotos", "vehicle"), act("sImportSpreadsheet", "spreadsheet", true), ask("sAddVehicleHow")];
   if (/^\/fleet\/[^/]+$/.test(path) && !/^\/fleet\/(new|import|assistant)$/.test(path)) return [ask("sTaxRunsOut", "records"), ask("sRecordService", "records"), act("sRenewPolicy", "vehicle"), ask("sArchiveHow")];
+  if (path.startsWith("/fleet")) return [act("sVehiclePhotos", "vehicle"), ask("sAddVehicleHow")];
   if (/^\/bookings\/[^/]+$/.test(path) && path !== "/bookings/new") return [ask("sExtendRental"), ask("sDepositBack"), act("sDamagePhotos", "damage")];
   if (path.startsWith("/bookings")) return [ask("sNewBookingHow"), ask("sBookingLinkHow"), ask("sDueWeek", "records")];
   if (path.startsWith("/transactions")) return [act("sRecordReceipt", "receipt"), ask("sOwesMe", "records"), ask("sRecordCostHow")];

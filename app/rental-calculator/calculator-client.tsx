@@ -5,10 +5,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { fetchVehicleMakesForCategory, fetchVehicleModels, fetchVehicleTrims } from "@/lib/vehicle-catalog-db";
 import type { VehicleMake, VehicleModel, VehicleTrim } from "@/lib/vehicle-catalog-db";
 import { Card, Fold } from "@/components/ui";
-import { longDate, numberLocale } from "@/lib/i18n/dates";
+import { longDate, numberLocale, shortDate } from "@/lib/i18n/dates";
 import { buildAssumptions, evaluate, flatResaleCurve, yearlyLossPct } from "@/lib/vehicle-investment";
 import { rentForAge } from "@/lib/rent-age";
 import type { Assumptions, Outcome, RentStyle, Research, Verdict } from "@/lib/vehicle-investment";
+import type { ChecksLeft } from "@/lib/purchase-checks";
+import Link from "next/link";
+
+/** Purchase checks are a quiet cap (Rory, 3 Nov 2026): nothing is said about them until this many or fewer are left. */
+const SHOW_CHECKS_LEFT_AT = 5;
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -182,12 +187,14 @@ function priceForReturn(a: Assumptions, targetPct: number) {
 }
 
 export function CalculatorClient({
+  checks: initialChecks,
   currency,
   defaultStyle,
   defaultCategory,
   fleetVehicles,
   initialSavedCalcs
 }: {
+  checks: ChecksLeft;
   currency: string;
   defaultStyle: RentStyle;
   defaultCategory: string;
@@ -222,8 +229,8 @@ export function CalculatorClient({
   const [trim, setTrim] = useState("");
   /** Tapped "Work it out" before filling enough in: the hint under the button turns red instead of the button just not working. */
   const [triedEarly, setTriedEarly] = useState(false);
-  /** The plan's new look-ups for this month are used up (the number allowed), or null. */
-  const [limitHit, setLimitHit] = useState<number | null>(null);
+  /** Purchase checks left this billing period (null: no limit). Updated with every look-up. */
+  const [checks, setChecks] = useState<ChecksLeft>(initialChecks);
   const [price, setPrice] = useState(0);
   const [mileage, setMileage] = useState(0);
   const [style, setStyle] = useState<RentStyle>(defaultStyle);
@@ -350,12 +357,11 @@ export function CalculatorClient({
         body: JSON.stringify({ ...next, price, mileage, locale })
       });
       const reply = await response.json();
+      if (reply.checks !== undefined) setChecks(reply.checks || null);
       if (reply.limited) {
-        setLimitHit(Number(reply.limit) || 0);
         setBusy(false);
         return;
       }
-      setLimitHit(null);
       found = reply.research || null;
       pages = reply.sources || [];
       where = reply.place || "";
@@ -637,7 +643,26 @@ export function CalculatorClient({
         </button>
         {!ready && !busy ? <p className={`mt-2 text-center text-sm font-semibold ${triedEarly ? "text-[var(--danger)]" : "text-[var(--muted)]"}`}>{t("needMore")}</p> : null}
         {busy ? <ResearchProgress elapsed={elapsed} say={say} /> : null}
-        {limitHit !== null && !busy ? <p className="mt-3 rounded-xl bg-[var(--panel-secondary)] p-3 text-center text-sm font-semibold text-[var(--foreground)]">{say("limitReached", { count: limitHit })}</p> : null}
+        {/* Purchase checks: a quiet cap. Nothing shows until a few are left; vehicles checked before always open free. */}
+        {checks && !busy ? (
+          checks.limit === 0 ? (
+            <p className="mt-3 text-center text-sm text-[var(--muted)]">
+              {t("checksPaidOnly")}{" "}
+              <Link className="font-semibold text-[var(--primary)] underline" href="/settings/billing">
+                {t("checksUpgrade")}
+              </Link>
+            </p>
+          ) : checks.left === 0 ? (
+            <p className="mt-3 rounded-xl bg-[var(--panel-secondary)] p-3 text-center text-sm font-semibold text-[var(--foreground)]">
+              {say("checksUsedUp", { date: shortDate(checks.resetsOn, locale) })}{" "}
+              <Link className="text-[var(--primary)] underline" href="/settings/billing">
+                {t("checksUpgrade")}
+              </Link>
+            </p>
+          ) : checks.left <= SHOW_CHECKS_LEFT_AT ? (
+            <p className="mt-2 text-center text-xs text-[var(--muted)]">{say("checksLeft", { count: checks.left })}</p>
+          ) : null
+        ) : null}
       </Card>
 
       {assumptions && outcome && best && subject ? (

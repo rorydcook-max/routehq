@@ -7,10 +7,8 @@ appPath: "/rental-calculator"
 related: ["fleet-value", "vehicle-report", "vehicle-loans", "reports"]
 video: "help-buying-a-vehicle-calculator.mp4"
 poster: "help-buying-a-vehicle-calculator.jpg"
-updated: 2026-11-02
+updated: 2026-11-03
 faq:
-  - q: "How many checks do I get?"
-    a: "Each month: 2 on Free, 10 on Starter, 50 on Pro and 200 on Business. During the free trial you get the allowance of the plan you're on (Pro unless you've picked another). A vehicle already looked up for your area (same model, year and version) opens straight away and doesn't use a check."
   - q: "The rent looks wrong for my area. Can I change it?"
     a: "Yes. Type your own price in the rent box under How it rents, or change any figure under The figures used. The result updates as you type."
 ---
@@ -58,9 +56,6 @@ A coloured line says whether figures were checked live today or are rough estima
 These are estimates. Check the vehicle and the numbers before you buy.
 
 ## Common questions
-
-**How many checks do I get?**
-Each month: 2 on Free, 10 on Starter, 50 on Pro and 200 on Business. During the free trial you get the allowance of the plan you're on (Pro unless you've picked another). A vehicle already looked up for your area (same model, year and version) opens straight away and doesn't use a check.
 
 **The rent looks wrong for my area. Can I change it?**
 Yes. Type your own price in the rent box under **How it rents**, or change any figure under **The figures used**. The result updates as you type.

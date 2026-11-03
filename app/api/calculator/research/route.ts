@@ -6,9 +6,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { platformRates } from "@/lib/platform-rates";
 import { businessPlace, languageName, researchAvailable, researchJson } from "@/lib/ai-research";
 import { cleanQuotes, rateRanges } from "@/lib/rate-range";
-import { viewerIsPlatformAdmin } from "@/lib/admin";
-import { effectiveLimits } from "@/lib/plans";
-import { businessToday } from "@/lib/business-time";
+import { checksLeft, takeCheck, type ChecksLeft } from "@/lib/purchase-checks";
 
 export const maxDuration = 120;
 
@@ -40,27 +38,6 @@ function settle(data: Record<string, any>, category = "car") {
     if (range && range.count >= 4) Object.assign(out, { [`rent_${period}_low`]: range.low, [`rent_${period}_typical`]: range.average, [`rent_${period}_high`]: range.high });
   }
   return out;
-}
-
-/**
- * The plan's monthly allowance of new look-ups (Rory, 2 Nov 2026: each one costs real money, so a business can't run
- * up the bill). Saved look-ups are free and never count. Platform admins aren't limited. Counted in
- * organizations.settings.calculator_lookups as { month: "YYYY-MM", count }.
- */
-async function takeLookup(store: any, organization: { id: string; subscription_tier?: string | null }) {
-  if (!store) return { ok: true, limit: 0 };
-  if (await viewerIsPlatformAdmin().catch(() => false)) return { ok: true, limit: 0 };
-  const { data: row } = await store.from("organizations").select("settings, custom_limits").eq("id", organization.id).maybeSingle();
-  const limit = effectiveLimits({ subscription_tier: organization.subscription_tier, custom_limits: row?.custom_limits }).comparisonLookups;
-  const month = businessToday().slice(0, 7);
-  const settings = (row?.settings || {}) as Record<string, any>;
-  const used = settings.calculator_lookups?.month === month ? Number(settings.calculator_lookups.count) || 0 : 0;
-  if (used >= limit) return { ok: false, limit };
-  await store
-    .from("organizations")
-    .update({ settings: { ...settings, calculator_lookups: { month, count: used + 1 } } })
-    .eq("id", organization.id);
-  return { ok: true, limit };
 }
 
 /** What a saved look-up is about, from its key, for the quick-check question. */
@@ -176,6 +153,8 @@ export async function POST(request: NextRequest) {
   } catch {
     store = null;
   }
+  /** Set once a purchase check is used; otherwise read when replying. */
+  let checks: ChecksLeft | undefined;
   const keep = async (research: Record<string, any>, pages: unknown[]) => {
     if (store && Number(research.rent_month_typical) > 0 && !(research.confidence === "low" && pages.length === 0)) {
       await store.from("market_research_cache").upsert({ cache_key: cacheKey, payload: research, sources: pages, created_at: new Date().toISOString() });
@@ -202,7 +181,9 @@ export async function POST(request: NextRequest) {
     // "live": the figures were checked against real pages on the web. Without it they are the AI's general knowledge,
     // and the result says so plainly at the top.
     const live = Array.isArray(pages) && pages.length > 0;
-    return NextResponse.json({ research: merged, sources: pages, place: area, atPrice: Number(research.at_price) || price, platform, how, live, checkedAt: checkedAt || new Date().toISOString() });
+    // Purchase checks left this billing period; the page only mentions them when few are left.
+    if (checks === undefined) checks = await checksLeft(store, organization.id).catch(() => null);
+    return NextResponse.json({ research: merged, sources: pages, place: area, atPrice: Number(research.at_price) || price, platform, how, live, checks, checkedAt: checkedAt || new Date().toISOString() });
   };
 
   /** A quick look: the earlier figures are checked against the live web rather than found from nothing. */
@@ -248,9 +229,10 @@ ${shape}`;
       // Carry on and look it up.
     }
 
-    // Anything past here costs a look-up from the plan's monthly allowance.
-    const allowance = await takeLookup(store, organization).catch(() => ({ ok: true, limit: 0 }));
-    if (!allowance.ok) return NextResponse.json({ research: null, sources: [], limited: true, limit: allowance.limit });
+    // Anything past here uses a purchase check from the billing period's allowance (saved look-ups above stay free).
+    const allowance = await takeCheck(store, organization.id).catch(() => ({ ok: true, checks: null as ChecksLeft }));
+    checks = allowance.checks;
+    if (!allowance.ok) return NextResponse.json({ research: null, sources: [], limited: true, checks });
 
     // 2. The same model was looked up for another year, trim or mileage: check those figures rather than starting over.
     try {
@@ -298,6 +280,6 @@ ${shape}`;
     return respond(research, pages, "fresh");
   } catch (error) {
     console.error("calculator research failed", error);
-    return NextResponse.json({ research: null, sources: [], failed: true });
+    return NextResponse.json({ research: null, sources: [], failed: true, checks: checks ?? null });
   }
 }

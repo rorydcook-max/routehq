@@ -5,7 +5,7 @@ category: account
 order: 3
 appPath: "/settings/billing"
 related: ["business-settings", "invite-your-team", "get-help"]
-updated: 2026-11-02
+updated: 2026-11-03
 faq:
   - q: "What happens if I have more vehicles than my plan covers?"
     a: "Nothing is blocked. RoveHQ asks you to move up to a plan that fits within 14 days."
@@ -26,7 +26,7 @@ You pay by fleet size. Cars and motorbikes are counted separately (scooters, e-b
 | **Pro** | Up to 15 cars and 25 motorbikes | Unlimited |
 | **Business** | Any size; extra cars and motorbikes are charged each | Unlimited |
 
-Everything that runs a rental is in every plan, even Free. Bigger plans add more ID scans and purchase checks, accounting export (from Starter), more than one location and your logo in the app (from Pro), and your booking page on your own web address (Business). Prices are on the page in your currency. Switch to **Yearly** to get a month free.
+Everything that runs a rental is in every plan, even Free. Bigger plans add more ID scans, accounting export (from Starter), more than one location and your logo in the app (from Pro), and your booking page on your own web address (Business). Prices are on the page in your currency. Switch to **Yearly** to get a month free.
 
 The plan that fits your fleet is marked **Fits your fleet**.
 

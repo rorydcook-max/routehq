@@ -5,8 +5,9 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { Route } from "next";
 import { useEffect } from "react";
+import { openChat } from "@/lib/chat-suggestions";
 
-type Action = { key: string; href: Route; icon: typeof Car };
+type Action = { key: string; href: Route; icon: typeof Car; /** Opens the live chat instead of a page. */ chat?: boolean };
 
 // The four things an owner does most days come first, in the order a rental happens.
 const everyday: Action[] = [
@@ -21,8 +22,8 @@ const everyday: Action[] = [
 const lessOften: Action[] = [
   { key: "addCustomer", href: "/customers/new" as Route, icon: UserPlus },
   { key: "addVehicle", href: "/fleet/new", icon: Car },
-  // Vehicles or who's renting now, by typing, talking or photos (Rory, 2 Nov 2026).
-  { key: "askAssistant", href: "/fleet/assistant" as Route, icon: Sparkles },
+  // Vehicles or who's renting now, by typing or photos (Rory, 2 Nov 2026): the live chat does it now (3 Nov 2026).
+  { key: "askAssistant", href: "/fleet" as Route, icon: Sparkles, chat: true },
   { key: "importVehicles", href: "/fleet/import", icon: UploadCloud }
 ];
 
@@ -45,13 +46,9 @@ export function FastActionSheet({ open, onClose, canImport = false }: { open: bo
 
   const row = (action: Action) => {
     const Icon = action.icon;
-    return (
-      <Link
-        className="sheet-row flex min-h-[60px] items-center gap-3 px-3.5 py-2.5 text-left transition hover:bg-[var(--primary-light)]"
-        href={action.href}
-        key={action.key}
-        onClick={onClose}
-      >
+    const className = "sheet-row flex min-h-[60px] w-full items-center gap-3 px-3.5 py-2.5 text-left transition hover:bg-[var(--primary-light)]";
+    const inside = (
+      <>
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
           <Icon size={20} />
         </span>
@@ -59,6 +56,26 @@ export function FastActionSheet({ open, onClose, canImport = false }: { open: bo
           <span className="block font-semibold text-[var(--foreground)]">{t(`quick_${action.key}`)}</span>
           <span className="block text-sm text-[var(--muted)]">{t(`quick_${action.key}_hint`)}</span>
         </span>
+      </>
+    );
+    if (action.chat) {
+      return (
+        <button
+          className={className}
+          key={action.key}
+          onClick={() => {
+            onClose();
+            openChat();
+          }}
+          type="button"
+        >
+          {inside}
+        </button>
+      );
+    }
+    return (
+      <Link className={className} href={action.href} key={action.key} onClick={onClose}>
+        {inside}
       </Link>
     );
   };

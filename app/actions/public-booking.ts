@@ -11,6 +11,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { retakeHold } from "@/lib/booking-holds";
 import { organizationSignatureReference } from "@/lib/branding-assets";
+import { localizeAgreementTemplate } from "@/lib/agreement-localize";
 import { buildContractVariables, renderContractTemplate } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { htmlToPdf } from "@/lib/html-to-pdf";
@@ -1068,7 +1069,7 @@ export async function completePublicBooking(formData: FormData) {
     rawContractVariables.owner_signature_url = ownerSignatureUrl;
   }
   const contractVariables = await embedLogoInContractVariables(supabase, rawContractVariables);
-  const bodyHtml = renderContractTemplate(contractTemplate, contractVariables);
+  const bodyHtml = renderContractTemplate(localizeAgreementTemplate(contractTemplate, String(contractVariables.agreement_language || "")), contractVariables);
   const ownerSignedAt = signedAt;
   const ownerSignedName = String(organizationSettings.owner_name || organization?.name || "Operator");
   const signedHtml = bodyHtml;

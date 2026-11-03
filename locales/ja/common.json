@@ -1097,8 +1097,8 @@
     "setup_reminders": "自動リマインドをオンにする",
     "setup_booking_page": "予約ページをシェアする",
     "setupShared": "リンクをコピーしました。Facebookページ、Googleマップ、LINEに貼り付けてください。",
-    "quick_askAssistant": "アシスタントに頼む",
-    "quick_askAssistant_hint": "チャット、音声、写真で車両や貸出情報を追加",
+    "quick_askAssistant": "チャットで追加",
+    "quick_askAssistant_hint": "車両や現在のレンタルを、メッセージか写真で",
     "askExample7": "デポジットを受け取るには？",
     "askExample8": "オンライン予約はどこで有効にできますか？",
     "askHowTo": "…するには？",
@@ -4160,7 +4160,7 @@
     "ag_n_law": "準拠法",
     "ag_sampleTitle": "顧客への表示",
     "ag_sampleBody": "架空の予約です。あなたの規約は末尾近くに表示されます。",
-    "ag_sampleOpen": "サンプルを全画面で開く",
+    "ag_sampleOpen": "フルサイズで開く",
     "sig_back": "戻る",
     "sig_pageTitle": "あなたの署名",
     "sig_pageBody": "お客様はスマホで署名します。あなたの署名は一度追加するだけです。",
@@ -4486,7 +4486,20 @@
     "extra_bodyTip": "予約フォームと予約ページに表示され、初回の支払いに加算され、契約書に記載されます。",
     "b_brandTip": "予約リンク、署名ページ、お客様の予約ページ、領収書、契約書。",
     "pn_bodyTip": "ネットワーク内の事業者同士だけが互いを見られます。",
-    "ag_subtitleOwn": "新しい予約には独自の契約書が使われます。下に追加した内容は契約書の末尾に入ります。"
+    "ag_subtitleOwn": "新しい予約には独自の契約書が使われます。下に追加した内容は契約書の末尾に入ります。",
+    "ag_intro": "お客様が署名する契約書です。数字を編集し、下に独自の条件を追加できます。",
+    "ag_introOwn": "お客様は独自の契約書に署名します。下の独自の条件は末尾に追加されます。",
+    "ag_ownAgreement": "独自の契約書",
+    "ag_languages": "英語と{language}",
+    "ag_languagesEn": "英語",
+    "ag_languagesTip": "契約書は常に英語と、事業所がある国の言語で作成されます。詳細はサンプル予約で入力されます。",
+    "ag_lang_th": "タイ語",
+    "ag_lang_id": "インドネシア語",
+    "ag_lang_vi": "ベトナム語",
+    "ag_lang_ms": "マレー語",
+    "ag_lang_fil": "フィリピン語",
+    "ag_lang_lo": "ラオ語",
+    "ag_lang_km": "クメール語"
   },
   "accountPage": {
     "roleOwner": "オーナー",
@@ -4969,7 +4982,11 @@
     "ownRateAged": "あなたの{year}年式{model}は、月額{amount}で貸し出せます。年式の違いを考慮すると、こちらは約{adjusted}になります。",
     "b_serviceSplit": "年{count, plural, other {#回}}の点検（1回約{each}）、さらにタイヤや予期せぬ出費として{reserve}かかります。",
     "limitReached": "今月のプランに含まれる車両チェック（{count}回）を使い切りました。過去にチェックした車両は引き続きすぐに確認できます。来月またご利用いただくか、上位プランをご検討ください。",
-    "rentFromOwnAged": "お持ちの {year} 年式 {model}（月額 {amount}）を基に、年式の差を考慮しています。"
+    "rentFromOwnAged": "お持ちの {year} 年式 {model}（月額 {amount}）を基に、年式の差を考慮しています。",
+    "checksLeft": "今回の請求期間の残り：{count, plural, one {購入チェック#回} other {購入チェック#回}}",
+    "checksUsedUp": "{date}まで購入チェックは残っていません。以前チェックした車両は引き続き開けます。",
+    "checksPaidOnly": "新しい購入チェックは有料プランでご利用いただけます。以前チェックした車両は引き続き開けます。",
+    "checksUpgrade": "アップグレード"
   },
   "importer": {
     "dt_vehicles": "車両",
@@ -6426,7 +6443,14 @@
     "paperPrinted": "（「{text}」と記載されています。）",
     "paperNeedDates": "保存するには、不足している日付を入力してください",
     "paperCheck": "書類と1件ずつ照合してください。間違っているものは ✕ をタップして削除します。",
-    "paperDismiss": "違いますか？削除する"
+    "paperDismiss": "違いますか？削除する",
+    "edit": "編集",
+    "fieldMake": "メーカー",
+    "fieldModel": "車種",
+    "fieldYear": "年式",
+    "fieldPlate": "ナンバー",
+    "fieldMonthly": "月額",
+    "fieldDaily": "日額"
   },
   "setupRequest": {
     "title": "こちらで設定代行します",
@@ -6551,7 +6575,13 @@
     "v_vehicle_make_model": "車両のメーカーと車種",
     "optionalTitle": "自社の契約書を使いたい場合",
     "optionalBody": "任意です。今お使いの契約書を続けたい場合のみ：お客様は当社のものではなく貴社の契約書に署名します。",
-    "optionalOpen": "自社の契約書をアップロード"
+    "optionalOpen": "自社の契約書をアップロード",
+    "panelTitle": "独自の契約書をお持ちですか？",
+    "panelBody": "アップロードすると、お客様はその契約書に署名します。",
+    "panelButton": "契約書をアップロード",
+    "activeTitle": "独自の契約書を使用中",
+    "activeShort": "新しい予約では「{title}」を使用します。署名済みの契約書はそのままです。",
+    "draftShort": "アップロードした契約書はまだ使用されていません。"
   },
   "chat": {
     "launcher": "RoveHQ とチャット",
@@ -6629,6 +6659,9 @@
     "sConnectWhatsApp": "WhatsApp を接続するには？",
     "sConnectLine": "LINE を接続するには？",
     "sLeastMoney": "一番稼げていない車両は？",
-    "sNextSixMonths": "今後 6 か月の収入見込みは？"
+    "sNextSixMonths": "今後 6 か月の収入見込みは？",
+    "sending": "送信中。",
+    "preparing": "写真を準備中。",
+    "reading": "読み取り中。"
   }
 }

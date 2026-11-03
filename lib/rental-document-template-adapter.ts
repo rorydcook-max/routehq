@@ -1,4 +1,5 @@
 import { buildBusinessDocumentSnapshot, type BusinessDocumentAssetReference, type BusinessDocumentSnapshot } from "@/lib/business-document-snapshot";
+import { localizeAgreementTemplate } from "@/lib/agreement-localize";
 import { buildContractVariables, renderContractTemplate } from "@/lib/contract-rendering";
 import { embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { calculateRentalDocumentContentHash, stableJsonStringify } from "@/lib/rental-documents";
@@ -137,7 +138,8 @@ export async function renderRentalAgreementDraftTemplate({
   variables.included_services = Array.isArray(bookingLink?.included_items) ? bookingLink.included_items.join(", ") : "";
 
   const [template] = await Promise.all([templateLoad, embedLogoInContractVariables(supabase, variables)]);
-  const templateHtml = String(template?.content_html || template?.body || "");
+  // English plus the business location's language (Thai for Thailand, as stored).
+  const templateHtml = localizeAgreementTemplate(String(template?.content_html || template?.body || ""), String(variables.agreement_language || ""));
   if (!templateHtml) {
     throw new Error("Contract template has no HTML content.");
   }

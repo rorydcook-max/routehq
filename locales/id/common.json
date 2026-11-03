@@ -1137,8 +1137,8 @@
     "setup_reminders": "Aktifkan pengingat otomatis",
     "setup_booking_page": "Bagikan halaman pemesanan Anda",
     "setupShared": "Tautan disalin. Tempel di halaman Facebook, Google Maps, dan LINE Anda.",
-    "quick_askAssistant": "Tanya Asisten",
-    "quick_askAssistant_hint": "Tambah kendaraan atau sewa saat ini via chat, suara, atau foto",
+    "quick_askAssistant": "Tambah lewat chat",
+    "quick_askAssistant_hint": "Kendaraan atau sewa berjalan, lewat pesan atau foto",
     "askExample7": "Bagaimana cara mengambil deposit?",
     "askExample8": "Di mana saya mengaktifkan pemesanan online?",
     "askHowTo": "Bagaimana cara…?",
@@ -4200,7 +4200,7 @@
     "ag_n_law": "Hukum yang berlaku",
     "ag_sampleTitle": "Yang dilihat pelanggan",
     "ag_sampleBody": "Contoh booking fiktif. Ketentuan Anda muncul di dekat akhir.",
-    "ag_sampleOpen": "Buka contoh dalam ukuran penuh",
+    "ag_sampleOpen": "Buka ukuran penuh",
     "sig_back": "Kembali",
     "sig_pageTitle": "Tanda tangan Anda",
     "sig_pageBody": "Pelanggan tanda tangan di HP. Tambahkan tanda tangan Anda sekali saja.",
@@ -4526,7 +4526,20 @@
     "extra_bodyTip": "Ditawarkan di formulir dan halaman booking, ditambahkan ke pembayaran pertama dan tercantum di perjanjian.",
     "b_brandTip": "Link booking, halaman tanda tangan, halaman booking pelanggan, kuitansi dan perjanjian.",
     "pn_bodyTip": "Hanya bisnis di dalam jaringan yang bisa saling melihat.",
-    "ag_subtitleOwn": "Pemesanan baru memakai perjanjian Anda sendiri. Apa pun yang Anda tambahkan di bawah akan diletakkan di akhir."
+    "ag_subtitleOwn": "Pemesanan baru memakai perjanjian Anda sendiri. Apa pun yang Anda tambahkan di bawah akan diletakkan di akhir.",
+    "ag_intro": "Ini perjanjian yang ditandatangani pelanggan Anda. Ubah angkanya dan tambahkan ketentuan Anda sendiri di bawah.",
+    "ag_introOwn": "Pelanggan Anda menandatangani perjanjian Anda sendiri. Ketentuan Anda di bawah ditambahkan di bagian akhir.",
+    "ag_ownAgreement": "Perjanjian Anda sendiri",
+    "ag_languages": "Dalam bahasa Inggris dan {language}",
+    "ag_languagesEn": "Dalam bahasa Inggris",
+    "ag_languagesTip": "Perjanjian selalu dalam bahasa Inggris dan bahasa lokasi usaha Anda. Contoh pemesanan akan mengisi detailnya.",
+    "ag_lang_th": "Bahasa Thai",
+    "ag_lang_id": "Bahasa Indonesia",
+    "ag_lang_vi": "Bahasa Vietnam",
+    "ag_lang_ms": "Bahasa Melayu",
+    "ag_lang_fil": "Bahasa Filipino",
+    "ag_lang_lo": "Bahasa Laos",
+    "ag_lang_km": "Bahasa Khmer"
   },
   "accountPage": {
     "roleOwner": "Pemilik",
@@ -5009,7 +5022,11 @@
     "ownRateAged": "{year} {model} Anda disewakan seharga {amount} sebulan. Mempertimbangkan selisih usianya, yang ini harganya sekitar {adjusted}.",
     "b_serviceSplit": "{count, plural, one {# servis} other {# servis}} setahun dengan biaya sekitar {each}, ditambah {reserve} untuk ban dan biaya tak terduga.",
     "limitReached": "Anda telah menggunakan {count} pengecekan kendaraan bulan ini sesuai paket Anda. Kendaraan yang sudah pernah dicek tetap bisa langsung dibuka. Pengecekan berikutnya tersedia bulan depan, atau dengan beralih ke paket yang lebih besar.",
-    "rentFromOwnAged": "Dari {model} {year} Anda seharga {amount} per bulan, sudah memperhitungkan selisih usia kendaraan."
+    "rentFromOwnAged": "Dari {model} {year} Anda seharga {amount} per bulan, sudah memperhitungkan selisih usia kendaraan.",
+    "checksLeft": "Sisa {count, plural, one {# cek pembelian} other {# cek pembelian}} di periode tagihan ini",
+    "checksUsedUp": "Cek pembelian habis sampai {date}. Kendaraan yang sudah dicek tetap bisa dibuka.",
+    "checksPaidOnly": "Cek pembelian baru tersedia di paket berbayar. Kendaraan yang sudah dicek tetap bisa dibuka.",
+    "checksUpgrade": "Upgrade"
   },
   "importer": {
     "dt_vehicles": "Kendaraan",
@@ -6426,7 +6443,14 @@
     "paperPrinted": "(Tertulis \"{text}\".)",
     "paperNeedDates": "Tambahkan tanggal yang kurang untuk menyimpan",
     "paperCheck": "Cocokkan masing-masing dengan dokumen. Ketuk ✕ untuk menghapus yang salah.",
-    "paperDismiss": "Tidak sesuai? Hapus"
+    "paperDismiss": "Tidak sesuai? Hapus",
+    "edit": "Ubah",
+    "fieldMake": "Merek",
+    "fieldModel": "Model",
+    "fieldYear": "Tahun",
+    "fieldPlate": "Pelat nomor",
+    "fieldMonthly": "Per bulan",
+    "fieldDaily": "Per hari"
   },
   "setupRequest": {
     "title": "Kami yang akan aturkan untuk Anda",
@@ -6551,7 +6575,13 @@
     "v_vehicle_make_model": "Merek dan model kendaraan",
     "optionalTitle": "Lebih suka kontrak sendiri?",
     "optionalBody": "Opsional. Hanya jika Anda ingin tetap memakai perjanjian yang sudah Anda gunakan: pelanggan akan menandatangani milik Anda, bukan milik kami.",
-    "optionalOpen": "Unggah kontrak saya sendiri"
+    "optionalOpen": "Unggah kontrak saya sendiri",
+    "panelTitle": "Punya kontrak sendiri?",
+    "panelBody": "Unggah, lalu pelanggan akan menandatangani kontrak Anda.",
+    "panelButton": "Unggah kontrak Anda",
+    "activeTitle": "Anda memakai perjanjian Anda sendiri",
+    "activeShort": "Pemesanan baru memakai \"{title}\". Perjanjian yang sudah ditandatangani tetap seperti semula.",
+    "draftShort": "Unggahan Anda belum dipakai."
   },
   "chat": {
     "launcher": "Chat dengan RoveHQ",
@@ -6629,6 +6659,9 @@
     "sConnectWhatsApp": "Bagaimana menghubungkan WhatsApp?",
     "sConnectLine": "Bagaimana menghubungkan LINE?",
     "sLeastMoney": "Kendaraan mana yang paling sedikit menghasilkan?",
-    "sNextSixMonths": "Berapa pendapatan saya 6 bulan ke depan?"
+    "sNextSixMonths": "Berapa pendapatan saya 6 bulan ke depan?",
+    "sending": "Mengirim.",
+    "preparing": "Menyiapkan foto.",
+    "reading": "Membaca."
   }
 }

@@ -3,6 +3,7 @@ import { readFileAsJson } from "@/lib/ai-vision";
 import type { ProposedAction } from "@/lib/assistant-actions";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { fileKindFromName, type ChatFileKind } from "@/lib/chat-suggestions";
+import type { ChatFleet } from "@/lib/fleet-chat";
 import { SUPPORT_BUCKET, SUPPORT_MAX_FILES, signAttachments, type SupportAttachment } from "@/lib/support";
 
 /**
@@ -42,6 +43,10 @@ export type ChatMeta = {
   proposalState?: "done" | "cancelled";
   proposalResult?: { message: string; link?: { label: string; href: string }; copy?: string };
   action?: ChatAction;
+  /** A fleet assistant reply: its lists, shown as cards under the chat's latest one (lib/fleet-chat.ts). */
+  fleet?: ChatFleet;
+  /** A fleet assistant follow-up (vehicles added, renewals saved): the next message still goes to the fleet assistant. */
+  fleetDone?: boolean;
   /** This message is the "passed to the team" note. */
   handoff?: boolean;
   /** The assistant couldn't answer: show a "Talk to a person" button under it. */
@@ -238,7 +243,6 @@ export function replyForFiles(kind: ChatFileKind, files: SupportAttachment[], wh
     return { body: "Thanks. I can't open files here on the website, but the RoveHQ team can. Tap Talk to a person and we'll look at them.", offerHandoff: true };
   }
   const owner = who.role === "owner";
-  const images = files.filter((file) => file.type.startsWith("image/"));
   if (kind === "receipt") {
     return {
       body: "That looks like a receipt. Tap the button and I'll pass it over: the amount, date and who was paid are filled in from it, ready for you to check and save.",
@@ -246,12 +250,9 @@ export function replyForFiles(kind: ChatFileKind, files: SupportAttachment[], wh
     };
   }
   if (kind === "vehicle") {
-    return {
-      body: images.length
-        ? "These go to the fleet assistant. It reads registration books, insurance policies and tax receipts, and adds the vehicles or renews their paperwork once you check them."
-        : "The fleet assistant reads photos of registration books, policies and tax receipts. Take a photo of the page and send it there.",
-      action: { kind, href: "/fleet/assistant", label: "Open the fleet assistant", paths: images.slice(0, 4).map((file) => file.path), handover: images.length ? "photos" : null }
-    };
+    // Members who may add vehicles have their photos read in the chat itself (fleetTurn in app/actions/chat.ts).
+    // This is everyone else.
+    return { body: "Adding vehicles and renewing their paperwork is done by the owner or a manager. Ask them to send these here." };
   }
   if (kind === "contract") {
     if (!owner) return { body: "Contracts are set up by the business owner in Settings. Ask them to send it in this chat, or to upload it under Settings, Rental agreement.", offerHandoff: false };

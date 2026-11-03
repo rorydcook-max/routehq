@@ -1120,8 +1120,8 @@
     "setup_reminders": "Automatische Erinnerungen einschalten",
     "setup_booking_page": "Buchungsseite teilen",
     "setupShared": "Link kopiert. Füge ihn auf deiner Facebook-Seite, bei Google Maps und LINE ein.",
-    "quick_askAssistant": "Dem Assistenten sagen",
-    "quick_askAssistant_hint": "Fahrzeuge oder aktuelle Vermietungen per Chat, Sprache oder Fotos hinzufügen"
+    "quick_askAssistant": "Per Chat hinzufügen",
+    "quick_askAssistant_hint": "Fahrzeuge oder laufende Vermietungen, per Nachricht oder Foto"
   },
   "todo": {
     "eyebrow": "Zu erledigen",
@@ -4174,7 +4174,7 @@
     "ag_n_law": "Geltendes Recht",
     "ag_sampleTitle": "Was der Kunde sieht",
     "ag_sampleBody": "Eine erfundene Buchung. Ihre Bedingungen stehen gegen Ende.",
-    "ag_sampleOpen": "Muster in voller Größe öffnen",
+    "ag_sampleOpen": "In voller Größe öffnen",
     "sig_back": "Zurück",
     "sig_pageTitle": "Ihre Unterschrift",
     "sig_pageBody": "Kunden unterschreiben auf dem Handy. Fügen Sie Ihre Unterschrift einmal hinzu.",
@@ -4285,7 +4285,6 @@
     "pl_team": "{count, plural, one {# Teamkonto} other {# Teamkonten}}",
     "pl_teamUnlimited": "Unbegrenzte Teamkonten",
     "pl_reads": "{count} Ausweis-Scans pro Monat",
-    "pl_lookups": "{count} Kaufprüfungen pro Monat",
     "pl_export": "Buchhaltungsexport",
     "pl_locations": "Mehr als ein Standort",
     "pl_whiteLabel": "Ihr Logo in der App, kein „Powered by RoveHQ“, Ihre eigene Buchungsadresse (ihrshop.rovehq.io)",
@@ -4500,7 +4499,20 @@
     "extra_bodyTip": "Wird im Buchungsformular und auf der Buchungsseite angeboten, zur ersten Zahlung addiert und im Vertrag aufgeführt.",
     "b_brandTip": "Buchungslinks, Unterschriftsseite, die Buchungsseite des Kunden, Quittungen und Verträge.",
     "pn_bodyTip": "Nur Betriebe im Netzwerk sehen sich gegenseitig.",
-    "ag_subtitleOwn": "Neue Buchungen verwenden Ihren eigenen Vertrag. Alles, was Sie unten hinzufügen, kommt ans Ende."
+    "ag_subtitleOwn": "Neue Buchungen verwenden Ihren eigenen Vertrag. Alles, was Sie unten hinzufügen, kommt ans Ende.",
+    "ag_intro": "Das ist der Vertrag, den Ihre Kunden unterschreiben. Passen Sie die Zahlen an und fügen Sie unten eigene Bedingungen hinzu.",
+    "ag_introOwn": "Ihre Kunden unterschreiben Ihren eigenen Vertrag. Ihre eigenen Bedingungen unten werden am Ende angefügt.",
+    "ag_ownAgreement": "Ihr eigener Vertrag",
+    "ag_languages": "Auf Englisch und {language}",
+    "ag_languagesEn": "Auf Englisch",
+    "ag_languagesTip": "Verträge sind immer auf Englisch und in der Sprache Ihres Geschäftsstandorts. Eine Beispielbuchung füllt die Angaben aus.",
+    "ag_lang_th": "Thailändisch",
+    "ag_lang_id": "Indonesisch",
+    "ag_lang_vi": "Vietnamesisch",
+    "ag_lang_ms": "Malaiisch",
+    "ag_lang_fil": "Filipino",
+    "ag_lang_lo": "Laotisch",
+    "ag_lang_km": "Khmer"
   },
   "accountPage": {
     "roleOwner": "Inhaber",
@@ -4982,8 +4994,11 @@
     "needMore": "Wählen Sie Marke und Modell und geben Sie den Preis ein, um fortzufahren.",
     "ownRateAged": "Dein {year} {model} wird für {amount} im Monat vermietet. Unter Berücksichtigung des Altersunterschieds läge dieser bei etwa {adjusted}.",
     "b_serviceSplit": "{count, plural, one {# Service} other {# Services}} pro Jahr für ca. {each}, plus {reserve} für Reifen und Unvorhergesehenes.",
-    "limitReached": "Du hast die {count} Fahrzeug-Checks deines Tarifs für diesen Monat aufgebraucht. Bereits geprüfte Fahrzeuge lassen sich weiterhin sofort öffnen. Mehr Checks gibt es nächsten Monat oder mit einem größeren Tarif.",
-    "rentFromOwnAged": "Basierend auf Ihrem {model} ({year}) für {amount} im Monat, mit Ausgleich für den Altersunterschied."
+    "rentFromOwnAged": "Basierend auf Ihrem {model} ({year}) für {amount} im Monat, mit Ausgleich für den Altersunterschied.",
+    "checksLeft": "Noch {count, plural, one {# Kaufcheck} other {# Kaufchecks}} in diesem Abrechnungszeitraum",
+    "checksUsedUp": "Keine Kaufchecks mehr bis {date}. Bereits geprüfte Fahrzeuge bleiben abrufbar.",
+    "checksPaidOnly": "Neue Kaufchecks gibt es in den kostenpflichtigen Tarifen. Bereits geprüfte Fahrzeuge bleiben abrufbar.",
+    "checksUpgrade": "Upgrade"
   },
   "importer": {
     "dt_vehicles": "Fahrzeuge",
@@ -6360,7 +6375,14 @@
     "paperPrinted": "(Dort steht „{text}“.)",
     "paperNeedDates": "Fehlende Daten ergänzen, um zu speichern",
     "paperCheck": "Prüfen Sie jeden Eintrag anhand des Dokuments. Tippen Sie auf ✕, um einen falschen zu entfernen.",
-    "paperDismiss": "Nicht richtig? Entfernen"
+    "paperDismiss": "Nicht richtig? Entfernen",
+    "edit": "Bearbeiten",
+    "fieldMake": "Marke",
+    "fieldModel": "Modell",
+    "fieldYear": "Baujahr",
+    "fieldPlate": "Kennzeichen",
+    "fieldMonthly": "Pro Monat",
+    "fieldDaily": "Pro Tag"
   },
   "setupRequest": {
     "title": "Wir richten es für dich ein",
@@ -6485,7 +6507,13 @@
     "v_vehicle_make_model": "Marke und Modell des Fahrzeugs",
     "optionalTitle": "Lieber Ihren eigenen Vertrag?",
     "optionalBody": "Optional. Nur wenn Sie Ihren bisherigen Vertrag behalten möchten: Kunden unterschreiben dann Ihren statt unseren.",
-    "optionalOpen": "Eigenen Vertrag hochladen"
+    "optionalOpen": "Eigenen Vertrag hochladen",
+    "panelTitle": "Haben Sie einen eigenen Vertrag?",
+    "panelBody": "Laden Sie ihn hoch – dann unterschreiben Ihre Kunden Ihren Vertrag.",
+    "panelButton": "Vertrag hochladen",
+    "activeTitle": "Sie nutzen Ihren eigenen Vertrag",
+    "activeShort": "Neue Buchungen nutzen „{title}“. Bereits unterschriebene Verträge bleiben unverändert.",
+    "draftShort": "Ihr hochgeladener Vertrag wird noch nicht verwendet."
   },
   "chat": {
     "launcher": "Mit RoveHQ chatten",
@@ -6561,6 +6589,9 @@
     "sConnectWhatsApp": "Wie verbinde ich WhatsApp?",
     "sConnectLine": "Wie verbinde ich LINE?",
     "sLeastMoney": "Welches Fahrzeug bringt am wenigsten ein?",
-    "sNextSixMonths": "Welche Einnahmen erwarten mich in 6 Monaten?"
+    "sNextSixMonths": "Welche Einnahmen erwarten mich in 6 Monaten?",
+    "sending": "Wird gesendet.",
+    "preparing": "Fotos werden vorbereitet.",
+    "reading": "Wird gelesen."
   }
 }

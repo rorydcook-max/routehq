@@ -1,3 +1,5 @@
+import { currencySymbol } from "@/components/currency-symbol";
+import { agreementCountry, agreementLanguageFor, agreementWords, secondDueLabel, secondPeriodLabel } from "@/lib/agreement-language";
 import { toWallTime } from "@/lib/business-time";
 import { feeOn, getTravelPolicySettings, type IslandTravelPolicy } from "@/lib/travel-policy";
 
@@ -413,14 +415,21 @@ export function buildContractVariables({
 }): ContractVariables {
   const settings = getTravelPolicySettings(organization?.settings);
   const bookingData = (bookingLink?.booking_data || {}) as Record<string, any>;
+  // English plus the business location's language (lib/agreement-language.ts). Thailand reads exactly as before.
+  const country = agreementCountry(organization);
+  const agreementLanguage = agreementLanguageFor(country.code);
+  const thai = agreementLanguage === "th";
+  const words = agreementWords(agreementLanguage);
+  const second = (english: string, thaiText: string, other?: string) => (thai ? `${english} / ${thaiText}` : words && other ? `${english} / ${other}` : english);
   const paidExtras = (Array.isArray(rental?.extras) ? rental.extras : []).map((line: any) => {
     const price = `${Math.round(Number(line?.price || 0)).toLocaleString("en-US")} ${rental?.currency || "THB"}`;
-    return `${line?.name} - ${line?.per === "day" ? `${price} per day / ต่อวัน` : `${price}`} (paid extra / บริการเสริม)`;
+    return `${line?.name} - ${line?.per === "day" ? `${price} ${second("per day", "ต่อวัน", words?.perDay)}` : `${price}`} (${second("paid extra", "บริการเสริม", words?.paidExtra)})`;
   });
   const includedItems = [...(Array.isArray(bookingLink?.included_items) ? bookingLink.included_items : []), ...paidExtras];
   const fullName = optionalText(customer?.full_name, "Customer");
   const name = splitName(fullName);
-  const locale = customer?.preferred_locale || bookingLink?.locale || organization?.default_locale || "en";
+  // The Buddhist-era year beside the date is for Thai agreements only.
+  const locale = thai ? customer?.preferred_locale || bookingLink?.locale || organization?.default_locale || "en" : "en";
   const deliveryDateTime =
     bookingData.delivery_datetime ||
     bookingData.deliveryDateTime ||
@@ -595,8 +604,8 @@ export function buildContractVariables({
     secondary_deposit_amount: formatAmount(settings.secondary_deposit_amount),
     // Distance switched off in Settings = unlimited. The setting is per month, so the agreement says so.
     mileage_limit: feeOn(settings, "mileage_limit")
-      ? `${formatAmount(settings.mileage_limit)} km per month / ${formatAmount(settings.mileage_limit)} กม. ต่อเดือน`
-      : "Unlimited / ไม่จำกัด",
+      ? second(`${formatAmount(settings.mileage_limit)} km per month`, `${formatAmount(settings.mileage_limit)} กม. ต่อเดือน`, words ? `${formatAmount(settings.mileage_limit)} ${words.kmPerMonth}` : "")
+      : second("Unlimited", "ไม่จำกัด", words?.unlimited),
     // Each fee switched off in Settings is left out of the agreement (the template checks these).
     fuel_charge_enabled: feeOn(settings, "fuel_charge_per_increment"),
     late_fee_enabled: feeOn(settings, "late_fee_percentage"),
@@ -655,6 +664,13 @@ export function buildContractVariables({
     return dob ? formatContractDate(String(dob), locale) : "";
   })();
   variables.vehicle_vin = stripEmpty(vehicle?.vin || vehicle?.chassis_number);
+
+  // What lib/agreement-localize.ts puts in the RoveHQ agreement for a business outside Thailand.
+  variables.agreement_language = agreementLanguage;
+  variables.agreement_country = country.name || settings.jurisdiction;
+  variables.currency_symbol = currencySymbol(rental?.currency || organization?.currency || "THB");
+  variables.billing_period_label_2 = secondPeriodLabel(agreementLanguage, rental?.pricing_model);
+  variables.payment_due_label_2 = secondDueLabel(agreementLanguage, rental?.pricing_model);
 
   return variables;
 }

@@ -1097,8 +1097,8 @@
     "setup_reminders": "자동 알림 켜기",
     "setup_booking_page": "예약 페이지 공유",
     "setupShared": "링크가 복사되었습니다. 페이스북 페이지, 구글 맵, LINE에 공유해 보세요.",
-    "quick_askAssistant": "어시스턴트에게 말하기",
-    "quick_askAssistant_hint": "채팅, 음성, 사진으로 차량이나 대여 내역을 추가하세요",
+    "quick_askAssistant": "채팅으로 추가",
+    "quick_askAssistant_hint": "차량 또는 진행 중인 렌탈을 메시지나 사진으로",
     "askExample7": "보증금은 어떻게 받나요?",
     "askExample8": "온라인 예약은 어디서 켜나요?",
     "askHowTo": "어떻게 하나요…?",
@@ -4160,7 +4160,7 @@
     "ag_n_law": "적용 법률",
     "ag_sampleTitle": "고객에게 보이는 화면",
     "ag_sampleBody": "가상의 예약이에요. 약관은 끝부분에 표시돼요.",
-    "ag_sampleOpen": "샘플 크게 보기",
+    "ag_sampleOpen": "원본 크기로 열기",
     "sig_back": "뒤로",
     "sig_pageTitle": "내 서명",
     "sig_pageBody": "고객은 휴대폰으로 서명해요. 서명은 한 번만 추가하면 돼요.",
@@ -4486,7 +4486,20 @@
     "extra_bodyTip": "예약 양식과 예약 페이지에 표시되고, 첫 결제에 더해지며, 계약서에 기재돼요.",
     "b_brandTip": "예약 링크, 서명 페이지, 고객 예약 페이지, 영수증, 계약서.",
     "pn_bodyTip": "네트워크에 있는 업체끼리만 서로 볼 수 있어요.",
-    "ag_subtitleOwn": "새 예약에는 직접 올린 계약서가 사용됩니다. 아래에 추가하는 내용은 계약서 끝에 들어갑니다."
+    "ag_subtitleOwn": "새 예약에는 직접 올린 계약서가 사용됩니다. 아래에 추가하는 내용은 계약서 끝에 들어갑니다.",
+    "ag_intro": "고객이 서명하는 계약서입니다. 숫자를 수정하고 아래에 나만의 조건을 추가하세요.",
+    "ag_introOwn": "고객은 직접 등록한 계약서에 서명합니다. 아래 추가 조건은 맨 끝에 붙습니다.",
+    "ag_ownAgreement": "내 계약서",
+    "ag_languages": "영어 및 {language}",
+    "ag_languagesEn": "영어",
+    "ag_languagesTip": "계약서는 항상 영어와 사업장 소재지의 언어로 제공됩니다. 세부 정보는 예시 예약으로 채워집니다.",
+    "ag_lang_th": "태국어",
+    "ag_lang_id": "인도네시아어",
+    "ag_lang_vi": "베트남어",
+    "ag_lang_ms": "말레이어",
+    "ag_lang_fil": "필리핀어",
+    "ag_lang_lo": "라오어",
+    "ag_lang_km": "크메르어"
   },
   "accountPage": {
     "roleOwner": "대표",
@@ -4969,7 +4982,11 @@
     "ownRateAged": "회원님의 {year} {model}은(는) 한 달에 {amount}에 대여됩니다. 연식 차이를 고려하면 이 차량은 약 {adjusted}입니다.",
     "b_serviceSplit": "연간 {count, plural, one {정비 #회} other {정비 #회}}, 회당 약 {each}, 타이어 및 예비비 {reserve} 별도.",
     "limitReached": "이번 달 요금제의 차량 점검 {count}회를 모두 사용하셨습니다. 이전에 점검한 차량은 바로 계속 이용하실 수 있습니다. 다음 달에 다시 점검하시거나 더 큰 요금제를 이용해 주세요.",
-    "rentFromOwnAged": "보유 중인 {year}년식 {model}(월 {amount}) 기준이며, 연식 차이를 반영했어요."
+    "rentFromOwnAged": "보유 중인 {year}년식 {model}(월 {amount}) 기준이며, 연식 차이를 반영했어요.",
+    "checksLeft": "이번 결제 기간에 {count, plural, one {구매 점검 #회} other {구매 점검 #회}} 남음",
+    "checksUsedUp": "{date}까지 남은 구매 점검이 없습니다. 이전에 점검한 차량은 계속 열람할 수 있습니다.",
+    "checksPaidOnly": "새 구매 점검은 유료 요금제에서 이용할 수 있습니다. 이전에 점검한 차량은 계속 열람할 수 있습니다.",
+    "checksUpgrade": "업그레이드"
   },
   "importer": {
     "dt_vehicles": "차량",
@@ -6426,7 +6443,14 @@
     "paperPrinted": "(표기: \"{text}\")",
     "paperNeedDates": "저장하려면 빠진 날짜를 입력하세요",
     "paperCheck": "서류와 하나씩 비교해 보세요. 잘못된 항목은 ✕를 눌러 삭제하세요.",
-    "paperDismiss": "틀렸나요? 삭제"
+    "paperDismiss": "틀렸나요? 삭제",
+    "edit": "수정",
+    "fieldMake": "제조사",
+    "fieldModel": "모델",
+    "fieldYear": "연식",
+    "fieldPlate": "번호판",
+    "fieldMonthly": "월 요금",
+    "fieldDaily": "일 요금"
   },
   "setupRequest": {
     "title": "저희가 대신 세팅해 드립니다",
@@ -6551,7 +6575,13 @@
     "v_vehicle_make_model": "차량 제조사와 모델",
     "optionalTitle": "직접 쓰는 계약서가 있나요?",
     "optionalBody": "선택 사항입니다. 지금 쓰는 계약서를 계속 쓰고 싶을 때만: 고객은 저희 계약서 대신 귀사의 계약서에 서명합니다.",
-    "optionalOpen": "내 계약서 올리기"
+    "optionalOpen": "내 계약서 올리기",
+    "panelTitle": "직접 쓰는 계약서가 있나요?",
+    "panelBody": "업로드하면 고객이 그 계약서에 서명합니다.",
+    "panelButton": "계약서 업로드",
+    "activeTitle": "내 계약서를 사용 중입니다",
+    "activeShort": "새 예약부터 \"{title}\" 계약서를 사용합니다. 이미 서명된 계약서는 그대로 유지됩니다.",
+    "draftShort": "업로드한 계약서는 아직 사용되지 않습니다."
   },
   "chat": {
     "launcher": "RoveHQ와 채팅",
@@ -6629,6 +6659,9 @@
     "sConnectWhatsApp": "WhatsApp은 어떻게 연결하나요?",
     "sConnectLine": "LINE은 어떻게 연결하나요?",
     "sLeastMoney": "가장 수익이 적은 차량은?",
-    "sNextSixMonths": "앞으로 6개월 예상 수입은?"
+    "sNextSixMonths": "앞으로 6개월 예상 수입은?",
+    "sending": "보내는 중.",
+    "preparing": "사진 준비 중.",
+    "reading": "읽는 중."
   }
 }

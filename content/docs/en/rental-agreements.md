@@ -7,15 +7,19 @@ appPath: "/settings/contracts"
 related: ["create-a-booking", "booking-and-price-rules", "extend-or-end-a-rental", "business-settings"]
 video: "help-rental-agreements.mp4"
 poster: "help-rental-agreements.jpg"
-updated: 2026-11-02
+updated: 2026-11-03
 faq:
   - q: "If I change my terms, do signed agreements change too?"
     a: "No. New terms only go into agreements that haven't been signed yet."
+  - q: "Which languages is the agreement in?"
+    a: "English and the language of your business location: Thai, Indonesian, Vietnamese, Malay, Filipino, Lao or Khmer. Anywhere else, English only."
 ---
 
-RoveHQ writes the agreement for every booking in English and Thai. You don't write one, you just add your signature and any extra terms.
+RoveHQ writes the agreement for every booking, in English and the language of your business location (Thai in Thailand). You don't write one, you just add your signature and any extra terms.
 
-Already have your own contract? [Use your own agreement](/docs/use-your-own-agreement) instead.
+**Settings** > **Business** > **Rental agreement** shows the agreement itself, filled in with a sample booking. Tap **Open full size** to read it in a new tab.
+
+Already have your own contract? Tap **Upload your contract** beside it. See [Use your own agreement](/docs/use-your-own-agreement).
 
 ## Add your signature
 
@@ -36,12 +40,12 @@ Or do it in **Settings** > **Business** > **Your signature**: tick the box, then
 ## Add your own terms
 
 1. **Settings** > **Business** > **Rental agreement** > **Edit agreement terms**.
-2. Under **Your own terms**, write each rule as a plain sentence, e.g. "No pets in the vehicle." Tap **Add another term** for more.
+2. Below the agreement, under **Your own terms**, write each rule as a plain sentence, e.g. "No pets in the vehicle." Tap **Add another term** for more. The agreement above shows them as you type.
 3. Tap **Save**.
 
 They're added at the end of every new agreement and numbered for you.
 
-Fees and limits in the agreement (late fee, fuel charge, cleaning, how far the vehicle can go) come from your travel settings. Tap **Change these numbers** to edit them. See [Booking and price rules](/docs/booking-and-price-rules).
+Fees and limits in the agreement (late fee, fuel charge, cleaning, how far the vehicle can go) are listed under **Your numbers in the agreement**. Tap **Change these numbers** to edit them. See [Booking and price rules](/docs/booking-and-price-rules).
 
 ## How the customer signs
 

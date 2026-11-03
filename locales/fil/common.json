@@ -1080,8 +1080,8 @@
     "setup_reminders": "I-on ang kusang paalala",
     "setup_booking_page": "I-share ang booking page mo",
     "setupShared": "Na-copy na ang link. Ilagay ito sa iyong Facebook page, Google Maps at LINE.",
-    "quick_askAssistant": "Sabihin sa katulong",
-    "quick_askAssistant_hint": "Magdagdag ng sasakyan o kasalukuyang paupa sa pamamagitan ng chat, boses o litrato"
+    "quick_askAssistant": "Magdagdag sa chat",
+    "quick_askAssistant_hint": "Mga sasakyan o kasalukuyang rental, sa mensahe o larawan"
   },
   "todo": {
     "eyebrow": "Gagawin",
@@ -4134,7 +4134,7 @@
     "ag_n_law": "Batas na susundin",
     "ag_sampleTitle": "Ang makikita ng customer",
     "ag_sampleBody": "Isang halimbawang booking. Makikita ang terms mo malapit sa dulo.",
-    "ag_sampleOpen": "Buksan ang sample sa buong laki",
+    "ag_sampleOpen": "Buksan sa buong laki",
     "sig_back": "Bumalik",
     "sig_pageTitle": "Iyong pirma",
     "sig_pageBody": "Pumipirma ang customer sa kanilang phone. Idagdag ang pirma mo nang isang beses.",
@@ -4460,7 +4460,20 @@
     "extra_bodyTip": "Inaalok sa booking form at booking page, idinadagdag sa unang bayad at nakalista sa agreement.",
     "b_brandTip": "Booking links, signing page, kanilang booking page, mga resibo at agreement.",
     "pn_bodyTip": "Ang mga negosyo lang sa network ang nakakakita sa isa't isa.",
-    "ag_subtitleOwn": "Gumagamit ang mga bagong booking ng sarili mong kasunduan. Ang idadagdag mo sa ibaba ay mapupunta sa dulo nito."
+    "ag_subtitleOwn": "Gumagamit ang mga bagong booking ng sarili mong kasunduan. Ang idadagdag mo sa ibaba ay mapupunta sa dulo nito.",
+    "ag_intro": "Ito ang kasunduang pinipirmahan ng mga customer mo. I-edit ang mga numero at idagdag ang sarili mong mga tuntunin sa ibaba.",
+    "ag_introOwn": "Pinipirmahan ng mga customer mo ang sarili mong kasunduan. Idinadagdag sa dulo ang sarili mong mga tuntunin sa ibaba.",
+    "ag_ownAgreement": "Sarili mong kasunduan",
+    "ag_languages": "Sa English at {language}",
+    "ag_languagesEn": "Sa English",
+    "ag_languagesTip": "Laging nasa English at sa wika ng lokasyon ng negosyo mo ang mga kasunduan. Pinupunan ng isang sample na booking ang mga detalye.",
+    "ag_lang_th": "Thai",
+    "ag_lang_id": "Indonesian",
+    "ag_lang_vi": "Vietnamese",
+    "ag_lang_ms": "Malay",
+    "ag_lang_fil": "Filipino",
+    "ag_lang_lo": "Lao",
+    "ag_lang_km": "Khmer"
   },
   "accountPage": {
     "roleOwner": "May-ari",
@@ -4943,7 +4956,11 @@
     "ownRateAged": "Ang {year} {model} mo ay naipaparenta ng {amount} kada buwan. Dahil sa agwat ng taon, ito ay aabot sa mga {adjusted}.",
     "b_serviceSplit": "{count, plural, one {# serbisyo} other {# serbisyo}} sa isang taon sa halagang {count, plural, one {humigit-kumulang {each}} other {humigit-kumulang {each}}}, dagdag pa ang {reserve} para sa mga gulong at hindi inaasahang gastusin.",
     "limitReached": "Nagamit mo na ang {count} na pagsusuri ng sasakyan ngayong buwan para sa plan mo. Ang mga sinuri nang sasakyan ay bukas pa rin agad. Mayroon pang karagdagang pagsusuri sa susunod na buwan, o lumipat sa mas malaking plan.",
-    "rentFromOwnAged": "Batay sa {year} {model} mo na {amount} kada buwan, isinasaalang-alang ang pagkakaiba ng edad."
+    "rentFromOwnAged": "Batay sa {year} {model} mo na {amount} kada buwan, isinasaalang-alang ang pagkakaiba ng edad.",
+    "checksLeft": "{count, plural, one {# purchase check} other {# purchase check}} na lang ang natitira ngayong billing period",
+    "checksUsedUp": "Wala nang purchase check hanggang {date}. Mabubuksan pa rin ang mga sasakyang na-check dati.",
+    "checksPaidOnly": "Nasa mga bayad na plan ang mga bagong purchase check. Mabubuksan pa rin ang mga sasakyang na-check dati.",
+    "checksUpgrade": "Mag-upgrade"
   },
   "importer": {
     "dt_vehicles": "Mga sasakyan",
@@ -6360,7 +6377,14 @@
     "paperPrinted": "(Nakasulat ay \"{text}\".)",
     "paperNeedDates": "Idagdag ang kulang na petsa para ma-save",
     "paperCheck": "I-check ang bawat isa sa dokumento. I-tap ang ✕ para alisin ang mali.",
-    "paperDismiss": "Mali? Alisin ito"
+    "paperDismiss": "Mali? Alisin ito",
+    "edit": "I-edit",
+    "fieldMake": "Brand",
+    "fieldModel": "Modelo",
+    "fieldYear": "Taon",
+    "fieldPlate": "Plaka",
+    "fieldMonthly": "Kada buwan",
+    "fieldDaily": "Kada araw"
   },
   "setupRequest": {
     "title": "Kami na ang maglalagay para sa iyo",
@@ -6485,7 +6509,13 @@
     "v_vehicle_make_model": "Make at model ng sasakyan",
     "optionalTitle": "Mas gusto ang sarili mong kontrata?",
     "optionalBody": "Opsyonal. Kung gusto mo lang gamitin pa rin ang kasunduang gamit mo na: ang sa iyo ang pipirmahan ng mga customer sa halip na amin.",
-    "optionalOpen": "I-upload ang sarili kong kontrata"
+    "optionalOpen": "I-upload ang sarili kong kontrata",
+    "panelTitle": "May sarili kang kontrata?",
+    "panelBody": "I-upload ito at ang kontrata mo ang pipirmahan ng mga customer.",
+    "panelButton": "I-upload ang kontrata mo",
+    "activeTitle": "Gumagamit ka ng sarili mong kasunduan",
+    "activeShort": "Gagamitin ng mga bagong booking ang \"{title}\". Hindi magbabago ang mga napirmahan na.",
+    "draftShort": "Hindi pa ginagamit ang in-upload mo."
   },
   "chat": {
     "launcher": "Mag-chat sa RoveHQ",
@@ -6561,6 +6591,9 @@
     "sConnectWhatsApp": "Paano i-connect ang WhatsApp?",
     "sConnectLine": "Paano i-connect ang LINE?",
     "sLeastMoney": "Aling sasakyan ang pinakamaliit ang kita?",
-    "sNextSixMonths": "Magkano ang kita ko sa susunod na 6 na buwan?"
+    "sNextSixMonths": "Magkano ang kita ko sa susunod na 6 na buwan?",
+    "sending": "Ipinapadala.",
+    "preparing": "Inihahanda ang mga larawan.",
+    "reading": "Binabasa."
   }
 }

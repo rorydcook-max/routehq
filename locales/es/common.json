@@ -6525,8 +6525,8 @@
     "close": "Cerrar",
     "newChat": "Chat nuevo",
     "greeting": "¡Hola! ¿En qué te ayudamos?",
-    "greetingOwner": "Pregunta por tus vehículos, reservas y dinero, cómo hacer algo en RoveHQ, o envía una foto o un archivo.",
-    "greetingTeammate": "Pregunta cómo hacer cualquier cosa en RoveHQ, o envía una foto o un archivo.",
+    "greetingOwner": "Pregunta lo que quieras, envía una foto o un archivo, o dime qué hacer: una reserva, un pago, un gasto, un vehículo.",
+    "greetingTeammate": "Pregunta lo que quieras, envía una foto o un archivo, o dime qué hacer: una reserva, un pago, un gasto.",
     "greetingSite": "Pregunta lo que quieras sobre RoveHQ. Alguien de nuestro equipo también puede ayudarte.",
     "previous": "Conversaciones anteriores",
     "untitled": "Conversación",
@@ -6579,7 +6579,7 @@
     "sDamagePhotos": "Subir fotos de daños",
     "sNewBookingHow": "¿Cómo hago una reserva?",
     "sBookingLinkHow": "¿Cómo envío un enlace de reserva?",
-    "sRecordReceipt": "Registrar un recibo",
+    "sRecordReceipt": "Escanear un recibo",
     "sRecordCostHow": "¿Cómo registro un gasto?",
     "sUploadContract": "Subir mi propio contrato",
     "sContractHow": "¿Cómo cambio mi contrato?",
@@ -6592,6 +6592,12 @@
     "sNextSixMonths": "¿Qué ingresos tendré en los próximos 6 meses?",
     "sending": "Enviando.",
     "preparing": "Preparando fotos.",
-    "reading": "Leyendo."
+    "reading": "Leyendo.",
+    "sNewBooking": "Nueva reserva",
+    "sBookingLink": "Enviar un enlace de reserva",
+    "sRecordPayment": "Registrar un pago",
+    "sRecordCost": "Registrar un gasto",
+    "choose": "Elegir",
+    "save": "Guardar"
   }
 }

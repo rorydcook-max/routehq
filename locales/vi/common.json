@@ -6593,8 +6593,8 @@
     "close": "Đóng",
     "newChat": "Chat mới",
     "greeting": "Xin chào! Chúng tôi có thể giúp gì cho bạn?",
-    "greetingOwner": "Hỏi về xe, đặt xe và tiền bạc của bạn, cách làm một việc trong RoveHQ, hoặc gửi ảnh hay tệp.",
-    "greetingTeammate": "Hỏi cách làm bất cứ việc gì trong RoveHQ, hoặc gửi ảnh hay tệp.",
+    "greetingOwner": "Hỏi gì cũng được, gửi ảnh hoặc tệp, hoặc bảo tôi cần làm gì: đặt xe, ghi thanh toán, ghi chi phí, thêm xe.",
+    "greetingTeammate": "Hỏi gì cũng được, gửi ảnh hoặc tệp, hoặc bảo tôi cần làm gì: đặt xe, ghi thanh toán, ghi chi phí.",
     "greetingSite": "Hỏi bất cứ điều gì về RoveHQ. Nhân viên của chúng tôi cũng có thể giúp bạn.",
     "previous": "Cuộc trò chuyện trước",
     "untitled": "Cuộc trò chuyện",
@@ -6649,7 +6649,7 @@
     "sDamagePhotos": "Tải ảnh hư hỏng lên",
     "sNewBookingHow": "Làm sao để tạo đặt xe?",
     "sBookingLinkHow": "Làm sao gửi link đặt xe?",
-    "sRecordReceipt": "Ghi lại hóa đơn",
+    "sRecordReceipt": "Quét hóa đơn",
     "sRecordCostHow": "Làm sao ghi lại chi phí?",
     "sUploadContract": "Tải lên hợp đồng của tôi",
     "sContractHow": "Làm sao sửa hợp đồng?",
@@ -6662,6 +6662,12 @@
     "sNextSixMonths": "Thu nhập dự kiến 6 tháng tới là bao nhiêu?",
     "sending": "Đang gửi…",
     "preparing": "Đang chuẩn bị ảnh…",
-    "reading": "Đang đọc…"
+    "reading": "Đang đọc…",
+    "sNewBooking": "Đặt xe mới",
+    "sBookingLink": "Gửi link đặt xe",
+    "sRecordPayment": "Ghi thanh toán",
+    "sRecordCost": "Ghi chi phí",
+    "choose": "Chọn",
+    "save": "Lưu"
   }
 }

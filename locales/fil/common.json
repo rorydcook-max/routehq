@@ -6527,8 +6527,8 @@
     "close": "Isara",
     "newChat": "Bagong chat",
     "greeting": "Hi! Paano kami makakatulong?",
-    "greetingOwner": "Magtanong tungkol sa mga sasakyan, booking at pera mo, kung paano gawin ang isang bagay sa RoveHQ, o magpadala ng photo o file.",
-    "greetingTeammate": "Magtanong kung paano gawin ang kahit ano sa RoveHQ, o magpadala ng photo o file.",
+    "greetingOwner": "Magtanong ng kahit ano, magpadala ng larawan o file, o sabihin sa akin ang gagawin: booking, bayad, gastos, o sasakyan.",
+    "greetingTeammate": "Magtanong ng kahit ano, magpadala ng larawan o file, o sabihin sa akin ang gagawin: booking, bayad, o gastos.",
     "greetingSite": "Magtanong ng kahit ano tungkol sa RoveHQ. Puwede ring tumulong ang isang tao mula sa team namin.",
     "previous": "Mga nakaraang usapan",
     "untitled": "Usapan",
@@ -6581,7 +6581,7 @@
     "sDamagePhotos": "Mag-upload ng damage photos",
     "sNewBookingHow": "Paano gumawa ng booking?",
     "sBookingLinkHow": "Paano magpadala ng booking link?",
-    "sRecordReceipt": "Mag-record ng resibo",
+    "sRecordReceipt": "I-scan ang resibo",
     "sRecordCostHow": "Paano mag-record ng gastos?",
     "sUploadContract": "I-upload ang sarili kong contract",
     "sContractHow": "Paano baguhin ang contract ko?",
@@ -6594,6 +6594,12 @@
     "sNextSixMonths": "Magkano ang kita ko sa susunod na 6 na buwan?",
     "sending": "Ipinapadala.",
     "preparing": "Inihahanda ang mga larawan.",
-    "reading": "Binabasa."
+    "reading": "Binabasa.",
+    "sNewBooking": "Bagong booking",
+    "sBookingLink": "Magpadala ng booking link",
+    "sRecordPayment": "Magtala ng bayad",
+    "sRecordCost": "Magtala ng gastos",
+    "choose": "Pumili",
+    "save": "I-save"
   }
 }

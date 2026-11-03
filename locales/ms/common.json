@@ -6593,8 +6593,8 @@
     "close": "Tutup",
     "newChat": "Sembang baharu",
     "greeting": "Hai! Apa yang boleh kami bantu?",
-    "greetingOwner": "Tanya tentang kenderaan, tempahan dan wang anda, cara buat sesuatu dalam RoveHQ, atau hantar foto atau fail.",
-    "greetingTeammate": "Tanya cara buat apa sahaja dalam RoveHQ, atau hantar foto atau fail.",
+    "greetingOwner": "Tanya apa sahaja, hantar foto atau fail, atau beritahu saya apa perlu dibuat: tempahan, bayaran, kos, kenderaan.",
+    "greetingTeammate": "Tanya apa sahaja, hantar foto atau fail, atau beritahu saya apa perlu dibuat: tempahan, bayaran, kos.",
     "greetingSite": "Tanya apa sahaja tentang RoveHQ. Pasukan kami juga boleh membantu.",
     "previous": "Perbualan sebelum ini",
     "untitled": "Perbualan",
@@ -6649,7 +6649,7 @@
     "sDamagePhotos": "Muat naik foto kerosakan",
     "sNewBookingHow": "Bagaimana nak buat tempahan?",
     "sBookingLinkHow": "Bagaimana nak hantar pautan tempahan?",
-    "sRecordReceipt": "Rekod resit",
+    "sRecordReceipt": "Imbas resit",
     "sRecordCostHow": "Bagaimana nak rekod kos?",
     "sUploadContract": "Muat naik kontrak saya sendiri",
     "sContractHow": "Bagaimana nak ubah kontrak saya?",
@@ -6662,6 +6662,12 @@
     "sNextSixMonths": "Berapa pendapatan saya dalam 6 bulan akan datang?",
     "sending": "Menghantar.",
     "preparing": "Menyediakan foto.",
-    "reading": "Membaca."
+    "reading": "Membaca.",
+    "sNewBooking": "Tempahan baharu",
+    "sBookingLink": "Hantar pautan tempahan",
+    "sRecordPayment": "Rekod bayaran",
+    "sRecordCost": "Rekod kos",
+    "choose": "Pilih",
+    "save": "Simpan"
   }
 }

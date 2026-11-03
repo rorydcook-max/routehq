@@ -6593,8 +6593,8 @@
     "close": "閉じる",
     "newChat": "新しいチャット",
     "greeting": "こんにちは！どのようなご用件ですか？",
-    "greetingOwner": "車両、予約、お金のこと、RoveHQ の使い方について質問したり、写真やファイルを送ったりできます。",
-    "greetingTeammate": "RoveHQ の使い方を何でも質問したり、写真やファイルを送ったりできます。",
+    "greetingOwner": "何でも聞いてください。写真やファイルを送ったり、予約・支払い・費用・車両など、やりたいことを伝えたりできます。",
+    "greetingTeammate": "何でも聞いてください。写真やファイルを送ったり、予約・支払い・費用など、やりたいことを伝えたりできます。",
     "greetingSite": "RoveHQ について何でも質問してください。チームのスタッフもお手伝いできます。",
     "previous": "過去の会話",
     "untitled": "会話",
@@ -6649,7 +6649,7 @@
     "sDamagePhotos": "損傷の写真をアップロード",
     "sNewBookingHow": "予約の作り方は？",
     "sBookingLinkHow": "予約リンクの送り方は？",
-    "sRecordReceipt": "領収書を記録",
+    "sRecordReceipt": "レシートをスキャン",
     "sRecordCostHow": "経費の記録方法は？",
     "sUploadContract": "自分の契約書をアップロード",
     "sContractHow": "契約書を変更するには？",
@@ -6662,6 +6662,12 @@
     "sNextSixMonths": "今後 6 か月の収入見込みは？",
     "sending": "送信中。",
     "preparing": "写真を準備中。",
-    "reading": "読み取り中。"
+    "reading": "読み取り中。",
+    "sNewBooking": "新規予約",
+    "sBookingLink": "予約リンクを送る",
+    "sRecordPayment": "支払いを記録",
+    "sRecordCost": "費用を記録",
+    "choose": "選択",
+    "save": "保存"
   }
 }

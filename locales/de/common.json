@@ -6525,8 +6525,8 @@
     "close": "Schließen",
     "newChat": "Neuer Chat",
     "greeting": "Hallo! Wie können wir helfen?",
-    "greetingOwner": "Fragen Sie zu Ihren Fahrzeugen, Buchungen und Finanzen, wie etwas in RoveHQ geht, oder senden Sie ein Foto oder eine Datei.",
-    "greetingTeammate": "Fragen Sie, wie etwas in RoveHQ geht, oder senden Sie ein Foto oder eine Datei.",
+    "greetingOwner": "Fragen Sie etwas, senden Sie ein Foto oder eine Datei oder sagen Sie mir, was zu tun ist: eine Buchung, eine Zahlung, eine Ausgabe, ein Fahrzeug.",
+    "greetingTeammate": "Fragen Sie etwas, senden Sie ein Foto oder eine Datei oder sagen Sie mir, was zu tun ist: eine Buchung, eine Zahlung, eine Ausgabe.",
     "greetingSite": "Fragen Sie alles zu RoveHQ. Auch jemand aus unserem Team kann helfen.",
     "previous": "Frühere Unterhaltungen",
     "untitled": "Unterhaltung",
@@ -6577,10 +6577,7 @@
     "sExtendRental": "Diese Miete verlängern",
     "sDepositBack": "Kaution zurückzahlen",
     "sDamagePhotos": "Schadensfotos hochladen",
-    "sNewBookingHow": "Wie erstelle ich eine Buchung?",
-    "sBookingLinkHow": "Wie sende ich einen Buchungslink?",
-    "sRecordReceipt": "Quittung erfassen",
-    "sRecordCostHow": "Wie erfasse ich Kosten?",
+    "sRecordReceipt": "Beleg scannen",
     "sUploadContract": "Eigenen Vertrag hochladen",
     "sContractHow": "Wie ändere ich meinen Vertrag?",
     "sAddTeammate": "Wie füge ich ein Teammitglied hinzu?",
@@ -6592,6 +6589,12 @@
     "sNextSixMonths": "Welche Einnahmen erwarten mich in 6 Monaten?",
     "sending": "Wird gesendet.",
     "preparing": "Fotos werden vorbereitet.",
-    "reading": "Wird gelesen."
+    "reading": "Wird gelesen.",
+    "sNewBooking": "Neue Buchung",
+    "sBookingLink": "Buchungslink senden",
+    "sRecordPayment": "Zahlung erfassen",
+    "sRecordCost": "Ausgabe erfassen",
+    "choose": "Auswählen",
+    "save": "Speichern"
   }
 }

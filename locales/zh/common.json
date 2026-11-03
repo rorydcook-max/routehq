@@ -6593,8 +6593,8 @@
     "close": "关闭",
     "newChat": "新聊天",
     "greeting": "你好！有什么可以帮你？",
-    "greetingOwner": "可以问你的车辆、预订和收支，在 RoveHQ 里怎么操作，也可以发送照片或文件。",
-    "greetingTeammate": "可以问在 RoveHQ 里怎么做任何事，也可以发送照片或文件。",
+    "greetingOwner": "有什么都可以问，发照片或文件，或告诉我要做什么：预订、收款、支出、车辆。",
+    "greetingTeammate": "有什么都可以问，发照片或文件，或告诉我要做什么：预订、收款、支出。",
     "greetingSite": "关于 RoveHQ 的任何问题都可以问。我们的团队成员也可以帮你。",
     "previous": "以往对话",
     "untitled": "对话",
@@ -6649,7 +6649,7 @@
     "sDamagePhotos": "上传损坏照片",
     "sNewBookingHow": "怎么创建预订？",
     "sBookingLinkHow": "怎么发送预订链接？",
-    "sRecordReceipt": "记录一张收据",
+    "sRecordReceipt": "扫描收据",
     "sRecordCostHow": "怎么记录一笔费用？",
     "sUploadContract": "上传我自己的合同",
     "sContractHow": "怎么修改我的合同？",
@@ -6662,6 +6662,12 @@
     "sNextSixMonths": "未来 6 个月预计收入多少？",
     "sending": "正在发送…",
     "preparing": "正在准备照片…",
-    "reading": "正在读取…"
+    "reading": "正在读取…",
+    "sNewBooking": "新建预订",
+    "sBookingLink": "发送预订链接",
+    "sRecordPayment": "记录收款",
+    "sRecordCost": "记录支出",
+    "choose": "选择",
+    "save": "保存"
   }
 }

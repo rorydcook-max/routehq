@@ -6593,8 +6593,8 @@
     "close": "Stäng",
     "newChat": "Ny chatt",
     "greeting": "Hej! Hur kan vi hjälpa till?",
-    "greetingOwner": "Fråga om dina fordon, bokningar och pengar, hur du gör något i RoveHQ, eller skicka en bild eller fil.",
-    "greetingTeammate": "Fråga hur du gör vad som helst i RoveHQ, eller skicka en bild eller fil.",
+    "greetingOwner": "Fråga vad du vill, skicka ett foto eller en fil, eller säg vad jag ska göra: en bokning, en betalning, en kostnad, ett fordon.",
+    "greetingTeammate": "Fråga vad du vill, skicka ett foto eller en fil, eller säg vad jag ska göra: en bokning, en betalning, en kostnad.",
     "greetingSite": "Fråga vad som helst om RoveHQ. Någon från vårt team kan också hjälpa till.",
     "previous": "Tidigare konversationer",
     "untitled": "Konversation",
@@ -6649,7 +6649,7 @@
     "sDamagePhotos": "Ladda upp skadebilder",
     "sNewBookingHow": "Hur gör jag en bokning?",
     "sBookingLinkHow": "Hur skickar jag en bokningslänk?",
-    "sRecordReceipt": "Registrera ett kvitto",
+    "sRecordReceipt": "Skanna ett kvitto",
     "sRecordCostHow": "Hur registrerar jag en kostnad?",
     "sUploadContract": "Ladda upp mitt eget avtal",
     "sContractHow": "Hur ändrar jag mitt avtal?",
@@ -6662,6 +6662,12 @@
     "sNextSixMonths": "Vilka intäkter kan jag vänta mig de kommande 6 månaderna?",
     "sending": "Skickar …",
     "preparing": "Förbereder foton …",
-    "reading": "Läser …"
+    "reading": "Läser …",
+    "sNewBooking": "Ny bokning",
+    "sBookingLink": "Skicka en bokningslänk",
+    "sRecordPayment": "Registrera en betalning",
+    "sRecordCost": "Registrera en kostnad",
+    "choose": "Välj",
+    "save": "Spara"
   }
 }

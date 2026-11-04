@@ -108,7 +108,7 @@ const SPECS: Record<ToolName, Spec> = {
     },
     ["startDate"]
   ),
-  import_sheet: fn("import_sheet", "Bring a whole spreadsheet (a file they sent, or a Google Sheet link) of vehicles, customers, bookings and payment history into RoveHQ, including an export from other rental software (Booqable, HQ Rental Software, RentWorks, Checkfront and others), which it recognises by name.", { sheetUrl: { type: "string" } }),
+  import_sheet: fn("import_sheet", "Bring a whole spreadsheet (a file they sent, or a Google Sheet link) of vehicles, customers, bookings and payment history into RoveHQ, including an export from other rental software (Booqable, HQ Rental Software, RentWorks, Checkfront, TWICE Commerce/Rentle, VEVS and others), which it recognises by name.", { sheetUrl: { type: "string" } }),
   contract_upload: fn("contract_upload", "They sent their own rental agreement or contract (PDF or Word) to use for bookings."),
   damage_photos: fn("damage_photos", "Photos of damage, an odometer or a fuel gauge for a rental.")
 };

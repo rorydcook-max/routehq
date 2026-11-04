@@ -29,6 +29,10 @@ type PresetFile = {
   /** Headings the file usually has; `need` of them (key included) must be there. */
   signature: RegExp[];
   need: number;
+  /** Headings that must all be there (for software whose exact headings aren't published: VEVS). */
+  require?: RegExp[];
+  /** Headings that rule this software out (another software's tell-tale columns). */
+  exclude?: RegExp[];
   /** This software's own names for columns, checked before the shared ones. */
   columns?: Columns;
   /** The record's own ID in the other system (for linking files). */
@@ -269,14 +273,80 @@ const PRESETS: PresetFile[] = [
     columns: [[/^(paid amount|amount paid|paid)$/, "amount_paid"], [/^(total amount|order total|total)$/, "rental_total"], [/^deposit( amount)?$/, "__ignore__"]],
     skip: ["deposit_amount"]
   },
-  // Rentle: orders by store, with start and end.
+  // TWICE Commerce (formerly Rentle): every table exports its current view as CSV. Orders table columns from TWICE's
+  // docs/updates (Customers, Price, Line items, Stage, Payment, Deposit, Sales channel, Purchase types...); older
+  // Rentle order exports by store, with start and end.
   {
     software: "rentle",
     kind: "rentals",
-    key: [/^(store|shop)( name)?$/],
-    signature: [/^order( id| no| number)?$/, /^(start|start time|start date)$/, /^(end|end time|end date)$/, /^(store|shop)( name)?$/, /^customer( name)?$/, /^(total|total price)$/, /^(products|items|product)$/],
+    key: [/^(store|shop)( name)?$/, /^sales channel$/, /^line items$/, /^purchase types?$/],
+    signature: [/^order( id| no| number)?$/, /^(start|start time|start date)$/, /^(end|end time|end date)$/, /^(store|shop)( name)?$/, /^customers?( name)?$/, /^(total|total price|price)$/, /^(products|items|product|line items)$/, /^(stage|state)$/, /^sales channel$/, /^purchase types?$/, /^fulfillment state$/],
     need: 5,
-    id: /^order( id| no| number)?$/
+    id: /^order( id| no| number)?$/,
+    columns: [
+      [/^line items$/, "vehicle_name"],
+      [/^customers$/, "customer_name"],
+      [/^(stage|state)$/, "booking_status"],
+      [/^(payment|item states|fulfillment state|purchase types?|sales channel|end date returned)$/, "__ignore__"]
+    ]
+  },
+  // TWICE Commerce Payments report, Export tab (CSV): Payment_Date, Payment_Type, Payment_Method, Amount_Total,
+  // Revenue_Row_ID, Row_ID... (docs/concepts/reports/finance-reports).
+  {
+    software: "rentle",
+    kind: "payments",
+    key: [/^revenue row id$/],
+    signature: [/^revenue row id$/, /^payment date$/, /^payment datetime$/, /^payment type$/, /^payment method$/, /^payment provider$/, /^amount total$/, /^amount excl tax$/, /^cost center$/, /^timezone$/, /^row id$/],
+    need: 4,
+    id: /^row id$/,
+    columns: [
+      [/^payment date$/, "date"],
+      [/^amount total$/, "amount"],
+      [/^payment type$/, "type"],
+      [/^payment method$/, "notes"],
+      [/^(payment datetime|payment provider|amount excl tax|cost center|timezone|account|location|row id)$/, "__ignore__"]
+    ]
+  },
+  // VEVS: Export Reservations (CSV, a configurable template) with booking reference, customer first and last name,
+  // email and phone, pickup and return date/time and location, vehicle, total, status, notes; DD.MM.YYYY dates.
+  // The exact headings aren't published, so this one is strict: names, email and both dates and locations must all
+  // be there, and another software's tell-tale columns rule it out. Confirm with a real file.
+  {
+    software: "vevs",
+    kind: "rentals",
+    key: [/^(pick ?up|pickup) (location|place|branch)$/],
+    require: [
+      /^(return|drop ?off|dropoff) (location|place|branch)$/,
+      /^(customer |client )?first name$/,
+      /^(customer |client )?(last name|surname)$/,
+      /^(customer |client )?e ?mail( address)?$/,
+      /^(pick ?up|pickup)( date)?( time)?( date time)?$/,
+      /^(return|drop ?off|dropoff)( date)?( time)?( date time)?$/
+    ],
+    exclude: [/^outstanding balance$/, /^merchant fee( amount)?$/, /^date booked$/, /^date closed$/, /^item count$/, /^tax region$/, /^sales channel$/, /^line items$/],
+    signature: [
+      /^(booking|reservation)( id| no| number| ref| reference)?$|^(reference|ref|booking uuid|uuid)$/,
+      /^(customer |client )?first name$/,
+      /^(customer |client )?(last name|surname)$/,
+      /^(customer |client )?e ?mail( address)?$/,
+      /^(customer |client )?(phone|mobile|telephone)( no| number)?$/,
+      /^(pick ?up|pickup)( date)?( time)?( date time)?$/,
+      /^(return|drop ?off|dropoff)( date)?( time)?( date time)?$/,
+      /^(pick ?up|pickup) (location|place|branch)$/,
+      /^(return|drop ?off|dropoff) (location|place|branch)$/,
+      /^(vehicle|car|car type|vehicle type|fleet)$/,
+      /^(booking |reservation )?(total|total price|amount)$/,
+      /^(booking |reservation )?status$/,
+      /^(notes?|comments?|remarks)$/
+    ],
+    need: 9,
+    id: /^(booking|reservation)( id| no| number| ref| reference)?$|^(reference|ref|booking uuid|uuid)$/,
+    columns: [
+      [/^(pick ?up|pickup)( date)?( time)?( date time)?$/, "start_date"],
+      [/^(return|drop ?off|dropoff)( date)?( time)?( date time)?$/, "end_date"],
+      [/^(booking |reservation )?(total|total price|amount)$/, "rental_total"],
+      [/^(booking |reservation )?status$/, "booking_status"]
+    ]
   }
 ];
 
@@ -292,6 +362,8 @@ export function detectPreset(sheet: Pick<ParsedSheet, "headers">, chosen?: strin
   let best: { preset: PresetFile; score: number } | null = null;
   for (const preset of PRESETS) {
     if (!preset.key.some((pattern) => hasHeading(keys, pattern))) continue;
+    if (preset.require && !preset.require.every((pattern) => hasHeading(keys, pattern))) continue;
+    if (preset.exclude && preset.exclude.some((pattern) => hasHeading(keys, pattern))) continue;
     const hits = preset.signature.filter((pattern) => hasHeading(keys, pattern)).length;
     const mine = preset.software === chosen;
     if (hits < (mine ? preset.need - 1 : preset.need)) continue;
@@ -425,7 +497,7 @@ function idColumn(item: Prepared) {
 }
 
 const REFERRING_FIELDS = new Set(["__ignore__", "customer_name", "first_name", "full_name", "email", "phone", "vehicle_registration", "registration_number", "vehicle_name", "notes", "type"]);
-const PAYMENT_ID = /^(id|payment( id| no| number)?|transaction( id| no| number)?)$/;
+const PAYMENT_ID = /^(id|row id|payment( id| no| number)?|transaction( id| no| number)?)$/;
 
 /** The column of `item` whose values are (mostly) found in `known`: how one file refers to another's records. */
 function referringColumn(item: Prepared, known: Set<string>, skip: Set<string> = new Set()) {

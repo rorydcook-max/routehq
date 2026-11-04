@@ -7,12 +7,12 @@ appPath: "/settings/contracts"
 related: ["create-a-booking", "booking-and-price-rules", "extend-or-end-a-rental", "business-settings"]
 video: "help-rental-agreements.mp4"
 poster: "help-rental-agreements.jpg"
-updated: 2026-11-03
+updated: 2026-11-04
 faq:
   - q: "If I change my terms, do signed agreements change too?"
     a: "No. New terms only go into agreements that haven't been signed yet."
   - q: "Which languages is the agreement in?"
-    a: "English and the language of your business location: Thai, Indonesian, Vietnamese, Malay, Filipino, Lao or Khmer. Anywhere else, English only."
+    a: "English and the language of your business location: Thai, Indonesian, Vietnamese, Malay, Filipino, Lao, Khmer, Greek, Spanish, Portuguese, Italian, Croatian, French or German. In the UK, Ireland, Malta and anywhere else, English only."
 ---
 
 RoveHQ writes the agreement for every booking, in English and the language of your business location (Thai in Thailand). You don't write one, you just add your signature and any extra terms.

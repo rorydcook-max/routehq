@@ -13,6 +13,8 @@ steps:
 ---
 TSD says its reports can be custom designed and exported to Microsoft Excel. RoveHQ recognises contract and unit exports with contract and stock numbers, links contracts to vehicles by stock number, converts miles to your business's unit and reads dates month first when the file can't say.
 
+Still deciding? Read our [TSD Rental vs RoveHQ comparison](/guides/tsd-rental-vs-rovehq).
+
 ## Free import
 
 Importing is free on every plan. RoveHQ recognises TSD Rental exports and reads them straight away. You see every vehicle, booking and payment before anything is saved, and you can take the whole import back within 30 days. If you'd rather not do it yourself, [send us the files](/contact) and we'll bring them in for you.

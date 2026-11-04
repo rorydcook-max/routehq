@@ -19,7 +19,12 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["puppeteer-core", "@sparticuz/chromium"],
   async redirects() {
     // The "For owners" page was dropped (28 Oct 2026): the website speaks only to rental businesses for now.
-    return [{ source: "/owners", destination: "/home", permanent: true }];
+    // Rentle is now TWICE Commerce (Nov 2026): its switching page stays at /switch/rentle.
+    return [
+      { source: "/owners", destination: "/home", permanent: true },
+      { source: "/switch/twice-commerce", destination: "/switch/rentle", permanent: true },
+      { source: "/:locale/switch/twice-commerce", destination: "/:locale/switch/rentle", permanent: true }
+    ];
   },
   experimental: {
     // The app and the website have separate root layouts (app/(app), app/(site)/site/[locale]), so an address that

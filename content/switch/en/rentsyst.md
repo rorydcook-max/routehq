@@ -13,6 +13,8 @@ steps:
 ---
 RentSyst's FAQ describes downloading the vehicle list from the Park tab as XLS or CSV. RoveHQ recognises its vehicle and order files by their headings and links each order to its car and client.
 
+Still deciding? Read our [RentSyst vs RoveHQ comparison](/guides/rentsyst-vs-rovehq).
+
 ## Free import
 
 Importing is free on every plan. RoveHQ recognises RentSyst exports and reads them straight away. You see every vehicle, booking and payment before anything is saved, and you can take the whole import back within 30 days. If you'd rather not do it yourself, [send us the files](/contact) and we'll bring them in for you.

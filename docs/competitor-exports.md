@@ -11,6 +11,20 @@ AI when on, header rules) for columns it doesn't know, and the owner checks ever
 
 | Software | Region | Data out | How | Preset |
 |---|---|---|---|---|
+| Anolla | EU (multilingual) | "Raw data" to Excel, Google Sheets, BI tools | Not documented step by step | No |
+| AnyRent | PT (incl. Madeira) | Not documented publicly | Ask support | No |
+| Appointrent | IT | Not documented publicly | Ask support | No |
+| Coastr | UK | Vehicle tracking/trip data as CSV; bookings/customers not documented | Reports (tracking); ask support | No |
+| Fleetee | FR | Not documented publicly | Ask support | No |
+| Lokki | FR | Not documented publicly | Ask support | No |
+| MyRent (Dogma Systems) | IT, global | Reports to Excel ("other format like excel") | Reports | No |
+| Prohire | UK | Not documented publicly | Ask support | No |
+| Renteon | HR, EU | "Data export to finance"; nothing else public | Ask support | No |
+| Rentware | DE | Revenue (Datev) as CSV/Excel only | app.rentware.io/metrics/datev-revenue | No |
+| TopRentApp | IT | All data as SQL or CSV on termination | Ask TopRentApp | No |
+| VEVS | Global (80+ countries, GR) | Reservations CSV (Export Reservations, configurable template); customers CSV | Customers > tick > Choose Action > Export selected | Yes (reservations, inferred and strict; **confirm headers with a real file**) |
+| Way2Rentals | PT, ES | Not documented publicly | Ask support | No |
+| Wheelsys | GR, global | Reports exported "in many formats", emailed or scheduled | Reports | No |
 | Booqable | EU, NA (equipment/scooters) | Orders, customers, inventory, documents, reports as CSV | Each list > Export at the bottom; Reports > Export; Background tasks to re-download | Yes (orders, customers, inventory) |
 | Car Rental Solutions | NA | Customers and renters as CSV | Marketing > Export Customers / Export Renters > Export | No (generic reading) |
 | Checkfront | Global (tours, activity rentals) | Bookings as CSV, Excel, PDF, XML | Booking Index > Export (all/visible columns, ISO dates option) | Yes (bookings) |
@@ -18,18 +32,23 @@ AI when on, header rules) for columns it doesn't know, and the owner checks ever
 | FareHarbor | NA, global (activities) | Bookings and contacts reports as CSV | Reports > Bookings / Contacts report > export | Yes (bookings) |
 | HQ Rental Software | Global (EU, NA, LatAm) | Every table and report to Excel; reports to PDF; REST API | Table menu (top right) > Actions > Export; Reports > Excel button | Yes (reservations, vehicles) |
 | MotoStack | SEA (Thailand, Bali) | No export documented on its public site | Ask support | No |
-| Navotar | NA | Reports to Excel (not documented publicly) | Ask support / reports | Yes (reservations/agreements, inferred) |
+| RENTALL (formerly Navotar) | NA | Reports to Excel (not documented publicly) | Ask support / reports | Yes (reservations/agreements, inferred) |
 | Rent Centric | NA | Reports (not documented publicly) | Ask support | No |
 | Rental Car Manager (RCM) | AU, NZ, UK, global | Bookings Export (all booking fields + payments) to Excel, CSV, PDF | Reports > Other Reports > Bookings Export, Include Payments | Yes (bookings with payments) |
-| Rentle | EU (Nordics) | Not documented publicly | Ask support | Yes (orders, inferred) |
 | RentSyst | EU, global | Vehicles list as XLS or CSV; data export listed on its pricing page | Vehicles > Park > Options > XLS/CSV | Yes (vehicles, orders, inferred) |
 | RentWorks / RentWorks Plus (Bluebird) | NA, UK | Every report to PDF, Excel, CSV; Reservations and Customers lists have Export buttons; accounting export | Export Results on reports; list Export buttons | Yes (agreements/reservations, fleet) |
 | Rezdy | AU, global (tours) | Sales - Orders report to CSV (all columns, whatever is shown) | Reports > Sales - Orders > Export to CSV | Yes (orders) |
 | TSD Rental | NA (dealer loaners, rental) | Custom reports exported to Microsoft Excel; G/L output files | Reports (not documented publicly) | Yes (contracts, units, inferred) |
+| TWICE Commerce (formerly Rentle) | EU (Nordics), equipment/scooters | Every table's current view as CSV; Revenue and Payments reports as CSV (Export tab, 100,000 rows) | Table > Export; Reports > Export tab | Yes (orders, payments report; partly documented) |
 | Wheelbase | NA (RV/campervan) | Not documented publicly | Ask support | No |
 
 Also looked at and left out of the presets (not enough public detail or not vehicle rental): Thermeon (enterprise,
-implementation-led), Rentall, Twice, Planyo, Bókun, TopRentApp, WorCo.
+implementation-led), Planyo, Bókun, WorCo. Europe/UK long tail (BookingPlan, GOCARS, Ridebly, Dynabyte, Renthub,
+Noleggy, Esposito, CileaRent, AZLoc, Teori, C-Rent, Yourenti, RentPanels, Flit2GO, Renviq, Eccocar, iVech, Carhire
+Manager Web, Rently) is covered by the generic spreadsheet reading; research in the 4 November 2026 EU report.
+
+The table is grouped: European and UK systems added on 4 November 2026 first, then the original list. The importer
+and website sort by name.
 
 ## Per software
 
@@ -84,7 +103,11 @@ implementation-led), Rentall, Twice, Planyo, Bókun, TopRentApp, WorCo.
   Data likely only via a support request.
 - Source: https://motostack.io/
 
-### Navotar — *nothing public*
+### RENTALL (formerly Navotar) — *nothing public*
+- Navotar announced its switch to the Rentall brand on 9 May 2022 (merger with Bluebird and Thermeon); navotar.com
+  redirects to rentallsoftware.com. Catalogue id and `/switch/navotar` kept. Sources:
+  https://www.autorentalnews.com/news/navotar-announces-branding-switch-to-rentall ·
+  https://www.autorentalnews.com/news/bluebird-thermeon-navotar-combine-to-form-rentall
 - No public help centre found. Preset (inferred) expects reservation and agreement numbers, pickup/return dates,
   vehicle type, vehicle number, customer, status. US: month-first dates, miles. Support request may be needed.
 - Source: https://www.youtube.com/watch?v=K8whwY_PxYk (vendor demo; no export documentation found)
@@ -96,8 +119,66 @@ implementation-led), Rentall, Twice, Planyo, Bókun, TopRentApp, WorCo.
   Reservation, Hired or Returned; payment details: payment date, payment type, reference number, amount, merchant fee.
 - Source: https://support.rentalcarmanager.com/portal/en/kb/articles/booking-export-report
 
-### Rentle — *nothing public*
-- No public export article found. Preset (inferred): order, start, end, store, customer, total, products.
+### TWICE Commerce (formerly Rentle) — *documented paths, partly documented columns*
+- Renamed: the Rentle WordPress plugin changelog reads "Rentle ==> Twice Commerce brand changes". Catalogue id
+  `rentle` and `/switch/rentle` kept; `/switch/twice-commerce` redirects there (next.config.ts).
+- Every admin table exports the current view (filters, sorts, groupings, visible columns) as CSV with one click.
+  Orders table columns named in TWICE's update notes: Payment, Deposit, Stage (formerly State), Item states,
+  Fulfillment state, Customers, Sales channel, Price, Line items, Purchase types, End date returned.
+- Finance reports (Revenue, Payments) export CSV from the Export tab, up to 100,000 rows. Revenue CSV: Document_Type,
+  Revenue_Category, Order_Number, Item_Name, Quantity, Create_Date, Start_Date, End_Date, Created/Started/Ended_In_Period,
+  Account, Location, Cost_Center, Timezone, Amount_Excl_Tax, Amount_Total, Payment_Status, Amount_Paid,
+  Amount_Refunded, Amount_Outstanding, First_Payment_Date, Row_ID (+ one tax column per rate). Payments CSV:
+  Payment_Date, Payment_Datetime, Payment_Type, Payment_Method, Payment_Provider, Account, Location, Cost_Center,
+  Timezone, Amount_Excl_Tax, Amount_Total, Revenue_Row_ID, Row_ID. Dates are in the account timezone; format not stated.
+- Presets: orders (key: store/shop, sales channel, line items or purchase types; Stage = status, Line items = vehicle,
+  Customers = customer) and the Payments CSV (key: Revenue_Row_ID). The Revenue CSV is one row per order line, so it
+  is not a preset; it is read generically when uploaded beside a recognised file. Older Rentle exports (order, start,
+  end, store, customer, total, products) still match. Exact orders headers for start/end dates are unconfirmed.
+- Sources: https://www.twicecommerce.com/docs/admin/tables · https://www.twicecommerce.com/docs/updates ·
+  https://www.twicecommerce.com/docs/concepts/reports/finance-reports · https://wordpress.org/plugins/embed-rentle/
+
+### VEVS — *documented paths, inferred columns (confirm with a real file)*
+- Customers: "Under the Customers menu check the client's details that you want to export and from the Choose Action
+  button click on 'Export selected'. Clients' details will be saved into a CSV file." Reservations: "Quickly export
+  reservations in CSV format" (VEVS blog); Glovebox's migration guide names the "Export Reservations" screen, which
+  uses a configurable export template.
+- Fields (from Glovebox's importer guide, not VEVS): booking reference, customer first name, last name, email, phone,
+  pickup and return date/time, vehicle, pickup and return locations, booking total, booking status, notes; dates
+  `DD.MM.YYYY`. Glovebox dedupes on the VEVS reference and matches customers on email.
+- **Exact header strings are not published.** The preset is deliberately strict: it needs a pickup location heading
+  and all of return location, first name, last name, email, pickup date and return date, 9 of 13 signature headings
+  (8 when the owner picks VEVS), and is ruled out by other software's tell-tale headings (outstanding balance,
+  merchant fee, date booked, date closed, item count, tax region, sales channel, line items). **Confirm the headings
+  with a real VEVS export and adjust `lib/import/presets.ts`.** Whether operators can run the reservations export
+  themselves is also unconfirmed (Glovebox flags it).
+- Sources: https://www.vevs.com/how-to/customers.php ·
+  https://www.vevs.com/blog/new-upgrade-for-the-car-rental-website-builder-67.php ·
+  https://getglovebox.co.nz/help/guides/switching-to-glovebox-from-vevs
+
+### Wheelsys, TopRentApp, MyRent, Renteon, Rentware, Anolla — *paths partly public, no columns*
+- Wheelsys (Athens): "Reports can be exported in many formats, printed or emailed... scheduled to be delivered in your
+  inbox." https://wheelsys.com/features/
+- TopRentApp (Oxygen S.R.L., Rome): "Upon termination, we will provide ALL DATA to the customer in a human readable
+  format such as SQL or CSV." https://toprentapp.com/
+- MyRent (Dogma Systems Srl, Italy): "exporting of reports to other format like excel".
+  https://www.myrentsoftware.com/introduction/
+- Renteon (VIP-DATA d.o.o., Zagreb): "data export to finance" listed. https://renteon.com/hr/
+- Rentware (Germany): revenue export (Datev) as CSV or Excel at app.rentware.io/metrics/datev-revenue; no booking or
+  customer export documented. https://rentware.com/en/help/export-your-accounting-data/
+- Anolla: "Export raw data at any time to Excel, Google Sheets or directly to BI and AI tools".
+  https://anolla.com/en/vehicle-rental-software
+- No presets: collect a real export from the first migrating customer before building one (Wheelsys and TopRentApp
+  first).
+
+### Coastr, Prohire (UK); Lokki, Fleetee (FR); Appointrent (IT); Way2Rentals, AnyRent (PT) — *nothing public*
+- Coastr: only vehicle tracking/trip CSV from Reports is documented
+  (https://help.coastr.com/knowledge/how-to-view-and-download-vehicle-tracking/trips-data-in-the-reports-section);
+  it offers migration in from Excel/paper (https://www.coastr.com/). Prohire: nothing public
+  (https://www.prohire.co.uk/). Lokki (https://solutions.lokki.rent/it/logiciel-location/mobilite), Fleetee
+  (https://www.fleetee.io/), Appointrent (https://appointrent.com/), Way2Rentals (https://way2rentals.com/en/),
+  AnyRent (https://www.anyrent.pt/pt): no export documentation found. Generic steps; UK entries miles, EU entries km,
+  all day-first dates (these defaults only take effect once a preset exists).
 
 ### RentSyst — *documented path (vehicles), inferred columns*
 - Vehicles > Park > **Options** > XLS or CSV. "Data export" and "Fleet import" are listed among plan features.
@@ -132,8 +213,10 @@ implementation-led), Rentall, Twice, Planyo, Bókun, TopRentApp, WorCo.
 ## Data that needs an API or a support request
 - **HQ Rental Software**: Excel covers tables and reports; full history with payments/refunds per reservation is
   easiest via the API (developer) if the table export lacks a column.
-- **MotoStack, Navotar, Rent Centric, Easy Rent Pro, Wheelbase, Rentle**: no documented self-serve export; expect a
-  support request (or copy lists / photos into RoveHQ's importer).
+- **MotoStack, RENTALL (Navotar), Rent Centric, Easy Rent Pro, Wheelbase, Prohire, Lokki, Fleetee, Appointrent,
+  Way2Rentals, AnyRent, Renteon**: no documented self-serve export; expect a support request (or copy lists / photos
+  into RoveHQ's importer). **TopRentApp** hands over all data (SQL or CSV) on termination. **Rentware** and **Coastr**
+  document only revenue or tracking exports; bookings and customers need support.
 - **TSD Rental**: report export to Excel exists but the path isn't public; dealers may need TSD support.
 - **RentSyst**: vehicles self-serve; orders and clients may need support depending on plan.
 

@@ -22,6 +22,8 @@ Rental Car Manager describes the Bookings Export as a data dump for analysis in 
 
 Columns you hide in the report are left out of the export too, so show everything before exporting.
 
+Still deciding? Read our [Rental Car Manager vs RoveHQ comparison](/guides/rental-car-manager-vs-rovehq).
+
 ## Free import
 
 Importing is free on every plan. RoveHQ recognises Rental Car Manager exports and reads them straight away. You see every vehicle, booking and payment before anything is saved, and you can take the whole import back within 30 days. If you'd rather not do it yourself, [send us the files](/contact) and we'll bring them in for you.

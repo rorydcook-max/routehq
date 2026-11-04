@@ -4,6 +4,7 @@ import { Marked } from "marked";
 import { parse as parseYaml } from "yaml";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { localizeSitePath } from "@/lib/site/locale-path";
+import { isLaunched } from "@/lib/site/launch";
 
 /**
  * The website's written content: guides (content/guides/<locale>/<slug>.md) and free resources
@@ -39,6 +40,8 @@ export type GuideMeta = {
   leadMagnet: string | null;
   faq: FaqItem[];
   cover: string | null;
+  /** `launch: payments`: written for a launch and hidden until it is live (lib/site/launch.ts). */
+  launch: string | null;
 };
 export type Guide = GuideMeta & { html: string; headings: Heading[] };
 
@@ -128,13 +131,58 @@ export function headingId(text: string) {
   return id || "section";
 }
 
-/** Markdown to HTML: heading ids (H2s become the table of contents), website links kept in the page's language, tables that scroll on phones. */
+/* ── Guides held for a launch, as seen from other pages' links ─────────── */
+
+const gateCache = new Map<string, { mtime: number; launch: string | null }>();
+
+/** A guide file's launch gate, from its frontmatter alone (no Markdown, so guides linking to each other can't loop); undefined when there's no file. */
+function guideGate(path: string): string | null | undefined {
+  let mtime: number;
+  try {
+    mtime = statSync(path).mtimeMs;
+  } catch {
+    return undefined;
+  }
+  const hit = gateCache.get(path);
+  if (hit && hit.mtime === mtime) return hit.launch;
+  const launch = str(splitFrontmatter(readFileSync(path, "utf8")).data.launch) || null;
+  gateCache.set(path, { mtime, launch });
+  return launch;
+}
+
+/** True when a website link points at a guide held back for a launch that isn't live yet (lib/site/launch.ts). */
+export function isHeldGuideLink(href: string, locale: string) {
+  const match = href.match(/^\/guides\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?(?:[?#].*)?$/);
+  if (!match) return false;
+  for (const code of [locale, "en"]) {
+    if (!locales.has(code)) continue;
+    const gate = guideGate(join(CONTENT, "guides", code, `${match[1]}.md`));
+    if (gate !== undefined) return !isLaunched(gate);
+  }
+  return false;
+}
+
+/**
+ * Markdown to HTML: heading ids (H2s become the table of contents), website links kept in the page's language, tables
+ * that scroll on phones. A paragraph that links to a guide held for a launch is left out until the launch, and such a
+ * link anywhere else (a list, a table) shows as plain text, so no page links to a guide that answers 404.
+ */
 export function renderMarkdown(body: string, locale: string): { html: string; headings: Heading[] } {
   const headings: Heading[] = [];
   const used = new Map<string, number>();
   const marked = new Marked({ gfm: true, async: false });
+  let heldLink = false;
   marked.use({
     renderer: {
+      paragraph({ tokens }) {
+        heldLink = false;
+        const inner = this.parser.parseInline(tokens);
+        if (heldLink) {
+          heldLink = false;
+          return "";
+        }
+        return `<p>${inner}</p>\n`;
+      },
       heading({ tokens, depth }) {
         const inner = this.parser.parseInline(tokens);
         const base = headingId(decodeEntities(inner.replace(/<[^>]+>/g, "")));
@@ -150,6 +198,10 @@ export function renderMarkdown(body: string, locale: string): { html: string; he
       },
       link({ href, title, tokens }) {
         const inner = this.parser.parseInline(tokens);
+        if (isHeldGuideLink(href, locale)) {
+          heldLink = true;
+          return inner;
+        }
         const external = /^https?:\/\//i.test(href);
         const safe = /^(https?:\/\/|mailto:|\/|#)/i.test(href) ? href : "#";
         const target = safe.startsWith("/") ? localizeSitePath(safe, locale) : safe;
@@ -194,6 +246,7 @@ function readGuide(locale: string, slug: string): Guide | null {
       leadMagnet: SLUG.test(str(data.leadMagnet)) ? str(data.leadMagnet) : null,
       faq,
       cover: str(data.cover) || null,
+      launch: str(data.launch) || null,
       html,
       headings,
       draft: data.draft === true
@@ -203,10 +256,10 @@ function readGuide(locale: string, slug: string): Guide | null {
 
 const isDraft = (item: unknown) => Boolean((item as { draft?: boolean } | null)?.draft);
 
-/** A guide in a language, or null when it has not been written (or translated) yet. */
+/** A guide in a language, or null when it has not been written (or translated) yet, or is held for a launch. */
 export function getGuide(locale: string, slug: string): Guide | null {
   const guide = readGuide(locale, slug);
-  return guide && !isDraft(guide) ? guide : null;
+  return guide && !isDraft(guide) && isLaunched(guide.launch) ? guide : null;
 }
 
 /** Every published guide in a language, newest first. */

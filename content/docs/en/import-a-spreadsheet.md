@@ -4,8 +4,8 @@ description: "Bring in vehicles, rentals, customers, payments and costs from a s
 category: getting-started
 order: 5
 appPath: "/fleet/import"
-related: ["fleet-assistant", "add-a-vehicle", "rentals-already-running", "get-help"]
-updated: 2026-11-02
+related: ["switch-from-other-software", "fleet-assistant", "add-a-vehicle", "rentals-already-running", "get-help"]
+updated: 2026-11-04
 faq:
   - q: "Will it make copies of vehicles I already have?"
     a: "No. Vehicles already in your fleet are matched, and only their blank details are filled in."
@@ -13,7 +13,9 @@ faq:
 
 Go to **Fleet** and tap **Import** (or **+**, then **Import vehicles**). Only the owner can import.
 
-One file can hold any mix of vehicles, current rentals, customers, and payments and costs. Thai or English headers, Buddhist years and baht amounts are fine.
+One file can hold any mix of vehicles, current rentals, customers, and payments and costs. Headers in any language, Buddhist years and any currency are fine.
+
+Moving from other rental software? See [Switch from other rental software](/docs/switch-from-other-software).
 
 ## 1. Add your file
 

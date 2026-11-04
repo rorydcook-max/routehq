@@ -4,9 +4,13 @@
  * The plain text and subjects are exactly what each email said before the redesign (4 Nov 2026): this file only adds
  * the HTML version beside them. Pure functions (no database), so scripts/email-previews.ts can draw each one with
  * sample data.
+ *
+ * Each takes `words` (lib/email/words.ts, emailWords(locale)) in the email's language: the button texts, the
+ * "why you got this" footer and "Sent with RoveHQ" follow it, and so do lang and right-to-left.
  */
 
 import { renderEmailHtml, type EmailBlock, type EmailBrand } from "@/lib/email/layout";
+import type { EmailWords } from "@/lib/email/words";
 
 export type BuiltEmail = { subject: string; text: string; html: string };
 
@@ -20,17 +24,26 @@ function around(text: string, marker: string): [string, string] {
 
 // ── Operator alerts (lib/notify-operator.ts) ────────────────────────────────────────────────────────────────────────
 
-export function operatorAlertEmail(input: { title: string; plain: string; link: string; orgName: string | null | undefined; appUrl: string }): BuiltEmail {
-  const business = input.orgName || "your business";
-  const reason = `You get this because email alerts are on for ${business}. Change them in Settings › Notifications.`;
-  const text = `${input.plain}\n\n${input.link ? `Open in RoveHQ: ${input.link}\n\n` : ""}${reason}`;
+/** "Reason. Change it in Settings › Notifications." as one plain-text line in English (as before), two lines otherwise. */
+function plainReason(words: EmailWords, reason: string, settings: string) {
+  return words.locale === "en" ? `${reason} ${settings}.` : `${reason}\n${settings}`;
+}
+
+/** The operator's own language (owner's preferred language, else the business's), from lib/notify-operator.ts. */
+export function operatorAlertEmail(input: { title: string; plain: string; link: string; orgName: string | null | undefined; appUrl: string; words: EmailWords }): BuiltEmail {
+  const { words } = input;
+  const business = input.orgName || words.t("yourBusiness");
+  const reason = words.t("alertReason", { business });
+  const settings = words.t("alertSettings");
+  const text = `${input.plain}\n\n${input.link ? `${words.t("openInApp")}: ${input.link}\n\n` : ""}${plainReason(words, reason, settings)}`;
   const html = renderEmailHtml({
+    locale: words.locale,
     preheader: input.plain.slice(0, 140),
     eyebrow: input.orgName || undefined,
     heading: input.title,
     blocks: [{ type: "text", text: input.plain }],
-    button: input.link ? { label: "Open in RoveHQ", url: input.link } : null,
-    footer: { reason: `You get this because email alerts are on for ${business}.`, settings: settingsUrl(input.appUrl) ? { label: "Change them in Settings › Notifications", url: settingsUrl(input.appUrl) } : null }
+    button: input.link ? { label: words.t("openInApp"), url: input.link } : null,
+    footer: { reason, settings: settingsUrl(input.appUrl) ? { label: settings, url: settingsUrl(input.appUrl) } : null }
   });
   return { subject: `${input.title}: ${input.plain.slice(0, 80)}`, text, html };
 }
@@ -108,34 +121,38 @@ function lineSummaryBlocks(messages: any[]): { eyebrow?: string; heading?: strin
   return out;
 }
 
-export function morningSummaryEmail(input: { orgName: string | null | undefined; messages: any[]; appUrl: string; locale?: string | null }): BuiltEmail | null {
+/** In the summary's own language (English or Thai, lib/line/daily-summary.ts): pass emailWords(data.locale). */
+export function morningSummaryEmail(input: { orgName: string | null | undefined; messages: any[]; appUrl: string; words: EmailWords }): BuiltEmail | null {
+  const { words } = input;
   const text = lineSummaryText(input.messages);
   if (!text) return null;
   const { eyebrow, heading, blocks } = lineSummaryBlocks(input.messages);
-  const business = input.orgName || "your business";
+  const business = input.orgName || words.t("yourBusiness");
   const html = renderEmailHtml({
-    locale: input.locale,
+    locale: words.locale,
     preheader: text.split("\n").slice(0, 3).join(" · "),
     eyebrow,
     heading,
     blocks,
-    button: input.appUrl ? { label: "Open RoveHQ", url: input.appUrl } : null,
+    button: input.appUrl ? { label: words.t("openApp"), url: input.appUrl } : null,
     footer: {
-      reason: `You get this because the morning summary by email is on for ${business}.`,
-      settings: settingsUrl(input.appUrl) ? { label: "Change it in Settings › Notifications", url: settingsUrl(input.appUrl) } : null
+      reason: words.t("summaryReason", { business }),
+      settings: settingsUrl(input.appUrl) ? { label: words.t("summarySettings"), url: settingsUrl(input.appUrl) } : null
     }
   });
-  return { subject: `${input.orgName || "RoveHQ"}: your morning summary`, text: `${text}${input.appUrl ? `\n\nOpen RoveHQ: ${input.appUrl}` : ""}`, html };
+  return { subject: `${input.orgName || "RoveHQ"}: your morning summary`, text: `${text}${input.appUrl ? `\n\n${words.t("openApp")}: ${input.appUrl}` : ""}`, html };
 }
 
 // ── Signed rental documents to the customer (lib/rental-document-email.ts) - the operator's brand ───────────────────
 
+/** The wording is English for now, so the caller passes emailWords("en") and the footer matches it. */
 export function executedDocumentEmail(input: {
   documentLabel: string;
   business: string;
   recipientName: string;
   filenames: string[];
   brand: EmailBrand;
+  words: EmailWords;
 }): BuiltEmail {
   const label = input.documentLabel.toLowerCase();
   const greeting = input.recipientName ? `Hi ${input.recipientName},` : "Hello,";
@@ -144,25 +161,29 @@ export function executedDocumentEmail(input: {
   const subject = `Your ${label} from ${input.business}`;
   const html = renderEmailHtml({
     brand: input.brand,
+    locale: input.words.locale,
     preheader: attached,
     heading: subject,
     blocks: [
       { type: "text", text: `${greeting}\n\n${attached}` },
       ...(input.filenames.length ? [{ type: "card" as const, lines: input.filenames.map((name) => ({ text: `📎 ${name}`, tone: "strong" as const })) }] : []),
       { type: "text", text: wrong }
-    ]
+    ],
+    footer: { sentWith: input.words.t("sentWith") }
   });
   return { subject, text: [greeting, "", attached, "", wrong].join("\n"), html };
 }
 
 // ── Messages to a customer by email, when they have no chat (lib/customer-messages.ts) - the operator's brand ──────
 
-export function customerMessageEmail(input: { subject: string; body: string; brand: EmailBrand; locale?: string | null }): BuiltEmail {
+/** In the customer's language: pass emailWords(<the customer's saved language>). */
+export function customerMessageEmail(input: { subject: string; body: string; brand: EmailBrand; words: EmailWords }): BuiltEmail {
   const html = renderEmailHtml({
     brand: input.brand,
-    locale: input.locale,
+    locale: input.words.locale,
     preheader: input.body.split("\n")[0]?.slice(0, 140),
-    blocks: [{ type: "text", text: input.body }]
+    blocks: [{ type: "text", text: input.body }],
+    footer: { sentWith: input.words.t("sentWith") }
   });
   return { subject: input.subject, text: input.body, html };
 }
@@ -180,11 +201,12 @@ export function leadEmail(input: {
   bodyWithMarker: string;
   heading?: string;
   downloads: Array<{ label: string; detail?: string; url: string }>;
-  locale?: string | null;
+  /** The visitor's language: emailWords(<the page's language>). */
+  words: EmailWords;
 }): BuiltEmail {
   const [before, after] = around(input.bodyWithMarker, LEAD_LINKS_MARKER);
   const html = renderEmailHtml({
-    locale: input.locale,
+    locale: input.words.locale,
     preheader: input.heading,
     heading: input.heading,
     blocks: [
@@ -198,30 +220,35 @@ export function leadEmail(input: {
 
 // ── RoveHQ support actions (app/actions/admin.ts) ───────────────────────────────────────────────────────────────────
 
-export function adminPasswordResetEmail(input: { link: string }): BuiltEmail {
+// The wording is English for now, so the caller passes emailWords("en") and the labels match it.
+
+export function adminPasswordResetEmail(input: { link: string; words: EmailWords }): BuiltEmail {
+  const { words } = input;
   const text = `Hello,\n\nRoveHQ support has sent you a link to choose a new password:\n\n${input.link}\n\nThe link works once and stops working after a short while. If you didn't ask for this, you can ignore this email: your password stays the same.\n\nRoveHQ`;
   const html = renderEmailHtml({
+    locale: words.locale,
     preheader: "RoveHQ support has sent you a link to choose a new password.",
     heading: "Reset your RoveHQ password",
     blocks: [
       { type: "text", text: "Hello,\n\nRoveHQ support has sent you a link to choose a new password:" },
-      { type: "fallback-link", intro: "If the button doesn't work, copy this link into your browser:", url: input.link },
+      { type: "fallback-link", intro: words.t("linkFallback"), url: input.link },
       { type: "text", text: "The link works once and stops working after a short while. If you didn't ask for this, you can ignore this email: your password stays the same.\n\nRoveHQ" }
     ],
-    button: { label: "Choose a new password", url: input.link },
-    footer: { reason: "You get this because RoveHQ support sent you a password link." }
+    button: { label: words.t("choosePassword"), url: input.link },
+    footer: { reason: words.t("passwordReason") }
   });
   return { subject: "Reset your RoveHQ password", text, html };
 }
 
-export function adminEmailChangedEmail(input: { before: string | null; email: string }): BuiltEmail {
+export function adminEmailChangedEmail(input: { before: string | null; email: string; words: EmailWords }): BuiltEmail {
   const changed = `RoveHQ support changed the email address you sign in with${input.before ? ` from ${input.before}` : ""} to ${input.email}.`;
   const tail = "If you didn't ask for this, reply to this email or contact RoveHQ support straight away.";
   const html = renderEmailHtml({
+    locale: input.words.locale,
     preheader: changed,
     heading: "Your RoveHQ email address was changed",
     blocks: [{ type: "text", text: `Hello,\n\n${changed}\n\n${tail}\n\nRoveHQ` }],
-    footer: { reason: "You get this because the sign-in email on your RoveHQ account changed." }
+    footer: { reason: input.words.t("emailChangedReason") }
   });
   return { subject: "Your RoveHQ email address was changed", text: `Hello,\n\n${changed}\n\n${tail}\n\nRoveHQ`, html };
 }

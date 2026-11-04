@@ -1,6 +1,7 @@
 import { isEmailConfigured, sendEmail, type EmailAttachment } from "@/lib/email";
 import { recordActivityEventOnce } from "@/lib/supabase/activity";
 import { executedDocumentEmail } from "@/lib/email/templates";
+import { emailWords } from "@/lib/email/words";
 import { operatorEmailBrandById } from "@/lib/email/operator-brand";
 
 type StoredFile = { bucket: string | null | undefined; path: string | null | undefined; filename: string };
@@ -85,7 +86,8 @@ export async function emailExecutedDocumentToCustomer(input: ExecutedDocumentEma
 
     const result = await sendEmail({
       to,
-      ...executedDocumentEmail({ documentLabel: input.documentLabel, business, recipientName: name, filenames: attachments.map((file) => file.filename), brand }),
+      // The wording is English, so the "Sent with RoveHQ" line is too.
+      ...executedDocumentEmail({ documentLabel: input.documentLabel, business, recipientName: name, filenames: attachments.map((file) => file.filename), brand, words: await emailWords("en") }),
       attachments,
       metadata: { document_id: input.documentId, version_id: input.versionId }
     });

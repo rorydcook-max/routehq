@@ -6681,5 +6681,19 @@
     "customerDelete": "Radera den här kunden",
     "customerDeleteBody": "Tar bort kundens uppgifter, ID-foton och meddelanden. Bokningar, betalningar och signerade avtal finns kvar som \"Raderad kund\" för din bokföring.",
     "customerDeleteConfirm": "Radera uppgifterna"
+  },
+  "email": {
+    "openInApp": "Öppna i RoveHQ",
+    "openApp": "Öppna RoveHQ",
+    "choosePassword": "Välj ett nytt lösenord",
+    "linkFallback": "Om knappen inte fungerar, kopiera den här länken till din webbläsare:",
+    "yourBusiness": "ditt företag",
+    "alertReason": "Du får det här eftersom e-postaviseringar är på för {business}.",
+    "alertSettings": "Ändra dem under Inställningar › Aviseringar",
+    "summaryReason": "Du får det här eftersom morgonsammanfattningen via e-post är på för {business}.",
+    "summarySettings": "Ändra det under Inställningar › Aviseringar",
+    "passwordReason": "Du får det här eftersom RoveHQ-supporten har skickat en lösenordslänk till dig.",
+    "emailChangedReason": "Du får det här eftersom inloggningsadressen för ditt RoveHQ-konto har ändrats.",
+    "sentWith": "Skickat med {rovehq}"
   }
 }

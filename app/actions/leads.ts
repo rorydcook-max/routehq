@@ -3,6 +3,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { LEAD_LINKS_MARKER, leadEmail } from "@/lib/email/templates";
+import { emailWords } from "@/lib/email/words";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { fileSize, LEAD_COUNTRIES, LEAD_FLEETS, type LeadDownload, type LeadState } from "@/lib/leads";
 import { getResource, isContentSlug, resourceFiles, resourceLocales } from "@/lib/site/content";
@@ -134,7 +135,7 @@ export async function requestLead(previous: LeadState, formData: FormData): Prom
           bodyWithMarker: m("leadEmailBody", { ...bodyValues, links: LEAD_LINKS_MARKER }),
           heading: resource?.title || undefined,
           downloads: downloads.map((item) => ({ label: item.label, detail: item.detail, url: `${siteOrigin()}${item.href}` })),
-          locale
+          words: await emailWords(locale)
         }),
         metadata: { kind: "lead", resource: slug }
       });

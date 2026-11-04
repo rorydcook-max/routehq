@@ -6608,5 +6608,19 @@
     "sRecordCost": "Registra una spesa",
     "choose": "Scegli",
     "save": "Salva"
+  },
+  "email": {
+    "openInApp": "Apri in RoveHQ",
+    "openApp": "Apri RoveHQ",
+    "choosePassword": "Scegli una nuova password",
+    "linkFallback": "Se il pulsante non funziona, copia questo link nel browser:",
+    "yourBusiness": "la tua attività",
+    "alertReason": "Ricevi questa email perché gli avvisi via email sono attivi per {business}.",
+    "alertSettings": "Modificali in Impostazioni › Notifiche",
+    "summaryReason": "Ricevi questa email perché il riepilogo del mattino via email è attivo per {business}.",
+    "summarySettings": "Modificalo in Impostazioni › Notifiche",
+    "passwordReason": "Ricevi questa email perché l’assistenza RoveHQ ti ha inviato un link per la password.",
+    "emailChangedReason": "Ricevi questa email perché l’email di accesso del tuo account RoveHQ è cambiata.",
+    "sentWith": "Inviato con {rovehq}"
   }
 }

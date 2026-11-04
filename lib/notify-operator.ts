@@ -4,6 +4,7 @@ import { sendPushToOrganization } from "@/lib/push";
 import { alertSettings, wantsAlert } from "@/lib/alerts";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { operatorAlertEmail } from "@/lib/email/templates";
+import { emailWords } from "@/lib/email/words";
 import { isTelegramConfigured, sendTelegram } from "@/lib/telegram";
 
 const PUSH_TITLES: Record<string, string> = {
@@ -30,6 +31,30 @@ async function alertEmails(supabase: any, organisationId: string, emailTo: strin
 }
 
 /**
+ * The language an email alert's button and footer are in: the owner's own app language, else the business's
+ * language, as the morning summary picks it (lib/line/daily-summary.ts); English when neither is set.
+ */
+async function operatorLanguage(supabase: any, organisationId: string, businessLocale: string | null | undefined): Promise<string> {
+  try {
+    const { data: owner } = await supabase
+      .from("organization_members")
+      .select("user_id")
+      .eq("organization_id", organisationId)
+      .eq("role", "owner")
+      .eq("is_active", true)
+      .limit(1)
+      .maybeSingle();
+    if (owner?.user_id) {
+      const { data: user } = await supabase.from("users").select("preferred_locale").eq("id", owner.user_id).maybeSingle();
+      if (user?.preferred_locale) return String(user.preferred_locale);
+    }
+  } catch {
+    // Fall back to the business's language.
+  }
+  return String(businessLocale || "en");
+}
+
+/**
  * Tells the business something happened: an alert on their devices, LINE, email and Telegram,
  * each only if switched on for this kind of event (Settings › Notifications).
  * Always fails silently - never throws - so it never breaks the main flow.
@@ -46,7 +71,7 @@ export async function notifyOperator(
 
     const { data: org } = await supabase
       .from("organizations")
-      .select("name, line_user_id, line_channel_access_token, line_notifications_enabled, settings")
+      .select("name, default_locale, line_user_id, line_channel_access_token, line_notifications_enabled, settings")
       .eq("id", organisationId)
       .maybeSingle();
     if (!org) return;
@@ -88,12 +113,15 @@ export async function notifyOperator(
 
     if (isEmailConfigured() && wantsAlert(settings, type, "email")) {
       jobs.push(
-        alertEmails(supabase, organisationId, alertSettings(settings).email_to).then((emails) =>
+        Promise.all([
+          alertEmails(supabase, organisationId, alertSettings(settings).email_to),
+          operatorLanguage(supabase, organisationId, org.default_locale).then(emailWords)
+        ]).then(([emails, words]) =>
           Promise.all(
             emails.map((to) =>
               sendEmail({
                 to,
-                ...operatorAlertEmail({ title, plain, link, orgName: org.name, appUrl }),
+                ...operatorAlertEmail({ title, plain, link, orgName: org.name, appUrl, words }),
                 metadata: { kind: "operator_alert", type }
               })
             )

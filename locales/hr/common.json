@@ -6608,5 +6608,19 @@
     "sRecordCost": "Zabilježi trošak",
     "choose": "Odaberi",
     "save": "Spremi"
+  },
+  "email": {
+    "openInApp": "Otvori u RoveHQ-u",
+    "openApp": "Otvori RoveHQ",
+    "choosePassword": "Odaberite novu lozinku",
+    "linkFallback": "Ako gumb ne radi, kopirajte ovu poveznicu u svoj preglednik:",
+    "yourBusiness": "Vašu tvrtku",
+    "alertReason": "Ovo primate jer su obavijesti e-poštom uključene za {business}.",
+    "alertSettings": "Promijenite ih ovdje: Postavke › Obavijesti",
+    "summaryReason": "Ovo primate jer je jutarnji sažetak e-poštom uključen za {business}.",
+    "summarySettings": "Promijenite to ovdje: Postavke › Obavijesti",
+    "passwordReason": "Ovo primate jer Vam je podrška RoveHQ-a poslala poveznicu za lozinku.",
+    "emailChangedReason": "Ovo primate jer je promijenjena e-pošta za prijavu na Vašem RoveHQ računu.",
+    "sentWith": "Poslano putem {rovehq}"
   }
 }

@@ -6608,5 +6608,19 @@
     "customerDelete": "Diesen Kunden löschen",
     "customerDeleteBody": "Entfernt seine Angaben, Ausweisfotos und Nachrichten. Buchungen, Zahlungen und unterschriebene Verträge bleiben als „Gelöschter Kunde“ für Ihre Buchhaltung erhalten.",
     "customerDeleteConfirm": "Seine Daten löschen"
+  },
+  "email": {
+    "openInApp": "In RoveHQ öffnen",
+    "openApp": "RoveHQ öffnen",
+    "choosePassword": "Neues Passwort wählen",
+    "linkFallback": "Falls der Button nicht funktioniert, kopieren Sie diesen Link in Ihren Browser:",
+    "yourBusiness": "Ihr Unternehmen",
+    "alertReason": "Sie erhalten diese E-Mail, weil E-Mail-Benachrichtigungen für {business} eingeschaltet sind.",
+    "alertSettings": "Ändern unter Einstellungen › Benachrichtigungen",
+    "summaryReason": "Sie erhalten diese E-Mail, weil die Morgenübersicht per E-Mail für {business} eingeschaltet ist.",
+    "summarySettings": "Ändern unter Einstellungen › Benachrichtigungen",
+    "passwordReason": "Sie erhalten diese E-Mail, weil der RoveHQ-Support Ihnen einen Passwort-Link gesendet hat.",
+    "emailChangedReason": "Sie erhalten diese E-Mail, weil die Anmelde-E-Mail Ihres RoveHQ-Kontos geändert wurde.",
+    "sentWith": "Gesendet mit {rovehq}"
   }
 }

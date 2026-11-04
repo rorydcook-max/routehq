@@ -6608,5 +6608,19 @@
     "sRecordCost": "Kosten vastleggen",
     "choose": "Kiezen",
     "save": "Opslaan"
+  },
+  "email": {
+    "openInApp": "Openen in RoveHQ",
+    "openApp": "RoveHQ openen",
+    "choosePassword": "Kies een nieuw wachtwoord",
+    "linkFallback": "Werkt de knop niet? Kopieer deze link naar je browser:",
+    "yourBusiness": "je bedrijf",
+    "alertReason": "Je krijgt dit omdat e-mailmeldingen aanstaan voor {business}.",
+    "alertSettings": "Wijzig ze in Instellingen › Meldingen",
+    "summaryReason": "Je krijgt dit omdat de ochtendsamenvatting per e-mail aanstaat voor {business}.",
+    "summarySettings": "Wijzig dit in Instellingen › Meldingen",
+    "passwordReason": "Je krijgt dit omdat RoveHQ-support je een wachtwoordlink heeft gestuurd.",
+    "emailChangedReason": "Je krijgt dit omdat het inlog-e-mailadres van je RoveHQ-account is gewijzigd.",
+    "sentWith": "Verzonden met {rovehq}"
   }
 }

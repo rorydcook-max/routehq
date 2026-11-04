@@ -10,6 +10,7 @@ import { ACTIVE_ORGANIZATION_COOKIE } from "@/lib/auth/active-organization";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
 import { sendEmail } from "@/lib/email";
 import { adminEmailChangedEmail, adminPasswordResetEmail } from "@/lib/email/templates";
+import { emailWords } from "@/lib/email/words";
 import { parseCustomLimits, type CustomLimits } from "@/lib/plans";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -133,7 +134,8 @@ export async function adminSendPasswordReset(_state: PersonActionState, formData
 
   const sent = await sendEmail({
     to: email,
-    ...adminPasswordResetEmail({ link }),
+    // Written in English, so its button and footer are too.
+    ...adminPasswordResetEmail({ link, words: await emailWords("en") }),
     metadata: { kind: "admin_password_reset" }
   });
   if (sent.status === "sent") {
@@ -179,10 +181,11 @@ export async function adminChangeEmail(_state: PersonActionState, formData: Form
   // Team lists show the invited address for people who haven't set a name: keep it in step.
   if (before) await found.db.from("organization_members").update({ invited_email: email }).eq("user_id", userId).eq("invited_email", before);
 
+  const words = await emailWords("en");
   const notice = (to: string) =>
     sendEmail({
       to,
-      ...adminEmailChangedEmail({ before, email }),
+      ...adminEmailChangedEmail({ before, email, words }),
       metadata: { kind: "admin_email_changed" }
     });
   const results = await Promise.all([notice(email), ...(before ? [notice(before)] : [])]);

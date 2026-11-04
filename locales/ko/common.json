@@ -6681,5 +6681,19 @@
     "customerDelete": "이 고객 삭제",
     "customerDeleteBody": "개인 정보, 신분증 사진, 메시지를 삭제해요. 예약, 결제, 서명된 계약서는 회계를 위해 \"삭제된 고객\"으로 남아요.",
     "customerDeleteConfirm": "데이터 삭제"
+  },
+  "email": {
+    "openInApp": "RoveHQ에서 열기",
+    "openApp": "RoveHQ 열기",
+    "choosePassword": "새 비밀번호 설정",
+    "linkFallback": "버튼이 작동하지 않으면 이 링크를 브라우저에 복사하세요:",
+    "yourBusiness": "회원님의 사업장",
+    "alertReason": "{business}의 이메일 알림이 켜져 있어서 이 메일을 받으셨어요.",
+    "alertSettings": "설정 › 알림에서 변경하세요",
+    "summaryReason": "{business}의 이메일 아침 요약이 켜져 있어서 이 메일을 받으셨어요.",
+    "summarySettings": "설정 › 알림에서 변경하세요",
+    "passwordReason": "RoveHQ 지원팀이 비밀번호 링크를 보내서 이 메일을 받으셨어요.",
+    "emailChangedReason": "RoveHQ 계정의 로그인 이메일이 변경되어 이 메일을 받으셨어요.",
+    "sentWith": "{rovehq}에서 보냄"
   }
 }

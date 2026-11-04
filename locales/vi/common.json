@@ -6681,5 +6681,19 @@
     "customerDelete": "Xóa khách hàng này",
     "customerDeleteBody": "Xóa thông tin, ảnh giấy tờ và tin nhắn của họ. Đặt xe, thanh toán và hợp đồng đã ký vẫn được giữ dưới tên \"Khách hàng đã xóa\" cho sổ sách của bạn.",
     "customerDeleteConfirm": "Xóa dữ liệu của họ"
+  },
+  "email": {
+    "openInApp": "Mở trong RoveHQ",
+    "openApp": "Mở RoveHQ",
+    "choosePassword": "Chọn mật khẩu mới",
+    "linkFallback": "Nếu nút không hoạt động, hãy sao chép liên kết này vào trình duyệt của bạn:",
+    "yourBusiness": "doanh nghiệp của bạn",
+    "alertReason": "Bạn nhận được email này vì thông báo qua email đang bật cho {business}.",
+    "alertSettings": "Thay đổi trong Cài đặt › Thông báo",
+    "summaryReason": "Bạn nhận được email này vì bản tóm tắt buổi sáng qua email đang bật cho {business}.",
+    "summarySettings": "Thay đổi trong Cài đặt › Thông báo",
+    "passwordReason": "Bạn nhận được email này vì bộ phận hỗ trợ RoveHQ đã gửi cho bạn liên kết đặt mật khẩu.",
+    "emailChangedReason": "Bạn nhận được email này vì email đăng nhập của tài khoản RoveHQ của bạn đã được thay đổi.",
+    "sentWith": "Gửi bằng {rovehq}"
   }
 }

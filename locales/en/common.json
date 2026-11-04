@@ -6608,5 +6608,19 @@
     "sRecordCost": "Record a cost",
     "choose": "Choose",
     "save": "Save"
+  },
+  "email": {
+    "openInApp": "Open in RoveHQ",
+    "openApp": "Open RoveHQ",
+    "choosePassword": "Choose a new password",
+    "linkFallback": "If the button doesn't work, copy this link into your browser:",
+    "yourBusiness": "your business",
+    "alertReason": "You get this because email alerts are on for {business}.",
+    "alertSettings": "Change them in Settings › Notifications",
+    "summaryReason": "You get this because the morning summary by email is on for {business}.",
+    "summarySettings": "Change it in Settings › Notifications",
+    "passwordReason": "You get this because RoveHQ support sent you a password link.",
+    "emailChangedReason": "You get this because the sign-in email on your RoveHQ account changed.",
+    "sentWith": "Sent with {rovehq}"
   }
 }

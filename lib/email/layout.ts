@@ -12,8 +12,9 @@
  * - Emails to an operator's customers (signed documents, booking updates): the operator's logo or name, and only a
  *   small "Sent with RoveHQ" at the bottom.
  *
- * This only draws: the words come from the callers, already in the reader's language. Right-to-left languages (he)
- * render right-to-left. The plain-text part of each email stays the caller's own text.
+ * This only draws: the words come from the callers, already in the reader's language (the design's own labels, such
+ * as button texts and the footer, from lib/email/words.ts). Right-to-left languages (he) render right-to-left. The
+ * plain-text part of each email stays the caller's own text.
  */
 
 import { textDirection } from "@/lib/i18n/locales";
@@ -63,6 +64,8 @@ export type EmailContent = {
     reason?: string;
     /** A link to change it, e.g. Settings › Notifications. */
     settings?: { label: string; url: string } | null;
+    /** On emails in an operator's name: "Sent with {rovehq}" in the reader's language ({rovehq} becomes the link). */
+    sentWith?: string;
   };
 };
 
@@ -282,10 +285,12 @@ function footer(brand: EmailBrand, content: EmailContent, align: string) {
   if (content.footer?.settings?.url) {
     parts.push(small(`<a href="${escapeAttr(content.footer.settings.url)}" target="_blank" class="rhq-link" style="color:${C.link};text-decoration:underline;">${escapeHtml(content.footer.settings.label)}</a>`));
   }
+  const rovehqLink = `<a href="${SITE}" target="_blank" class="rhq-muted" style="color:${C.muted};text-decoration:none;font-weight:600;">RoveHQ</a>`;
+  const sentWith = String(content.footer?.sentWith || "Sent with {rovehq}");
   parts.push(
     brand.kind === "rovehq"
-      ? small(`<a href="${SITE}" target="_blank" class="rhq-muted" style="color:${C.muted};text-decoration:none;font-weight:600;">RoveHQ</a> &middot; <a href="${SITE}" target="_blank" class="rhq-muted" style="color:${C.muted};text-decoration:none;">rovehq.io</a>`)
-      : small(`Sent with <a href="${SITE}" target="_blank" class="rhq-muted" style="color:${C.muted};text-decoration:none;font-weight:600;">RoveHQ</a>`, "font-size:11px;")
+      ? small(`${rovehqLink} &middot; <a href="${SITE}" target="_blank" class="rhq-muted" style="color:${C.muted};text-decoration:none;">rovehq.io</a>`)
+      : small(sentWith.split("{rovehq}").map(escapeHtml).join(rovehqLink), "font-size:11px;")
   );
   void align;
   return parts.join("\n");

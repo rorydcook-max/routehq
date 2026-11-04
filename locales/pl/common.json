@@ -6608,5 +6608,19 @@
     "sRecordCost": "Zapisz koszt",
     "choose": "Wybierz",
     "save": "Zapisz"
+  },
+  "email": {
+    "openInApp": "Otwórz w RoveHQ",
+    "openApp": "Otwórz RoveHQ",
+    "choosePassword": "Ustaw nowe hasło",
+    "linkFallback": "Jeśli przycisk nie działa, skopiuj ten link do przeglądarki:",
+    "yourBusiness": "Twojej firmy",
+    "alertReason": "Otrzymujesz tę wiadomość, ponieważ powiadomienia e-mail są włączone dla {business}.",
+    "alertSettings": "Zmień je tutaj: Ustawienia › Powiadomienia",
+    "summaryReason": "Otrzymujesz tę wiadomość, ponieważ poranne podsumowanie e-mailem jest włączone dla {business}.",
+    "summarySettings": "Zmień to tutaj: Ustawienia › Powiadomienia",
+    "passwordReason": "Otrzymujesz tę wiadomość, ponieważ wsparcie RoveHQ wysłało Ci link do hasła.",
+    "emailChangedReason": "Otrzymujesz tę wiadomość, ponieważ zmieniono e-mail logowania do Twojego konta RoveHQ.",
+    "sentWith": "Wysłano przez {rovehq}"
   }
 }

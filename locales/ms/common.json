@@ -6681,5 +6681,19 @@
     "customerDelete": "Padam pelanggan ini",
     "customerDeleteBody": "Membuang butiran, foto ID dan mesej mereka. Tempahan, bayaran dan perjanjian yang ditandatangani kekal sebagai \"Pelanggan dipadam\" untuk akaun anda.",
     "customerDeleteConfirm": "Padam data mereka"
+  },
+  "email": {
+    "openInApp": "Buka dalam RoveHQ",
+    "openApp": "Buka RoveHQ",
+    "choosePassword": "Pilih kata laluan baharu",
+    "linkFallback": "Jika butang tidak berfungsi, salin pautan ini ke pelayar anda:",
+    "yourBusiness": "perniagaan anda",
+    "alertReason": "Anda menerima e-mel ini kerana amaran e-mel dihidupkan untuk {business}.",
+    "alertSettings": "Tukar dalam Tetapan › Pemberitahuan",
+    "summaryReason": "Anda menerima e-mel ini kerana ringkasan pagi melalui e-mel dihidupkan untuk {business}.",
+    "summarySettings": "Tukar dalam Tetapan › Pemberitahuan",
+    "passwordReason": "Anda menerima e-mel ini kerana sokongan RoveHQ menghantar pautan kata laluan kepada anda.",
+    "emailChangedReason": "Anda menerima e-mel ini kerana e-mel log masuk akaun RoveHQ anda telah ditukar.",
+    "sentWith": "Dihantar dengan {rovehq}"
   }
 }

@@ -6613,5 +6613,19 @@
     "customerDelete": "Burahin ang customer na ito",
     "customerDeleteBody": "Buburahin ang kanyang detalye, ID photo at mensahe. Mananatili ang booking, bayad at pinirmahang kasunduan bilang \"Binurang customer\" para sa iyong accounts.",
     "customerDeleteConfirm": "Burahin ang kanyang data"
+  },
+  "email": {
+    "openInApp": "Buksan sa RoveHQ",
+    "openApp": "Buksan ang RoveHQ",
+    "choosePassword": "Pumili ng bagong password",
+    "linkFallback": "Kung hindi gumagana ang button, kopyahin ang link na ito sa iyong browser:",
+    "yourBusiness": "iyong negosyo",
+    "alertReason": "Natanggap mo ito dahil naka-on ang mga email alert para sa {business}.",
+    "alertSettings": "Baguhin ang mga ito sa Mga Setting › Mga notification",
+    "summaryReason": "Natanggap mo ito dahil naka-on ang morning summary sa email para sa {business}.",
+    "summarySettings": "Baguhin ito sa Mga Setting › Mga notification",
+    "passwordReason": "Natanggap mo ito dahil nagpadala sa iyo ang RoveHQ support ng link para sa password.",
+    "emailChangedReason": "Natanggap mo ito dahil binago ang sign-in email ng iyong RoveHQ account.",
+    "sentWith": "Ipinadala gamit ang {rovehq}"
   }
 }

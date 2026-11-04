@@ -23,6 +23,7 @@ import {
   morningSummaryEmail,
   operatorAlertEmail
 } from "../lib/email/templates";
+import { emailLocale, emailWordsFrom } from "../lib/email/words";
 import { buildDailySummaryMessages, type SummaryData } from "../lib/line/daily-summary";
 
 const repo = resolve(__dirname, "..");
@@ -65,20 +66,29 @@ const summary = (locale: "en" | "th"): SummaryData => {
   };
 };
 
+// The design's own labels in a language, from the same locale files the app reads (lib/email/words.ts).
+const emailNamespace = (locale: string) => JSON.parse(readFileSync(join(repo, "locales", locale, "common.json"), "utf8")).email as Record<string, string>;
+const wordsIn = (locale: string) => emailWordsFrom(emailLocale(locale), emailNamespace("en"), locale === "en" ? null : emailNamespace(emailLocale(locale)));
+const en = wordsIn("en");
+
 const emails: Array<{ name: string; html: string; subject: string }> = [];
 const add = (name: string, built: { html: string; subject: string } | null) => built && emails.push({ name, ...built });
 const operator = (logo: boolean) => ({ kind: "operator" as const, name: "Sunny Cars Samui", logoUrl: logo ? SAMPLE_OPERATOR_LOGO : null, colour: "#c2410c" });
 
-add("alert-payment", operatorAlertEmail({ title: "Payment", plain: "Anna Müller paid ฿4,500 for the Toyota Yaris Ativ (booking SC-1042).", link: `${APP}/rentals/123`, orgName: "Sunny Cars Samui", appUrl: APP }));
-add("alert-portal-request", operatorAlertEmail({ title: "Customer request", plain: "James Carter asked to extend his booking by 3 days (Honda City, until 12 Nov).", link: `${APP}/tasks`, orgName: "Sunny Cars Samui", appUrl: APP }));
-add("morning-summary-en", morningSummaryEmail({ orgName: "Sunny Cars Samui", messages: buildDailySummaryMessages(summary("en")) as any[], appUrl: APP, locale: "en" }));
-add("morning-summary-th", morningSummaryEmail({ orgName: "Sunny Cars Samui", messages: buildDailySummaryMessages(summary("th")) as any[], appUrl: APP, locale: "th" }));
-add("morning-summary-quiet", morningSummaryEmail({ orgName: "Sunny Cars Samui", messages: buildDailySummaryMessages({ ...summary("en"), activeRentals: [], overdueRentals: [], paymentsExpectedToday: [], urgentCompliance: [], notificationSettings: { daily_revenue: false } }) as any[], appUrl: APP, locale: "en" }));
-add("document-to-customer-logo", executedDocumentEmail({ documentLabel: "Rental agreement", business: "Sunny Cars Samui", recipientName: "Anna", filenames: ["Rental-agreement-SC-1042.pdf"], brand: operator(true) }));
-add("document-to-customer-nologo", executedDocumentEmail({ documentLabel: "Return receipt", business: "Sunny Cars Samui", recipientName: "", filenames: ["Return-receipt-SC-1042.pdf"], brand: operator(false) }));
+add("alert-payment", operatorAlertEmail({ title: "Payment", plain: "Anna Müller paid ฿4,500 for the Toyota Yaris Ativ (booking SC-1042).", link: `${APP}/rentals/123`, orgName: "Sunny Cars Samui", appUrl: APP, words: en }));
+add("alert-portal-request", operatorAlertEmail({ title: "Customer request", plain: "James Carter asked to extend his booking by 3 days (Honda City, until 12 Nov).", link: `${APP}/tasks`, orgName: "Sunny Cars Samui", appUrl: APP, words: en }));
+// An operator whose app is in Thai / Greek: the button and footer follow their language. (The alert's own title and
+// sentence are written by each caller of notifyOperator, in English today; translated here to see a whole email.)
+add("alert-payment-th", operatorAlertEmail({ title: "การชำระเงิน", plain: "Anna Müller ชำระ ฿4,500 สำหรับ Toyota Yaris Ativ (การจอง SC-1042)", link: `${APP}/rentals/123`, orgName: "Sunny Cars Samui", appUrl: APP, words: wordsIn("th") }));
+add("alert-payment-el", operatorAlertEmail({ title: "Πληρωμή", plain: "Η Anna Müller πλήρωσε ฿4.500 για το Toyota Yaris Ativ (κράτηση SC-1042).", link: `${APP}/rentals/123`, orgName: "Sunny Cars Samui", appUrl: APP, words: wordsIn("el") }));
+add("morning-summary-en", morningSummaryEmail({ orgName: "Sunny Cars Samui", messages: buildDailySummaryMessages(summary("en")) as any[], appUrl: APP, words: en }));
+add("morning-summary-th", morningSummaryEmail({ orgName: "Sunny Cars Samui", messages: buildDailySummaryMessages(summary("th")) as any[], appUrl: APP, words: wordsIn("th") }));
+add("morning-summary-quiet", morningSummaryEmail({ orgName: "Sunny Cars Samui", messages: buildDailySummaryMessages({ ...summary("en"), activeRentals: [], overdueRentals: [], paymentsExpectedToday: [], urgentCompliance: [], notificationSettings: { daily_revenue: false } }) as any[], appUrl: APP, words: en }));
+add("document-to-customer-logo", executedDocumentEmail({ documentLabel: "Rental agreement", business: "Sunny Cars Samui", recipientName: "Anna", filenames: ["Rental-agreement-SC-1042.pdf"], brand: operator(true), words: en }));
+add("document-to-customer-nologo", executedDocumentEmail({ documentLabel: "Return receipt", business: "Sunny Cars Samui", recipientName: "", filenames: ["Return-receipt-SC-1042.pdf"], brand: operator(false), words: en }));
 const reminder = "Hi Anna, a reminder that your next payment of ฿4,500 for the Toyota Yaris Ativ is due tomorrow (6 Nov).";
-add("customer-message-en", customerMessageEmail({ subject: "Sunny Cars Samui: an update on your booking", body: `${reminder}\n\nYour booking: https://rove.rent/book/abc123\n\nSunny Cars Samui`, brand: operator(true), locale: "en" }));
-add("customer-message-he", customerMessageEmail({ subject: "Sunny Cars Samui: עדכון על ההזמנה שלך", body: "היי אנה, תזכורת שהתשלום הבא שלך בסך ‎฿4,500 עבור טויוטה יאריס מגיע מחר (6 בנוב׳).\n\nההזמנה שלך: https://rove.rent/book/abc123\n\nSunny Cars Samui", brand: operator(true), locale: "he" }));
+add("customer-message-en", customerMessageEmail({ subject: "Sunny Cars Samui: an update on your booking", body: `${reminder}\n\nYour booking: https://rove.rent/book/abc123\n\nSunny Cars Samui`, brand: operator(true), words: en }));
+add("customer-message-he", customerMessageEmail({ subject: "Sunny Cars Samui: עדכון על ההזמנה שלך", body: "היי אנה, תזכורת שהתשלום הבא שלך בסך ‎฿4,500 עבור טויוטה יאריס מגיע מחר (6 בנוב׳).\n\nההזמנה שלך: https://rove.rent/book/abc123\n\nSunny Cars Samui", brand: operator(true), words: wordsIn("he") }));
 const leadDownloads = [
   { label: "Download the Word file", detail: "English · 48 KB", url: "https://rovehq.io/api/download/rental-agreement?t=x" },
   { label: "Download the PDF", detail: "English · 112 KB", url: "https://rovehq.io/api/download/rental-agreement?t=y" },
@@ -95,11 +105,11 @@ for (const locale of ["en", "he", "th"]) {
     bodyWithMarker: fill("leadEmailBody", { name: " Rory", links: LEAD_LINKS_MARKER, disclaimer: fill("disclaimer") }),
     heading: "Car rental agreement",
     downloads,
-    locale
+    words: wordsIn(locale)
   }));
 }
-add("admin-password-reset", adminPasswordResetEmail({ link: "https://xyz.supabase.co/auth/v1/verify?token=pkce_123&type=recovery&redirect_to=https://rovehq.app/auth/callback?next=/reset-password" }));
-add("admin-email-changed", adminEmailChangedEmail({ before: "old@sunnycars.co", email: "owner@sunnycars.co" }));
+add("admin-password-reset", adminPasswordResetEmail({ link: "https://xyz.supabase.co/auth/v1/verify?token=pkce_123&type=recovery&redirect_to=https://rovehq.app/auth/callback?next=/reset-password", words: en }));
+add("admin-email-changed", adminEmailChangedEmail({ before: "old@sunnycars.co", email: "owner@sunnycars.co", words: en }));
 for (const template of SUPABASE_TEMPLATES) {
   add(`supabase-${template.file}`, {
     subject: template.subject,

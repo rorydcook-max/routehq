@@ -6681,5 +6681,19 @@
     "customerDelete": "删除此客户",
     "customerDeleteBody": "删除其个人信息、证件照片和消息。预订、付款和已签署的合同会以“已删除客户”的名义保留，供您记账使用。",
     "customerDeleteConfirm": "删除其数据"
+  },
+  "email": {
+    "openInApp": "在 RoveHQ 中打开",
+    "openApp": "打开 RoveHQ",
+    "choosePassword": "设置新密码",
+    "linkFallback": "如果按钮无法使用，请将此链接复制到浏览器中：",
+    "yourBusiness": "您的企业",
+    "alertReason": "您收到此邮件，是因为 {business} 已开启邮件提醒。",
+    "alertSettings": "可在 设置 › 通知 中更改",
+    "summaryReason": "您收到此邮件，是因为 {business} 已开启邮件晨间摘要。",
+    "summarySettings": "可在 设置 › 通知 中更改",
+    "passwordReason": "您收到此邮件，是因为 RoveHQ 支持团队向您发送了密码链接。",
+    "emailChangedReason": "您收到此邮件，是因为您的 RoveHQ 账户的登录邮箱已更改。",
+    "sentWith": "通过 {rovehq} 发送"
   }
 }

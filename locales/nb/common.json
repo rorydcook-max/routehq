@@ -6681,5 +6681,19 @@
     "customerDelete": "Slett denne kunden",
     "customerDeleteBody": "Fjerner opplysningene, ID-bildene og meldingene deres. Bookinger, betalinger og signerte avtaler blir værende som «Slettet kunde» for regnskapet ditt.",
     "customerDeleteConfirm": "Slett dataene deres"
+  },
+  "email": {
+    "openInApp": "Åpne i RoveHQ",
+    "openApp": "Åpne RoveHQ",
+    "choosePassword": "Velg et nytt passord",
+    "linkFallback": "Hvis knappen ikke virker, kopier denne lenken inn i nettleseren din:",
+    "yourBusiness": "bedriften din",
+    "alertReason": "Du får denne e-posten fordi e-postvarsler er slått på for {business}.",
+    "alertSettings": "Endre dem under Innstillinger › Varsler",
+    "summaryReason": "Du får denne e-posten fordi morgenoppsummeringen på e-post er slått på for {business}.",
+    "summarySettings": "Endre det under Innstillinger › Varsler",
+    "passwordReason": "Du får denne e-posten fordi RoveHQ-støtte har sendt deg en passordlenke.",
+    "emailChangedReason": "Du får denne e-posten fordi innloggings-e-posten på RoveHQ-kontoen din er endret.",
+    "sentWith": "Sendt med {rovehq}"
   }
 }

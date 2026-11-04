@@ -1,6 +1,7 @@
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { OPERATOR_BRAND_COLUMNS, operatorEmailBrand } from "@/lib/email/operator-brand";
 import { customerMessageEmail } from "@/lib/email/templates";
+import { emailWords } from "@/lib/email/words";
 import { customerDate } from "@/lib/i18n/customer-dates";
 import { customerMessageText } from "@/lib/i18n/customer-message-text";
 import { linePush, PROVIDER_LABELS, telegramSend } from "@/lib/inbox/providers";
@@ -239,7 +240,7 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
     const brand = await operatorEmailBrand(admin, organization, organization?.name || "");
     const result = await sendEmail({
       to: customer.email,
-      ...customerMessageEmail({ subject: wording.t("emailSubject", { business: organization?.name || "RoveHQ" }), body, brand, locale: wording.locale })
+      ...customerMessageEmail({ subject: wording.t("emailSubject", { business: organization?.name || "RoveHQ" }), body, brand, words: await emailWords(wording.locale) })
     });
     if (result.status === "sent") {
       await log("sent", "email", { provider: result.provider });

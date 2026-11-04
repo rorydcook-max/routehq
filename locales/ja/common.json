@@ -6681,5 +6681,19 @@
     "customerDelete": "この顧客を削除",
     "customerDeleteBody": "個人情報、身分証写真、メッセージを削除します。予約、支払い、署名済みの契約書は会計のため「削除された顧客」として残ります。",
     "customerDeleteConfirm": "データを削除"
+  },
+  "email": {
+    "openInApp": "RoveHQで開く",
+    "openApp": "RoveHQを開く",
+    "choosePassword": "新しいパスワードを設定",
+    "linkFallback": "ボタンが機能しない場合は、このリンクをブラウザにコピーしてください：",
+    "yourBusiness": "お客様のビジネス",
+    "alertReason": "{business} のメール通知がオンになっているため、このメールをお送りしています。",
+    "alertSettings": "設定 › 通知 で変更できます",
+    "summaryReason": "{business} の朝のサマリー（メール）がオンになっているため、このメールをお送りしています。",
+    "summarySettings": "設定 › 通知 で変更できます",
+    "passwordReason": "RoveHQ サポートからパスワード用のリンクが送信されたため、このメールをお送りしています。",
+    "emailChangedReason": "RoveHQ アカウントのログイン用メールアドレスが変更されたため、このメールをお送りしています。",
+    "sentWith": "{rovehq} から送信"
   }
 }

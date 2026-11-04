@@ -5,6 +5,7 @@ import { alertSettings, wantsSummary } from "@/lib/alerts";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { isTelegramConfigured, sendTelegram } from "@/lib/telegram";
 import { lineSummaryText as plainText, morningSummaryEmail } from "@/lib/email/templates";
+import { emailWords } from "@/lib/email/words";
 
 export const runtime = "nodejs";
 
@@ -72,7 +73,8 @@ export async function POST(req: NextRequest) {
           if (u?.user?.email) recipients.push(u.user.email);
         }
       }
-      const email = morningSummaryEmail({ orgName: org.name, messages: messages as any[], appUrl, locale: data.locale });
+      // In the summary's own language (the owner's, English or Thai), so the button and footer match it.
+      const email = morningSummaryEmail({ orgName: org.name, messages: messages as any[], appUrl, words: await emailWords(data.locale) });
       for (const recipient of email ? recipients : []) {
         const sent = await sendEmail({ to: recipient, ...email!, metadata: { kind: "daily_summary" } });
         results.push({ org: org.name, channel: "email", success: sent.status === "sent", error: sent.status === "failed" ? sent.error : undefined });

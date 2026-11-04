@@ -6681,5 +6681,19 @@
     "customerDelete": "Hapus pelanggan ini",
     "customerDeleteBody": "Menghapus detail, foto identitas, dan pesan mereka. Booking, pembayaran, dan perjanjian yang ditandatangani tetap ada sebagai \"Pelanggan dihapus\" untuk pembukuan Anda.",
     "customerDeleteConfirm": "Hapus data mereka"
+  },
+  "email": {
+    "openInApp": "Buka di RoveHQ",
+    "openApp": "Buka RoveHQ",
+    "choosePassword": "Pilih kata sandi baru",
+    "linkFallback": "Jika tombol tidak berfungsi, salin tautan ini ke browser Anda:",
+    "yourBusiness": "bisnis Anda",
+    "alertReason": "Anda menerima email ini karena peringatan email aktif untuk {business}.",
+    "alertSettings": "Ubah di Pengaturan › Notifikasi",
+    "summaryReason": "Anda menerima email ini karena ringkasan pagi lewat email aktif untuk {business}.",
+    "summarySettings": "Ubah di Pengaturan › Notifikasi",
+    "passwordReason": "Anda menerima email ini karena dukungan RoveHQ mengirimi Anda tautan kata sandi.",
+    "emailChangedReason": "Anda menerima email ini karena email masuk akun RoveHQ Anda diubah.",
+    "sentWith": "Dikirim dengan {rovehq}"
   }
 }

@@ -6681,5 +6681,19 @@
     "customerDelete": "刪除此客戶",
     "customerDeleteBody": "刪除其個人資料、證件照片與訊息。預訂、付款與已簽署的合約會以「已刪除的客戶」保留，供您記帳使用。",
     "customerDeleteConfirm": "刪除其資料"
+  },
+  "email": {
+    "openInApp": "在 RoveHQ 中開啟",
+    "openApp": "開啟 RoveHQ",
+    "choosePassword": "設定新密碼",
+    "linkFallback": "如果按鈕無法使用，請將此連結複製到瀏覽器中：",
+    "yourBusiness": "您的公司",
+    "alertReason": "您收到這封郵件，是因為 {business} 已開啟電子郵件提醒。",
+    "alertSettings": "可在 設定 › 通知 中變更",
+    "summaryReason": "您收到這封郵件，是因為 {business} 已開啟電子郵件晨間摘要。",
+    "summarySettings": "可在 設定 › 通知 中變更",
+    "passwordReason": "您收到這封郵件，是因為 RoveHQ 支援團隊寄給您密碼連結。",
+    "emailChangedReason": "您收到這封郵件，是因為您的 RoveHQ 帳戶登入電子郵件已變更。",
+    "sentWith": "透過 {rovehq} 寄送"
   }
 }

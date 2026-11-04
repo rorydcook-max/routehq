@@ -6681,5 +6681,19 @@
     "customerDelete": "Eliminar este cliente",
     "customerDeleteBody": "Remove os seus dados, fotos de identificação e mensagens. As reservas, pagamentos e contratos assinados ficam como \"Cliente eliminado\" para a sua contabilidade.",
     "customerDeleteConfirm": "Eliminar os dados"
+  },
+  "email": {
+    "openInApp": "Abrir no RoveHQ",
+    "openApp": "Abrir o RoveHQ",
+    "choosePassword": "Escolha uma nova senha",
+    "linkFallback": "Se o botão não funcionar, copie este link no seu navegador:",
+    "yourBusiness": "sua empresa",
+    "alertReason": "Você recebe este e-mail porque os alertas por e-mail estão ativados para {business}.",
+    "alertSettings": "Altere em Configurações › Notificações",
+    "summaryReason": "Você recebe este e-mail porque o resumo da manhã por e-mail está ativado para {business}.",
+    "summarySettings": "Altere em Configurações › Notificações",
+    "passwordReason": "Você recebe este e-mail porque o suporte do RoveHQ enviou um link de senha para você.",
+    "emailChangedReason": "Você recebe este e-mail porque o e-mail de acesso da sua conta RoveHQ foi alterado.",
+    "sentWith": "Enviado com {rovehq}"
   }
 }

@@ -50,18 +50,11 @@ const THAI_INSURANCE =
   "The vehicle is covered by full comprehensive (Type 1) insurance valid throughout the Kingdom of Thailand. The Renter will be added as a named driver on the policy.";
 const NEUTRAL_INSURANCE =
   "The vehicle is insured as stated by the Owner, including any third-party liability insurance required by law in {{agreement_country}}. The Renter is covered as a driver named in this agreement.";
-// Keeping the whole deposit, whatever the loss, is a disproportionate penalty under EU and UK unfair-terms law
-// (Directive 93/13/EEC, Annex point (e); Consumer Rights Act 2015, Schedule 2 para 6): in Europe, actual losses only.
-const EUROPE_FAIRER: Array<[string, string]> = [
-  [
-    "Any suspected tampering may result in deposit forfeiture and recovery of additional losses.",
-    "Proven tampering allows the Owner to recover the losses it causes, including from the deposit."
-  ],
-  [
-    "entitle the Owner to immediately repossess the vehicle and forfeit the security deposit in full.",
-    "entitle the Owner to immediately repossess the vehicle and to deduct from the security deposit the losses and costs this causes."
-  ]
-];
+// The deposit (4 Nov 2026): the template itself now says the Owner deducts only the losses and costs actually caused
+// (odometer/GPS tampering, 14; sub-letting, 18.7), for every country, so there is no Europe-only swap any more.
+// Keeping the whole deposit whatever the loss is a penalty under EU and UK unfair-terms law (Directive 93/13/EEC,
+// Annex point (e); Consumer Rights Act 2015, Schedule 2 para 6) and under Thailand's contract-controlled business
+// rules for car rental and the Unfair Contract Terms Act B.E. 2540, and is disfavoured across South-East Asia too.
 const EUROPE_PLACES: Array<{ section: string; shared: string[]; countries: string[] }> = [
   { section: "4. Renter qualifications", shared: [], countries: ["GR"] },
   { section: "10. Exclusions and prohibited use", shared: ["use"], countries: [] },
@@ -96,7 +89,6 @@ function addEuropeanClauses(html: string, second: SecondLanguage | null) {
     const blocks = countryBlock("data", second, "agreement_eu_uk", true) + countryBlock("esign", second, "agreement_eu_uk", true);
     out = `${out.slice(0, special)}${blocks.trimStart()}\n      ${out.slice(special)}`;
   }
-  for (const [unfair, fair] of EUROPE_FAIRER) out = out.replace(unfair, `{{#if agreement_eu_uk}}${fair}{{else}}${unfair}{{/if}}`);
   return out;
 }
 
@@ -143,7 +135,7 @@ export function localizeAgreementTemplate(templateHtml: string, lang: AgreementL
   // Anything Thai still left (wording added to the template later without a translation) is dropped from labels.
   out = out.replace(/ \/ [^<{]*[฀-๿][^<{]*/g, "");
 
-  // Europe and the UK: fairer deposit wording and the country clauses, each shown only for those countries.
+  // Europe and the UK: the country clauses, each shown only for those countries.
   out = addEuropeanClauses(out, second);
 
   if (second) out = out.replace("</head>", `  ${fontStyle(second)}\n</head>`);

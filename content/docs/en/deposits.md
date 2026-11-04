@@ -45,7 +45,7 @@ Don't know the repair cost yet? Tick **Damage cost not known yet: keep the depos
 On the booking, open the **Vehicle & deposit** tab and find **Refunds & deposit**. It shows what you took, returned, kept, and still hold.
 
 - **Return deposit**: enter the amount and tap **Confirm return**.
-- **Record deduction**: enter the amount and a reason (damage, late return, unpaid rent) and tap **Confirm deduction**. Keeping the whole deposit is the same thing, for the full amount.
+- **Record deduction**: enter the amount and a reason (damage, late return, unpaid rent) and tap **Confirm deduction**. Keeping the whole deposit is the same thing, for the full amount, when the costs really add up to it. The RoveHQ agreement lets you deduct only what the renter actually owes, never the whole deposit as a penalty.
 
 ## How it shows in Money in & out
 

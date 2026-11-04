@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
+import { parsePhoneNumberFromString, type CountryCode } from "libphonenumber-js";
 import { allCountries, countriesSorted, isLocalNumber, readPhone } from "@/lib/customer-options";
 
 /**
@@ -19,7 +20,9 @@ export function PhoneField({
   required = false,
   placeholder,
   inputClass = "",
-  onCountryFound
+  onCountryFound,
+  followCountry,
+  onValueChange
 }: {
   codeName?: string;
   inputName?: string;
@@ -30,6 +33,10 @@ export function PhoneField({
   inputClass?: string;
   /** Told when a pasted number reveals the country, so a nationality left untouched can follow it. */
   onCountryFound?: (countryCode: string) => void;
+  /** A country chosen elsewhere on the form (ISO code): the code follows it until a number is typed. */
+  followCountry?: string;
+  /** The whole number in international form ("+66812345678"), or "" when empty, as it changes. */
+  onValueChange?: (international: string) => void;
 }) {
   const t = useTranslations("customers");
   const locale = useLocale();
@@ -41,6 +48,20 @@ export function PhoneField({
   useEffect(() => setMounted(true), []);
   const current = allCountries.find((item) => item.code === country) || allCountries.find((item) => item.code === "TH")!;
   const national = text.replace(/[^\d]/g, "");
+
+  useEffect(() => {
+    if (followCountry && !national && allCountries.some((item) => item.code === followCountry)) setCountry(followCountry);
+    // Only when the other choice changes: a number already typed keeps its own country.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [followCountry]);
+
+  useEffect(() => {
+    if (!onValueChange) return;
+    if (!national) return onValueChange("");
+    const parsed = parsePhoneNumberFromString(national, current.code as CountryCode);
+    onValueChange(parsed?.number || `${current.phoneCode}${national.replace(/^0/, "")}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [national, current.code]);
 
   function typed(value: string) {
     const trimmed = value.trim();

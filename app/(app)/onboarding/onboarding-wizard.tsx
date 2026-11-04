@@ -12,6 +12,8 @@ import { FleetAssistant } from "@/components/fleet-assistant";
 import { SetupRequestPanel } from "@/components/setup-request-panel";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { defaultCurrencyForCountry, locationOptions, townsFor } from "@/lib/onboarding-locations";
+import { PhoneField } from "@/components/phone-field";
+import { allCountries } from "@/lib/customer-options";
 
 type Organization = { id: string; name: string; default_locale: string; settings?: Record<string, any> };
 
@@ -23,6 +25,12 @@ const labelClass = "font-semibold text-[var(--foreground-secondary)]";
  * 1. Language, phone, where you are. 2. Your vehicles: tell the assistant, a short form, a list, or later.
  * Setup counts as done once step 1 is saved, so nobody is ever sent back here; vehicles can be added any time.
  */
+/** The setup list's country (an English name) as the ISO code the phone field uses; Thailand when unknown. */
+function phoneCountryFor(name: string) {
+  const wanted = name.trim().toLowerCase();
+  return allCountries.find((item) => item.name.toLowerCase() === wanted || item.country.toLowerCase() === wanted)?.code || "TH";
+}
+
 export function OnboardingWizard({
   organization,
   initialStep,
@@ -135,7 +143,16 @@ export function OnboardingWizard({
               </label>
               <label className="block">
                 <span className={labelClass}>{t("phone")}</span>
-                <input autoComplete="tel" className={fieldClass} inputMode="tel" maxLength={40} onChange={(event) => setPhone(event.target.value)} placeholder="+66 ..." type="tel" value={phone} />
+                {/* The country code follows the Country chosen below (which starts from where the visitor is), with a picker to change it. */}
+                <PhoneField
+                  codeName="setupPhoneCode"
+                  defaultCountry={phoneCountryFor(country)}
+                  defaultNumber={phone}
+                  followCountry={phoneCountryFor(country)}
+                  inputClass={fieldClass}
+                  inputName="setupPhone"
+                  onValueChange={setPhone}
+                />
                 <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{t("phoneHint")}</span>
               </label>
               <div className="grid gap-4 sm:grid-cols-2">

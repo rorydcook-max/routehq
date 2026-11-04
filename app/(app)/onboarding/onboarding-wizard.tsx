@@ -5,11 +5,10 @@ import type { Route } from "next";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Car, CheckCircle2, ChevronRight, FileSpreadsheet, HandHelping, Loader2, PenLine, Sparkles } from "lucide-react";
+import { Car, CheckCircle2, ChevronRight, FileSpreadsheet, Loader2, PenLine, Sparkles } from "lucide-react";
 import { finishOnboarding, saveBusinessProfile } from "@/app/actions/onboarding";
 import { setMyLanguage } from "@/app/actions/settings";
 import { FleetAssistant } from "@/components/fleet-assistant";
-import { SetupRequestPanel } from "@/components/setup-request-panel";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { defaultCurrencyForCountry, locationOptions, townsFor } from "@/lib/onboarding-locations";
 import { PhoneField } from "@/components/phone-field";
@@ -52,7 +51,6 @@ export function OnboardingWizard({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
   const [assistantOpen, setAssistantOpen] = useState(openAssistant);
-  const [helpOpen, setHelpOpen] = useState(false);
   const saved = organization.settings?.main_location || {};
   const [phone, setPhone] = useState(String(organization.settings?.business_phone || ""));
   const [country, setCountry] = useState(String(saved.country || defaultCountry || "Thailand"));
@@ -233,19 +231,6 @@ export function OnboardingWizard({
                 </span>
                 <ChevronRight className="mt-1 shrink-0 text-[var(--muted)]" size={20} />
               </Link>
-              {/* Done for them: they send what they have, RoveHQ brings it in. */}
-              {helpOpen ? (
-                <SetupRequestPanel />
-              ) : (
-                <button className="pressable flex items-start gap-3 rounded-xl bg-[var(--panel-secondary)] p-4 text-left" onClick={() => setHelpOpen(true)} type="button">
-                  <HandHelping className="mt-0.5 shrink-0 text-[var(--primary)]" size={24} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[17px] font-bold text-[var(--foreground)]">{t("optHelp")}</span>
-                    <span className="block font-medium text-[var(--foreground-secondary)]">{t("optHelpBody")}</span>
-                  </span>
-                  <ChevronRight className="mt-1 shrink-0 text-[var(--muted)]" size={20} />
-                </button>
-              )}
             </div>
 
             <button className={`${vehicleCount ? "primary-action" : "secondary-action"} pressable mt-5 w-full justify-center`} disabled={isPending} onClick={done} type="button">

@@ -75,6 +75,7 @@ function systemPrompt(input: AssistantInput, tools: ToolName[]) {
       ? ""
       : `Files: receipts and bills go to record_cost${has("add_vehicles") ? "; vehicle photos and registration books to add_vehicles; policies, tax receipts and inspection certificates to renew_paperwork" : ""}${has("import_sheet") ? "; spreadsheets to import_sheet; their own contract to contract_upload" : ""}; damage, odometer and fuel photos to damage_photos.${has("add_vehicles") ? "" : " Adding vehicles and their paperwork is for the owner or a manager."}`,
     "Things you can't do here (deleting, editing or cancelling records, messaging customers): say so and name the page to do it on.",
+    "When you can't read what they sent, an import keeps failing, or you're going round in circles, say a person from the RoveHQ team can bring it in for them for free, and set handoff.",
     "Only call talk_to_person when they ask for a person."
   ]
     .filter(Boolean)

@@ -17,14 +17,26 @@ const headingClass = "text-[16px] font-bold text-[var(--foreground)]";
 
 // Stored in English (the agreement wording keys off it); shown in the account language.
 const countries: Array<{ value: string; code: string | null }> = [
-  { value: "Thailand", code: "TH" },
-  { value: "Indonesia", code: "ID" },
-  { value: "Philippines", code: "PH" },
-  { value: "Malaysia", code: "MY" },
-  { value: "Singapore", code: "SG" },
-  { value: "Vietnam", code: "VN" },
   { value: "Australia", code: "AU" },
+  { value: "Cambodia", code: "KH" },
+  { value: "Croatia", code: "HR" },
+  { value: "Cyprus", code: "CY" },
+  { value: "France", code: "FR" },
+  { value: "Germany", code: "DE" },
+  { value: "Greece", code: "GR" },
+  { value: "Indonesia", code: "ID" },
+  { value: "Ireland", code: "IE" },
+  { value: "Italy", code: "IT" },
+  { value: "Laos", code: "LA" },
+  { value: "Malaysia", code: "MY" },
+  { value: "Malta", code: "MT" },
+  { value: "Philippines", code: "PH" },
+  { value: "Portugal", code: "PT" },
+  { value: "Singapore", code: "SG" },
+  { value: "Spain", code: "ES" },
+  { value: "Thailand", code: "TH" },
   { value: "United Kingdom", code: "GB" },
+  { value: "Vietnam", code: "VN" },
   { value: "Other", code: null }
 ];
 
@@ -75,7 +87,7 @@ export function TravelPolicyForm({ organizationId, settings, currency = "฿" }:
           <label className="block">
             <span className={labelClass}>{say("tp_country")}</span>
             <select className="mt-1 w-full" name="country" onChange={(event) => updateCountry(event.target.value)} value={country}>
-              {countries.map((item) => (
+              {[...countries].sort((a, b) => (a.code ? 0 : 1) - (b.code ? 0 : 1) || countryName(a).localeCompare(countryName(b), locale)).map((item) => (
                 <option key={item.value} value={item.value}>
                   {countryName(item)}
                 </option>

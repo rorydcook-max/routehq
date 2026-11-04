@@ -47,6 +47,8 @@ export const jurisdictionByCountry: Record<string, string> = {
   Singapore: "the Republic of Singapore",
   Vietnam: "the Socialist Republic of Vietnam",
   Australia: "Australia",
+  Laos: "the Lao People's Democratic Republic",
+  Cambodia: "the Kingdom of Cambodia",
   "United Kingdom": "England and Wales",
   // The business location stores a country code, so codes are listed too (an Indonesian business with only a
   // location set was getting Thailand's governing law).

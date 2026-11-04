@@ -22,8 +22,8 @@ export const GA_MEASUREMENT_ID = "G-1NGPP6YDZN";
 const PRODUCTION_HOSTS = new Set(["rovehq.io", "www.rovehq.io", "rovehq.app"]);
 /** The renter marketplace: its own container and GA4 property. */
 export const RENTER_GTM_ID = "GTM-NZL8J5FN";
-/** Its GA4 property's measurement ID, for Google's per-page off switch; set in Vercel once known. */
-export const RENTER_GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_RENTER_GA_ID || "";
+/** Its GA4 property's measurement ID, for Google's per-page off switch. */
+export const RENTER_GA_MEASUREMENT_ID = "G-8C2SZKPW8J";
 const RENTER_HOSTS = new Set(["rove.rent", "www.rove.rent"]);
 
 export function isRenterAnalyticsHost(hostname: string) {

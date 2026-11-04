@@ -5123,7 +5123,16 @@
     "sw_rentworks_1": "Χρησιμοποιήστε το κουμπί Export στις λίστες Reservations και Customers.",
     "sw_rentworks_2": "Για συμβόλαια και στόλο, εκτελέστε την αναφορά και χρησιμοποιήστε το Export Results (Excel ή CSV).",
     "sw_rezdy_1": "Πηγαίνετε στα Reports, μετά Sales - Orders, και ορίστε τις ημερομηνίες.",
-    "sw_rezdy_2": "Πατήστε Export to CSV."
+    "sw_rezdy_2": "Πατήστε Export to CSV.",
+    "sw_anolla_1": "Εξαγάγετε τα ακατέργαστα δεδομένα σας σε Excel ή Google Sheets.",
+    "sw_myrent_1": "Βγάλτε τις αναφορές που χρειάζεστε και εξαγάγετε την καθεμία σε Excel.",
+    "sw_rentware_1": "Ανοίξτε το app.rentware.io/metrics/datev-revenue και εξαγάγετε τα έσοδά σας σε CSV ή Excel.",
+    "sw_rentware_2": "Αυτό το αρχείο περιέχει μόνο έσοδα. Ζητήστε από την υποστήριξη του Rentware και τις κρατήσεις και τους πελάτες σας.",
+    "sw_toprentapp_1": "Ζητήστε από το TopRentApp όλα τα δεδομένα σας σε CSV. Τα παραδίδουν όταν φεύγετε.",
+    "sw_twice_1": "Ανοίξτε Orders, εμφανίστε τις στήλες πελάτη, ημερομηνίας, γραμμής παραγγελίας και τιμής, και εξαγάγετε την προβολή σε CSV.",
+    "sw_twice_2": "Εξαγάγετε τα Customers με τον ίδιο τρόπο. Για τις πληρωμές, ανοίξτε Reports, μετά Payments, και κατεβάστε το CSV από την καρτέλα Export.",
+    "sw_vevs_1": "Ανοίξτε Reservations και χρησιμοποιήστε το Export Reservations για να τις αποθηκεύσετε ως αρχείο CSV.",
+    "sw_vevs_2": "Στα Customers, επιλέξτε τους πελάτες, πατήστε Choose Action και μετά Export selected."
   },
   "errorPages": {
     "notFoundTitle": "Δεν βρήκαμε αυτή τη σελίδα",

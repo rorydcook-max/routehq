@@ -5191,7 +5191,16 @@
     "sw_rentworks_1": "Reservations နဲ့ Customers စာရင်းတွေမှာ Export ခလုတ်ကို သုံးပါ။",
     "sw_rentworks_2": "စာချုပ်တွေနဲ့ ယာဉ်တွေအတွက် report ကို run ပြီး Export Results (Excel သို့မဟုတ် CSV) ကို သုံးပါ။",
     "sw_rezdy_1": "Reports ကို သွားပါ၊ ပြီးရင် Sales - Orders ကို ဖွင့်ပြီး ရက်စွဲ သတ်မှတ်ပါ။",
-    "sw_rezdy_2": "Export to CSV ကို နှိပ်ပါ။"
+    "sw_rezdy_2": "Export to CSV ကို နှိပ်ပါ။",
+    "sw_anolla_1": "ကုန်ကြမ်းဒေတာကို Excel ဒါမှမဟုတ် Google Sheets သို့ ထုတ်ယူပါ။",
+    "sw_myrent_1": "လိုအပ်တဲ့ အစီရင်ခံစာတွေကို run ပြီး တစ်ခုစီကို Excel သို့ ထုတ်ယူပါ။",
+    "sw_rentware_1": "app.rentware.io/metrics/datev-revenue ကိုဖွင့်ပြီး သင့်ဝင်ငွေကို CSV ဒါမှမဟုတ် Excel အဖြစ် ထုတ်ယူပါ။",
+    "sw_rentware_2": "အဲဒီဖိုင်မှာ ဝင်ငွေပဲ ပါပါတယ်။ Rentware အကူအညီအဖွဲ့ကို သင့်ဘိုကင်နဲ့ ဖောက်သည်တွေကိုပါ တောင်းပါ။",
+    "sw_toprentapp_1": "TopRentApp ကို သင့်ဒေတာအားလုံး CSV နဲ့ တောင်းပါ။ သင်ထွက်သွားတဲ့အခါ သူတို့ ပေးပါတယ်။",
+    "sw_twice_1": "Orders ကိုဖွင့်၊ ဖောက်သည်၊ ရက်စွဲ၊ line item နဲ့ ဈေးနှုန်း ကော်လံတွေကို ပြပြီး view ကို CSV အဖြစ် ထုတ်ယူပါ။",
+    "sw_twice_2": "Customers ကိုလည်း အလားတူ ထုတ်ယူပါ။ ငွေပေးချေမှုတွေအတွက် Reports ကိုဖွင့်၊ ပြီးရင် Payments ကိုဖွင့်ပြီး Export tab ကနေ CSV ကို ဒေါင်းလုဒ်လုပ်ပါ။",
+    "sw_vevs_1": "Reservations ကိုဖွင့်ပြီး Export Reservations ကိုသုံးကာ CSV ဖိုင်အဖြစ် သိမ်းပါ။",
+    "sw_vevs_2": "Customers မှာ ဖောက်သည်တွေကို အမှန်ခြစ်၊ Choose Action ကိုနှိပ်ပြီး Export selected ကို နှိပ်ပါ။"
   },
   "errorPages": {
     "notFoundTitle": "ဒီစာမျက်နှာကို ရှာမတွေ့ပါ",

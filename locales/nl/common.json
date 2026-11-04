@@ -5123,7 +5123,16 @@
     "sw_rentworks_1": "Gebruik de knop Export bij de lijsten Reservations en Customers.",
     "sw_rentworks_2": "Voor contracten en wagenpark: voer het rapport uit en gebruik Export Results (Excel of CSV).",
     "sw_rezdy_1": "Ga naar Reports, dan Sales - Orders, en stel de data in.",
-    "sw_rezdy_2": "Klik op Export to CSV."
+    "sw_rezdy_2": "Klik op Export to CSV.",
+    "sw_anolla_1": "Exporteer je ruwe data naar Excel of Google Sheets.",
+    "sw_myrent_1": "Draai de rapporten die je nodig hebt en exporteer ze elk naar Excel.",
+    "sw_rentware_1": "Open app.rentware.io/metrics/datev-revenue en exporteer je omzet als CSV of Excel.",
+    "sw_rentware_2": "Dat bestand bevat alleen omzet. Vraag de support van Rentware ook om je boekingen en klanten.",
+    "sw_toprentapp_1": "Vraag TopRentApp om al je gegevens als CSV. Ze geven die mee als je vertrekt.",
+    "sw_twice_1": "Open Orders, laat de kolommen klant, datum, orderregel en prijs zien en exporteer de weergave als CSV.",
+    "sw_twice_2": "Exporteer Customers op dezelfde manier. Voor betalingen open je Reports, dan Payments, en download je de CSV vanuit het tabblad Export.",
+    "sw_vevs_1": "Open Reservations en sla ze met Export Reservations op als CSV-bestand.",
+    "sw_vevs_2": "Vink in Customers de klanten aan, klik op Choose Action en dan op Export selected."
   },
   "errorPages": {
     "notFoundTitle": "We konden die pagina niet vinden",

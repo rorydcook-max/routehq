@@ -5151,7 +5151,16 @@
     "sw_rentworks_1": "Reservations와 Customers 목록에서 Export 버튼을 사용하세요.",
     "sw_rentworks_2": "계약과 차량은 보고서를 실행한 뒤 Export Results(Excel 또는 CSV)를 사용하세요.",
     "sw_rezdy_1": "Reports에서 Sales - Orders로 이동해 기간을 설정하세요.",
-    "sw_rezdy_2": "Export to CSV를 클릭하세요."
+    "sw_rezdy_2": "Export to CSV를 클릭하세요.",
+    "sw_anolla_1": "원본 데이터를 Excel이나 Google Sheets로 내보내세요.",
+    "sw_myrent_1": "필요한 보고서를 실행하고 각각 Excel로 내보내세요.",
+    "sw_rentware_1": "app.rentware.io/metrics/datev-revenue를 열고 매출을 CSV나 Excel로 내보내세요.",
+    "sw_rentware_2": "이 파일에는 매출만 들어 있어요. 예약과 고객도 Rentware 고객지원에 요청하세요.",
+    "sw_toprentapp_1": "TopRentApp에 모든 데이터를 CSV로 요청하세요. 떠날 때 제공해 줘요.",
+    "sw_twice_1": "‘Orders’를 열고 고객, 날짜, 품목, 가격 열을 보이게 한 뒤 현재 화면을 CSV로 내보내세요.",
+    "sw_twice_2": "‘Customers’도 같은 방법으로 내보내세요. 결제는 ‘Reports’ → ‘Payments’를 열고 ‘Export’ 탭에서 CSV를 내려받으세요.",
+    "sw_vevs_1": "‘Reservations’를 열고 ‘Export Reservations’로 CSV 파일로 저장하세요.",
+    "sw_vevs_2": "‘Customers’에서 고객을 체크하고 ‘Choose Action’ → ‘Export selected’를 누르세요."
   },
   "errorPages": {
     "notFoundTitle": "페이지를 찾을 수 없어요",

@@ -5151,7 +5151,16 @@
     "sw_rentworks_1": "Reservations සහ Customers ලැයිස්තුවල ඇති Export බොත්තම භාවිත කරන්න.",
     "sw_rentworks_2": "ගිවිසුම් සහ වාහන සඳහා, වාර්තාව ධාවනය කර Export Results (Excel හෝ CSV) භාවිත කරන්න.",
     "sw_rezdy_1": "Reports, ඉන්පසු Sales - Orders වෙත ගොස් දින සකසන්න.",
-    "sw_rezdy_2": "Export to CSV ක්ලික් කරන්න."
+    "sw_rezdy_2": "Export to CSV ක්ලික් කරන්න.",
+    "sw_anolla_1": "ඔබේ අමු දත්ත Excel හෝ Google Sheets වෙත අපනයනය කරන්න.",
+    "sw_myrent_1": "ඔබට අවශ්‍ය වාර්තා ධාවනය කර එක් එක් එක Excel වෙත අපනයනය කරන්න.",
+    "sw_rentware_1": "app.rentware.io/metrics/datev-revenue විවෘත කර ඔබේ ආදායම CSV හෝ Excel ලෙස අපනයනය කරන්න.",
+    "sw_rentware_2": "එම ගොනුවේ ඇත්තේ ආදායම පමණි. ඔබේ වෙන්කිරීම් සහ පාරිභෝගිකයින්ද Rentware සහාය කණ්ඩායමෙන් ඉල්ලන්න.",
+    "sw_toprentapp_1": "ඔබේ සියලු දත්ත CSV ලෙස TopRentApp වෙතින් ඉල්ලන්න. ඔබ ඉවත් වන විට ඔවුන් එය ලබා දෙයි.",
+    "sw_twice_1": "Orders විවෘත කර, පාරිභෝගිකයා, දිනය, line item සහ මිල තීරු පෙන්වා, දසුන CSV ලෙස අපනයනය කරන්න.",
+    "sw_twice_2": "Customers ද එලෙසම අපනයනය කරන්න. ගෙවීම් සඳහා, Reports, ඉන්පසු Payments විවෘත කර Export ටැබයෙන් CSV බාගන්න.",
+    "sw_vevs_1": "Reservations විවෘත කර Export Reservations භාවිතයෙන් ඒවා CSV ගොනුවක් ලෙස සුරකින්න.",
+    "sw_vevs_2": "Customers හි, පාරිභෝගිකයින් සලකුණු කර, Choose Action ක්ලික් කර, ඉන්පසු Export selected ක්ලික් කරන්න."
   },
   "errorPages": {
     "notFoundTitle": "එම පිටුව සොයා ගත නොහැකි විය",

@@ -5151,7 +5151,16 @@
     "sw_rentworks_1": "Bruk Export-knappen i listene Reservations og Customers.",
     "sw_rentworks_2": "For avtaler og flåte: kjør rapporten og bruk Export Results (Excel eller CSV).",
     "sw_rezdy_1": "Gå til Reports, så Sales - Orders, og velg datoer.",
-    "sw_rezdy_2": "Klikk Export to CSV."
+    "sw_rezdy_2": "Klikk Export to CSV.",
+    "sw_anolla_1": "Eksporter rådataene dine til Excel eller Google Sheets.",
+    "sw_myrent_1": "Kjør rapportene du trenger, og eksporter hver av dem til Excel.",
+    "sw_rentware_1": "Åpne app.rentware.io/metrics/datev-revenue og eksporter omsetningen som CSV eller Excel.",
+    "sw_rentware_2": "Den filen inneholder bare omsetning. Be kundestøtten hos Rentware om bookinger og kunder også.",
+    "sw_toprentapp_1": "Be TopRentApp om alle dataene dine som CSV. De leverer dem når du slutter.",
+    "sw_twice_1": "Åpne Orders, vis kolonnene for kunde, dato, ordrelinje og pris, og eksporter visningen som CSV.",
+    "sw_twice_2": "Eksporter Customers på samme måte. For betalinger åpner du Reports, så Payments, og laster ned CSV-filen fra Export-fanen.",
+    "sw_vevs_1": "Åpne Reservations og bruk Export Reservations for å lagre dem som en CSV-fil.",
+    "sw_vevs_2": "I Customers huker du av kundene, klikker Choose Action og så Export selected."
   },
   "errorPages": {
     "notFoundTitle": "Vi fant ikke den siden",

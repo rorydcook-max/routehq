@@ -5191,7 +5191,16 @@
     "sw_rentworks_1": "Используйте кнопку Export в списках Reservations и Customers.",
     "sw_rentworks_2": "Для договоров и автопарка запустите отчёт и нажмите Export Results (Excel или CSV).",
     "sw_rezdy_1": "Перейдите в Reports, затем Sales - Orders, и укажите даты.",
-    "sw_rezdy_2": "Нажмите Export to CSV."
+    "sw_rezdy_2": "Нажмите Export to CSV.",
+    "sw_anolla_1": "Выгрузите исходные данные в Excel или Google Таблицы.",
+    "sw_myrent_1": "Сформируйте нужные отчёты и выгрузите каждый в Excel.",
+    "sw_rentware_1": "Откройте app.rentware.io/metrics/datev-revenue и выгрузите выручку в CSV или Excel.",
+    "sw_rentware_2": "В этом файле только выручка. Попросите поддержку Rentware прислать ещё бронирования и клиентов.",
+    "sw_toprentapp_1": "Попросите у TopRentApp все ваши данные в CSV. Они выдают их при уходе.",
+    "sw_twice_1": "Откройте Orders, включите столбцы клиента, даты, позиции и цены и выгрузите вид в CSV.",
+    "sw_twice_2": "Так же выгрузите Customers. Для платежей откройте Reports, затем Payments, и скачайте CSV со вкладки Export.",
+    "sw_vevs_1": "Откройте Reservations и через Export Reservations сохраните их в CSV-файл.",
+    "sw_vevs_2": "В Customers отметьте клиентов, нажмите Choose Action, затем Export selected."
   },
   "errorPages": {
     "notFoundTitle": "Мы не нашли эту страницу",

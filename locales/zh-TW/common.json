@@ -5151,7 +5151,16 @@
     "sw_rentworks_1": "在 Reservations 和 Customers 清單中使用 Export 按鈕。",
     "sw_rentworks_2": "合約和車隊請執行報表，再使用 Export Results（Excel 或 CSV）。",
     "sw_rezdy_1": "前往 Reports，再進入 Sales - Orders，設定日期。",
-    "sw_rezdy_2": "點選 Export to CSV。"
+    "sw_rezdy_2": "點選 Export to CSV。",
+    "sw_anolla_1": "把原始資料匯出到 Excel 或 Google 試算表。",
+    "sw_myrent_1": "執行你需要的報表，逐個匯出到 Excel。",
+    "sw_rentware_1": "開啟 app.rentware.io/metrics/datev-revenue，把收入匯出為 CSV 或 Excel。",
+    "sw_rentware_2": "這個檔案只有收入。預訂和客戶也請向 Rentware 客服索取。",
+    "sw_toprentapp_1": "請 TopRentApp 把你的全部資料以 CSV 格式提供給你。你離開時他們會提供。",
+    "sw_twice_1": "開啟 Orders，顯示客戶、日期、明細和價格欄位，把目前的檢視匯出為 CSV。",
+    "sw_twice_2": "用同樣的方法匯出 Customers。付款方面，開啟 Reports，再開啟 Payments，從 Export 分頁下載 CSV。",
+    "sw_vevs_1": "開啟 Reservations，用 Export Reservations 把預訂儲存為 CSV 檔案。",
+    "sw_vevs_2": "在 Customers 中勾選客戶，點選 Choose Action，再點 Export selected。"
   },
   "errorPages": {
     "notFoundTitle": "找不到該頁面",

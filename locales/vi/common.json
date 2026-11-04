@@ -5191,7 +5191,16 @@
     "sw_rentworks_1": "Dùng nút Export ở danh sách Reservations và Customers.",
     "sw_rentworks_2": "Với hợp đồng và đội xe, chạy báo cáo rồi dùng Export Results (Excel hoặc CSV).",
     "sw_rezdy_1": "Vào Reports, rồi Sales - Orders, và chọn ngày.",
-    "sw_rezdy_2": "Bấm Export to CSV."
+    "sw_rezdy_2": "Bấm Export to CSV.",
+    "sw_anolla_1": "Xuất dữ liệu thô ra Excel hoặc Google Sheets.",
+    "sw_myrent_1": "Chạy các báo cáo bạn cần và xuất từng báo cáo ra Excel.",
+    "sw_rentware_1": "Mở app.rentware.io/metrics/datev-revenue và xuất doanh thu dạng CSV hoặc Excel.",
+    "sw_rentware_2": "Tệp đó chỉ có doanh thu. Hãy nhờ bộ phận hỗ trợ của Rentware gửi thêm lượt đặt xe và khách hàng.",
+    "sw_toprentapp_1": "Xin TopRentApp toàn bộ dữ liệu dạng CSV. Họ cung cấp khi bạn ngừng dùng.",
+    "sw_twice_1": "Mở Orders, hiện các cột khách hàng, ngày, mặt hàng và giá, rồi xuất chế độ xem đó dạng CSV.",
+    "sw_twice_2": "Xuất Customers theo cách tương tự. Với thanh toán, mở Reports, rồi Payments, và tải CSV từ thẻ Export.",
+    "sw_vevs_1": "Mở Reservations và dùng Export Reservations để lưu thành tệp CSV.",
+    "sw_vevs_2": "Trong Customers, đánh dấu các khách hàng, bấm Choose Action, rồi Export selected."
   },
   "errorPages": {
     "notFoundTitle": "Không tìm thấy trang đó",

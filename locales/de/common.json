@@ -5163,7 +5163,16 @@
     "sw_rentworks_1": "Nutzen Sie die Export-Schaltfläche in den Listen Reservations und Customers.",
     "sw_rentworks_2": "Für Verträge und Flotte führen Sie den Bericht aus und nutzen Export Results (Excel oder CSV).",
     "sw_rezdy_1": "Gehen Sie zu Reports, dann zu Sales - Orders, und legen Sie den Zeitraum fest.",
-    "sw_rezdy_2": "Klicken Sie auf Export to CSV."
+    "sw_rezdy_2": "Klicken Sie auf Export to CSV.",
+    "sw_anolla_1": "Exportieren Sie Ihre Rohdaten nach Excel oder Google Sheets.",
+    "sw_myrent_1": "Erstellen Sie die Berichte, die Sie brauchen, und exportieren Sie jeden nach Excel.",
+    "sw_rentware_1": "Öffnen Sie app.rentware.io/metrics/datev-revenue und exportieren Sie Ihre Umsätze als CSV oder Excel.",
+    "sw_rentware_2": "Diese Datei enthält nur Umsätze. Bitten Sie den Support von Rentware auch um Ihre Buchungen und Kunden.",
+    "sw_toprentapp_1": "Bitten Sie TopRentApp um alle Ihre Daten als CSV. Beim Kündigen werden sie herausgegeben.",
+    "sw_twice_1": "Öffnen Sie Orders, blenden Sie die Spalten für Kunde, Datum, Position und Preis ein und exportieren Sie die Ansicht als CSV.",
+    "sw_twice_2": "Exportieren Sie Customers auf dieselbe Weise. Für Zahlungen öffnen Sie Reports, dann Payments, und laden die CSV aus dem Export-Tab herunter.",
+    "sw_vevs_1": "Öffnen Sie Reservations und speichern Sie sie mit Export Reservations als CSV-Datei.",
+    "sw_vevs_2": "Haken Sie in Customers die Kunden an, klicken Sie auf Choose Action und dann auf Export selected."
   },
   "errorPages": {
     "notFoundTitle": "Diese Seite wurde nicht gefunden",

@@ -5191,7 +5191,16 @@
     "sw_rentworks_1": "Gunakan tombol Export di daftar Reservations dan Customers.",
     "sw_rentworks_2": "Untuk perjanjian dan armada, jalankan laporannya dan gunakan Export Results (Excel atau CSV).",
     "sw_rezdy_1": "Buka Reports, lalu Sales - Orders, dan atur tanggalnya.",
-    "sw_rezdy_2": "Klik Export to CSV."
+    "sw_rezdy_2": "Klik Export to CSV.",
+    "sw_anolla_1": "Ekspor data mentah Anda ke Excel atau Google Sheets.",
+    "sw_myrent_1": "Jalankan laporan yang Anda perlukan dan ekspor masing-masing ke Excel.",
+    "sw_rentware_1": "Buka app.rentware.io/metrics/datev-revenue dan ekspor pendapatan Anda sebagai CSV atau Excel.",
+    "sw_rentware_2": "File itu hanya berisi pendapatan. Minta juga data pemesanan dan pelanggan Anda ke tim dukungan Rentware.",
+    "sw_toprentapp_1": "Minta semua data Anda sebagai CSV ke TopRentApp. Mereka memberikannya saat Anda berhenti berlangganan.",
+    "sw_twice_1": "Buka Orders, tampilkan kolom pelanggan, tanggal, item, dan harga, lalu ekspor tampilan itu sebagai CSV.",
+    "sw_twice_2": "Ekspor Customers dengan cara yang sama. Untuk pembayaran, buka Reports, lalu Payments, dan unduh CSV dari tab Export.",
+    "sw_vevs_1": "Buka Reservations dan gunakan Export Reservations untuk menyimpannya sebagai file CSV.",
+    "sw_vevs_2": "Di Customers, centang pelanggannya, klik Choose Action, lalu Export selected."
   },
   "errorPages": {
     "notFoundTitle": "Halaman itu tidak ditemukan",

@@ -5191,7 +5191,16 @@
     "sw_rentworks_1": "השתמשו בכפתור Export ברשימות Reservations ו-Customers.",
     "sw_rentworks_2": "לחוזים ולצי, הריצו את הדוח והשתמשו ב-Export Results (Excel או CSV).",
     "sw_rezdy_1": "היכנסו ל-Reports, ואז Sales - Orders, והגדירו את התאריכים.",
-    "sw_rezdy_2": "לחצו על Export to CSV."
+    "sw_rezdy_2": "לחצו על Export to CSV.",
+    "sw_anolla_1": "ייצאו את הנתונים הגולמיים ל-Excel או ל-Google Sheets.",
+    "sw_myrent_1": "הפיקו את הדוחות שאתם צריכים וייצאו כל אחד ל-Excel.",
+    "sw_rentware_1": "פתחו את app.rentware.io/metrics/datev-revenue וייצאו את ההכנסות כ-CSV או Excel.",
+    "sw_rentware_2": "הקובץ הזה כולל רק הכנסות. בקשו מהתמיכה של Rentware גם את ההזמנות והלקוחות.",
+    "sw_toprentapp_1": "בקשו מ-TopRentApp את כל הנתונים שלכם כ-CSV. הם מספקים אותם כשעוזבים.",
+    "sw_twice_1": "פתחו את Orders, הציגו את עמודות הלקוח, התאריך, שורת ההזמנה והמחיר, וייצאו את התצוגה כ-CSV.",
+    "sw_twice_2": "ייצאו את Customers באותה דרך. לתשלומים, פתחו את Reports ואז Payments, והורידו את ה-CSV מהלשונית Export.",
+    "sw_vevs_1": "פתחו את Reservations והשתמשו ב-Export Reservations כדי לשמור אותן כקובץ CSV.",
+    "sw_vevs_2": "ב-Customers, סמנו את הלקוחות, לחצו על Choose Action ואז Export selected."
   },
   "errorPages": {
     "notFoundTitle": "לא מצאנו את העמוד הזה",

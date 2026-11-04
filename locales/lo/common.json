@@ -5151,7 +5151,16 @@
     "sw_rentworks_1": "ໃຊ້ປຸ່ມ Export ໃນລາຍການ Reservations ແລະ Customers.",
     "sw_rentworks_2": "ສຳລັບສັນຍາ ແລະ ລົດ, ແລ່ນລາຍງານ ແລ້ວໃຊ້ Export Results (Excel ຫຼື CSV).",
     "sw_rezdy_1": "ໄປທີ່ Reports, ຈາກນັ້ນ Sales - Orders, ແລ້ວຕັ້ງວັນທີ.",
-    "sw_rezdy_2": "ກົດ Export to CSV."
+    "sw_rezdy_2": "ກົດ Export to CSV.",
+    "sw_anolla_1": "ສົ່ງອອກຂໍ້ມູນດິບເປັນ Excel ຫຼື Google Sheets.",
+    "sw_myrent_1": "ເອີ້ນລາຍງານທີ່ຕ້ອງການ ແລ້ວສົ່ງອອກແຕ່ລະລາຍງານເປັນ Excel.",
+    "sw_rentware_1": "ເປີດ app.rentware.io/metrics/datev-revenue ແລ້ວສົ່ງອອກລາຍຮັບເປັນ CSV ຫຼື Excel.",
+    "sw_rentware_2": "ໄຟລ໌ນັ້ນມີແຕ່ລາຍຮັບ. ຂໍຂໍ້ມູນການຈອງ ແລະ ລູກຄ້າຈາກທີມຊ່ວຍເຫຼືອຂອງ Rentware ນຳ.",
+    "sw_toprentapp_1": "ຂໍຂໍ້ມູນທັງໝົດເປັນ CSV ຈາກ TopRentApp. ເຂົາຈະໃຫ້ເມື່ອທ່ານເລີກໃຊ້.",
+    "sw_twice_1": "ເປີດ Orders, ສະແດງຖັນລູກຄ້າ, ວັນທີ, ລາຍການສິນຄ້າ ແລະ ລາຄາ, ແລ້ວສົ່ງອອກມຸມມອງນັ້ນເປັນ CSV.",
+    "sw_twice_2": "ສົ່ງອອກ Customers ແບບດຽວກັນ. ສຳລັບການຊຳລະເງິນ, ເປີດ Reports, ແລ້ວ Payments, ແລ້ວດາວໂຫຼດ CSV ຈາກແຖບ Export.",
+    "sw_vevs_1": "ເປີດ Reservations ແລ້ວໃຊ້ Export Reservations ເພື່ອບັນທຶກເປັນໄຟລ໌ CSV.",
+    "sw_vevs_2": "ໃນ Customers, ໝາຍເລືອກລູກຄ້າ, ກົດ Choose Action, ແລ້ວ Export selected."
   },
   "errorPages": {
     "notFoundTitle": "ພວກເຮົາບໍ່ພົບໜ້ານັ້ນ",

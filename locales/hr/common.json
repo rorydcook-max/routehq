@@ -5123,7 +5123,16 @@
     "sw_rentworks_1": "Upotrijebite gumb Export na popisima Reservations i Customers.",
     "sw_rentworks_2": "Za ugovore i vozni park pokrenite izvješće i upotrijebite Export Results (Excel ili CSV).",
     "sw_rezdy_1": "Idite na Reports, zatim Sales - Orders, i postavite datume.",
-    "sw_rezdy_2": "Kliknite Export to CSV."
+    "sw_rezdy_2": "Kliknite Export to CSV.",
+    "sw_anolla_1": "Izvezite sirove podatke u Excel ili Google Sheets.",
+    "sw_myrent_1": "Pokrenite izvješća koja trebate i svako izvezite u Excel.",
+    "sw_rentware_1": "Otvorite app.rentware.io/metrics/datev-revenue i izvezite prihode kao CSV ili Excel.",
+    "sw_rentware_2": "Ta datoteka sadrži samo prihode. Od podrške programa Rentware zatražite i rezervacije i klijente.",
+    "sw_toprentapp_1": "Zatražite od programa TopRentApp sve svoje podatke kao CSV. Predaju ih kad odlazite.",
+    "sw_twice_1": "Otvorite Orders, prikažite stupce klijenta, datuma, stavke narudžbe i cijene te izvezite prikaz kao CSV.",
+    "sw_twice_2": "Na isti način izvezite Customers. Za uplate otvorite Reports, zatim Payments, i preuzmite CSV iz kartice Export.",
+    "sw_vevs_1": "Otvorite Reservations i pomoću Export Reservations spremite ih kao CSV datoteku.",
+    "sw_vevs_2": "U Customers označite klijente, kliknite Choose Action, zatim Export selected."
   },
   "errorPages": {
     "notFoundTitle": "Nismo pronašli tu stranicu",

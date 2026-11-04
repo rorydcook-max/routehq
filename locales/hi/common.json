@@ -5151,7 +5151,16 @@
     "sw_rentworks_1": "Reservations और Customers लिस्ट पर Export बटन इस्तेमाल करें।",
     "sw_rentworks_2": "एग्रीमेंट और फ़्लीट के लिए, रिपोर्ट चलाएँ और Export Results (Excel या CSV) इस्तेमाल करें।",
     "sw_rezdy_1": "Reports में जाएँ, फिर Sales - Orders, और तारीखें सेट करें।",
-    "sw_rezdy_2": "Export to CSV पर क्लिक करें।"
+    "sw_rezdy_2": "Export to CSV पर क्लिक करें।",
+    "sw_anolla_1": "अपना रॉ डेटा Excel या Google Sheets में एक्सपोर्ट करें।",
+    "sw_myrent_1": "अपनी ज़रूरी रिपोर्ट्स चलाएँ और हर एक को Excel में एक्सपोर्ट करें।",
+    "sw_rentware_1": "app.rentware.io/metrics/datev-revenue खोलें और अपना रेवेन्यू CSV या Excel में एक्सपोर्ट करें।",
+    "sw_rentware_2": "उस फ़ाइल में सिर्फ़ रेवेन्यू होता है। Rentware सपोर्ट से अपनी बुकिंग और ग्राहक भी माँगें।",
+    "sw_toprentapp_1": "TopRentApp से अपना सारा डेटा CSV में माँगें। छोड़ते समय वे इसे देते हैं।",
+    "sw_twice_1": "Orders खोलें, ग्राहक, तारीख, लाइन आइटम और कीमत वाले कॉलम दिखाएँ, और व्यू को CSV में एक्सपोर्ट करें।",
+    "sw_twice_2": "Customers को भी इसी तरह एक्सपोर्ट करें। भुगतान के लिए Reports खोलें, फिर Payments, और Export टैब से CSV डाउनलोड करें।",
+    "sw_vevs_1": "Reservations खोलें और Export Reservations से उन्हें CSV फ़ाइल के रूप में सेव करें।",
+    "sw_vevs_2": "Customers में ग्राहकों को टिक करें, Choose Action पर क्लिक करें, फिर Export selected।"
   },
   "errorPages": {
     "notFoundTitle": "हमें वह पेज नहीं मिला",

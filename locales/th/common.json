@@ -5186,7 +5186,16 @@
     "sw_rentworks_1": "ใช้ปุ่ม Export ในรายการ Reservations และ Customers",
     "sw_rentworks_2": "สำหรับสัญญาและรถ ให้รันรายงานแล้วใช้ Export Results (Excel หรือ CSV)",
     "sw_rezdy_1": "ไปที่ Reports แล้ว Sales - Orders จากนั้นตั้งช่วงวันที่",
-    "sw_rezdy_2": "คลิก Export to CSV"
+    "sw_rezdy_2": "คลิก Export to CSV",
+    "sw_anolla_1": "ส่งออกข้อมูลดิบเป็น Excel หรือ Google Sheets",
+    "sw_myrent_1": "เรียกรายงานที่ต้องการ แล้วส่งออกแต่ละรายงานเป็น Excel",
+    "sw_rentware_1": "เปิด app.rentware.io/metrics/datev-revenue แล้วส่งออกรายได้เป็น CSV หรือ Excel",
+    "sw_rentware_2": "ไฟล์นั้นมีแค่รายได้ ขอข้อมูลการจองและลูกค้าจากทีมซัพพอร์ตของ Rentware ด้วย",
+    "sw_toprentapp_1": "ขอข้อมูลทั้งหมดเป็น CSV จาก TopRentApp เขาจะให้เมื่อคุณเลิกใช้",
+    "sw_twice_1": "เปิด Orders แสดงคอลัมน์ลูกค้า วันที่ รายการสินค้า และราคา แล้วส่งออกมุมมองนั้นเป็น CSV",
+    "sw_twice_2": "ส่งออก Customers แบบเดียวกัน สำหรับการชำระเงิน เปิด Reports แล้ว Payments แล้วดาวน์โหลด CSV จากแท็บ Export",
+    "sw_vevs_1": "เปิด Reservations แล้วใช้ Export Reservations เพื่อบันทึกเป็นไฟล์ CSV",
+    "sw_vevs_2": "ใน Customers ติ๊กเลือกลูกค้า กด Choose Action แล้ว Export selected"
   },
   "errorPages": {
     "notFoundTitle": "ไม่พบหน้านี้",

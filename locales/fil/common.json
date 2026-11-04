@@ -5125,7 +5125,16 @@
     "sw_rentworks_1": "Gamitin ang Export button sa listahan ng Reservations at Customers.",
     "sw_rentworks_2": "Para sa mga agreement at fleet, patakbuhin ang report at gamitin ang Export Results (Excel o CSV).",
     "sw_rezdy_1": "Pumunta sa Reports, tapos Sales - Orders, at itakda ang mga petsa.",
-    "sw_rezdy_2": "I-click ang Export to CSV."
+    "sw_rezdy_2": "I-click ang Export to CSV.",
+    "sw_anolla_1": "I-export ang raw data mo sa Excel o Google Sheets.",
+    "sw_myrent_1": "Patakbuhin ang mga report na kailangan mo at i-export ang bawat isa sa Excel.",
+    "sw_rentware_1": "Buksan ang app.rentware.io/metrics/datev-revenue at i-export ang revenue mo bilang CSV o Excel.",
+    "sw_rentware_2": "Revenue lang ang laman ng file na iyon. Hingin din sa support ng Rentware ang mga booking at customer mo.",
+    "sw_toprentapp_1": "Hingin sa TopRentApp ang lahat ng data mo bilang CSV. Ibinibigay nila ito kapag umalis ka.",
+    "sw_twice_1": "Buksan ang Orders, ipakita ang mga column ng customer, petsa, line item at presyo, at i-export ang view bilang CSV.",
+    "sw_twice_2": "I-export ang Customers sa parehong paraan. Para sa mga bayad, buksan ang Reports, tapos Payments, at i-download ang CSV mula sa Export tab.",
+    "sw_vevs_1": "Buksan ang Reservations at gamitin ang Export Reservations para i-save ang mga ito bilang CSV file.",
+    "sw_vevs_2": "Sa Customers, i-tick ang mga customer, i-click ang Choose Action, tapos Export selected."
   },
   "errorPages": {
     "notFoundTitle": "Hindi namin mahanap ang page na iyan",

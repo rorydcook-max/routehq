@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { getConsent, hasConsent, onConsentChange } from "@/lib/consent";
-import { GA_MEASUREMENT_ID, GTM_ID, isTrackedHost, isUntrackedPath, PENDING_EVENT_COOKIE } from "@/lib/analytics";
+import { gaIdFor, gtmIdFor, isTrackedHost, isUntrackedPath, PENDING_EVENT_COOKIE } from "@/lib/analytics";
 
 declare global {
   interface Window {
@@ -37,12 +37,13 @@ function setDefaults() {
 }
 
 function currentPathAllowed() {
-  return isTrackedHost(window.location.hostname) && !isUntrackedPath(window.location.pathname);
+  return isTrackedHost(window.location.hostname) && !isUntrackedPath(window.location.pathname, window.location.hostname);
 }
 
 /** Google's own off switch, checked by the GA4 tag on every hit: on while a customer page is open in the same tab. */
 function setPageSwitch(off: boolean) {
-  (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = off;
+  const id = gaIdFor(window.location.hostname);
+  if (id) (window as unknown as Record<string, unknown>)[`ga-disable-${id}`] = off;
 }
 
 /** Consent granted: the defaults, then the update, then GTM itself (once). */
@@ -59,7 +60,7 @@ function grantAndLoad() {
   const add = () => {
     const script = document.createElement("script");
     script.async = true;
-    script.src = `https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`;
+    script.src = `https://www.googletagmanager.com/gtm.js?id=${gtmIdFor(window.location.hostname)}`;
     document.head.appendChild(script);
   };
   // After the page is interactive and idle, so it never competes with the page's own loading.
@@ -94,7 +95,7 @@ function flushPendingEvent() {
     clearPendingEvent();
     return;
   }
-  if (!choice || isUntrackedPath(window.location.pathname)) return;
+  if (!choice || isUntrackedPath(window.location.pathname, window.location.hostname)) return;
   clearPendingEvent();
   const [event, method] = pending.split(":");
   if (event !== "sign_up" && event !== "login") return;

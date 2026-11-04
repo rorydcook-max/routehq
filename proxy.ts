@@ -138,6 +138,8 @@ export async function proxy(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = "/rent";
       request.headers.set("x-routehq-customer-page", "1");
+      // The directory itself is Rove's own page: it gets the cookie notice and Rove's analytics (lib/analytics.ts).
+      request.headers.set("x-routehq-directory", "1");
       return NextResponse.rewrite(url, { request });
     }
   }

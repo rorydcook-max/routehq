@@ -43,7 +43,8 @@ We use Google Analytics 4, loaded through Google Tag Manager (which sets no cook
 ## Things we don't do
 
 - No advertising or tracking cookies, and no selling of data. Google's advertising features stay switched off.
-- Businesses' booking pages (their own addresses, rovehq.app/rent and booking links), the booking box on their websites, and rove.rent set only strictly necessary cookies. We never run analytics on them: renters' details belong to the business.
+- Businesses' booking pages (their own addresses, rovehq.app/rent, rove.rent/<business> and booking links) and the booking box on their websites set only strictly necessary cookies. We never run analytics on them: renters' details belong to the business.
+- rove.rent's search page asks the same question and, only if you accept, measures visits with its own Google Analytics 4 property (the same `_ga` cookies, up to 14 months).
 
 ## Other companies' content
 

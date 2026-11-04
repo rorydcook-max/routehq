@@ -41,7 +41,7 @@ A sub-processor is a company RoveHQ uses that may handle personal information th
 
 | Company | What it does | Where | Safeguard |
 |---|---|---|---|
-| Google Ireland Ltd / Google LLC (Google Analytics 4, through Google Tag Manager) | Visit statistics for rovehq.io and rovehq.app (pages used, sign-ups and sign-ins), only after a visitor accepts analytics cookies. Never runs on booking pages or rove.rent and never receives renters' information or anything from businesses' records | EU / United States | EU-US Data Privacy Framework and SCCs |
+| Google Ireland Ltd / Google LLC (Google Analytics 4, through Google Tag Manager) | Visit statistics for rovehq.io, rovehq.app and rove.rent's search page (pages used, sign-ups and sign-ins), only after a visitor accepts analytics cookies. Never runs on businesses' booking pages and never receives renters' information or anything from businesses' records | EU / United States | EU-US Data Privacy Framework and SCCs |
 
 ## Changes to this list
 

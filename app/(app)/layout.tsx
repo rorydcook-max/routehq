@@ -18,6 +18,15 @@ import { shellBrand } from "@/lib/shell-brand";
 import { StaffMessages } from "@/components/staff-messages";
 import { rootMetadata, rootViewport } from "../root-metadata";
 
+/** rove.rent's directory search: a customer page, but Rove's own, so it asks about cookies and may be measured. */
+async function isDirectoryPage() {
+  try {
+    return Boolean((await headers()).get("x-routehq-directory"));
+  } catch {
+    return false;
+  }
+}
+
 async function isCustomerPage() {
   try {
     return Boolean((await headers()).get("x-routehq-customer-page"));
@@ -84,10 +93,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, brand, customerPage, theme, timeZone] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage(), themeChoice(), getTimeZone().catch(() => null)]);
+  const [locale, brand, customerPage, directoryPage, theme, timeZone] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage(), isDirectoryPage(), themeChoice(), getTimeZone().catch(() => null)]);
   // Customer pages (booking pages, booking links, the directory, embedded checkouts) get no cookie notice and no
   // analytics: renters' data is the business's, not ours. Everything else on rovehq.app gets both.
-  const words = customerPage ? null : await cookieWords().catch(() => null);
+  // rove.rent's directory search is the exception: Rove's own page, with its own notice and analytics.
+  const words = customerPage && !directoryPage ? null : await cookieWords().catch(() => null);
   // Read after getTimeZone(): loading the signed-in business recorded its unit for this request.
   const page = <ShellBrandProvider brand={brand} currency={businessCurrency()} distanceUnit={businessDistanceUnit()} timeZone={timeZone}>{children}</ShellBrandProvider>;
   return (

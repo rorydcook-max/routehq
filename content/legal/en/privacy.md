@@ -71,7 +71,7 @@ To save typing, RoveHQ uses AI to read photos people upload: passports, driving 
 |---|---|---|
 | Messages and contact details you send us (contact form, chat) | To reply | Legitimate interests; steps before a contract |
 | Strictly necessary cookies (language, theme, sign-in) | To make the site work | Necessary; no consent needed (see the [cookie policy](/legal/cookies)) |
-| Analytics (Google Analytics 4, loaded through Google Tag Manager) on rovehq.io and rovehq.app: pages visited, device and browser type, rough location, and whether someone signed up or signed in. Never your name, email, phone, business name or account ID, and never on businesses' booking pages or rove.rent | To understand which pages help people and how many of them sign up | **Your consent**, only after you click Accept; withdraw any time with Cookie choices |
+| Analytics (Google Analytics 4, loaded through Google Tag Manager) on rovehq.io, rovehq.app and rove.rent's search page: pages visited, device and browser type, rough location, and whether someone signed up or signed in. Never your name, email, phone, business name or account ID, and never on businesses' booking pages | To understand which pages help people and how many of them sign up | **Your consent**, only after you click Accept; withdraw any time with Cookie choices |
 
 ## How long we keep it
 

@@ -8,6 +8,9 @@
  * - "Basic" Consent Mode: GTM is not loaded at all until the visitor accepts analytics cookies (lib/consent.ts).
  * - Nothing personal is ever pushed (no email, name, phone, business name or user id).
  *
+ * - rove.rent (4 Nov 2026): its own container GTM-NZL8J5FN (its own GA4 property), on the directory search page only
+ *   (rove.rent/ and /rent). Each business's booking page there (rove.rent/<their-name>) is the business's, not tracked.
+ *
  * Local testing only: NEXT_PUBLIC_GTM_ALLOW_LOCAL=1 also allows localhost / 127.0.0.1 / site.localhost. Never set it
  * on Vercel.
  */
@@ -17,17 +20,38 @@ export const GTM_ID = "GTM-NX2B3BSS";
 export const GA_MEASUREMENT_ID = "G-1NGPP6YDZN";
 
 const PRODUCTION_HOSTS = new Set(["rovehq.io", "www.rovehq.io", "rovehq.app"]);
+/** The renter marketplace: its own container and GA4 property. */
+export const RENTER_GTM_ID = "GTM-NZL8J5FN";
+/** Its GA4 property's measurement ID, for Google's per-page off switch; set in Vercel once known. */
+export const RENTER_GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_RENTER_GA_ID || "";
+const RENTER_HOSTS = new Set(["rove.rent", "www.rove.rent"]);
+
+export function isRenterAnalyticsHost(hostname: string) {
+  return RENTER_HOSTS.has(hostname.toLowerCase());
+}
+
+/** The container for this host. */
+export function gtmIdFor(hostname: string) {
+  return isRenterAnalyticsHost(hostname) ? RENTER_GTM_ID : GTM_ID;
+}
+
+/** The GA4 measurement ID behind this host's container (empty when not known). */
+export function gaIdFor(hostname: string) {
+  return isRenterAnalyticsHost(hostname) ? RENTER_GA_MEASUREMENT_ID : GA_MEASUREMENT_ID;
+}
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "site.localhost"]);
 
 /** Whether this host may load GTM at all. */
 export function isTrackedHost(hostname: string) {
   const host = hostname.toLowerCase();
-  if (PRODUCTION_HOSTS.has(host)) return true;
+  if (PRODUCTION_HOSTS.has(host) || RENTER_HOSTS.has(host)) return true;
   return process.env.NEXT_PUBLIC_GTM_ALLOW_LOCAL === "1" && LOCAL_HOSTS.has(host);
 }
 
 /** Customer pages (a business's booking page, the directory, booking links, changes): never tracked. */
-export function isUntrackedPath(pathname: string) {
+export function isUntrackedPath(pathname: string, hostname = "") {
+  // On rove.rent only the directory search is ours; everything else there is a business's page or a booking link.
+  if (isRenterAnalyticsHost(hostname)) return !(pathname === "/" || pathname === "/rent");
   return pathname === "/rent" || pathname.startsWith("/rent/") || pathname === "/book" || pathname.startsWith("/book/") || pathname.startsWith("/amend/");
 }
 

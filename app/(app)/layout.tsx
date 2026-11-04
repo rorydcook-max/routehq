@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getTimeZone } from "next-intl/server";
+import { getLocale, getTimeZone, getTranslations } from "next-intl/server";
+import { CookieBanner, type CookieWords } from "@/components/cookie-banner";
+import { GoogleTagManager } from "@/components/google-tag-manager";
+import { legalUrl } from "@/lib/site/legal-slugs";
 import { textDirection } from "@/lib/i18n/locales";
 import { ImageShrinker } from "@/components/image-shrinker";
 import { FlagFont } from "@/components/flag-font";
@@ -46,6 +49,26 @@ import "../theme-dark.css";
 export const metadata: Metadata = rootMetadata;
 export const viewport: Viewport = rootViewport;
 
+/** The cookie notice's words: the website's own (site.cookie*), so both domains ask the same thing. */
+async function cookieWords(): Promise<CookieWords> {
+  const t = await getTranslations("site");
+  return {
+    body: t("cookieBody"),
+    accept: t("cookieAccept"),
+    reject: t("cookieReject"),
+    choices: t("cookieChoices"),
+    choicesTitle: t("cookieChoicesTitle"),
+    necessary: t("cookieNecessary"),
+    necessaryBody: t("cookieNecessaryBody"),
+    alwaysOn: t("cookieAlwaysOn"),
+    analytics: t("cookieAnalytics"),
+    analyticsBody: t("cookieAnalyticsBody"),
+    save: t("cookieSave"),
+    policy: t("cookiePolicy"),
+    policyHref: legalUrl("cookies")
+  };
+}
+
 /** Light, dark, or (no cookie) the device's own setting. */
 async function themeChoice(): Promise<ThemeChoice> {
   try {
@@ -62,6 +85,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const [locale, brand, customerPage, theme, timeZone] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage(), themeChoice(), getTimeZone().catch(() => null)]);
+  // Customer pages (booking pages, booking links, the directory, embedded checkouts) get no cookie notice and no
+  // analytics: renters' data is the business's, not ours. Everything else on rovehq.app gets both.
+  const words = customerPage ? null : await cookieWords().catch(() => null);
   // Read after getTimeZone(): loading the signed-in business recorded its unit for this request.
   const page = <ShellBrandProvider brand={brand} currency={businessCurrency()} distanceUnit={businessDistanceUnit()} timeZone={timeZone}>{children}</ShellBrandProvider>;
   return (
@@ -79,6 +105,13 @@ export default async function RootLayout({
         ) : (
           <StaffMessages locale={locale} timeZone={timeZone}>{page}</StaffMessages>
         )}
+        {words ? (
+          <>
+            <CookieBanner words={words} />
+            {/* Google Tag Manager (GA4), loaded in the browser only after the visitor accepts analytics cookies. */}
+            <GoogleTagManager />
+          </>
+        ) : null}
         <ImageShrinker />
         <FlagFont />
       </body>

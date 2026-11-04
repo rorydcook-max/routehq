@@ -11,7 +11,8 @@ import { siteLocale, siteLocaleParams } from "@/lib/site/static-page";
 import { themeScript } from "@/lib/theme";
 import { rootMetadata, rootViewport } from "../../../root-metadata";
 import { localizeSitePath } from "@/lib/site/locale-path";
-import { CookieBanner } from "./_components/cookie-banner";
+import { CookieBanner } from "@/components/cookie-banner";
+import { GoogleTagManager } from "@/components/google-tag-manager";
 import { SiteFooter } from "./_components/site-footer";
 import { SiteHeader } from "./_components/site-header";
 import s from "./site.module.css";
@@ -86,6 +87,8 @@ export default async function SiteLayout({ children, params }: { children: React
               }}
             />
           </div>
+          {/* Google Tag Manager (GA4), loaded in the browser only after the visitor accepts analytics cookies. */}
+          <GoogleTagManager />
         </NextIntlClientProvider>
         <ImageShrinker />
         <FlagFont />

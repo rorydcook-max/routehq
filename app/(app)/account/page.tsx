@@ -7,6 +7,7 @@ import { PageBand } from "@/components/page-band";
 import { PendingButton } from "@/components/pending-button";
 import { PushToggle } from "@/components/push-toggle";
 import { BusinessPrivacy } from "@/components/privacy/business-privacy";
+import { CookieChoicesLink } from "@/components/cookie-choices-link";
 import { legalUrl } from "@/lib/site/legal-slugs";
 import { ThemePicker } from "@/components/theme-picker";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -38,6 +39,7 @@ export default async function AccountPage() {
     supabase.from("organizations").select("name, default_locale, settings").eq("id", membership.organizationId).maybeSingle()
   ]);
   const privacy = (await getTranslations("privacy")) as unknown as Say;
+  const marketing = await getTranslations("marketing");
   const privacySettings = ((organization?.settings as Record<string, any> | null)?.privacy || {}) as { idPhotoMonths?: number; idPhotoAutoDelete?: boolean };
 
   const locale = profile?.preferred_locale || organization?.default_locale || "en";
@@ -141,6 +143,10 @@ export default async function AccountPage() {
                 </a>
               </li>
             ))}
+            {/* Change or withdraw the analytics-cookie choice on rovehq.app (each domain keeps its own). */}
+            <li>
+              <CookieChoicesLink className="inline-flex min-h-11 items-center font-semibold text-[var(--primary)] underline" label={marketing("legalCookieChoices")} />
+            </li>
           </ul>
           {membership.role === "owner" ? (
             <BusinessPrivacy autoDelete={Boolean(privacySettings.idPhotoAutoDelete)} businessName={organization?.name || ""} months={Number(privacySettings.idPhotoMonths) || 24} />

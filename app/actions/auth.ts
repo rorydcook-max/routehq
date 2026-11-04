@@ -11,6 +11,29 @@ import { appRoleFromForm, dbRoleFromApp, getCurrentMembership, OWNER_ONLY_MESSAG
 import { ACTIVE_ORGANIZATION_COOKIE } from "@/lib/auth/active-organization";
 import { shellBrand } from "@/lib/shell-brand";
 import { emailCheckToken } from "@/lib/email-check";
+import { PENDING_EVENT_COOKIE, PENDING_EVENT_MAX_AGE, type PendingEvent, type PendingMethod } from "@/lib/analytics";
+import { CONSENT_KEY, consentFromCookieValue } from "@/lib/consent";
+
+/**
+ * Tells the next page that a sign-up or sign-in just happened, for Google Analytics (components/google-tag-manager.tsx
+ * pushes it once). The event name and method only: nothing personal. Only set when this browser has already accepted
+ * analytics cookies on rovehq.app (the rovehq_consent cookie), since the flag exists only for analytics.
+ */
+async function queueAnalyticsEvent(event: PendingEvent, method: PendingMethod) {
+  try {
+    const store = await cookies();
+    if (!consentFromCookieValue(store.get(CONSENT_KEY)?.value)?.analytics) return;
+    store.set(PENDING_EVENT_COOKIE, `${event}:${method}`, {
+      httpOnly: false,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: PENDING_EVENT_MAX_AGE
+    });
+  } catch {
+    // Never let analytics get in the way of signing in.
+  }
+}
 
 export type AuthActionState = {
   error?: string;
@@ -40,6 +63,7 @@ export async function signInWithEmail(_state: AuthActionState, formData: FormDat
     return { error: /confirm/i.test(error.message) ? say("confirmFirst") : say("signInFailed") };
   }
 
+  await queueAnalyticsEvent("login", "email");
   redirect("/");
 }
 
@@ -291,6 +315,8 @@ export async function signUpWithEmail(_state: AuthActionState, formData: FormDat
     () => null,
     () => null
   );
+  // The account exists and is signed in: counted once as a sign-up (not also as a login).
+  await queueAnalyticsEvent("sign_up", "email");
   redirect("/onboarding");
 }
 

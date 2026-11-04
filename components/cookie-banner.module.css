@@ -1,6 +1,17 @@
 /* The cookie notice: a small white card in the bottom corner, a 1px line and the site's soft frame shadow. It never
-   covers the page; on phones it spans the width with the site's 16px gutters. */
+   covers the page; on phones it spans the width with the site's 16px gutters.
+   It carries the website's colours itself (the same values as site.module.css), so it looks the same in the app. */
 .banner {
+  --line: rgba(6, 22, 43, 0.1);
+  --white: #ffffff;
+  --text: #0b1a2e;
+  --muted: #5f6b7a;
+  --ink: #06162b;
+  --ink-2: #0b2140;
+  --teal: #12bcb8;
+  --teal-deep: #0b8f8c;
+  --frame-shadow-light: 0 24px 60px -30px rgba(6, 22, 43, 0.25);
+  color-scheme: light;
   position: fixed;
   z-index: 60;
   inset-inline: 16px;
@@ -35,6 +46,30 @@
   align-items: center;
   gap: 8px;
   margin-top: 14px;
+}
+/* The website's small ink button (site.module.css .btn .btnSmall .btnInk). */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background-color 150ms ease;
+}
+.button:hover {
+  background: var(--ink-2);
+}
+.banner :is(a, button, input):focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+  border-radius: 8px;
 }
 .equal {
   flex: 1 1 0;

@@ -1,7 +1,7 @@
 ---
 title: Privacy policy
 description: What RoveHQ collects, why, how long we keep it, where it is stored, and how to use your rights under GDPR, UK GDPR and Thailand's PDPA.
-updated: 2026-11-03
+updated: 2026-11-04
 order: 1
 ---
 
@@ -30,7 +30,7 @@ EU representative (Article 27 GDPR): **[to be appointed]**. UK representative (A
 | Someone who runs or works for a rental business on RoveHQ | RoveHQ (your account, billing, support) | Everything |
 | A renter of a business on RoveHQ | That business (your bookings, documents, payments) | How RoveHQ handles it for the business, and the renter list if you joined it |
 | A renter who ticked "Send me trip extras" | RoveHQ (the renter list) | Everything about the renter list |
-| A visitor to our website | RoveHQ | Website, chat and cookies |
+| A visitor to our website (rovehq.io) or app (rovehq.app) | RoveHQ | Website, chat, cookies and analytics |
 
 ## What we collect and why
 
@@ -65,13 +65,13 @@ If you tick **"Send me trip extras"** on a booking form, you agree that RoveHQ k
 
 To save typing, RoveHQ uses AI to read photos people upload: passports, driving licences, receipts and payment slips. The photo is sent to our AI provider (Anthropic; if it is unavailable, OpenAI or Google Gemini), which returns the text it reads (name, numbers, dates, amounts). A person at the business can check and correct the result. Our AI providers process the photos under their business terms: they don't use them to train their models and keep them only for a short time for safety and abuse monitoring. No decision with legal or similarly significant effects is made by AI alone (Article 22 GDPR).
 
-### Website visitors
+### Website and app visitors
 
 | What | Why | Legal basis |
 |---|---|---|
 | Messages and contact details you send us (contact form, chat) | To reply | Legitimate interests; steps before a contract |
 | Strictly necessary cookies (language, theme, sign-in) | To make the site work | Necessary; no consent needed (see the [cookie policy](/legal/cookies)) |
-| Analytics (Google Analytics) | To understand which pages help people | **Your consent**, only after you click Accept |
+| Analytics (Google Analytics 4, loaded through Google Tag Manager) on rovehq.io and rovehq.app: pages visited, device and browser type, rough location, and whether someone signed up or signed in. Never your name, email, phone, business name or account ID, and never on businesses' booking pages or rove.rent | To understand which pages help people and how many of them sign up | **Your consent**, only after you click Accept; withdraw any time with Cookie choices |
 
 ## How long we keep it
 

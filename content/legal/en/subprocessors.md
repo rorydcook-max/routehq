@@ -1,7 +1,7 @@
 ---
 title: Sub-processors
 description: The companies RoveHQ uses to store and process personal information, what each one does, where, and the safeguard that protects transfers.
-updated: 2026-11-03
+updated: 2026-11-04
 order: 4
 ---
 
@@ -37,11 +37,11 @@ A sub-processor is a company RoveHQ uses that may handle personal information th
 
 **Note on messaging apps.** A business chooses to connect LINE, Telegram or WhatsApp, and the renter chooses to message on it. Those apps also act as controllers under their own terms with the renter. We list them because RoveHQ passes messages through them for the business.
 
-## Website only (RoveHQ as controller)
+## Website and app statistics (RoveHQ as controller)
 
 | Company | What it does | Where | Safeguard |
 |---|---|---|---|
-| Google Ireland Ltd / Google LLC (Google Analytics) | Website statistics, only after a visitor accepts analytics cookies | EU / United States | EU-US Data Privacy Framework and SCCs |
+| Google Ireland Ltd / Google LLC (Google Analytics 4, through Google Tag Manager) | Visit statistics for rovehq.io and rovehq.app (pages used, sign-ups and sign-ins), only after a visitor accepts analytics cookies. Never runs on booking pages or rove.rent and never receives renters' information or anything from businesses' records | EU / United States | EU-US Data Privacy Framework and SCCs |
 
 ## Changes to this list
 

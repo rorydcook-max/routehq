@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { AuthLanguage } from "@/components/auth-language";
 import { RouteHqLogo } from "@/components/brand-logo";
-import { CookieChoicesLink } from "./cookie-choices-link";
+import { CookieChoicesLink } from "@/components/cookie-choices-link";
 import { Container, SITE_LINKS, SiteLink } from "./site-ui";
 import s from "../site.module.css";
 import l from "../legal/legal.module.css";

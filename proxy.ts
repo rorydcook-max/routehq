@@ -116,6 +116,12 @@ export async function proxy(request: NextRequest) {
   // Rove (rove.rent), the renter booking site: its home is the /rent search; booking links work there too;
   // anything else (the operator app, the RoveHQ website) belongs on rovehq.app.
   if (isRenterHost(requestHost)) {
+    // rove.rent's own robots.txt and sitemap (the directory and every listed business), not RoveHQ's website ones.
+    if (pathname === "/robots.txt" || pathname === "/sitemap.xml") {
+      const url = request.nextUrl.clone();
+      url.pathname = pathname === "/robots.txt" ? "/rove-robots.txt" : "/rove-sitemap.xml";
+      return NextResponse.rewrite(url);
+    }
     // A business's booking page at its short address, rove.rent/<their-name> (Rory, 1 Nov 2026): served from
     // /rent/<their-name>. One renter domain for the search page and every business's page.
     if (/^\/[a-z0-9][a-z0-9-]{1,62}$/.test(pathname) && !isRenterSitePath(pathname) && !APP_TOP_LEVEL.has(pathname.slice(1))) {

@@ -1,5 +1,6 @@
 /**
- * Cookie consent on RoveHQ's website (GDPR / UK PECR / ePrivacy / Thai PDPA, 3 Nov 2026).
+ * Cookie consent on RoveHQ's website and platform (GDPR / UK PECR / ePrivacy / Thai PDPA, 3 Nov 2026; rovehq.app too
+ * from 4 Nov 2026, each domain keeping its own choice). Google Tag Manager waits on it: components/google-tag-manager.tsx.
  *
  * Browser only, so it works on the website's prerendered pages: nothing is read per request. The choice is kept in
  * localStorage and mirrored in a first-party cookie (rovehq_consent) for 6 months, then asked again.
@@ -31,6 +32,17 @@ function valid(value: unknown): value is ConsentChoice {
   if (choice.version !== VERSION || typeof choice.analytics !== "boolean") return false;
   const at = Date.parse(choice.decidedAt);
   return Number.isFinite(at) && Date.now() - at < MAX_AGE_DAYS * 86_400_000;
+}
+
+/** The choice held in the rovehq_consent cookie's value (already URL-decoded), or null. Safe on the server too. */
+export function consentFromCookieValue(value: string | null | undefined): ConsentChoice | null {
+  if (!value) return null;
+  try {
+    const parsed = JSON.parse(value);
+    return valid(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
 }
 
 /** The visitor's current choice, or null if they haven't chosen (or it expired). */

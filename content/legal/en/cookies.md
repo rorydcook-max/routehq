@@ -1,7 +1,7 @@
 ---
 title: Cookie policy
 description: The cookies and browser storage RoveHQ uses, which ones need your consent, and how to change your choice.
-updated: 2026-11-03
+updated: 2026-11-04
 order: 5
 ---
 
@@ -11,9 +11,9 @@ Cookies are small files a website saves in your browser. Similar browser storage
 
 ## Your choice
 
-On rovehq.io we ask before using any cookie that isn't strictly necessary. **Accept** and **Reject** are equally easy, and nothing on the site is hidden if you reject. You can change your mind at any time with **Cookie choices** at the bottom of every page.
+On our website (rovehq.io) and in the RoveHQ app (rovehq.app) we ask before using any cookie that isn't strictly necessary. **Accept** and **Reject** are equally easy, and nothing is hidden if you reject. You can change your mind at any time with **Cookie choices**: at the bottom of every page on rovehq.io, and under Privacy in **My account** on rovehq.app.
 
-We remember your choice for 6 months in your browser (`rovehq_consent`), then ask again.
+We remember your choice for 6 months in your browser (`rovehq_consent`), then ask again. rovehq.io and rovehq.app are separate websites, so each one asks and remembers its own choice.
 
 ## Strictly necessary (no consent needed)
 
@@ -35,14 +35,15 @@ These make the site and app work. Under the UK PECR, the EU ePrivacy Directive a
 
 | Name | Company | What it does | How long |
 |---|---|---|---|
-| `_ga`, `_ga_<id>` | Google Analytics (Google Ireland Ltd / Google LLC) | Counts visits and which pages are used, with IP addresses shortened | Up to 13 months |
+| `_ga`, `_ga_<id>` | Google Analytics 4 (Google Ireland Ltd / Google LLC) | Counts visits, which pages are used, and how many people sign up or sign in (Google Analytics 4 doesn't store IP addresses) | Up to 14 months |
+| `rovehq_event` | RoveHQ | Tells the next page that you just signed up or signed in, so it's counted once (no details about you) | Up to 30 minutes, deleted once read |
 
-Google Analytics runs only on our public website, and only after you click **Accept**. If you reject or later withdraw, it doesn't load and we delete the `_ga` cookies we can reach.
+We use Google Analytics 4, loaded through Google Tag Manager (which sets no cookies of its own), on rovehq.io and rovehq.app, and only after you click **Accept**. Until then neither is loaded at all. If you reject or later withdraw, Google is told straight away, it stops storing or sending anything, and we delete the `_ga` cookies we can reach. Nothing we send to Google identifies you: no name, email address, phone number, business name or account ID.
 
 ## Things we don't do
 
-- No advertising or tracking cookies, and no selling of data.
-- The RoveHQ app (rovehq.app) and booking pages set only strictly necessary cookies.
+- No advertising or tracking cookies, and no selling of data. Google's advertising features stay switched off.
+- Businesses' booking pages (their own addresses, rovehq.app/rent and booking links), the booking box on their websites, and rove.rent set only strictly necessary cookies. We never run analytics on them: renters' details belong to the business.
 
 ## Other companies' content
 

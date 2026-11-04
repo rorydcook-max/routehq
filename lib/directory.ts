@@ -70,6 +70,35 @@ function quoteFor(vehicle: { dailyRate: number; weeklyRate: number; monthlyRate:
   return { model: plan.pricingModel, rate, total: amounts.reduce((sum, amount) => sum + amount, 0) };
 }
 
+/**
+ * rove.rent's sitemap: every business a renter could find in the directory (listed, bookable, with at least one
+ * priced vehicle that's available to rent), as its short-address slug and when it last changed.
+ */
+export async function listedBusinessesForSitemap(): Promise<Array<{ slug: string; updatedAt: string | null }>> {
+  const admin = createSupabaseAdminClient() as any;
+  const { data: organizations } = await admin
+    .from("organizations")
+    .select("id, slug, settings, subscription_tier, subscription_status, directory_addon, updated_at")
+    .is("deleted_at", null);
+  const listed = ((organizations || []) as any[]).filter(
+    (organization) => organization.slug && canBeListed(organization) && directorySettings(organization.settings).enabled && publicBookingSettings(organization.settings).enabled
+  );
+  if (!listed.length) return [];
+  const { data: vehicles } = await admin
+    .from("vehicles")
+    .select("organization_id, daily_rate, weekly_rate, monthly_rate")
+    .in("organization_id", listed.map((organization) => organization.id))
+    .is("deleted_at", null)
+    .not("status", "in", "(maintenance,inactive,retired)");
+  const withVehicles = new Set(
+    ((vehicles || []) as any[]).filter((vehicle) => Number(vehicle.daily_rate) > 0 || Number(vehicle.weekly_rate) > 0 || Number(vehicle.monthly_rate) > 0).map((vehicle) => vehicle.organization_id)
+  );
+  return listed
+    .filter((organization) => withVehicles.has(organization.id))
+    .map((organization) => ({ slug: String(organization.slug), updatedAt: organization.updated_at || null }))
+    .sort((a, b) => a.slug.localeCompare(b.slug));
+}
+
 export async function searchDirectory(input: DirectorySearch): Promise<DirectoryBusiness[]> {
   const admin = createSupabaseAdminClient() as any;
   const { data: organizations } = await admin

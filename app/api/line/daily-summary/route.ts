@@ -4,26 +4,9 @@ import { buildDailySummaryMessages, fetchSummaryData, sendDailySummary } from "@
 import { alertSettings, wantsSummary } from "@/lib/alerts";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { isTelegramConfigured, sendTelegram } from "@/lib/telegram";
+import { lineSummaryText as plainText, morningSummaryEmail } from "@/lib/email/templates";
 
 export const runtime = "nodejs";
-
-/** The words of a LINE summary (its cards), as plain lines for Telegram and email. */
-function plainText(messages: unknown): string {
-  const lines: string[] = [];
-  const walk = (node: any) => {
-    if (!node || typeof node !== "object") return;
-    if (Array.isArray(node)) return node.forEach(walk);
-    if (node.type === "box" && node.layout === "horizontal" && Array.isArray(node.contents)) {
-      const row = node.contents.filter((child: any) => child?.type === "text" && child.text).map((child: any) => child.text).join("  ·  ");
-      if (row) lines.push(row);
-      return;
-    }
-    if (node.type === "text" && typeof node.text === "string" && node.text !== "RoveHQ") lines.push(node.text);
-    for (const key of ["contents", "header", "body", "footer"]) if (node[key]) walk(node[key]);
-  };
-  walk(messages);
-  return lines.join("\n");
-}
 
 /**
  * The morning summary (08:00 Bangkok, Vercel Cron): on LINE for businesses that connected it and left it on,
@@ -70,7 +53,8 @@ export async function POST(req: NextRequest) {
     if (!toTelegram && !toEmail) continue;
     const data = await fetchSummaryData(org.id).catch(() => null);
     if (!data) continue;
-    const text = plainText(buildDailySummaryMessages(data));
+    const messages = buildDailySummaryMessages(data);
+    const text = plainText(messages);
     if (!text) continue;
     if (toTelegram) {
       const sent = await sendTelegram(settings.telegram_chat_id, `${text}${appUrl ? `\n\n${appUrl}` : ""}`);
@@ -88,8 +72,9 @@ export async function POST(req: NextRequest) {
           if (u?.user?.email) recipients.push(u.user.email);
         }
       }
-      for (const recipient of recipients) {
-        const sent = await sendEmail({ to: recipient, subject: `${org.name || "RoveHQ"}: your morning summary`, text: `${text}${appUrl ? `\n\nOpen RoveHQ: ${appUrl}` : ""}`, metadata: { kind: "daily_summary" } });
+      const email = morningSummaryEmail({ orgName: org.name, messages: messages as any[], appUrl, locale: data.locale });
+      for (const recipient of email ? recipients : []) {
+        const sent = await sendEmail({ to: recipient, ...email!, metadata: { kind: "daily_summary" } });
         results.push({ org: org.name, channel: "email", success: sent.status === "sent", error: sent.status === "failed" ? sent.error : undefined });
       }
     }

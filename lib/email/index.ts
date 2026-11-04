@@ -20,7 +20,10 @@ export type EmailAttachment = {
 export type EmailMessage = {
   to: string;
   subject: string;
+  /** The plain-text version: always sent, alongside the HTML one when there is one. */
   text: string;
+  /** The designed version (lib/email/layout.ts renderEmailHtml). */
+  html?: string;
   replyTo?: string;
   attachments?: EmailAttachment[];
   /** Free-form labels passed to the provider for tracking, e.g. document id. */
@@ -56,6 +59,7 @@ function createResendProvider(): EmailProvider {
           to: [message.to],
           subject: message.subject,
           text: message.text,
+          html: message.html || undefined,
           reply_to: message.replyTo || undefined,
           attachments: message.attachments?.map((file) => ({ filename: file.filename, content: Buffer.from(file.content).toString("base64") })),
           tags: message.metadata ? Object.entries(message.metadata).map(([name, value]) => ({ name, value: value.replace(/[^\w-]/g, "_").slice(0, 256) })) : undefined

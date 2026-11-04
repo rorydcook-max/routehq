@@ -2,6 +2,7 @@
 
 import { getLocale, getTranslations } from "next-intl/server";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
+import { LEAD_LINKS_MARKER, leadEmail } from "@/lib/email/templates";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { fileSize, LEAD_COUNTRIES, LEAD_FLEETS, type LeadDownload, type LeadState } from "@/lib/leads";
 import { getResource, isContentSlug, resourceFiles, resourceLocales } from "@/lib/site/content";
@@ -123,10 +124,18 @@ export async function requestLead(previous: LeadState, formData: FormData): Prom
     let emailed = false;
     if (isEmailConfigured()) {
       const links = downloads.map((item) => `${item.label} (${item.detail}):\n${siteOrigin()}${item.href}`).join("\n\n");
+      const bodyValues = { name: values.name ? ` ${values.name}` : "", disclaimer: m("disclaimer") };
       const result = await sendEmail({
         to: values.email,
-        subject: m("leadEmailSubject", { title: resource?.title || slug }),
-        text: m("leadEmailBody", { name: values.name ? ` ${values.name}` : "", links, disclaimer: m("disclaimer") }),
+        ...leadEmail({
+          subject: m("leadEmailSubject", { title: resource?.title || slug }),
+          text: m("leadEmailBody", { ...bodyValues, links }),
+          // The same translated words, with the designed download list where {links} goes.
+          bodyWithMarker: m("leadEmailBody", { ...bodyValues, links: LEAD_LINKS_MARKER }),
+          heading: resource?.title || undefined,
+          downloads: downloads.map((item) => ({ label: item.label, detail: item.detail, url: `${siteOrigin()}${item.href}` })),
+          locale
+        }),
         metadata: { kind: "lead", resource: slug }
       });
       emailed = result.status === "sent";

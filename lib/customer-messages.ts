@@ -1,4 +1,6 @@
 import { isEmailConfigured, sendEmail } from "@/lib/email";
+import { OPERATOR_BRAND_COLUMNS, operatorEmailBrand } from "@/lib/email/operator-brand";
+import { customerMessageEmail } from "@/lib/email/templates";
 import { customerDate } from "@/lib/i18n/customer-dates";
 import { customerMessageText } from "@/lib/i18n/customer-message-text";
 import { linePush, PROVIDER_LABELS, telegramSend } from "@/lib/inbox/providers";
@@ -164,7 +166,7 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
   const text = String(input.text || "").trim();
   if (!input.customerId || !text) return { sent: false, reason: "no_customer" };
 
-  const { data: organization } = await admin.from("organizations").select("name, settings").eq("id", input.organizationId).maybeSingle();
+  const { data: organization } = await admin.from("organizations").select(OPERATOR_BRAND_COLUMNS).eq("id", input.organizationId).maybeSingle();
   if (!customerMessagesOn(organization?.settings)) return { sent: false, reason: "off" };
 
   if (input.replacesEarlier && input.rentalId) await retireUnsent(admin, input.organizationId, input.rentalId).catch(() => null);
@@ -233,7 +235,12 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
 
   // 2. Email, the one channel a business can start a conversation on.
   if (customer?.email && isEmailConfigured()) {
-    const result = await sendEmail({ to: customer.email, subject: wording.t("emailSubject", { business: organization?.name || "RoveHQ" }), text: body });
+    // Headed with the business's own logo or name (lib/email/operator-brand.ts), in the customer's language and direction.
+    const brand = await operatorEmailBrand(admin, organization, organization?.name || "");
+    const result = await sendEmail({
+      to: customer.email,
+      ...customerMessageEmail({ subject: wording.t("emailSubject", { business: organization?.name || "RoveHQ" }), body, brand, locale: wording.locale })
+    });
     if (result.status === "sent") {
       await log("sent", "email", { provider: result.provider });
       return { sent: true, via: "email" };

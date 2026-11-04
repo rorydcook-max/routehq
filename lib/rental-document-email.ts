@@ -1,5 +1,7 @@
 import { isEmailConfigured, sendEmail, type EmailAttachment } from "@/lib/email";
 import { recordActivityEventOnce } from "@/lib/supabase/activity";
+import { executedDocumentEmail } from "@/lib/email/templates";
+import { operatorEmailBrandById } from "@/lib/email/operator-brand";
 
 type StoredFile = { bucket: string | null | undefined; path: string | null | undefined; filename: string };
 
@@ -78,17 +80,12 @@ export async function emailExecutedDocumentToCustomer(input: ExecutedDocumentEma
     const business = String(input.businessName || "").trim() || "your rental company";
     const name = String(input.recipientName || "").trim();
     const attachments = await downloadAttachments(input.supabase, input.files);
+    // Headed with the business's own logo or name, not RoveHQ's.
+    const brand = await operatorEmailBrandById(input.supabase, input.organizationId, business);
 
     const result = await sendEmail({
       to,
-      subject: `Your ${input.documentLabel.toLowerCase()} from ${business}`,
-      text: [
-        name ? `Hi ${name},` : "Hello,",
-        "",
-        `Attached is your signed ${input.documentLabel.toLowerCase()} from ${business}. Please keep it for your records.`,
-        "",
-        `If anything in it looks wrong, reply to this email or contact ${business} directly.`
-      ].join("\n"),
+      ...executedDocumentEmail({ documentLabel: input.documentLabel, business, recipientName: name, filenames: attachments.map((file) => file.filename), brand }),
       attachments,
       metadata: { document_id: input.documentId, version_id: input.versionId }
     });

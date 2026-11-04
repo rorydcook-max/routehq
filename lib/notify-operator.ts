@@ -3,6 +3,7 @@ import { sendLineMessage } from "@/services/messaging/line";
 import { sendPushToOrganization } from "@/lib/push";
 import { alertSettings, wantsAlert } from "@/lib/alerts";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
+import { operatorAlertEmail } from "@/lib/email/templates";
 import { isTelegramConfigured, sendTelegram } from "@/lib/telegram";
 
 const PUSH_TITLES: Record<string, string> = {
@@ -92,8 +93,7 @@ export async function notifyOperator(
             emails.map((to) =>
               sendEmail({
                 to,
-                subject: `${title}: ${plain.slice(0, 80)}`,
-                text: `${plain}\n\n${link ? `Open in RoveHQ: ${link}\n\n` : ""}You get this because email alerts are on for ${org.name || "your business"}. Change them in Settings › Notifications.`,
+                ...operatorAlertEmail({ title, plain, link, orgName: org.name, appUrl }),
                 metadata: { kind: "operator_alert", type }
               })
             )

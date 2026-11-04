@@ -9,6 +9,7 @@ import { endViewSession, SUPPORT_DISPLAY_NAME, VIEW_SESSION_HOURS, viewSessionsA
 import { ACTIVE_ORGANIZATION_COOKIE } from "@/lib/auth/active-organization";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
 import { sendEmail } from "@/lib/email";
+import { adminEmailChangedEmail, adminPasswordResetEmail } from "@/lib/email/templates";
 import { parseCustomLimits, type CustomLimits } from "@/lib/plans";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -132,8 +133,7 @@ export async function adminSendPasswordReset(_state: PersonActionState, formData
 
   const sent = await sendEmail({
     to: email,
-    subject: "Reset your RoveHQ password",
-    text: `Hello,\n\nRoveHQ support has sent you a link to choose a new password:\n\n${link}\n\nThe link works once and stops working after a short while. If you didn't ask for this, you can ignore this email: your password stays the same.\n\nRoveHQ`,
+    ...adminPasswordResetEmail({ link }),
     metadata: { kind: "admin_password_reset" }
   });
   if (sent.status === "sent") {
@@ -182,8 +182,7 @@ export async function adminChangeEmail(_state: PersonActionState, formData: Form
   const notice = (to: string) =>
     sendEmail({
       to,
-      subject: "Your RoveHQ email address was changed",
-      text: `Hello,\n\nRoveHQ support changed the email address you sign in with${before ? ` from ${before}` : ""} to ${email}.\n\nIf you didn't ask for this, reply to this email or contact RoveHQ support straight away.\n\nRoveHQ`,
+      ...adminEmailChangedEmail({ before, email }),
       metadata: { kind: "admin_email_changed" }
     });
   const results = await Promise.all([notice(email), ...(before ? [notice(before)] : [])]);

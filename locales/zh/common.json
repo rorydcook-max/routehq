@@ -1025,7 +1025,8 @@
     "chargeFromDepositPlain": "已从您的押金中扣除 {amount} 用于支付租赁期间产生的费用。",
     "chargeRestToPay": "仍有 {amount} 待支付，您可以在预订页面进行支付。",
     "depositHeldForDamage": "您的押金暂不退还，直至对损坏情况完成评估。评估后我们会通知您退还金额。",
-    "extendCheck": "您租用的{vehicle}将于 {date} 到期。您要续租吗？请在这里点按“续租”或“按时还车”：{link}"
+    "extendCheck": "您租用的{vehicle}将于 {date} 到期。您要续租吗？请在这里点按“续租”或“按时还车”：{link}",
+    "reviewRequest": "感谢您租用{vehicle}。体验如何？欢迎在这里留下简短评价：{link}"
   },
   "directory": {
     "title": "在泰国租车或租摩托车",
@@ -1318,7 +1319,9 @@
     "collect_deposit": "收取押金",
     "collect_top_up": "收取补缴款",
     "collect_extension": "收取续租费",
-    "collect_extras": "收取附加项费用"
+    "collect_extras": "收取附加项费用",
+    "job_review": "待审核：{name}的评价",
+    "job_review_open": "打开评价"
   },
   "bookings": {
     "eyebrow": "预订",
@@ -2981,7 +2984,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "租期和消费",
     "in_avgLength": "平均租期",
-    "in_avgSpend": "平均消费"
+    "in_avgSpend": "平均消费",
+    "pillReviews": "{count, plural, other {#条评价}}"
   },
   "calendar": {
     "title": "日历",
@@ -3629,7 +3633,8 @@
     "tl_paid": "付款",
     "tl_paidCharge": "支付了费用",
     "tl_refunded": "退款",
-    "tl_damage": "还车时发现车损：{count, plural, other {# 处}}"
+    "tl_damage": "还车时发现车损：{count, plural, other {# 处}}",
+    "tl_review": "留下评价：{rating}/5"
   },
   "vehicleForm": {
     "addTitle": "添加车辆",
@@ -4808,7 +4813,8 @@
     "kv_motorbikes": "摩托车",
     "kv_onRental": "出租中",
     "kv_parked": "已停用",
-    "kv_confirm": "继续"
+    "kv_confirm": "继续",
+    "rem_review": "还车后邀请评价"
   },
   "accountPage": {
     "roleOwner": "所有者",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "把预订页面放到您的 Facebook 主页、Google 地图和 LINE 资料中，让客户随时预订。",
     "nudgeSignature": "添加一次签名，客户就能在手机上签署租车合同。",
     "nudgePaymentMethods": "添加 PromptPay 或银行信息，客户即可直接在预订页面付款。",
-    "extensionHoldReturning": "{customer} 不续租：{vehicle}将于 {date} 归还。之后的日期已重新开放预订。"
+    "extensionHoldReturning": "{customer} 不续租：{vehicle}将于 {date} 归还。之后的日期已重新开放预订。",
+    "reviewReceived": "{customer}给出了{rating}星评价。"
   },
   "handoverPay": {
     "title": "付款",
@@ -7368,5 +7375,48 @@
     "receipt": "收据 {number}",
     "failed": "无法记录付款，请重试。",
     "later": "稍后"
+  },
+  "renterReview": {
+    "title": "这次租车体验如何？",
+    "titleVehicle": "{vehicle}怎么样？",
+    "stars": "您的评分",
+    "starCount": "{count, plural, other {#星}}",
+    "yourWords": "您的评价（可选）",
+    "shownAs": "显示为",
+    "consent": "允许在{business}的网站上展示我的评价",
+    "send": "提交评价",
+    "sending": "提交中…",
+    "pickStars": "请选择1到5颗星。",
+    "failed": "提交失败，请重试。",
+    "thanks": "感谢您的评价！",
+    "google": "也发布到Google",
+    "notFound": "此评价链接无效。"
+  },
+  "reviewsPage": {
+    "title": "评价",
+    "back": "客户",
+    "average": "平均",
+    "count": "{count, plural, other {#条评价}}",
+    "all": "全部评价",
+    "pillAll": "全部",
+    "pillToCheck": "待审核",
+    "pillPublished": "网站展示",
+    "empty": "暂无评价",
+    "new": "新",
+    "test": "测试",
+    "published": "网站展示中",
+    "hidden": "已隐藏",
+    "noConsent": "不可展示",
+    "booking": "预订",
+    "yourReply": "您的回复",
+    "reply": "回复",
+    "editReply": "编辑回复",
+    "publish": "发布",
+    "hide": "隐藏",
+    "save": "保存",
+    "saved": "已保存",
+    "cancel": "取消",
+    "failed": "保存失败，请重试。",
+    "googleLink": "Google评价链接"
   }
 }

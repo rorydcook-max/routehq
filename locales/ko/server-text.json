@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "“{}”의 금액은 {} 기준이라 적힌 그대로 두었어요. 사업장은 {}를 사용해요.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "찾은 탭과 행: {}. {} 내보내기 파일이에요. RoveHQ가 알아보고 바로 읽어요. 추가하기 전에 가져오기를 열어 들어갈 내용을 확인하세요.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "{} 내보내기 파일이에요. RoveHQ가 알아보고 바로 읽어요. 가져오기를 열어 읽어 보세요. 추가하기 전에 찾은 내용을 확인할 수 있어요.",
-  "Read as {} export.": "{} 내보내기 파일로 읽었어요."
+  "Read as {} export.": "{} 내보내기 파일로 읽었어요.",
+  "Review not found.": "리뷰를 찾을 수 없습니다.",
+  "This renter didn't agree to show their review.": "이 고객은 리뷰 공개에 동의하지 않았습니다.",
+  "Enter a web address.": "웹 주소를 입력하세요."
 }

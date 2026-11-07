@@ -1025,7 +1025,8 @@
     "extrasRemoved": "{names} ඔබේ බුකින් එකෙන් ඉවත් කර ඇත.",
     "extrasRefunded": "ඔබේ අමතර දෑ සඳහා අපි {amount} ආපසු ගෙව්වා. ස්තූතියි.",
     "extrasCredited": "අමතර දෑ සඳහා ඔබ ගෙවූ {amount} {date} ගෙවිය යුතු කුලියෙන් අඩු කෙරේ.",
-    "extendCheck": "ඔබේ {vehicle} කුලිය {date} දින අවසන් වේ. ඔබ දිගු කරනවාද? මෙහි දිගු කරන්න හෝ ආපසු දෙනවා තට්ටු කරන්න: {link}"
+    "extendCheck": "ඔබේ {vehicle} කුලිය {date} දින අවසන් වේ. ඔබ දිගු කරනවාද? මෙහි දිගු කරන්න හෝ ආපසු දෙනවා තට්ටු කරන්න: {link}",
+    "reviewRequest": "{vehicle} කුලියට ගත්තාට ස්තූතියි. කොහොමද? මෙතැනින් කෙටි සමාලෝචනයක් දෙන්න: {link}"
   },
   "common": {
     "kinds_car": "කාර්",
@@ -1278,7 +1279,9 @@
     "collect_deposit": "තැන්පතුව එකතු කරන්න",
     "collect_top_up": "අමතර මුදල එකතු කරන්න",
     "collect_extension": "දිගු කිරීමේ මුදල එකතු කරන්න",
-    "collect_extras": "අමතර දේවල මුදල එකතු කරන්න"
+    "collect_extras": "අමතර දේවල මුදල එකතු කරන්න",
+    "job_review": "{name} ගෙන් ලැබුණු සමාලෝචනය පරීක්ෂා කිරීමට",
+    "job_review_open": "සමාලෝචන විවෘත කරන්න"
   },
   "bookings": {
     "eyebrow": "බුකින්",
@@ -2941,7 +2944,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "කුලී කාලය සහ වියදම",
     "in_avgLength": "සාමාන්‍ය කාලය",
-    "in_avgSpend": "සාමාන්‍ය වියදම"
+    "in_avgSpend": "සාමාන්‍ය වියදම",
+    "pillReviews": "{count, plural, one {සමාලෝචන #} other {සමාලෝචන #}}"
   },
   "calendar": {
     "title": "දින දර්ශනය",
@@ -3589,7 +3593,8 @@
     "tl_paid": "ගෙවීම",
     "tl_paidCharge": "ගාස්තුවක් ගෙව්වා",
     "tl_refunded": "ආපසු ගෙවීම",
-    "tl_damage": "ආපසු දීමේදී හානි: {count, plural, one {අයිතම #} other {අයිතම #}}"
+    "tl_damage": "ආපසු දීමේදී හානි: {count, plural, one {අයිතම #} other {අයිතම #}}",
+    "tl_review": "සමාලෝචනයක් දුන්නා: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "වාහනයක් එකතු කරන්න",
@@ -4768,7 +4773,8 @@
     "kv_motorbikes": "මෝටර් සයිකල්",
     "kv_onRental": "කුලියට දී ඇත",
     "kv_parked": "නවතා ඇත",
-    "kv_confirm": "ඉදිරියට"
+    "kv_confirm": "ඉදිරියට",
+    "rem_review": "ආපසු භාර දීමෙන් පසු සමාලෝචනයක් ඉල්ලන්න"
   },
   "accountPage": {
     "roleOwner": "හිමිකරු",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "පාරිභෝගිකයින්ට ඕනෑම වේලාවක වෙන් කළ හැකි වන ලෙස ඔබේ වෙන්කිරීමේ පිටුව Facebook පිටුවේ, Google Maps හි සහ LINE පැතිකඩේ දමන්න.",
     "nudgeSignature": "ඔබේ අත්සන එක් වරක් එක් කරන්න, පාරිභෝගිකයින්ට දුරකථනයෙන්ම කුලී ගිවිසුම අත්සන් කළ හැක.",
     "nudgePaymentMethods": "පාරිභෝගිකයින්ට තම වෙන්කිරීමේ පිටුවෙන්ම ගෙවිය හැකි වන ලෙස PromptPay හෝ බැංකු විස්තර එක් කරන්න.",
-    "extensionHoldReturning": "{customer} දිගු නොකරයි: {vehicle} {date} දින ආපසු ලැබිය යුතුය. ඉන් පසු දින නැවත බුකින් සඳහා විවෘතයි."
+    "extensionHoldReturning": "{customer} දිගු නොකරයි: {vehicle} {date} දින ආපසු ලැබිය යුතුය. ඉන් පසු දින නැවත බුකින් සඳහා විවෘතයි.",
+    "reviewReceived": "{customer} තරු {rating} ක සමාලෝචනයක් දුන්නා."
   },
   "handoverPay": {
     "title": "ගෙවීම",
@@ -7368,5 +7375,48 @@
     "receipt": "රිසිට්පත {number}",
     "failed": "ගෙවීම සටහන් කළ නොහැකි විය. නැවත උත්සාහ කරන්න.",
     "later": "පසුව"
+  },
+  "renterReview": {
+    "title": "ඔබේ කුලී ගමන කොහොමද?",
+    "titleVehicle": "{vehicle} කොහොමද?",
+    "stars": "ඔබේ ශ්‍රේණිගත කිරීම",
+    "starCount": "{count, plural, one {තරු #} other {තරු #}}",
+    "yourWords": "ඔබේ සමාලෝචනය (අත්‍යවශ්‍ය නැත)",
+    "shownAs": "පෙන්වන නම",
+    "consent": "මගේ සමාලෝචනය {business} වෙබ් අඩවියේ පෙන්වන්න",
+    "send": "සමාලෝචනය යවන්න",
+    "sending": "යවමින්…",
+    "pickStars": "තරු 1 සිට 5 දක්වා තෝරන්න.",
+    "failed": "යැවීමට නොහැකි විය. නැවත උත්සාහ කරන්න.",
+    "thanks": "ඔබේ සමාලෝචනයට ස්තූතියි!",
+    "google": "Google හි ද පළ කරන්න",
+    "notFound": "මෙම සමාලෝචන සබැඳිය වලංගු නැත."
+  },
+  "reviewsPage": {
+    "title": "සමාලෝචන",
+    "back": "පාරිභෝගිකයන්",
+    "average": "සාමාන්‍යය",
+    "count": "{count, plural, one {සමාලෝචන #} other {සමාලෝචන #}}",
+    "all": "සියලු සමාලෝචන",
+    "pillAll": "සියල්ල",
+    "pillToCheck": "පරීක්ෂා කිරීමට",
+    "pillPublished": "වෙබ් අඩවියේ",
+    "empty": "තවම සමාලෝචන නැත",
+    "new": "නව",
+    "test": "පරීක්ෂණ",
+    "published": "වෙබ් අඩවියේ",
+    "hidden": "සඟවා ඇත",
+    "noConsent": "වෙබ් අඩවියට නොවේ",
+    "booking": "වෙන්කිරීම",
+    "yourReply": "ඔබේ පිළිතුර",
+    "reply": "පිළිතුරු දෙන්න",
+    "editReply": "පිළිතුර සංස්කරණය",
+    "publish": "ප්‍රකාශ කරන්න",
+    "hide": "සඟවන්න",
+    "save": "සුරකින්න",
+    "saved": "සුරැකිණි",
+    "cancel": "අවලංගු කරන්න",
+    "failed": "සුරැකීමට නොහැකි විය. නැවත උත්සාහ කරන්න.",
+    "googleLink": "Google සමාලෝචන සබැඳිය"
   }
 }

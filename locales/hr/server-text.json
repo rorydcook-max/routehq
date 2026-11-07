@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Iznosi u „{}” su u valuti {} i ostavljeni su kako su upisani; Vaša tvrtka koristi {}.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "Pronađene kartice i retci: {}. Ovo je izvoz iz sustava {}: RoveHQ ga prepoznaje i odmah čita. Otvorite uvoz da provjerite što ulazi prije nego što se išta doda.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Ovo je izvoz iz sustava {}: RoveHQ ga prepoznaje i odmah čita. Otvorite uvoz da ga pročitate: provjerit ćete što je pronađeno prije nego što se išta doda.",
-  "Read as {} export.": "Pročitano kao izvoz iz sustava {}."
+  "Read as {} export.": "Pročitano kao izvoz iz sustava {}.",
+  "Review not found.": "Recenzija nije pronađena.",
+  "This renter didn't agree to show their review.": "Ovaj najmoprimac nije pristao na prikaz svoje recenzije.",
+  "Enter a web address.": "Unesite web adresu."
 }

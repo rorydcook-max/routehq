@@ -398,5 +398,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "จำนวนเงินใน “{}” เป็นสกุล {} และคงไว้ตามเดิม ธุรกิจของคุณใช้ {}",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "พบแท็บและแถวเหล่านี้: {} นี่คือไฟล์ส่งออกจาก {} RoveHQ รู้จักและอ่านได้ทันที เปิดหน้านำเข้าเพื่อตรวจสอบสิ่งที่จะนำเข้าก่อนเพิ่มข้อมูลใดๆ",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "นี่คือไฟล์ส่งออกจาก {} RoveHQ รู้จักและอ่านได้ทันที เปิดหน้านำเข้าเพื่ออ่านไฟล์ คุณจะได้ตรวจสอบสิ่งที่พบก่อนเพิ่มข้อมูลใดๆ",
-  "Read as {} export.": "อ่านเป็นไฟล์ส่งออกจาก {}"
+  "Read as {} export.": "อ่านเป็นไฟล์ส่งออกจาก {}",
+  "Review not found.": "ไม่พบรีวิว",
+  "This renter didn't agree to show their review.": "ผู้เช่ารายนี้ไม่ได้ยินยอมให้แสดงรีวิว",
+  "Enter a web address.": "กรอกที่อยู่เว็บไซต์"
 }

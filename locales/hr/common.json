@@ -1025,7 +1025,8 @@
     "extrasRemoved": "Iz Vaše rezervacije uklonjeno je: {names}.",
     "extrasRefunded": "vratili smo Vam {amount} za dodatke. Hvala.",
     "extrasCredited": "{amount} koje ste platili za dodatke oduzet će se od najamnine koja dospijeva {date}.",
-    "extendCheck": "Vaš najam vozila {vehicle} završava {date}. Produljujete li? Ovdje dodirnite Produljujem ili Vraćam: {link}"
+    "extendCheck": "Vaš najam vozila {vehicle} završava {date}. Produljujete li? Ovdje dodirnite Produljujem ili Vraćam: {link}",
+    "reviewRequest": "hvala što ste unajmili vozilo {vehicle}. Kako je bilo? Ostavite kratku recenziju ovdje: {link}"
   },
   "common": {
     "kinds_car": "Automobili",
@@ -1252,7 +1253,9 @@
     "collect_deposit": "Naplati polog",
     "collect_top_up": "Naplati nadoplatu",
     "collect_extension": "Naplati produljenje",
-    "collect_extras": "Naplati dodatke"
+    "collect_extras": "Naplati dodatke",
+    "job_review": "Recenzija od {name} za provjeru",
+    "job_review_open": "Otvori recenzije"
   },
   "bookings": {
     "eyebrow": "Rezervacije",
@@ -2915,7 +2918,8 @@
     "in_share": "{count} · {percent} %",
     "in_trend": "Trajanje najma i potrošnja",
     "in_avgLength": "Prosječno trajanje",
-    "in_avgSpend": "Prosječna potrošnja"
+    "in_avgSpend": "Prosječna potrošnja",
+    "pillReviews": "{count, plural, one {# recenzija} few {# recenzije} other {# recenzija}}"
   },
   "calendar": {
     "title": "Kalendar",
@@ -3563,7 +3567,8 @@
     "tl_paid": "Uplata",
     "tl_paidCharge": "Platio naknadu",
     "tl_refunded": "Povrat novca",
-    "tl_damage": "Šteta pri povratu: {count, plural, one {# stavka} few {# stavke} other {# stavki}}"
+    "tl_damage": "Šteta pri povratu: {count, plural, one {# stavka} few {# stavke} other {# stavki}}",
+    "tl_review": "Ostavio recenziju: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Dodaj vozilo",
@@ -4741,7 +4746,8 @@
     "kv_motorbikes": "Motocikli",
     "kv_onRental": "U najmu",
     "kv_parked": "Parkirano",
-    "kv_confirm": "Nastavi"
+    "kv_confirm": "Nastavi",
+    "rem_review": "Zatraži recenziju nakon povrata"
   },
   "accountPage": {
     "roleOwner": "Vlasnik",
@@ -7261,7 +7267,8 @@
     "nudgeBookingPage": "Stavite svoju stranicu za rezervacije na Facebook stranicu, Google karte i LINE profil kako bi klijenti mogli rezervirati bilo kada.",
     "nudgeSignature": "Dodajte svoj potpis jednom i klijenti mogu potpisati ugovor o najmu na mobitelu.",
     "nudgePaymentMethods": "Dodajte PromptPay ili bankovne podatke kako bi klijenti plaćali izravno sa svoje stranice rezervacije.",
-    "extensionHoldReturning": "{customer} ne produljuje: vozilo {vehicle} vraća se {date}. Dani nakon toga ponovno su slobodni za rezervaciju."
+    "extensionHoldReturning": "{customer} ne produljuje: vozilo {vehicle} vraća se {date}. Dani nakon toga ponovno su slobodni za rezervaciju.",
+    "reviewReceived": "{customer} je ostavio recenziju s {rating} zvjezdica."
   },
   "handoverPay": {
     "title": "Plaćanje",
@@ -7295,5 +7302,48 @@
     "receipt": "Potvrda {number}",
     "failed": "Plaćanje nije zabilježeno. Pokušajte ponovno.",
     "later": "Kasnije"
+  },
+  "renterReview": {
+    "title": "Kako je prošao najam?",
+    "titleVehicle": "Kakvo je bilo vozilo {vehicle}?",
+    "stars": "Vaša ocjena",
+    "starCount": "{count, plural, one {# zvjezdica} few {# zvjezdice} other {# zvjezdica}}",
+    "yourWords": "Vaša recenzija (neobavezno)",
+    "shownAs": "Prikazuje se kao",
+    "consent": "Prikaži moju recenziju na web stranici tvrtke {business}",
+    "send": "Pošalji recenziju",
+    "sending": "Slanje…",
+    "pickStars": "Odaberite 1 do 5 zvjezdica.",
+    "failed": "Slanje nije uspjelo. Pokušajte ponovno.",
+    "thanks": "Hvala na recenziji!",
+    "google": "Objavi je i na Googleu",
+    "notFound": "Ova poveznica za recenziju nije valjana."
+  },
+  "reviewsPage": {
+    "title": "Recenzije",
+    "back": "Klijenti",
+    "average": "prosjek",
+    "count": "{count, plural, one {# recenzija} few {# recenzije} other {# recenzija}}",
+    "all": "Sve recenzije",
+    "pillAll": "sve",
+    "pillToCheck": "za provjeru",
+    "pillPublished": "na webu",
+    "empty": "Još nema recenzija",
+    "new": "Nova",
+    "test": "Test",
+    "published": "Na webu",
+    "hidden": "Skrivena",
+    "noConsent": "Nije za web",
+    "booking": "Rezervacija",
+    "yourReply": "Vaš odgovor",
+    "reply": "Odgovori",
+    "editReply": "Uredi odgovor",
+    "publish": "Objavi",
+    "hide": "Sakrij",
+    "save": "Spremi",
+    "saved": "Spremljeno",
+    "cancel": "Odustani",
+    "failed": "Spremanje nije uspjelo. Pokušajte ponovno.",
+    "googleLink": "Poveznica na Google recenzije"
   }
 }

@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "「{}」中的金額以 {} 計，已照原樣保留；您的業務使用 {}。",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "找到這些分頁和列：{}。這是 {} 匯出檔：RoveHQ 能辨識並直接讀取。請開啟匯入，在新增任何資料前確認要匯入的內容。",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "這是 {} 匯出檔：RoveHQ 能辨識並直接讀取。請開啟匯入來讀取：新增任何資料前，您會先確認找到的內容。",
-  "Read as {} export.": "以 {} 匯出檔讀取。"
+  "Read as {} export.": "以 {} 匯出檔讀取。",
+  "Review not found.": "找不到評價。",
+  "This renter didn't agree to show their review.": "此租客未同意展示其評價。",
+  "Enter a web address.": "請輸入網址。"
 }

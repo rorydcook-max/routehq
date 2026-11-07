@@ -1025,7 +1025,8 @@
     "extrasRemoved": "{names} is van je boeking gehaald.",
     "extrasRefunded": "we hebben {amount} voor je extra's terugbetaald. Bedankt.",
     "extrasCredited": "de {amount} die je voor extra's hebt betaald, gaat af van de huur die op {date} betaald moet worden.",
-    "extendCheck": "je huur van {vehicle} eindigt op {date}. Verleng je? Tik hier op Verlengen of Ik lever in: {link}"
+    "extendCheck": "je huur van {vehicle} eindigt op {date}. Verleng je? Tik hier op Verlengen of Ik lever in: {link}",
+    "reviewRequest": "bedankt dat je {vehicle} hebt gehuurd. Hoe was het? Laat hier een korte review achter: {link}"
   },
   "common": {
     "kinds_car": "Auto's",
@@ -1252,7 +1253,9 @@
     "collect_deposit": "Borg innen",
     "collect_top_up": "Bijbetaling innen",
     "collect_extension": "Verlenging innen",
-    "collect_extras": "Extra's innen"
+    "collect_extras": "Extra's innen",
+    "job_review": "Review van {name} controleren",
+    "job_review_open": "Reviews openen"
   },
   "bookings": {
     "eyebrow": "Boekingen",
@@ -2915,7 +2918,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "Huurduur en besteding",
     "in_avgLength": "Gemiddelde duur",
-    "in_avgSpend": "Gemiddelde besteding"
+    "in_avgSpend": "Gemiddelde besteding",
+    "pillReviews": "{count, plural, one {# review} other {# reviews}}"
   },
   "calendar": {
     "title": "Agenda",
@@ -3563,7 +3567,8 @@
     "tl_paid": "Betaling",
     "tl_paidCharge": "Betaalde een toeslag",
     "tl_refunded": "Terugbetaling",
-    "tl_damage": "Schade bij inleveren: {count, plural, one {# punt} other {# punten}}"
+    "tl_damage": "Schade bij inleveren: {count, plural, one {# punt} other {# punten}}",
+    "tl_review": "Gaf een review: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Voertuig toevoegen",
@@ -4741,7 +4746,8 @@
     "kv_motorbikes": "Motoren",
     "kv_onRental": "Verhuurd",
     "kv_parked": "Geparkeerd",
-    "kv_confirm": "Doorgaan"
+    "kv_confirm": "Doorgaan",
+    "rem_review": "Na inleveren om een review vragen"
   },
   "accountPage": {
     "roleOwner": "Eigenaar",
@@ -7261,7 +7267,8 @@
     "nudgeBookingPage": "Zet je boekingspagina op je Facebookpagina, Google Maps en LINE-profiel zodat klanten altijd kunnen boeken.",
     "nudgeSignature": "Voeg één keer je handtekening toe en klanten kunnen de huurovereenkomst op hun telefoon ondertekenen.",
     "nudgePaymentMethods": "Voeg PromptPay of je bankgegevens toe zodat klanten direct vanaf hun boekingspagina kunnen betalen.",
-    "extensionHoldReturning": "{customer} verlengt niet: {vehicle} moet op {date} terug. De dagen daarna zijn weer te boeken."
+    "extensionHoldReturning": "{customer} verlengt niet: {vehicle} moet op {date} terug. De dagen daarna zijn weer te boeken.",
+    "reviewReceived": "{customer} gaf een review van {rating} sterren."
   },
   "handoverPay": {
     "title": "Betaling",
@@ -7295,5 +7302,48 @@
     "receipt": "Bon {number}",
     "failed": "Betaling kon niet worden vastgelegd. Probeer het opnieuw.",
     "later": "Later"
+  },
+  "renterReview": {
+    "title": "Hoe was je huur?",
+    "titleVehicle": "Hoe was {vehicle}?",
+    "stars": "Jouw beoordeling",
+    "starCount": "{count, plural, one {# ster} other {# sterren}}",
+    "yourWords": "Jouw review (optioneel)",
+    "shownAs": "Getoond als",
+    "consent": "Mijn review tonen op de website van {business}",
+    "send": "Review versturen",
+    "sending": "Versturen…",
+    "pickStars": "Kies 1 tot 5 sterren.",
+    "failed": "Versturen mislukt. Probeer het opnieuw.",
+    "thanks": "Bedankt voor je review!",
+    "google": "Plaats hem ook op Google",
+    "notFound": "Deze reviewlink is niet geldig."
+  },
+  "reviewsPage": {
+    "title": "Reviews",
+    "back": "Klanten",
+    "average": "gemiddeld",
+    "count": "{count, plural, one {# review} other {# reviews}}",
+    "all": "Alle reviews",
+    "pillAll": "alle",
+    "pillToCheck": "te controleren",
+    "pillPublished": "op website",
+    "empty": "Nog geen reviews",
+    "new": "Nieuw",
+    "test": "Test",
+    "published": "Op website",
+    "hidden": "Verborgen",
+    "noConsent": "Niet voor website",
+    "booking": "Boeking",
+    "yourReply": "Jouw reactie",
+    "reply": "Reageren",
+    "editReply": "Reactie bewerken",
+    "publish": "Publiceren",
+    "hide": "Verbergen",
+    "save": "Opslaan",
+    "saved": "Opgeslagen",
+    "cancel": "Annuleren",
+    "failed": "Opslaan mislukt. Probeer het opnieuw.",
+    "googleLink": "Link naar Google-reviews"
   }
 }

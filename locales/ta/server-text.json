@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "“{}” இல் உள்ள தொகைகள் {} இல் உள்ளன, எழுதியபடியே வைக்கப்பட்டுள்ளன; உங்கள் வணிகம் {} ஐப் பயன்படுத்துகிறது.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "இந்தத் தாவல்களும் வரிசைகளும் கிடைத்தன: {}. இது ஒரு {} ஏற்றுமதி: RoveHQ இதை அடையாளம் கண்டு உடனே படிக்கும். எதுவும் சேர்க்கப்படும் முன் என்ன உள்ளே வரும் என்று சரிபார்க்க இறக்குமதியைத் திறங்கள்.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "இது ஒரு {} ஏற்றுமதி: RoveHQ இதை அடையாளம் கண்டு உடனே படிக்கும். படிக்க இறக்குமதியைத் திறங்கள்: எதுவும் சேர்க்கப்படும் முன் கிடைத்ததை நீங்கள் சரிபார்க்கலாம்.",
-  "Read as {} export.": "{} ஏற்றுமதியாகப் படிக்கப்பட்டது."
+  "Read as {} export.": "{} ஏற்றுமதியாகப் படிக்கப்பட்டது.",
+  "Review not found.": "மதிப்பாய்வு கிடைக்கவில்லை.",
+  "This renter didn't agree to show their review.": "இந்த வாடகைதாரர் தனது மதிப்பாய்வைக் காட்ட ஒப்புக்கொள்ளவில்லை.",
+  "Enter a web address.": "இணைய முகவரியை உள்ளிடவும்."
 }

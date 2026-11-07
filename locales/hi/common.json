@@ -1025,7 +1025,8 @@
     "extrasRemoved": "{names} आपकी बुकिंग से हटा दिया गया है।",
     "extrasRefunded": "हमने आपके एक्स्ट्रा के लिए {amount} रिफ़ंड कर दिए हैं। धन्यवाद।",
     "extrasCredited": "एक्स्ट्रा के लिए आपके चुकाए {amount}, {date} को देय किराये से घटा दिए जाएँगे।",
-    "extendCheck": "{vehicle} का आपका रेंटल {date} को खत्म हो रहा है। क्या आप अवधि बढ़ा रहे हैं? यहाँ अवधि बढ़ाएँ या वापस कर रहा/रही हूँ पर टैप करें: {link}"
+    "extendCheck": "{vehicle} का आपका रेंटल {date} को खत्म हो रहा है। क्या आप अवधि बढ़ा रहे हैं? यहाँ अवधि बढ़ाएँ या वापस कर रहा/रही हूँ पर टैप करें: {link}",
+    "reviewRequest": "{vehicle} किराए पर लेने के लिए धन्यवाद। आपका अनुभव कैसा रहा? यहाँ एक छोटा-सा रिव्यू दें: {link}"
   },
   "common": {
     "kinds_car": "कारें",
@@ -1278,7 +1279,9 @@
     "collect_deposit": "डिपॉज़िट लें",
     "collect_top_up": "टॉप-अप लें",
     "collect_extension": "एक्सटेंशन का पैसा लें",
-    "collect_extras": "एक्स्ट्रा का पैसा लें"
+    "collect_extras": "एक्स्ट्रा का पैसा लें",
+    "job_review": "{name} का रिव्यू जाँचें",
+    "job_review_open": "रिव्यू खोलें"
   },
   "bookings": {
     "eyebrow": "बुकिंग",
@@ -2941,7 +2944,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "रेंटल अवधि और खर्च",
     "in_avgLength": "औसत अवधि",
-    "in_avgSpend": "औसत खर्च"
+    "in_avgSpend": "औसत खर्च",
+    "pillReviews": "{count, plural, one {# रिव्यू} other {# रिव्यू}}"
   },
   "calendar": {
     "title": "कैलेंडर",
@@ -3589,7 +3593,8 @@
     "tl_paid": "पेमेंट",
     "tl_paidCharge": "चार्ज चुकाया",
     "tl_refunded": "रिफ़ंड",
-    "tl_damage": "वापसी पर डैमेज मिला: {count, plural, one {# चीज़} other {# चीज़ें}}"
+    "tl_damage": "वापसी पर डैमेज मिला: {count, plural, one {# चीज़} other {# चीज़ें}}",
+    "tl_review": "रिव्यू दिया: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "वाहन जोड़ें",
@@ -4768,7 +4773,8 @@
     "kv_motorbikes": "बाइक",
     "kv_onRental": "किराए पर",
     "kv_parked": "रोका गया",
-    "kv_confirm": "जारी रखें"
+    "kv_confirm": "जारी रखें",
+    "rem_review": "वापसी के बाद रिव्यू माँगें"
   },
   "accountPage": {
     "roleOwner": "मालिक",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "अपना बुकिंग पेज अपने Facebook पेज, Google Maps और LINE प्रोफ़ाइल पर लगाएँ ताकि ग्राहक कभी भी बुक कर सकें।",
     "nudgeSignature": "अपना हस्ताक्षर एक बार जोड़ें, फिर ग्राहक फ़ोन पर रेंटल एग्रीमेंट पर हस्ताक्षर कर सकते हैं।",
     "nudgePaymentMethods": "PromptPay या बैंक विवरण जोड़ें ताकि ग्राहक सीधे अपने बुकिंग पेज से भुगतान कर सकें।",
-    "extensionHoldReturning": "{customer} अवधि नहीं बढ़ा रहे: {vehicle} {date} को वापस आना है। उसके बाद के दिन फिर से बुकिंग के लिए खुले हैं।"
+    "extensionHoldReturning": "{customer} अवधि नहीं बढ़ा रहे: {vehicle} {date} को वापस आना है। उसके बाद के दिन फिर से बुकिंग के लिए खुले हैं।",
+    "reviewReceived": "{customer} ने {rating}-स्टार रिव्यू दिया।"
   },
   "handoverPay": {
     "title": "पेमेंट",
@@ -7368,5 +7375,48 @@
     "receipt": "रसीद {number}",
     "failed": "पेमेंट दर्ज नहीं हुआ। फिर कोशिश करें।",
     "later": "बाद में"
+  },
+  "renterReview": {
+    "title": "आपका किराया अनुभव कैसा रहा?",
+    "titleVehicle": "{vehicle} कैसी रही?",
+    "stars": "आपकी रेटिंग",
+    "starCount": "{count, plural, one {# स्टार} other {# स्टार}}",
+    "yourWords": "आपका रिव्यू (वैकल्पिक)",
+    "shownAs": "इस नाम से दिखेगा",
+    "consent": "मेरा रिव्यू {business} की वेबसाइट पर दिखाएँ",
+    "send": "रिव्यू भेजें",
+    "sending": "भेजा जा रहा है…",
+    "pickStars": "1 से 5 स्टार चुनें।",
+    "failed": "भेजा नहीं जा सका। कृपया फिर से कोशिश करें।",
+    "thanks": "आपके रिव्यू के लिए धन्यवाद!",
+    "google": "इसे Google पर भी पोस्ट करें",
+    "notFound": "यह रिव्यू लिंक मान्य नहीं है।"
+  },
+  "reviewsPage": {
+    "title": "रिव्यू",
+    "back": "ग्राहक",
+    "average": "औसत",
+    "count": "{count, plural, one {# रिव्यू} other {# रिव्यू}}",
+    "all": "सभी रिव्यू",
+    "pillAll": "सभी",
+    "pillToCheck": "जाँचने हैं",
+    "pillPublished": "वेबसाइट पर",
+    "empty": "अभी कोई रिव्यू नहीं",
+    "new": "नया",
+    "test": "टेस्ट",
+    "published": "वेबसाइट पर",
+    "hidden": "छिपा हुआ",
+    "noConsent": "वेबसाइट के लिए नहीं",
+    "booking": "बुकिंग",
+    "yourReply": "आपका जवाब",
+    "reply": "जवाब दें",
+    "editReply": "जवाब बदलें",
+    "publish": "प्रकाशित करें",
+    "hide": "छिपाएँ",
+    "save": "सेव करें",
+    "saved": "सेव हो गया",
+    "cancel": "रद्द करें",
+    "failed": "सेव नहीं हो सका। कृपया फिर से कोशिश करें।",
+    "googleLink": "Google रिव्यू लिंक"
   }
 }

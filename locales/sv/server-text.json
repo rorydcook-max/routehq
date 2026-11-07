@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Beloppen i ”{}” är i {} och behålls som de är; ditt företag använder {}.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "Hittade de här flikarna och raderna: {}. Det här är en export från {}: RoveHQ känner igen den och läser den direkt. Öppna importen och kontrollera vad som läggs in innan något läggs till.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Det här är en export från {}: RoveHQ känner igen den och läser den direkt. Öppna importen för att läsa den: du kontrollerar vad den hittade innan något läggs till.",
-  "Read as {} export.": "Läst som export från {}."
+  "Read as {} export.": "Läst som export från {}.",
+  "Review not found.": "Omdömet hittades inte.",
+  "This renter didn't agree to show their review.": "Den här hyrestagaren har inte godkänt att omdömet visas.",
+  "Enter a web address.": "Ange en webbadress."
 }

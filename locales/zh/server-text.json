@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "“{}”中的金额以 {} 计，已按原样保留；您的业务使用 {}。",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "找到以下分页和行：{}。这是 {} 导出文件：RoveHQ 能识别并直接读取。打开导入，在添加任何内容前核对要导入的内容。",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "这是 {} 导出文件：RoveHQ 能识别并直接读取。打开导入进行读取：添加任何内容前，您会先核对找到的内容。",
-  "Read as {} export.": "按 {} 导出文件读取。"
+  "Read as {} export.": "按 {} 导出文件读取。",
+  "Review not found.": "未找到评价。",
+  "This renter didn't agree to show their review.": "该租客未同意展示其评价。",
+  "Enter a web address.": "请输入网址。"
 }

@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "“{}” හි මුදල් {} වලින් ඇති අතර ලියා ඇති ආකාරයටම තබා ඇත; ඔබේ ව්‍යාපාරය භාවිත කරන්නේ {}.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "මෙම tab සහ පේළි හමු විය: {}. මෙය {} අපනයනයකි: RoveHQ එය හඳුනාගෙන වහාම කියවයි. කිසිවක් එක් කිරීමට පෙර ඇතුළත් වන දේ පරීක්ෂා කිරීමට ආයාතය විවෘත කරන්න.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "මෙය {} අපනයනයකි: RoveHQ එය හඳුනාගෙන වහාම කියවයි. එය කියවීමට ආයාතය විවෘත කරන්න: කිසිවක් එක් කිරීමට පෙර හමු වූ දේ ඔබ පරීක්ෂා කරනවා.",
-  "Read as {} export.": "{} අපනයනයක් ලෙස කියවන ලදී."
+  "Read as {} export.": "{} අපනයනයක් ලෙස කියවන ලදී.",
+  "Review not found.": "සමාලෝචනය හමු නොවීය.",
+  "This renter didn't agree to show their review.": "මෙම කුලීකරු තම සමාලෝචනය පෙන්වීමට එකඟ වී නැත.",
+  "Enter a web address.": "වෙබ් ලිපිනයක් ඇතුළත් කරන්න."
 }

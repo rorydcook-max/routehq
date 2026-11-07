@@ -1025,7 +1025,8 @@
     "chargeFromDepositPlain": "{amount} נגבו מהפיקדון שלך עבור עלויות במהלך ההשכרה.",
     "chargeRestToPay": "{amount} נוספים עדיין לתשלום; אפשר לשלם אותם מעמוד ההזמנה שלך.",
     "depositHeldForDamage": "הפיקדון שלך מוחזק עד להערכת הנזק. נודיע לך מה יוחזר.",
-    "extendCheck": "ההשכרה שלכם של {vehicle} מסתיימת ב-{date}. אתם מאריכים? הקישו כאן על להאריך או מחזיר/ה: {link}"
+    "extendCheck": "ההשכרה שלכם של {vehicle} מסתיימת ב-{date}. אתם מאריכים? הקישו כאן על להאריך או מחזיר/ה: {link}",
+    "reviewRequest": "תודה ששכרת את {vehicle}. איך היה? אפשר להשאיר כאן ביקורת קצרה: {link}"
   },
   "directory": {
     "title": "השכרת רכב או קטנוע בתאילנד",
@@ -1318,7 +1319,9 @@
     "collect_deposit": "לגבות פיקדון",
     "collect_top_up": "לגבות השלמה",
     "collect_extension": "לגבות הארכה",
-    "collect_extras": "לגבות תוספות"
+    "collect_extras": "לגבות תוספות",
+    "job_review": "ביקורת מאת {name} לבדיקה",
+    "job_review_open": "פתיחת ביקורות"
   },
   "bookings": {
     "eyebrow": "הזמנות",
@@ -2981,7 +2984,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "משך השכרה והוצאה",
     "in_avgLength": "משך ממוצע",
-    "in_avgSpend": "הוצאה ממוצעת"
+    "in_avgSpend": "הוצאה ממוצעת",
+    "pillReviews": "{count, plural, one {ביקורת אחת} other {# ביקורות}}"
   },
   "calendar": {
     "title": "יומן",
@@ -3629,7 +3633,8 @@
     "tl_paid": "תשלום",
     "tl_paidCharge": "שילם חיוב",
     "tl_refunded": "החזר כספי",
-    "tl_damage": "נזק בהחזרה: {count, plural, one {פריט #} other {# פריטים}}"
+    "tl_damage": "נזק בהחזרה: {count, plural, one {פריט #} other {# פריטים}}",
+    "tl_review": "השאיר/ה ביקורת: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "הוספת רכב",
@@ -4808,7 +4813,8 @@
     "kv_motorbikes": "אופנועים",
     "kv_onRental": "בהשכרה",
     "kv_parked": "מושבת",
-    "kv_confirm": "המשך"
+    "kv_confirm": "המשך",
+    "rem_review": "לבקש ביקורת אחרי ההחזרה"
   },
   "accountPage": {
     "roleOwner": "בעלים",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "שימו את דף ההזמנות שלכם בעמוד הפייסבוק, ב-Google Maps ובפרופיל LINE כדי שלקוחות יוכלו להזמין בכל שעה.",
     "nudgeSignature": "הוסיפו את החתימה שלכם פעם אחת, והלקוחות יוכלו לחתום על הסכם ההשכרה בטלפון.",
     "nudgePaymentMethods": "הוסיפו PromptPay או פרטי בנק כדי שהלקוחות ישלמו ישירות מדף ההזמנה שלהם.",
-    "extensionHoldReturning": "{customer} לא מאריך/ה: {vehicle} צריך לחזור ב-{date}. הימים שאחרי פתוחים שוב להזמנה."
+    "extensionHoldReturning": "{customer} לא מאריך/ה: {vehicle} צריך לחזור ב-{date}. הימים שאחרי פתוחים שוב להזמנה.",
+    "reviewReceived": "{customer} השאיר/ה ביקורת של {rating} כוכבים."
   },
   "handoverPay": {
     "title": "תשלום",
@@ -7368,5 +7375,48 @@
     "receipt": "קבלה {number}",
     "failed": "לא הצלחנו לרשום את התשלום. נסו שוב.",
     "later": "אחר כך"
+  },
+  "renterReview": {
+    "title": "איך הייתה ההשכרה?",
+    "titleVehicle": "איך היה {vehicle}?",
+    "stars": "הדירוג שלך",
+    "starCount": "{count, plural, one {כוכב אחד} other {# כוכבים}}",
+    "yourWords": "הביקורת שלך (לא חובה)",
+    "shownAs": "יוצג בשם",
+    "consent": "להציג את הביקורת שלי באתר של {business}",
+    "send": "שליחת ביקורת",
+    "sending": "שולח…",
+    "pickStars": "יש לבחור בין 1 ל־5 כוכבים.",
+    "failed": "השליחה נכשלה. נסו שוב.",
+    "thanks": "תודה על הביקורת!",
+    "google": "לפרסם גם ב־Google",
+    "notFound": "קישור הביקורת הזה אינו תקף."
+  },
+  "reviewsPage": {
+    "title": "ביקורות",
+    "back": "לקוחות",
+    "average": "ממוצע",
+    "count": "{count, plural, one {ביקורת אחת} other {# ביקורות}}",
+    "all": "כל הביקורות",
+    "pillAll": "הכול",
+    "pillToCheck": "לבדיקה",
+    "pillPublished": "באתר",
+    "empty": "אין עדיין ביקורות",
+    "new": "חדשה",
+    "test": "בדיקה",
+    "published": "באתר",
+    "hidden": "מוסתרת",
+    "noConsent": "לא לאתר",
+    "booking": "הזמנה",
+    "yourReply": "התגובה שלך",
+    "reply": "להגיב",
+    "editReply": "עריכת תגובה",
+    "publish": "פרסום",
+    "hide": "הסתרה",
+    "save": "שמירה",
+    "saved": "נשמר",
+    "cancel": "ביטול",
+    "failed": "השמירה נכשלה. נסו שוב.",
+    "googleLink": "קישור לביקורות Google"
   }
 }

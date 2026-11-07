@@ -1025,7 +1025,8 @@
     "extrasRemoved": "{names} ໄດ້ຖືກຕັດອອກຈາກການຈອງຂອງທ່ານ.",
     "extrasRefunded": "ພວກເຮົາໄດ້ຄືນເງິນ {amount} ສຳລັບລາຍການເສີມແລ້ວ. ຂອບໃຈ.",
     "extrasCredited": "{amount} ທີ່ທ່ານຈ່າຍສຳລັບລາຍການເສີມ ຈະຫັກອອກຈາກຄ່າເຊົ່າທີ່ກຳນົດຈ່າຍ {date}.",
-    "extendCheck": "ການເຊົ່າ {vehicle} ຂອງທ່ານຈະສິ້ນສຸດວັນທີ {date}. ທ່ານຈະຕໍ່ສັນຍາບໍ? ແຕະ “ຕໍ່ສັນຍາ” ຫຼື “ສົ່ງລົດຄືນ” ຢູ່ນີ້: {link}"
+    "extendCheck": "ການເຊົ່າ {vehicle} ຂອງທ່ານຈະສິ້ນສຸດວັນທີ {date}. ທ່ານຈະຕໍ່ສັນຍາບໍ? ແຕະ “ຕໍ່ສັນຍາ” ຫຼື “ສົ່ງລົດຄືນ” ຢູ່ນີ້: {link}",
+    "reviewRequest": "ຂອບໃຈທີ່ເຊົ່າ {vehicle} ກັບພວກເຮົາ. ເປັນແນວໃດແດ່? ຂຽນລີວິວສັ້ນໆໄດ້ທີ່ນີ້: {link}"
   },
   "common": {
     "kinds_car": "ລົດໃຫຍ່",
@@ -1278,7 +1279,9 @@
     "collect_deposit": "ເກັບມັດຈຳ",
     "collect_top_up": "ເກັບເງິນເພີ່ມ",
     "collect_extension": "ເກັບຄ່າຕໍ່ສັນຍາ",
-    "collect_extras": "ເກັບຄ່າບໍລິການເສີມ"
+    "collect_extras": "ເກັບຄ່າບໍລິການເສີມ",
+    "job_review": "ລີວິວຈາກ {name} ລໍຖ້າກວດ",
+    "job_review_open": "ເປີດລີວິວ"
   },
   "bookings": {
     "eyebrow": "ການຈອງ",
@@ -2941,7 +2944,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "ໄລຍະເຊົ່າ ແລະ ຍອດໃຊ້ຈ່າຍ",
     "in_avgLength": "ໄລຍະເຊົ່າສະເລ່ຍ",
-    "in_avgSpend": "ຍອດໃຊ້ຈ່າຍສະເລ່ຍ"
+    "in_avgSpend": "ຍອດໃຊ້ຈ່າຍສະເລ່ຍ",
+    "pillReviews": "{count, plural, other {# ລີວິວ}}"
   },
   "calendar": {
     "title": "ປະຕິທິນ",
@@ -3589,7 +3593,8 @@
     "tl_paid": "ຊຳລະເງິນ",
     "tl_paidCharge": "ຊຳລະຄ່າໃຊ້ຈ່າຍເພີ່ມ",
     "tl_refunded": "ຄືນເງິນ",
-    "tl_damage": "ພົບຮອຍເສຍຫາຍຕອນຄືນລົດ: {count, plural, other {# ລາຍການ}}"
+    "tl_damage": "ພົບຮອຍເສຍຫາຍຕອນຄືນລົດ: {count, plural, other {# ລາຍການ}}",
+    "tl_review": "ໃຫ້ລີວິວ: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "ເພີ່ມລົດ",
@@ -4768,7 +4773,8 @@
     "kv_motorbikes": "ລົດຈັກ",
     "kv_onRental": "ກຳລັງເຊົ່າ",
     "kv_parked": "ພັກໄວ້",
-    "kv_confirm": "ດຳເນີນການຕໍ່"
+    "kv_confirm": "ດຳເນີນການຕໍ່",
+    "rem_review": "ຂໍລີວິວຫຼັງຄືນລົດ"
   },
   "accountPage": {
     "roleOwner": "ເຈົ້າຂອງ",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "ໃສ່ໜ້າຈອງຂອງທ່ານໃນໜ້າ Facebook, Google Maps ແລະ ໂປຣໄຟລ໌ LINE ເພື່ອໃຫ້ລູກຄ້າຈອງໄດ້ທຸກເວລາ.",
     "nudgeSignature": "ເພີ່ມລາຍເຊັນຂອງທ່ານຄັ້ງດຽວ ແລ້ວລູກຄ້າເຊັນສັນຍາເຊົ່າໃນມືຖືໄດ້ເລີຍ.",
     "nudgePaymentMethods": "ເພີ່ມ PromptPay ຫຼື ບັນຊີທະນາຄານ ເພື່ອໃຫ້ລູກຄ້າຈ່າຍເງິນຈາກໜ້າຈອງໄດ້ທັນທີ.",
-    "extensionHoldReturning": "{customer} ບໍ່ຕໍ່ສັນຍາ: {vehicle} ຈະສົ່ງຄືນວັນທີ {date}. ມື້ຫຼັງຈາກນັ້ນເປີດໃຫ້ຈອງໄດ້ອີກ."
+    "extensionHoldReturning": "{customer} ບໍ່ຕໍ່ສັນຍາ: {vehicle} ຈະສົ່ງຄືນວັນທີ {date}. ມື້ຫຼັງຈາກນັ້ນເປີດໃຫ້ຈອງໄດ້ອີກ.",
+    "reviewReceived": "{customer} ໃຫ້ລີວິວ {rating} ດາວ."
   },
   "handoverPay": {
     "title": "ຊຳລະເງິນ",
@@ -7368,5 +7375,48 @@
     "receipt": "ໃບຮັບເງິນ {number}",
     "failed": "ບັນທຶກການຊຳລະບໍ່ສຳເລັດ ລອງອີກຄັ້ງ",
     "later": "ໄວ້ພາຍຫຼັງ"
+  },
+  "renterReview": {
+    "title": "ການເຊົ່າຂອງທ່ານເປັນແນວໃດ?",
+    "titleVehicle": "{vehicle} ເປັນແນວໃດ?",
+    "stars": "ຄະແນນຂອງທ່ານ",
+    "starCount": "{count, plural, other {# ດາວ}}",
+    "yourWords": "ລີວິວຂອງທ່ານ (ບໍ່ບັງຄັບ)",
+    "shownAs": "ສະແດງເປັນ",
+    "consent": "ສະແດງລີວິວຂອງຂ້ອຍໃນເວັບໄຊຂອງ {business}",
+    "send": "ສົ່ງລີວິວ",
+    "sending": "ກຳລັງສົ່ງ…",
+    "pickStars": "ເລືອກ 1 ຫາ 5 ດາວ.",
+    "failed": "ສົ່ງບໍ່ໄດ້. ກະລຸນາລອງໃໝ່.",
+    "thanks": "ຂອບໃຈສຳລັບລີວິວ!",
+    "google": "ໂພສໃນ Google ນຳ",
+    "notFound": "ລິ້ງລີວິວນີ້ບໍ່ຖືກຕ້ອງ."
+  },
+  "reviewsPage": {
+    "title": "ລີວິວ",
+    "back": "ລູກຄ້າ",
+    "average": "ສະເລ່ຍ",
+    "count": "{count, plural, other {# ລີວິວ}}",
+    "all": "ລີວິວທັງໝົດ",
+    "pillAll": "ທັງໝົດ",
+    "pillToCheck": "ລໍຖ້າກວດ",
+    "pillPublished": "ໃນເວັບໄຊ",
+    "empty": "ຍັງບໍ່ມີລີວິວ",
+    "new": "ໃໝ່",
+    "test": "ທົດສອບ",
+    "published": "ໃນເວັບໄຊ",
+    "hidden": "ເຊື່ອງໄວ້",
+    "noConsent": "ບໍ່ແມ່ນສຳລັບເວັບໄຊ",
+    "booking": "ການຈອງ",
+    "yourReply": "ຄຳຕອບຂອງທ່ານ",
+    "reply": "ຕອບກັບ",
+    "editReply": "ແກ້ໄຂຄຳຕອບ",
+    "publish": "ເຜີຍແຜ່",
+    "hide": "ເຊື່ອງ",
+    "save": "ບັນທຶກ",
+    "saved": "ບັນທຶກແລ້ວ",
+    "cancel": "ຍົກເລີກ",
+    "failed": "ບັນທຶກບໍ່ໄດ້. ກະລຸນາລອງໃໝ່.",
+    "googleLink": "ລິ້ງລີວິວ Google"
   }
 }

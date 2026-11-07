@@ -1025,7 +1025,8 @@
     "extrasRemoved": "{names} をご予約から外しました。",
     "extrasRefunded": "オプション分の {amount} を返金しました。ありがとうございます。",
     "extrasCredited": "オプションにお支払いいただいた {amount} は、{date} 期限のレンタル料金から差し引かれます。",
-    "extendCheck": "{vehicle}のレンタルは{date}に終了します。延長されますか？こちらで「延長する」か「返却する」をタップしてください：{link}"
+    "extendCheck": "{vehicle}のレンタルは{date}に終了します。延長されますか？こちらで「延長する」か「返却する」をタップしてください：{link}",
+    "reviewRequest": "{vehicle}をご利用いただきありがとうございました。いかがでしたか？こちらから短いレビューをお寄せください: {link}"
   },
   "common": {
     "kinds_car": "車",
@@ -1278,7 +1279,9 @@
     "collect_deposit": "保証金を回収",
     "collect_top_up": "追加料金を回収",
     "collect_extension": "延長料金を回収",
-    "collect_extras": "オプション料金を回収"
+    "collect_extras": "オプション料金を回収",
+    "job_review": "{name}さんのレビューを確認",
+    "job_review_open": "レビューを開く"
   },
   "bookings": {
     "eyebrow": "予約",
@@ -2941,7 +2944,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "利用期間と利用額",
     "in_avgLength": "平均期間",
-    "in_avgSpend": "平均利用額"
+    "in_avgSpend": "平均利用額",
+    "pillReviews": "{count, plural, other {#件のレビュー}}"
   },
   "calendar": {
     "title": "カレンダー",
@@ -3589,7 +3593,8 @@
     "tl_paid": "支払い",
     "tl_paidCharge": "追加料金を支払い",
     "tl_refunded": "返金",
-    "tl_damage": "返却時に損傷：{count, plural, other {#件}}"
+    "tl_damage": "返却時に損傷：{count, plural, other {#件}}",
+    "tl_review": "レビューを投稿: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "車両を追加",
@@ -4768,7 +4773,8 @@
     "kv_motorbikes": "バイク",
     "kv_onRental": "貸出中",
     "kv_parked": "休止中",
-    "kv_confirm": "続ける"
+    "kv_confirm": "続ける",
+    "rem_review": "返却後にレビューを依頼"
   },
   "accountPage": {
     "roleOwner": "オーナー",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "予約ページを Facebook ページ、Google マップ、LINE プロフィールに載せて、いつでも予約できるようにしましょう。",
     "nudgeSignature": "署名を一度追加すれば、お客様はスマホでレンタル契約書に署名できます。",
     "nudgePaymentMethods": "PromptPay または銀行口座を追加すると、お客様は予約ページから直接支払えます。",
-    "extensionHoldReturning": "{customer}さんは延長しません：{vehicle}は{date}に返却予定です。それ以降の日程は再び予約可能になりました。"
+    "extensionHoldReturning": "{customer}さんは延長しません：{vehicle}は{date}に返却予定です。それ以降の日程は再び予約可能になりました。",
+    "reviewReceived": "{customer}さんが星{rating}つのレビューを投稿しました。"
   },
   "handoverPay": {
     "title": "支払い",
@@ -7368,5 +7375,48 @@
     "receipt": "領収書 {number}",
     "failed": "支払いを記録できませんでした。もう一度お試しください。",
     "later": "あとで"
+  },
+  "renterReview": {
+    "title": "ご利用はいかがでしたか？",
+    "titleVehicle": "{vehicle}はいかがでしたか？",
+    "stars": "評価",
+    "starCount": "{count, plural, other {星#つ}}",
+    "yourWords": "レビュー（任意）",
+    "shownAs": "表示名",
+    "consent": "{business}のウェブサイトにレビューを掲載してもよい",
+    "send": "レビューを送信",
+    "sending": "送信中…",
+    "pickStars": "星を1〜5つ選んでください。",
+    "failed": "送信できませんでした。もう一度お試しください。",
+    "thanks": "レビューありがとうございました！",
+    "google": "Googleにも投稿する",
+    "notFound": "このレビューリンクは無効です。"
+  },
+  "reviewsPage": {
+    "title": "レビュー",
+    "back": "顧客",
+    "average": "平均",
+    "count": "{count, plural, other {#件のレビュー}}",
+    "all": "すべてのレビュー",
+    "pillAll": "すべて",
+    "pillToCheck": "要確認",
+    "pillPublished": "サイト掲載中",
+    "empty": "まだレビューはありません",
+    "new": "新着",
+    "test": "テスト",
+    "published": "サイト掲載中",
+    "hidden": "非表示",
+    "noConsent": "サイト掲載不可",
+    "booking": "予約",
+    "yourReply": "あなたの返信",
+    "reply": "返信",
+    "editReply": "返信を編集",
+    "publish": "公開",
+    "hide": "非表示にする",
+    "save": "保存",
+    "saved": "保存しました",
+    "cancel": "キャンセル",
+    "failed": "保存できませんでした。もう一度お試しください。",
+    "googleLink": "Googleレビューのリンク"
   }
 }

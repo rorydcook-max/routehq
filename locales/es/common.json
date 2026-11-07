@@ -1025,7 +1025,8 @@
     "extrasRemoved": "{names} se ha eliminado de tu reserva.",
     "extrasRefunded": "te hemos reembolsado {amount} por tus extras. Gracias.",
     "extrasCredited": "los {amount} que pagaste por extras se descontarán de tu alquiler que vence el {date}.",
-    "extendCheck": "tu alquiler del {vehicle} termina el {date}. ¿Vas a ampliarlo? Pulsa Ampliar o Lo devuelvo aquí: {link}"
+    "extendCheck": "tu alquiler del {vehicle} termina el {date}. ¿Vas a ampliarlo? Pulsa Ampliar o Lo devuelvo aquí: {link}",
+    "reviewRequest": "gracias por alquilar el {vehicle}. ¿Qué tal fue? Deja una opinión breve aquí: {link}"
   },
   "common": {
     "kinds_car": "Coches",
@@ -1252,7 +1253,9 @@
     "collect_deposit": "Cobrar fianza",
     "collect_top_up": "Cobrar suplemento",
     "collect_extension": "Cobrar ampliación",
-    "collect_extras": "Cobrar extras"
+    "collect_extras": "Cobrar extras",
+    "job_review": "Opinión de {name} por revisar",
+    "job_review_open": "Abrir opiniones"
   },
   "bookings": {
     "eyebrow": "Reservas",
@@ -2915,7 +2918,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "Duración y gasto",
     "in_avgLength": "Duración media",
-    "in_avgSpend": "Gasto medio"
+    "in_avgSpend": "Gasto medio",
+    "pillReviews": "{count, plural, one {# opinión} other {# opiniones}}"
   },
   "calendar": {
     "title": "Calendario",
@@ -3563,7 +3567,8 @@
     "tl_paid": "Pago",
     "tl_paidCharge": "Pagó un cargo",
     "tl_refunded": "Reembolso",
-    "tl_damage": "Daños en la devolución: {count, plural, one {# elemento} other {# elementos}}"
+    "tl_damage": "Daños en la devolución: {count, plural, one {# elemento} other {# elementos}}",
+    "tl_review": "Dejó una opinión: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Añadir vehículo",
@@ -4741,7 +4746,8 @@
     "kv_motorbikes": "Motos",
     "kv_onRental": "Alquilado",
     "kv_parked": "Aparcado",
-    "kv_confirm": "Continuar"
+    "kv_confirm": "Continuar",
+    "rem_review": "Pedir una opinión tras la devolución"
   },
   "accountPage": {
     "roleOwner": "Propietario",
@@ -7264,7 +7270,8 @@
     "nudgeBookingPage": "Ponga su página de reservas en su página de Facebook, Google Maps y su perfil de LINE para que sus clientes reserven cuando quieran.",
     "nudgeSignature": "Añada su firma una vez y sus clientes podrán firmar el contrato de alquiler en el móvil.",
     "nudgePaymentMethods": "Añada PromptPay o sus datos bancarios para que sus clientes paguen directamente desde su página de reserva.",
-    "extensionHoldReturning": "{customer} no amplía el alquiler: el {vehicle} se devuelve el {date}. Los días siguientes vuelven a estar disponibles para reservar."
+    "extensionHoldReturning": "{customer} no amplía el alquiler: el {vehicle} se devuelve el {date}. Los días siguientes vuelven a estar disponibles para reservar.",
+    "reviewReceived": "{customer} dejó una opinión de {rating} estrellas."
   },
   "handoverPay": {
     "title": "Pago",
@@ -7298,5 +7305,48 @@
     "receipt": "Recibo {number}",
     "failed": "No se pudo registrar el pago. Inténtalo de nuevo.",
     "later": "Más tarde"
+  },
+  "renterReview": {
+    "title": "¿Qué tal tu alquiler?",
+    "titleVehicle": "¿Qué tal el {vehicle}?",
+    "stars": "Tu valoración",
+    "starCount": "{count, plural, one {# estrella} other {# estrellas}}",
+    "yourWords": "Tu opinión (opcional)",
+    "shownAs": "Se mostrará como",
+    "consent": "Mostrar mi opinión en la web de {business}",
+    "send": "Enviar opinión",
+    "sending": "Enviando…",
+    "pickStars": "Elige de 1 a 5 estrellas.",
+    "failed": "No se pudo enviar. Inténtalo de nuevo.",
+    "thanks": "¡Gracias por tu opinión!",
+    "google": "Publicarla también en Google",
+    "notFound": "Este enlace de opinión no es válido."
+  },
+  "reviewsPage": {
+    "title": "Opiniones",
+    "back": "Clientes",
+    "average": "media",
+    "count": "{count, plural, one {# opinión} other {# opiniones}}",
+    "all": "Todas las opiniones",
+    "pillAll": "todas",
+    "pillToCheck": "por revisar",
+    "pillPublished": "en la web",
+    "empty": "Aún no hay opiniones",
+    "new": "Nueva",
+    "test": "Prueba",
+    "published": "En la web",
+    "hidden": "Oculta",
+    "noConsent": "No para la web",
+    "booking": "Reserva",
+    "yourReply": "Tu respuesta",
+    "reply": "Responder",
+    "editReply": "Editar respuesta",
+    "publish": "Publicar",
+    "hide": "Ocultar",
+    "save": "Guardar",
+    "saved": "Guardado",
+    "cancel": "Cancelar",
+    "failed": "No se pudo guardar. Inténtalo de nuevo.",
+    "googleLink": "Enlace de opiniones de Google"
   }
 }

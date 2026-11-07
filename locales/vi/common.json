@@ -1025,7 +1025,8 @@
     "chargeFromDepositPlain": "{amount} đã được trừ từ tiền cọc của bạn cho các chi phí trong thời gian thuê xe.",
     "chargeRestToPay": "vẫn còn thiếu {amount}; bạn có thể thanh toán từ trang đặt xe của mình.",
     "depositHeldForDamage": "Tiền cọc của bạn đang được giữ lại cho đến khi mức độ hư hỏng được đánh giá. Chúng tôi sẽ thông báo cho bạn số tiền được hoàn lại.",
-    "extendCheck": "hợp đồng thuê {vehicle} của bạn kết thúc vào {date}. Bạn có gia hạn không? Nhấn Gia hạn hoặc Trả xe tại đây: {link}"
+    "extendCheck": "hợp đồng thuê {vehicle} của bạn kết thúc vào {date}. Bạn có gia hạn không? Nhấn Gia hạn hoặc Trả xe tại đây: {link}",
+    "reviewRequest": "cảm ơn bạn đã thuê {vehicle}. Bạn thấy thế nào? Hãy để lại một đánh giá ngắn tại đây: {link}"
   },
   "directory": {
     "title": "Thuê ô tô hoặc xe máy ở Thái Lan",
@@ -1318,7 +1319,9 @@
     "collect_deposit": "Thu tiền cọc",
     "collect_top_up": "Thu tiền bù",
     "collect_extension": "Thu tiền gia hạn",
-    "collect_extras": "Thu tiền dịch vụ thêm"
+    "collect_extras": "Thu tiền dịch vụ thêm",
+    "job_review": "Đánh giá từ {name} cần kiểm tra",
+    "job_review_open": "Mở đánh giá"
   },
   "bookings": {
     "eyebrow": "Đặt xe",
@@ -2981,7 +2984,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "Thời gian thuê và chi tiêu",
     "in_avgLength": "Thời gian trung bình",
-    "in_avgSpend": "Chi tiêu trung bình"
+    "in_avgSpend": "Chi tiêu trung bình",
+    "pillReviews": "{count, plural, other {# đánh giá}}"
   },
   "calendar": {
     "title": "Lịch",
@@ -3629,7 +3633,8 @@
     "tl_paid": "Thanh toán",
     "tl_paidCharge": "Đã trả một khoản phí",
     "tl_refunded": "Hoàn tiền",
-    "tl_damage": "Hư hỏng khi trả xe: {count, plural, other {# mục}}"
+    "tl_damage": "Hư hỏng khi trả xe: {count, plural, other {# mục}}",
+    "tl_review": "Đã đánh giá: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Thêm xe",
@@ -4808,7 +4813,8 @@
     "kv_motorbikes": "Xe máy",
     "kv_onRental": "Đang cho thuê",
     "kv_parked": "Tạm ngưng",
-    "kv_confirm": "Tiếp tục"
+    "kv_confirm": "Tiếp tục",
+    "rem_review": "Mời đánh giá sau khi trả xe"
   },
   "accountPage": {
     "roleOwner": "Chủ sở hữu",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "Đưa trang đặt xe của bạn lên trang Facebook, Google Maps và hồ sơ LINE để khách đặt xe bất cứ lúc nào.",
     "nudgeSignature": "Thêm chữ ký của bạn một lần, khách có thể ký hợp đồng thuê xe ngay trên điện thoại.",
     "nudgePaymentMethods": "Thêm PromptPay hoặc thông tin ngân hàng để khách thanh toán ngay từ trang đặt xe.",
-    "extensionHoldReturning": "{customer} không gia hạn: {vehicle} sẽ được trả vào {date}. Những ngày sau đó đã mở lại để đặt."
+    "extensionHoldReturning": "{customer} không gia hạn: {vehicle} sẽ được trả vào {date}. Những ngày sau đó đã mở lại để đặt.",
+    "reviewReceived": "{customer} đã đánh giá {rating} sao."
   },
   "handoverPay": {
     "title": "Thanh toán",
@@ -7368,5 +7375,48 @@
     "receipt": "Biên lai {number}",
     "failed": "Không thể ghi nhận thanh toán. Hãy thử lại.",
     "later": "Để sau"
+  },
+  "renterReview": {
+    "title": "Chuyến thuê xe của bạn thế nào?",
+    "titleVehicle": "Bạn thấy {vehicle} thế nào?",
+    "stars": "Xếp hạng của bạn",
+    "starCount": "{count, plural, other {# sao}}",
+    "yourWords": "Đánh giá của bạn (không bắt buộc)",
+    "shownAs": "Hiển thị là",
+    "consent": "Hiển thị đánh giá của tôi trên trang web của {business}",
+    "send": "Gửi đánh giá",
+    "sending": "Đang gửi…",
+    "pickStars": "Chọn từ 1 đến 5 sao.",
+    "failed": "Không gửi được. Vui lòng thử lại.",
+    "thanks": "Cảm ơn bạn đã đánh giá!",
+    "google": "Đăng cả lên Google",
+    "notFound": "Liên kết đánh giá này không hợp lệ."
+  },
+  "reviewsPage": {
+    "title": "Đánh giá",
+    "back": "Khách hàng",
+    "average": "trung bình",
+    "count": "{count, plural, other {# đánh giá}}",
+    "all": "Tất cả đánh giá",
+    "pillAll": "tất cả",
+    "pillToCheck": "cần kiểm tra",
+    "pillPublished": "trên web",
+    "empty": "Chưa có đánh giá",
+    "new": "Mới",
+    "test": "Thử nghiệm",
+    "published": "Trên web",
+    "hidden": "Đã ẩn",
+    "noConsent": "Không đăng web",
+    "booking": "Đặt xe",
+    "yourReply": "Phản hồi của bạn",
+    "reply": "Phản hồi",
+    "editReply": "Sửa phản hồi",
+    "publish": "Đăng",
+    "hide": "Ẩn",
+    "save": "Lưu",
+    "saved": "Đã lưu",
+    "cancel": "Hủy",
+    "failed": "Không lưu được. Vui lòng thử lại.",
+    "googleLink": "Liên kết đánh giá Google"
   }
 }

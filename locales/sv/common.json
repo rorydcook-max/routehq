@@ -1025,7 +1025,8 @@
     "extrasRemoved": "{names} har tagits bort från din bokning.",
     "extrasRefunded": "vi har återbetalat {amount} för dina tillval. Tack.",
     "extrasCredited": "de {amount} du betalade för tillval dras av från hyran som förfaller {date}.",
-    "extendCheck": "din hyra av {vehicle} slutar den {date}. Förlänger du? Tryck på Förläng eller Jag lämnar tillbaka här: {link}"
+    "extendCheck": "din hyra av {vehicle} slutar den {date}. Förlänger du? Tryck på Förläng eller Jag lämnar tillbaka här: {link}",
+    "reviewRequest": "tack för att du hyrde {vehicle}. Hur var det? Lämna ett kort omdöme här: {link}"
   },
   "common": {
     "kinds_car": "Bilar",
@@ -1278,7 +1279,9 @@
     "collect_deposit": "Ta betalt för deposition",
     "collect_top_up": "Ta betalt för tillägg",
     "collect_extension": "Ta betalt för förlängning",
-    "collect_extras": "Ta betalt för tillval"
+    "collect_extras": "Ta betalt för tillval",
+    "job_review": "Omdöme från {name} att granska",
+    "job_review_open": "Öppna omdömen"
   },
   "bookings": {
     "eyebrow": "Bokningar",
@@ -2941,7 +2944,8 @@
     "in_share": "{count} · {percent} %",
     "in_trend": "Hyrlängd och utgifter",
     "in_avgLength": "Snittlängd",
-    "in_avgSpend": "Snittutgift"
+    "in_avgSpend": "Snittutgift",
+    "pillReviews": "{count, plural, one {# omdöme} other {# omdömen}}"
   },
   "calendar": {
     "title": "Kalender",
@@ -3589,7 +3593,8 @@
     "tl_paid": "Betalning",
     "tl_paidCharge": "Betalade en avgift",
     "tl_refunded": "Återbetalning",
-    "tl_damage": "Skada vid återlämning: {count, plural, one {# punkt} other {# punkter}}"
+    "tl_damage": "Skada vid återlämning: {count, plural, one {# punkt} other {# punkter}}",
+    "tl_review": "Lämnade ett omdöme: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Lägg till fordon",
@@ -4768,7 +4773,8 @@
     "kv_motorbikes": "Motorcyklar",
     "kv_onRental": "Uthyrd",
     "kv_parked": "Parkerad",
-    "kv_confirm": "Fortsätt"
+    "kv_confirm": "Fortsätt",
+    "rem_review": "Be om ett omdöme efter återlämning"
   },
   "accountPage": {
     "roleOwner": "Ägare",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "Lägg din bokningssida på din Facebooksida, Google Maps och LINE-profil så att kunder kan boka när som helst.",
     "nudgeSignature": "Lägg till din signatur en gång så kan kunderna signera hyresavtalet i mobilen.",
     "nudgePaymentMethods": "Lägg till PromptPay eller dina bankuppgifter så kan kunderna betala direkt från sin bokningssida.",
-    "extensionHoldReturning": "{customer} förlänger inte: {vehicle} ska lämnas tillbaka den {date}. Dagarna efter går att boka igen."
+    "extensionHoldReturning": "{customer} förlänger inte: {vehicle} ska lämnas tillbaka den {date}. Dagarna efter går att boka igen.",
+    "reviewReceived": "{customer} lämnade ett omdöme med {rating} stjärnor."
   },
   "handoverPay": {
     "title": "Betalning",
@@ -7368,5 +7375,48 @@
     "receipt": "Kvitto {number}",
     "failed": "Betalningen kunde inte registreras. Försök igen.",
     "later": "Senare"
+  },
+  "renterReview": {
+    "title": "Hur var din hyra?",
+    "titleVehicle": "Hur var {vehicle}?",
+    "stars": "Ditt betyg",
+    "starCount": "{count, plural, one {# stjärna} other {# stjärnor}}",
+    "yourWords": "Ditt omdöme (valfritt)",
+    "shownAs": "Visas som",
+    "consent": "Visa mitt omdöme på {business}s webbplats",
+    "send": "Skicka omdöme",
+    "sending": "Skickar…",
+    "pickStars": "Välj 1 till 5 stjärnor.",
+    "failed": "Det gick inte att skicka. Försök igen.",
+    "thanks": "Tack för ditt omdöme!",
+    "google": "Lägg upp det på Google också",
+    "notFound": "Den här länken till omdömet är inte giltig."
+  },
+  "reviewsPage": {
+    "title": "Omdömen",
+    "back": "Kunder",
+    "average": "snitt",
+    "count": "{count, plural, one {# omdöme} other {# omdömen}}",
+    "all": "Alla omdömen",
+    "pillAll": "alla",
+    "pillToCheck": "att granska",
+    "pillPublished": "på webbplatsen",
+    "empty": "Inga omdömen än",
+    "new": "Nytt",
+    "test": "Test",
+    "published": "På webbplatsen",
+    "hidden": "Dolt",
+    "noConsent": "Inte för webbplatsen",
+    "booking": "Bokning",
+    "yourReply": "Ditt svar",
+    "reply": "Svara",
+    "editReply": "Redigera svar",
+    "publish": "Publicera",
+    "hide": "Dölj",
+    "save": "Spara",
+    "saved": "Sparat",
+    "cancel": "Avbryt",
+    "failed": "Kunde inte spara. Försök igen.",
+    "googleLink": "Länk till Google-omdömen"
   }
 }

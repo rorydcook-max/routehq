@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Số tiền trong “{}” tính bằng {} và được giữ nguyên; cơ sở của bạn dùng {}.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "Đã tìm thấy các tab và dòng sau: {}. Đây là tệp xuất từ {}: RoveHQ nhận ra và đọc ngay. Mở phần nhập để kiểm tra những gì sẽ được thêm trước khi thêm bất cứ thứ gì.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Đây là tệp xuất từ {}: RoveHQ nhận ra và đọc ngay. Mở phần nhập để đọc tệp: bạn kiểm tra những gì tìm thấy trước khi thêm bất cứ thứ gì.",
-  "Read as {} export.": "Đọc như tệp xuất từ {}."
+  "Read as {} export.": "Đọc như tệp xuất từ {}.",
+  "Review not found.": "Không tìm thấy đánh giá.",
+  "This renter didn't agree to show their review.": "Khách thuê này không đồng ý hiển thị đánh giá của họ.",
+  "Enter a web address.": "Nhập địa chỉ web."
 }

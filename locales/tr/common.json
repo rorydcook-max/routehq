@@ -3067,7 +3067,8 @@
     "kv_motorbikes": "Motosikletler",
     "kv_onRental": "Kirada",
     "kv_parked": "Park edildi",
-    "kv_confirm": "Devam"
+    "kv_confirm": "Devam",
+    "rem_review": "İadeden sonra yorum iste"
   },
   "customerPage": {
     "back": "Müşteriler",
@@ -3270,7 +3271,8 @@
     "tl_paid": "Ödeme",
     "tl_paidCharge": "Bir ücreti ödedi",
     "tl_refunded": "İade",
-    "tl_damage": "İadede hasar bulundu: {count, plural, one {# kalem} other {# kalem}}"
+    "tl_damage": "İadede hasar bulundu: {count, plural, one {# kalem} other {# kalem}}",
+    "tl_review": "Yorum bıraktı: {rating}/5"
   },
   "reportsPage": {
     "title": "Raporlar",
@@ -3511,7 +3513,8 @@
     "in_share": "{count} · %{percent}",
     "in_trend": "Kiralama süresi ve harcama",
     "in_avgLength": "Ortalama süre",
-    "in_avgSpend": "Ortalama harcama"
+    "in_avgSpend": "Ortalama harcama",
+    "pillReviews": "{count, plural, one {# yorum} other {# yorum}}"
   },
   "inspectStart": {
     "titleOut": "Araç teslim et",
@@ -4574,7 +4577,9 @@
     "collect_deposit": "Depozito tahsil et",
     "collect_top_up": "Ek ödeme tahsil et",
     "collect_extension": "Uzatma ücretini tahsil et",
-    "collect_extras": "Ekstraları tahsil et"
+    "collect_extras": "Ekstraları tahsil et",
+    "job_review": "{name} kişisinden gelen yorumu kontrol et",
+    "job_review_open": "Yorumları aç"
   },
   "chat": {
     "launcher": "RoveHQ ile sohbet",
@@ -6921,7 +6926,8 @@
     "extrasRemoved": "{names} rezervasyonunuzdan çıkarıldı.",
     "extrasRefunded": "ekstralarınız için {amount} iade ettik. Teşekkür ederiz.",
     "extrasCredited": "ekstralar için ödediğiniz {amount}, {date} tarihli kiranızdan düşülecek.",
-    "extendCheck": "{vehicle} kiralamanız {date} tarihinde bitiyor. Uzatıyor musunuz? Buradan Uzat veya İade ediyorum'a dokunun: {link}"
+    "extendCheck": "{vehicle} kiralamanız {date} tarihinde bitiyor. Uzatıyor musunuz? Buradan Uzat veya İade ediyorum'a dokunun: {link}",
+    "reviewRequest": "{vehicle} aracını kiraladığınız için teşekkürler. Nasıldı? Buradan kısa bir yorum bırakın: {link}"
   },
   "auth": {
     "signInTitle": "Giriş yap",
@@ -7265,7 +7271,8 @@
     "nudgeReminders": "LINE veya Telegram'ı bağlayın, ödeme hatırlatmaları müşterilerinize kendiliğinden gitsin.",
     "nudgeBookingPage": "Rezervasyon sayfanızı Facebook sayfanıza, Google Haritalar'a ve LINE profilinize ekleyin, müşteriler istedikleri zaman rezervasyon yapabilsin.",
     "nudgeSignature": "İmzanızı bir kez ekleyin, müşteriler kiralama sözleşmesini telefonlarından imzalayabilsin.",
-    "nudgePaymentMethods": "PromptPay veya banka bilgilerinizi ekleyin, müşteriler doğrudan rezervasyon sayfalarından ödeme yapabilsin."
+    "nudgePaymentMethods": "PromptPay veya banka bilgilerinizi ekleyin, müşteriler doğrudan rezervasyon sayfalarından ödeme yapabilsin.",
+    "reviewReceived": "{customer} {rating} yıldızlı bir yorum bıraktı."
   },
   "handoverPay": {
     "title": "Ödeme",
@@ -7299,5 +7306,48 @@
     "receipt": "Makbuz {number}",
     "failed": "Ödeme kaydedilemedi. Tekrar deneyin.",
     "later": "Sonra"
+  },
+  "renterReview": {
+    "title": "Kiralamanız nasıldı?",
+    "titleVehicle": "{vehicle} nasıldı?",
+    "stars": "Puanınız",
+    "starCount": "{count, plural, one {# yıldız} other {# yıldız}}",
+    "yourWords": "Yorumunuz (isteğe bağlı)",
+    "shownAs": "Görünen ad",
+    "consent": "Yorumumu {business} web sitesinde göster",
+    "send": "Yorumu gönder",
+    "sending": "Gönderiliyor…",
+    "pickStars": "1 ile 5 arasında yıldız seçin.",
+    "failed": "Gönderilemedi. Lütfen tekrar deneyin.",
+    "thanks": "Yorumunuz için teşekkürler!",
+    "google": "Google'da da paylaş",
+    "notFound": "Bu yorum bağlantısı geçerli değil."
+  },
+  "reviewsPage": {
+    "title": "Yorumlar",
+    "back": "Müşteriler",
+    "average": "ortalama",
+    "count": "{count, plural, one {# yorum} other {# yorum}}",
+    "all": "Tüm yorumlar",
+    "pillAll": "tümü",
+    "pillToCheck": "kontrol edilecek",
+    "pillPublished": "web sitesinde",
+    "empty": "Henüz yorum yok",
+    "new": "Yeni",
+    "test": "Test",
+    "published": "Web sitesinde",
+    "hidden": "Gizli",
+    "noConsent": "Web sitesi için değil",
+    "booking": "Rezervasyon",
+    "yourReply": "Yanıtınız",
+    "reply": "Yanıtla",
+    "editReply": "Yanıtı düzenle",
+    "publish": "Yayınla",
+    "hide": "Gizle",
+    "save": "Kaydet",
+    "saved": "Kaydedildi",
+    "cancel": "İptal",
+    "failed": "Kaydedilemedi. Lütfen tekrar deneyin.",
+    "googleLink": "Google yorum bağlantısı"
   }
 }

@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Jumlah di “{}” dalam {} dan dibiarkan sesuai aslinya; usaha Anda memakai {}.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "Tab dan baris yang ditemukan: {}. Ini adalah ekspor {}: RoveHQ mengenalinya dan langsung membacanya. Buka impor untuk memeriksa apa yang masuk sebelum ada yang ditambahkan.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Ini adalah ekspor {}: RoveHQ mengenalinya dan langsung membacanya. Buka impor untuk membacanya: Anda memeriksa apa yang ditemukan sebelum ada yang ditambahkan.",
-  "Read as {} export.": "Dibaca sebagai ekspor {}."
+  "Read as {} export.": "Dibaca sebagai ekspor {}.",
+  "Review not found.": "Ulasan tidak ditemukan.",
+  "This renter didn't agree to show their review.": "Penyewa ini tidak setuju ulasannya ditampilkan.",
+  "Enter a web address.": "Masukkan alamat web."
 }

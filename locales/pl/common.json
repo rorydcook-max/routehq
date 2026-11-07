@@ -1025,7 +1025,8 @@
     "extrasRemoved": "Z Twojej rezerwacji usunięto: {names}.",
     "extrasRefunded": "zwróciliśmy Ci {amount} za dodatki. Dziękujemy.",
     "extrasCredited": "{amount} zapłacone za dodatki zostanie odliczone od czynszu płatnego {date}.",
-    "extendCheck": "Twój wynajem {vehicle} kończy się {date}. Przedłużasz? Stuknij tutaj Przedłużam lub Oddaję: {link}"
+    "extendCheck": "Twój wynajem {vehicle} kończy się {date}. Przedłużasz? Stuknij tutaj Przedłużam lub Oddaję: {link}",
+    "reviewRequest": "dziękujemy za wynajem {vehicle}. Jak było? Zostaw krótką opinię tutaj: {link}"
   },
   "common": {
     "kinds_car": "Samochody",
@@ -1252,7 +1253,9 @@
     "collect_deposit": "Pobierz kaucję",
     "collect_top_up": "Pobierz dopłatę",
     "collect_extension": "Pobierz za przedłużenie",
-    "collect_extras": "Pobierz za dodatki"
+    "collect_extras": "Pobierz za dodatki",
+    "job_review": "Opinia od {name} do sprawdzenia",
+    "job_review_open": "Otwórz opinie"
   },
   "bookings": {
     "eyebrow": "Rezerwacje",
@@ -2915,7 +2918,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "Długość wynajmu i wydatki",
     "in_avgLength": "Średnia długość",
-    "in_avgSpend": "Średnie wydatki"
+    "in_avgSpend": "Średnie wydatki",
+    "pillReviews": "{count, plural, one {# opinia} few {# opinie} many {# opinii} other {# opinii}}"
   },
   "calendar": {
     "title": "Kalendarz",
@@ -3563,7 +3567,8 @@
     "tl_paid": "Płatność",
     "tl_paidCharge": "Zapłacił opłatę",
     "tl_refunded": "Zwrot pieniędzy",
-    "tl_damage": "Szkody przy zwrocie: {count, plural, one {# pozycja} few {# pozycje} many {# pozycji} other {# pozycji}}"
+    "tl_damage": "Szkody przy zwrocie: {count, plural, one {# pozycja} few {# pozycje} many {# pozycji} other {# pozycji}}",
+    "tl_review": "Wystawił opinię: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Dodaj pojazd",
@@ -4741,7 +4746,8 @@
     "kv_motorbikes": "Motocykle",
     "kv_onRental": "Wynajęte",
     "kv_parked": "Zawieszone",
-    "kv_confirm": "Dalej"
+    "kv_confirm": "Dalej",
+    "rem_review": "Poproś o opinię po zwrocie"
   },
   "accountPage": {
     "roleOwner": "Właściciel",
@@ -7261,7 +7267,8 @@
     "nudgeBookingPage": "Umieść swoją stronę rezerwacji na stronie na Facebooku, w Mapach Google i w profilu LINE, aby klienci mogli rezerwować o każdej porze.",
     "nudgeSignature": "Dodaj swój podpis raz, a klienci podpiszą umowę najmu na telefonie.",
     "nudgePaymentMethods": "Dodaj PromptPay lub dane bankowe, aby klienci płacili bezpośrednio ze swojej strony rezerwacji.",
-    "extensionHoldReturning": "{customer} nie przedłuża: pojazd {vehicle} ma wrócić {date}. Kolejne dni są znów dostępne do rezerwacji."
+    "extensionHoldReturning": "{customer} nie przedłuża: pojazd {vehicle} ma wrócić {date}. Kolejne dni są znów dostępne do rezerwacji.",
+    "reviewReceived": "{customer} wystawił opinię: {rating} gwiazdek."
   },
   "handoverPay": {
     "title": "Płatność",
@@ -7295,5 +7302,48 @@
     "receipt": "Paragon {number}",
     "failed": "Nie udało się zapisać płatności. Spróbuj ponownie.",
     "later": "Później"
+  },
+  "renterReview": {
+    "title": "Jak minął wynajem?",
+    "titleVehicle": "Jak sprawował się {vehicle}?",
+    "stars": "Twoja ocena",
+    "starCount": "{count, plural, one {# gwiazdka} few {# gwiazdki} many {# gwiazdek} other {# gwiazdki}}",
+    "yourWords": "Twoja opinia (opcjonalnie)",
+    "shownAs": "Wyświetlane jako",
+    "consent": "Pokaż moją opinię na stronie {business}",
+    "send": "Wyślij opinię",
+    "sending": "Wysyłanie…",
+    "pickStars": "Wybierz od 1 do 5 gwiazdek.",
+    "failed": "Nie udało się wysłać. Spróbuj ponownie.",
+    "thanks": "Dziękujemy za opinię!",
+    "google": "Opublikuj ją też w Google",
+    "notFound": "Ten link do opinii jest nieprawidłowy."
+  },
+  "reviewsPage": {
+    "title": "Opinie",
+    "back": "Klienci",
+    "average": "średnia",
+    "count": "{count, plural, one {# opinia} few {# opinie} many {# opinii} other {# opinii}}",
+    "all": "Wszystkie opinie",
+    "pillAll": "wszystkie",
+    "pillToCheck": "do sprawdzenia",
+    "pillPublished": "na stronie",
+    "empty": "Jeszcze brak opinii",
+    "new": "Nowa",
+    "test": "Test",
+    "published": "Na stronie",
+    "hidden": "Ukryta",
+    "noConsent": "Nie na stronę",
+    "booking": "Rezerwacja",
+    "yourReply": "Twoja odpowiedź",
+    "reply": "Odpowiedz",
+    "editReply": "Edytuj odpowiedź",
+    "publish": "Opublikuj",
+    "hide": "Ukryj",
+    "save": "Zapisz",
+    "saved": "Zapisano",
+    "cancel": "Anuluj",
+    "failed": "Nie udało się zapisać. Spróbuj ponownie.",
+    "googleLink": "Link do opinii Google"
   }
 }

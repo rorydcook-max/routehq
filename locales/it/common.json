@@ -1025,7 +1025,8 @@
     "extrasRemoved": "{names} è stato tolto dalla tua prenotazione.",
     "extrasRefunded": "ti abbiamo rimborsato {amount} per gli extra. Grazie.",
     "extrasCredited": "i {amount} che hai pagato per gli extra verranno scalati dal noleggio in scadenza il {date}.",
-    "extendCheck": "il tuo noleggio del veicolo {vehicle} termina il {date}. Vuoi prolungarlo? Tocca Prolungo o Riconsegno qui: {link}"
+    "extendCheck": "il tuo noleggio del veicolo {vehicle} termina il {date}. Vuoi prolungarlo? Tocca Prolungo o Riconsegno qui: {link}",
+    "reviewRequest": "grazie per aver noleggiato il veicolo {vehicle}. Com'è andata? Lascia una breve recensione qui: {link}"
   },
   "common": {
     "kinds_car": "Auto",
@@ -1252,7 +1253,9 @@
     "collect_deposit": "Incassa la cauzione",
     "collect_top_up": "Incassa l'integrazione",
     "collect_extension": "Incassa la proroga",
-    "collect_extras": "Incassa gli extra"
+    "collect_extras": "Incassa gli extra",
+    "job_review": "Recensione di {name} da controllare",
+    "job_review_open": "Apri recensioni"
   },
   "bookings": {
     "eyebrow": "Prenotazioni",
@@ -2915,7 +2918,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "Durata e spesa",
     "in_avgLength": "Durata media",
-    "in_avgSpend": "Spesa media"
+    "in_avgSpend": "Spesa media",
+    "pillReviews": "{count, plural, one {# recensione} other {# recensioni}}"
   },
   "calendar": {
     "title": "Calendario",
@@ -3563,7 +3567,8 @@
     "tl_paid": "Pagamento",
     "tl_paidCharge": "Ha pagato un addebito",
     "tl_refunded": "Rimborso",
-    "tl_damage": "Danni al rientro: {count, plural, one {# elemento} other {# elementi}}"
+    "tl_damage": "Danni al rientro: {count, plural, one {# elemento} other {# elementi}}",
+    "tl_review": "Ha lasciato una recensione: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Aggiungi veicolo",
@@ -4741,7 +4746,8 @@
     "kv_motorbikes": "Moto",
     "kv_onRental": "A noleggio",
     "kv_parked": "In pausa",
-    "kv_confirm": "Continua"
+    "kv_confirm": "Continua",
+    "rem_review": "Chiedi una recensione dopo la riconsegna"
   },
   "accountPage": {
     "roleOwner": "Titolare",
@@ -7261,7 +7267,8 @@
     "nudgeBookingPage": "Metti la tua pagina di prenotazione sulla pagina Facebook, su Google Maps e sul profilo LINE, così i clienti prenotano quando vogliono.",
     "nudgeSignature": "Aggiungi la tua firma una volta e i clienti potranno firmare il contratto di noleggio dal telefono.",
     "nudgePaymentMethods": "Aggiungi PromptPay o i tuoi dati bancari così i clienti pagano direttamente dalla loro pagina di prenotazione.",
-    "extensionHoldReturning": "{customer} non prolunga: il veicolo {vehicle} va riconsegnato il {date}. I giorni successivi sono di nuovo prenotabili."
+    "extensionHoldReturning": "{customer} non prolunga: il veicolo {vehicle} va riconsegnato il {date}. I giorni successivi sono di nuovo prenotabili.",
+    "reviewReceived": "{customer} ha lasciato una recensione da {rating} stelle."
   },
   "handoverPay": {
     "title": "Pagamento",
@@ -7295,5 +7302,48 @@
     "receipt": "Ricevuta {number}",
     "failed": "Impossibile registrare il pagamento. Riprova.",
     "later": "Più tardi"
+  },
+  "renterReview": {
+    "title": "Com'è andato il noleggio?",
+    "titleVehicle": "Com'era il veicolo {vehicle}?",
+    "stars": "Il tuo voto",
+    "starCount": "{count, plural, one {# stella} other {# stelle}}",
+    "yourWords": "La tua recensione (facoltativa)",
+    "shownAs": "Mostrato come",
+    "consent": "Mostra la mia recensione sul sito di {business}",
+    "send": "Invia recensione",
+    "sending": "Invio…",
+    "pickStars": "Scegli da 1 a 5 stelle.",
+    "failed": "Invio non riuscito. Riprova.",
+    "thanks": "Grazie per la tua recensione!",
+    "google": "Pubblicala anche su Google",
+    "notFound": "Questo link per la recensione non è valido."
+  },
+  "reviewsPage": {
+    "title": "Recensioni",
+    "back": "Clienti",
+    "average": "media",
+    "count": "{count, plural, one {# recensione} other {# recensioni}}",
+    "all": "Tutte le recensioni",
+    "pillAll": "tutte",
+    "pillToCheck": "da controllare",
+    "pillPublished": "sul sito",
+    "empty": "Ancora nessuna recensione",
+    "new": "Nuova",
+    "test": "Test",
+    "published": "Sul sito",
+    "hidden": "Nascosta",
+    "noConsent": "Non per il sito",
+    "booking": "Prenotazione",
+    "yourReply": "La tua risposta",
+    "reply": "Rispondi",
+    "editReply": "Modifica risposta",
+    "publish": "Pubblica",
+    "hide": "Nascondi",
+    "save": "Salva",
+    "saved": "Salvato",
+    "cancel": "Annulla",
+    "failed": "Salvataggio non riuscito. Riprova.",
+    "googleLink": "Link alle recensioni Google"
   }
 }

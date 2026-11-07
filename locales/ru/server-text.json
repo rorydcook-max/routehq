@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Суммы в «{}» указаны в {} и оставлены как есть; ваш бизнес использует {}.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "Найдены вкладки и строки: {}. Это экспорт из {}: RoveHQ распознаёт его и сразу читает. Откройте импорт и проверьте, что будет перенесено, прежде чем что-либо добавится.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Это экспорт из {}: RoveHQ распознаёт его и сразу читает. Откройте импорт, чтобы прочитать его: вы проверите найденное, прежде чем что-либо добавится.",
-  "Read as {} export.": "Прочитано как экспорт {}."
+  "Read as {} export.": "Прочитано как экспорт {}.",
+  "Review not found.": "Отзыв не найден.",
+  "This renter didn't agree to show their review.": "Этот арендатор не разрешил показывать свой отзыв.",
+  "Enter a web address.": "Введите веб-адрес."
 }

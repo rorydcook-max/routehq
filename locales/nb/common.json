@@ -1025,7 +1025,8 @@
     "extrasRefunded": "vi har refundert {amount} for ekstrautstyret ditt. Takk skal du ha.",
     "extrasCredited": "beløpet på {amount} som du betalte for ekstrautstyr, trekkes fra leien som forfaller {date}.",
     "vehicleMoved": "en endring i din booking: du får {to} i stedet for {from}. Datoene og prisen forblir den samme. Send oss en melding hvis det ikke passer for deg.",
-    "extendCheck": "leien din av {vehicle} slutter {date}. Forlenger du? Trykk på Forleng eller Jeg leverer tilbake her: {link}"
+    "extendCheck": "leien din av {vehicle} slutter {date}. Forlenger du? Trykk på Forleng eller Jeg leverer tilbake her: {link}",
+    "reviewRequest": "takk for at du leide {vehicle}. Hvordan var det? Legg igjen en kort anmeldelse her: {link}"
   },
   "common": {
     "kinds_car": "Biler",
@@ -1278,7 +1279,9 @@
     "collect_deposit": "Ta betalt for depositum",
     "collect_top_up": "Ta betalt for tillegg",
     "collect_extension": "Ta betalt for forlengelse",
-    "collect_extras": "Ta betalt for ekstrautstyr"
+    "collect_extras": "Ta betalt for ekstrautstyr",
+    "job_review": "Anmeldelse fra {name} til gjennomgang",
+    "job_review_open": "Åpne anmeldelser"
   },
   "bookings": {
     "eyebrow": "Bestillinger",
@@ -2941,7 +2944,8 @@
     "in_share": "{count} · {percent} %",
     "in_trend": "Leielengde og forbruk",
     "in_avgLength": "Snittlengde",
-    "in_avgSpend": "Snittforbruk"
+    "in_avgSpend": "Snittforbruk",
+    "pillReviews": "{count, plural, one {# anmeldelse} other {# anmeldelser}}"
   },
   "calendar": {
     "title": "Kalender",
@@ -3589,7 +3593,8 @@
     "tl_paid": "Betaling",
     "tl_paidCharge": "Betalte et gebyr",
     "tl_refunded": "Refusjon",
-    "tl_damage": "Skade ved retur: {count, plural, one {# punkt} other {# punkter}}"
+    "tl_damage": "Skade ved retur: {count, plural, one {# punkt} other {# punkter}}",
+    "tl_review": "Ga en anmeldelse: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Legg til kjøretøy",
@@ -4768,7 +4773,8 @@
     "kv_motorbikes": "Motorsykler",
     "kv_onRental": "Utleid",
     "kv_parked": "Parkert",
-    "kv_confirm": "Fortsett"
+    "kv_confirm": "Fortsett",
+    "rem_review": "Be om anmeldelse etter retur"
   },
   "accountPage": {
     "roleOwner": "Eier",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "Legg bestillingssiden din på Facebook-siden, Google Maps og LINE-profilen, så kan kundene bestille når som helst.",
     "nudgeSignature": "Legg til signaturen din én gang, så kan kundene signere leiekontrakten på mobilen.",
     "nudgePaymentMethods": "Legg til PromptPay eller bankopplysningene dine, så kan kundene betale rett fra bestillingssiden sin.",
-    "extensionHoldReturning": "{customer} forlenger ikke: {vehicle} skal leveres tilbake {date}. Dagene etter er åpne for booking igjen."
+    "extensionHoldReturning": "{customer} forlenger ikke: {vehicle} skal leveres tilbake {date}. Dagene etter er åpne for booking igjen.",
+    "reviewReceived": "{customer} ga en anmeldelse med {rating} stjerner."
   },
   "handoverPay": {
     "title": "Betaling",
@@ -7368,5 +7375,48 @@
     "receipt": "Kvittering {number}",
     "failed": "Betalingen kunne ikke registreres. Prøv igjen.",
     "later": "Senere"
+  },
+  "renterReview": {
+    "title": "Hvordan var leien?",
+    "titleVehicle": "Hvordan var {vehicle}?",
+    "stars": "Din vurdering",
+    "starCount": "{count, plural, one {# stjerne} other {# stjerner}}",
+    "yourWords": "Din anmeldelse (valgfritt)",
+    "shownAs": "Vises som",
+    "consent": "Vis anmeldelsen min på nettsiden til {business}",
+    "send": "Send anmeldelse",
+    "sending": "Sender…",
+    "pickStars": "Velg 1 til 5 stjerner.",
+    "failed": "Kunne ikke sende. Prøv igjen.",
+    "thanks": "Takk for anmeldelsen!",
+    "google": "Legg den ut på Google også",
+    "notFound": "Denne anmeldelseslenken er ikke gyldig."
+  },
+  "reviewsPage": {
+    "title": "Anmeldelser",
+    "back": "Kunder",
+    "average": "snitt",
+    "count": "{count, plural, one {# anmeldelse} other {# anmeldelser}}",
+    "all": "Alle anmeldelser",
+    "pillAll": "alle",
+    "pillToCheck": "til gjennomgang",
+    "pillPublished": "på nettsiden",
+    "empty": "Ingen anmeldelser ennå",
+    "new": "Ny",
+    "test": "Test",
+    "published": "På nettsiden",
+    "hidden": "Skjult",
+    "noConsent": "Ikke for nettsiden",
+    "booking": "Booking",
+    "yourReply": "Ditt svar",
+    "reply": "Svar",
+    "editReply": "Rediger svar",
+    "publish": "Publiser",
+    "hide": "Skjul",
+    "save": "Lagre",
+    "saved": "Lagret",
+    "cancel": "Avbryt",
+    "failed": "Kunne ikke lagre. Prøv igjen.",
+    "googleLink": "Lenke til Google-anmeldelser"
   }
 }

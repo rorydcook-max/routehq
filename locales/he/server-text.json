@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "הסכומים ב„{}” הם ב-{} ונשמרים כפי שנכתבו; העסק שלכם משתמש ב-{}.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "נמצאו הלשוניות והשורות האלה: {}. זה ייצוא של {}: RoveHQ מזהה אותו וקורא אותו מיד. פתחו את הייבוא כדי לבדוק מה נכנס לפני שמשהו מתווסף.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "זה ייצוא של {}: RoveHQ מזהה אותו וקורא אותו מיד. פתחו את הייבוא כדי לקרוא אותו: אתם בודקים מה נמצא לפני שמשהו מתווסף.",
-  "Read as {} export.": "נקרא כייצוא מ-{}."
+  "Read as {} export.": "נקרא כייצוא מ-{}.",
+  "Review not found.": "הביקורת לא נמצאה.",
+  "This renter didn't agree to show their review.": "השוכר הזה לא הסכים להציג את הביקורת שלו.",
+  "Enter a web address.": "יש להזין כתובת אתר."
 }

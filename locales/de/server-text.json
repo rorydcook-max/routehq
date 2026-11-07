@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Beträge in „{}“ sind in {} und bleiben wie angegeben; Ihr Betrieb verwendet {}.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "Gefundene Tabellenblätter und Zeilen: {}. Das ist ein {}-Export: RoveHQ erkennt ihn und liest ihn sofort ein. Öffnen Sie den Import, um zu prüfen, was übernommen wird, bevor etwas hinzugefügt wird.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Das ist ein {}-Export: RoveHQ erkennt ihn und liest ihn sofort ein. Öffnen Sie den Import, um ihn einzulesen: Sie prüfen, was gefunden wurde, bevor etwas hinzugefügt wird.",
-  "Read as {} export.": "Gelesen als Export aus {}."
+  "Read as {} export.": "Gelesen als Export aus {}.",
+  "Review not found.": "Bewertung nicht gefunden.",
+  "This renter didn't agree to show their review.": "Dieser Mieter hat der Anzeige seiner Bewertung nicht zugestimmt.",
+  "Enter a web address.": "Geben Sie eine Webadresse ein."
 }

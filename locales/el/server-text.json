@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Τα ποσά στο «{}» είναι σε {} και διατηρούνται όπως γράφτηκαν· η επιχείρησή σας χρησιμοποιεί {}.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "Βρέθηκαν αυτές οι καρτέλες και γραμμές: {}. Πρόκειται για εξαγωγή {}: το RoveHQ την αναγνωρίζει και τη διαβάζει αμέσως. Ανοίξτε την εισαγωγή για να ελέγξετε τι θα μπει πριν προστεθεί οτιδήποτε.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Πρόκειται για εξαγωγή {}: το RoveHQ την αναγνωρίζει και τη διαβάζει αμέσως. Ανοίξτε την εισαγωγή για να τη διαβάσετε: ελέγχετε τι βρέθηκε πριν προστεθεί οτιδήποτε.",
-  "Read as {} export.": "Διαβάστηκε ως εξαγωγή {}."
+  "Read as {} export.": "Διαβάστηκε ως εξαγωγή {}.",
+  "Review not found.": "Η κριτική δεν βρέθηκε.",
+  "This renter didn't agree to show their review.": "Αυτός ο ενοικιαστής δεν συμφώνησε να εμφανιστεί η κριτική του.",
+  "Enter a web address.": "Εισαγάγετε μια διεύθυνση ιστού."
 }

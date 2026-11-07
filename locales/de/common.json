@@ -1025,7 +1025,8 @@
     "chargeFromDepositPlain": "{amount} wurden für Kosten während Ihrer Vermietung von Ihrer Kaution abgezogen.",
     "chargeRestToPay": "{amount} sind noch zu zahlen; Sie können den Betrag auf Ihrer Buchungsseite bezahlen.",
     "depositHeldForDamage": "Ihre Kaution wird einbehalten, bis der Schaden bewertet wurde. Wir teilen Ihnen mit, was zurückgezahlt wird.",
-    "extendCheck": "Ihre Miete für {vehicle} endet am {date}. Verlängern Sie? Tippen Sie hier auf Verlängern oder Ich gebe zurück: {link}"
+    "extendCheck": "Ihre Miete für {vehicle} endet am {date}. Verlängern Sie? Tippen Sie hier auf Verlängern oder Ich gebe zurück: {link}",
+    "reviewRequest": "danke, dass Sie {vehicle} gemietet haben. Wie war es? Hinterlassen Sie hier eine kurze Bewertung: {link}"
   },
   "directory": {
     "title": "Auto oder Roller in Thailand mieten",
@@ -1292,7 +1293,9 @@
     "collect_deposit": "Kaution kassieren",
     "collect_top_up": "Nachzahlung kassieren",
     "collect_extension": "Verlängerung kassieren",
-    "collect_extras": "Extras kassieren"
+    "collect_extras": "Extras kassieren",
+    "job_review": "Bewertung von {name} prüfen",
+    "job_review_open": "Bewertungen öffnen"
   },
   "bookings": {
     "eyebrow": "Buchungen",
@@ -2955,7 +2958,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "Mietdauer und Umsatz",
     "in_avgLength": "Ø Dauer",
-    "in_avgSpend": "Ø Umsatz"
+    "in_avgSpend": "Ø Umsatz",
+    "pillReviews": "{count, plural, one {# Bewertung} other {# Bewertungen}}"
   },
   "calendar": {
     "title": "Kalender",
@@ -3603,7 +3607,8 @@
     "tl_paid": "Zahlung",
     "tl_paidCharge": "Gebühr bezahlt",
     "tl_refunded": "Erstattung",
-    "tl_damage": "Schaden bei Rückgabe: {count, plural, one {# Punkt} other {# Punkte}}"
+    "tl_damage": "Schaden bei Rückgabe: {count, plural, one {# Punkt} other {# Punkte}}",
+    "tl_review": "Bewertung abgegeben: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Fahrzeug hinzufügen",
@@ -4781,7 +4786,8 @@
     "kv_motorbikes": "Motorräder",
     "kv_onRental": "Vermietet",
     "kv_parked": "Geparkt",
-    "kv_confirm": "Weiter"
+    "kv_confirm": "Weiter",
+    "rem_review": "Nach der Rückgabe um eine Bewertung bitten"
   },
   "accountPage": {
     "roleOwner": "Inhaber",
@@ -7261,7 +7267,8 @@
     "nudgeBookingPage": "Stellen Sie Ihre Buchungsseite auf Ihre Facebook-Seite, Google Maps und Ihr LINE-Profil, damit Kunden jederzeit buchen können.",
     "nudgeSignature": "Hinterlegen Sie einmal Ihre Unterschrift, dann können Kunden den Mietvertrag auf dem Handy unterschreiben.",
     "nudgePaymentMethods": "Hinterlegen Sie PromptPay oder Ihre Bankdaten, damit Kunden direkt auf ihrer Buchungsseite bezahlen können.",
-    "extensionHoldReturning": "{customer} verlängert nicht: {vehicle} kommt am {date} zurück. Die Tage danach sind wieder buchbar."
+    "extensionHoldReturning": "{customer} verlängert nicht: {vehicle} kommt am {date} zurück. Die Tage danach sind wieder buchbar.",
+    "reviewReceived": "{customer} hat eine {rating}-Sterne-Bewertung abgegeben."
   },
   "handoverPay": {
     "title": "Zahlung",
@@ -7295,5 +7302,48 @@
     "receipt": "Beleg {number}",
     "failed": "Zahlung konnte nicht erfasst werden. Bitte erneut versuchen.",
     "later": "Später"
+  },
+  "renterReview": {
+    "title": "Wie war Ihre Miete?",
+    "titleVehicle": "Wie war {vehicle}?",
+    "stars": "Ihre Bewertung",
+    "starCount": "{count, plural, one {# Stern} other {# Sterne}}",
+    "yourWords": "Ihr Kommentar (optional)",
+    "shownAs": "Angezeigt als",
+    "consent": "Meine Bewertung auf der Website von {business} zeigen",
+    "send": "Bewertung senden",
+    "sending": "Wird gesendet…",
+    "pickStars": "Wählen Sie 1 bis 5 Sterne.",
+    "failed": "Senden fehlgeschlagen. Bitte erneut versuchen.",
+    "thanks": "Danke für Ihre Bewertung!",
+    "google": "Auch auf Google posten",
+    "notFound": "Dieser Bewertungslink ist ungültig."
+  },
+  "reviewsPage": {
+    "title": "Bewertungen",
+    "back": "Kunden",
+    "average": "Durchschnitt",
+    "count": "{count, plural, one {# Bewertung} other {# Bewertungen}}",
+    "all": "Alle Bewertungen",
+    "pillAll": "alle",
+    "pillToCheck": "zu prüfen",
+    "pillPublished": "auf der Website",
+    "empty": "Noch keine Bewertungen",
+    "new": "Neu",
+    "test": "Test",
+    "published": "Auf der Website",
+    "hidden": "Ausgeblendet",
+    "noConsent": "Nicht für die Website",
+    "booking": "Buchung",
+    "yourReply": "Ihre Antwort",
+    "reply": "Antworten",
+    "editReply": "Antwort bearbeiten",
+    "publish": "Veröffentlichen",
+    "hide": "Ausblenden",
+    "save": "Speichern",
+    "saved": "Gespeichert",
+    "cancel": "Abbrechen",
+    "failed": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+    "googleLink": "Link zu Google-Bewertungen"
   }
 }

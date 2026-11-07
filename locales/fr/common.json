@@ -1025,7 +1025,8 @@
     "chargeFromDepositPlain": "La somme de {amount} a été prélevée sur votre caution pour des frais encourus pendant votre location.",
     "chargeRestToPay": "Il reste {amount} à régler ; vous pouvez effectuer le paiement depuis votre page de réservation.",
     "depositHeldForDamage": "Votre caution est retenue jusqu'à l'évaluation des dommages. Nous vous informerons du montant remboursé.",
-    "extendCheck": "votre location du véhicule {vehicle} se termine le {date}. Prolongez-vous ? Touchez Prolonger ou Je le rends ici : {link}"
+    "extendCheck": "votre location du véhicule {vehicle} se termine le {date}. Prolongez-vous ? Touchez Prolonger ou Je le rends ici : {link}",
+    "reviewRequest": "merci d’avoir loué le véhicule {vehicle}. Comment ça s’est passé ? Laissez un petit avis ici : {link}"
   },
   "directory": {
     "title": "Louer une voiture ou un scooter en Thaïlande",
@@ -1318,7 +1319,9 @@
     "collect_deposit": "Encaisser la caution",
     "collect_top_up": "Encaisser le complément",
     "collect_extension": "Encaisser la prolongation",
-    "collect_extras": "Encaisser les options"
+    "collect_extras": "Encaisser les options",
+    "job_review": "Avis de {name} à vérifier",
+    "job_review_open": "Ouvrir les avis"
   },
   "bookings": {
     "eyebrow": "Réservations",
@@ -2981,7 +2984,8 @@
     "in_share": "{count} · {percent} %",
     "in_trend": "Durée et dépenses",
     "in_avgLength": "Durée moyenne",
-    "in_avgSpend": "Dépense moyenne"
+    "in_avgSpend": "Dépense moyenne",
+    "pillReviews": "{count, plural, one {# avis} other {# avis}}"
   },
   "calendar": {
     "title": "Calendrier",
@@ -3629,7 +3633,8 @@
     "tl_paid": "Paiement",
     "tl_paidCharge": "A payé des frais",
     "tl_refunded": "Remboursement",
-    "tl_damage": "Dommages au retour : {count, plural, one {# élément} other {# éléments}}"
+    "tl_damage": "Dommages au retour : {count, plural, one {# élément} other {# éléments}}",
+    "tl_review": "A laissé un avis : {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Ajouter un véhicule",
@@ -4808,7 +4813,8 @@
     "kv_motorbikes": "Deux-roues",
     "kv_onRental": "En location",
     "kv_parked": "En pause",
-    "kv_confirm": "Continuer"
+    "kv_confirm": "Continuer",
+    "rem_review": "Demander un avis après le retour"
   },
   "accountPage": {
     "roleOwner": "Propriétaire",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "Mettez votre page de réservation sur votre page Facebook, Google Maps et votre profil LINE pour que vos clients réservent à tout moment.",
     "nudgeSignature": "Ajoutez votre signature une fois, et vos clients pourront signer le contrat de location sur leur téléphone.",
     "nudgePaymentMethods": "Ajoutez PromptPay ou vos coordonnées bancaires pour que vos clients paient directement depuis leur page de réservation.",
-    "extensionHoldReturning": "{customer} ne prolonge pas : le véhicule {vehicle} doit être rendu le {date}. Les jours suivants sont de nouveau réservables."
+    "extensionHoldReturning": "{customer} ne prolonge pas : le véhicule {vehicle} doit être rendu le {date}. Les jours suivants sont de nouveau réservables.",
+    "reviewReceived": "{customer} a laissé un avis {rating} étoiles."
   },
   "handoverPay": {
     "title": "Paiement",
@@ -7368,5 +7375,48 @@
     "receipt": "Reçu {number}",
     "failed": "Le paiement n’a pas pu être enregistré. Réessayez.",
     "later": "Plus tard"
+  },
+  "renterReview": {
+    "title": "Comment s’est passée votre location ?",
+    "titleVehicle": "Comment était le véhicule {vehicle} ?",
+    "stars": "Votre note",
+    "starCount": "{count, plural, one {# étoile} other {# étoiles}}",
+    "yourWords": "Votre avis (facultatif)",
+    "shownAs": "Affiché sous le nom",
+    "consent": "Afficher mon avis sur le site de {business}",
+    "send": "Envoyer l’avis",
+    "sending": "Envoi…",
+    "pickStars": "Choisissez de 1 à 5 étoiles.",
+    "failed": "Envoi impossible. Veuillez réessayer.",
+    "thanks": "Merci pour votre avis !",
+    "google": "Le publier aussi sur Google",
+    "notFound": "Ce lien d’avis n’est pas valide."
+  },
+  "reviewsPage": {
+    "title": "Avis",
+    "back": "Clients",
+    "average": "moyenne",
+    "count": "{count, plural, one {# avis} other {# avis}}",
+    "all": "Tous les avis",
+    "pillAll": "tous",
+    "pillToCheck": "à vérifier",
+    "pillPublished": "sur le site",
+    "empty": "Aucun avis pour l’instant",
+    "new": "Nouveau",
+    "test": "Test",
+    "published": "Sur le site",
+    "hidden": "Masqué",
+    "noConsent": "Pas pour le site",
+    "booking": "Réservation",
+    "yourReply": "Votre réponse",
+    "reply": "Répondre",
+    "editReply": "Modifier la réponse",
+    "publish": "Publier",
+    "hide": "Masquer",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "cancel": "Annuler",
+    "failed": "Enregistrement impossible. Veuillez réessayer.",
+    "googleLink": "Lien vers les avis Google"
   }
 }

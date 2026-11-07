@@ -1025,7 +1025,8 @@
     "extrasRemoved": "{names} 已從您的預訂中移除。",
     "extrasRefunded": "我們已退還加購項目的 {amount}，謝謝。",
     "extrasCredited": "您為加購項目支付的 {amount} 將從 {date} 到期的租金中扣除。",
-    "extendCheck": "您租用的{vehicle}將於 {date} 到期。您要續租嗎？請在這裡點選「續租」或「如期還車」：{link}"
+    "extendCheck": "您租用的{vehicle}將於 {date} 到期。您要續租嗎？請在這裡點選「續租」或「如期還車」：{link}",
+    "reviewRequest": "感謝您租用{vehicle}。體驗如何？歡迎在這裡留下簡短評價：{link}"
   },
   "common": {
     "kinds_car": "汽車",
@@ -1278,7 +1279,9 @@
     "collect_deposit": "收取押金",
     "collect_top_up": "收取補繳款",
     "collect_extension": "收取續租費",
-    "collect_extras": "收取加購費用"
+    "collect_extras": "收取加購費用",
+    "job_review": "待審核：{name} 的評價",
+    "job_review_open": "開啟評價"
   },
   "bookings": {
     "eyebrow": "預訂",
@@ -2941,7 +2944,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "租期和消費",
     "in_avgLength": "平均租期",
-    "in_avgSpend": "平均消費"
+    "in_avgSpend": "平均消費",
+    "pillReviews": "{count, plural, other {# 則評價}}"
   },
   "calendar": {
     "title": "行事曆",
@@ -3589,7 +3593,8 @@
     "tl_paid": "付款",
     "tl_paidCharge": "支付了費用",
     "tl_refunded": "退款",
-    "tl_damage": "還車時發現車損：{count, plural, other {# 處}}"
+    "tl_damage": "還車時發現車損：{count, plural, other {# 處}}",
+    "tl_review": "留下評價：{rating}/5"
   },
   "vehicleForm": {
     "addTitle": "新增車輛",
@@ -4768,7 +4773,8 @@
     "kv_motorbikes": "機車",
     "kv_onRental": "出租中",
     "kv_parked": "已停用",
-    "kv_confirm": "繼續"
+    "kv_confirm": "繼續",
+    "rem_review": "還車後邀請評價"
   },
   "accountPage": {
     "roleOwner": "負責人",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "把預約頁面放到您的 Facebook 粉絲專頁、Google 地圖和 LINE 個人檔案，讓顧客隨時預約。",
     "nudgeSignature": "加入一次簽名，顧客就能在手機上簽署租賃合約。",
     "nudgePaymentMethods": "加入 PromptPay 或銀行資料，顧客即可直接在預約頁面付款。",
-    "extensionHoldReturning": "{customer} 不續租：{vehicle}將於 {date} 歸還。之後的日期已重新開放預訂。"
+    "extensionHoldReturning": "{customer} 不續租：{vehicle}將於 {date} 歸還。之後的日期已重新開放預訂。",
+    "reviewReceived": "{customer} 給了 {rating} 顆星評價。"
   },
   "handoverPay": {
     "title": "付款",
@@ -7368,5 +7375,48 @@
     "receipt": "收據 {number}",
     "failed": "無法記錄付款，請再試一次。",
     "later": "稍後"
+  },
+  "renterReview": {
+    "title": "這次租車體驗如何？",
+    "titleVehicle": "{vehicle}怎麼樣？",
+    "stars": "您的評分",
+    "starCount": "{count, plural, other {#顆星}}",
+    "yourWords": "您的評價（選填）",
+    "shownAs": "顯示為",
+    "consent": "允許在{business}的網站上展示我的評價",
+    "send": "送出評價",
+    "sending": "送出中…",
+    "pickStars": "請選擇 1 到 5 顆星。",
+    "failed": "無法送出，請再試一次。",
+    "thanks": "感謝您的評價！",
+    "google": "也發布到 Google",
+    "notFound": "此評價連結無效。"
+  },
+  "reviewsPage": {
+    "title": "評價",
+    "back": "客戶",
+    "average": "平均",
+    "count": "{count, plural, other {# 則評價}}",
+    "all": "所有評價",
+    "pillAll": "全部",
+    "pillToCheck": "待審核",
+    "pillPublished": "網站展示",
+    "empty": "尚無評價",
+    "new": "新",
+    "test": "測試",
+    "published": "網站展示中",
+    "hidden": "已隱藏",
+    "noConsent": "不可展示",
+    "booking": "預訂",
+    "yourReply": "您的回覆",
+    "reply": "回覆",
+    "editReply": "編輯回覆",
+    "publish": "發布",
+    "hide": "隱藏",
+    "save": "儲存",
+    "saved": "已儲存",
+    "cancel": "取消",
+    "failed": "無法儲存，請再試一次。",
+    "googleLink": "Google 評價連結"
   }
 }

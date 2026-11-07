@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "Ang mga halaga sa “{}” ay nasa {} at pinanatili gaya ng nakasulat; {} ang gamit ng negosyo mo.",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "Nakita ang mga tab at row na ito: {}. Isa itong {} export: kilala ito ng RoveHQ at binabasa agad. Buksan ang import para suriin kung ano ang papasok bago may maidagdag.",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "Isa itong {} export: kilala ito ng RoveHQ at binabasa agad. Buksan ang import para basahin ito: susuriin mo ang nakita nito bago may maidagdag.",
-  "Read as {} export.": "Binasa bilang {} export."
+  "Read as {} export.": "Binasa bilang {} export.",
+  "Review not found.": "Hindi nahanap ang review.",
+  "This renter didn't agree to show their review.": "Hindi pumayag ang renter na ito na ipakita ang kanyang review.",
+  "Enter a web address.": "Maglagay ng web address."
 }

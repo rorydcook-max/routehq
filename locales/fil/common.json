@@ -1025,7 +1025,8 @@
     "extrasRemoved": "tinanggal ang {names} sa iyong booking.",
     "extrasRefunded": "isinasauli namin ang {amount} para sa iyong mga dagdag na item. Salamat.",
     "extrasCredited": "ang {amount} na binayaran mo para sa mga dagdag na item ay ibabawas sa iyong upa na bayarin sa {date}.",
-    "extendCheck": "matatapos ang upa mo sa {vehicle} sa {date}. Mag-e-extend ka ba? I-tap ang Mag-extend o Isasauli ko dito: {link}"
+    "extendCheck": "matatapos ang upa mo sa {vehicle} sa {date}. Mag-e-extend ka ba? I-tap ang Mag-extend o Isasauli ko dito: {link}",
+    "reviewRequest": "salamat sa pagrenta ng {vehicle}. Kumusta ito? Mag-iwan ng maikling review dito: {link}"
   },
   "common": {
     "kinds_car": "Mga Kotse",
@@ -1252,7 +1253,9 @@
     "collect_deposit": "Singilin ang deposito",
     "collect_top_up": "Singilin ang dagdag na bayad",
     "collect_extension": "Singilin ang extension",
-    "collect_extras": "Singilin ang extras"
+    "collect_extras": "Singilin ang extras",
+    "job_review": "Review mula kay {name} na susuriin",
+    "job_review_open": "Buksan ang mga review"
   },
   "bookings": {
     "eyebrow": "Mga Booking",
@@ -2915,7 +2918,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "Haba ng upa at gastos",
     "in_avgLength": "Average na haba",
-    "in_avgSpend": "Average na gastos"
+    "in_avgSpend": "Average na gastos",
+    "pillReviews": "{count, plural, one {# review} other {# review}}"
   },
   "calendar": {
     "title": "Kalendaryo",
@@ -3563,7 +3567,8 @@
     "tl_paid": "Bayad",
     "tl_paidCharge": "Nagbayad ng singil",
     "tl_refunded": "Refund",
-    "tl_damage": "Sira na nakita sa pagsauli: {count, plural, one {# item} other {# item}}"
+    "tl_damage": "Sira na nakita sa pagsauli: {count, plural, one {# item} other {# item}}",
+    "tl_review": "Nag-iwan ng review: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Magdagdag ng sasakyan",
@@ -4742,7 +4747,8 @@
     "kv_motorbikes": "Mga motor",
     "kv_onRental": "Nakaupa",
     "kv_parked": "Naka-park",
-    "kv_confirm": "Magpatuloy"
+    "kv_confirm": "Magpatuloy",
+    "rem_review": "Humingi ng review pagkatapos ibalik"
   },
   "accountPage": {
     "roleOwner": "May-ari",
@@ -7266,7 +7272,8 @@
     "nudgeBookingPage": "Ilagay ang iyong booking page sa iyong Facebook page, Google Maps at LINE profile para makapag-book ang mga customer anumang oras.",
     "nudgeSignature": "Idagdag ang iyong pirma nang isang beses, at makakapirma ang mga customer sa kasunduan sa pagrenta sa kanilang phone.",
     "nudgePaymentMethods": "Idagdag ang PromptPay o detalye ng bangko para direktang makapagbayad ang mga customer mula sa kanilang booking page.",
-    "extensionHoldReturning": "Hindi mag-e-extend si {customer}: dapat maisauli ang {vehicle} sa {date}. Bukas na ulit para sa booking ang mga susunod na araw."
+    "extensionHoldReturning": "Hindi mag-e-extend si {customer}: dapat maisauli ang {vehicle} sa {date}. Bukas na ulit para sa booking ang mga susunod na araw.",
+    "reviewReceived": "Nag-iwan si {customer} ng {rating}-star na review."
   },
   "handoverPay": {
     "title": "Bayad",
@@ -7300,5 +7307,48 @@
     "receipt": "Resibo {number}",
     "failed": "Hindi na-record ang bayad. Subukan ulit.",
     "later": "Mamaya"
+  },
+  "renterReview": {
+    "title": "Kumusta ang iyong rental?",
+    "titleVehicle": "Kumusta ang {vehicle}?",
+    "stars": "Iyong rating",
+    "starCount": "{count, plural, one {# star} other {# stars}}",
+    "yourWords": "Iyong review (opsyonal)",
+    "shownAs": "Ipapakita bilang",
+    "consent": "Ipakita ang review ko sa website ng {business}",
+    "send": "Ipadala ang review",
+    "sending": "Ipinapadala…",
+    "pickStars": "Pumili ng 1 hanggang 5 star.",
+    "failed": "Hindi naipadala. Pakisubukan ulit.",
+    "thanks": "Salamat sa iyong review!",
+    "google": "I-post din sa Google",
+    "notFound": "Hindi valid ang review link na ito."
+  },
+  "reviewsPage": {
+    "title": "Mga review",
+    "back": "Mga customer",
+    "average": "average",
+    "count": "{count, plural, one {# review} other {# review}}",
+    "all": "Lahat ng review",
+    "pillAll": "lahat",
+    "pillToCheck": "susuriin",
+    "pillPublished": "nasa website",
+    "empty": "Wala pang review",
+    "new": "Bago",
+    "test": "Test",
+    "published": "Nasa website",
+    "hidden": "Nakatago",
+    "noConsent": "Hindi para sa website",
+    "booking": "Booking",
+    "yourReply": "Iyong sagot",
+    "reply": "Sumagot",
+    "editReply": "I-edit ang sagot",
+    "publish": "I-publish",
+    "hide": "Itago",
+    "save": "I-save",
+    "saved": "Na-save",
+    "cancel": "Kanselahin",
+    "failed": "Hindi na-save. Pakisubukan ulit.",
+    "googleLink": "Link ng Google review"
   }
 }

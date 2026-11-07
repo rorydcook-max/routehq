@@ -291,5 +291,8 @@
   "Amounts in “{}” are in {} and are kept as written; your business uses {}.": "“{}” ထဲက ပမာဏတွေက {} ဖြစ်ပြီး ရေးထားတဲ့အတိုင်း ထားပါတယ်၊ သင့်လုပ်ငန်းက {} ကို သုံးပါတယ်။",
   "Found these tabs and rows: {}. This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to check what goes in before anything is added.": "တွေ့ရှိသည့် tab နဲ့ အတန်းများ- {}။ ဒါက {} ထုတ်ယူဖိုင် ဖြစ်ပါတယ်- RoveHQ က သိပြီး ချက်ချင်း ဖတ်ပါတယ်။ ဘာမှ မထည့်ခင် ဝင်မယ့်အရာကို စစ်ဖို့ ထည့်သွင်းမှုကို ဖွင့်ပါ။",
   "This is a {} export: RoveHQ recognizes it and reads it straight away. Open the import to read it: you check what it found before anything is added.": "ဒါက {} ထုတ်ယူဖိုင် ဖြစ်ပါတယ်- RoveHQ က သိပြီး ချက်ချင်း ဖတ်ပါတယ်။ ဖတ်ဖို့ ထည့်သွင်းမှုကို ဖွင့်ပါ- ဘာမှ မထည့်ခင် တွေ့ရှိတာကို သင် စစ်ကြည့်နိုင်ပါတယ်။",
-  "Read as {} export.": "{} ထုတ်ယူဖိုင်အဖြစ် ဖတ်ထားပါတယ်။"
+  "Read as {} export.": "{} ထုတ်ယူဖိုင်အဖြစ် ဖတ်ထားပါတယ်။",
+  "Review not found.": "သုံးသပ်ချက် မတွေ့ပါ။",
+  "This renter didn't agree to show their review.": "ဤငှားရမ်းသူသည် ၎င်း၏သုံးသပ်ချက်ကို ပြသရန် သဘောမတူခဲ့ပါ။",
+  "Enter a web address.": "ဝဘ်လိပ်စာ ထည့်ပါ။"
 }

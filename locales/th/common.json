@@ -1060,7 +1060,8 @@
     "extrasRemoved": "เราได้นำ {names} ออกจากการจองของคุณแล้ว",
     "extrasRefunded": "เราได้คืนเงินค่าบริการเสริม {amount} ให้คุณแล้ว ขอบคุณ",
     "extrasCredited": "เงิน {amount} ที่คุณชำระค่าบริการเสริม จะหักจากค่าเช่าที่ครบกำหนดวันที่ {date}",
-    "extendCheck": "การเช่า{vehicle}ของคุณจะครบกำหนดวันที่ {date} จะต่อสัญญาไหม แตะ \"ต่อสัญญา\" หรือ \"คืนรถ\" ได้ที่นี่: {link}"
+    "extendCheck": "การเช่า{vehicle}ของคุณจะครบกำหนดวันที่ {date} จะต่อสัญญาไหม แตะ \"ต่อสัญญา\" หรือ \"คืนรถ\" ได้ที่นี่: {link}",
+    "reviewRequest": "ขอบคุณที่เช่า{vehicle}กับเรา เป็นอย่างไรบ้าง ช่วยเขียนรีวิวสั้นๆ ได้ที่นี่: {link}"
   },
   "common": {
     "kinds_car": "รถยนต์",
@@ -1313,7 +1314,9 @@
     "collect_deposit": "เก็บมัดจำ",
     "collect_top_up": "เก็บเงินเพิ่ม",
     "collect_extension": "เก็บค่าต่อสัญญา",
-    "collect_extras": "เก็บค่าบริการเสริม"
+    "collect_extras": "เก็บค่าบริการเสริม",
+    "job_review": "รีวิวจาก {name} รอตรวจ",
+    "job_review_open": "เปิดรีวิว"
   },
   "bookings": {
     "eyebrow": "การจอง",
@@ -2976,7 +2979,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "ระยะเช่าและยอดใช้จ่าย",
     "in_avgLength": "ระยะเช่าเฉลี่ย",
-    "in_avgSpend": "ยอดใช้จ่ายเฉลี่ย"
+    "in_avgSpend": "ยอดใช้จ่ายเฉลี่ย",
+    "pillReviews": "{count, plural, other {# รีวิว}}"
   },
   "calendar": {
     "title": "ปฏิทิน",
@@ -3624,7 +3628,8 @@
     "tl_paid": "ชำระเงิน",
     "tl_paidCharge": "ชำระค่าใช้จ่ายเพิ่มเติม",
     "tl_refunded": "คืนเงิน",
-    "tl_damage": "พบรอยเสียหายตอนคืนรถ: {count, plural, other {# รายการ}}"
+    "tl_damage": "พบรอยเสียหายตอนคืนรถ: {count, plural, other {# รายการ}}",
+    "tl_review": "ให้รีวิว: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "เพิ่มรถ",
@@ -4804,7 +4809,8 @@
     "kv_motorbikes": "มอเตอร์ไซค์",
     "kv_onRental": "กำลังเช่าอยู่",
     "kv_parked": "พักไว้",
-    "kv_confirm": "ดำเนินการต่อ"
+    "kv_confirm": "ดำเนินการต่อ",
+    "rem_review": "ขอรีวิวหลังคืนรถ"
   },
   "accountPage": {
     "roleOwner": "เจ้าของ",
@@ -7341,7 +7347,8 @@
     "nudgeBookingPage": "ใส่ลิงก์หน้าจองของคุณใน Facebook, Google Maps และโปรไฟล์ LINE ให้ลูกค้าจองได้ตลอดเวลา",
     "nudgeSignature": "เพิ่มลายเซ็นของคุณครั้งเดียว แล้วลูกค้าเซ็นสัญญาเช่าบนมือถือได้เลย",
     "nudgePaymentMethods": "เพิ่ม PromptPay หรือบัญชีธนาคาร ให้ลูกค้าชำระเงินจากหน้าจองได้ทันที",
-    "extensionHoldReturning": "{customer} ไม่ต่อสัญญา: {vehicle} จะคืนวันที่ {date} วันหลังจากนั้นเปิดให้จองได้อีกครั้ง"
+    "extensionHoldReturning": "{customer} ไม่ต่อสัญญา: {vehicle} จะคืนวันที่ {date} วันหลังจากนั้นเปิดให้จองได้อีกครั้ง",
+    "reviewReceived": "{customer} ให้รีวิว {rating} ดาว"
   },
   "handoverPay": {
     "title": "ชำระเงิน",
@@ -7375,5 +7382,48 @@
     "receipt": "ใบเสร็จ {number}",
     "failed": "บันทึกการชำระเงินไม่สำเร็จ ลองอีกครั้ง",
     "later": "ไว้ทีหลัง"
+  },
+  "renterReview": {
+    "title": "การเช่าครั้งนี้เป็นอย่างไรบ้าง",
+    "titleVehicle": "{vehicle} เป็นอย่างไรบ้าง",
+    "stars": "คะแนนของคุณ",
+    "starCount": "{count, plural, other {# ดาว}}",
+    "yourWords": "รีวิวของคุณ (ไม่บังคับ)",
+    "shownAs": "แสดงในชื่อ",
+    "consent": "แสดงรีวิวของฉันบนเว็บไซต์ของ {business}",
+    "send": "ส่งรีวิว",
+    "sending": "กำลังส่ง…",
+    "pickStars": "เลือก 1 ถึง 5 ดาว",
+    "failed": "ส่งไม่สำเร็จ ลองอีกครั้งนะ",
+    "thanks": "ขอบคุณสำหรับรีวิว!",
+    "google": "โพสต์บน Google ด้วย",
+    "notFound": "ลิงก์รีวิวนี้ใช้ไม่ได้"
+  },
+  "reviewsPage": {
+    "title": "รีวิว",
+    "back": "ลูกค้า",
+    "average": "เฉลี่ย",
+    "count": "{count, plural, other {# รีวิว}}",
+    "all": "รีวิวทั้งหมด",
+    "pillAll": "ทั้งหมด",
+    "pillToCheck": "รอตรวจ",
+    "pillPublished": "บนเว็บไซต์",
+    "empty": "ยังไม่มีรีวิว",
+    "new": "ใหม่",
+    "test": "ทดสอบ",
+    "published": "บนเว็บไซต์",
+    "hidden": "ซ่อนอยู่",
+    "noConsent": "ไม่ให้แสดงบนเว็บ",
+    "booking": "การจอง",
+    "yourReply": "คำตอบของคุณ",
+    "reply": "ตอบกลับ",
+    "editReply": "แก้ไขคำตอบ",
+    "publish": "เผยแพร่",
+    "hide": "ซ่อน",
+    "save": "บันทึก",
+    "saved": "บันทึกแล้ว",
+    "cancel": "ยกเลิก",
+    "failed": "บันทึกไม่สำเร็จ ลองอีกครั้งนะ",
+    "googleLink": "ลิงก์รีวิว Google"
   }
 }

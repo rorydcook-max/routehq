@@ -1025,7 +1025,8 @@
     "extrasRefunded": "추가 항목에 대한 {amount}이 환불되었습니다. 감사합니다.",
     "extrasCredited": "추가 항목으로 지불하신 {amount}은 {date}에 청구될 임대료에서 차감됩니다.",
     "extrasRemoved": "{names} 항목이 예약에서 빠졌어요.",
-    "extendCheck": "{vehicle} 대여가 {date}에 끝나요. 연장하시나요? 여기에서 '연장할게요' 또는 '반납할게요'를 눌러 주세요: {link}"
+    "extendCheck": "{vehicle} 대여가 {date}에 끝나요. 연장하시나요? 여기에서 '연장할게요' 또는 '반납할게요'를 눌러 주세요: {link}",
+    "reviewRequest": "{vehicle}을(를) 이용해 주셔서 감사합니다. 어떠셨나요? 여기에서 짧은 리뷰를 남겨 주세요: {link}"
   },
   "common": {
     "kinds_car": "자동차",
@@ -1278,7 +1279,9 @@
     "collect_deposit": "보증금 받기",
     "collect_top_up": "추가금 받기",
     "collect_extension": "연장 요금 받기",
-    "collect_extras": "옵션 요금 받기"
+    "collect_extras": "옵션 요금 받기",
+    "job_review": "{name}님의 리뷰 확인",
+    "job_review_open": "리뷰 열기"
   },
   "bookings": {
     "eyebrow": "예약",
@@ -2941,7 +2944,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "대여 기간과 지출",
     "in_avgLength": "평균 기간",
-    "in_avgSpend": "평균 지출"
+    "in_avgSpend": "평균 지출",
+    "pillReviews": "{count, plural, other {리뷰 #개}}"
   },
   "calendar": {
     "title": "캘린더",
@@ -3589,7 +3593,8 @@
     "tl_paid": "결제",
     "tl_paidCharge": "추가 요금 결제",
     "tl_refunded": "환불",
-    "tl_damage": "반납 시 손상 발견: {count, plural, other {#건}}"
+    "tl_damage": "반납 시 손상 발견: {count, plural, other {#건}}",
+    "tl_review": "리뷰 작성: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "차량 추가",
@@ -4768,7 +4773,8 @@
     "kv_motorbikes": "오토바이",
     "kv_onRental": "대여 중",
     "kv_parked": "보관 중",
-    "kv_confirm": "계속"
+    "kv_confirm": "계속",
+    "rem_review": "반납 후 리뷰 요청"
   },
   "accountPage": {
     "roleOwner": "대표",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "예약 페이지를 Facebook 페이지, Google 지도, LINE 프로필에 올려 고객이 언제든 예약할 수 있게 하세요.",
     "nudgeSignature": "서명을 한 번 추가하면 고객이 휴대폰에서 대여 계약서에 서명할 수 있습니다.",
     "nudgePaymentMethods": "PromptPay 또는 은행 정보를 추가하면 고객이 예약 페이지에서 바로 결제할 수 있습니다.",
-    "extensionHoldReturning": "{customer} 님은 연장하지 않아요: {vehicle}은(는) {date}에 반납될 예정이에요. 그 이후 날짜는 다시 예약할 수 있어요."
+    "extensionHoldReturning": "{customer} 님은 연장하지 않아요: {vehicle}은(는) {date}에 반납될 예정이에요. 그 이후 날짜는 다시 예약할 수 있어요.",
+    "reviewReceived": "{customer}님이 별 {rating}개 리뷰를 남겼습니다."
   },
   "handoverPay": {
     "title": "결제",
@@ -7368,5 +7375,48 @@
     "receipt": "영수증 {number}",
     "failed": "결제를 기록하지 못했어요. 다시 시도해 주세요.",
     "later": "나중에"
+  },
+  "renterReview": {
+    "title": "렌트는 어떠셨나요?",
+    "titleVehicle": "{vehicle}은(는) 어떠셨나요?",
+    "stars": "내 평점",
+    "starCount": "{count, plural, other {별 #개}}",
+    "yourWords": "리뷰 (선택 사항)",
+    "shownAs": "표시 이름",
+    "consent": "{business} 웹사이트에 내 리뷰 공개",
+    "send": "리뷰 보내기",
+    "sending": "보내는 중…",
+    "pickStars": "별 1~5개를 선택해 주세요.",
+    "failed": "보내지 못했습니다. 다시 시도해 주세요.",
+    "thanks": "리뷰를 남겨 주셔서 감사합니다!",
+    "google": "Google에도 올리기",
+    "notFound": "유효하지 않은 리뷰 링크입니다."
+  },
+  "reviewsPage": {
+    "title": "리뷰",
+    "back": "고객",
+    "average": "평균",
+    "count": "{count, plural, other {리뷰 #개}}",
+    "all": "전체 리뷰",
+    "pillAll": "전체",
+    "pillToCheck": "확인 필요",
+    "pillPublished": "웹사이트 게시",
+    "empty": "아직 리뷰가 없습니다",
+    "new": "새 리뷰",
+    "test": "테스트",
+    "published": "웹사이트 게시 중",
+    "hidden": "숨김",
+    "noConsent": "웹사이트 비공개",
+    "booking": "예약",
+    "yourReply": "내 답글",
+    "reply": "답글",
+    "editReply": "답글 수정",
+    "publish": "게시",
+    "hide": "숨기기",
+    "save": "저장",
+    "saved": "저장됨",
+    "cancel": "취소",
+    "failed": "저장하지 못했습니다. 다시 시도해 주세요.",
+    "googleLink": "Google 리뷰 링크"
   }
 }

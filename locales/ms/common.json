@@ -1025,7 +1025,8 @@
     "chargeFromDepositPlain": "{amount} telah diambil daripada deposit anda untuk kos semasa sewaan anda.",
     "chargeRestToPay": "{amount} lagi masih perlu dibayar; anda boleh membayarnya dari halaman tempahan anda.",
     "depositHeldForDamage": "Deposit anda dipegang sehingga kerosakan dinilai. Kami akan memaklumkan jumlah yang dipulangkan.",
-    "extendCheck": "sewa {vehicle} anda tamat pada {date}. Adakah anda melanjutkan? Ketik Lanjutkan atau Saya pulangkan di sini: {link}"
+    "extendCheck": "sewa {vehicle} anda tamat pada {date}. Adakah anda melanjutkan? Ketik Lanjutkan atau Saya pulangkan di sini: {link}",
+    "reviewRequest": "terima kasih kerana menyewa {vehicle}. Bagaimana pengalaman anda? Tinggalkan ulasan ringkas di sini: {link}"
   },
   "directory": {
     "title": "Sewa kereta atau motosikal di Thailand",
@@ -1318,7 +1319,9 @@
     "collect_deposit": "Kutip deposit",
     "collect_top_up": "Kutip bayaran tambahan",
     "collect_extension": "Kutip lanjutan",
-    "collect_extras": "Kutip bayaran ekstra"
+    "collect_extras": "Kutip bayaran ekstra",
+    "job_review": "Ulasan daripada {name} untuk disemak",
+    "job_review_open": "Buka ulasan"
   },
   "bookings": {
     "eyebrow": "Tempahan",
@@ -2981,7 +2984,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "Tempoh sewa dan perbelanjaan",
     "in_avgLength": "Purata tempoh",
-    "in_avgSpend": "Purata perbelanjaan"
+    "in_avgSpend": "Purata perbelanjaan",
+    "pillReviews": "{count, plural, other {# ulasan}}"
   },
   "calendar": {
     "title": "Kalendar",
@@ -3629,7 +3633,8 @@
     "tl_paid": "Bayaran",
     "tl_paidCharge": "Membayar caj",
     "tl_refunded": "Bayaran balik",
-    "tl_damage": "Kerosakan semasa pemulangan: {count, plural, other {# perkara}}"
+    "tl_damage": "Kerosakan semasa pemulangan: {count, plural, other {# perkara}}",
+    "tl_review": "Memberi ulasan: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Tambah kenderaan",
@@ -4808,7 +4813,8 @@
     "kv_motorbikes": "Motosikal",
     "kv_onRental": "Sedang disewa",
     "kv_parked": "Digantung",
-    "kv_confirm": "Teruskan"
+    "kv_confirm": "Teruskan",
+    "rem_review": "Minta ulasan selepas pemulangan"
   },
   "accountPage": {
     "roleOwner": "Pemilik",
@@ -7334,7 +7340,8 @@
     "nudgeBookingPage": "Letakkan halaman tempahan anda di halaman Facebook, Google Maps dan profil LINE supaya pelanggan boleh menempah bila-bila masa.",
     "nudgeSignature": "Tambah tandatangan anda sekali, dan pelanggan boleh menandatangani perjanjian sewa di telefon.",
     "nudgePaymentMethods": "Tambah PromptPay atau butiran bank supaya pelanggan boleh membayar terus dari halaman tempahan mereka.",
-    "extensionHoldReturning": "{customer} tidak melanjutkan: {vehicle} dipulangkan pada {date}. Hari selepasnya dibuka semula untuk tempahan."
+    "extensionHoldReturning": "{customer} tidak melanjutkan: {vehicle} dipulangkan pada {date}. Hari selepasnya dibuka semula untuk tempahan.",
+    "reviewReceived": "{customer} memberikan ulasan {rating} bintang."
   },
   "handoverPay": {
     "title": "Bayaran",
@@ -7368,5 +7375,48 @@
     "receipt": "Resit {number}",
     "failed": "Bayaran tidak dapat direkod. Cuba lagi.",
     "later": "Kemudian"
+  },
+  "renterReview": {
+    "title": "Bagaimana sewaan anda?",
+    "titleVehicle": "Bagaimana {vehicle} itu?",
+    "stars": "Penilaian anda",
+    "starCount": "{count, plural, other {# bintang}}",
+    "yourWords": "Ulasan anda (pilihan)",
+    "shownAs": "Dipaparkan sebagai",
+    "consent": "Paparkan ulasan saya di laman web {business}",
+    "send": "Hantar ulasan",
+    "sending": "Menghantar…",
+    "pickStars": "Pilih 1 hingga 5 bintang.",
+    "failed": "Tidak dapat dihantar. Sila cuba lagi.",
+    "thanks": "Terima kasih atas ulasan anda!",
+    "google": "Siarkan juga di Google",
+    "notFound": "Pautan ulasan ini tidak sah."
+  },
+  "reviewsPage": {
+    "title": "Ulasan",
+    "back": "Pelanggan",
+    "average": "purata",
+    "count": "{count, plural, other {# ulasan}}",
+    "all": "Semua ulasan",
+    "pillAll": "semua",
+    "pillToCheck": "perlu disemak",
+    "pillPublished": "di laman web",
+    "empty": "Belum ada ulasan",
+    "new": "Baharu",
+    "test": "Ujian",
+    "published": "Di laman web",
+    "hidden": "Disembunyikan",
+    "noConsent": "Bukan untuk laman web",
+    "booking": "Tempahan",
+    "yourReply": "Balasan anda",
+    "reply": "Balas",
+    "editReply": "Edit balasan",
+    "publish": "Terbitkan",
+    "hide": "Sembunyikan",
+    "save": "Simpan",
+    "saved": "Disimpan",
+    "cancel": "Batal",
+    "failed": "Tidak dapat disimpan. Sila cuba lagi.",
+    "googleLink": "Pautan ulasan Google"
   }
 }

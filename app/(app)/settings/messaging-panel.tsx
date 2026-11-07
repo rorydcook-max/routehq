@@ -198,9 +198,6 @@ export function MessagingPanel({ channels, publicUrl }: { channels: Channel[]; p
             </li>
           ))}
       </ul>
-      <p className="text-sm font-medium text-[var(--muted)]">
-        <span className="font-bold text-[var(--foreground-secondary)]">{say("mp_marketplaceName")}:</span> {say("mp_marketplace")}
-      </p>
     </div>
   );
 }

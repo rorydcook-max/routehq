@@ -37,6 +37,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const [results, words] = await Promise.all([
     searchMarket({
       point: parsed.point,
+      within: parsed.within,
       stay: parsed.stay,
       filter: { kind: parsed.kind || null, size: parsed.size, engine: null, gearbox: parsed.gearbox },
       maxPerDay: parsed.max,
@@ -45,7 +46,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
     }),
     searchWords()
   ]);
-  const currency = results[0]?.vehicle.business.currency || "THB";
+  // The budget is in the businesses' own currency; with no results yet there's none to name.
+  const currency = results[0]?.vehicle.business.currency || "";
   const stay = parsed.stay;
   const where = parsed.place && !parsed.placeUnknown ? parsed.place : null;
   const heading = where ? t("rv.resultsIn", { place: where }) : t("rv.resultsAnywhere");
@@ -141,7 +143,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
           <fieldset className={s.filterGroup}>
             <legend>{t("rv.budget")}</legend>
             <label className={s.field}>
-              {t("rv.budgetLabel", { currency })}
+              {currency ? t("rv.budgetLabel", { currency }) : t("rv.budgetLabelPlain")}
               <input className={s.input} defaultValue={parsed.max ? String(parsed.max) : ""} inputMode="numeric" min="0" name="max" placeholder={t("rv.budgetAny")} step="50" type="number" />
             </label>
           </fieldset>

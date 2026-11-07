@@ -9,11 +9,18 @@
  * No server code: the proxy imports this file.
  */
 
+import { WORLD_COUNTRIES, WORLD_DESTINATIONS } from "@/lib/rove/destinations-world";
+
 export type Source = { label: string; url: string };
+
+/** World regions, for grouping destinations (the home page). */
+export type RoveRegion = "europe" | "americas" | "asia-pacific" | "africa-middle-east";
+export const ROVE_REGIONS: RoveRegion[] = ["europe", "americas", "asia-pacific", "africa-middle-east"];
 
 export type CountryRules = {
   slug: string;
   name: string;
+  group: RoveRegion;
   /** For place-coords lookups (lib/place-coords.ts country names). */
   placeCountry: string;
   /** The rules a renter needs everywhere in the country, each with where it comes from. */
@@ -43,6 +50,8 @@ export type Destination = {
   gettingAround: string[];
   /** When a monthly rental makes sense here (local context; the page adds real prices). */
   monthly: string;
+  /** Shown on the home page (a worldwide set; at most a few per country). */
+  featured?: boolean;
   sources: Source[];
 };
 
@@ -64,10 +73,11 @@ const SRC = {
 
 export const ROVE_SOURCES = SRC;
 
-export const COUNTRIES: Record<string, CountryRules> = {
+const ASIA_COUNTRIES: Record<string, CountryRules> = {
   thailand: {
     slug: "thailand",
     name: "Thailand",
+    group: "asia-pacific",
     placeCountry: "Thailand",
     licence: [
       "As a visitor you need your home driving license plus an International Driving Permit (IDP). Thailand's government lists IDPs issued under the 1949 Geneva Convention; the UK government tells UK drivers to carry the 1968 version. Get the type your licensing authority says is valid for Thailand before you travel.",
@@ -99,6 +109,7 @@ export const COUNTRIES: Record<string, CountryRules> = {
   indonesia: {
     slug: "indonesia",
     name: "Indonesia",
+    group: "asia-pacific",
     placeCountry: "Indonesia",
     licence: [
       "A foreign driving license on its own isn't enough in Indonesia: you need an International Driving Permit (or an Indonesian license). Make sure it covers the type of vehicle you'll drive."
@@ -123,11 +134,12 @@ export const COUNTRIES: Record<string, CountryRules> = {
   }
 };
 
-export const DESTINATIONS: Destination[] = [
+const ASIA_DESTINATIONS: Destination[] = [
   {
     country: "thailand",
     slug: "koh-samui",
     name: "Koh Samui",
+    featured: true,
     region: "Surat Thani",
     placeName: "Koh Samui",
     center: { lat: 9.512, lng: 100.0136 },
@@ -160,6 +172,7 @@ export const DESTINATIONS: Destination[] = [
     country: "thailand",
     slug: "phuket",
     name: "Phuket",
+    featured: true,
     region: "Phuket",
     placeName: "Phuket Town",
     center: { lat: 7.95, lng: 98.34 },
@@ -240,6 +253,7 @@ export const DESTINATIONS: Destination[] = [
     country: "indonesia",
     slug: "bali",
     name: "Bali",
+    featured: true,
     region: "Bali",
     placeName: "Denpasar",
     center: { lat: -8.55, lng: 115.17 },
@@ -253,6 +267,11 @@ export const DESTINATIONS: Destination[] = [
     sources: [SRC.auId]
   }
 ];
+
+/** Every country Rove has a page for: the rest of the world (lib/rove/destinations-world.ts) and Thailand/Indonesia. */
+export const COUNTRIES: Record<string, CountryRules> = { ...WORLD_COUNTRIES, ...ASIA_COUNTRIES };
+/** Every destination page. The home page shows the `featured` ones, grouped by world region. */
+export const DESTINATIONS: Destination[] = [...WORLD_DESTINATIONS, ...ASIA_DESTINATIONS];
 
 export function countryRules(slug: string): CountryRules | null {
   return COUNTRIES[slug] || null;

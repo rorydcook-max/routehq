@@ -231,6 +231,8 @@ export function reachFrom(vehicle: RoveVehicle, point: { lat: number; lng: numbe
 export type SearchSort = "price" | "price_desc" | "deposit" | "nearest";
 export type MarketSearch = {
   point: { lat: number; lng: number } | null;
+  /** A whole destination: vehicles based anywhere in it count (a big island like Crete is more than one town). */
+  within?: { center: { lat: number; lng: number }; radiusKm: number } | null;
   stay: Stay;
   filter: VehicleFilter;
   /** Most per day, in the vehicle's own currency; null for no limit. */
@@ -246,7 +248,8 @@ export async function searchMarket(input: MarketSearch): Promise<SearchResult[]>
   const results: SearchResult[] = [];
   for (const vehicle of vehicles) {
     if (!passesVehicleFilter(input.filter, vehicle.kind, vehicle.specs)) continue;
-    const reach = reachFrom(vehicle, input.point);
+    const inside = input.within && vehicle.area ? distanceKm(input.within.center, vehicle.area) <= input.within.radiusKm : false;
+    const reach = reachFrom(vehicle, input.point) || (inside ? { km: null, delivers: Boolean(vehicle.area && vehicle.area.radiusKm > 0) } : null);
     if (!reach) continue;
     if (input.deliveryOnly && !reach.delivers) continue;
     const quote = quoteFor(vehicle, input.stay);

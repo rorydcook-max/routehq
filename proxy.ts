@@ -10,6 +10,7 @@ import { DEFAULT_SITE_LOCALE, isSitePath, localizeSitePath, splitSiteLocale } fr
 import { SITE_INTERNAL_PREFIX, siteInternalPath } from "@/lib/site/internal-path";
 import { LEGAL_SLUGS } from "@/lib/site/legal-slugs";
 import { CUSTOMER_LOCALE_COOKIE, pickLocale } from "@/lib/i18n/customer-locale";
+import { COUNTRY_SLUGS } from "@/lib/rove/guide-slugs";
 import { parseRovePath, ROVE_DEFAULT_LOCALE, ROVE_INTERNAL_PREFIX, roveHasLocale, roveHref, roveInternalPath } from "@/lib/rove/paths";
 
 // custom_limits: an admin-set custom plan (returned by resolve_booking_host_v2, migration 0108).
@@ -106,6 +107,9 @@ const APP_TOP_LEVEL = new Set(
   "accept-invite,account,actions,amend,api,auth,book,booking-page,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,docs,faq,guides,home,legal,pricing,resources,switch,car-rental-software,scooter-rental-software,motorcycle-rental-software,booking-pages,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko,el,it,nl,pl,hr,tr".split(",")
 );
 
+/** Under one of Rove's sections (guides, vehicles, a country) on rove.rent, optionally after a language. */
+const ROVE_SECTION_MISS = new RegExp(`^/(?:[a-z]{2,3}(?:-[A-Z]{2})?/)?(?:guides|vehicles|${COUNTRY_SLUGS.join("|")})/`);
+
 /** Search engines and link previews: never sent to a language by their Accept-Language (they index each address as it is). */
 const BOT = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|lighthouse|headless/i;
 
@@ -150,7 +154,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.rewrite(url);
     }
     // Under one of Rove's sections but not a page (an unknown guide, vehicle or place): Rove's "not found".
-    if (/^\/(?:[a-z]{2,3}(?:-[A-Z]{2})?\/)?(?:guides|vehicles|thailand|indonesia)\//.test(pathname)) {
+    if (ROVE_SECTION_MISS.test(pathname)) {
       const url = request.nextUrl.clone();
       url.pathname = `${ROVE_INTERNAL_PREFIX}/${ROVE_DEFAULT_LOCALE}/guides/not-a-page`;
       return NextResponse.rewrite(url, { status: 404 });

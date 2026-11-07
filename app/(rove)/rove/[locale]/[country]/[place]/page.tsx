@@ -56,10 +56,16 @@ export default async function DestinationPage({ params }: Props) {
     .map((vehicle) => ({ vehicle, quote: quoteFor(vehicle, stay), reach: reachFrom(vehicle, null), next: nextFree(vehicle, today) }))
     .filter((row) => row.quote && row.next !== "open")
     .sort((a, b) => Number(Boolean(a.next)) - Number(Boolean(b.next)) || (a.quote?.perDay || 0) - (b.quote?.perDay || 0));
-  const money = (value: number) => roveMoney(value, stats.currency || "THB", locale);
+  // Price ranges in the listed businesses' own currency (only shown when there are listings).
+  const money = (value: number) => roveMoney(value, stats.currency || "USD", locale);
   const path = destinationPath(destination);
-  const others = DESTINATIONS.filter((other) => other !== destination);
-  const guides = GUIDES.filter((guide) => guide.related.includes(`${destination.country}/${destination.slug}`));
+  // The same country's other places first, then the worldwide set.
+  const others = [
+    ...DESTINATIONS.filter((other) => other !== destination && other.country === destination.country),
+    ...DESTINATIONS.filter((other) => other.country !== destination.country && other.featured)
+  ].slice(0, 12);
+  // Guides about this place, plus the two that apply everywhere (permits, insurance).
+  const guides = GUIDES.filter((guide) => guide.related.includes(`${destination.country}/${destination.slug}`) || guide.slug === "do-i-need-an-international-driving-permit" || guide.slug === "car-rental-insurance-explained");
 
   return (
     <div className={s.wrap}>

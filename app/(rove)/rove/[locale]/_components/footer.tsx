@@ -23,7 +23,7 @@ export async function RoveFooter({ locale: _locale }: { locale: string }) {
         <div>
           <p className={s.footerHead}>{t("rv.navDestinations")}</p>
           <ul className={s.footerList}>
-            {DESTINATIONS.map((destination) => (
+            {DESTINATIONS.filter((destination) => destination.featured).map((destination) => (
               <li key={destinationPath(destination)}>
                 <a href={destinationPath(destination)}>{t("rv.rentIn", { place: destination.name })}</a>
               </li>

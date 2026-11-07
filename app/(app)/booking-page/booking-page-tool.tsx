@@ -169,7 +169,7 @@ export function BookingPageTool({
             <div className="space-y-4">
               <LogoUploadSection logoUrl={logoUrl} onDone={reload} orgName={businessName} />
               {/* Part of the website draft (published with it): a wordmark logo already says the name. */}
-              <SwitchField checked={site.draft.showName} description={say("bt_showNameHint")} label={say("bt_showName")} onChange={(event) => site.update({ showName: event.target.checked })} />
+              <SwitchField checked={site.draft.showName} label={say("bt_showName")} onChange={(event) => site.update({ showName: event.target.checked })} />
               <BrandColourPart colour={colour} onSaved={reload} />
             </div>
           </Fold>

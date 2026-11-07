@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { DESTINATIONS, destinationPath } from "@/lib/rove/destinations";
+import { COUNTRIES, DESTINATIONS, destinationPath, ROVE_REGIONS } from "@/lib/rove/destinations";
 import { GUIDES } from "@/lib/rove/guides";
 import { vehiclesIn } from "@/lib/rove/market";
 import { roveHref } from "@/lib/rove/paths";
@@ -23,9 +23,15 @@ export async function generateMetadata({ params }: RoveParams): Promise<Metadata
 export default async function RoveHome({ params }: RoveParams) {
   const locale = await roveLocale(params);
   const t = await getTranslations("directory");
-  const [words, counts] = await Promise.all([searchWords(), Promise.all(DESTINATIONS.map(async (destination) => (await vehiclesIn(destination)).length))]);
-  // Places with vehicles first (in the list's order), then the rest.
-  const places = DESTINATIONS.map((destination, index) => ({ destination, count: counts[index] })).sort((a, b) => Number(b.count > 0) - Number(a.count > 0));
+  // A worldwide set (task "roverent2": rove.rent is for renters everywhere), grouped by region; each region's places
+  // with live vehicles first. Only real listings get a count.
+  const featured = DESTINATIONS.filter((destination) => destination.featured);
+  const [words, counts] = await Promise.all([searchWords(), Promise.all(featured.map(async (destination) => (await vehiclesIn(destination)).length))]);
+  const places = featured.map((destination, index) => ({ destination, count: counts[index], country: COUNTRIES[destination.country] }));
+  const regions = ROVE_REGIONS.map((region) => ({
+    region,
+    places: places.filter((place) => place.country?.group === region).sort((a, b) => Number(b.count > 0) - Number(a.count > 0))
+  })).filter((group) => group.places.length);
 
   return (
     <>
@@ -46,20 +52,25 @@ export default async function RoveHome({ params }: RoveParams) {
         <div className={s.wrap}>
           <h2 className={s.sectionTitle}>{t("rv.destinationsTitle")}</h2>
           <p className={s.sectionLede}>{t("rv.destinationsLede")}</p>
-          <div className={s.signs}>
-            {places.map(({ destination, count }) => (
-              <a className={count ? s.sign : s.signQuiet} href={destinationPath(destination)} key={destinationPath(destination)}>
-                <span>
-                  <span className={s.signName}>{destination.name}</span>
-                  <span className={s.signRegion}>{destination.country === "thailand" ? destination.region : `${destination.region}, Indonesia`}</span>
-                </span>
-                <span className={s.signCount}>
-                  <span>{count ? t("rv.vehicleCount", { count }) : t("rv.noListingsYet")}</span>
-                  <i aria-hidden="true" className="ti ti-arrow-up-right" style={{ fontSize: 20 }} />
-                </span>
-              </a>
-            ))}
-          </div>
+          {regions.map((group) => (
+            <div key={group.region}>
+              <h3 className={s.regionTitle}>{t(`rv.region_${group.region}`)}</h3>
+              <div className={s.signs}>
+                {group.places.map(({ destination, count, country }) => (
+                  <a className={count ? s.sign : s.signQuiet} href={destinationPath(destination)} key={destinationPath(destination)}>
+                    <span>
+                      <span className={s.signName}>{destination.name}</span>
+                      <span className={s.signRegion}>{country?.name}</span>
+                    </span>
+                    <span className={s.signCount}>
+                      <span>{count ? t("rv.vehicleCount", { count }) : ""}</span>
+                      <i aria-hidden="true" className="ti ti-arrow-up-right" style={{ fontSize: 20 }} />
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -103,7 +114,8 @@ export default async function RoveHome({ params }: RoveParams) {
           <h2 className={s.sectionTitle}>{t("rv.guidesTitle")}</h2>
           <p className={s.sectionLede}>{t("rv.guidesLede")}</p>
           <div className={s.cardGrid}>
-            {GUIDES.map((guide) => (
+            {/* The worldwide guides (listed first); the rest are on /guides. */}
+            {GUIDES.slice(0, 4).map((guide) => (
               <a className={s.guideCard} href={`/guides/${guide.slug}`} key={guide.slug} lang="en">
                 <span className={s.h3}>{guide.title}</span>
                 <span className={s.muted} style={{ display: "block", marginTop: 8 }}>

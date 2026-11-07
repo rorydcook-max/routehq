@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getPublishedReviews, getReviewStats } from "@/lib/reviews";
-import { COUNTRIES, DESTINATIONS, destinationPath } from "@/lib/rove/destinations";
+import { DESTINATIONS, destinationPath } from "@/lib/rove/destinations";
 import { distanceKm } from "@/lib/place-coords";
 import { extrasForVehicle, findVehicle, loadMarket, quoteFor, roveToday, type Stay } from "@/lib/rove/market";
 import { roveHref } from "@/lib/rove/paths";
@@ -54,7 +54,6 @@ export default async function VehiclePage({ params, searchParams }: Props) {
   const [reviews, stats, market] = await Promise.all([getPublishedReviews(business.organizationId, 6), getReviewStats(business.organizationId), loadMarket()]);
   const fleetCount = market.vehicles.filter((other) => other.business.organizationId === business.organizationId).length;
   const destination = destinationOf(vehicle);
-  const country = destination ? COUNTRIES[destination.country] : null;
   const place = business.town || business.region;
   const fullName = `${vehicle.name}${vehicle.year ? ` ${vehicle.year}` : ""}`;
   const path = `/vehicles/${vehicle.id}`;
@@ -166,7 +165,8 @@ export default async function VehiclePage({ params, searchParams }: Props) {
             <ul className={s.list}>
               {vehicle.area && vehicle.area.radiusKm > 0 ? <li>{t("rv.includedDelivery", { km: Math.round(vehicle.area.radiusKm), place })}</li> : <li>{t("rv.includedPickup", { place })}</li>}
               <li>{t("rv.includedDirect", { business: business.name })}</li>
-              {country?.slug === "thailand" ? <li>{t("rv.includedCmi", { business: business.name })}</li> : null}
+              {/* Thailand's compulsory motor insurance: only for vehicles of a business in Thailand. */}
+              {business.country.toLowerCase() === "thailand" ? <li>{t("rv.includedCmi", { business: business.name })}</li> : null}
             </ul>
             {extras.length ? (
               <>

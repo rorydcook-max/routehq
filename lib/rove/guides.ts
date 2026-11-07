@@ -1,4 +1,5 @@
 import { ROVE_SOURCES as S, type Source } from "@/lib/rove/destinations";
+import { WORLD_SOURCES as W } from "@/lib/rove/destinations-world";
 
 /**
  * rove.rent's renter guides (task "roverent", 7 Nov 2026): short, practical, and sourced. English only for now.
@@ -25,7 +26,192 @@ export type Guide = {
 
 const GOVUK_IDP: Source = { label: "GOV.UK: international driving permits", url: "https://www.gov.uk/driving-abroad/international-driving-permit" };
 
+// Worldwide guides first (task "roverent2"): rove.rent is for renters everywhere.
 export const GUIDES: Guide[] = [
+  {
+    slug: "do-i-need-an-international-driving-permit",
+    title: "Do I need an international driving permit? A country-by-country guide for renters",
+    description: "Which countries ask visitors for an international driving permit, which convention version they accept, and what else to carry, for popular rental destinations.",
+    standfirst: "An IDP is a translation of your license, and some countries require one while others don't. Here's how it works and what popular destinations ask for.",
+    published: "2026-11-07",
+    updated: "2026-11-07",
+    related: ["japan/okinawa", "greece/crete", "united-states/maui", "thailand/koh-samui", "indonesia/bali", "morocco/marrakech"],
+    body: [
+      { type: "h2", text: "What an IDP is, and what it isn't" },
+      {
+        type: "p",
+        text: "An International Driving Permit translates your license into a standard format recognized under international road-traffic conventions. It only works alongside your full license from home, and it only covers the vehicle categories your license covers. You get it in the country that issued your license, before you travel."
+      },
+      {
+        type: "p",
+        text: "There are three versions, named after the conventions behind them: 1926, 1949 and 1968. A country accepts the version (or versions) of the conventions it belongs to, so the right one depends on where you're going."
+      },
+      { type: "h2", text: "What popular destinations ask for" },
+      {
+        type: "ul",
+        items: [
+          "European Union: a license from an EU or EEA country is valid across the EU. Visitors from elsewhere should check each country; the UK government lists Portugal, Greece, Italy and Croatia under the 1968 convention, and Spain and Malta under 1949.",
+          "Japan: only the paper IDP under the 1949 Geneva Convention is accepted. Licenses from Switzerland, Germany, France, Belgium, Monaco and Taiwan are used instead with an authorized Japanese translation. You can drive for up to a year after arriving.",
+          "United States: visitors can generally drive on their home license, but rules vary by state and an IDP may be needed (the 1949 version). Check each state you'll drive in, and the rental business's own rules.",
+          "New Zealand: you can drive on a current overseas license for a limited time; if it isn't in English, carry an approved English translation.",
+          "Costa Rica: a valid home license works for the length of your tourist stay, normally up to 90 days.",
+          "United Arab Emirates: visitors from more than 30 countries can drive on their home license on a visit visa; others need an IDP.",
+          "Morocco: the UK government says UK drivers need the 1968 IDP, and that the 1949 version is no longer accepted.",
+          "Thailand and Indonesia: visitors need an IDP with their license, and for scooters both must include motorcycles. See our Thailand and Bali guides."
+        ]
+      },
+      { type: "h2", text: "Rental businesses can ask for more" },
+      {
+        type: "p",
+        text: "Even where the law doesn't require an IDP, a rental business may, along with a minimum age or a year or more of driving experience. If a business on Rove asks for documents, they'll say so when they confirm your booking."
+      },
+      { type: "h2", text: "Scooters and motorbikes" },
+      {
+        type: "p",
+        text: "A car license doesn't automatically cover a scooter. In Greece, for example, you need at least category A1 (light motorcycle) to rent a moped. Riding without the right license can also mean your travel insurance won't pay out after an accident."
+      }
+    ],
+    sources: [W.idpTable, W.jp, W.ukUs, W.nz, W.crLicense, W.uae, W.ukMa, W.ukGr, S.thGov, S.ukId]
+  },
+  {
+    slug: "car-rental-insurance-explained",
+    title: "Car rental insurance explained: CDW, excess and deposits",
+    description: "What a collision damage waiver covers, what the excess is, why a deposit is held on your card, and how to avoid surprise charges when you rent a car or scooter abroad.",
+    standfirst: "Rental cover is full of acronyms. Here's what CDW, excess and deposits mean, and what to check before you sign.",
+    published: "2026-11-07",
+    updated: "2026-11-07",
+    related: ["portugal/algarve", "spain/mallorca", "united-states/miami-florida-keys", "mexico/cancun-riviera-maya", "united-arab-emirates/dubai"],
+    body: [
+      { type: "h2", text: "Third-party liability" },
+      {
+        type: "p",
+        text: "Liability insurance covers damage or injury you cause to other people. In the EU every rental vehicle must have it, normally included in the price. In the UAE third-party cover is included by law. In Mexico liability cover from a Mexican insurer is required, and US or Canadian policies aren't valid there."
+      },
+      { type: "h2", text: "Collision damage waiver (CDW) and the excess" },
+      {
+        type: "p",
+        text: "A CDW limits what you pay if the rental vehicle itself is damaged, but it rarely removes the cost completely. What's left is the excess: the most you'd pay toward damage. A CDW often excludes tires and glass, so check what yours covers."
+      },
+      {
+        type: "p",
+        text: "Rental businesses often sell extra cover that lowers the excess (sometimes to zero). It can be expensive. Independent excess insurance is often cheaper, but you'd pay the business first and claim the money back."
+      },
+      { type: "h2", text: "Deposits" },
+      {
+        type: "p",
+        text: "The deposit is usually a hold on a credit card in the driver's name. You can't spend that amount while it's held, and it's released when the vehicle comes back without damage, fines or unpaid tolls. In the UAE, for example, it should be released within 30 days. On Rove, each vehicle shows its deposit before you book."
+      },
+      { type: "h2", text: "Avoiding surprise charges" },
+      {
+        type: "ul",
+        items: [
+          "Before you drive away, walk round the vehicle with the business and photograph or film it from every side, inside too, including the fuel level. Make sure any damage is written on the handover form.",
+          "Check the fuel policy, any mileage limit, and the price of extras like child seats.",
+          "Keep copies of the contract and the pick-up and return reports.",
+          "If a dispute with a business in another EU country goes nowhere, your country's European Consumer Centre can help for free."
+        ]
+      },
+      { type: "h2", text: "Scooters and quads" },
+      {
+        type: "p",
+        text: "Cover sold with scooters and quads is often third-party only, so you'd pay for damage to the vehicle itself. Many travel policies exclude quad biking, and riding without the right license can void your cover."
+      }
+    ],
+    sources: [W.renting, W.euRental, W.uae, W.mxIns, W.ukGr, { label: "European Consumer Centre Czech Republic: holiday with a rental car", url: "https://evropskyspotrebitel.gov.cz/articles/holiday-with-a-rental-car-get-ready-before-you-turn-the-key/" }]
+  },
+  {
+    slug: "renting-a-car-in-europe",
+    title: "Renting a car in Europe: licenses, tolls, city zones and what to carry",
+    description: "What visitors need to rent and drive a car in Europe: license and age rules, electronic tolls, Italy's ZTL zones, compulsory kit, drink-drive limits and insurance.",
+    standfirst: "Europe's rules vary from country to country. These are the ones that catch visitors out most.",
+    published: "2026-11-07",
+    updated: "2026-11-07",
+    related: ["portugal/algarve", "spain/mallorca", "italy/amalfi-coast", "greece/crete", "croatia/split", "malta/malta-and-gozo"],
+    body: [
+      { type: "h2", text: "Licenses and age" },
+      {
+        type: "p",
+        text: "A license from an EU or EEA country is valid across the EU. With a license from elsewhere, check each country you'll drive in; some ask for an International Driving Permit. The minimum age to drive a car is 18 in Portugal, Spain, Greece, Italy and Croatia, but rental businesses often set their own minimum (21 is common in Malta) and may charge more under 25."
+      },
+      { type: "h2", text: "Tolls and city zones" },
+      {
+        type: "ul",
+        items: [
+          "Portugal: some motorways take electronic tolls only. Ask whether the car has a toll transponder.",
+          "Italy: many town centers are limited traffic zones (ZTL) enforced by cameras. Driving in without a permit brings a fine, often sent on later through the rental business.",
+          "Spain: some cities have low-emission zones, and Barcelona asks foreign vehicles to register in advance."
+        ]
+      },
+      { type: "h2", text: "What the car must carry" },
+      {
+        type: "p",
+        text: "In Croatia every car must carry a warning triangle, a first-aid kit and reflective vests. Check they're in the car at pick-up. Carry your license and ID whenever you drive; it's mandatory in Portugal."
+      },
+      { type: "h2", text: "On the road" },
+      {
+        type: "ul",
+        items: [
+          "Everyone drives on the right except in Malta, Cyprus, Ireland and the UK.",
+          "The usual drink-drive limit in Portugal, Spain and Greece is 0.05%, lower for new drivers.",
+          "In Spain using a phone while driving is illegal even when pulled over, and children under 1.35 m need a child seat."
+        ]
+      },
+      { type: "h2", text: "Insurance" },
+      {
+        type: "p",
+        text: "Third-party liability is included with every EU rental. Damage to the car itself is usually covered by a CDW with an excess; see our guide to CDW, excess and deposits."
+      }
+    ],
+    sources: [W.euRental, W.idpTable, W.racPt, W.racEs, W.racIt, W.racHr, W.racMt, W.racGr, W.ukEs, W.ukPt, W.sides]
+  },
+  {
+    slug: "renting-a-scooter-in-greece",
+    title: "Renting a scooter or quad in Greece",
+    description: "The license you need to rent a moped, scooter or quad in Greece, helmet rules and fines, insurance gaps and safety tips for the islands.",
+    standfirst: "Scooters and quads are everywhere on the Greek islands. The license rules are stricter than many visitors expect.",
+    published: "2026-11-07",
+    updated: "2026-11-07",
+    related: ["greece/santorini", "greece/crete"],
+    body: [
+      { type: "h2", text: "The license you need" },
+      {
+        type: "p",
+        text: "To rent a moped or scooter in Greece you need a valid license with at least category A1 (light motorcycle). A car license alone isn't enough, and the UK's category P for mopeds up to 50 cc isn't valid in Greece. Provisional licenses aren't valid for any vehicle."
+      },
+      { type: "h2", text: "Helmets" },
+      {
+        type: "p",
+        text: "Riders and passengers on mopeds and quads must wear helmets. If police stop you without one, they will fine you and take your license, and riding without one can invalidate your insurance."
+      },
+      { type: "h2", text: "Quads: take extra care" },
+      {
+        type: "ul",
+        items: [
+          "Quad bikes cause serious injuries and deaths every year. Get proper instructions before you ride, and remember you're sharing the road with bigger, faster traffic.",
+          "Insurance sold with a quad is usually third-party only: the business will likely charge you for any damage to the quad itself.",
+          "Many travel policies treat quad biking as an extreme sport and exclude it. Read your policy before you ride."
+        ]
+      },
+      { type: "h2", text: "On the road" },
+      {
+        type: "ul",
+        items: [
+          "Greece drives on the right.",
+          "Traffic can be fast and chaotic, and drivers don't always stop at pedestrian crossings.",
+          "Drink-driving is a serious offense, with fines and possible prison."
+        ]
+      },
+      { type: "h2", text: "Before you ride away" },
+      {
+        type: "ul",
+        items: [
+          "Check the vehicle is in good condition: brakes, tires and lights.",
+          "Photograph it with the business, including any existing damage, and agree the deposit and return time."
+        ]
+      }
+    ],
+    sources: [W.ukGr, W.racGr, W.renting]
+  },
   {
     slug: "renting-a-scooter-in-thailand",
     title: "Renting a scooter in Thailand: licenses, helmets and insurance",

@@ -343,7 +343,16 @@
   font-size: 14px;
 }
 
-/* Destination signs */
+/* Destination signs, grouped by world region */
+.regionTitle {
+  margin: 32px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--rv-muted);
+}
+.regionTitle + .signs {
+  margin-top: 12px;
+}
 .signs {
   display: grid;
   gap: 10px;

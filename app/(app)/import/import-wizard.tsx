@@ -11,10 +11,24 @@ import { IMPORT_FIELD_GROUPS, IMPORT_FIELDS } from "@/lib/import/fields";
 import type { ImportPreview, PreviewCustomer, PreviewRental, PreviewTransaction, PreviewVehicle, Problem } from "@/lib/import/preview";
 import { previewCounts } from "@/lib/import/preview";
 import { answerQuestion, importQuestions, type ImportQuestion } from "@/lib/import/questions";
-import { distanceKey } from "@/lib/business-units";
+import { businessCurrency, distanceKey } from "@/lib/business-units";
+import { currencySymbol } from "@/components/currency-symbol";
 import { SOFTWARE, softwareById } from "@/lib/import/software";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
+
+/** A price box with the business's currency symbol inside it, not in the label (7 Nov 2026). */
+function PriceBox({ className, value, onChange }: { className: string; value: number | null | undefined; onChange: (value: number | null) => void }) {
+  const symbol = currencySymbol(businessCurrency());
+  return (
+    <span className="relative block">
+      <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-2.5 mt-1 flex items-center font-semibold text-[var(--foreground-secondary)]">
+        {symbol}
+      </span>
+      <input className={className} inputMode="numeric" onChange={(event) => onChange(event.target.value ? Number(event.target.value) : null)} style={{ paddingInlineStart: `calc(1rem + ${Math.max(1, symbol.length)}ch)` }} value={value ?? ""} />
+    </span>
+  );
+}
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[15px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
@@ -69,7 +83,7 @@ function QuickQuestions({ questions, busy, onAnswer, t, locale }: { questions: I
               </>
             ) : (
               <>
-                <p className="text-sm text-[var(--foreground)]">{t("q_rent", { sheet: question.sheet, amount: question.amount.toLocaleString(numberLocale(locale)), customer: question.customer || "—" })}</p>
+                <p className="text-sm text-[var(--foreground)]">{t("q_rent", { sheet: question.sheet, amount: question.amount.toLocaleString(numberLocale(locale)), customer: question.customer || "—", symbol: currencySymbol(businessCurrency()) })}</p>
                 <div className="mt-1.5 flex flex-wrap gap-2">
                   {(["day", "week", "month"] as const).map((period) => choice(question, period, t(`q_per_${period}`), question.current === period))}
                 </div>
@@ -863,15 +877,15 @@ function VehicleCard({ vehicle, onChange, t }: { vehicle: PreviewVehicle; onChan
         </label>
         <label className="block text-xs font-semibold text-[var(--muted)]">
           {t("c_daily")}
-          <input className={smallInput} inputMode="numeric" onChange={(event) => onChange({ dailyRate: event.target.value ? Number(event.target.value) : null })} value={vehicle.dailyRate ?? ""} />
+          <PriceBox className={smallInput} onChange={(value) => onChange({ dailyRate: value })} value={vehicle.dailyRate} />
         </label>
         <label className="block text-xs font-semibold text-[var(--muted)]">
           {t("c_weekly")}
-          <input className={smallInput} inputMode="numeric" onChange={(event) => onChange({ weeklyRate: event.target.value ? Number(event.target.value) : null })} value={vehicle.weeklyRate ?? ""} />
+          <PriceBox className={smallInput} onChange={(value) => onChange({ weeklyRate: value })} value={vehicle.weeklyRate} />
         </label>
         <label className="block text-xs font-semibold text-[var(--muted)]">
           {t("c_monthly")}
-          <input className={smallInput} inputMode="numeric" onChange={(event) => onChange({ monthlyRate: event.target.value ? Number(event.target.value) : null })} value={vehicle.monthlyRate ?? ""} />
+          <PriceBox className={smallInput} onChange={(value) => onChange({ monthlyRate: value })} value={vehicle.monthlyRate} />
         </label>
       </div>
     </div>

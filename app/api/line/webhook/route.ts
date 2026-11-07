@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       } else if (result.reason === "expired") {
         await reply(e.replyToken, "That code has expired. Get a new one in RoveHQ → Settings → LINE and send it here.");
       } else {
-        await reply(e.replyToken, "That code wasn't recognised. Check it in RoveHQ → Settings → LINE and try again.");
+        await reply(e.replyToken, "That code wasn't recognized. Check it in RoveHQ → Settings → LINE and try again.");
       }
     }
   }

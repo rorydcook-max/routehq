@@ -3,7 +3,7 @@ locale: it
 language: Italian
 currency: EUR
 prevailing_language:
-  en: the version more favourable to the Renter
+  en: the version more favorable to the Renter
   local: la versione più favorevole al Conduttore
 local_language:
   en: Italian
@@ -68,7 +68,7 @@ words:
     local: (da compilare)
 sources:
   - url: https://eur-lex.europa.eu/eli/dir/1993/13/oj
-    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favour (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
+    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favor (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
   - url: https://eur-lex.europa.eu/eli/dir/2011/83/oj
     supports: "Consumer Rights Directive 2011/83/EU: total price including all compulsory charges (Arts 5-6); Art 16(l) no withdrawal right for car rental for a specific date or period (charges.1, cancellation.7)."
   - url: https://commission.europa.eu/topics/consumers/consumer-rights-and-complaints/enforcement-consumer-protection/coordinated-actions/other-travel-services_en
@@ -76,9 +76,9 @@ sources:
   - url: https://eur-lex.europa.eu/eli/dir/2009/103/oj
     supports: "Motor Insurance Directive 2009/103/EC (as amended by 2021/2118): compulsory third-party cover with EU minimum amounts, valid across the EU (insurance.1)."
   - url: https://eur-lex.europa.eu/eli/dir/2006/126/oj
-    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licences recognised in every member state (renter.2)."
+    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licenses recognized in every member state (renter.2)."
   - url: https://eur-lex.europa.eu/eli/dir/2015/413/oj
-    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offences, so fines follow foreign renters (fines.1)."
+    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offenses, so fines follow foreign renters (fines.1)."
   - url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
     supports: "GDPR: controller duties, lawful bases (contract, legal obligation for giving driver details to authorities, legitimate interest), data subject rights (data.1, data.2)."
   - url: https://eur-lex.europa.eu/eli/reg/2014/910/oj
@@ -94,11 +94,11 @@ sources:
   - url: https://www.brocardi.it/codice-della-strada/titolo-vi/capo-i/sezione-i/art196.html
     supports: "Highway Code Art 196: in rental without driver, joint liability falls on the renter (fines.2)."
   - url: https://miolegale.it/codici/codice-strada/art-126-bis/
-    supports: "Highway Code Art 126-bis: communication of the driver's details for licence points (fines.2)."
+    supports: "Highway Code Art 126-bis: communication of the driver's details for license points (fines.2)."
   - url: https://www.brocardi.it/codice-del-consumo/parte-iii/titolo-i/art33.html
     supports: "Consumer Code Arts 33-38: unfair terms, including the consumer's court (general.7, general.5)."
   - url: https://www.rac.co.uk/drive/travel/country/italy
-    supports: "RAC Italy: UK licences need no IDP; helmets for moped, motorcycle and quad riders; 0.05% limit, zero for new and professional drivers; ZTL camera zones; winter tyres or chains 15 Nov-15 Apr (Valle d'Aosta from 15 Oct); usual minimum hire age 21 (use.2, use.4, fines.2, use.8_it)."
+    supports: "RAC Italy: UK licenses need no IDP; helmets for moped, motorcycle and quad riders; 0.05% limit, zero for new and professional drivers; ZTL camera zones; winter tires or chains 15 Nov-15 Apr (Valle d'Aosta from 15 Oct); usual minimum hire age 21 (use.2, use.4, fines.2, use.8_it)."
   - url: https://www.garanteprivacy.it/
     supports: Italian Data Protection Authority (data.2).
 title:
@@ -168,10 +168,10 @@ sections:
         en: Email
         local: E-mail
       - key: renter_licence
-        en: Driving licence number, categories and issuing country
+        en: Driver's license number, categories and issuing country
         local: N. patente, categorie e paese di rilascio
       - key: renter_licence_expiry
-        en: Licence expiry date / date first issued
+        en: License expiry date / date first issued
         local: Scadenza patente / data del primo rilascio
       - key: renter_idp
         en: International Driving Permit (number / not required)
@@ -180,18 +180,18 @@ sections:
         en: Emergency contact (name and phone)
         local: Contatto di emergenza (nome e telefono)
       - key: driver2_details
-        en: Additional driver (name, ID, licence), if any
+        en: Additional driver (name, ID, license), if any
         local: Conducente aggiuntivo (nome, documento, patente), se presente
     clauses:
       - id: renter.1
         en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
         local: Il Conduttore conferma che i dati sopra indicati sono veri e completi e che vi figurano tutte le persone che guideranno il veicolo. Solo il Conduttore e il conducente aggiuntivo indicato possono guidarlo.
       - id: renter.2
-        en: Every driver must hold a valid driving licence for this class of vehicle (category B for cars; AM, A1, A2 or A for motorcycles; in Italy a category B licence also allows motorcycles up to 125 cc and 11 kW) and carry it while driving. Licences from the EU and EEA are valid. A visitor with a licence from outside the EU and EEA must carry an International Driving Permit or an official translation with it.
+        en: Every driver must hold a valid driver's license for this class of vehicle (category B for cars; AM, A1, A2 or A for motorcycles; in Italy a category B license also allows motorcycles up to 125 cc and 11 kW) and carry it while driving. Licenses from the EU and EEA are valid. A visitor with a license from outside the EU and EEA must carry an International Driving Permit or an official translation with it.
         local: Ogni conducente deve essere titolare di una patente valida per questa categoria di veicolo (categoria B per le auto; AM, A1, A2 o A per le moto; in Italia la patente B consente anche la guida di moto fino a 125 cc e 11 kW) e portarla con sé durante la guida. Le patenti dell'UE e del SEE sono valide. Un visitatore con patente rilasciata fuori dall'UE e dal SEE deve portare con sé un permesso internazionale di guida o una traduzione ufficiale.
         country: true
       - id: renter.3
-        en: Each driver must meet the minimum age and the minimum period of holding a full licence that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
+        en: Each driver must meet the minimum age and the minimum period of holding a full license that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
         local: Ogni conducente deve avere l'età minima e l'anzianità minima di patente indicate dal Locatore alla prenotazione. L'eventuale supplemento per conducente giovane o aggiuntivo è indicato nel presente contratto prima della firma.
   - id: vehicle
     title:
@@ -211,7 +211,7 @@ sections:
         en: Registration (plate) number
         local: Targa
       - key: vehicle_colour
-        en: Colour
+        en: Color
         local: Colore
       - key: renter_vin
         en: Chassis / VIN number
@@ -237,7 +237,7 @@ sections:
         en: The Owner keeps the vehicle serviced as the manufacturer recommends and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time; if servicing takes more than one day, section 13 applies.
         local: Il Locatore esegue la manutenzione secondo le indicazioni del costruttore e sostiene le normali riparazioni meccaniche e l'usura, salvo diversa previsione. Nei noleggi lunghi il Locatore concorda la manutenzione con il Conduttore in un momento comodo; se dura più di un giorno si applica la sezione 13.
       - id: vehicle.4
-        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
         local: "Durante il noleggio il Conduttore cura lo stato quotidiano del veicolo: verifica che pneumatici, luci, freni, olio e liquido di raffreddamento appaiano normali e non lo usa se non è più sicuro."
   - id: period
     title:
@@ -386,7 +386,7 @@ sections:
         local: Il carburante mancante è addebitato al prezzo locale alla pompa per la quantità necessaria{{#if fuel_service_fee}}, più un costo del servizio di rifornimento di {{currency}} {{fuel_service_fee}}{{/if}}.
       - id: fuel.4
         if: mileage_limit
-        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}."
         local: "Chilometraggio incluso: {{mileage_limit}} km per {{mileage_period_label}}. Ogni chilometro in più costa {{currency}} {{excess_km_fee}}."
       - id: fuel.5
         unless: mileage_limit
@@ -427,13 +427,13 @@ sections:
         local: "È vietato: guidare con un tasso alcolemico superiore al limite di legge (0,5 g/l; zero per i conducenti sotto i 21 anni, nei primi tre anni di patente e professionali) o sotto l'effetto di droghe; usare il telefono in mano durante la guida; fare gare, acrobazie o guida fuoristrada (salvo che il veicolo sia adatto e il Locatore lo consenta); trainare o spingere alcunché; trasportare merci a pagamento, merci illecite o carichi pericolosi; usare il veicolo per servizi NCC, consegne, scuola guida o per noleggiarlo ad altri; far guidare persone non indicate nella sezione 2."
         country: true
       - id: use.8_it
-        en: Between 15 November and 15 April, winter tyres or snow chains on board are required on roads where signs show it (in Valle d'Aosta from 15 October). The Owner states what is fitted.
+        en: Between 15 November and 15 April, winter tires or snow chains on board are required on roads where signs show it (in Valle d'Aosta from 15 October). The Owner states what is fitted.
         local: Dal 15 novembre al 15 aprile, sulle strade dove è segnalato, sono obbligatori pneumatici invernali o catene a bordo (in Valle d'Aosta dal 15 ottobre). Il Locatore indica la dotazione del veicolo.
         country: true
       - id: use.5
         when:
           smoking: no
-        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}
         local: È vietato fumare e svapare nel veicolo.{{#if smoking_fee}} La violazione costa {{currency}} {{smoking_fee}} per l'eliminazione degli odori.{{/if}}
       - id: use.6
         when:
@@ -496,7 +496,7 @@ sections:
         en: The vehicle has only the compulsory insurance. Damage to or theft of the rented vehicle is the Renter's responsibility (section 12), limited to the actual, evidenced cost.
         local: Il veicolo ha solo l'assicurazione obbligatoria. I danni o il furto del veicolo noleggiato sono a carico del Conduttore (sezione 12), nei limiti del costo effettivo e documentato.
       - id: insurance.5
-        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
+        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
         local: "La limitazione di responsabilità e l'assicurazione non proteggono il Conduttore, che paga il costo effettivo, quando il danno o la perdita si verificano: guidando sotto l'effetto di alcol o droghe, senza patente valida per il veicolo, con un conducente non indicato nella sezione 2, fuori dalla zona consentita, durante un uso vietato (sezione 9), per dolo o colpa grave, o lasciando le chiavi nel veicolo. Pneumatici, cerchi, cristalli, sottoscocca, interni, chiavi e accessori sono coperti solo se il Locatore lo indica per iscritto."
       - id: insurance.6
         en: Personal belongings left in or on the vehicle are not insured by the Owner, and the Owner is not responsible for their loss or damage except through its own fault.
@@ -555,7 +555,7 @@ sections:
         en: The Renter pays all traffic and parking fines, tolls, congestion and low-emission-zone charges, towing, impound and clamping costs arising during the rental, including those that reach the Owner after the vehicle is returned{{#if fine_admin_fee}}, plus a handling fee of {{currency}} {{fine_admin_fee}} for each fine or notice the Owner has to handle{{/if}}.
         local: Il Conduttore paga tutte le multe per violazioni stradali e soste, pedaggi, tariffe per ZTL e zone a basse emissioni, rimozione, custodia e ganasce maturati durante il noleggio, anche quelli che arrivano al Locatore dopo la riconsegna{{#if fine_admin_fee}}, più un costo di gestione di {{currency}} {{fine_admin_fee}} per ogni multa o notifica che il Locatore deve gestire{{/if}}.
       - id: fines.2
-        en: Under the Highway Code (Article 196) the Renter is jointly liable with the driver for offences during the rental, and the Owner will give the Renter's details to the authority, which then notifies the fine to the Renter. Restricted traffic zones (ZTL) in historic centres are enforced by camera, and their fines can arrive months later; they are the Renter's. Where licence points apply, the driver's details are communicated as Article 126-bis requires.
+        en: Under the Highway Code (Article 196) the Renter is jointly liable with the driver for offenses during the rental, and the Owner will give the Renter's details to the authority, which then notifies the fine to the Renter. Restricted traffic zones (ZTL) in historic centers are enforced by camera, and their fines can arrive months later; they are the Renter's. Where license points apply, the driver's details are communicated as Article 126-bis requires.
         local: Ai sensi del Codice della Strada (art. 196) il Conduttore risponde in solido con il conducente delle violazioni commesse durante il noleggio, e il Locatore comunicherà i suoi dati all'autorità, che notificherà la multa al Conduttore. Le zone a traffico limitato (ZTL) dei centri storici sono controllate da telecamere e le relative multe possono arrivare mesi dopo; sono a carico del Conduttore. Quando è prevista la decurtazione dei punti, i dati del conducente sono comunicati come richiede l'art. 126-bis.
         country: true
   - id: termination
@@ -579,11 +579,11 @@ sections:
         local: Il veicolo deve essere riconsegnato con chiavi, documenti e accessori, con il livello di carburante concordato nella sezione 8 e ragionevolmente pulito. Le parti verificano insieme il veicolo e annotano stato, chilometri e carburante nell'Allegato A con foto. Se il Conduttore sceglie di non essere presente, le foto datate scattate dal Locatore alla riconsegna valgono come verbale e il Conduttore ne riceve copia.
       - id: return.2
         if: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
         local: Un veicolo riconsegnato con sporco eccessivo, sabbia, fango, macchie, residui di cibo o odori all'interno comporta un costo di pulizia di {{currency}} {{cleaning_fee}} (superiore solo se serve una pulizia specialistica, dietro ricevuta).
       - id: return.3
         unless: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning.
         local: Un veicolo riconsegnato con sporco eccessivo, sabbia, fango, macchie, residui di cibo o odori all'interno può comportare l'addebito del costo ragionevole della pulizia.
   - id: data
     title:
@@ -591,7 +591,7 @@ sections:
       local: 17. Dati personali
     clauses:
       - id: data.1
-        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and licence details, copies of documents, vehicle photos and any tracker location data) under the GDPR and the Italian Privacy Code (Legislative Decree 196/2003). It uses them to provide this rental, check identity and licence, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
+        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and license details, copies of documents, vehicle photos and any tracker location data) under the GDPR and the Italian Privacy Code (Legislative Decree 196/2003). It uses them to provide this rental, check identity and license, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
         local: Il Locatore è titolare del trattamento dei dati personali del Conduttore e dei conducenti (nome, contatti, dati del documento e della patente, copie dei documenti, foto del veicolo ed eventuale posizione del localizzatore) ai sensi del Regolamento generale sulla protezione dei dati (GDPR) e del Codice privacy (d.lgs. 196/2003). Li usa per fornire il noleggio, verificare identità e patente, adempiere agli obblighi di legge (contabilità, multe, richieste di polizia), gestire sinistri e controversie e proteggere il veicolo. Li conserva solo per il tempo richiesto da tali finalità e dalla legge, li protegge e non li vende mai.
         country: true
       - id: data.2
@@ -613,7 +613,7 @@ sections:
         en: "Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies."
         local: "Intero accordo: il presente contratto, i suoi allegati e le condizioni particolari costituiscono l'intero accordo. Le modifiche sono valide solo per iscritto (basta un messaggio di entrambe le parti). Se una clausola è dichiarata invalida, il resto rimane valido."
       - id: general.4
-        en: "Language: this agreement is written in English and Italian, as Italian law requires information for consumers to be given at least in Italian. If the versions differ, the meaning more favourable to the Renter applies."
+        en: "Language: this agreement is written in English and Italian, as Italian law requires information for consumers to be given at least in Italian. If the versions differ, the meaning more favorable to the Renter applies."
         local: "Lingua: il presente contratto è redatto in inglese e in italiano, poiché la legge italiana richiede che le informazioni ai consumatori siano rese almeno in lingua italiana. In caso di divergenza prevale il significato più favorevole al Conduttore."
         country: true
       - id: general.5
@@ -666,7 +666,7 @@ sections:
         local: "Carrozzeria: anteriore / posteriore / sinistra / destra"
       - en: Windscreen, glass, mirrors and lights
         local: Parabrezza, cristalli, specchietti e luci
-      - en: Tyres and wheels
+      - en: Tires and wheels
         local: Pneumatici e cerchi
       - en: Interior and seats
         local: Interni e sedili
@@ -708,7 +708,7 @@ sections:
         local: Specchietto
       - en: Headlight / tail light / indicator
         local: Faro / fanale / indicatore di direzione
-      - en: Tyre (each)
+      - en: Tire (each)
         local: Pneumatico (ciascuno)
       - en: Key / remote
         local: Chiave / telecomando

@@ -50,4 +50,4 @@ Operators elsewhere in Thailand can use the main [free bilingual rental agreemen
 
 ## Let RoveHQ do the paperwork
 
-RoveHQ fills in this agreement from each booking automatically, including monthly renewals. The renter signs it on their phone, and their passport and licence details are read from a photo, so a long-stay renter is set up in a few minutes. [Start free with RoveHQ](/signup).
+RoveHQ fills in this agreement from each booking automatically, including monthly renewals. The renter signs it on their phone, and their passport and license details are read from a photo, so a long-stay renter is set up in a few minutes. [Start free with RoveHQ](/signup).

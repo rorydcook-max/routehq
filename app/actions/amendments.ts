@@ -360,7 +360,7 @@ export async function cancelRentalAmendment(amendmentId: string): Promise<Result
     const { data: amendment } = await admin.from("rental_amendments").select("*").eq("id", amendmentId).maybeSingle();
     if (!amendment) return { ok: false, error: await said("Amendment was not found.") };
     const { user } = await operatorFor(amendment.rental_id);
-    if (amendment.status !== "awaiting_signature") return { ok: false, error: await said("Only an amendment waiting for a signature can be cancelled.") };
+    if (amendment.status !== "awaiting_signature") return { ok: false, error: await said("Only an amendment waiting for a signature can be canceled.") };
     if (amendment.changes?.applied_before_signature) {
       return { ok: false, error: await said("The vehicle has already changed and needs the customer's signature. To undo, change it back.") };
     }
@@ -387,8 +387,8 @@ export async function cancelRentalAmendment(amendmentId: string): Promise<Result
       entity_id: amendment.rental_id,
       rental_id: amendment.rental_id,
       event_type: "rental_amendment_cancelled",
-      title: "Amendment cancelled",
-      detail: `The amendment sent for signature was cancelled before the customer signed. ${describeChanges(amendment.changes)}`,
+      title: "Amendment canceled",
+      detail: `The amendment sent for signature was canceled before the customer signed. ${describeChanges(amendment.changes)}`,
       metadata: { amendment_id: amendment.id }
     });
     revalidatePath(`/bookings/${amendment.rental_id}`);
@@ -439,7 +439,7 @@ export async function signRentalAmendment(input: {
     const { data: amendment } = await admin.from("rental_amendments").select("*").eq("token", token).maybeSingle();
     if (!amendment) return { ok: false, error: await said("This amendment could not be found.") };
     if (amendment.status === "signed") return { ok: true };
-    if (amendment.status !== "awaiting_signature") return { ok: false, error: await said("This amendment was cancelled by the rental business.") };
+    if (amendment.status !== "awaiting_signature") return { ok: false, error: await said("This amendment was canceled by the rental business.") };
     if (new Date(amendment.expires_at).getTime() < Date.now()) return { ok: false, error: await said("This amendment has expired. Please ask the rental business for a new link.") };
     if (input.contentHash !== amendment.content_hash) {
       return { ok: false, error: await said("The amendment has changed since you opened it. Please reload the page.") };
@@ -792,7 +792,7 @@ async function applyVehicleChange(admin: any, amendment: any, rental: any): Prom
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
-      if (!partner || partner.status === "cancelled") return "the other customer's change was cancelled, so the exchange can't happen";
+      if (!partner || partner.status === "cancelled") return "the other customer's change was canceled, so the exchange can't happen";
       if (partner.status !== "signed") return "waiting";
       const { error } = await admin.rpc("swap_rental_vehicles", { p_rental_a: rental.id, p_rental_b: changes.swap_with_rental_id });
       if (error) return "the vehicles could not be exchanged because another booking is in the way";

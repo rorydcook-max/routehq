@@ -35,17 +35,17 @@ sources:
   - url: "https://mylaw.my/legislation/road-transport-act-1987/section-91"
     supports: "Road Transport Act 1987 (Act 333) Part IV s.91 (official text): compulsory policy must cover liability for death of or bodily injury to any person arising from use of the vehicle on a road; it need not cover passengers (except vehicles carrying passengers for hire), employees or contractual liability. No compulsory cover for property damage or the vehicle itself."
   - url: "https://www.mot.gov.my/en/Documents/Act%20333%20-%20Road%20Transport%20Act%201987.pdf"
-    supports: "Road Transport Act 1987 (Ministry of Transport copy): s.90 users must be insured against third-party risks; s.28 recognition of foreign licences; s.53A notice of camera-recorded offences; Part IIB foreign vehicle entry permits."
+    supports: "Road Transport Act 1987 (Ministry of Transport copy): s.90 users must be insured against third-party risks; s.28 recognition of foreign licenses; s.53A notice of camera-recorded offenses; Part IIB foreign vehicle entry permits."
   - url: "https://mylaw.my/legislation/road-transport-act-1987/section-53b"
-    supports: "RTA s.53B: a registered owner served with a camera-recorded offence notice who was not driving must give the driver's name and address to the issuing authority within 30 days. Basis for fines.2 and deposit.3."
+    supports: "RTA s.53B: a registered owner served with a camera-recorded offense notice who was not driving must give the driver's name and address to the issuing authority within 30 days. Basis for fines.2 and deposit.3."
   - url: "https://mylaw.my/legislation/road-transport-act-1987/section-52"
-    supports: "RTA s.52: after an accident the driver must stop, give details if asked, and report the accident at the nearest police station as soon as practicable and within 24 hours, producing the driving licence. Basis for accident.1."
+    supports: "RTA s.52: after an accident the driver must stop, give details if asked, and report the accident at the nearest police station as soon as practicable and within 24 hours, producing the driver's license. Basis for accident.1."
   - url: "https://mylaw.my/legislation/road-transport-act-1987/section-49"
     supports: "RTA s.49: no more than one pillion passenger on a two-wheeled motorcycle, sitting astride behind the rider on a proper seat. Basis for use.2."
   - url: "https://mylaw.my/legislation/road-transport-act-1987/section-28"
-    supports: "RTA s.28: a driving licence issued in a country party to a treaty with Malaysia recognising domestic licences is deemed a licence under the Act while in force. Basis for renter.2 (foreign licences recognised only as the law allows)."
+    supports: "RTA s.28: a driver's license issued in a country party to a treaty with Malaysia recognizing domestic licenses is deemed a license under the Act while in force. Basis for renter.2 (foreign licenses recognized only as the law allows)."
   - url: "https://www.jpj.gov.my/pusat-media-3/informasi-perkhidmatan-jpj/pemandu/permohonan-permit-memandu-antarabangsa/"
-    supports: "JPJ (Road Transport Department): International Driving Permits are valid for 1 year only. Exact period a visitor may drive on a foreign licence was not confirmed on an official page, so renter.2 refers to 'the period JPJ allows'."
+    supports: "JPJ (Road Transport Department): International Driving Permits are valid for 1 year only. Exact period a visitor may drive on a foreign license was not confirmed on an official page, so renter.2 refers to 'the period JPJ allows'."
   - url: "https://www.jpj.gov.my/sistem-kekangan-kanak-kanak-crs/"
     supports: "JPJ FAQ on child restraint systems (CRS): every child passenger who meets the criteria (under 12 years, under 36 kg, around 135-136 cm) must be in a suitable UN R44/R129 CRS, with listed exemptions. Basis for use.3."
   - url: "https://www.freemalaysiatoday.com/category/nation/2025/11/27/why-arent-child-car-seats-more-widely-used-in-malaysia"
@@ -57,7 +57,7 @@ sources:
   - url: "https://mylaw.my/legislation/commercial-vehicles-licensing-board-act-1987/section-1"
     supports: "Commercial Vehicles Licensing Board Act 1987 (Act 334, applied in Sabah and Sarawak by LPKP): defines 'hire and drive car' as a motor vehicle let on hire to be driven by the hirer or his nominee. Basis for vehicle.2."
   - url: "https://www.carsifu.my/news/no-to-renting-out-private-cars"
-    supports: "APAD Director-General (Jan 2023): car rental firms must be licensed by APAD; tourism rentals need a Ministry of Tourism (MOTAC) licence; renting out private cars without a licence is illegal, may breach insurance and JPJ can seize the vehicle. Police treated unreturned rental cars as breach of contract rather than theft."
+    supports: "APAD Director-General (Jan 2023): car rental firms must be licensed by APAD; tourism rentals need a Ministry of Tourism (MOTAC) license; renting out private cars without a license is illegal, may breach insurance and JPJ can seize the vehicle. Police treated unreturned rental cars as breach of contract rather than theft."
   - url: "https://motac.gov.my/muat-turun/send/145-unit-perundangan/790-akta-594-akta-pelesenan-kenderaan-pelancongan-1999-terkini-bm"
     supports: "Tourism Vehicles Licensing Act 1999 (Act 594): licensing of tourism vehicles including tourism hire-and-drive cars by MOTAC."
   - url: "https://www.allenandgledhill.com/publication/articles/10024/malaysian-federal-court-finds-there-is-no-necessity-for-proof-of-actual-loss-or-damage-under-section-75-contracts-act-1950"
@@ -67,13 +67,13 @@ sources:
   - url: "https://www.rajahtannasia.com/?p=161886"
     supports: "Personal Data Protection (Amendment) Act 2024 commencement: 'data controller' terminology and processor security duty from 1 April 2025; data protection officer, mandatory breach notification and data portability from 1 June 2025. Basis for data.1."
   - url: "https://www.refworld.org/legal/legislation/natlegbod/1966/14712"
-    supports: "Passports Act 1966 s.12(1)(f): it is an offence, without lawful authority, to have in one's possession a passport issued for the use of another person. Basis for deposit.4."
+    supports: "Passports Act 1966 s.12(1)(f): it is an offense, without lawful authority, to have in one's possession a passport issued for the use of another person. Basis for deposit.4."
   - url: "https://malaysia.news.yahoo.com/nrd-holding-another-individual-mykad-023125939.html"
-    supports: "National Registration Department: holding another person's MyKad is against the law; only officers authorised under reg. 25 of the National Registration Regulations 1990 may hold it. Basis for deposit.4."
+    supports: "National Registration Department: holding another person's MyKad is against the law; only officers authorized under reg. 25 of the National Registration Regulations 1990 may hold it. Basis for deposit.4."
   - url: "https://onemotoring.lta.gov.sg/content/onemotoring/home/driving/entering_and_exiting_singapore/foreign-vehicles-not-registered-in-malaysia.html"
     supports: "Singapore LTA: foreign-registered vehicles need permits (Vehicle Entry Permit/Autopass for Malaysia-registered vehicles) and insurance meeting Singapore law to enter. Basis for area.2."
   - url: "https://checkdi.com/th/lp/main?p=fnmctothfrommy&lg=en"
-    supports: "Driving a Malaysian vehicle into Thailand needs customs temporary import papers, an owner's authorisation letter and Thai compulsory insurance. Basis for area.2."
+    supports: "Driving a Malaysian vehicle into Thailand needs customs temporary import papers, an owner's authorization letter and Thai compulsory insurance. Basis for area.2."
   - url: "https://policystreet.com.my/en/blog/ultimate-malaysia-saman-guide"
     supports: "Traffic summonses in Malaysia come from PDRM (police), JPJ (incl. AES/AwAS camera notices) and local councils, checkable via MyBayar PDRM and MyJPJ. Basis for fines.1-2."
 title:
@@ -113,17 +113,17 @@ sections:
       - { key: renter_local_address, en: "Local address during the rental (hotel / homestay / condo)", local: "Alamat tempatan semasa sewaan (hotel / inap desa / kondominium)" }
       - { key: renter_phone, en: "Phone / WhatsApp", local: "Telefon / WhatsApp" }
       - { key: renter_email, en: "Email", local: "E-mel" }
-      - { key: renter_licence, en: "Driving licence number, class and issuing country", local: "No. lesen memandu, kelas dan negara pengeluar" }
-      - { key: renter_licence_expiry, en: "Licence expiry date", local: "Tarikh tamat lesen" }
+      - { key: renter_licence, en: "Driver's license number, class and issuing country", local: "No. lesen memandu, kelas dan negara pengeluar" }
+      - { key: renter_licence_expiry, en: "License expiry date", local: "Tarikh tamat lesen" }
       - { key: renter_idp, en: "International Driving Permit (number / not required)", local: "Permit Memandu Antarabangsa (nombor / tidak diperlukan)" }
       - { key: renter_emergency, en: "Emergency contact (name and phone)", local: "Hubungan kecemasan (nama dan telefon)" }
-      - { key: driver2_details, en: "Additional driver (name, ID, licence), if any", local: "Pemandu tambahan (nama, ID, lesen), jika ada" }
+      - { key: driver2_details, en: "Additional driver (name, ID, license), if any", local: "Pemandu tambahan (nama, ID, lesen), jika ada" }
     clauses:
       - id: renter.1
         en: "The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle."
         local: "Penyewa mengesahkan bahawa butiran di atas adalah benar dan lengkap, dan bahawa setiap orang yang akan memandu atau menunggang kenderaan dinamakan di sini. Hanya Penyewa dan pemandu tambahan yang dinamakan di atas boleh memandu atau menunggang kenderaan."
       - id: renter.2
-        en: "Every driver must hold a valid driving licence for this class of vehicle (in Malaysia, class D or DA for cars and class B, B1 or B2 for motorcycles, or the equivalent foreign class) and carry it at all times while driving. A visitor using a foreign licence must also carry an International Driving Permit or an official translation where the law requires one, and may drive on a foreign licence only for as long as the Road Transport Department (JPJ) allows. A car licence does not allow a person to ride a motorbike."
+        en: "Every driver must hold a valid driver's license for this class of vehicle (in Malaysia, class D or DA for cars and class B, B1 or B2 for motorcycles, or the equivalent foreign class) and carry it at all times while driving. A visitor using a foreign license must also carry an International Driving Permit or an official translation where the law requires one, and may drive on a foreign license only for as long as the Road Transport Department (JPJ) allows. A car license does not allow a person to ride a motorbike."
         local: "Setiap pemandu mesti memiliki lesen memandu yang sah bagi kelas kenderaan ini (di Malaysia, kelas D atau DA untuk kereta dan kelas B, B1 atau B2 untuk motosikal, atau kelas setara dari luar negara) dan membawanya pada setiap masa semasa memandu. Pelawat yang menggunakan lesen luar negara juga mesti membawa Permit Memandu Antarabangsa atau terjemahan rasmi jika undang-undang memerlukannya, dan hanya boleh memandu dengan lesen luar negara selama tempoh yang dibenarkan oleh Jabatan Pengangkutan Jalan (JPJ). Lesen kereta tidak membenarkan seseorang menunggang motosikal."
         country: true
 
@@ -134,7 +134,7 @@ sections:
       - { key: vehicle_make_model, en: "Make and model", local: "Buatan dan model" }
       - { key: vehicle_year, en: "Year", local: "Tahun" }
       - { key: vehicle_plate, en: "Registration (plate) number", local: "No. pendaftaran (plat)" }
-      - { key: vehicle_colour, en: "Colour", local: "Warna" }
+      - { key: vehicle_colour, en: "Color", local: "Warna" }
       - { key: renter_vin, en: "Chassis / VIN number", local: "No. casis / VIN" }
       - { key: out_odometer, en: "Odometer at handover", local: "Odometer semasa penyerahan" }
       - { key: out_fuel, en: "Fuel / battery level at handover", local: "Paras minyak / bateri semasa penyerahan" }
@@ -144,14 +144,14 @@ sections:
         en: "The Owner rents the vehicle described above, with the accessories listed, to the Renter for the rental period and on the terms of this agreement. The vehicle remains the property of the Owner at all times."
         local: "Pemilik menyewakan kenderaan yang diterangkan di atas, bersama aksesori yang disenaraikan, kepada Penyewa bagi tempoh sewaan dan mengikut terma perjanjian ini. Kenderaan itu kekal sebagai hak milik Pemilik pada setiap masa."
       - id: vehicle.2
-        en: "The Owner confirms that: the vehicle is registered with JPJ and its motor vehicle licence (road tax) is valid; it is insured as the Road Transport Act 1987 requires, for use as a rental vehicle, for the whole rental period; the Owner holds any operator licence or permit the law requires to rent it out (for example from APAD in Peninsular Malaysia, from LPKP in Sabah and Sarawak, or from the Ministry of Tourism for tourism hire-and-drive vehicles); and the vehicle is handed over in a roadworthy condition."
+        en: "The Owner confirms that: the vehicle is registered with JPJ and its motor vehicle license (road tax) is valid; it is insured as the Road Transport Act 1987 requires, for use as a rental vehicle, for the whole rental period; the Owner holds any operator license or permit the law requires to rent it out (for example from APAD in Peninsular Malaysia, from LPKP in Sabah and Sarawak, or from the Ministry of Tourism for tourism hire-and-drive vehicles); and the vehicle is handed over in a roadworthy condition."
         local: "Pemilik mengesahkan bahawa: kenderaan itu didaftarkan dengan JPJ dan lesen kenderaan motornya (cukai jalan) sah; kenderaan itu diinsuranskan sebagaimana dikehendaki oleh Akta Pengangkutan Jalan 1987, untuk kegunaan sebagai kenderaan sewa, bagi seluruh tempoh sewaan; Pemilik memegang apa-apa lesen pengendali atau permit yang dikehendaki oleh undang-undang untuk menyewakannya (contohnya daripada APAD di Semenanjung Malaysia, daripada LPKP di Sabah dan Sarawak, atau daripada Kementerian Pelancongan bagi kenderaan sewa pandu sendiri pelancongan); dan kenderaan itu diserahkan dalam keadaan layak digunakan di jalan raya."
         country: true
       - id: vehicle.3
         en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies."
         local: "Pemilik menyenggara kenderaan seperti yang disyorkan oleh pengeluar, termasuk penukaran minyak enjin, pemeriksaan dan penggantian alat ganti yang haus, dan menanggung kos pembaikan mekanikal biasa dan haus lusuh, melainkan dinyatakan sebaliknya dalam perjanjian ini. Bagi sewaan jangka panjang, Pemilik mengatur servis bersama Penyewa pada masa yang sesuai dan memulangkan kenderaan dengan segera; jika servis mengambil masa lebih daripada satu hari, Bahagian 13 terpakai."
       - id: vehicle.4
-        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
         local: "Sepanjang tempoh sewaan, Penyewa menjaga keadaan harian kenderaan: memeriksa bahawa tayar, lampu, brek, minyak enjin dan bahan penyejuk kelihatan normal, memastikan kenderaan cukup bersih untuk dipandu dengan selamat, dan tidak memandu atau menunggang kenderaan itu jika ia menjadi tidak selamat atau tidak layak digunakan di jalan raya."
 
   - id: period
@@ -218,7 +218,7 @@ sections:
         local: "Saman lalu lintas (termasuk notis kamera AES/AwAS JPJ) selalunya sampai kepada pemilik berdaftar selepas sewaan tamat. Pemilik boleh menahan sebahagian deposit yang munasabah sehingga 30 hari bagi menampung saman yang dijangka dengan munasabah, dan mesti memulangkannya dengan segera jika tiada saman diterima."
         country: true
       - id: deposit.4
-        en: "The Owner will not keep the Renter's original passport or MyKad (identity card) as a deposit. In Malaysia, holding another person's passport or MyKad without lawful authority is an offence. The Owner may take a copy or photo of them to identify the Renter (section 17)."
+        en: "The Owner will not keep the Renter's original passport or MyKad (identity card) as a deposit. In Malaysia, holding another person's passport or MyKad without lawful authority is an offense. The Owner may take a copy or photo of them to identify the Renter (section 17)."
         local: "Pemilik tidak akan menyimpan pasport asal atau MyKad (kad pengenalan) Penyewa sebagai deposit. Di Malaysia, menyimpan pasport atau MyKad orang lain tanpa kuasa yang sah adalah suatu kesalahan. Pemilik boleh mengambil salinan atau gambar dokumen tersebut untuk mengenal pasti Penyewa (Bahagian 17)."
         country: true
 
@@ -265,7 +265,7 @@ sections:
         local: "Minyak yang kurang dikenakan pada harga pam tempatan berserta fi perkhidmatan isian minyak sebanyak {{currency}} {{fuel_service_fee}}. Penggunaan minyak yang salah adalah tanggungjawab Penyewa, termasuk kos tunda dan pembaikan."
       - id: fuel.4
         if: mileage_limit
-        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}."
         local: "Had jarak perjalanan: {{mileage_limit}} km setiap {{mileage_period_label}}. Setiap kilometer tambahan dikenakan {{currency}} {{excess_km_fee}}."
       - id: fuel.5
         unless: mileage_limit
@@ -299,7 +299,7 @@ sections:
         local: "Adalah dilarang untuk: memandu di bawah pengaruh alkohol atau dadah, atau melebihi had yang dibenarkan undang-undang; menggunakan telefon semasa memandu kecuali secara bebas tangan; berlumba, melakukan aksi berbahaya atau memandu di luar jalan raya (melainkan kenderaan itu dibuat untuknya dan Pemilik bersetuju); menunda atau menolak apa-apa; membawa penumpang di luar kabin atau di ruang muatan terbuka; membawa barang untuk bayaran, barang haram atau muatan berbahaya; menggunakan kenderaan untuk e-hailing, kerja penghantaran, kelas memandu atau menyewakannya kepada orang lain; membenarkan sesiapa yang tidak dinamakan dalam Bahagian 2 memandu atau menunggang."
       - id: use.5
         when: { smoking: no }
-        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}"
+        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}"
         local: "Merokok dan menghisap vape tidak dibenarkan di dalam kenderaan.{{#if smoking_fee}} Pelanggaran peraturan ini dikenakan fi sebanyak {{currency}} {{smoking_fee}} untuk menghilangkan bau.{{/if}}"
       - id: use.6
         when: { pets: no }
@@ -349,7 +349,7 @@ sections:
         en: "The vehicle has only the compulsory insurance. The Renter is responsible for damage to the rented vehicle, its theft, and damage to other people's property (section 12)."
         local: "Kenderaan ini hanya mempunyai insurans wajib. Penyewa bertanggungjawab bagi kerosakan kenderaan sewa, kecuriannya, dan kerosakan harta orang lain (Bahagian 12)."
       - id: insurance.5
-        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
+        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
         local: "Insurans tidak melindungi Penyewa, dan Penyewa membayar sepenuhnya, apabila kerosakan atau kehilangan berlaku: semasa memandu di bawah pengaruh alkohol atau dadah, tanpa lesen yang sah bagi kenderaan itu, oleh pemandu yang tidak dinamakan dalam Bahagian 2, di luar kawasan yang dibenarkan, semasa penggunaan yang dilarang (Bahagian 9), akibat perbuatan sengaja atau melulu, atau apabila kunci ditinggalkan bersama kenderaan. Tayar, rim, cermin, bahagian bawah kenderaan, bahagian dalam, kunci dan aksesori sering dikecualikan oleh syarikat insurans dan menjadi tanggungjawab Penyewa melainkan Pemilik mengesahkan secara bertulis bahawa ia dilindungi."
       - id: insurance.6
         en: "Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage."
@@ -402,7 +402,7 @@ sections:
         en: "The Renter pays all traffic summonses (from PDRM, JPJ, including AES/AwAS camera notices, and local councils), parking fines, tolls, towing, impound and clamping costs arising during the rental, including those that reach the Owner after the vehicle is returned, plus a handling fee of {{currency}} {{fine_admin_fee}} per fine."
         local: "Penyewa membayar semua saman lalu lintas (daripada PDRM, JPJ termasuk notis kamera AES/AwAS, dan pihak berkuasa tempatan), saman letak kereta, tol, kos tunda, sitaan dan pengapit tayar yang timbul semasa sewaan, termasuk yang sampai kepada Pemilik selepas kenderaan dipulangkan, berserta fi pengendalian sebanyak {{currency}} {{fine_admin_fee}} bagi setiap saman."
       - id: fines.2
-        en: "The Owner may give the Renter's name, address and details to the police, JPJ or the issuing authority so that a summons is transferred to the Renter as the driver, where the law allows. For camera-recorded offences the law requires the registered owner to name the driver within 30 days of receiving the notice."
+        en: "The Owner may give the Renter's name, address and details to the police, JPJ or the issuing authority so that a summons is transferred to the Renter as the driver, where the law allows. For camera-recorded offenses the law requires the registered owner to name the driver within 30 days of receiving the notice."
         local: "Pemilik boleh memberikan nama, alamat dan butiran Penyewa kepada polis, JPJ atau pihak berkuasa yang mengeluarkan saman supaya saman itu dipindahkan kepada Penyewa sebagai pemandu, setakat yang dibenarkan oleh undang-undang. Bagi kesalahan yang dirakam oleh kamera, undang-undang mewajibkan pemilik berdaftar menamakan pemandu dalam tempoh 30 hari selepas menerima notis."
         country: true
 
@@ -424,18 +424,18 @@ sections:
         local: "Kenderaan mesti dipulangkan bersama kunci, dokumen dan aksesorinya, dengan paras minyak yang dipersetujui dalam Bahagian 8, dan dalam keadaan bersih secara munasabah. Kedua-dua pihak memeriksa kenderaan bersama-sama dan merekodkan keadaan, odometer dan minyak dalam Lampiran A bersama gambar. Jika Penyewa tidak hadir semasa pemeriksaan, gambar bertarikh yang diambil oleh Pemilik diterima sebagai rekod."
       - id: return.2
         if: cleaning_fee
-        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
         local: "Kenderaan yang dipulangkan dengan kotoran, pasir, lumpur, kesan noda, makanan atau bau yang berlebihan di dalamnya dikenakan fi pembersihan sebanyak {{currency}} {{cleaning_fee}} (lebih jika pembersihan khas diperlukan, berdasarkan resit)."
       - id: return.3
         unless: cleaning_fee
-        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning."
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning."
         local: "Kenderaan yang dipulangkan dengan kotoran, pasir, lumpur, kesan noda, makanan atau bau yang berlebihan di dalamnya boleh dikenakan kos pembersihan yang munasabah."
 
   - id: data
     title: { en: "17. Personal data and documents", local: "17. Data peribadi dan dokumen" }
     clauses:
       - id: data.1
-        en: "The Owner, as data controller under the Personal Data Protection Act 2010, collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle summonses, claims and disputes, and keep business records. Giving these details is needed for the rental. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, does not sell them, and will tell the authorities and affected persons about a data breach where the law requires. The Renter may ask to access or correct their data, or raise a complaint, using the Owner's contact details in section 1."
+        en: "The Owner, as data controller under the Personal Data Protection Act 2010, collects the Renter's and drivers' names, contact details, ID and license details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle summonses, claims and disputes, and keep business records. Giving these details is needed for the rental. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, does not sell them, and will tell the authorities and affected persons about a data breach where the law requires. The Renter may ask to access or correct their data, or raise a complaint, using the Owner's contact details in section 1."
         local: "Pemilik, sebagai pengawal data di bawah Akta Perlindungan Data Peribadi 2010, mengumpul nama, butiran hubungan, butiran ID dan lesen, salinan dokumen Penyewa dan pemandu serta gambar kenderaan hanya untuk menyediakan sewaan ini, membuktikan identiti, mematuhi undang-undang, mengendalikan saman, tuntutan dan pertikaian, dan menyimpan rekod perniagaan. Butiran ini perlu diberikan untuk sewaan. Pemilik menyimpannya hanya selama yang perlu bagi tujuan tersebut dan undang-undang, menyimpannya dengan selamat, tidak menjualnya, dan akan memaklumkan pihak berkuasa dan orang yang terjejas tentang pelanggaran data jika dikehendaki oleh undang-undang. Penyewa boleh meminta untuk mengakses atau membetulkan data mereka, atau membuat aduan, melalui butiran hubungan Pemilik dalam Bahagian 1."
         country: true
       - id: data.2
@@ -496,7 +496,7 @@ sections:
       - { en: "Fuel / battery level", local: "Paras minyak / bateri" }
       - { en: "Body: front / rear / left / right", local: "Badan: hadapan / belakang / kiri / kanan" }
       - { en: "Glass, mirrors and lights", local: "Cermin, cermin sisi dan lampu" }
-      - { en: "Tyres and wheels", local: "Tayar dan rim" }
+      - { en: "Tires and wheels", local: "Tayar dan rim" }
       - { en: "Interior and seats", local: "Bahagian dalam dan tempat duduk" }
       - { en: "Keys, remote, documents", local: "Kunci, alat kawalan jauh, dokumen" }
       - { en: "Helmets / child seat / accessories", local: "Topi keledar / kerusi kanak-kanak / aksesori" }
@@ -516,7 +516,7 @@ sections:
       - { en: "Dent, per panel", local: "Kemek, setiap panel" }
       - { en: "Mirror", local: "Cermin sisi" }
       - { en: "Headlight / tail light / indicator", local: "Lampu hadapan / lampu belakang / lampu isyarat" }
-      - { en: "Tyre (each)", local: "Tayar (setiap satu)" }
+      - { en: "Tire (each)", local: "Tayar (setiap satu)" }
       - { en: "Key / remote", local: "Kunci / alat kawalan jauh" }
       - { en: "Helmet", local: "Topi keledar" }
       - { en: "Number plate replacement", local: "Penggantian plat nombor" }

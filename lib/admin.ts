@@ -127,7 +127,7 @@ export async function listBusinesses(): Promise<AdminBusiness[]> {
 }
 
 export const ADMIN_STATUSES = ["trial", "active", "past_due", "expired", "cancelled"] as const;
-export const ADMIN_STATUS_LABEL: Record<string, string> = { trial: "Free trial", active: "Paying", past_due: "Payment late", expired: "Trial ended", cancelled: "Cancelled" };
+export const ADMIN_STATUS_LABEL: Record<string, string> = { trial: "Free trial", active: "Paying", past_due: "Payment late", expired: "Trial ended", cancelled: "Canceled" };
 export const ADMIN_TIER_LABEL: Record<string, string> = { free: "Free", starter: "Starter", pro: "Pro", growth: "Pro", business: "Business" };
 
 export const ACTION_LABEL: Record<string, string> = {

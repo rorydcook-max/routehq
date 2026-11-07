@@ -3,9 +3,14 @@ import { amountDueNowByRental } from "@/lib/rental-balances";
 import { lineFlex, lineText, sendLinePushMessage, type LineMessage } from "@/lib/providers/messaging/line";
 import { paperworkFor } from "@/lib/country-paperwork";
 import { orgTimeZone } from "@/lib/scheduled-runs";
+import { niceMoney } from "@/lib/nice-money";
 
-const THB = (n: number) =>
-  new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(n);
+/**
+ * Amounts in the business's own currency (the summary also goes by email and push to businesses outside Thailand;
+ * it was always baht). Set at the start of buildDailySummaryMessages, which builds every bubble in one go.
+ */
+let summaryCurrency = "THB";
+const THB = (n: number) => niceMoney(Math.round(n), summaryCurrency);
 
 function todayStr(timezone = "Asia/Bangkok") {
   return new Intl.DateTimeFormat("sv-SE", { timeZone: timezone }).format(new Date());
@@ -236,6 +241,7 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
 }
 
 export function buildDailySummaryMessages(data: SummaryData): LineMessage[] {
+  summaryCurrency = data.currency || "THB";
   const ns = data.notificationSettings;
   const w = WORDS[data.locale] || WORDS.en;
   const loc = data.locale;

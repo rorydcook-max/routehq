@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { businessCurrency } from "@/lib/business-units";
+import { currencySymbol } from "@/components/currency-symbol";
 
 const CURRENCY_INFO: Record<string, { symbol: string; locale: string }> = {
   THB: { symbol: "฿", locale: "th-TH" },
@@ -47,7 +48,9 @@ export function MoneyInput({
   defaultValue = "",
   currency = businessCurrency(),
   required = false,
-  onValueChange
+  onValueChange,
+  className = "mt-1",
+  label
 }: {
   name: string;
   defaultValue?: string | number;
@@ -55,8 +58,13 @@ export function MoneyInput({
   required?: boolean;
   /** Told the plain amount ("1200.5") each time it changes. */
   onValueChange?: (amount: string) => void;
+  /** Spacing and width for the box (default: a little space above it, full width). */
+  className?: string;
+  /** For a box with no visible label of its own (screen readers). */
+  label?: string;
 }) {
-  const info = CURRENCY_INFO[currency] ?? CURRENCY_INFO["THB"];
+  // Any other currency shows its own symbol (never a baht sign by mistake): "₺", "Kč", "CHF"...
+  const info = CURRENCY_INFO[currency] ?? { symbol: currencySymbol(currency), locale: "en-US" };
   const decimals = NO_DECIMALS.has(currency) ? 0 : 2;
   // A saved amount starts as it is: 1200.5 shows 1,200.50, a whole 1200 shows 1,200.
   const startNumber = Number(String(defaultValue ?? "").replace(/,/g, ""));
@@ -69,7 +77,7 @@ export function MoneyInput({
   const [raw, setRaw] = useState(initial);
   const [display, setDisplay] = useState(formatAmount(initial));
   return (
-    <div className="relative mt-1">
+    <div className={`relative ${className}`}>
       {/* Symbol overlay — always visible, never editable */}
       <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 select-none text-sm font-medium text-[var(--foreground-secondary)]">
         {info.symbol}
@@ -79,6 +87,7 @@ export function MoneyInput({
       {/* Visible formatted input: no name so it is not submitted */}
       <input
         className="input-with-leading-symbol font-mono-data w-full rounded-xl border border-[var(--border-strong)] bg-white py-3 pr-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+        aria-label={label}
         inputMode={decimals ? "decimal" : "numeric"}
         placeholder="0"
         required={required}

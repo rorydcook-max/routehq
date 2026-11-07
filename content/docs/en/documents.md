@@ -19,7 +19,7 @@ Files are saved as you work, so you don't upload anything twice:
 - the photo of a new tax receipt, Por Ror Bor or policy when you record a renewal
 - garage receipts when you log a service
 - the blue book (or registration document) photo from when you added the vehicle
-- customer passports, licences and photos
+- customer passports, licenses and photos
 - signed agreements, handover and return reports
 - handover and return photos
 - receipts you gave customers

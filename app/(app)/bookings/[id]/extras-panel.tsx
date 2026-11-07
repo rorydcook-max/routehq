@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { creditExtrasToRent, moveExtrasToRent, refundExtras, removeExtras } from "@/app/actions/extras";
+import { MoneyInput } from "@/components/money-input";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 type Line = { name: string; amount: number; index: number };
@@ -169,7 +170,8 @@ export function ExtrasPanel({ rentalId, organizationId, currency, lines, removed
           <p>{form === "refund" ? say("ex_refundText") : say("ex_creditText", { next: nextRent || "" })}</p>
           <label className="mt-2 block text-xs font-bold text-[var(--foreground-secondary)]">
             {say("ex_amount")}
-            <input className="mt-1 w-full" defaultValue={available} key={form} max={available} min={1} name="amount" step="1" type="number" />
+            {/* The booking's currency symbol inside the box (7 Nov 2026). */}
+            <MoneyInput currency={currency || undefined} defaultValue={available} key={form} name="amount" />
           </label>
           {form === "refund" ? (
             <>

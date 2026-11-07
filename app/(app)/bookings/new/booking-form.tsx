@@ -934,7 +934,9 @@ export function BookingForm({
           </label>
           {dateConflict ? (
             <p className="mt-3 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]" role="alert">
-              {dateConflict.endDate
+              {dateConflict.heldForExtension
+                ? say("clashHeld", { who: dateConflict.customerName || say("clashHeldRenter") })
+                : dateConflict.endDate
                 ? say("clashUntil", { from: shortDate(dateConflict.startDate, locale), to: shortDate(dateConflict.endDate, locale), who: [dateConflict.code, dateConflict.customerName].filter(Boolean).join(", ") })
                 : say("clashOpen", { from: shortDate(dateConflict.startDate, locale), who: [dateConflict.code, dateConflict.customerName].filter(Boolean).join(", ") })}
               {/* Nothing of their own free: a partner's vehicle keeps the customer. */}

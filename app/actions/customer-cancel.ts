@@ -33,9 +33,9 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
     .is("deleted_at", null)
     .maybeSingle();
   if (!rental) return { ok: false, error: await said("This booking could not be found.") };
-  if (rental.status === "cancelled" || link.status === "cancelled") return { ok: false, error: await said("This booking has already been cancelled.") };
+  if (rental.status === "cancelled" || link.status === "cancelled") return { ok: false, error: await said("This booking has already been canceled.") };
   // Once the vehicle is with the customer it is a return, not a cancellation.
-  if (!["booked", "draft"].includes(String(rental.status))) return { ok: false, error: await said("Your rental has started, so it can't be cancelled. Tell us when you'll return the vehicle instead.") };
+  if (!["booked", "draft"].includes(String(rental.status))) return { ok: false, error: await said("Your rental has started, so it can't be canceled. Tell us when you'll return the vehicle instead.") };
 
   const { data: payments } = await admin.from("rental_payments").select("amount, status, voided, metadata").eq("rental_id", rental.id);
   const live = (payments || []).filter((payment: any) => !payment.voided);
@@ -66,7 +66,7 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
   const currency = String(rental.currency || "THB");
   const money = `${currency === "THB" ? "฿" : `${currency} `}${paid.toLocaleString("en-US")}`;
   const settle = paid > 0 ? ` They have paid ${money}: decide what to refund.` : receiptWaiting ? " They sent a payment receipt that has not been checked yet." : "";
-  const detail = `${who} cancelled their booking for the ${vehicle} (${when}) from their booking link.${reason ? ` Their reason: "${reason}".` : ""} The dates are free again.${settle}`;
+  const detail = `${who} canceled their booking for the ${vehicle} (${when}) from their booking link.${reason ? ` Their reason: "${reason}".` : ""} The dates are free again.${settle}`;
 
   await Promise.all([
     recordActivityEvent(admin, {
@@ -77,7 +77,7 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
       rental_id: rental.id,
       customer_id: rental.customer_id,
       event_type: "booking_cancelled",
-      title: "Cancelled by the customer",
+      title: "Canceled by the customer",
       detail
     } as any).catch(() => null),
     admin.from("communication_log").insert({
@@ -97,7 +97,7 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
           rental_id: rental.id,
           title_key: null,
           created_by: null,
-          title: paid > 0 ? `Refund to decide - ${who} cancelled the ${vehicle} (${money} paid)` : `Receipt to check - ${who} cancelled the ${vehicle} after sending a payment receipt`,
+          title: paid > 0 ? `Refund to decide - ${who} canceled the ${vehicle} (${money} paid)` : `Receipt to check - ${who} canceled the ${vehicle} after sending a payment receipt`,
           task_type: "admin",
           action: paid > 0 ? "refund" : null,
           due_at: now

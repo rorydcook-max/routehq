@@ -19,7 +19,7 @@ faq:
     a: "Yes. Run RCM's Bookings Export with payments included, export it as Excel or CSV and upload it to RoveHQ. The import is free and you can undo it within 30 days."
 ---
 
-Rental Car Manager (RCM) is a cloud system for car, campervan and other vehicle hire, with a long list of integrations with booking agents. RoveHQ is a phone-first tool for small fleets of cars, scooters, motorbikes, quads and vans. They overlap for small car rental businesses, and differ most in how you sell and how you get started.
+Rental Car Manager (RCM) is a cloud system for car, campervan and other vehicle rental, with a long list of integrations with booking agents. RoveHQ is a phone-first tool for small fleets of cars, scooters, motorbikes, quads and vans. They overlap for small car rental businesses, and differ most in how you sell and how you get started.
 
 Facts about RCM come from its own website **as of November 2026**, unless we say otherwise.
 
@@ -51,7 +51,7 @@ It also says clients use it for "cars, campers, uber vehicle fleets, bikes/scoot
 
 ## Where Rental Car Manager is stronger
 
-- **Agent and channel bookings.** Direct integration with large rental agents, so your fleet appears on sites travellers already use.
+- **Agent and channel bookings.** Direct integration with large rental agents, so your fleet appears on sites travelers already use.
 - **Campervans and motorhomes.** A natural fit, with Motorhome Republic integration and packages for bundling rates and extras.
 - **Fleet finance.** Depreciation, leases, servicing costs and integrated telematics.
 - **Payment provider choice.** VostroPay and other gateways, where RoveHQ works with Stripe only.
@@ -61,7 +61,7 @@ It also says clients use it for "cars, campers, uber vehicle fleets, bikes/scoot
 - **Published prices and a free plan.** See exactly what you'll pay, including the platform fee on card payments, or pay nothing a month for up to 2 cars and 5 motorbikes. Set it up yourself in minutes.
 - **Scooter and motorbike shops.** Cars and motorbikes are counted separately, so a scooter-heavy fleet stays on a small plan.
 - **Every way customers pay.** Card, Apple Pay, Google Pay and European methods online, deposits held on the card, and cash, transfer or QR with slips checked against what's owed (including PromptPay and QRIS).
-- **Agreements and ID.** An agreement for each booking in English and the local language in 18 countries across Southeast Asia and Europe, signed on the customer's phone, with passport and licence photos read for you.
+- **Agreements and ID.** An agreement for each booking in English and the local language in 18 countries across Southeast Asia and Europe, signed on the customer's phone, with passport and license photos read for you.
 - **Languages and chat.** 28 languages for staff and customers; LINE and Telegram in one inbox with automatic reminders.
 
 ## Who should pick which
@@ -74,6 +74,6 @@ For more options, see our [roundup of car and scooter rental software for small 
 
 ## Switching from Rental Car Manager
 
-RCM's Bookings Export is a full data dump of your bookings, with payments if you tick Include Payments. Our [guide to switching from Rental Car Manager](/switch/rental-car-manager) shows where to find it. RoveHQ recognises the export, turns Reservation, Hired and Returned bookings into upcoming, current and past rentals, and brings the payments across. Importing is free, and you can undo it within 30 days.
+RCM's Bookings Export is a full data dump of your bookings, with payments if you tick Include Payments. Our [guide to switching from Rental Car Manager](/switch/rental-car-manager) shows where to find it. RoveHQ recognizes the export, turns Reservation, Hired and Returned bookings into upcoming, current and past rentals, and brings the payments across. Importing is free, and you can undo it within 30 days.
 
 [Create a free RoveHQ account](/signup) to try it with your own vehicles.

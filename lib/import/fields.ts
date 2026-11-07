@@ -15,7 +15,7 @@ export const IMPORT_FIELDS: ImportField[] = [
   { key: "trim", label: "Trim / variant", group: "Vehicle" },
   { key: "vehicle_name", label: "Make and model in one column", group: "Vehicle" },
   { key: "year", label: "Year", group: "Vehicle" },
-  { key: "color", label: "Colour", group: "Vehicle" },
+  { key: "color", label: "Color", group: "Vehicle" },
   { key: "transmission", label: "Transmission", group: "Vehicle" },
   { key: "engine_cc", label: "Engine size", group: "Vehicle" },
   { key: "fuel_type", label: "Fuel type", group: "Vehicle" },
@@ -66,14 +66,14 @@ export const IMPORT_FIELDS: ImportField[] = [
   { key: "next_payment_date", label: "Next payment due", group: "Current rental" },
   { key: "rental_total", label: "Total price of the booking", group: "Current rental" },
   { key: "amount_paid", label: "Amount already paid", group: "Current rental" },
-  { key: "booking_status", label: "Booking status (cancelled ones are left out)", group: "Current rental" },
+  { key: "booking_status", label: "Booking status (canceled ones are left out)", group: "Current rental" },
   { key: "rental_days", label: "Number of days rented", group: "Current rental" },
   { key: "returned", label: "Returned (yes / no)", group: "Current rental" },
 
   { key: "full_name", label: "Customer name", group: "Customer" },
   { key: "nationality", label: "Nationality", group: "Customer" },
   { key: "passport_number", label: "Passport number", group: "Customer" },
-  { key: "driving_licence_number", label: "Driving licence number", group: "Customer" },
+  { key: "driving_licence_number", label: "Driver's license number", group: "Customer" },
 
   { key: "vehicle_registration", label: "Vehicle plate (for a rental or payment)", group: "Rental" },
 

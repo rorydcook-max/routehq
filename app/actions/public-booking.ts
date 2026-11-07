@@ -37,9 +37,9 @@ const FIELD_WORDS: Record<string, string> = {
   dateOfBirth: "your date of birth",
   preferredContactMethod: "how we should contact you",
   passportNumber: "your passport or ID number",
-  driverLicenseNumber: "your driving licence number",
-  driverLicenseExpiry: "when your driving licence runs out",
-  driverLicenseCountry: "the country that issued your licence",
+  driverLicenseNumber: "your driver's license number",
+  driverLicenseExpiry: "when your driver's license runs out",
+  driverLicenseCountry: "the country that issued your license",
   signedName: "your name as signed",
   signature: "your signature"
 };
@@ -390,7 +390,7 @@ export async function reportPublicBookingPayment(formData: FormData) {
     throw new Error("This booking link could not be found.");
   }
   if (bookingLink.status === "cancelled") {
-    throw new Error("This booking has been cancelled.");
+    throw new Error("This booking has been canceled.");
   }
 
   const reportedAt = new Date().toISOString();
@@ -561,7 +561,7 @@ export async function completePublicBooking(formData: FormData) {
     throw new Error("This booking link could not be found.");
   }
   if (bookingLink.status === "cancelled") {
-    throw new Error("This booking has been cancelled.");
+    throw new Error("This booking has been canceled.");
   }
   if (bookingLink.expires_at && new Date(bookingLink.expires_at).getTime() < Date.now()) {
     await supabase.from("booking_links").update({ status: "expired" }).eq("id", bookingLink.id);
@@ -870,7 +870,7 @@ export async function completePublicBooking(formData: FormData) {
 
   if (currentRentalForAuthority) {
     if (customerDocumentStatus !== "complete") {
-      throw new Error("Please upload passport, driving licence and selfie documents before signing.");
+      throw new Error("Please upload passport, driver's license and selfie documents before signing.");
     }
     if (
       !currentCustomerForSigning?.passport_number ||
@@ -878,7 +878,7 @@ export async function completePublicBooking(formData: FormData) {
       !currentCustomerForSigning?.driver_license_country ||
       !currentCustomerForSigning?.driver_license_expiry
     ) {
-      throw new Error("Passport or driving licence details are missing.");
+      throw new Error("Passport or driver's license details are missing.");
     }
 
     const headerStore = await headers();

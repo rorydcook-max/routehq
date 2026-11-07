@@ -33,7 +33,7 @@ export default async function SupportInboxPage({ searchParams }: { searchParams:
       <Link className="card pressable mb-4 flex items-center gap-3 px-4 py-3" href={"/help/team/content" as Route}>
         <span className="min-w-0 flex-1">
           <span className="block text-[16px] font-bold text-[var(--foreground)]">Content requests</span>
-          <span className="block truncate font-medium text-[var(--muted)]">Questions the help centre couldn&apos;t answer, and articles people asked for.</span>
+          <span className="block truncate font-medium text-[var(--muted)]">Questions the help center couldn&apos;t answer, and articles people asked for.</span>
         </span>
         {contentWaiting ? <span className="shrink-0 rounded-full bg-[var(--primary)] px-2.5 py-0.5 text-[13px] font-bold text-white">{contentWaiting} waiting</span> : null}
         <ChevronRight className="shrink-0 text-[var(--muted)]" size={18} />

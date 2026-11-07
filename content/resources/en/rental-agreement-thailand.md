@@ -11,7 +11,7 @@ inside:
   - "Follows the Contract Committee notice in force since 30 December 2025 (car form ก, motorbike form ข)"
   - "Deposit rules: deductions only for actual, evidenced damage, cash refunds on the day of return"
   - "Replacement vehicle, pro rata early return, and termination only for a breach"
-  - "Licence and IDP, helmets, seatbelts and child seats, พ.ร.บ. and voluntary insurance"
+  - "License and IDP, helmets, seatbelts and child seats, พ.ร.บ. and voluntary insurance"
   - "Traffic fines that arrive after the rental, and PDPA wording for ID copies"
   - "Handover check (Annex A), damage price list (Annex B) and two signed copies"
 ---
@@ -37,9 +37,9 @@ Our agreement includes these terms and states that, where anything conflicts wit
 
 Beyond the required terms, it covers the everyday problems: late return charges, fuel and mileage, cleaning, smoking and pets, cancellation, accidents and breakdowns, theft, lost keys and helmets, a permitted area, and a ban on ride-hailing, delivery work and sub-letting. Annex A is a handover and return check; Annex B is a damage price list that caps what the renter pays for common items.
 
-## Licences, helmets and insurance
+## Licenses, helmets and insurance
 
-**Licence and IDP.** Thailand issues and accepts International Driving Permits under both the 1949 Geneva and 1968 Vienna conventions ([Department of Land Transport](https://www.dlt.go.th/th/public-news/3535)). A car licence does not cover a motorbike, and an owner who lets an unlicensed person drive commits an offence too ([Daily News](https://www.dailynews.co.th/news/4255531/)). The agreement lets you refuse handover until a valid licence is shown.
+**License and IDP.** Thailand issues and accepts International Driving Permits under both the 1949 Geneva and 1968 Vienna conventions ([Department of Land Transport](https://www.dlt.go.th/th/public-news/3535)). A car license does not cover a motorbike, and an owner who lets an unlicensed person drive commits an offense too ([Daily News](https://www.dailynews.co.th/news/4255531/)). The agreement lets you refuse handover until a valid license is shown.
 
 **Helmets.** Rider and passenger must both wear one, and nationwide enforcement was stepped up from 1 June 2025 ([The Bangkok Insight](https://www.thebangkokinsight.com/news/politics-general/general/1496928/)). Cars need seatbelts in every seat and a child seat for children aged 6 or under.
 
@@ -47,7 +47,7 @@ Beyond the required terms, it covers the everyday problems: late return charges,
 
 ## Passports and deposits
 
-Don't keep original passports. The UK government tells its travellers not to hand them over to rental businesses ([FCDO travel advice](https://www.gov.uk/foreign-travel-advice/thailand/safety-and-security)), and renters need them for hotels and immigration. The agreement says you check the original and keep a copy or photo, and take a money deposit instead. For amounts and dispute handling, see [how much deposit to charge](/guides/rental-deposit-policy).
+Don't keep original passports. The UK government tells its travelers not to hand them over to rental businesses ([FCDO travel advice](https://www.gov.uk/foreign-travel-advice/thailand/safety-and-security)), and renters need them for hotels and immigration. The agreement says you check the original and keep a copy or photo, and take a money deposit instead. For amounts and dispute handling, see [how much deposit to charge](/guides/rental-deposit-policy).
 
 ## Fines that arrive later
 
@@ -61,4 +61,4 @@ This page is the Thailand edition of our [free bilingual rental agreement](/reso
 
 ## Let RoveHQ do the paperwork
 
-RoveHQ fills in this agreement from each booking automatically. The renter signs it on their phone, and their passport and licence details are read from a photo, so nobody types them out at the counter. [Start free with RoveHQ](/signup).
+RoveHQ fills in this agreement from each booking automatically. The renter signs it on their phone, and their passport and license details are read from a photo, so nobody types them out at the counter. [Start free with RoveHQ](/signup).

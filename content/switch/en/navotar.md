@@ -13,10 +13,10 @@ steps:
 ---
 Navotar now operates under the RENTALL brand: it announced the switch in May 2022, after merging with Bluebird and Thermeon. If you still call it Navotar, these steps are for you.
 
-We couldn't find a public help article on its exports, so the steps above are general. RoveHQ recognises reservation exports with agreement numbers, vehicle types and pickup and return dates. Navotar is US-based, so mileage in miles is converted to your business's unit, and dates are read month first when the file can't say (RoveHQ asks you to confirm).
+We couldn't find a public help article on its exports, so the steps above are general. RoveHQ recognizes reservation exports with agreement numbers, vehicle types and pickup and return dates. Navotar is US-based, so mileage in miles is converted to your business's unit, and dates are read month first when the file can't say (RoveHQ asks you to confirm).
 
 Still deciding? Read our [Navotar (now RENTALL) vs RoveHQ comparison](/guides/navotar-vs-rovehq).
 
 ## Free import
 
-Importing is free on every plan. RoveHQ recognises RENTALL and Navotar exports and reads them straight away. You see every vehicle, booking and payment before anything is saved, and you can take the whole import back within 30 days. If you'd rather not do it yourself, [send us the files](/contact) and we'll bring them in for you.
+Importing is free on every plan. RoveHQ recognizes RENTALL and Navotar exports and reads them straight away. You see every vehicle, booking and payment before anything is saved, and you can take the whole import back within 30 days. If you'd rather not do it yourself, [send us the files](/contact) and we'll bring them in for you.

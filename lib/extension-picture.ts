@@ -1,5 +1,5 @@
 import { addDaysIso, bookingRules, clashes } from "@/lib/booking-rules";
-import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
+import { BLOCKING_RENTAL_STATUSES, EXTEND_HOLD_COLUMNS, ownerBusyEnd } from "@/lib/rental-conflicts";
 import { quoteStay, rentalRateCard } from "@/lib/rental-estimate";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 
@@ -52,13 +52,14 @@ function daysBetween(from: string, to: string) {
 async function freeVehiclesFor(admin: any, organizationId: string, booking: { vehicleId: string; startDate: string; endDate: string | null; categoryId: string | null }, gapDays: number): Promise<MoveOption[]> {
   const [{ data: vehicles }, { data: rentals }] = await Promise.all([
     admin.from("vehicles").select("id, make, model, registration_number, status, category_id, monthly_rate").eq("organization_id", organizationId).is("deleted_at", null),
-    admin.from("rentals").select("vehicle_id, start_date, end_date").eq("organization_id", organizationId).is("deleted_at", null).in("status", BLOCKING_RENTAL_STATUSES as unknown as string[])
+    admin.from("rentals").select(`vehicle_id, start_date, ${EXTEND_HOLD_COLUMNS}`).eq("organization_id", organizationId).is("deleted_at", null).in("status", BLOCKING_RENTAL_STATUSES as unknown as string[])
   ]);
   const busy = new Map<string, Array<{ startDate: string; endDate: string | null }>>();
   for (const row of rentals || []) {
     if (!row.vehicle_id || !row.start_date) continue;
     const list = busy.get(row.vehicle_id) || [];
-    list.push({ startDate: String(row.start_date).slice(0, 10), endDate: iso(row.end_date) });
+    // Held because its renter answered "Extend": not free to move another booking onto (lib/extension-hold.ts).
+    list.push({ startDate: String(row.start_date).slice(0, 10), endDate: ownerBusyEnd(row) });
     busy.set(row.vehicle_id, list);
   }
   return ((vehicles || []) as any[])

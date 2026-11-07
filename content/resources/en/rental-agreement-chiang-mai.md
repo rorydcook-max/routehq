@@ -27,7 +27,7 @@ Highway 1095 from Chiang Mai through Pai to Mae Hong Son runs about 245 km on a 
 Three clauses do the work here:
 
 - **Permitted area.** Write what you allow: "Chiang Mai province only", or "Chiang Mai and Mae Hong Son provinces". Going further needs your written permission, and insurance doesn't follow the vehicle outside the area unless the insurer confirms it in writing.
-- **Mileage.** Choose unlimited kilometres within the permitted area, or a daily or monthly allowance with a charge per extra kilometre. The odometer reading goes into the handover check (Annex A) at pick-up and return, and tampering with the odometer or GPS tracker is a serious breach.
+- **Mileage.** Choose unlimited kilometers within the permitted area, or a daily or monthly allowance with a charge per extra kilometer. The odometer reading goes into the handover check (Annex A) at pick-up and return, and tampering with the odometer or GPS tracker is a serious breach.
 - **Off-road.** Off-road riding is forbidden unless the vehicle is meant for it and you agree. If you rent trail bikes for dirt tracks, say so in the special conditions.
 
 The agreement also bans taking the vehicle out of Thailand, which matters in a province that borders Myanmar. Crossing a border with a vehicle needs separate permits and your written permission.
@@ -42,7 +42,7 @@ Northern Thailand's burning season is real for operators: in late March 2026, PM
 
 ## Monthly renters: students and remote workers
 
-If you rent by the month to students, teachers or remote workers, use the monthly mode: rent in advance on the same day each month, 7 days' notice for early return with a pro rata refund, and no early termination by you unless the renter breaches the agreement. Check the motorbike category on their licence or IDP: Thailand accepts IDPs under the 1949 Geneva and 1968 Vienna conventions ([Department of Land Transport](https://www.dlt.go.th/th/public-news/3535)), but a car-only permit doesn't cover a scooter. More on long rentals in [how to run a monthly rental business](/guides/monthly-car-rental-business).
+If you rent by the month to students, teachers or remote workers, use the monthly mode: rent in advance on the same day each month, 7 days' notice for early return with a pro rata refund, and no early termination by you unless the renter breaches the agreement. Check the motorbike category on their license or IDP: Thailand accepts IDPs under the 1949 Geneva and 1968 Vienna conventions ([Department of Land Transport](https://www.dlt.go.th/th/public-news/3535)), but a car-only permit doesn't cover a scooter. More on long rentals in [how to run a monthly rental business](/guides/monthly-car-rental-business).
 
 ## Chiang Mai land transport offices
 
@@ -52,4 +52,4 @@ For other provinces, start from the main [free bilingual rental agreement](/reso
 
 ## Let RoveHQ do the paperwork
 
-RoveHQ fills in this agreement from each booking automatically, including the permitted area and mileage allowance. The renter signs it on their phone, and their passport and licence details are read from a photo, so you can see the licence category before you hand over a bike for the loop. [Start free with RoveHQ](/signup).
+RoveHQ fills in this agreement from each booking automatically, including the permitted area and mileage allowance. The renter signs it on their phone, and their passport and license details are read from a photo, so you can see the license category before you hand over a bike for the loop. [Start free with RoveHQ](/signup).

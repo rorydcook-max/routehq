@@ -12,6 +12,7 @@ import { AlertCircle, ArrowLeft, Check, RotateCcw, Send, Sparkles } from "lucide
 import { inboxStamp, linkConversationCustomer, markConversationRead, sendInboxMessage, setConversationStatus, suggestInboxReply } from "@/app/actions/inbox";
 import type { InboxConversation, InboxMessage } from "@/lib/inbox/store";
 import { dateFormat, shortDate as dateInWords } from "@/lib/i18n/dates";
+import { niceMoney } from "@/lib/nice-money";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -302,11 +303,12 @@ export function InboxView({
                 {bookings.map((booking) => (
                   <Link className="flex-shrink-0 rounded-lg border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] hover:border-[var(--primary)]" href={`/bookings/${booking.id}` as Route} key={booking.id}>
                     <span className="block font-semibold text-[var(--foreground)]">
-                      {[booking.vehicles?.make, booking.vehicles?.model].filter(Boolean).join(" ") || say("booking")} Â· {t.has(`status_${booking.status}`) ? say(`status_${booking.status}`) : booking.status}
+                      {[booking.vehicles?.make, booking.vehicles?.model].filter(Boolean).join(" ") || say("booking")} · {t.has(`status_${booking.status}`) ? say(`status_${booking.status}`) : booking.status}
                     </span>
                     <span className="block text-[var(--muted)]">
-                      {shortDate(booking.start_date, say, locale)} â€“ {shortDate(booking.end_date, say, locale)}
-                      {Number(booking.balance_due || 0) > 0 ? ` Â· ${say("owed", { amount: `à¸¿${Number(booking.balance_due).toLocaleString("en-US")}` })}` : ""}
+                      {shortDate(booking.start_date, say, locale)} – {shortDate(booking.end_date, say, locale)}
+                      {/* In the booking's own currency (this was a garbled, always-baht sign). */}
+                      {Number(booking.balance_due || 0) > 0 ? ` · ${say("owed", { amount: niceMoney(booking.balance_due, (booking as { currency?: string | null }).currency || undefined) })}` : ""}
                     </span>
                   </Link>
                 ))}

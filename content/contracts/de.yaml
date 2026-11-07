@@ -3,7 +3,7 @@ locale: de
 language: German
 currency: EUR
 prevailing_language:
-  en: the version more favourable to the Renter
+  en: the version more favorable to the Renter
   local: die für den Mieter günstigere Fassung
 local_language:
   en: German
@@ -68,7 +68,7 @@ words:
     local: (ausfüllen)
 sources:
   - url: https://eur-lex.europa.eu/eli/dir/1993/13/oj
-    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favour (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
+    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favor (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
   - url: https://eur-lex.europa.eu/eli/dir/2011/83/oj
     supports: "Consumer Rights Directive 2011/83/EU: total price including all compulsory charges (Arts 5-6); Art 16(l) no withdrawal right for car rental for a specific date or period (charges.1, cancellation.7)."
   - url: https://commission.europa.eu/topics/consumers/consumer-rights-and-complaints/enforcement-consumer-protection/coordinated-actions/other-travel-services_en
@@ -76,9 +76,9 @@ sources:
   - url: https://eur-lex.europa.eu/eli/dir/2009/103/oj
     supports: "Motor Insurance Directive 2009/103/EC (as amended by 2021/2118): compulsory third-party cover with EU minimum amounts, valid across the EU (insurance.1)."
   - url: https://eur-lex.europa.eu/eli/dir/2006/126/oj
-    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licences recognised in every member state (renter.2)."
+    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licenses recognized in every member state (renter.2)."
   - url: https://eur-lex.europa.eu/eli/dir/2015/413/oj
-    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offences, so fines follow foreign renters (fines.1)."
+    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offenses, so fines follow foreign renters (fines.1)."
   - url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
     supports: "GDPR: controller duties, lawful bases (contract, legal obligation for giving driver details to authorities, legitimate interest), data subject rights (data.1, data.2)."
   - url: https://eur-lex.europa.eu/eli/reg/2014/910/oj
@@ -94,13 +94,13 @@ sources:
   - url: https://www.gesetze-im-internet.de/bgb/__309.html
     supports: "BGB § 309 no. 5: a flat-rate damages clause in standard terms is void unless the customer may prove a lower or no loss (general.9_de)."
   - url: https://www.gesetze-im-internet.de/stvo_2013/__2.html
-    supports: "StVO § 2(3a): winter tyres required in wintry conditions (use.8_de)."
+    supports: "StVO § 2(3a): winter tires required in wintry conditions (use.8_de)."
   - url: https://www.gesetze-im-internet.de/stvg/__25a.html
     supports: "StVG § 25a: keeper's liability for parking costs where the driver cannot be identified (fines.2)."
   - url: https://www.gesetze-im-internet.de/fev_2010/__29.html
-    supports: "FeV § 29: foreign licences from outside the EU/EEA valid for six months of residence; translation requirements (renter.2)."
+    supports: "FeV § 29: foreign licenses from outside the EU/EEA valid for six months of residence; translation requirements (renter.2)."
   - url: https://www.rac.co.uk/drive/travel/country/germany
-    supports: "RAC Germany: children under 12 and 150 cm need a restraint; zero alcohol for drivers under 21 and in their first two years; emissions sticker; no motorway toll for cars; winter tyres when conditions require (use.3, use.4, fines.3_de, use.8_de)."
+    supports: "RAC Germany: children under 12 and 150 cm need a restraint; zero alcohol for drivers under 21 and in their first two years; emissions sticker; no motorway toll for cars; winter tires when conditions require (use.3, use.4, fines.3_de, use.8_de)."
   - url: https://www.verbraucher-schlichter.de/
     supports: Consumer conciliation under the VSBG (general.7).
 title:
@@ -170,10 +170,10 @@ sections:
         en: Email
         local: E-Mail
       - key: renter_licence
-        en: Driving licence number, categories and issuing country
+        en: Driver's license number, categories and issuing country
         local: Führerscheinnummer, Klassen und Ausstellungsland
       - key: renter_licence_expiry
-        en: Licence expiry date / date first issued
+        en: License expiry date / date first issued
         local: Führerschein gültig bis / erstmals ausgestellt am
       - key: renter_idp
         en: International Driving Permit (number / not required)
@@ -182,18 +182,18 @@ sections:
         en: Emergency contact (name and phone)
         local: Notfallkontakt (Name und Telefon)
       - key: driver2_details
-        en: Additional driver (name, ID, licence), if any
+        en: Additional driver (name, ID, license), if any
         local: Zusätzlicher Fahrer (Name, Ausweis, Führerschein), falls vorhanden
     clauses:
       - id: renter.1
         en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
         local: Der Mieter bestätigt, dass die obigen Angaben wahr und vollständig sind und dass alle Personen, die das Fahrzeug führen werden, hier genannt sind. Nur der Mieter und der genannte zusätzliche Fahrer dürfen das Fahrzeug führen.
       - id: renter.2
-        en: Every driver must hold a valid driving licence for this class of vehicle (class B for cars; AM, A1, A2 or A for motorcycles; a class B licence with the code 196, available to drivers aged 25 or over after five years and a training course, allows motorcycles up to 125 cc) and carry it while driving. Licences from the EU and EEA are valid. A visitor with a licence from outside the EU and EEA may drive on it for up to six months, with a German translation or International Driving Permit where required.
+        en: Every driver must hold a valid driver's license for this class of vehicle (class B for cars; AM, A1, A2 or A for motorcycles; a class B license with the code 196, available to drivers aged 25 or over after five years and a training course, allows motorcycles up to 125 cc) and carry it while driving. Licenses from the EU and EEA are valid. A visitor with a license from outside the EU and EEA may drive on it for up to six months, with a German translation or International Driving Permit where required.
         local: Jeder Fahrer muss eine gültige Fahrerlaubnis für diese Fahrzeugklasse besitzen (Klasse B für Pkw; AM, A1, A2 oder A für Motorräder; Klasse B mit der Schlüsselzahl 196, erhältlich ab 25 Jahren nach fünf Jahren Besitz und einer Schulung, erlaubt Motorräder bis 125 cm³) und den Führerschein beim Fahren mitführen. Führerscheine aus der EU und dem EWR sind gültig. Ein Besucher mit einem Führerschein von außerhalb der EU und des EWR darf damit bis zu sechs Monate fahren, mit einer deutschen Übersetzung oder einem Internationalen Führerschein, soweit vorgeschrieben.
         country: true
       - id: renter.3
-        en: Each driver must meet the minimum age and the minimum period of holding a full licence that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
+        en: Each driver must meet the minimum age and the minimum period of holding a full license that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
         local: Jeder Fahrer muss das Mindestalter und den Mindestführerscheinbesitz erfüllen, die der Vermieter bei der Buchung genannt hat. Eine Gebühr für junge oder zusätzliche Fahrer steht vor der Unterschrift in diesem Vertrag.
   - id: vehicle
     title:
@@ -213,7 +213,7 @@ sections:
         en: Registration (plate) number
         local: Kennzeichen
       - key: vehicle_colour
-        en: Colour
+        en: Color
         local: Farbe
       - key: renter_vin
         en: Chassis / VIN number
@@ -239,7 +239,7 @@ sections:
         en: The Owner keeps the vehicle serviced as the manufacturer recommends and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time; if servicing takes more than one day, section 13 applies.
         local: Der Vermieter wartet das Fahrzeug nach Herstellervorgaben und trägt normale Reparaturen und Verschleiß, sofern dieser Vertrag nichts anderes bestimmt. Bei längeren Mieten vereinbart der Vermieter die Wartung mit dem Mieter zu einem passenden Zeitpunkt; dauert sie länger als einen Tag, gilt Abschnitt 13.
       - id: vehicle.4
-        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
         local: "Während der Miete achtet der Mieter auf den laufenden Zustand: Er prüft, ob Reifen, Licht, Bremsen, Öl und Kühlmittel normal wirken, und nutzt das Fahrzeug nicht, wenn es nicht mehr sicher ist."
   - id: period
     title:
@@ -388,7 +388,7 @@ sections:
         local: Fehlender Kraftstoff wird zum örtlichen Tankstellenpreis für die benötigte Menge berechnet{{#if fuel_service_fee}}, zuzüglich einer Betankungsgebühr von {{currency}} {{fuel_service_fee}}{{/if}}.
       - id: fuel.4
         if: mileage_limit
-        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}."
         local: "Inklusivkilometer: {{mileage_limit}} km pro {{mileage_period_label}}. Jeder weitere Kilometer kostet {{currency}} {{excess_km_fee}}."
       - id: fuel.5
         unless: mileage_limit
@@ -429,13 +429,13 @@ sections:
         local: "Verboten ist: Fahren mit mehr Alkohol als gesetzlich erlaubt (0,5 Promille; 0,0 Promille für Fahrer unter 21 Jahren und in der Probezeit) oder unter Drogeneinfluss; das Handy beim Fahren in der Hand zu halten; Rennen, Stunts oder Geländefahrten (außer das Fahrzeug ist dafür gedacht und der Vermieter stimmt zu); etwas zu ziehen oder zu schieben; Güter gegen Entgelt, verbotene Waren oder Gefahrgut zu befördern; das Fahrzeug für Fahrdienste, Lieferungen, Fahrschulen oder zur Weitervermietung zu nutzen; Personen fahren zu lassen, die nicht in Abschnitt 2 genannt sind."
         country: true
       - id: use.8_de
-        en: In wintry conditions (black ice, snow, slush or frost) the vehicle may only be driven with winter or all-season tyres marked with the Alpine symbol (section 2(3a) StVO). The Owner states what is fitted.
+        en: In wintry conditions (black ice, snow, slush or frost) the vehicle may only be driven with winter or all-season tires marked with the Alpine symbol (section 2(3a) StVO). The Owner states what is fitted.
         local: Bei winterlichen Straßenverhältnissen (Glatteis, Schnee, Schneematsch, Reifglätte) darf das Fahrzeug nur mit Winter- oder Ganzjahresreifen mit Alpine-Symbol gefahren werden (§ 2 Abs. 3a StVO). Der Vermieter gibt die Bereifung an.
         country: true
       - id: use.5
         when:
           smoking: no
-        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}
         local: Rauchen und Dampfen sind im Fahrzeug nicht erlaubt.{{#if smoking_fee}} Ein Verstoß kostet {{currency}} {{smoking_fee}} für die Geruchsbeseitigung.{{/if}}
       - id: use.6
         when:
@@ -498,7 +498,7 @@ sections:
         en: The vehicle has only the compulsory insurance. Damage to or theft of the rented vehicle is the Renter's responsibility (section 12), limited to the actual, evidenced cost.
         local: Das Fahrzeug hat nur die gesetzliche Haftpflichtversicherung. Schäden am Mietfahrzeug und sein Diebstahl gehen zulasten des Mieters (Abschnitt 12), begrenzt auf die tatsächlichen, belegten Kosten.
       - id: insurance.5
-        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
+        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
         local: "Haftungsfreistellung und Versicherung schützen den Mieter nicht, und er zahlt die tatsächlichen Kosten, wenn der Schaden oder Verlust entsteht: beim Fahren unter Alkohol- oder Drogeneinfluss, ohne gültige Fahrerlaubnis für das Fahrzeug, durch einen nicht in Abschnitt 2 genannten Fahrer, außerhalb des erlaubten Gebiets, bei verbotener Nutzung (Abschnitt 9), durch Vorsatz oder grobe Fahrlässigkeit oder wenn die Schlüssel beim Fahrzeug gelassen wurden. Reifen, Felgen, Glas, Unterboden, Innenraum, Schlüssel und Zubehör sind nur abgedeckt, wenn der Vermieter dies schriftlich bestätigt."
       - id: insurance.6
         en: Personal belongings left in or on the vehicle are not insured by the Owner, and the Owner is not responsible for their loss or damage except through its own fault.
@@ -557,7 +557,7 @@ sections:
         en: The Renter pays all traffic and parking fines, tolls, congestion and low-emission-zone charges, towing, impound and clamping costs arising during the rental, including those that reach the Owner after the vehicle is returned{{#if fine_admin_fee}}, plus a handling fee of {{currency}} {{fine_admin_fee}} for each fine or notice the Owner has to handle{{/if}}.
         local: Der Mieter zahlt alle Verwarnungs- und Bußgelder, Parkgebühren, Mautgebühren, Umweltzonen- und Einfahrtsgebühren, Abschlepp-, Verwahr- und Parkkrallenkosten, die während der Miete entstehen, auch solche, die dem Vermieter nach der Rückgabe zugehen{{#if fine_admin_fee}}, zuzüglich einer Bearbeitungsgebühr von {{currency}} {{fine_admin_fee}} für jeden Bescheid, den der Vermieter bearbeiten muss{{/if}}.
       - id: fines.2
-        en: If the authorities send the Owner a hearing letter (Anhörungsbogen) or a notice for an offence during the rental, the Owner names the Renter as the driver, and the proceedings continue against the Renter. Parking costs the Owner is charged as keeper (section 25a StVG) are passed to the Renter.
+        en: If the authorities send the Owner a hearing letter (Anhörungsbogen) or a notice for an offense during the rental, the Owner names the Renter as the driver, and the proceedings continue against the Renter. Parking costs the Owner is charged as keeper (section 25a StVG) are passed to the Renter.
         local: Erhält der Vermieter für einen Verstoß während der Mietzeit einen Anhörungsbogen oder Bescheid, benennt er den Mieter als Fahrer, und das Verfahren wird gegen den Mieter fortgesetzt. Kosten, die dem Vermieter als Halter für Parkverstöße auferlegt werden (§ 25a StVG), werden an den Mieter weitergegeben.
         country: true
       - id: fines.3_de
@@ -585,11 +585,11 @@ sections:
         local: Das Fahrzeug ist mit Schlüsseln, Papieren und Zubehör, mit dem in Abschnitt 8 vereinbarten Tankstand und in angemessen sauberem Zustand zurückzugeben. Beide Parteien prüfen das Fahrzeug gemeinsam und halten Zustand, Kilometer- und Tankstand in Anlage A mit Fotos fest. Will der Mieter nicht anwesend sein, gelten die datierten Fotos des Vermieters bei der Rückgabe als Protokoll; der Mieter erhält eine Kopie.
       - id: return.2
         if: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
         local: Bei übermäßiger Verschmutzung, Sand, Schlamm, Flecken, Essensresten oder Gerüchen im Innenraum fällt eine Reinigungsgebühr von {{currency}} {{cleaning_fee}} an (mehr nur bei nötiger Spezialreinigung, gegen Beleg).
       - id: return.3
         unless: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning.
         local: Bei übermäßiger Verschmutzung, Sand, Schlamm, Flecken, Essensresten oder Gerüchen im Innenraum können die angemessenen Reinigungskosten berechnet werden.
   - id: data
     title:
@@ -597,7 +597,7 @@ sections:
       local: 17. Personenbezogene Daten
     clauses:
       - id: data.1
-        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and licence details, copies of documents, vehicle photos and any tracker location data) under the GDPR and the Federal Data Protection Act (BDSG). It uses them to provide this rental, check identity and licence, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
+        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and license details, copies of documents, vehicle photos and any tracker location data) under the GDPR and the Federal Data Protection Act (BDSG). It uses them to provide this rental, check identity and license, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
         local: Der Vermieter ist Verantwortlicher für die personenbezogenen Daten des Mieters und der Fahrer (Name, Kontaktdaten, Ausweis- und Führerscheindaten, Dokumentkopien, Fahrzeugfotos und gegebenenfalls GPS-Standortdaten) nach der Datenschutz-Grundverordnung (DSGVO) und dem BDSG. Er nutzt sie, um die Miete durchzuführen, Identität und Fahrerlaubnis zu prüfen, gesetzliche Pflichten zu erfüllen (Buchhaltung, Bußgelder, Anfragen der Polizei), Schäden und Streitigkeiten abzuwickeln und das Fahrzeug zu schützen. Er speichert sie nur so lange, wie diese Zwecke und das Gesetz es erfordern, schützt sie und verkauft sie nie.
         country: true
       - id: data.2
@@ -619,7 +619,7 @@ sections:
         en: "Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies."
         local: "Vollständigkeit: Dieser Vertrag, seine Anlagen und besondere Vereinbarungen bilden die gesamte Vereinbarung. Änderungen gelten nur in Textform (eine Nachricht beider Parteien genügt). Ist eine Bestimmung unwirksam, bleibt der übrige Vertrag wirksam."
       - id: general.4
-        en: "Language: this agreement is written in English and German. If the versions differ, the meaning more favourable to the Renter applies."
+        en: "Language: this agreement is written in English and German. If the versions differ, the meaning more favorable to the Renter applies."
         local: "Sprache: Dieser Vertrag ist in englischer und deutscher Sprache abgefasst. Weichen die Fassungen voneinander ab, gilt die für den Mieter günstigere Bedeutung."
         country: true
       - id: general.5
@@ -676,7 +676,7 @@ sections:
         local: "Karosserie: vorne / hinten / links / rechts"
       - en: Windscreen, glass, mirrors and lights
         local: Windschutzscheibe, Scheiben, Spiegel und Leuchten
-      - en: Tyres and wheels
+      - en: Tires and wheels
         local: Reifen und Felgen
       - en: Interior and seats
         local: Innenraum und Sitze
@@ -718,7 +718,7 @@ sections:
         local: Spiegel
       - en: Headlight / tail light / indicator
         local: Scheinwerfer / Rückleuchte / Blinker
-      - en: Tyre (each)
+      - en: Tire (each)
         local: Reifen (je Stück)
       - en: Key / remote
         local: Schlüssel / Fernbedienung

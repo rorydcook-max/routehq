@@ -1,6 +1,6 @@
 ---
 title: "Free Germany car and motorbike rental agreement (English–German)"
-description: "Free bilingual Mietvertrag for Germany: AGB control under BGB 305-310, Anhörungsbogen driver naming, winter tyre rule, Umweltzone sticker, B196, euro pricing."
+description: "Free bilingual Mietvertrag for Germany: AGB control under BGB 305-310, Anhörungsbogen driver naming, winter tire rule, Umweltzone sticker, B196, euro pricing."
 date: 2026-11-03
 updated: 2026-11-03
 listed: false
@@ -10,7 +10,7 @@ inside:
   - "English beside German"
   - "Standard terms kept within BGB sections 305 to 310"
   - "The renter named as driver on a hearing letter (Anhörungsbogen)"
-  - "Winter tyres in wintry conditions (StVO section 2(3a)) and the green emissions sticker"
+  - "Winter tires in wintry conditions (StVO section 2(3a)) and the green emissions sticker"
   - "Zero alcohol for drivers under 21 and in their probation period"
   - "Handover check (Annex A), damage price list (Annex B) and signature blocks"
 ---
@@ -18,11 +18,11 @@ German courts read rental terms as standard business terms ([BGB sections 305 to
 
 ## What the Germany version covers
 
-**Fines.** When the authorities send a hearing letter for an offence during the rental, you name the renter as the driver; parking costs charged to you as keeper ([StVG section 25a](https://www.gesetze-im-internet.de/stvg/__25a.html)) are passed on.
+**Fines.** When the authorities send a hearing letter for an offense during the rental, you name the renter as the driver; parking costs charged to you as keeper ([StVG section 25a](https://www.gesetze-im-internet.de/stvg/__25a.html)) are passed on.
 
-**Licences.** Visitors from outside the EU can drive for six months, with a translation where needed ([FeV section 29](https://www.gesetze-im-internet.de/fev_2010/__29.html)); B196 allows 125 cc for drivers over 25.
+**Licenses.** Visitors from outside the EU can drive for six months, with a translation where needed ([FeV section 29](https://www.gesetze-im-internet.de/fev_2010/__29.html)); B196 allows 125 cc for drivers over 25.
 
-**Winter.** In wintry conditions only winter or all-season tyres with the Alpine symbol are allowed ([StVO section 2(3a)](https://www.gesetze-im-internet.de/stvo_2013/__2.html)).
+**Winter.** In wintry conditions only winter or all-season tires with the Alpine symbol are allowed ([StVO section 2(3a)](https://www.gesetze-im-internet.de/stvo_2013/__2.html)).
 
 **Zones.** Umweltzonen need the green sticker, which you provide.
 

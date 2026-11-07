@@ -82,11 +82,11 @@ export function getDocumentFinalisationEligibility({
     pushIssue(blockingIssues, "ownership", "organization_mismatch", "Document version does not belong to this organization.");
   }
   if (version.document_id !== document.id) pushIssue(blockingIssues, "ownership", "document_mismatch", "Version does not belong to the selected document.");
-  if (version.status !== "draft") pushIssue(blockingIssues, "version", "not_draft", "Only draft versions can be finalised.");
+  if (version.status !== "draft") pushIssue(blockingIssues, "version", "not_draft", "Only draft versions can be finalized.");
   if (document.current_version_id && document.current_version_id !== version.id) {
-    pushIssue(blockingIssues, "version", "not_current_version", "Only the current draft version can be finalised.");
+    pushIssue(blockingIssues, "version", "not_current_version", "Only the current draft version can be finalized.");
   }
-  if (document.document_type !== "rental_agreement") pushIssue(blockingIssues, "version", "unsupported_document_type", "Only rental agreement drafts can be finalised in this phase.");
+  if (document.document_type !== "rental_agreement") pushIssue(blockingIssues, "version", "unsupported_document_type", "Only rental agreement drafts can be finalized in this phase.");
   if (!text(version.rendered_html_snapshot)) pushIssue(blockingIssues, "version", "missing_html", "Rendered HTML snapshot is missing.");
   if (!Object.keys(renderedDataSnapshot).length) pushIssue(blockingIssues, "version", "missing_data_snapshot", "Rendered data snapshot is missing.");
   if (!Object.keys(businessSnapshot).length) pushIssue(blockingIssues, "business", "missing_business_snapshot", "Business snapshot is missing.");
@@ -107,13 +107,13 @@ export function getDocumentFinalisationEligibility({
   if (text(variables.is_rolling_monthly) === "true" && !text(variables.standard_daily_rate)) {
     pushIssue(warnings, "rental", "missing_standard_daily_rate", "Standard daily rate is not set for this open-ended rental.");
   }
-  if (!text(authorisedSignatory.name)) pushIssue(blockingIssues, "signature", "missing_signatory_name", "Authorised signatory name is missing.");
-  if (!text(authorisedSignatory.title)) pushIssue(blockingIssues, "signature", "missing_signatory_title", "Authorised signatory title is missing.");
+  if (!text(authorisedSignatory.name)) pushIssue(blockingIssues, "signature", "missing_signatory_name", "Authorized signatory name is missing.");
+  if (!text(authorisedSignatory.title)) pushIssue(blockingIssues, "signature", "missing_signatory_title", "Authorized signatory title is missing.");
   if (!text(authorisedSignatory.signature_authorised_at) || !text(authorisedSignatory.signature_authorisation_text_version)) {
-    pushIssue(blockingIssues, "signature", "missing_signature_authorisation", "Signature authorisation has not been accepted.");
+    pushIssue(blockingIssues, "signature", "missing_signature_authorisation", "Signature authorization has not been accepted.");
   }
   if (!isStorageReference(businessSnapshot.authorised_signature)) {
-    pushIssue(blockingIssues, "signature", "missing_authorised_signature", "Authorised signature reference is missing.");
+    pushIssue(blockingIssues, "signature", "missing_authorised_signature", "Authorized signature reference is missing.");
   }
   if (newerDraftExists) pushIssue(blockingIssues, "version", "newer_draft_exists", "A newer draft version supersedes this version.");
   for (const warning of adapterWarnings) {

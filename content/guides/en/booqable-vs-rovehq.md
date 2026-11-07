@@ -8,7 +8,7 @@ country: global
 launch: payments
 faq:
   - q: "What is the main difference between Booqable and RoveHQ?"
-    a: "Booqable is general rental software for equipment such as party gear, cameras, tools and bikes, with a strong online shop and a wide choice of payment providers. RoveHQ is built only for vehicle rental (cars, scooters, motorbikes, quads and vans), with handover checks, licence reading and rental agreements written for you, and it's run from a phone."
+    a: "Booqable is general rental software for equipment such as party gear, cameras, tools and bikes, with a strong online shop and a wide choice of payment providers. RoveHQ is built only for vehicle rental (cars, scooters, motorbikes, quads and vans), with handover checks, license reading and rental agreements written for you, and it's run from a phone."
   - q: "Is Booqable cheaper than RoveHQ?"
     a: "On the monthly price, no: as of November 2026 Booqable starts at $29 a month paid yearly ($35 monthly), while RoveHQ has a free plan and paid plans from US$15 a month. But Booqable says it takes no commission, and RoveHQ charges a platform fee on payments taken through Stripe (5% on Free, 2.5% Starter, 2% Pro, 1.5% Business, 1% on any yearly plan), on top of Stripe's own fee. On RoveHQ Starter paid monthly, that fee passes Booqable Start's $35 once you take about $800 a month by card. On yearly plans, RoveHQ Starter ($165 a year plus 1%) costs more than Booqable Start ($348 a year) once card takings pass about $18,300 a year. Work it out with your own figures."
   - q: "Does RoveHQ take card payments like Booqable?"
@@ -36,11 +36,11 @@ This page compares the two using Booqable's own website **as of November 2026**.
 | Fleet size it suits | Any number of items | One vehicle to a few dozen; Business has no limit |
 | Free plan or trial | 14-day trial, no card; account inactive after until you pick a plan | Free plan with no time limit (2 cars, 5 motorbikes); 30-day trial with everything on |
 | Payments | Stripe, PayPal, Square, Adyen, Mercado Pago, Teya, Mollie; Tap to Pay; pre-authorisations | Your own Stripe account: cards on the booking page, embedded checkout and payment links; Apple Pay, Google Pay; SEPA Direct Debit, iDEAL, Bancontact, Klarna, MB Way, BLIK; card deposit holds. Plus cash, bank transfer and QR with slip checking |
-| Languages | 10+ admin languages; customer-facing text fully customisable | 28 languages for the app and customer pages |
+| Languages | 10+ admin languages; customer-facing text fully customizable | 28 languages for the app and customer pages |
 | Mobile | iOS and Android app, add-on at $9 to $12 per user a month | Phone-first web app, included in every plan |
 | Contracts | Quotes, contracts and invoices; e-signatures from Grow | Rental agreement written for you in English and the local language (18 countries across Southeast Asia and Europe), signed on the customer's phone, every plan |
 | Vehicle handover | Not listed | Odometer and fuel photos, walkaround, damage map, signature |
-| ID checks | Not listed | Passport and licence photos read automatically |
+| ID checks | Not listed | Passport and license photos read automatically |
 | Customer chat | Email confirmations and templates | LINE and Telegram inbox, automatic reminders; WhatsApp opens with the message ready |
 | Online booking | Booking page, website integration, website builder add-on | Booking page and website booking box; custom domain on Business |
 | Accounting and integrations | Xero, Zapier, Mailchimp, Google Analytics, API | Accounting export from Starter; no direct accounting sync |
@@ -57,7 +57,7 @@ This page compares the two using Booqable's own website **as of November 2026**.
 ## Where RoveHQ is stronger
 
 - **Built for vehicles.** Handover and return checks record the odometer (read from a photo), fuel, a walkaround video, damage on a diagram and the customer's signature, then compare at return. See [handover checks](/docs/handover-checks).
-- **Agreements and ID.** RoveHQ writes a vehicle rental agreement for every booking, in English and the local language in 18 countries, and reads passport and licence photos so the customer's details are filled in for them.
+- **Agreements and ID.** RoveHQ writes a vehicle rental agreement for every booking, in English and the local language in 18 countries, and reads passport and license photos so the customer's details are filled in for them.
 - **Card deposits for vehicles.** Hold a deposit on the customer's card at pickup, then release it or capture what's owed when the vehicle comes back.
 - **Small-fleet pricing.** A free plan with no time limit, and plans priced by vehicles rather than users, with no add-on for the phone app.
 - **Every way customers pay.** Card and wallet payments online, plus cash, bank transfer and QR codes, with slips checked against what's owed (including PromptPay in Thailand and QRIS in Indonesia).
@@ -67,12 +67,12 @@ This page compares the two using Booqable's own website **as of November 2026**.
 
 **Choose Booqable if** you mainly rent equipment, or bikes and scooters as part of a wider range, you want a polished online shop with integrations like Xero and Zapier, or you'd rather use PayPal, Square or Adyen than Stripe.
 
-**Choose RoveHQ if** you rent cars, scooters, motorbikes, quads or vans, from one vehicle to a few dozen, and want to run it all from your phone: bookings, card payments and deposits, agreements, licence checks and handover photos. You can set it up yourself in minutes on the free plan.
+**Choose RoveHQ if** you rent cars, scooters, motorbikes, quads or vans, from one vehicle to a few dozen, and want to run it all from your phone: bookings, card payments and deposits, agreements, license checks and handover photos. You can set it up yourself in minutes on the free plan.
 
 If you're comparing more options, see our list of [Booqable alternatives for vehicle rental businesses](/guides/booqable-alternatives).
 
 ## Switching from Booqable
 
-Booqable exports orders, customers and inventory as CSV from the bottom of each list. Our [step-by-step guide to switching from Booqable](/switch/booqable) shows where to click. RoveHQ recognises Booqable's files, turns reserved, started and stopped orders into upcoming, current and past rentals, and records deposits as deposits held rather than income. Importing is free on every plan, and you can undo it within 30 days.
+Booqable exports orders, customers and inventory as CSV from the bottom of each list. Our [step-by-step guide to switching from Booqable](/switch/booqable) shows where to click. RoveHQ recognizes Booqable's files, turns reserved, started and stopped orders into upcoming, current and past rentals, and records deposits as deposits held rather than income. Importing is free on every plan, and you can undo it within 30 days.
 
 [Create a free RoveHQ account](/signup) to see your own fleet in it before you decide.

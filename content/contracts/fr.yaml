@@ -3,7 +3,7 @@ locale: fr
 language: French
 currency: EUR
 prevailing_language:
-  en: the version more favourable to the Renter
+  en: the version more favorable to the Renter
   local: la version la plus favorable au Locataire
 local_language:
   en: French
@@ -68,7 +68,7 @@ words:
     local: (à compléter)
 sources:
   - url: https://eur-lex.europa.eu/eli/dir/1993/13/oj
-    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favour (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
+    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favor (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
   - url: https://eur-lex.europa.eu/eli/dir/2011/83/oj
     supports: "Consumer Rights Directive 2011/83/EU: total price including all compulsory charges (Arts 5-6); Art 16(l) no withdrawal right for car rental for a specific date or period (charges.1, cancellation.7)."
   - url: https://commission.europa.eu/topics/consumers/consumer-rights-and-complaints/enforcement-consumer-protection/coordinated-actions/other-travel-services_en
@@ -76,9 +76,9 @@ sources:
   - url: https://eur-lex.europa.eu/eli/dir/2009/103/oj
     supports: "Motor Insurance Directive 2009/103/EC (as amended by 2021/2118): compulsory third-party cover with EU minimum amounts, valid across the EU (insurance.1)."
   - url: https://eur-lex.europa.eu/eli/dir/2006/126/oj
-    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licences recognised in every member state (renter.2)."
+    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licenses recognized in every member state (renter.2)."
   - url: https://eur-lex.europa.eu/eli/dir/2015/413/oj
-    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offences, so fines follow foreign renters (fines.1)."
+    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offenses, so fines follow foreign renters (fines.1)."
   - url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
     supports: "GDPR: controller duties, lawful bases (contract, legal obligation for giving driver details to authorities, legitimate interest), data subject rights (data.1, data.2)."
   - url: https://eur-lex.europa.eu/eli/reg/2014/910/oj
@@ -92,11 +92,11 @@ sources:
   - url: https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000349929
     supports: "Loi n° 94-665 (Toubon), Article 2: French is compulsory in offers and contracts with consumers; other languages may be added (general.4)."
   - url: https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006069565/
-    supports: "Code de la consommation: L212-1 and R212-1/R212-2 (unfair terms black and grey lists), L612-1 (every consumer may use a consumer mediator free of charge), R631-3 (consumer's choice of court) (general.7, general.5)."
+    supports: "Code de la consommation: L212-1 and R212-1/R212-2 (unfair terms black and gray lists), L612-1 (every consumer may use a consumer mediator free of charge), R631-3 (consumer's choice of court) (general.7, general.5)."
   - url: https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006074228/
-    supports: "Code de la route, Article L121-6: a company holding the vehicle must designate the driver within 45 days for camera-recorded offences (fines.2)."
+    supports: "Code de la route, Article L121-6: a company holding the vehicle must designate the driver within 45 days for camera-recorded offenses (fines.2)."
   - url: https://www.rac.co.uk/drive/travel/country/france
-    supports: "RAC France: UK licences need no IDP; children under 10 need a restraint; helmets; 0.05% limit, 0.02% probationary and bus drivers; Crit'Air stickers for low-emission zones; snow chains where signed (use.3, use.4, fines.3_fr, use.8_fr)."
+    supports: "RAC France: UK licenses need no IDP; children under 10 need a restraint; helmets; 0.05% limit, 0.02% probationary and bus drivers; Crit'Air stickers for low-emission zones; snow chains where signed (use.3, use.4, fines.3_fr, use.8_fr)."
   - url: https://www.securite-routiere.gouv.fr/
     supports: "Sécurité routière: gloves compulsory for motorcyclists since 2016; loi Montagne winter equipment 1 Nov-31 Mar in listed areas (use.2, use.8_fr)."
   - url: https://www.cnil.fr/
@@ -168,10 +168,10 @@ sections:
         en: Email
         local: E-mail
       - key: renter_licence
-        en: Driving licence number, categories and issuing country
+        en: Driver's license number, categories and issuing country
         local: N° de permis, catégories et pays de délivrance
       - key: renter_licence_expiry
-        en: Licence expiry date / date first issued
+        en: License expiry date / date first issued
         local: Validité du permis / date de première délivrance
       - key: renter_idp
         en: International Driving Permit (number / not required)
@@ -180,18 +180,18 @@ sections:
         en: Emergency contact (name and phone)
         local: Contact d'urgence (nom et téléphone)
       - key: driver2_details
-        en: Additional driver (name, ID, licence), if any
+        en: Additional driver (name, ID, license), if any
         local: Conducteur supplémentaire (nom, pièce d'identité, permis), le cas échéant
     clauses:
       - id: renter.1
         en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
         local: Le Locataire confirme que les informations ci-dessus sont exactes et complètes et que toutes les personnes qui conduiront le véhicule y figurent. Seuls le Locataire et le conducteur supplémentaire désigné peuvent le conduire.
       - id: renter.2
-        en: Every driver must hold a valid driving licence for this class of vehicle (category B for cars; AM, A1, A2 or A for motorcycles; in France a category B licence held for two years plus a 7-hour training course allows motorcycles up to 125 cc) and carry it while driving. Licences from the EU and EEA are valid. A visitor may drive on another foreign licence during a stay, with an official translation or International Driving Permit where it is not written in French.
+        en: Every driver must hold a valid driver's license for this class of vehicle (category B for cars; AM, A1, A2 or A for motorcycles; in France a category B license held for two years plus a 7-hour training course allows motorcycles up to 125 cc) and carry it while driving. Licenses from the EU and EEA are valid. A visitor may drive on another foreign license during a stay, with an official translation or International Driving Permit where it is not written in French.
         local: Chaque conducteur doit être titulaire d'un permis de conduire valable pour cette catégorie de véhicule (catégorie B pour les voitures ; AM, A1, A2 ou A pour les motos ; en France, le permis B détenu depuis deux ans complété par une formation de 7 heures permet la conduite des motos jusqu'à 125 cm³) et l'avoir sur soi en conduisant. Les permis de l'UE et de l'EEE sont valables. Un visiteur peut conduire avec un autre permis étranger pendant son séjour, accompagné d'une traduction officielle ou d'un permis international s'il n'est pas rédigé en français.
         country: true
       - id: renter.3
-        en: Each driver must meet the minimum age and the minimum period of holding a full licence that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
+        en: Each driver must meet the minimum age and the minimum period of holding a full license that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
         local: Chaque conducteur doit avoir l'âge minimum et l'ancienneté de permis minimale indiqués par le Loueur lors de la réservation. Tout supplément jeune conducteur ou conducteur supplémentaire figure dans le présent contrat avant sa signature.
   - id: vehicle
     title:
@@ -211,7 +211,7 @@ sections:
         en: Registration (plate) number
         local: Immatriculation
       - key: vehicle_colour
-        en: Colour
+        en: Color
         local: Couleur
       - key: renter_vin
         en: Chassis / VIN number
@@ -237,7 +237,7 @@ sections:
         en: The Owner keeps the vehicle serviced as the manufacturer recommends and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time; if servicing takes more than one day, section 13 applies.
         local: Le Loueur entretient le véhicule selon les préconisations du constructeur et prend en charge les réparations mécaniques normales et l'usure, sauf stipulation contraire. Pour les locations longues, le Loueur convient de l'entretien avec le Locataire à un moment adapté ; s'il dure plus d'un jour, la section 13 s'applique.
       - id: vehicle.4
-        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
         local: "Pendant la location, le Locataire veille à l'état courant du véhicule : il vérifie que pneus, feux, freins, huile et liquide de refroidissement paraissent normaux et ne l'utilise pas s'il n'est plus sûr."
   - id: period
     title:
@@ -386,7 +386,7 @@ sections:
         local: Le carburant manquant est facturé au prix local à la pompe pour la quantité nécessaire{{#if fuel_service_fee}}, plus des frais de service de remplissage de {{currency}} {{fuel_service_fee}}{{/if}}.
       - id: fuel.4
         if: mileage_limit
-        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}."
         local: "Kilométrage inclus : {{mileage_limit}} km par {{mileage_period_label}}. Chaque kilomètre supplémentaire coûte {{currency}} {{excess_km_fee}}."
       - id: fuel.5
         unless: mileage_limit
@@ -423,17 +423,17 @@ sections:
         local: "Voitures : tous les occupants doivent attacher leur ceinture et les enfants de moins de 10 ans doivent voyager dans un dispositif de retenue homologué adapté à leur poids et à leur taille. Le nombre de passagers ne doit pas dépasser le nombre de places."
         country: true
       - id: use.4
-        en: "It is forbidden to: drive with alcohol above the legal limit (0.5 g/l; 0.2 g/l for drivers on a probationary licence and bus drivers) or under the influence of drugs; use a hand-held phone while driving; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        en: "It is forbidden to: drive with alcohol above the legal limit (0.5 g/l; 0.2 g/l for drivers on a probationary license and bus drivers) or under the influence of drugs; use a hand-held phone while driving; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
         local: "Il est interdit : de conduire avec un taux d'alcool supérieur à la limite légale (0,5 g/l ; 0,2 g/l pour les conducteurs en permis probatoire et les conducteurs de transport en commun) ou sous l'emprise de stupéfiants ; de tenir son téléphone en main en conduisant ; de faire des courses, des acrobaties ou du hors-piste (sauf véhicule prévu pour cela et accord du Loueur) ; de remorquer ou de pousser quoi que ce soit ; de transporter des marchandises contre rémunération, des marchandises illicites ou des matières dangereuses ; d'utiliser le véhicule pour du VTC, de la livraison, de l'auto-école ou pour le relouer ; de laisser conduire une personne non désignée à la section 2."
         country: true
       - id: use.8_fr
-        en: From 1 November to 31 March, in designated mountain areas, the vehicle must have winter tyres or carry snow chains or socks (loi Montagne). The Owner states what is fitted.
+        en: From 1 November to 31 March, in designated mountain areas, the vehicle must have winter tires or carry snow chains or socks (loi Montagne). The Owner states what is fitted.
         local: Du 1er novembre au 31 mars, dans les zones de montagne désignées, le véhicule doit être équipé de pneus hiver ou détenir des chaînes ou chaussettes à neige (loi Montagne). Le Loueur indique l'équipement du véhicule.
         country: true
       - id: use.5
         when:
           smoking: no
-        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}
         local: Il est interdit de fumer et de vapoter dans le véhicule.{{#if smoking_fee}} Le non-respect de cette règle entraîne des frais de désodorisation de {{currency}} {{smoking_fee}}.{{/if}}
       - id: use.6
         when:
@@ -496,7 +496,7 @@ sections:
         en: The vehicle has only the compulsory insurance. Damage to or theft of the rented vehicle is the Renter's responsibility (section 12), limited to the actual, evidenced cost.
         local: Le véhicule n'a que l'assurance obligatoire. Les dommages ou le vol du véhicule loué restent à la charge du Locataire (section 12), dans la limite du coût réel et justifié.
       - id: insurance.5
-        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
+        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
         local: "La garantie dommages et l'assurance ne protègent pas le Locataire, qui paie le coût réel, lorsque le dommage ou la perte survient : en conduisant sous l'emprise de l'alcool ou de stupéfiants, sans permis valable pour le véhicule, avec un conducteur non désigné à la section 2, hors de la zone autorisée, lors d'une utilisation interdite (section 9), par faute intentionnelle ou lourde, ou en laissant les clés avec le véhicule. Pneus, jantes, vitrages, bas de caisse, intérieur, clés et accessoires ne sont couverts que si le Loueur l'indique par écrit."
       - id: insurance.6
         en: Personal belongings left in or on the vehicle are not insured by the Owner, and the Owner is not responsible for their loss or damage except through its own fault.
@@ -555,7 +555,7 @@ sections:
         en: The Renter pays all traffic and parking fines, tolls, congestion and low-emission-zone charges, towing, impound and clamping costs arising during the rental, including those that reach the Owner after the vehicle is returned{{#if fine_admin_fee}}, plus a handling fee of {{currency}} {{fine_admin_fee}} for each fine or notice the Owner has to handle{{/if}}.
         local: Le Locataire paie toutes les amendes de circulation et de stationnement, forfaits post-stationnement, péages, redevances de zones à faibles émissions, frais de fourrière et d'immobilisation générés pendant la location, y compris ceux reçus par le Loueur après la restitution{{#if fine_admin_fee}}, plus des frais de gestion de {{currency}} {{fine_admin_fee}} par amende ou avis que le Loueur doit traiter{{/if}}.
       - id: fines.2
-        en: For offences recorded by automatic camera, the Owner, as a company, must designate the driver to the authorities within 45 days (Highway Code, Article L121-6) and will designate the Renter, who then receives the fine and any loss of points. Parking charges (forfaits post-stationnement) incurred during the rental are the Renter's.
+        en: For offenses recorded by automatic camera, the Owner, as a company, must designate the driver to the authorities within 45 days (Highway Code, Article L121-6) and will designate the Renter, who then receives the fine and any loss of points. Parking charges (forfaits post-stationnement) incurred during the rental are the Renter's.
         local: Pour les infractions constatées par appareil automatique, le Loueur, personne morale, doit désigner le conducteur aux autorités dans un délai de 45 jours (code de la route, article L121-6) et désignera le Locataire, qui recevra l'amende et l'éventuel retrait de points. Les forfaits post-stationnement dus pendant la location sont à la charge du Locataire.
         country: true
       - id: fines.3_fr
@@ -583,11 +583,11 @@ sections:
         local: Le véhicule doit être restitué avec ses clés, documents et accessoires, avec le niveau de carburant convenu à la section 8 et raisonnablement propre. Les parties contrôlent ensemble le véhicule et consignent l'état, le kilométrage et le carburant dans l'Annexe A avec photos. Si le Locataire choisit de ne pas être présent, les photos datées prises par le Loueur à la restitution font foi et le Locataire en reçoit une copie.
       - id: return.2
         if: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
         local: Un véhicule restitué avec une saleté excessive, du sable, de la boue, des taches, des restes de nourriture ou des odeurs à l'intérieur entraîne des frais de nettoyage de {{currency}} {{cleaning_fee}} (davantage seulement si un nettoyage spécialisé est nécessaire, sur justificatif).
       - id: return.3
         unless: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning.
         local: Un véhicule restitué avec une saleté excessive, du sable, de la boue, des taches, des restes de nourriture ou des odeurs à l'intérieur peut entraîner la facturation du coût raisonnable du nettoyage.
   - id: data
     title:
@@ -595,7 +595,7 @@ sections:
       local: 17. Données personnelles
     clauses:
       - id: data.1
-        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and licence details, copies of documents, vehicle photos and any tracker location data) under the GDPR and the French Data Protection Act (loi Informatique et Libertés). It uses them to provide this rental, check identity and licence, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
+        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and license details, copies of documents, vehicle photos and any tracker location data) under the GDPR and the French Data Protection Act (loi Informatique et Libertés). It uses them to provide this rental, check identity and license, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
         local: Le Loueur est responsable du traitement des données personnelles du Locataire et des conducteurs (nom, coordonnées, données de pièce d'identité et de permis, copies de documents, photos du véhicule et éventuelle géolocalisation) au sens du règlement général sur la protection des données (RGPD) et de la loi Informatique et Libertés. Il les utilise pour fournir la location, vérifier l'identité et le permis, respecter ses obligations légales (comptabilité, amendes, réquisitions), gérer les sinistres et litiges et protéger le véhicule. Il ne les conserve que le temps nécessaire à ces finalités et à la loi, les sécurise et ne les vend jamais.
         country: true
       - id: data.2
@@ -617,7 +617,7 @@ sections:
         en: "Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies."
         local: "Intégralité : le présent contrat, ses annexes et les conditions particulières constituent l'intégralité de l'accord. Les modifications ne sont valables que par écrit (un message des deux parties suffit). Si une clause est déclarée nulle, le reste demeure applicable."
       - id: general.4
-        en: "Language: this agreement is written in French and English, as French law requires French for consumer contracts. If the versions differ, the meaning more favourable to the Renter applies."
+        en: "Language: this agreement is written in French and English, as French law requires French for consumer contracts. If the versions differ, the meaning more favorable to the Renter applies."
         local: "Langue : le présent contrat est rédigé en français et en anglais, la loi française imposant l'emploi du français dans les contrats conclus avec les consommateurs. En cas de divergence, le sens le plus favorable au Locataire prévaut."
         country: true
       - id: general.5
@@ -670,7 +670,7 @@ sections:
         local: "Carrosserie : avant / arrière / gauche / droite"
       - en: Windscreen, glass, mirrors and lights
         local: Pare-brise, vitrages, rétroviseurs et feux
-      - en: Tyres and wheels
+      - en: Tires and wheels
         local: Pneus et jantes
       - en: Interior and seats
         local: Intérieur et sièges
@@ -712,7 +712,7 @@ sections:
         local: Rétroviseur
       - en: Headlight / tail light / indicator
         local: Phare / feu arrière / clignotant
-      - en: Tyre (each)
+      - en: Tire (each)
         local: Pneu (l'unité)
       - en: Key / remote
         local: Clé / télécommande

@@ -16,7 +16,7 @@ Open the vehicle, go to **Paperwork & service**, and open **Services and repairs
 ## Log a service or repair
 
 1. Tap **Log a service or repair** (also under **More for this vehicle**).
-2. Pick **What was done**: **Service**, **Oil change**, **Repair**, **Tyres** or **Battery**.
+2. Pick **What was done**: **Service**, **Oil change**, **Repair**, **Tires** or **Battery**.
 3. Fill in **Date**, **Cost**, **Mileage** and **Garage or mechanic**.
 4. Tick **Oil changed** if it was done during a service.
 5. Set **Next due date**, **Next due at (km)**, or both.
@@ -24,7 +24,7 @@ Open the vehicle, go to **Paperwork & service**, and open **Services and repairs
 
 RoveHQ then:
 
-- adds the cost to **Money in & out** (as Servicing, or Repair for repairs, tyres and batteries)
+- adds the cost to **Money in & out** (as Servicing, or Repair for repairs, tires and batteries)
 - updates **Last service** (only for Service or Oil change) and **Last oil change**
 - sets the next service, or clears an old due date you've now passed
 - moves the mileage forward

@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 type Say = (key: string, values?: Record<string, string | number>) => string;
 import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
 import { recordPaymentRefund } from "@/app/actions/bookings";
+import { MoneyInput } from "@/components/money-input";
 
 type Props = {
   rentalId: string;
@@ -214,15 +215,7 @@ export function RefundDepositPanel({
             >
               <label className="block text-xs font-bold text-[var(--foreground-secondary)]">
                 {say("ref_amountReturn")}
-                <input
-                  className="mt-1 w-full"
-                  defaultValue={available}
-                  max={available}
-                  min={0.01}
-                  name="returnAmount"
-                  step="0.01"
-                  type="number"
-                />
+                <MoneyInput currency={currency} defaultValue={available} name="returnAmount" required />
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 {say("ref_how")}
@@ -250,14 +243,7 @@ export function RefundDepositPanel({
             >
               <label className="block text-xs font-bold text-[var(--foreground-secondary)]">
                 {say("ref_deductionAmount")}
-                <input
-                  className="mt-1 w-full"
-                  max={available}
-                  min={0.01}
-                  name="deductionAmount"
-                  step="0.01"
-                  type="number"
-                />
+                <MoneyInput currency={currency} name="deductionAmount" required />
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 {say("ref_reason")}
@@ -284,14 +270,11 @@ export function RefundDepositPanel({
             >
               <label className="block text-xs font-bold text-[var(--foreground-secondary)]">
                 {say("ref_refundAmount")}
-                <input
-                  className="mt-1 w-full"
+                <MoneyInput
+                  currency={currency}
                   defaultValue={earlyReturn ? Math.min(Math.max(0, earlyReturn.amount - Number(earlyReturn.owed || 0)), totalPaid) : totalPaid}
-                  max={totalPaid}
-                  min={0.01}
                   name="amount"
-                  step="0.01"
-                  type="number"
+                  required
                 />
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">

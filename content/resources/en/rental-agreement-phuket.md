@@ -1,6 +1,6 @@
 ---
 title: "Free car and motorbike rental agreement for Phuket (Thai–English)"
-description: "Free Thai–English rental contract for Phuket scooter and car shops: licence checks, helmets, deposits, the bridge to Phang Nga. Word and PDF."
+description: "Free Thai–English rental contract for Phuket scooter and car shops: license checks, helmets, deposits, the bridge to Phang Nga. Word and PDF."
 date: 2026-10-28
 updated: 2026-10-28
 fileLabel: "Agreement · Thai + English"
@@ -8,7 +8,7 @@ formats: [docx, pdf]
 listed: false
 inside:
   - "Thai beside English, written to the standard rental contract in force since 30 December 2025"
-  - "Licence check before handover, including the motorcycle category on an IDP"
+  - "License check before handover, including the motorcycle category on an IDP"
   - "Helmet rule for rider and passenger, with helmets listed as accessories"
   - "Permitted area clause for trips off the island to Phang Nga or Krabi"
   - "Deposit refunded on the day of return, deductions only with evidence"
@@ -16,23 +16,23 @@ inside:
   - "Camera and posted fines passed to the renter at the amount actually paid"
 ---
 
-Phuket is one of the most policed rental markets in Thailand. Scooters fill Patong, Kata and Karon, cars go out from shops and villa companies across the island, and police checkpoints regularly look at who is riding a rental bike. An agreement that shows you checked the renter's licence and explained the rules is worth having when an officer, an insurer or an unhappy renter asks.
+Phuket is one of the most policed rental markets in Thailand. Scooters fill Patong, Kata and Karon, cars go out from shops and villa companies across the island, and police checkpoints regularly look at who is riding a rental bike. An agreement that shows you checked the renter's license and explained the rules is worth having when an officer, an insurer or an unhappy renter asks.
 
 This free agreement is in Thai beside English and follows the national standard contract for car and motorbike rental. The form on this page is already set to Thailand; add your shop's details and download it as Word or PDF.
 
-## Licence checks: the rule Phuket enforces most
+## License checks: the rule Phuket enforces most
 
-Phuket police treat unlicensed riding as the island's most common traffic offence. For Songkran 2026 they said every station must run at least two checkpoints and that rental vehicles ridden by unlicensed drivers would face maximum penalties for both the rider and the owner ([The Phuket News, April 2026](https://www.thephuketnews.com/crackdown-police-vow-maximum-enforcement-in-songkran-road-safety-campaign-99867.php)). In an earlier Patong operation, police impounded 15 rental motorbikes because the shops had rented them to people without valid licences, and the Phuket Land Transport Office chief said shops must check licences and refuse renters who don't have the right one; the fine for renting to an unlicensed rider was ฿2,000 ([The Phuket News, 2023](https://www.thephuketnews.com/dozens-caught-as-police-crack-down-on-foreigners-on-motorbikes-in-patong-87115.php)).
+Phuket police treat unlicensed riding as the island's most common traffic offense. For Songkran 2026 they said every station must run at least two checkpoints and that rental vehicles ridden by unlicensed drivers would face maximum penalties for both the rider and the owner ([The Phuket News, April 2026](https://www.thephuketnews.com/crackdown-police-vow-maximum-enforcement-in-songkran-road-safety-campaign-99867.php)). In an earlier Patong operation, police impounded 15 rental motorbikes because the shops had rented them to people without valid licenses, and the Phuket Land Transport Office chief said shops must check licenses and refuse renters who don't have the right one; the fine for renting to an unlicensed rider was ฿2,000 ([The Phuket News, 2023](https://www.thephuketnews.com/dozens-caught-as-police-crack-down-on-foreigners-on-motorbikes-in-patong-87115.php)).
 
-The agreement records each driver's licence and IDP number, says a car licence doesn't cover a motorbike, and lets you refuse handover until a valid licence is shown.
+The agreement records each driver's license and IDP number, says a car license doesn't cover a motorbike, and lets you refuse handover until a valid license is shown.
 
 ## Helmets
 
-Rider and passenger must both wear a helmet. Phuket police list helmets among their top priorities, with fines of up to ฿2,000 per offence (same April 2026 report). The agreement repeats the rule for the renter, and helmets are listed with the accessories, so a lost one is charged at its actual replacement cost.
+Rider and passenger must both wear a helmet. Phuket police list helmets among their top priorities, with fines of up to ฿2,000 per offense (same April 2026 report). The agreement repeats the rule for the renter, and helmets are listed with the accessories, so a lost one is charged at its actual replacement cost.
 
 ## Leaving the island
 
-A renter leaves Phuket by road over the bridges at Tha Chatchai, which cross to Phang Nga province ([Sarasin Bridge, Wikipedia](https://en.wikipedia.org/wiki/Sarasin_Bridge)). Day trips to Khao Lak, Phang Nga Bay or Krabi are popular, and they put far more kilometres on a scooter than a week around Kata. Write "Phuket island only" in the permitted area, or name the provinces you allow. Taking the vehicle further then needs your written permission, insurance outside the permitted area isn't assumed, and you can add a mileage allowance if you want one.
+A renter leaves Phuket by road over the bridges at Tha Chatchai, which cross to Phang Nga province ([Sarasin Bridge, Wikipedia](https://en.wikipedia.org/wiki/Sarasin_Bridge)). Day trips to Khao Lak, Phang Nga Bay or Krabi are popular, and they put far more kilometers on a scooter than a week around Kata. Write "Phuket island only" in the permitted area, or name the provinces you allow. Taking the vehicle further then needs your written permission, insurance outside the permitted area isn't assumed, and you can add a mileage allowance if you want one.
 
 ## Deposits
 
@@ -54,4 +54,4 @@ For other provinces, start from the main [free bilingual rental agreement](/reso
 
 ## Let RoveHQ do the paperwork
 
-RoveHQ fills in this agreement from each booking automatically, including the delivery place. The renter signs it on their phone, and their passport and licence details are read from a photo, so the licence check is on record before the keys change hands. [Start free with RoveHQ](/signup).
+RoveHQ fills in this agreement from each booking automatically, including the delivery place. The renter signs it on their phone, and their passport and license details are read from a photo, so the license check is on record before the keys change hands. [Start free with RoveHQ](/signup).

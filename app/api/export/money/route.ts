@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
   const th = locale === "th";
   const header = th
     ? ["วันที่", "เข้า/ออก", "หมวด", "จำนวนเงิน", "สกุลเงิน", "นับเป็นรายได้", "ส่วนที่เป็นบริการเสริม", "ช่องทางชำระ", "การจอง", "ลูกค้า", "รถ", "ทะเบียน", "จ่ายให้", "หมายเหตุ", "ยกเลิกแล้ว"]
-    : ["Date", "In/Out", "Category", "Amount", "Currency", "Counts as income", "Of which extras", "Paid by", "Booking", "Customer", "Vehicle", "Plate", "Paid to", "Notes", "Cancelled"];
+    : ["Date", "In/Out", "Category", "Amount", "Currency", "Counts as income", "Of which extras", "Paid by", "Booking", "Customer", "Vehicle", "Plate", "Paid to", "Notes", "Canceled"];
   const yes = th ? "ใช่" : "Yes";
   const no = th ? "ไม่" : "No";
   const lines = [header.map(cell).join(",")];

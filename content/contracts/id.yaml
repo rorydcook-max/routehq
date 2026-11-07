@@ -37,25 +37,25 @@ sources:
   - url: https://www.hukumonline.com/klinik/a/wajibkah-membuat-kontrak-dalam-dua-bahasa-jika-melibatkan-pihak-asing--lt4dd480ffe6cb1/
     supports: "Explains UU 24/2009 art. 31 and Perpres 63/2019 art. 26(1)-(4); bilingual contracts allowed; risk of a contract not in Indonesian being challenged as void; advises agreeing a prevailing language."
   - url: https://peraturan.bpk.go.id/Details/38654/uu-no-22-tahun-2009
-    supports: "Road Traffic Law 22/2009 (LLAJ): art. 57 (SNI helmet as motorcycle equipment), 77 (driving licence required), 106(5)-(9) (carry STNK and SIM, seatbelts, SNI helmets for rider and passenger, max one passenger on a motorcycle without sidecar), penalties in arts. 281, 288, 289, 291 (renter.2, vehicle.2, vehicle.3_cc, use.2, use.3)."
+    supports: "Road Traffic Law 22/2009 (LLAJ): art. 57 (SNI helmet as motorcycle equipment), 77 (driver's license required), 106(5)-(9) (carry STNK and SIM, seatbelts, SNI helmets for rider and passenger, max one passenger on a motorcycle without sidecar), penalties in arts. 281, 288, 289, 291 (renter.2, vehicle.2, vehicle.3_cc, use.2, use.3)."
   - url: https://www.hukumonline.com/klinik/a/undang-undang-yang-mewajibkan-penggunaan-helm-standar-cl4957/
     supports: "Quotes LLAJ art. 57(2), 106(8) and 291(1)-(2): rider and passenger must wear SNI helmets; rider is liable for a passenger without a helmet (use.2)."
   - url: https://www.hukumonline.com/klinik/a/aturan-sabuk-keselamatan-untuk-pengemudi-dan-penumpang-mobil-lt5d3a9d9aa4ce4
     supports: "LLAJ art. 106(6) and 289: seatbelt duty applies to the driver and front passenger; no statutory child-seat rule identified (use.3)."
   - url: https://peraturan.bpk.go.id/Download/210908/Perpol%20Nomor%205%20Tahun%202021.pdf
-    supports: "Police Regulation 5/2021 on driving licences: SIM classes (A for cars; C, CI, CII for motorcycles by engine size) and requirements for foreigners to obtain an Indonesian SIM (passport plus KITAS/KITAP or other permit) (renter.2)."
+    supports: "Police Regulation 5/2021 on driver's licenses: SIM classes (A for cars; C, CI, CII for motorcycles by engine size) and requirements for foreigners to obtain an Indonesian SIM (passport plus KITAS/KITAP or other permit) (renter.2)."
   - url: https://peraturan.go.id/files/Peraturan+POLRI-no-2-tahun-2023.pdf
     supports: "Police Regulation 2/2023 amending Perpol 5/2021: international driving permits; a foreign-issued permit is valid in Indonesia under an international convention or agreement (renter.2)."
   - url: https://www.hukumonline.com/klinik/a/dasar-hukum-sim-internasional-lt592e221b26fc2/
-    supports: "LLAJ art. 85(4) and Perpol 2/2023 art. 3(12)-(13): foreign licences/IDPs recognised only under international agreements; notes Indonesia's ratification of the 1968 Vienna Convention is not confirmed (uncertainty flagged in renter.2 wording)."
+    supports: "LLAJ art. 85(4) and Perpol 2/2023 art. 3(12)-(13): foreign licenses/IDPs recognized only under international agreements; notes Indonesia's ratification of the 1968 Vienna Convention is not confirmed (uncertainty flagged in renter.2 wording)."
   - url: https://www.hukumonline.com/berita/a/mengenali-kategori-sim-c-terbaru-lt60b4a251a5de4/
     supports: "SIM C split into C, CI and CII by motorcycle engine capacity under Perpol 5/2021 (renter.2)."
   - url: https://www.smartraveller.gov.au/destinations/asia/indonesia
-    supports: "Australian Government advice: to drive in Indonesia you need an Indonesian licence or an IDP; check the licence covers motorbikes; always wear a helmet; do not hand over your passport (renter.2, deposit.4)."
+    supports: "Australian Government advice: to drive in Indonesia you need an Indonesian license or an IDP; check the license covers motorbikes; always wear a helmet; do not hand over your passport (renter.2, deposit.4)."
   - url: https://bali.antaranews.com/berita/373757/bali-luncurkan-edaran-tatanan-baru-bagi-turis-asing
     supports: "Bali Provincial Circular SE 7/2025 for foreign tourists (March 2025): carry an international or national SIM, obey traffic rules, wear helmets, do not exceed vehicle capacity, use roadworthy four-wheel vehicles from licensed rental businesses, transact in rupiah/QRIS."
   - url: https://www.antaranews.com/berita/3530361/kadishub-bali-s
-    supports: "Bali Transport Agency (May 2023): foreigners need the proper licence to rent a motorbike; the Governor's announced motorbike-rental ban for foreign tourists was still under discussion and not in force."
+    supports: "Bali Transport Agency (May 2023): foreigners need the proper license to rent a motorbike; the Governor's announced motorbike-rental ban for foreign tourists was still under discussion and not in force."
   - url: https://otomotifnet.gridoto.com/read/233725844/wna-dilarang-sewa-motor-di-bali-hanya-boleh-pakai-mobil-dari-agen-travel
     supports: "Governor Koster's 12 March 2023 announcement of a planned ban on foreign tourists renting motorbikes in Bali (context for operators; no enacted regulation found)."
   - url: https://peraturan.bpk.go.id/Details/39140/uu-no-6-tahun-2011
@@ -124,17 +124,17 @@ sections:
       - { key: renter_local_address, en: "Local address during the rental (hotel / villa / guesthouse)", local: "Alamat selama masa sewa (hotel / vila / penginapan)" }
       - { key: renter_phone, en: "Phone / WhatsApp", local: "Telepon / WhatsApp" }
       - { key: renter_email, en: "Email", local: "Email" }
-      - { key: renter_licence, en: "Driving licence number, class (e.g. SIM A / SIM C) and issuing country", local: "Nomor SIM, golongan (misalnya SIM A / SIM C) dan negara penerbit" }
-      - { key: renter_licence_expiry, en: "Licence expiry date", local: "Tanggal berakhir masa berlaku SIM" }
+      - { key: renter_licence, en: "Driver's license number, class (e.g. SIM A / SIM C) and issuing country", local: "Nomor SIM, golongan (misalnya SIM A / SIM C) dan negara penerbit" }
+      - { key: renter_licence_expiry, en: "License expiry date", local: "Tanggal berakhir masa berlaku SIM" }
       - { key: renter_idp, en: "International Driving Permit (number and categories / not required)", local: "SIM internasional / IDP (nomor dan kategori / tidak diperlukan)" }
       - { key: renter_emergency, en: "Emergency contact (name and phone)", local: "Kontak darurat (nama dan telepon)" }
-      - { key: driver2_details, en: "Additional driver (name, ID, licence), if any", local: "Pengemudi tambahan (nama, identitas, SIM), jika ada" }
+      - { key: driver2_details, en: "Additional driver (name, ID, license), if any", local: "Pengemudi tambahan (nama, identitas, SIM), jika ada" }
     clauses:
       - id: renter.1
         en: "The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle."
         local: "Penyewa menyatakan bahwa data di atas benar dan lengkap, dan bahwa setiap orang yang akan mengemudikan kendaraan tercantum di sini. Hanya Penyewa dan pengemudi tambahan yang tercantum di atas yang boleh mengemudikan kendaraan."
       - id: renter.2
-        en: "Every driver must hold a driving licence that is valid in Indonesia for this class of vehicle and carry it at all times while driving: an Indonesian SIM A for cars or SIM C (C, CI or CII, depending on engine size) for motorbikes, or a valid foreign licence for the same class together with an International Driving Permit (IDP) covering that class (category A for motorbikes, B for cars) or another permit recognised in Indonesia. A car licence does not allow a person to ride a motorbike. The Owner may refuse to hand over the vehicle if these documents cannot be shown. Driving without the right licence is a traffic offence and removes insurance protection (section 11)."
+        en: "Every driver must hold a driver's license that is valid in Indonesia for this class of vehicle and carry it at all times while driving: an Indonesian SIM A for cars or SIM C (C, CI or CII, depending on engine size) for motorbikes, or a valid foreign license for the same class together with an International Driving Permit (IDP) covering that class (category A for motorbikes, B for cars) or another permit recognized in Indonesia. A car license does not allow a person to ride a motorbike. The Owner may refuse to hand over the vehicle if these documents cannot be shown. Driving without the right license is a traffic offense and removes insurance protection (section 11)."
         local: "Setiap pengemudi wajib memiliki surat izin mengemudi yang berlaku di Indonesia untuk golongan kendaraan ini dan membawanya setiap kali mengemudi, yaitu: SIM A Indonesia untuk mobil atau SIM C (C, CI atau CII sesuai kapasitas mesin) untuk sepeda motor; atau SIM asing yang masih berlaku untuk golongan yang sama disertai International Driving Permit (IDP/SIM internasional) yang mencakup golongan tersebut (kategori A untuk sepeda motor, B untuk mobil) atau izin lain yang diakui di Indonesia. SIM mobil tidak berlaku untuk mengendarai sepeda motor. Pemilik berhak menolak menyerahkan kendaraan apabila dokumen tersebut tidak dapat ditunjukkan. Mengemudi tanpa SIM yang sesuai merupakan pelanggaran lalu lintas dan menghilangkan perlindungan asuransi (Pasal 11)."
         country: true
 
@@ -145,7 +145,7 @@ sections:
       - { key: vehicle_make_model, en: "Make and model", local: "Merek dan tipe" }
       - { key: vehicle_year, en: "Year", local: "Tahun pembuatan" }
       - { key: vehicle_plate, en: "Registration (plate) number", local: "Nomor polisi (pelat nomor)" }
-      - { key: vehicle_colour, en: "Colour", local: "Warna" }
+      - { key: vehicle_colour, en: "Color", local: "Warna" }
       - { key: renter_vin, en: "Chassis / VIN number", local: "Nomor rangka / VIN" }
       - { key: out_odometer, en: "Odometer at handover", local: "Odometer saat serah terima" }
       - { key: out_fuel, en: "Fuel / battery level at handover", local: "Level bahan bakar / baterai saat serah terima" }
@@ -163,10 +163,10 @@ sections:
         en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies."
         local: "Pemilik merawat kendaraan sesuai anjuran pabrikan, termasuk penggantian oli, pemeriksaan berkala dan penggantian suku cadang yang aus, serta menanggung biaya perbaikan mekanis biasa dan keausan wajar, kecuali ditentukan lain dalam perjanjian ini. Untuk sewa jangka panjang, Pemilik mengatur jadwal servis bersama Penyewa pada waktu yang sesuai dan segera mengembalikan kendaraan; apabila servis memakan waktu lebih dari satu hari, berlaku Pasal 13."
       - id: vehicle.4
-        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
         local: "Selama masa sewa, Penyewa menjaga kondisi harian kendaraan: memeriksa bahwa ban, lampu, rem, oli dan cairan pendingin tampak normal, menjaga kendaraan cukup bersih agar aman dikendarai, dan tidak mengemudikan kendaraan apabila kendaraan menjadi tidak aman atau tidak laik jalan."
       - id: vehicle.3_cc
-        en: "The original STNK is handed over with the vehicle and must be carried whenever the vehicle is used, because the police may ask to see it together with the driving licence. The Renter must not leave it in an unattended vehicle, must keep it safe and must return it with the vehicle. A lost STNK or number plate is charged under section 12."
+        en: "The original STNK is handed over with the vehicle and must be carried whenever the vehicle is used, because the police may ask to see it together with the driver's license. The Renter must not leave it in an unattended vehicle, must keep it safe and must return it with the vehicle. A lost STNK or number plate is charged under section 12."
         local: "STNK asli diserahkan bersama kendaraan dan wajib dibawa setiap kali kendaraan digunakan, karena polisi dapat memintanya bersama SIM. Penyewa tidak boleh meninggalkannya di dalam kendaraan yang ditinggal, wajib menyimpannya dengan aman dan mengembalikannya bersama kendaraan. STNK atau pelat nomor yang hilang dikenakan biaya sesuai Pasal 12."
 
   - id: period
@@ -233,7 +233,7 @@ sections:
         local: "Denda lalu lintas sering datang setelah masa sewa berakhir, terutama tilang elektronik (ETLE) yang dikirim kepada pemilik kendaraan yang terdaftar. Pemilik dapat menahan sebagian uang jaminan secara wajar, tidak lebih dari perkiraan denda dan biaya administrasinya, paling lama 30 hari untuk menutup denda yang patut diduga akan datang, dan wajib segera mengembalikannya apabila tidak ada denda atau setelah denda diselesaikan."
         country: true
       - id: deposit.4
-        en: "The Owner will not keep the Renter's original passport, KTP (identity card), KITAS/KITAP or driving licence as a deposit. Foreign visitors must be able to show their passport or stay permit to officials when asked. The Owner may take a copy or photo of these documents to identify the Renter (section 17)."
+        en: "The Owner will not keep the Renter's original passport, KTP (identity card), KITAS/KITAP or driver's license as a deposit. Foreign visitors must be able to show their passport or stay permit to officials when asked. The Owner may take a copy or photo of these documents to identify the Renter (section 17)."
         local: "Pemilik tidak akan menahan paspor asli, KTP, KITAS/KITAP atau SIM milik Penyewa sebagai jaminan. Warga negara asing wajib dapat menunjukkan paspor atau izin tinggalnya kepada petugas apabila diminta. Pemilik dapat membuat salinan atau foto dokumen tersebut untuk mengidentifikasi Penyewa (Pasal 17)."
         country: true
 
@@ -280,7 +280,7 @@ sections:
         local: "Kekurangan bahan bakar dikenakan biaya sesuai harga SPBU setempat ditambah biaya layanan pengisian sebesar {{currency}} {{fuel_service_fee}}. Penggunaan jenis bahan bakar yang salah menjadi tanggung jawab Penyewa, termasuk biaya derek dan perbaikan."
       - id: fuel.4
         if: mileage_limit
-        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}."
         local: "Batas jarak tempuh: {{mileage_limit}} km per {{mileage_period_label}}. Setiap kilometer tambahan dikenakan biaya {{currency}} {{excess_km_fee}}."
       - id: fuel.5
         unless: mileage_limit
@@ -314,7 +314,7 @@ sections:
         local: "Penyewa dilarang: mengemudi di bawah pengaruh alkohol atau narkotika; menggunakan telepon saat mengemudi kecuali dengan perangkat bebas genggam; balapan, melakukan atraksi atau mengemudi di luar jalan atau di pantai (kecuali kendaraan memang diperuntukkan untuk itu dan Pemilik menyetujuinya); menarik atau mendorong apa pun; mengangkut penumpang di luar kabin atau di bak muatan; mengangkut barang dengan bayaran, barang terlarang atau muatan berbahaya; menggunakan kendaraan untuk ojek/taksi daring, jasa pengiriman, latihan mengemudi atau menyewakannya kepada orang lain; membiarkan orang yang tidak tercantum dalam Pasal 2 mengemudikan kendaraan."
       - id: use.5
         when: { smoking: no }
-        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}"
+        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}"
         local: "Dilarang merokok dan menggunakan rokok elektrik di dalam kendaraan.{{#if smoking_fee}} Pelanggaran atas larangan ini dikenakan biaya penghilangan bau sebesar {{currency}} {{smoking_fee}}.{{/if}}"
       - id: use.6
         when: { pets: no }
@@ -367,7 +367,7 @@ sections:
         en: "The vehicle has only the compulsory insurance. The Renter is responsible, as set out in section 12, for damage to the rented vehicle, its theft, and damage to other people's property."
         local: "Kendaraan hanya memiliki asuransi wajib. Penyewa bertanggung jawab, sebagaimana diatur dalam Pasal 12, atas kerusakan kendaraan sewa, kehilangan karena pencurian, dan kerusakan harta benda orang lain."
       - id: insurance.5
-        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, when keys were left with the vehicle, or when the vehicle is not returned (standard Indonesian motor policies do not cover embezzlement). Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
+        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, when keys were left with the vehicle, or when the vehicle is not returned (standard Indonesian motor policies do not cover embezzlement). Tires, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
         local: "Asuransi tidak melindungi Penyewa, dan Penyewa menanggung seluruh kerugian, apabila kerusakan atau kehilangan terjadi: saat mengemudi di bawah pengaruh alkohol atau narkotika, tanpa SIM yang berlaku untuk kendaraan tersebut, oleh pengemudi yang tidak tercantum dalam Pasal 2, di luar wilayah penggunaan, selama penggunaan yang dilarang (Pasal 9), karena perbuatan yang disengaja atau sembrono, ketika kunci ditinggalkan pada kendaraan, atau ketika kendaraan tidak dikembalikan (polis standar asuransi kendaraan di Indonesia tidak menanggung penggelapan). Ban, velg, kaca, bagian bawah kendaraan, interior, kunci dan perlengkapan sering dikecualikan oleh perusahaan asuransi dan menjadi tanggung jawab Penyewa, kecuali Pemilik menyatakan secara tertulis bahwa hal tersebut ditanggung."
       - id: insurance.6
         en: "Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage."
@@ -448,18 +448,18 @@ sections:
         local: "Kendaraan wajib dikembalikan beserta kunci, dokumen (termasuk STNK) dan perlengkapannya, dengan level bahan bakar sesuai Pasal 8, dan dalam keadaan cukup bersih. Para pihak memeriksa kendaraan bersama-sama dan mencatat kondisi, odometer dan bahan bakar dalam Lampiran A beserta foto. Apabila Penyewa tidak hadir saat pemeriksaan, foto bertanggal dari Pemilik diterima sebagai catatan."
       - id: return.2
         if: cleaning_fee
-        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
         local: "Kendaraan yang dikembalikan dengan kotoran, pasir, lumpur, noda, sisa makanan atau bau yang berlebihan di dalamnya dikenakan biaya pembersihan sebesar {{currency}} {{cleaning_fee}} (lebih apabila diperlukan pembersihan khusus, dengan kuitansi)."
       - id: return.3
         unless: cleaning_fee
-        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning."
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning."
         local: "Kendaraan yang dikembalikan dengan kotoran, pasir, lumpur, noda, sisa makanan atau bau yang berlebihan di dalamnya dapat dikenakan biaya pembersihan yang wajar."
 
   - id: data
     title: { en: "17. Personal data and documents", local: "17. Data pribadi dan dokumen" }
     clauses:
       - id: data.1
-        en: "Under the Personal Data Protection Law (Law 27/2022), the Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines (including ETLE), claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, does not sell them, and may mark copies of ID documents with their purpose and date. The Renter may ask to see, correct or delete their data, within the limits of the law."
+        en: "Under the Personal Data Protection Law (Law 27/2022), the Owner collects the Renter's and drivers' names, contact details, ID and license details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines (including ETLE), claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, does not sell them, and may mark copies of ID documents with their purpose and date. The Renter may ask to see, correct or delete their data, within the limits of the law."
         local: "Berdasarkan Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi, Pemilik mengumpulkan nama, kontak, data identitas dan SIM, salinan dokumen Penyewa dan pengemudi serta foto kendaraan hanya untuk melaksanakan sewa ini, membuktikan identitas, mematuhi hukum, menangani denda (termasuk ETLE), klaim dan sengketa, serta menyimpan catatan usaha. Pemilik menyimpan data tersebut hanya selama diperlukan untuk tujuan tersebut dan sesuai ketentuan hukum, menjaga keamanannya, tidak menjualnya, dan dapat memberi tanda tujuan dan tanggal pada salinan dokumen identitas. Penyewa berhak meminta akses, perbaikan atau penghapusan datanya, dalam batas yang diatur oleh hukum."
         country: true
       - id: data.2
@@ -517,7 +517,7 @@ sections:
       - { en: "Fuel / battery level", local: "Level bahan bakar / baterai" }
       - { en: "Body: front / rear / left / right", local: "Bodi: depan / belakang / kiri / kanan" }
       - { en: "Glass, mirrors and lights", local: "Kaca, spion dan lampu" }
-      - { en: "Tyres and wheels", local: "Ban dan velg" }
+      - { en: "Tires and wheels", local: "Ban dan velg" }
       - { en: "Interior and seats", local: "Interior dan jok" }
       - { en: "Keys, remote, STNK", local: "Kunci, remote, STNK" }
       - { en: "Helmets / child seat / accessories", local: "Helm / kursi anak / perlengkapan" }
@@ -537,7 +537,7 @@ sections:
       - { en: "Dent, per panel", local: "Penyok, per panel" }
       - { en: "Mirror", local: "Spion" }
       - { en: "Headlight / tail light / indicator", local: "Lampu depan / lampu belakang / lampu sein" }
-      - { en: "Tyre (each)", local: "Ban (per buah)" }
+      - { en: "Tire (each)", local: "Ban (per buah)" }
       - { en: "Key / remote", local: "Kunci / remote" }
       - { en: "Helmet", local: "Helm" }
       - { en: "Number plate replacement", local: "Penggantian pelat nomor" }

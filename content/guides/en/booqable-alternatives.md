@@ -8,7 +8,7 @@ country: global
 launch: payments
 faq:
   - q: "Is Booqable good for car or scooter rental?"
-    a: "It can work, especially for bikes and e-scooters, which Booqable lists as one of its industries. But it is built around stock items such as cameras, party gear and tools, so you won't find vehicle-specific features like mileage, fuel levels or licence checks on its pricing page. If those matter, a vehicle rental tool fits better."
+    a: "It can work, especially for bikes and e-scooters, which Booqable lists as one of its industries. But it is built around stock items such as cameras, party gear and tools, so you won't find vehicle-specific features like mileage, fuel levels or license checks on its pricing page. If those matter, a vehicle rental tool fits better."
   - q: "How much does Booqable cost?"
     a: "As of November 2026, Booqable's pricing page lists Start from $29 a month, Grow from $69 and Scale from $149 when paid yearly ($35, $87 and $187 paid monthly). All plans have a 14-day free trial with no credit card. Check their site for current prices."
   - q: "What is the cheapest Booqable alternative for a small vehicle fleet?"
@@ -16,7 +16,7 @@ faq:
   - q: "Which Booqable alternatives take card payments?"
     a: "All of the alternatives here do. RoveHQ takes cards, Apple Pay, Google Pay and European methods such as SEPA Direct Debit, iDEAL and Klarna through your own Stripe account, with card deposit holds. HQ Rental Software, RentSyst and Rental Car Manager connect to their own choice of payment providers."
   - q: "Can I move my data from Booqable?"
-    a: "Yes. Booqable exports orders, customers and inventory as CSV. RoveHQ recognises those files and imports them for free; see our guide to switching from Booqable."
+    a: "Yes. Booqable exports orders, customers and inventory as CSV. RoveHQ recognizes those files and imports them for free; see our guide to switching from Booqable."
 ---
 
 Booqable is a popular, well-made rental tool. Its homepage says it's used by "8,500+ business owners in 12+ industries", from party and AV hire to tools, boats and bikes. If you rent out vehicles, though, you may be looking for something built around cars and motorbikes rather than stock items.
@@ -29,7 +29,7 @@ This guide covers the main alternatives for small vehicle rental shops, what eac
 
 Booqable is strong if your business is mostly equipment, or a mix where vehicles are a small part. According to its [pricing page](https://booqable.com/pricing/), every plan includes unlimited inventory and orders with no commission, a ready-made booking page, website integration, and payments through Stripe, PayPal, Square, Adyen, Mollie and others. There's a mobile app for iOS and Android (an add-on at $9 to $12 per user a month), and a website builder add-on.
 
-If you rent bikes, kayaks or e-scooters alongside other gear and want a polished online shop with a wide choice of payment providers, Booqable is a sensible pick. It's less suited if you need to record a vehicle's mileage and fuel, check a driver's licence, or produce a vehicle rental agreement.
+If you rent bikes, kayaks or e-scooters alongside other gear and want a polished online shop with a wide choice of payment providers, Booqable is a sensible pick. It's less suited if you need to record a vehicle's mileage and fuel, check a driver's license, or produce a vehicle rental agreement.
 
 ## The alternatives at a glance (as of November 2026)
 
@@ -50,7 +50,7 @@ RoveHQ is built for small fleets, from one vehicle to a few dozen cars, scooters
 - **Price.** A [free plan](/pricing) for up to 2 cars and 5 motorbikes with no time limit. Starter is US$15, €13 or £11 a month (5 cars and 10 motorbikes), Pro $30, €27 or £22 (15 cars and 25 motorbikes) and Business from $45, €40 or £33, charged in your own currency. Yearly billing charges 11 months. Cars and motorbikes are counted separately, so a shop with 25 scooters fits Pro.
 - **Payments.** Connect your own Stripe account and customers pay by card on your booking page, through embedded checkout or a payment link, or with Apple Pay and Google Pay. European methods such as SEPA Direct Debit, iDEAL, Bancontact, Klarna, MB Way and BLIK are available where Stripe offers them. Deposits can be held on the card, then released or captured. Cash, bank transfer and QR payments still work, and RoveHQ checks the slips customers send, including PromptPay and QRIS.
 - **Platform fee.** Payments taken through Stripe carry a RoveHQ fee of 5% on Free, 2.5% on Starter, 2% on Pro, 1.5% on Business and 1% on any yearly plan, on top of Stripe's own processing fee. Booqable charges no commission, so if you take a lot by card, add this to the comparison.
-- **Vehicle features.** Handover and return checks with odometer and fuel photos, a damage map and the customer's signature. Passport and licence photos are read automatically.
+- **Vehicle features.** Handover and return checks with odometer and fuel photos, a damage map and the customer's signature. Passport and license photos are read automatically.
 - **Agreements.** RoveHQ writes the rental agreement for each booking, in English and the local language in 18 countries across Southeast Asia and Europe, and the customer signs on their phone.
 - **Messaging and languages.** Connect a LINE Official Account or Telegram bot and reply from one inbox; payment reminders go out automatically, and RoveHQ opens WhatsApp with the message ready to send. The app and customer pages come in 28 languages.
 - **Where it falls short.** Stripe is the only card provider, there's no connection to travel booking sites, and no telematics integration.

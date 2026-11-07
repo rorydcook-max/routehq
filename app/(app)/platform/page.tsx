@@ -42,7 +42,7 @@ export default async function AdminOverviewPage() {
     ["On a free trial", String(count((b) => b.status === "trial")), `${endingSoon.length} ending in 7 days`],
     ["Paying", String(count((b) => b.status === "active")), `${count((b) => b.status === "past_due")} payment late`],
     ["Monthly revenue", formatPlanPrice(Math.round(mrr), "THB", "en-GB"), "List prices, custom prices where set"],
-    ["Catalogue suggestions waiting", String(catalogWaiting || 0), "New makes and models from operators", "/platform/catalog"]
+    ["Catalog suggestions waiting", String(catalogWaiting || 0), "New makes and models from operators", "/platform/catalog"]
   ];
 
   return (

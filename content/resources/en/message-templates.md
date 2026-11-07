@@ -5,7 +5,7 @@ date: 2026-10-28
 fileLabel: "Templates · 6 pages"
 formats: [docx, pdf]
 inside:
-  - "Booking replies: enquiry with price, confirmation, cancellation"
+  - "Booking replies: inquiry with price, confirmation, cancellation"
   - "Money messages: deposit request with payment details, receipt, refund sent, monthly rent due"
   - "Day-before pickup or delivery details and a welcome message with your key rules"
   - "Return reminders for the day before and the morning of, plus an extension offer"
@@ -24,7 +24,7 @@ Most of a rental shop's day is spent typing the same messages. What's the price?
 
 ## What's inside
 
-Each message has the gaps marked in braces, like `{renter_name}`, `{return_time}` or `{deposit_amount}`. Replace them, check the numbers, and send. The messages are short on purpose: renters read them on a phone, often while travelling.
+Each message has the gaps marked in braces, like `{renter_name}`, `{return_time}` or `{deposit_amount}`. Replace them, check the numbers, and send. The messages are short on purpose: renters read them on a phone, often while traveling.
 
 The money messages (deposit request, receipt, refund) always repeat the amount and the booking dates. That small habit avoids most payment confusion. The late return and damage messages start calm and factual, and point back to the agreement rather than to anyone's mood.
 

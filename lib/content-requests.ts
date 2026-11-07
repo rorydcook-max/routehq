@@ -177,7 +177,7 @@ export async function collateContentRequests(): Promise<CollateResult> {
             role: "system",
             content: [
               "You sort questions that people asked RoveHQ's in-app support assistant into requests for new help content. RoveHQ is an app for small vehicle rental businesses.",
-              "Each question either couldn't be answered from the help centre, or asked for new help content.",
+              "Each question either couldn't be answered from the help center, or asked for new help content.",
               "Group questions about the same need into one topic. For each topic choose a kind:",
               '- "article": a topic no existing article covers.',
               '- "faq": an existing article almost covers it and one extra question and answer would do. Give its target_slug.',
@@ -364,7 +364,7 @@ export async function draftContentRequest(id: string): Promise<Result> {
   const ui = uiStringsFor(searchText);
 
   const rules = [
-    "You write RoveHQ's help centre. RoveHQ is an app for small vehicle rental businesses; readers are owners and staff, often on a phone.",
+    "You write RoveHQ's help center. RoveHQ is an app for small vehicle rental businesses; readers are owners and staff, often on a phone.",
     "Rules: as short as possible. Written like a real person talking: no fluff, no marketing, no \"In this article\". Numbered steps, with button, tab and field names in **bold**, spelled exactly as in the UI strings. British English. Match the style of the example articles.",
     "Only describe what the example articles or the UI strings show exists. Write [check] straight after anything you aren't sure exists or works that way."
   ];

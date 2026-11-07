@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
+import { businessCurrency } from "@/lib/business-units";
+import { formatMoney } from "@/lib/regional";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 import { ChevronRight, Search } from "lucide-react";
@@ -12,12 +14,9 @@ import { flagForNationality } from "@/lib/customer-options";
 import { initialsOf } from "@/components/glance";
 import type { CustomerListItem } from "@/lib/customer-detail";
 
+// In the business's own currency (was always baht).
 function money(value: number) {
-  return new Intl.NumberFormat("th-TH", {
-    style: "currency",
-    currency: "THB",
-    maximumFractionDigits: 0
-  }).format(value);
+  return formatMoney(Math.round(value), businessCurrency(), "en-GB");
 }
 
 function formatDate(value: string | null, say: Say, locale: string) {

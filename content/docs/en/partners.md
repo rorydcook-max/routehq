@@ -29,7 +29,7 @@ Fully booked? Send the customer to another RoveHQ business that has a vehicle fr
 4. Enter the **Customer's name** and **Customer's phone**, then tap **Create the link**.
 5. Tap **Copy link** or **Send on WhatsApp** to give it to the customer. The partner has already been told.
 
-From then on the customer belongs to the partner. You only see how it's going (**Link sent**, **Booked**, **Rented** or **Cancelled**) and your fee.
+From then on the customer belongs to the partner. You only see how it's going (**Link sent**, **Booked**, **Rented** or **Canceled**) and your fee.
 
 ## When a partner sends you a customer
 

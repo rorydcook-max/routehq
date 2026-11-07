@@ -52,7 +52,7 @@ You'll see **Starting today**. Either **Share booking link with customer**, or t
 
 ## After you send it
 
-The vehicle is held for the customer. They open the link, add their details and passport and licence photos, choose how to pay, and sign. Once they sign, the booking is confirmed and the payment schedule is set up. You can follow each step on the booking.
+The vehicle is held for the customer. They open the link, add their details and passport and license photos, choose how to pay, and sign. Once they sign, the booking is confirmed and the payment schedule is set up. You can follow each step on the booking.
 
 ## The booking page
 

@@ -5,7 +5,7 @@ import { businessToday } from "@/lib/business-time";
 import { notifyOperator, type AlertText } from "@/lib/notify-operator";
 import { addMonthlyPayments, nextMonthlyDue } from "@/lib/open-ended-billing";
 import { openEndedMonthCount } from "@/lib/payment-schedule";
-import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
+import { BLOCKING_RENTAL_STATUSES, EXTEND_HOLD_COLUMNS, ownerBusyEnd } from "@/lib/rental-conflicts";
 import { planFor, quoteStay, rentalRateCard } from "@/lib/rental-estimate";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 
@@ -59,16 +59,15 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
 
   const { data: others } = await admin
     .from("rentals")
-    .select("start_date, end_date")
+    .select(`start_date, ${EXTEND_HOLD_COLUMNS}`)
     .eq("organization_id", rental.organization_id)
     .eq("vehicle_id", rental.vehicle_id)
     .neq("id", rental.id)
     .is("deleted_at", null)
     .in("status", BLOCKING_RENTAL_STATUSES as unknown as string[]);
   const start = String(rental.start_date).slice(0, 10);
-  const blocked = (others || []).some((row: any) =>
-    clashes(start, newEndDate, { startDate: String(row.start_date).slice(0, 10), endDate: row.end_date ? String(row.end_date).slice(0, 10) : null }, rules.gapDays)
-  );
+  // Another rental whose renter answered "Extend" keeps its held days (lib/extension-hold.ts).
+  const blocked = (others || []).some((row: any) => clashes(start, newEndDate, { startDate: String(row.start_date).slice(0, 10), endDate: ownerBusyEnd(row) }, rules.gapDays));
   if (blocked) return { applied: false, reason: openEnded ? "a later booking for this vehicle is in the way" : "another booking for this vehicle is in the way" };
 
   const currency = String(rental.currency || "THB");

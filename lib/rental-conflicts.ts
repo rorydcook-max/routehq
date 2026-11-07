@@ -19,7 +19,32 @@ export type BusyPeriod = {
   endDate: string | null;
   /** True while the customer has the vehicle (handed over, not yet returned). */
   out?: boolean;
+  /** The days after this rental, held because the renter answered "Extend" (not yet applied). Blocks the team too. */
+  heldForExtension?: boolean;
 };
+
+/** Columns of a rental needed by extendHeldUntil / ownerBusyEnd. */
+export const EXTEND_HOLD_COLUMNS = "end_date, extension_hold_until, extension_answer, extension_check_end";
+
+/**
+ * The renter answered "Extend" for the current end date and it isn't applied yet (owner's decision, 7 Nov 2026): the
+ * held days are then off limits everywhere, the team's own booking form, date changes and vehicle pickers included,
+ * until the extension is applied (the end date moves) or the hold is released. Returns the first free day, else null.
+ * Before an answer, or after "Returning", only customer-facing availability sees the hold (bookableEnd).
+ */
+export function extendHeldUntil(row: { end_date?: unknown; extension_hold_until?: unknown; extension_answer?: unknown; extension_check_end?: unknown }): string | null {
+  const end = row.end_date ? String(row.end_date).slice(0, 10) : null;
+  const held = row.extension_hold_until ? String(row.extension_hold_until).slice(0, 10) : null;
+  if (!end || !held || held <= end) return null;
+  if (row.extension_answer !== "extend" || String(row.extension_check_end || "").slice(0, 10) !== end) return null;
+  return held;
+}
+
+/** End of the time a rental keeps its vehicle from the team's own bookings: its end date, or a confirmed-wanted extension hold. */
+export function ownerBusyEnd(row: { end_date?: unknown; extension_hold_until?: unknown; extension_answer?: unknown; extension_check_end?: unknown }): string | null {
+  const end = row.end_date ? String(row.end_date).slice(0, 10) : null;
+  return extendHeldUntil(row) || end;
+}
 
 function addDay(iso: string) {
   const date = new Date(`${iso}T00:00:00Z`);
@@ -78,6 +103,7 @@ function shortDate(iso: string) {
 }
 
 export function conflictMessage(period: BusyPeriod) {
+  if (period.heldForExtension) return `Held for extension: ${period.customerName || "the renter"} wants to extend. Confirm or release the hold first.`;
   const when = period.endDate ? `from ${shortDate(period.startDate)} to ${shortDate(period.endDate)}` : `from ${shortDate(period.startDate)} with no end date`;
   const who = [period.code, period.customerName].filter(Boolean).join(", ");
   return `This vehicle is already booked ${when}${who ? ` (${who})` : ""}. Choose other dates or another vehicle.`;
@@ -87,7 +113,7 @@ export function conflictMessage(period: BusyPeriod) {
 export async function loadBusyPeriods(supabase: any, organizationId: string, vehicleIds?: string[]) {
   let query = supabase
     .from("rentals")
-    .select("id, vehicle_id, display_code, reference, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name)")
+    .select(`id, vehicle_id, display_code, reference, start_date, status, ${EXTEND_HOLD_COLUMNS}, customers!rentals_customer_id_fkey(full_name)`)
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
     .in("status", BLOCKING_RENTAL_STATUSES as unknown as string[]);
@@ -106,6 +132,19 @@ export async function loadBusyPeriods(supabase: any, organizationId: string, veh
       endDate: row.end_date ? String(row.end_date).slice(0, 10) : null,
       out: (OUT_RENTAL_STATUSES as readonly string[]).includes(String(row.status || ""))
     });
+    // The renter said "Extend" and it isn't applied yet: the held days block the team's bookings too (same rental id,
+    // so the rental's own date changes and extension aren't blocked by its own hold).
+    const held = extendHeldUntil(row);
+    if (held) {
+      byVehicle[row.vehicle_id].push({
+        rentalId: row.id,
+        code: row.display_code || row.reference || null,
+        customerName: row.customers?.full_name || null,
+        startDate: String(row.end_date).slice(0, 10),
+        endDate: held,
+        heldForExtension: true
+      });
+    }
   }
   for (const list of Object.values(byVehicle)) list.sort((a, b) => a.startDate.localeCompare(b.startDate));
   return byVehicle;

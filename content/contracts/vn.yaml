@@ -42,17 +42,17 @@ sources:
   - url: "https://hethongphapluat.com/luat-trat-tu-an-toan-giao-thong-duong-bo-2024/dieu-33"
     supports: "Law 36/2024 Art. 33: motorbike rider may carry one passenger (two only in listed cases, e.g. a child under 12); rider and passenger must wear a helmet meeting the national standard with the strap fastened; passengers may not stand, sit on handlebars or carry bulky items."
   - url: "https://hethongphapluat.com/luat-trat-tu-an-toan-giao-thong-duong-bo-2024/dieu-56"
-    supports: "Law 36/2024 Art. 56: documents a driver must carry (registration certificate or permitted certified copy, licence, inspection certificate for vehicles that need one, compulsory insurance certificate); documents in the electronic identity account may be shown instead."
+    supports: "Law 36/2024 Art. 56: documents a driver must carry (registration certificate or permitted certified copy, license, inspection certificate for vehicles that need one, compulsory insurance certificate); documents in the electronic identity account may be shown instead."
   - url: "https://hethongphapluat.com/luat-trat-tu-an-toan-giao-thong-duong-bo-2024/dieu-57"
-    supports: "Law 36/2024 Art. 57: licence classes. A1 = motorbikes up to 125 cc / 11 kW; A = above that; B = cars up to 8 seats besides the driver and light trucks up to 3,500 kg."
+    supports: "Law 36/2024 Art. 57: license classes. A1 = motorbikes up to 125 cc / 11 kW; A = above that; B = cars up to 8 seats besides the driver and light trucks up to 3,500 kg."
   - url: "https://hethongphapluat.com/luat-trat-tu-an-toan-giao-thong-duong-bo-2024/dieu-59"
     supports: "Law 36/2024 Art. 59: minimum age 18 for classes A1, A and B (16 for mopeds)."
   - url: "https://luatvietnam.vn/giao-thong/luat-trat-tu-an-toan-giao-thong-duong-bo-2024-quy-dinh-nhu-the-nao-ve-giay-phep-lai-xe-hang-a1-863-100479-article.html"
-    supports: "Law 36/2024 Art. 89: licences issued before 1 January 2025 remain valid for the term and vehicles stated on them."
+    supports: "Law 36/2024 Art. 89: licenses issued before 1 January 2025 remain valid for the term and vehicles stated on them."
   - url: "https://xaydungchinhsach.chinhphu.vn/toan-van-thong-tu-12-2025-tt-bca-cua-bo-cong-an-quy-dinh-ve-sat-hach-cap-giay-phep-lai-xe-119250303174347028.htm"
-    supports: "Circular 12/2025/TT-BCA (Ministry of Public Security, government portal): Art. 24 conversion of foreign licences; Art. 29 IDPs recognised under a treaty Vietnam is party to are used according to that treaty."
+    supports: "Circular 12/2025/TT-BCA (Ministry of Public Security, government portal): Art. 24 conversion of foreign licenses; Art. 29 IDPs recognized under a treaty Vietnam is party to are used according to that treaty."
   - url: "https://daibieunhandan.vn/print/10330947.html"
-    supports: "Vietnam acceded to the 1968 Vienna Convention on Road Traffic (2014); an IDP from a Convention country is valid in Vietnam only together with the matching national licence; residents of 3+ months may convert a foreign licence."
+    supports: "Vietnam acceded to the 1968 Vienna Convention on Road Traffic (2014); an IDP from a Convention country is valid in Vietnam only together with the matching national license; residents of 3+ months may convert a foreign license."
   - url: "https://lsvn.vn/thiet-hai-nao-se-duoc-doanh-nghiep-bao-hiem-xe-co-gioi-boi-thuong-1697152694-a136310.html"
     supports: "Decree 67/2023/NĐ-CP: compulsory civil liability insurance of motor vehicle owners covers injury/death and property damage of third parties and injury/death of passengers; limits VND 150 million per person per accident (injury/death), VND 50 million (motorbikes) / VND 100 million (cars) per accident for property."
   - url: "https://vbpl.vn/van-ban/chi-tiet/bo-luat-dan-su-so-91-2015-qh13--95942"
@@ -72,7 +72,7 @@ sources:
   - url: "https://luatvietnam.vn/tin-van-ban-moi/da-co-luat-bao-ve-du-lieu-ca-nhan-2025-so-91-2025-qh15-186-102925-article.html"
     supports: "Personal Data Protection Law No. 91/2025/QH15, in force 1 January 2026."
   - url: "https://hatinh.gov.vn/vi/bai-viet/xu-ly-the-nao-voi-tai-xe-thue-xe-tu-lai-khi-bi-phat-nguoi"
-    supports: "Provincial government: camera-detected violations (phạt nguội) on self-drive rental cars; under Decree 168/2024/NĐ-CP the owner must cooperate and may identify the renter with the rental contract, ID and licence, and the renter is then fined."
+    supports: "Provincial government: camera-detected violations (phạt nguội) on self-drive rental cars; under Decree 168/2024/NĐ-CP the owner must cooperate and may identify the renter with the rental contract, ID and license, and the renter is then fined."
   - url: "https://khoaluat.duytan.edu.vn/goc-hoc-tap/vuong-mac-ve-tham-quyen-giai-quyet-tranh-chap-hop-dong-cua-toa-an-theo-lanh-tho"
     supports: "Civil Procedure Code 2015 Arts. 39-40: territorial jurisdiction; in contract disputes the plaintiff may choose the court where the contract is performed."
   - url: "https://luatvietnam.vn/linh-vuc-khac/se-thay-cac-so-113-114-115-bang-dau-so-nao-883-104078-article.html"
@@ -114,17 +114,17 @@ sections:
       - { key: renter_local_address, en: "Local address during the rental (hotel / homestay / apartment)", local: "Địa chỉ lưu trú trong thời gian thuê (khách sạn / homestay / căn hộ)" }
       - { key: renter_phone, en: "Phone / WhatsApp / Zalo", local: "Điện thoại / WhatsApp / Zalo" }
       - { key: renter_email, en: "Email", local: "Email" }
-      - { key: renter_licence, en: "Driving licence number, class and issuing country", local: "Số giấy phép lái xe, hạng và nước cấp" }
-      - { key: renter_licence_expiry, en: "Licence expiry date", local: "Ngày hết hạn giấy phép lái xe" }
+      - { key: renter_licence, en: "Driver's license number, class and issuing country", local: "Số giấy phép lái xe, hạng và nước cấp" }
+      - { key: renter_licence_expiry, en: "License expiry date", local: "Ngày hết hạn giấy phép lái xe" }
       - { key: renter_idp, en: "International Driving Permit under the 1968 Convention (number / not required)", local: "Giấy phép lái xe quốc tế theo Công ước 1968 (số / không cần)" }
       - { key: renter_emergency, en: "Emergency contact (name and phone)", local: "Người liên hệ khẩn cấp (họ tên và số điện thoại)" }
-      - { key: driver2_details, en: "Additional driver (name, ID, licence), if any", local: "Người lái bổ sung (họ tên, giấy tờ tùy thân, giấy phép lái xe), nếu có" }
+      - { key: driver2_details, en: "Additional driver (name, ID, license), if any", local: "Người lái bổ sung (họ tên, giấy tờ tùy thân, giấy phép lái xe), nếu có" }
     clauses:
       - id: renter.1
         en: "The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle."
         local: "Bên thuê xác nhận các thông tin trên là đúng và đầy đủ, và mọi người sẽ lái xe đều có tên tại đây. Chỉ Bên thuê và người lái bổ sung có tên nêu trên mới được lái xe."
       - id: renter.2
-        en: "Every driver must be at least 18 years old and hold a driving licence valid in Vietnam for this vehicle, and carry it while driving. Under Vietnamese law, motorbikes need class A1 (up to 125 cc or 11 kW) or class A (above that), and cars of up to 8 seats besides the driver need class B. Vietnamese licences issued before 2025 remain valid for the vehicles shown on them. A foreign licence can be used only together with an International Driving Permit issued under the 1968 Vienna Convention on Road Traffic, or after it has been converted into a Vietnamese licence. Permits issued under other conventions may not be accepted. A car licence does not allow a person to ride a motorbike. The Owner will not hand over the vehicle to a driver without the required licence."
+        en: "Every driver must be at least 18 years old and hold a driver's license valid in Vietnam for this vehicle, and carry it while driving. Under Vietnamese law, motorbikes need class A1 (up to 125 cc or 11 kW) or class A (above that), and cars of up to 8 seats besides the driver need class B. Vietnamese licenses issued before 2025 remain valid for the vehicles shown on them. A foreign license can be used only together with an International Driving Permit issued under the 1968 Vienna Convention on Road Traffic, or after it has been converted into a Vietnamese license. Permits issued under other conventions may not be accepted. A car license does not allow a person to ride a motorbike. The Owner will not hand over the vehicle to a driver without the required license."
         local: "Mọi người lái xe phải đủ 18 tuổi trở lên, có giấy phép lái xe có giá trị tại Việt Nam phù hợp với loại xe thuê và mang theo khi lái xe. Theo pháp luật Việt Nam, xe mô tô cần giấy phép lái xe hạng A1 (đến 125 cm3 hoặc 11 kW) hoặc hạng A (trên mức đó); ô tô chở người đến 08 chỗ (không kể chỗ của người lái) cần hạng B. Giấy phép lái xe Việt Nam cấp trước năm 2025 tiếp tục được sử dụng cho loại xe ghi trên giấy phép. Giấy phép lái xe nước ngoài chỉ được sử dụng kèm theo giấy phép lái xe quốc tế cấp theo Công ước Viên năm 1968 về giao thông đường bộ, hoặc sau khi đã đổi sang giấy phép lái xe Việt Nam. Giấy phép cấp theo các công ước khác có thể không được công nhận. Giấy phép lái ô tô không cho phép điều khiển xe mô tô. Bên cho thuê sẽ không giao xe cho người không có giấy phép lái xe theo quy định."
         country: true
 
@@ -135,7 +135,7 @@ sections:
       - { key: vehicle_make_model, en: "Make and model", local: "Nhãn hiệu và kiểu xe" }
       - { key: vehicle_year, en: "Year", local: "Năm sản xuất" }
       - { key: vehicle_plate, en: "Registration (plate) number", local: "Biển số xe" }
-      - { key: vehicle_colour, en: "Colour", local: "Màu sơn" }
+      - { key: vehicle_colour, en: "Color", local: "Màu sơn" }
       - { key: renter_vin, en: "Chassis / VIN number", local: "Số khung / số VIN" }
       - { key: out_odometer, en: "Odometer at handover", local: "Số km khi giao xe" }
       - { key: out_fuel, en: "Fuel / battery level at handover", local: "Mức nhiên liệu / pin khi giao xe" }
@@ -152,7 +152,7 @@ sections:
         en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies."
         local: "Bên cho thuê bảo dưỡng xe theo khuyến nghị của nhà sản xuất, bao gồm thay dầu, kiểm tra định kỳ và thay phụ tùng hao mòn, và chịu chi phí sửa chữa cơ khí thông thường và hao mòn tự nhiên, trừ khi hợp đồng này quy định khác. Đối với thuê dài hạn, Bên cho thuê sắp xếp lịch bảo dưỡng với Bên thuê vào thời điểm thuận tiện và giao lại xe ngay; nếu việc bảo dưỡng kéo dài hơn một ngày, áp dụng mục 13."
       - id: vehicle.4
-        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
         local: "Trong thời gian thuê, Bên thuê giữ gìn tình trạng hằng ngày của xe: kiểm tra lốp, đèn, phanh, dầu máy và nước làm mát ở tình trạng bình thường, giữ xe đủ sạch để lái an toàn, và không lái xe nếu xe trở nên không an toàn hoặc không đủ điều kiện tham gia giao thông."
       - id: vehicle.docs_cc
         en: "The Owner hands over with the vehicle the documents the driver must carry under the Road Traffic Order and Safety Law: the vehicle registration certificate (or a copy where the law allows), the compulsory insurance certificate and, for vehicles that need one, the inspection certificate. Electronic versions may be used where the law allows. The Renter keeps these documents safe and returns them with the vehicle."
@@ -269,7 +269,7 @@ sections:
         local: "Nhiên liệu thiếu được tính theo giá bán lẻ tại địa phương cộng phí dịch vụ đổ nhiên liệu {{currency}} {{fuel_service_fee}}. Bên thuê chịu trách nhiệm nếu đổ sai loại nhiên liệu, bao gồm chi phí cứu hộ và sửa chữa."
       - id: fuel.4
         if: mileage_limit
-        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}."
         local: "Số km cho phép: {{mileage_limit}} km mỗi {{mileage_period_label}}. Mỗi km vượt tính phí {{currency}} {{excess_km_fee}}."
       - id: fuel.5
         unless: mileage_limit
@@ -303,7 +303,7 @@ sections:
         local: "Nghiêm cấm: lái xe khi trong máu hoặc hơi thở có nồng độ cồn (Việt Nam không cho phép bất kỳ mức nồng độ cồn nào) hoặc khi sử dụng chất ma túy; cầm hoặc sử dụng điện thoại, thiết bị điện tử khác khi đang lái xe, trừ hình thức rảnh tay khi pháp luật cho phép; đua xe, biểu diễn hoặc chạy xe địa hình (trừ khi xe dành cho mục đích đó và Bên cho thuê đồng ý); kéo hoặc đẩy bất cứ vật gì; chở người ngồi bên ngoài khoang xe hoặc trên thùng chở hàng; chở hàng thuê, hàng cấm hoặc hàng nguy hiểm; dùng xe để chạy xe công nghệ, giao hàng, dạy lái xe hoặc cho người khác thuê lại; để người không có tên tại mục 2 lái xe."
       - id: use.5
         when: { smoking: no }
-        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}"
+        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}"
         local: "Không được hút thuốc lá hoặc thuốc lá điện tử trong xe.{{#if smoking_fee}} Vi phạm sẽ chịu phí khử mùi {{currency}} {{smoking_fee}}.{{/if}}"
       - id: use.6
         when: { pets: no }
@@ -353,7 +353,7 @@ sections:
         en: "The vehicle has only the compulsory insurance. The Renter is responsible for damage to the rented vehicle, its theft, and any damage to other people or their property above what the compulsory insurance pays (section 12)."
         local: "Xe chỉ có bảo hiểm bắt buộc. Bên thuê chịu trách nhiệm về hư hỏng, mất cắp xe thuê, và mọi thiệt hại về người và tài sản của người khác vượt quá mức bảo hiểm bắt buộc chi trả (mục 12)."
       - id: insurance.5
-        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving with alcohol or drugs, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
+        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving with alcohol or drugs, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
         local: "Bảo hiểm không bảo vệ Bên thuê, và Bên thuê bồi thường toàn bộ, khi thiệt hại hoặc mất mát xảy ra: khi lái xe có nồng độ cồn hoặc sử dụng ma túy, không có giấy phép lái xe hợp lệ cho loại xe, do người lái không có tên tại mục 2, ngoài khu vực được phép, trong khi sử dụng xe vào mục đích bị cấm (mục 9), do cố ý hoặc liều lĩnh, hoặc khi để chìa khóa cùng xe. Lốp, vành, kính, gầm xe, nội thất, chìa khóa và phụ kiện thường bị loại trừ khỏi bảo hiểm và do Bên thuê chịu trách nhiệm, trừ khi Bên cho thuê xác nhận bằng văn bản là được bảo hiểm."
       - id: insurance.6
         en: "Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage."
@@ -406,7 +406,7 @@ sections:
         en: "The Renter pays all traffic and parking fines, tolls, towing, impound and clamping costs arising during the rental, including fines that reach the Owner after the vehicle is returned, plus a handling fee of {{currency}} {{fine_admin_fee}} per fine."
         local: "Bên thuê thanh toán mọi khoản tiền phạt vi phạm giao thông và đỗ xe, phí đường bộ, chi phí cứu hộ, tạm giữ và khóa bánh xe phát sinh trong thời gian thuê, kể cả các khoản phạt được thông báo đến Bên cho thuê sau khi đã trả xe, cộng phí xử lý {{currency}} {{fine_admin_fee}} cho mỗi khoản phạt."
       - id: fines.2
-        en: "The Owner may give the Renter's name, ID and licence details and a copy of this agreement to the police or the issuing authority so that a violation is handled against the Renter as the driver, as the law allows."
+        en: "The Owner may give the Renter's name, ID and license details and a copy of this agreement to the police or the issuing authority so that a violation is handled against the Renter as the driver, as the law allows."
         local: "Bên cho thuê được cung cấp họ tên, thông tin giấy tờ tùy thân, giấy phép lái xe của Bên thuê và bản sao hợp đồng này cho cơ quan công an hoặc cơ quan có thẩm quyền để xử lý vi phạm đối với Bên thuê là người điều khiển xe, theo quy định của pháp luật."
         country: true
       - id: fines.camera_cc
@@ -431,18 +431,18 @@ sections:
         local: "Xe phải được trả kèm chìa khóa, giấy tờ và phụ kiện, với mức nhiên liệu đã thỏa thuận tại mục 8, và tương đối sạch sẽ. Hai bên cùng kiểm tra xe và ghi tình trạng, số km và nhiên liệu vào Phụ lục A kèm ảnh chụp. Nếu Bên thuê không có mặt khi kiểm tra, ảnh chụp có ghi ngày giờ của Bên cho thuê được dùng làm căn cứ."
       - id: return.2
         if: cleaning_fee
-        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
         local: "Xe trả lại có nhiều bụi bẩn, cát, bùn, vết bẩn, thức ăn hoặc mùi hôi bên trong sẽ chịu phí vệ sinh {{currency}} {{cleaning_fee}} (cao hơn nếu cần vệ sinh chuyên sâu, theo hóa đơn)."
       - id: return.3
         unless: cleaning_fee
-        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning."
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning."
         local: "Xe trả lại có nhiều bụi bẩn, cát, bùn, vết bẩn, thức ăn hoặc mùi hôi bên trong có thể bị tính chi phí vệ sinh hợp lý."
 
   - id: data
     title: { en: "17. Personal data and documents", local: "17. Dữ liệu cá nhân và giấy tờ" }
     clauses:
       - id: data.1
-        en: "The Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents, photos of the vehicle and, where a tracker is fitted, location data, only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner processes them in line with the Personal Data Protection Law and its guiding decree, keeps them only as long as needed for those purposes and the law, keeps them secure, and does not sell them. The Renter may ask to see, correct or delete their data, subject to the Owner's legal duties to keep records."
+        en: "The Owner collects the Renter's and drivers' names, contact details, ID and license details, copies of documents, photos of the vehicle and, where a tracker is fitted, location data, only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner processes them in line with the Personal Data Protection Law and its guiding decree, keeps them only as long as needed for those purposes and the law, keeps them secure, and does not sell them. The Renter may ask to see, correct or delete their data, subject to the Owner's legal duties to keep records."
         local: "Bên cho thuê thu thập họ tên, thông tin liên lạc, thông tin giấy tờ tùy thân và giấy phép lái xe, bản sao giấy tờ của Bên thuê và người lái, ảnh chụp xe và, nếu xe có thiết bị định vị, dữ liệu vị trí, chỉ để thực hiện việc cho thuê này, xác minh danh tính, tuân thủ pháp luật, xử lý tiền phạt, yêu cầu bồi thường và tranh chấp, và lưu trữ hồ sơ kinh doanh. Bên cho thuê xử lý dữ liệu theo Luật Bảo vệ dữ liệu cá nhân và nghị định hướng dẫn, chỉ lưu giữ trong thời gian cần thiết cho các mục đích đó và theo quy định của pháp luật, bảo mật dữ liệu và không bán dữ liệu. Bên thuê có quyền yêu cầu xem, chỉnh sửa hoặc xóa dữ liệu của mình, trừ trường hợp Bên cho thuê phải lưu giữ theo quy định của pháp luật."
         country: true
       - id: data.2
@@ -500,7 +500,7 @@ sections:
       - { en: "Fuel / battery level", local: "Mức nhiên liệu / pin" }
       - { en: "Body: front / rear / left / right", local: "Thân xe: trước / sau / trái / phải" }
       - { en: "Glass, mirrors and lights", local: "Kính, gương và đèn" }
-      - { en: "Tyres and wheels", local: "Lốp và vành" }
+      - { en: "Tires and wheels", local: "Lốp và vành" }
       - { en: "Interior and seats", local: "Nội thất và ghế" }
       - { en: "Keys, remote, documents", local: "Chìa khóa, điều khiển, giấy tờ xe" }
       - { en: "Helmets / child seat / accessories", local: "Mũ bảo hiểm / ghế trẻ em / phụ kiện" }
@@ -520,7 +520,7 @@ sections:
       - { en: "Dent, per panel", local: "Vết móp, mỗi tấm" }
       - { en: "Mirror", local: "Gương" }
       - { en: "Headlight / tail light / indicator", local: "Đèn pha / đèn hậu / đèn xi-nhan" }
-      - { en: "Tyre (each)", local: "Lốp (mỗi chiếc)" }
+      - { en: "Tire (each)", local: "Lốp (mỗi chiếc)" }
       - { en: "Key / remote", local: "Chìa khóa / điều khiển" }
       - { en: "Helmet", local: "Mũ bảo hiểm" }
       - { en: "Number plate replacement", local: "Làm lại biển số" }

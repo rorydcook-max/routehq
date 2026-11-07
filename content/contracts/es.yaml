@@ -3,7 +3,7 @@ locale: es
 language: Spanish
 currency: EUR
 prevailing_language:
-  en: the version more favourable to the Renter
+  en: the version more favorable to the Renter
   local: la versión más favorable para el Arrendatario
 local_language:
   en: Spanish
@@ -68,7 +68,7 @@ words:
     local: (rellenar)
 sources:
   - url: https://eur-lex.europa.eu/eli/dir/1993/13/oj
-    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favour (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
+    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favor (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
   - url: https://eur-lex.europa.eu/eli/dir/2011/83/oj
     supports: "Consumer Rights Directive 2011/83/EU: total price including all compulsory charges (Arts 5-6); Art 16(l) no withdrawal right for car rental for a specific date or period (charges.1, cancellation.7)."
   - url: https://commission.europa.eu/topics/consumers/consumer-rights-and-complaints/enforcement-consumer-protection/coordinated-actions/other-travel-services_en
@@ -76,9 +76,9 @@ sources:
   - url: https://eur-lex.europa.eu/eli/dir/2009/103/oj
     supports: "Motor Insurance Directive 2009/103/EC (as amended by 2021/2118): compulsory third-party cover with EU minimum amounts, valid across the EU (insurance.1)."
   - url: https://eur-lex.europa.eu/eli/dir/2006/126/oj
-    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licences recognised in every member state (renter.2)."
+    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licenses recognized in every member state (renter.2)."
   - url: https://eur-lex.europa.eu/eli/dir/2015/413/oj
-    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offences, so fines follow foreign renters (fines.1)."
+    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offenses, so fines follow foreign renters (fines.1)."
   - url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
     supports: "GDPR: controller duties, lawful bases (contract, legal obligation for giving driver details to authorities, legitimate interest), data subject rights (data.1, data.2)."
   - url: https://eur-lex.europa.eu/eli/reg/2014/910/oj
@@ -94,7 +94,7 @@ sources:
   - url: https://www.boe.es/buscar/act.php?id=BOE-A-2015-11722
     supports: "Royal Legislative Decree 6/2015 (Traffic Act), Art 11: the vehicle owner must identify the driver when required (fines.2)."
   - url: https://www.rac.co.uk/drive/travel/country/spain
-    supports: "RAC Spain: UK licences need no IDP; children under 135 cm need a restraint; reflective jackets and triangle; 0.05% limit, 0.03% new and professional drivers; low-emission zones; usual minimum hire age 21 (use.3, use.4, fines.3_es)."
+    supports: "RAC Spain: UK licenses need no IDP; children under 135 cm need a restraint; reflective jackets and triangle; 0.05% limit, 0.03% new and professional drivers; low-emission zones; usual minimum hire age 21 (use.3, use.4, fines.3_es)."
   - url: https://portaljuridic.gencat.cat/eli/es-ct/l/2010/07/20/22
     supports: "Catalan Consumer Code (Law 22/2010): consumers may be served and receive contracts and documents in Catalan; other regions with a co-official language have similar rules (general.4)."
   - url: https://www.consumoresponde.es/art%C3%ADculos/informacion_precontractual
@@ -170,10 +170,10 @@ sections:
         en: Email
         local: Correo electrónico
       - key: renter_licence
-        en: Driving licence number, categories and issuing country
+        en: Driver's license number, categories and issuing country
         local: N.º de permiso de conducción, categorías y país de expedición
       - key: renter_licence_expiry
-        en: Licence expiry date / date first issued
+        en: License expiry date / date first issued
         local: Caducidad del permiso / fecha de primera expedición
       - key: renter_idp
         en: International Driving Permit (number / not required)
@@ -182,18 +182,18 @@ sections:
         en: Emergency contact (name and phone)
         local: Contacto de emergencia (nombre y teléfono)
       - key: driver2_details
-        en: Additional driver (name, ID, licence), if any
+        en: Additional driver (name, ID, license), if any
         local: Conductor adicional (nombre, documento, permiso), si lo hay
     clauses:
       - id: renter.1
         en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
         local: El Arrendatario confirma que los datos anteriores son verdaderos y completos y que figuran todas las personas que conducirán el vehículo. Solo el Arrendatario y el conductor adicional indicado pueden conducirlo.
       - id: renter.2
-        en: Every driver must hold a valid driving licence for this class of vehicle (category B for cars; AM, A1, A2 or A for motorcycles; in Spain a category B licence held for more than three years also allows motorcycles up to 125 cc) and carry it while driving. Licences from the EU and EEA are valid. A visitor with another foreign licence may drive on it for up to six months from entering Spain, with an International Driving Permit or official translation where Spain does not recognise the licence on its own.
+        en: Every driver must hold a valid driver's license for this class of vehicle (category B for cars; AM, A1, A2 or A for motorcycles; in Spain a category B license held for more than three years also allows motorcycles up to 125 cc) and carry it while driving. Licenses from the EU and EEA are valid. A visitor with another foreign license may drive on it for up to six months from entering Spain, with an International Driving Permit or official translation where Spain does not recognize the license on its own.
         local: Cada conductor debe tener un permiso de conducción válido para esta clase de vehículo (categoría B para turismos; AM, A1, A2 o A para motos; en España, el permiso B con más de tres años de antigüedad permite además conducir motos de hasta 125 cc) y llevarlo consigo al conducir. Los permisos de la UE y del EEE son válidos. Un visitante con otro permiso extranjero puede conducir con él hasta seis meses desde su entrada en España, con permiso internacional o traducción oficial cuando España no reconozca el permiso por sí solo.
         country: true
       - id: renter.3
-        en: Each driver must meet the minimum age and the minimum period of holding a full licence that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
+        en: Each driver must meet the minimum age and the minimum period of holding a full license that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
         local: Cada conductor debe cumplir la edad mínima y la antigüedad mínima del permiso que el Propietario indicó en la reserva. Cualquier suplemento por conductor joven o adicional figura en este contrato antes de su firma.
   - id: vehicle
     title:
@@ -213,7 +213,7 @@ sections:
         en: Registration (plate) number
         local: Matrícula
       - key: vehicle_colour
-        en: Colour
+        en: Color
         local: Color
       - key: renter_vin
         en: Chassis / VIN number
@@ -239,7 +239,7 @@ sections:
         en: The Owner keeps the vehicle serviced as the manufacturer recommends and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time; if servicing takes more than one day, section 13 applies.
         local: El Propietario mantiene el vehículo según las indicaciones del fabricante y paga las reparaciones mecánicas normales y el desgaste, salvo que este contrato diga otra cosa. En alquileres largos, el Propietario acuerda el mantenimiento con el Arrendatario en un momento oportuno; si dura más de un día, se aplica la sección 13.
       - id: vehicle.4
-        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
         local: "Durante el alquiler, el Arrendatario cuida el estado diario del vehículo: comprueba que neumáticos, luces, frenos, aceite y refrigerante parecen normales, y no lo utiliza si deja de ser seguro."
   - id: period
     title:
@@ -388,7 +388,7 @@ sections:
         local: El combustible que falte se cobra al precio local del surtidor por la cantidad necesaria{{#if fuel_service_fee}}, más un cargo por servicio de repostaje de {{currency}} {{fuel_service_fee}}{{/if}}.
       - id: fuel.4
         if: mileage_limit
-        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}."
         local: "Kilometraje incluido: {{mileage_limit}} km por {{mileage_period_label}}. Cada kilómetro adicional cuesta {{currency}} {{excess_km_fee}}."
       - id: fuel.5
         unless: mileage_limit
@@ -425,13 +425,13 @@ sections:
         local: "Turismos: todos los ocupantes deben llevar el cinturón abrochado y los niños de menos de 135 cm de altura deben viajar en un sistema de retención infantil homologado adecuado a su peso y talla. No puede haber más pasajeros que plazas."
         country: true
       - id: use.4
-        en: "It is forbidden to: drive with alcohol above the legal limit (0.5 g/l in blood (0.25 mg/l in breath); 0.3 g/l for drivers with less than two years' licence and professional drivers) or under the influence of drugs; use a hand-held phone while driving; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        en: "It is forbidden to: drive with alcohol above the legal limit (0.5 g/l in blood (0.25 mg/l in breath); 0.3 g/l for drivers with less than two years' license and professional drivers) or under the influence of drugs; use a hand-held phone while driving; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
         local: "Está prohibido: conducir con una tasa de alcohol superior a la legal (0,5 g/l en sangre (0,25 mg/l en aire espirado); 0,3 g/l para conductores con menos de dos años de permiso y profesionales) o bajo los efectos de drogas; usar el teléfono en la mano mientras se conduce; hacer carreras, acrobacias o circular fuera de carretera (salvo que el vehículo esté pensado para ello y el Propietario lo acepte); remolcar o empujar nada; transportar mercancías a cambio de precio, mercancías ilícitas o cargas peligrosas; usar el vehículo para VTC, reparto, autoescuela o para alquilarlo a otros; dejar conducir a alguien no indicado en la sección 2."
         country: true
       - id: use.5
         when:
           smoking: no
-        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}
         local: No se permite fumar ni vapear en el vehículo.{{#if smoking_fee}} Incumplir esta norma cuesta {{currency}} {{smoking_fee}} por eliminación de olores.{{/if}}
       - id: use.6
         when:
@@ -494,7 +494,7 @@ sections:
         en: The vehicle has only the compulsory insurance. Damage to or theft of the rented vehicle is the Renter's responsibility (section 12), limited to the actual, evidenced cost.
         local: El vehículo solo tiene el seguro obligatorio. Los daños o el robo del vehículo alquilado son responsabilidad del Arrendatario (sección 12), limitada al coste real y acreditado.
       - id: insurance.5
-        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
+        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
         local: "La exención de daños y el seguro no protegen al Arrendatario, que paga el coste real, cuando el daño o la pérdida se producen: conduciendo bajo los efectos del alcohol o las drogas, sin permiso válido para el vehículo, con un conductor no indicado en la sección 2, fuera de la zona permitida, durante un uso prohibido (sección 9), por actos intencionados o negligencia grave, o habiendo dejado las llaves con el vehículo. Neumáticos, llantas, cristales, bajos, interior, llaves y accesorios solo están cubiertos si el Propietario lo indica por escrito."
       - id: insurance.6
         en: Personal belongings left in or on the vehicle are not insured by the Owner, and the Owner is not responsible for their loss or damage except through its own fault.
@@ -553,7 +553,7 @@ sections:
         en: The Renter pays all traffic and parking fines, tolls, congestion and low-emission-zone charges, towing, impound and clamping costs arising during the rental, including those that reach the Owner after the vehicle is returned{{#if fine_admin_fee}}, plus a handling fee of {{currency}} {{fine_admin_fee}} for each fine or notice the Owner has to handle{{/if}}.
         local: El Arrendatario paga todas las multas de tráfico y aparcamiento, peajes, tasas de zonas de bajas emisiones o de acceso, grúa, depósito y cepos generados durante el alquiler, incluidos los que lleguen al Propietario tras la devolución{{#if fine_admin_fee}}, más un cargo de gestión de {{currency}} {{fine_admin_fee}} por cada multa o notificación que el Propietario deba tramitar{{/if}}.
       - id: fines.2
-        en: Under the Traffic Act (Royal Legislative Decree 6/2015, Article 11) the Owner must identify the driver to the traffic authority (DGT, or the regional or city authority) when asked, and will identify the Renter. Fines and licence points then go to the Renter.
+        en: Under the Traffic Act (Royal Legislative Decree 6/2015, Article 11) the Owner must identify the driver to the traffic authority (DGT, or the regional or city authority) when asked, and will identify the Renter. Fines and license points then go to the Renter.
         local: Conforme a la Ley sobre Tráfico (Real Decreto Legislativo 6/2015, artículo 11), el Propietario debe identificar al conductor ante la autoridad de tráfico (DGT o la autoridad autonómica o municipal) cuando se le requiera, e identificará al Arrendatario. Las multas y los puntos del permiso se dirigen entonces al Arrendatario.
         country: true
       - id: fines.3_es
@@ -581,11 +581,11 @@ sections:
         local: El vehículo debe devolverse con sus llaves, documentos y accesorios, con el nivel de combustible acordado en la sección 8 y razonablemente limpio. Ambas partes revisan juntas el vehículo y anotan el estado, el kilometraje y el combustible en el Anexo A con fotos. Si el Arrendatario decide no estar presente, las fotos fechadas que haga el Propietario en la devolución sirven de constancia y el Arrendatario recibe una copia.
       - id: return.2
         if: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
         local: Un vehículo devuelto con suciedad excesiva, arena, barro, manchas, restos de comida u olores en el interior tiene un cargo de limpieza de {{currency}} {{cleaning_fee}} (más solo si se necesita una limpieza especializada, contra factura).
       - id: return.3
         unless: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning.
         local: Un vehículo devuelto con suciedad excesiva, arena, barro, manchas, restos de comida u olores en el interior puede generar el coste razonable de su limpieza.
   - id: data
     title:
@@ -593,7 +593,7 @@ sections:
       local: 17. Datos personales
     clauses:
       - id: data.1
-        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and licence details, copies of documents, vehicle photos and any tracker location data) under the GDPR and Organic Law 3/2018 (LOPDGDD). It uses them to provide this rental, check identity and licence, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
+        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and license details, copies of documents, vehicle photos and any tracker location data) under the GDPR and Organic Law 3/2018 (LOPDGDD). It uses them to provide this rental, check identity and license, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
         local: El Propietario es responsable del tratamiento de los datos personales del Arrendatario y de los conductores (nombre, contacto, datos del documento y del permiso, copias de documentos, fotos del vehículo y, en su caso, la ubicación del localizador) conforme a lo dispuesto en el RGPD y la Ley Orgánica 3/2018 (LOPDGDD). Los utiliza para prestar este alquiler, comprobar la identidad y el permiso, cumplir obligaciones legales (contabilidad, multas, requerimientos policiales), gestionar siniestros y reclamaciones y proteger el vehículo. Los conserva solo el tiempo que exigen esos fines y la ley, los protege y nunca los vende.
         country: true
       - id: data.2
@@ -615,7 +615,7 @@ sections:
         en: "Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies."
         local: "Contrato íntegro: este contrato, sus anexos y las condiciones especiales constituyen la totalidad del acuerdo. Los cambios solo son válidos por escrito (basta un mensaje de ambas partes). Si alguna parte se declara nula, el resto sigue en vigor."
       - id: general.4
-        en: "Language: this agreement is written in English and Spanish (Castilian). In a region with another official language, the Renter may ask for a copy in that language. If the versions differ, the meaning more favourable to the Renter applies."
+        en: "Language: this agreement is written in English and Spanish (Castilian). In a region with another official language, the Renter may ask for a copy in that language. If the versions differ, the meaning more favorable to the Renter applies."
         local: "Idioma: este contrato está redactado en inglés y en español (castellano). En una comunidad autónoma con otra lengua oficial, el Arrendatario puede pedir un ejemplar en esa lengua. Si las versiones difieren, prevalece el sentido más favorable para el Arrendatario."
         country: true
       - id: general.5
@@ -672,7 +672,7 @@ sections:
         local: "Carrocería: delante / detrás / izquierda / derecha"
       - en: Windscreen, glass, mirrors and lights
         local: Parabrisas, cristales, retrovisores y luces
-      - en: Tyres and wheels
+      - en: Tires and wheels
         local: Neumáticos y llantas
       - en: Interior and seats
         local: Interior y asientos
@@ -714,7 +714,7 @@ sections:
         local: Retrovisor
       - en: Headlight / tail light / indicator
         local: Faro / piloto / intermitente
-      - en: Tyre (each)
+      - en: Tire (each)
         local: Neumático (cada uno)
       - en: Key / remote
         local: Llave / mando

@@ -9,7 +9,7 @@ export const rootMetadata: Metadata = {
     default: "RoveHQ",
     template: "%s | RoveHQ"
   },
-  description: "The command centre for vehicle rental operations.",
+  description: "The command center for vehicle rental operations.",
   applicationName: "RoveHQ",
   metadataBase: new URL("https://rovehq.app"),
   icons: {

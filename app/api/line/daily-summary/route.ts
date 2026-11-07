@@ -3,7 +3,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { buildDailySummaryMessages, fetchSummaryData, sendDailySummary } from "@/lib/line/daily-summary";
 import { alertSettings, wantsSummary } from "@/lib/alerts";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
-import { isTelegramConfigured, sendTelegram } from "@/lib/telegram";
+import { sendPushToOrganization } from "@/lib/push";
 import { lineSummaryText as plainText, morningSummaryEmail } from "@/lib/email/templates";
 import { emailWords } from "@/lib/email/words";
 import { operatorAlertText } from "@/lib/operator-alert-text";
@@ -16,7 +16,7 @@ type Result = { org: string; channel: string; success: boolean; error?: string }
 /**
  * The morning summary at 08:00 on each business's own clock (lib/scheduled-runs.ts): Vercel Cron calls this every
  * hour, and each call sends it only to the businesses whose local time is 08:00 (or a missed hour shortly after),
- * once a day each. On LINE for businesses that connected it and left it on, and on Telegram / by email where
+ * once a day each. On LINE for businesses that connected it and left it on, and by push / email where
  * Settings › Notifications says so.
  */
 export async function POST(req: NextRequest) {
@@ -57,7 +57,9 @@ export async function POST(req: NextRequest) {
 
 async function sendMorningSummary(supabase: any, org: any, appUrl: string, results: Result[]) {
   const settings = org.settings || {};
-  if (org.line_user_id && org.line_notifications_enabled !== false && org.line_daily_summary_enabled !== false) {
+  // LINE carries only the morning summary now (7 Nov 2026), so its own switch decides; the old "pause all LINE"
+  // switch is gone from Settings and no longer stops it.
+  if (org.line_user_id && org.line_daily_summary_enabled !== false) {
     const result = await sendDailySummary(org.id);
     await supabase.from("line_messages").insert({
       organisation_id: org.id,
@@ -71,17 +73,26 @@ async function sendMorningSummary(supabase: any, org: any, appUrl: string, resul
     results.push({ org: org.name, channel: "line", success: result.sent, ...(result.sent ? {} : { error: result.reason }) });
   }
 
-  const toTelegram = isTelegramConfigured() && settings.telegram_chat_id && wantsSummary(settings, "telegram");
+  // Push and email (Settings › Notifications). Telegram no longer gets the summary (Rory, 7 Nov 2026).
+  const toPush = wantsSummary(settings, "push");
   const toEmail = isEmailConfigured() && wantsSummary(settings, "email");
-  if (!toTelegram && !toEmail) return;
+  if (!toPush && !toEmail) return;
   const data = await fetchSummaryData(org.id).catch(() => null);
   if (!data) return;
   const messages = buildDailySummaryMessages(data);
   const text = plainText(messages);
   if (!text) return;
-  if (toTelegram) {
-    const sent = await sendTelegram(settings.telegram_chat_id, `${text}${appUrl ? `\n\n${appUrl}` : ""}`);
-    results.push({ org: org.name, channel: "telegram", success: sent.ok, error: sent.error });
+  if (toPush) {
+    // A short version on the lock screen (its first few lines); tapping it opens the dashboard.
+    const alertText = await operatorAlertText(data.locale);
+    const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
+    const delivered = await sendPushToOrganization(supabase, org.id, {
+      title: alertText.say("summarySubject", { business: data.orgName || org.name || "RoveHQ" }),
+      body: lines.slice(1, 5).join(" · ") || lines[0] || "",
+      url: "/",
+      tag: "morning-summary"
+    }).catch(() => 0);
+    if (delivered) results.push({ org: org.name, channel: "push", success: true });
   }
   if (toEmail) {
     const to = alertSettings(settings).email_to;

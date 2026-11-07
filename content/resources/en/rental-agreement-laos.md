@@ -9,14 +9,14 @@ formats: [docx, pdf]
 inside:
   - "English beside Lao, with the Lao text prevailing"
   - "Based on the Civil Code No. 55/NA, which replaced the 2008 contract law"
-  - "1949 Geneva-type IDP plus national licence for foreign drivers"
-  - "Documents to carry at police checks: licence, IDP and passport or a copy"
+  - "1949 Geneva-type IDP plus national license for foreign drivers"
+  - "Documents to carry at police checks: license, IDP and passport or a copy"
   - "Compulsory third-party insurance and its low limits explained"
   - "No passport or ID card as a deposit, and no taking the vehicle across any border"
   - "Handover check (Annex A) with photos, to end arguments over old damage"
 ---
 
-Most rental shops in Laos are small motorbike businesses in Vientiane, Vang Vieng, Luang Prabang, Pakse and Thakhek, renting to backpackers doing the northern or southern loops. A lot of them still take the passport and hand over the keys with no written terms. Foreign governments now tell their travellers [not to do that](https://www.gov.uk/foreign-travel-advice/laos/safety-and-security), and the Australian government warns of [motorbike hire disputes over existing damage](https://www.smartraveller.gov.au/destinations/asia/laos). A bilingual agreement with a proper handover check protects you from both.
+Most rental shops in Laos are small motorbike businesses in Vientiane, Vang Vieng, Luang Prabang, Pakse and Thakhek, renting to backpackers doing the northern or southern loops. A lot of them still take the passport and hand over the keys with no written terms. Foreign governments now tell their travelers [not to do that](https://www.gov.uk/foreign-travel-advice/laos/safety-and-security), and the Australian government warns of [motorbike rental disputes over existing damage](https://www.smartraveller.gov.au/destinations/asia/laos). A bilingual agreement with a proper handover check protects you from both.
 
 Our free agreement for Laos is written for small car and motorbike rental businesses, in English with a full Lao translation. Laos is preset in the form.
 
@@ -26,9 +26,9 @@ Our free agreement for Laos is written for small car and motorbike rental busine
 
 **Language.** [Article 110 of the Constitution](https://www.constituteproject.org/constitution/Laos_2015) makes Lao the official language, and authorities and courts work from Lao text. So the Lao version prevails, and the renter can ask you to explain any part before signing.
 
-**Licences and IDP.** Laos is party to the [1949 Geneva Convention on Road Traffic](https://treatydatabase.overheid.nl/en/Treaty/Details/007193_p), and the UK government advises that visiting drivers need [a 1949-type IDP plus their national licence](https://www.gov.uk/foreign-travel-advice/laos/safety-and-security). The clause asks for exactly that from anyone without a Lao licence. A car licence does not cover a motorbike.
+**Licenses and IDP.** Laos is party to the [1949 Geneva Convention on Road Traffic](https://treatydatabase.overheid.nl/en/Treaty/Details/007193_p), and the UK government advises that visiting drivers need [a 1949-type IDP plus their national license](https://www.gov.uk/foreign-travel-advice/laos/safety-and-security). The clause asks for exactly that from anyone without a Lao license. A car license does not cover a motorbike.
 
-**Police checks.** Police may stop vehicles and ask for ID. A Laos-only clause makes every driver carry their licence, IDP and passport or ID (or a copy where the police accept one). The Lao News Agency reported in 2026 that drivers must also carry [registration, inspection, road tax and insurance papers](https://kpl.gov.la/En/detail.aspx?id=97786); the agreement has you hand those over with the vehicle.
+**Police checks.** Police may stop vehicles and ask for ID. A Laos-only clause makes every driver carry their license, IDP and passport or ID (or a copy where the police accept one). The Lao News Agency reported in 2026 that drivers must also carry [registration, inspection, road tax and insurance papers](https://kpl.gov.la/En/detail.aspx?id=97786); the agreement has you hand those over with the vehicle.
 
 **Helmets and seatbelts.** Riders and passengers must wear helmets, and car occupants must wear seatbelts. The [Law on Land Traffic](https://kpl.gov.la/En/detail.aspx?id=25138) requires belts for the driver and front passenger and suitable seats for children who can't use a normal belt.
 
@@ -54,4 +54,4 @@ Laos is preset. Add your shop, vehicle, rates, deposit and permitted area, leave
 
 ## Let RoveHQ fill it in for you
 
-RoveHQ fills in the agreement from each booking automatically, the renter signs on their phone, and passport and licence details are read from a photo, so you never need to keep the passport. [Start free](/signup).
+RoveHQ fills in the agreement from each booking automatically, the renter signs on their phone, and passport and license details are read from a photo, so you never need to keep the passport. [Start free](/signup).

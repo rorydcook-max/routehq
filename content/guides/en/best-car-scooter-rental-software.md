@@ -31,7 +31,7 @@ There's no single best rental software. There's the one that fits how many vehic
 - **Booqable**: best for equipment rental with some bikes or scooters, and a polished online shop.
 - **RentSyst**: best value for 10 to 15 vehicles if you want GPS and telematics.
 - **HQ Rental Software**: best for growing car and van businesses that sell through booking sites.
-- **Rental Car Manager**: best for campervan and car hire that sells through agents.
+- **Rental Car Manager**: best for campervan and car rental that sells through agents.
 - **TWICE Commerce (formerly Rentle)**: best for multi-store bike and sports shops that rent and resell.
 - **RENTALL (formerly Navotar), TSD Rental and RentWorks Plus**: built for larger fleets; quote-based.
 
@@ -56,13 +56,13 @@ Built for small fleets, from one vehicle to a few dozen cars, scooters, motorbik
 
 Customers can pay by card on your booking page, through embedded checkout or a payment link, with Apple Pay or Google Pay, or with SEPA Direct Debit, iDEAL, Bancontact, Klarna, MB Way or BLIK where Stripe offers them. You can hold a deposit on the card and release or capture it. Money goes to your own Stripe account. Payments through Stripe carry a RoveHQ platform fee (5% on Free, 2.5% Starter, 2% Pro, 1.5% Business, 1% on any yearly plan) on top of Stripe's fee. Cash, bank transfer and QR payments work too, with slip checking for PromptPay, QRIS and bank transfers.
 
-It writes a rental agreement for each booking in English and the local language in 18 countries across Southeast Asia and Europe, signed on the customer's phone, reads passport and licence photos, and records handovers with photos, a damage diagram and signature. LINE and Telegram chats sit in one inbox, with automatic reminders. The app and customer pages come in 28 languages, and RoveHQ imports your data from your current software for free.
+It writes a rental agreement for each booking in English and the local language in 18 countries across Southeast Asia and Europe, signed on the customer's phone, reads passport and license photos, and records handovers with photos, a damage diagram and signature. LINE and Telegram chats sit in one inbox, with automatic reminders. The app and customer pages come in 28 languages, and RoveHQ imports your data from your current software for free.
 
 **Not for you if** you need bookings from travel sites, telematics, a payment provider other than Stripe, or a large multi-branch operation.
 
 ## Booqable
 
-General rental software used by "8,500+ business owners in 12+ industries", per its [homepage](https://booqable.com/), including bikes and scooters. Strong online shop, many payment gateways with no commission, Xero and Zapier. Plans from $29 a month paid yearly. Built around stock items rather than vehicles, so mileage, fuel and licence checks aren't on its feature list. See [Booqable vs RoveHQ](/guides/booqable-vs-rovehq) and [Booqable alternatives](/guides/booqable-alternatives).
+General rental software used by "8,500+ business owners in 12+ industries", per its [homepage](https://booqable.com/), including bikes and scooters. Strong online shop, many payment gateways with no commission, Xero and Zapier. Plans from $29 a month paid yearly. Built around stock items rather than vehicles, so mileage, fuel and license checks aren't on its feature list. See [Booqable vs RoveHQ](/guides/booqable-vs-rovehq) and [Booqable alternatives](/guides/booqable-alternatives).
 
 ## RentSyst
 

@@ -19,7 +19,7 @@ Open **Buying a vehicle** from the menu.
 
 1. Pick the type: **Car**, **Scooter**, **Motorbike**, **Van**, **ATV** or **E-bike**.
 2. Choose the **Make**, **Model** and **Year** (and **Version** if offered). Not on the list? Choose **Not listed** and type it.
-3. Enter the **Price asked** and **Kilometres so far**.
+3. Enter the **Price asked** and **Kilometers so far**.
 4. Under **How you would rent it out**, pick **By the month**, **By the day** or **Both**.
 5. Buying on finance? Tick **I would buy it on a loan** and enter the deposit, monthly payment and months.
 6. Tap **Calculate earnings**.
@@ -49,7 +49,7 @@ Then:
 - **Reliability and known issues**, and other vehicles worth a look for the same money.
 - **When to sell**: the year it earns you the most, and what it should sell for.
 
-A coloured line says whether figures were checked live today or are rough estimates. Open **The figures used** to change any number, and **Year by year** to see what you'd make selling after each year.
+A colored line says whether figures were checked live today or are rough estimates. Open **The figures used** to change any number, and **Year by year** to see what you'd make selling after each year.
 
 **Save to compare** keeps it in a list with your other checks. **Find better buys** searches current adverts around the same budget.
 

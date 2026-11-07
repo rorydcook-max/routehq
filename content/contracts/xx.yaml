@@ -136,10 +136,10 @@ sections:
     en: Email
     local: ''
   - key: renter_licence
-    en: Driving licence number, class and issuing country
+    en: Driver's license number, class and issuing country
     local: ''
   - key: renter_licence_expiry
-    en: Licence expiry date
+    en: License expiry date
     local: ''
   - key: renter_idp
     en: International Driving Permit (number / not required)
@@ -148,14 +148,14 @@ sections:
     en: Emergency contact (name and phone)
     local: ''
   - key: driver2_details
-    en: Additional driver (name, ID, licence), if any
+    en: Additional driver (name, ID, license), if any
     local: ''
   clauses:
   - id: renter.1
     en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
     local: ''
   - id: renter.2
-    en: Every driver must hold a valid driving licence for this class of vehicle, carried at all times while driving, together with any International Driving Permit the law requires. A car licence does not allow a person to ride a motorbike.
+    en: Every driver must hold a valid driver's license for this class of vehicle, carried at all times while driving, together with any International Driving Permit the law requires. A car license does not allow a person to ride a motorbike.
     local: ''
     country: true
 - id: vehicle
@@ -176,7 +176,7 @@ sections:
     en: Registration (plate) number
     local: ''
   - key: vehicle_colour
-    en: Colour
+    en: Color
     local: ''
   - key: renter_vin
     en: Chassis / VIN number
@@ -202,7 +202,7 @@ sections:
     en: The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies.
     local: The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies.
   - id: vehicle.4
-    en: 'During the rental the Renter looks after the vehicle''s day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy.'
+    en: 'During the rental the Renter looks after the vehicle''s day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy.'
     local: 'During the rental the Renter looks after the vehicle''s day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy.'
 - id: period
   title:
@@ -350,7 +350,7 @@ sections:
     local: ''
   - id: fuel.4
     if: mileage_limit
-    en: 'Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}.'
+    en: 'Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}.'
     local: ''
   - id: fuel.5
     unless: mileage_limit
@@ -392,7 +392,7 @@ sections:
   - id: use.5
     when:
       smoking: false
-    en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+    en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}
     local: ''
   - id: use.6
     when:
@@ -455,7 +455,7 @@ sections:
     en: The vehicle has only the compulsory insurance. The Renter is responsible for damage to the rented vehicle, its theft, and damage to other people's property (section 12).
     local: ''
   - id: insurance.5
-    en: 'Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter''s responsibility unless the Owner confirms in writing that they are covered.'
+    en: 'Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter''s responsibility unless the Owner confirms in writing that they are covered.'
     local: ''
   - id: insurance.6
     en: Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage.
@@ -535,11 +535,11 @@ sections:
     local: ''
   - id: return.2
     if: cleaning_fee
-    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt).
+    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt).
     local: ''
   - id: return.3
     unless: cleaning_fee
-    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning.
     local: ''
 - id: data
   title:
@@ -547,7 +547,7 @@ sections:
     local: ''
   clauses:
   - id: data.1
-    en: The Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, and does not sell them.
+    en: The Owner collects the Renter's and drivers' names, contact details, ID and license details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, and does not sell them.
     local: ''
     country: true
   - id: data.2
@@ -615,7 +615,7 @@ sections:
     local: ''
   - en: Glass, mirrors and lights
     local: ''
-  - en: Tyres and wheels
+  - en: Tires and wheels
     local: ''
   - en: Interior and seats
     local: ''
@@ -655,7 +655,7 @@ sections:
     local: ''
   - en: Headlight / tail light / indicator
     local: ''
-  - en: Tyre (each)
+  - en: Tire (each)
     local: ''
   - en: Key / remote
     local: ''

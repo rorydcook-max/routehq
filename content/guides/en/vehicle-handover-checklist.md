@@ -38,7 +38,7 @@ Take the same 12 photos, in the same order, at every handover and every return. 
 7. **Right side,** the whole vehicle in frame.
 8. **Front right corner,** at about 45 degrees.
 9. **Dashboard** with the ignition on, showing the odometer and fuel gauge clearly.
-10. **Wheels and tyres:** both wheels on a scooter, all four on a car (a quick burst is fine).
+10. **Wheels and tires:** both wheels on a scooter, all four on a car (a quick burst is fine).
 11. **Seat and interior:** scooter seat and under-seat box; car front seats, rear seats, floor and boot.
 12. **Accessories laid out together:** keys, helmets, phone holder, rain poncho, registration copy, child seat or anything else you hand over.
 
@@ -111,7 +111,7 @@ The protocol is the same, but the problem areas differ.
 |---|---|---|
 | Where damage hides | Under the body panels, brake and clutch levers, mirrors, footboard, exhaust | Bumper corners, alloy wheels, windscreen chips, underside, door edges |
 | Common small losses | Helmets, keys, phone holders | Keys, fuel cap, parcel shelf, floor mats |
-| Fall damage | Scratches on both sides at the widest points; bent levers and mirrors | Rarely falls; look for kerb rash on wheels |
+| Fall damage | Scratches on both sides at the widest points; bent levers and mirrors | Rarely falls; look for curb rash on wheels |
 | Extra photos | Under the seat; ends of handlebars | Boot with spare wheel and tools; windscreen close-up |
 | Typical time | 3–4 minutes | 5–8 minutes |
 

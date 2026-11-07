@@ -7,7 +7,7 @@ appPath: "/fleet/import"
 related: ["import-a-spreadsheet", "rentals-already-running", "get-help"]
 updated: 2026-11-04
 faq:
-  - q: "Which systems does RoveHQ recognise?"
+  - q: "Which systems does RoveHQ recognize?"
     a: "Booqable, Checkfront, FareHarbor, HQ Rental Software, Rental Car Manager, RENTALL (formerly Navotar), RentSyst, RentWorks, Rezdy, TSD Rental, TWICE Commerce (formerly Rentle) and VEVS. Exports from any other system still come in; you just check the columns first."
   - q: "Are deposits counted as income?"
     a: "No. A security deposit comes in as a deposit held, not as income."
@@ -35,7 +35,7 @@ Export everything you can: vehicles, customers, bookings, and payments if they'r
 
 Upload up to 8 files at once. RoveHQ links them for you: bookings go to the right vehicle by plate and to the right customer by name, phone or ID.
 
-For recognised systems you'll see **read as a … export** next to each file. Those are read straight away, with no guessing.
+For recognized systems you'll see **read as a … export** next to each file. Those are read straight away, with no guessing.
 
 ## 4. Check and bring it in
 
@@ -44,9 +44,9 @@ Go through the **Vehicles**, **Rentals**, **Customers** and **Money** tabs, unti
 How things come across:
 
 - Upcoming and current bookings become bookings. Finished ones come in as returned.
-- Cancelled bookings, quotes and drafts are listed but left unticked. Tick any you want.
+- Canceled bookings, quotes and drafts are listed but left unticked. Tick any you want.
 - Security deposits are recorded as deposits held, not income.
-- Dates and miles or kilometres are read the way your old software writes them.
+- Dates and miles or kilometers are read the way your old software writes them.
 
 Changed your mind? You have 30 days to **Take this import back** under **Earlier imports**.
 

@@ -18,7 +18,7 @@ Paid ฿12,000 for a year of insurance? If it all landed in one month, that mont
 You pay one of two ways:
 
 - **All at once**: one cost on the day you paid, shared across the months it covers.
-- **Every month**: RoveHQ adds each instalment as a cost on the same day every month until the cover runs out. You don't enter them.
+- **Every month**: RoveHQ adds each installment as a cost on the same day every month until the cover runs out. You don't enter them.
 
 ## Renew from the vehicle (best way)
 

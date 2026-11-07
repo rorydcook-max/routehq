@@ -11,7 +11,7 @@ faq:
   - q: "How much does RentWorks Plus cost?"
     a: "RentWorks Plus doesn't publish prices. Its pricing page says proposals are scoped to your fleet size, segment, locations and integrations, so you need to request a demo for a quote."
   - q: "Is RentWorks Plus suitable for a small rental business?"
-    a: "It can be if your fleet is at the larger end of small. Its demo page says dealership loaner programmes and independents 'from 15 cars up' are its highest-priority segment. A shop with five scooters is not who it is built for."
+    a: "It can be if your fleet is at the larger end of small. Its demo page says dealership loaner programs and independents 'from 15 cars up' are its highest-priority segment. A shop with five scooters is not who it is built for."
   - q: "Does HQ Rental Software work for motorbikes?"
     a: "HQ says it powers car and van rental out of the box and adapts to motorbikes, boats and equipment 'with a few simple configurations'. Try it during their 7-day free trial to check it fits your workflow."
   - q: "Which is best for a small fleet in Thailand or Indonesia?"
@@ -95,7 +95,7 @@ Then compare that with your income. For example, a motorbike rented at ฿250 a 
 
 ## Who should pick which
 
-**Choose RentWorks Plus if** you run a dealership loaner programme, several branches, an airport operation or a franchise, and you have 15 or more cars. It suits you if claims recovery, repair orders, telematics, rules-based pricing and a clean handoff to QuickBooks or Xero matter more than fast self-serve setup, and if you're comfortable with a scoped proposal and an implementation project. Four decades of rental software and a named account manager are real advantages for a larger operation.
+**Choose RentWorks Plus if** you run a dealership loaner program, several branches, an airport operation or a franchise, and you have 15 or more cars. It suits you if claims recovery, repair orders, telematics, rules-based pricing and a clean handoff to QuickBooks or Xero matter more than fast self-serve setup, and if you're comfortable with a scoped proposal and an implementation project. Four decades of rental software and a named account manager are real advantages for a larger operation.
 
 **Choose HQ Rental Software if** you want published pricing, a broad set of integrations, channel management with sites like Expedia and Turo, and a booking engine on your own website. It suits growing car and van rental businesses, especially those taking card payments through Stripe or PayPal, and fleets of 10 to 50 vehicles that want to start without a sales process. The 30+ languages and Singapore hosting help in Asia.
 

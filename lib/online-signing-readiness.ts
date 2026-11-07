@@ -12,11 +12,11 @@ import { authorisationCoversAutomaticSigning } from "@/lib/signature-authorisati
 export function onlineSigningGaps(organization: BusinessDocumentSnapshotOrganization): string[] {
   const snapshot = buildBusinessDocumentSnapshot(organization);
   const gaps: string[] = [];
-  if (!snapshot.authorised_signatory.name) gaps.push("the authorised signatory's name");
+  if (!snapshot.authorised_signatory.name) gaps.push("the authorized signatory's name");
   if (!snapshot.authorised_signatory.title) gaps.push("their job title");
   if (snapshot.authorised_signature?.kind !== "storage") gaps.push("an uploaded signature");
   if (!authorisationCoversAutomaticSigning(snapshot.authorised_signatory.signature_authorisation_text_version)) {
-    gaps.push("accepting the current signature authorisation (re-upload the signature to accept it)");
+    gaps.push("accepting the current signature authorization (re-upload the signature to accept it)");
   }
   return gaps;
 }

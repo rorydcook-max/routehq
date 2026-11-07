@@ -34,15 +34,15 @@ This agreement is made on ____________ between the rental business named above (
 | Local address during the rental (hotel / villa / condo) | |
 | Phone / WhatsApp | |
 | Email | |
-| Driving licence number, class and issuing country | |
-| Licence expiry date | |
+| Driver's license number, class and issuing country | |
+| License expiry date | |
 | International Driving Permit (number / not required) | |
 | Emergency contact (name and phone) | |
-| Additional driver (name, ID, licence), if any | |
+| Additional driver (name, ID, license), if any | |
 
 The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
 
-Every driver must hold a valid driving licence for this class of vehicle, carried at all times while driving, together with any International Driving Permit the law requires. A car licence does not allow a person to ride a motorbike.
+Every driver must hold a valid driver's license for this class of vehicle, carried at all times while driving, together with any International Driving Permit the law requires. A car license does not allow a person to ride a motorbike.
 
 ## 3. The vehicle
 
@@ -51,7 +51,7 @@ Every driver must hold a valid driving licence for this class of vehicle, carrie
 | Make and model | |
 | Year | |
 | Registration (plate) number | |
-| Colour | |
+| Color | |
 | Chassis / VIN number | |
 | Odometer at handover | |
 | Fuel / battery level at handover | |
@@ -151,7 +151,7 @@ The vehicle has the compulsory insurance required by law, which covers injury to
 
 The vehicle has only the compulsory insurance. The Renter is responsible for damage to the rented vehicle, its theft, and damage to other people's property (section 12).
 
-Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered.
+Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered.
 
 Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage.
 
@@ -191,11 +191,11 @@ The Renter must make the vehicle available for collection, and pays reasonable r
 
 The vehicle must be returned with its keys, documents and accessories, with the fuel level agreed in section 8, and reasonably clean. Both parties check the vehicle together and record the condition, odometer and fuel in Annex A with photos. If the Renter is not present at the check, the Owner's dated photos are accepted as the record.
 
-A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning.
 
 ## 17. Personal data and documents
 
-The Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, and does not sell them.
+The Owner collects the Renter's and drivers' names, contact details, ID and license details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, and does not sell them.
 
 The Renter agrees that copies of their documents and the inspection photos and videos may be used as evidence of identity and of the vehicle's condition, and may be given to insurers, the police and authorities when needed for a claim, fine or legal requirement.
 
@@ -233,7 +233,7 @@ Mark existing scratches (S), dents (D), cracks (C) and missing items (M). Take p
 | Fuel / battery level | | |
 | Body: front / rear / left / right | | |
 | Glass, mirrors and lights | | |
-| Tyres and wheels | | |
+| Tires and wheels | | |
 | Interior and seats | | |
 | Keys, remote, documents | | |
 | Helmets / child seat / accessories | | |
@@ -250,7 +250,7 @@ Agreed prices for common damage and lost items. Damage not listed is charged per
 | Dent, per panel | |
 | Mirror | |
 | Headlight / tail light / indicator | |
-| Tyre (each) | |
+| Tire (each) | |
 | Key / remote | |
 | Helmet | |
 | Number plate replacement | |

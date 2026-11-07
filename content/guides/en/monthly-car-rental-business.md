@@ -62,7 +62,7 @@ Price adjustments that work well for long rentals:
 
 One bad monthly renter can cost more than a season of good ones. A short, consistent check works better than gut feeling.
 
-- **ID and licence.** Passport, visa or entry stamp, and a valid licence for the vehicle class. Under the standard contract forms, a foreign renter shows an international driving permit under a convention Thailand is party to, or a Thai driving licence. Check the motorbike category specifically: many visitors only hold a car licence.
+- **ID and license.** Passport, visa or entry stamp, and a valid license for the vehicle class. Under the standard contract forms, a foreign renter shows an international driving permit under a convention Thailand is party to, or a Thai driver's license. Check the motorbike category specifically: many visitors only hold a car license.
 - **Address in Thailand.** Where they are staying, ideally with a lease or booking you can see.
 - **Contact details** on at least two channels, such as phone plus LINE or WhatsApp.
 - **History.** Returning customers and referrals are your best renters. For new ones, a short call or video chat tells you a lot.
@@ -100,13 +100,13 @@ A car rented for six months will need servicing during the rental. Agree who doe
 | Item | Usually paid by | Notes |
 |---|---|---|
 | Scheduled service (oil, filters) | Operator | Ask the renter to bring it in at a set mileage or date; you book and pay |
-| Tyres, brakes, battery from normal wear | Operator | Inspect at each service |
+| Tires, brakes, battery from normal wear | Operator | Inspect at each service |
 | Breakdown from mechanical failure | Operator | Plus a replacement vehicle if it's off the road for more than a day |
 | Fuel, tolls, parking | Renter | |
 | Cleaning during the rental | Renter | Set a return-condition standard |
 | Damage caused by the renter | Renter, up to the agreed limit | Claim actual cost with evidence |
 | Traffic and parking fines | Renter | The forms let you recover fines the renter caused, at actual cost |
-| Punctures | Agree in advance | Many operators split: renter pays repairs, operator replaces worn tyres |
+| Punctures | Agree in advance | Many operators split: renter pays repairs, operator replaces worn tires |
 
 Two rules from the standard contract forms matter here:
 
@@ -123,7 +123,7 @@ Practical tips:
 
 On a twelve-month rental, every annual renewal falls inside it. Plan for them.
 
-- **Annual tax (ป้ายวงกลม).** Private vehicles can renew up to 90 days early, and vehicles over a certain age need an inspection at a private inspection centre (ตรอ.) first: cars from seven years and motorbikes from five years after first registration ([KTC guide](https://www.ktc.co.th/article/knowledge/vehicle-tax-renewal-document-and-age-atpb)). Late tax adds a surcharge of 1% a month. Green-plate rental cars can only renew 30 days early and must be inspected first ([DLT service guide](https://infocenter.oic.go.th/FILEWEB/CABINFOCENTER4/DRAWER032/GENERAL/DATA0000/00000142.PDF)).
+- **Annual tax (ป้ายวงกลม).** Private vehicles can renew up to 90 days early, and vehicles over a certain age need an inspection at a private inspection center (ตรอ.) first: cars from seven years and motorbikes from five years after first registration ([KTC guide](https://www.ktc.co.th/article/knowledge/vehicle-tax-renewal-document-and-age-atpb)). Late tax adds a surcharge of 1% a month. Green-plate rental cars can only renew 30 days early and must be inspected first ([DLT service guide](https://infocenter.oic.go.th/FILEWEB/CABINFOCENTER4/DRAWER032/GENERAL/DATA0000/00000142.PDF)).
 - **Compulsory insurance (พ.ร.บ.).** You need a valid พ.ร.บ. to renew tax. From 1 September 2026 the regulator allows policy terms shorter than a year or up to two years, priced pro rata ([Howden summary of the new rules](https://www.howdengroup.com/th-th/thai-compulsory-motor-insurance)), but if you use it for tax, it must cover at least until the tax expires the following year.
 - **Voluntary insurance.** Renew before it lapses, and make sure the renewal still says the vehicle is rented. More in our [insurance guide](/guides/rental-vehicle-insurance-thailand).
 

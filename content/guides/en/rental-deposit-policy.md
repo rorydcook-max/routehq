@@ -14,7 +14,7 @@ faq:
   - q: "When should I refund the deposit?"
     a: "Refund it at the return inspection if there is no damage, or within a short, stated period if you hold part of it for fines or repairs. Write the timing into your agreement."
   - q: "What can I deduct from a rental deposit?"
-    a: "Only what your signed agreement allows: new damage shown by comparing handover and return photos, missing accessories, fuel shortfall, late return, cleaning beyond normal use and traffic fines from the rental period. Always give the renter an itemised list."
+    a: "Only what your signed agreement allows: new damage shown by comparing handover and return photos, missing accessories, fuel shortfall, late return, cleaning beyond normal use and traffic fines from the rental period. Always give the renter an itemized list."
 ---
 
 *By Anan · Updated 28 October 2026*
@@ -53,7 +53,7 @@ If you offer this, keep it simple and honest:
 - **Charge a fixed daily fee** (for example ฿50 a day on a 125cc scooter) and state exactly what it covers, such as cosmetic damage up to a set amount.
 - **Keep a small deposit** for keys, helmets and fuel, which the cover usually excludes.
 - **Say clearly that it is not insurance** unless it is a real policy from a licensed insurer. Calling your own scheme "insurance" can mislead renters and, in some countries, breach insurance rules.
-- **Exclude what you must:** riding without a licence, drink-riding, and taking the vehicle off the permitted area.
+- **Exclude what you must:** riding without a license, drink-riding, and taking the vehicle off the permitted area.
 
 Track how much you collect against how much you pay out in repairs. If repairs regularly exceed the fees, raise the fee or narrow the cover.
 
@@ -77,7 +77,7 @@ Many shops still keep the renter's passport. It feels safe because nobody leaves
 - **You become responsible for it.** If it is lost, stolen or damaged in your shop, you have a serious problem.
 - **It does not pay for repairs.** You still have to negotiate money for damage, now with someone who is angry.
 
-In Thailand and other countries where we could not find a specific rule, the safe approach is the same: take a money deposit, record the passport number and licence on the agreement, and take a photo of the ID page with the renter's consent. If you are unsure, check with your local police or tourist police.
+In Thailand and other countries where we could not find a specific rule, the safe approach is the same: take a money deposit, record the passport number and license on the agreement, and take a photo of the ID page with the renter's consent. If you are unsure, check with your local police or tourist police.
 
 ## Deduction rules and evidence
 
@@ -97,9 +97,9 @@ What makes a deduction stick:
 - Handover photos with a timestamp, taken in front of the renter. Our [vehicle handover checklist guide](/guides/vehicle-handover-checklist) lists the 12 photos to take.
 - A damage price list that the renter saw before signing.
 - A repair quote or receipt for anything not on the list.
-- An itemised breakdown given to the renter in writing.
+- An itemized breakdown given to the renter in writing.
 
-Never deduct for normal wear: tyre wear, small stone chips on the front of a car or faded plastics.
+Never deduct for normal wear: tire wear, small stone chips on the front of a car or faded plastics.
 
 ## Writing a damage price list
 

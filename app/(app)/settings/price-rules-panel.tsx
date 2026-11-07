@@ -383,7 +383,20 @@ function ExtraSheet({
               <span className={small}>
                 {say("xp_excess", { symbol: currencySymbol })} <InfoTip label={say("xp_excess", { symbol: currencySymbol })} text={say("xp_excessTip")} />
               </span>
-              <input className={field} inputMode="numeric" onChange={(event) => change({ excess: Number(event.target.value.replace(/[^\d]/g, "")) || 0 })} value={draft.excess ? String(draft.excess) : ""} />
+              {/* The symbol inside the box, like the price above (7 Nov 2026). */}
+              <span className="relative mt-1 block">
+                <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-3 flex items-center font-semibold text-[var(--foreground-secondary)]">
+                  {currencySymbol}
+                </span>
+                <input
+                  className="w-full"
+                  inputMode="numeric"
+                  onChange={(event) => change({ excess: Number(event.target.value.replace(/[^\d]/g, "")) || 0 })}
+                  placeholder="0"
+                  style={{ paddingInlineStart: `calc(1.25rem + ${Math.max(1, currencySymbol.length)}ch)` }}
+                  value={draft.excess ? String(draft.excess) : ""}
+                />
+              </span>
             </label>
           ) : null}
           {draft.preset === "young_driver" ? (

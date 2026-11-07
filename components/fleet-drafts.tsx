@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import type { DraftPaperwork, DraftRental, DraftVehicle } from "@/app/actions/fleet-assistant";
 import { dateFormat } from "@/lib/i18n/dates";
+import { currencySymbol } from "@/components/currency-symbol";
 
 /**
  * The fleet assistant's draft cards: vehicles to add, rentals running now, paperwork renewals read from photos.
@@ -79,7 +80,7 @@ export function VehicleDrafts({
                 <X size={16} />
               </button>
             </div>
-            {onEdit && editing === index ? <VehicleFields onChange={(next) => onEdit(index, next)} vehicle={vehicle} /> : null}
+            {onEdit && editing === index ? <VehicleFields currency={currency} onChange={(next) => onEdit(index, next)} vehicle={vehicle} /> : null}
           </li>
         ))}
       </ul>
@@ -92,9 +93,19 @@ export function VehicleDrafts({
 }
 
 /** The details worth correcting before a vehicle goes in: make, model, year, plate and the price. */
-function VehicleFields({ vehicle, onChange }: { vehicle: DraftVehicle; onChange: (vehicle: DraftVehicle) => void }) {
+function VehicleFields({ vehicle, currency, onChange }: { vehicle: DraftVehicle; currency?: string; onChange: (vehicle: DraftVehicle) => void }) {
   const t = useTranslations("fleetAssistant");
   const field = "mt-0.5 h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--panel)] px-2.5 text-[16px] text-[var(--foreground)]";
+  // Prices with the business's currency symbol inside the box (7 Nov 2026).
+  const symbol = currencySymbol(currency);
+  const priceBox = (value: number | null | undefined, set: (value: string) => void) => (
+    <span className="relative block">
+      <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-2.5 mt-0.5 flex items-center text-[15px] font-semibold text-[var(--foreground-secondary)]">
+        {symbol}
+      </span>
+      <input className={field} inputMode="decimal" onChange={(event) => set(event.target.value)} style={{ paddingInlineStart: `calc(1rem + ${Math.max(1, symbol.length)}ch)` }} value={value || ""} />
+    </span>
+  );
   const label = "block text-[12px] font-semibold text-[var(--muted)]";
   const num = (value: string) => (Number(value) > 0 ? Number(value) : null);
   return (
@@ -117,11 +128,11 @@ function VehicleFields({ vehicle, onChange }: { vehicle: DraftVehicle; onChange:
       </label>
       <label className={label}>
         {t("fieldMonthly")}
-        <input className={field} inputMode="decimal" onChange={(event) => onChange({ ...vehicle, monthlyRate: num(event.target.value) })} value={vehicle.monthlyRate || ""} />
+        {priceBox(vehicle.monthlyRate, (value) => onChange({ ...vehicle, monthlyRate: num(value) }))}
       </label>
       <label className={label}>
         {t("fieldDaily")}
-        <input className={field} inputMode="decimal" onChange={(event) => onChange({ ...vehicle, dailyRate: num(event.target.value) })} value={vehicle.dailyRate || ""} />
+        {priceBox(vehicle.dailyRate, (value) => onChange({ ...vehicle, dailyRate: num(value) }))}
       </label>
     </div>
   );

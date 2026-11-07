@@ -7,7 +7,7 @@ fileLabel: "Agreement · English + local language"
 formats: [docx, pdf]
 inside:
   - "Bilingual: English side by side with Thai, Indonesian, Vietnamese, Malay, Filipino, Lao, Khmer, Greek, Spanish, Portuguese, Italian, Croatian, French, German or Turkish (English only for the UK, Ireland and Malta)"
-  - "Written for each country's rules: licences, helmets, compulsory insurance, ID documents, traffic fines, personal data"
+  - "Written for each country's rules: licenses, helmets, compulsory insurance, ID documents, traffic fines, personal data"
   - "Your logo, business details, vehicle, prices, deposit and rules filled in for you, or left blank to write in"
   - "Cancellation, early return, late return, fuel, mileage, cleaning, smoking and pets"
   - "Insurance and excess, damage, theft, accidents and breakdowns"
@@ -19,7 +19,7 @@ Most rental shops start with an agreement copied from somewhere else, in one lan
 
 This agreement covers them. It's written for small car, motorbike and scooter rental businesses, in English side by side with your country's language, so your renter understands what they sign and the document still works if you ever have to show it to the police, an insurer or a court.
 
-**Choose your country** in the form and you get the version written for its rules. We built each one from public information on that country's traffic, licensing, insurance, consumer and personal data laws: who needs which licence, helmet and seatbelt rules, what compulsory insurance does and doesn't cover, why you shouldn't keep a renter's passport, and how fines reach the renter. Each version lists its sources. Countries we don't have yet get a general English version.
+**Choose your country** in the form and you get the version written for its rules. We built each one from public information on that country's traffic, licensing, insurance, consumer and personal data laws: who needs which license, helmet and seatbelt rules, what compulsory insurance does and doesn't cover, why you shouldn't keep a renter's passport, and how fines reach the renter. Each version lists its sources. Countries we don't have yet get a general English version.
 
 **Fill in your details** (optional) and they're printed in for you: your logo, business name and address, the vehicle, your prices and deposit, fuel and mileage rules, late and cancellation fees, insurance and excess, smoking and pet rules, and any terms of your own. Anything you leave blank becomes a line to write on by hand.
 

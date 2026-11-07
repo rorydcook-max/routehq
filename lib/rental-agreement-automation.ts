@@ -242,7 +242,7 @@ export async function countersignRentalAgreementForCustomer({
       return {
         ok: false,
         reason: "not_eligible",
-        message: "The business's signature authorisation does not cover automatic signing of online bookings.",
+        message: "The business's signature authorization does not cover automatic signing of online bookings.",
         blockingIssues: [`signature_authorisation_version_${acceptedVersion || "missing"}_does_not_cover_automatic_signing`]
       };
     }

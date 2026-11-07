@@ -1,6 +1,6 @@
 ---
 title: "Free car rental agreement for the Philippines (English–Filipino)"
-description: "Free self-drive car and motorcycle rental agreement for the Philippines: 90-day foreign licence rule, CTPL, rent-sangla, NCAP fines, Data Privacy Act."
+description: "Free self-drive car and motorcycle rental agreement for the Philippines: 90-day foreign license rule, CTPL, rent-sangla, NCAP fines, Data Privacy Act."
 date: 2026-10-28
 updated: 2026-10-28
 listed: false
@@ -8,7 +8,7 @@ fileLabel: "Agreement · English + Filipino"
 formats: [docx, pdf]
 inside:
   - "English beside Filipino, with English prevailing"
-  - "Foreign licences for the first 90 days only, LTO codes A and B, IDP or English translation"
+  - "Foreign licenses for the first 90 days only, LTO codes A and B, IDP or English translation"
   - "OR/CR and CTPL confirmed, and what CTPL does not cover"
   - "No pawning or subleasing (rent-sangla), with the carnapping and estafa warning"
   - "No Contact Apprehension and LTO violations transferred to the renter"
@@ -22,7 +22,7 @@ Our free agreement for the Philippines is written for small car and motorcycle r
 
 ## Philippine rules built in
 
-**Foreign licences: 90 days.** Under [RA 4136 section 21](https://lawphil.net/statutes/repacts/ra1964/ra_4136_1964.html), a licensed foreign tourist may drive during the first 90 days of their stay, not after. The [Philippine embassy's guidance](https://buenosairespe.dfa.gov.ph/comunidad-filipina/87-comunidad-filipina/240-driving-in-the-philippines) says a non-English licence needs an official English translation. The clause asks for an English licence, a translation or an IDP, and the passport as proof of arrival date. Local licences need the [right LTO code](https://www.autoindustriya.com/features/what-can-you-drive-under-the-new-license-codes.html): A for motorcycles, B for cars.
+**Foreign licenses: 90 days.** Under [RA 4136 section 21](https://lawphil.net/statutes/repacts/ra1964/ra_4136_1964.html), a licensed foreign tourist may drive during the first 90 days of their stay, not after. The [Philippine embassy's guidance](https://buenosairespe.dfa.gov.ph/comunidad-filipina/87-comunidad-filipina/240-driving-in-the-philippines) says a non-English license needs an official English translation. The clause asks for an English license, a translation or an IDP, and the passport as proof of arrival date. Local licenses need the [right LTO code](https://www.autoindustriya.com/features/what-can-you-drive-under-the-new-license-codes.html): A for motorcycles, B for cars.
 
 **Self-drive and franchises.** LTFRB [MC 2011-008](https://elibrary.judiciary.gov.ph/thebookshelf/showdocsfriendly/10/57714) exempts private vehicles that are exclusively used and driven by the lessee from the rent-a-car franchise rule; other rent-a-car services still need one. The agreement states that it is a self-drive rental with no driver provided, and that only named drivers may drive.
 
@@ -43,7 +43,7 @@ Our free agreement for the Philippines is written for small car and motorcycle r
 ## Problems it handles
 
 - **Floods and typhoons.** Flood damage is usually an [optional add-on](https://www.moneymax.ph/car-insurance/articles/acts-of-god-coverage) to comprehensive cover. The agreement bars driving into flood water and asks renters to move the car to higher ground when it's safe to.
-- **Inter-island trips.** Ferries ask for the OR/CR and an [authorisation letter from the owner](https://pamasahe.com/posts/starlite-ferries-issues-vehicle-requirements-for-holy-week-travelers). The car stays on the island or province unless you give written permission and that letter.
+- **Inter-island trips.** Ferries ask for the OR/CR and an [authorization letter from the owner](https://pamasahe.com/posts/starlite-ferries-issues-vehicle-requirements-for-holy-week-travelers). The car stays on the island or province unless you give written permission and that letter.
 - **Rent-sangla.** A clause bans selling, pawning (isangla), subleasing or lending the car, its plates or OR/CR.
 
 For setting the deposit, see our [deposit guide](/guides/rental-deposit-policy), and for handover photos the [handover checklist guide](/guides/vehicle-handover-checklist).
@@ -54,4 +54,4 @@ The Philippines is preset. Add your business, vehicle, rates, deposit and permit
 
 ## Let RoveHQ fill it in for you
 
-RoveHQ fills in the agreement from each booking automatically, the renter signs on their phone, and passport and licence details are read from a photo, so you have a verified ID on file for every rental. [Start free](/signup).
+RoveHQ fills in the agreement from each booking automatically, the renter signs on their phone, and passport and license details are read from a photo, so you have a verified ID on file for every rental. [Start free](/signup).

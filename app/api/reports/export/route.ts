@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getReportsData, type DatePreset } from "@/lib/reports";
 import { getDefaultOrganization } from "@/lib/organization";
+import { niceMoney } from "@/lib/nice-money";
 
 export const dynamic = "force-dynamic";
 
@@ -10,8 +11,9 @@ function csvCell(value: unknown): string {
   return `"${text.replace(/"/g, '""')}"`;
 }
 
+// In the business's own currency (getDefaultOrganization records it for this request); was always baht.
 function money(value: number): string {
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(value);
+  return niceMoney(value);
 }
 
 export async function GET(request: NextRequest) {

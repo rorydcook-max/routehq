@@ -3,7 +3,7 @@ locale: el
 language: Greek
 currency: EUR
 prevailing_language:
-  en: the version more favourable to the Renter
+  en: the version more favorable to the Renter
   local: η εκδοχή που είναι ευνοϊκότερη για τον Μισθωτή
 local_language:
   en: Greek
@@ -68,7 +68,7 @@ words:
     local: (συμπληρώστε)
 sources:
   - url: https://eur-lex.europa.eu/eli/dir/1993/13/oj
-    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favour (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
+    supports: "Unfair Contract Terms Directive 93/13/EEC: terms must be plain and intelligible, doubts are read in the consumer's favor (Art 5), disproportionate compensation is unfair (Annex point e). Basis for general.4, general.7, deposit.2, damage.2."
   - url: https://eur-lex.europa.eu/eli/dir/2011/83/oj
     supports: "Consumer Rights Directive 2011/83/EU: total price including all compulsory charges (Arts 5-6); Art 16(l) no withdrawal right for car rental for a specific date or period (charges.1, cancellation.7)."
   - url: https://commission.europa.eu/topics/consumers/consumer-rights-and-complaints/enforcement-consumer-protection/coordinated-actions/other-travel-services_en
@@ -76,9 +76,9 @@ sources:
   - url: https://eur-lex.europa.eu/eli/dir/2009/103/oj
     supports: "Motor Insurance Directive 2009/103/EC (as amended by 2021/2118): compulsory third-party cover with EU minimum amounts, valid across the EU (insurance.1)."
   - url: https://eur-lex.europa.eu/eli/dir/2006/126/oj
-    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licences recognised in every member state (renter.2)."
+    supports: "Driving Licence Directive 2006/126/EC: categories AM, A1, A2, A and B; EU licenses recognized in every member state (renter.2)."
   - url: https://eur-lex.europa.eu/eli/dir/2015/413/oj
-    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offences, so fines follow foreign renters (fines.1)."
+    supports: "Directive (EU) 2015/413: cross-border exchange of vehicle registration data for road-safety offenses, so fines follow foreign renters (fines.1)."
   - url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
     supports: "GDPR: controller duties, lawful bases (contract, legal obligation for giving driver details to authorities, legitimate interest), data subject rights (data.1, data.2)."
   - url: https://eur-lex.europa.eu/eli/reg/2014/910/oj
@@ -90,11 +90,11 @@ sources:
   - url: https://www.ccpc.ie/news-and-media/news/article/2026/06/16/consumer-rights-explained--i-think-my-holiday-car-hire-firm-is-trying-to-rip-me-off-what-are-my-rights
     supports: "CCPC (Irish consumer authority), 2026: damage may be charged only with clear evidence it happened during the rental; renters can ask for inspection reports and a cost breakdown; ECRCS conciliation (damage.2)."
   - url: https://www.rac.co.uk/drive/travel/country/greece
-    supports: "RAC Greece: IDP not needed with a UK licence; children under 12 / 1.35 m need a restraint; crash helmets compulsory for moped and motorcycle riders; 0.05% limit, 0.02% for professional and new drivers; usual minimum hire age 21; check before taking the car out of Greece (renter.2, use.2, use.3, use.4, area.2)."
+    supports: "RAC Greece: IDP not needed with a UK license; children under 12 / 1.35 m need a restraint; crash helmets compulsory for moped and motorcycle riders; 0.05% limit, 0.02% for professional and new drivers; usual minimum hire age 21; check before taking the car out of Greece (renter.2, use.2, use.3, use.4, area.2)."
   - url: https://www.athenstoolkit.com/2025/11/new-traffic-law-in-greece-Sept-2025.html
-    supports: "New Greek Highway Code (Law 5209/2025) in force since 2025: higher fines, camera enforcement, licence and plate removal for serious offences (fines.2)."
+    supports: "New Greek Highway Code (Law 5209/2025) in force since 2025: higher fines, camera enforcement, license and plate removal for serious offenses (fines.2)."
   - url: https://www.iefimerida.gr/english/greece-bans-rental-scooters-and-quads-without-helmets-and-bars-minors-e-scooters-tourism
-    supports: "June 2026 announcement: rental firms not to hand over motorcycles, scooters or quads without helmets; quad renters to have held a licence for five years. Proposal only, not confirmed in force; not written into this agreement as law (open item)."
+    supports: "June 2026 announcement: rental firms not to hand over motorcycles, scooters or quads without helmets; quad renters to have held a license for five years. Proposal only, not confirmed in force; not written into this agreement as law (open item)."
   - url: https://zeya.com/newsletters/amendment-and-codification-law-consumers-protection-law-22511994
     supports: "Law 2251/1994 on consumer protection, Article 2: unfair general terms (general.7)."
   - url: https://www.dpa.gr/
@@ -166,10 +166,10 @@ sections:
         en: Email
         local: Email
       - key: renter_licence
-        en: Driving licence number, categories and issuing country
+        en: Driver's license number, categories and issuing country
         local: Αριθμός άδειας οδήγησης, κατηγορίες και χώρα έκδοσης
       - key: renter_licence_expiry
-        en: Licence expiry date / date first issued
+        en: License expiry date / date first issued
         local: Λήξη άδειας / ημερομηνία πρώτης έκδοσης
       - key: renter_idp
         en: International Driving Permit (number / not required)
@@ -178,18 +178,18 @@ sections:
         en: Emergency contact (name and phone)
         local: Επαφή έκτακτης ανάγκης (όνομα και τηλέφωνο)
       - key: driver2_details
-        en: Additional driver (name, ID, licence), if any
+        en: Additional driver (name, ID, license), if any
         local: Πρόσθετος οδηγός (όνομα, ταυτότητα, άδεια), εφόσον υπάρχει
     clauses:
       - id: renter.1
         en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
         local: Ο Μισθωτής βεβαιώνει ότι τα παραπάνω στοιχεία είναι αληθή και πλήρη και ότι αναφέρονται όλα τα πρόσωπα που θα οδηγήσουν το όχημα. Μόνο ο Μισθωτής και ο πρόσθετος οδηγός που αναφέρεται επιτρέπεται να το οδηγούν.
       - id: renter.2
-        en: "Every driver must hold a full, valid driving licence for this class of vehicle: category B for cars; for motorcycles and scooters, category AM, A1, A2 or A as the engine requires (a car licence does not cover motorcycles); for quads (ATVs), the category the vehicle's registration requires, which the Owner checks at handover. Licences from the EU and EEA are valid; a visitor with another licence must also carry an International Driving Permit unless Greece accepts that licence on its own (as it does UK licences)."
+        en: "Every driver must hold a full, valid driver's license for this class of vehicle: category B for cars; for motorcycles and scooters, category AM, A1, A2 or A as the engine requires (a car license does not cover motorcycles); for quads (ATVs), the category the vehicle's registration requires, which the Owner checks at handover. Licenses from the EU and EEA are valid; a visitor with another license must also carry an International Driving Permit unless Greece accepts that license on its own (as it does UK licenses)."
         local: "Κάθε οδηγός πρέπει να έχει πλήρη, έγκυρη άδεια οδήγησης για την κατηγορία του οχήματος: κατηγορία Β για αυτοκίνητα· για μοτοσικλέτες και σκούτερ, κατηγορία AM, A1, A2 ή A ανάλογα με τον κινητήρα (η άδεια αυτοκινήτου δεν καλύπτει μοτοσικλέτες)· για γουρούνες (ATV), την κατηγορία που απαιτεί η άδεια κυκλοφορίας του οχήματος, την οποία ελέγχει ο Εκμισθωτής κατά την παράδοση. Οι άδειες της ΕΕ και του ΕΟΧ ισχύουν· επισκέπτης με άλλη άδεια πρέπει να φέρει και Διεθνή Άδεια Οδήγησης, εκτός αν η Ελλάδα αναγνωρίζει την άδειά του αυτοτελώς (όπως τις άδειες του Ηνωμένου Βασιλείου)."
         country: true
       - id: renter.3
-        en: Each driver must meet the minimum age and the minimum period of holding a full licence that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
+        en: Each driver must meet the minimum age and the minimum period of holding a full license that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
         local: Κάθε οδηγός πρέπει να έχει την ελάχιστη ηλικία και τον ελάχιστο χρόνο κατοχής άδειας που δήλωσε ο Εκμισθωτής κατά την κράτηση. Κάθε επιβάρυνση για νέο ή πρόσθετο οδηγό αναγράφεται στη σύμβαση πριν από την υπογραφή.
   - id: vehicle
     title:
@@ -209,7 +209,7 @@ sections:
         en: Registration (plate) number
         local: Αριθμός κυκλοφορίας
       - key: vehicle_colour
-        en: Colour
+        en: Color
         local: Χρώμα
       - key: renter_vin
         en: Chassis / VIN number
@@ -235,7 +235,7 @@ sections:
         en: The Owner keeps the vehicle serviced as the manufacturer recommends and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time; if servicing takes more than one day, section 13 applies.
         local: Ο Εκμισθωτής συντηρεί το όχημα σύμφωνα με τον κατασκευαστή και αναλαμβάνει τις συνήθεις μηχανικές επισκευές και τη φθορά, εκτός αν η σύμβαση ορίζει διαφορετικά. Σε μακροχρόνιες μισθώσεις συμφωνεί τη συντήρηση με τον Μισθωτή σε κατάλληλη ώρα· αν διαρκέσει πάνω από μία ημέρα, εφαρμόζεται η ενότητα 13.
       - id: vehicle.4
-        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
         local: "Κατά τη μίσθωση ο Μισθωτής φροντίζει την καθημερινή κατάσταση του οχήματος: ελέγχει ότι ελαστικά, φώτα, φρένα, λάδια και ψυκτικό φαίνονται κανονικά και δεν το χρησιμοποιεί αν δεν είναι πλέον ασφαλές."
   - id: period
     title:
@@ -384,7 +384,7 @@ sections:
         local: Το καύσιμο που λείπει χρεώνεται με την τοπική τιμή αντλίας για την απαιτούμενη ποσότητα{{#if fuel_service_fee}}, πλέον τέλους υπηρεσίας ανεφοδιασμού {{currency}} {{fuel_service_fee}}{{/if}}.
       - id: fuel.4
         if: mileage_limit
-        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}."
         local: "Χιλιόμετρα που περιλαμβάνονται: {{mileage_limit}} χλμ. ανά {{mileage_period_label}}. Κάθε επιπλέον χιλιόμετρο κοστίζει {{currency}} {{excess_km_fee}}."
       - id: fuel.5
         unless: mileage_limit
@@ -427,7 +427,7 @@ sections:
       - id: use.5
         when:
           smoking: no
-        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}
         local: Το κάπνισμα και το ηλεκτρονικό τσιγάρο απαγορεύονται στο όχημα.{{#if smoking_fee}} Η παράβαση κοστίζει {{currency}} {{smoking_fee}} για απομάκρυνση οσμών.{{/if}}
       - id: use.6
         when:
@@ -490,7 +490,7 @@ sections:
         en: The vehicle has only the compulsory insurance. Damage to or theft of the rented vehicle is the Renter's responsibility (section 12), limited to the actual, evidenced cost.
         local: Το όχημα έχει μόνο την υποχρεωτική ασφάλιση. Για ζημιά ή κλοπή του μισθωμένου οχήματος ευθύνεται ο Μισθωτής (ενότητα 12), έως το πραγματικό, αποδεδειγμένο κόστος.
       - id: insurance.5
-        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
+        en: "The damage waiver and insurance do not protect the Renter, and the Renter pays the actual cost, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or grossly negligent acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are covered only if the Owner says so in writing."
         local: "Η απαλλαγή από ζημιές και η ασφάλιση δεν προστατεύουν τον Μισθωτή, που πληρώνει το πραγματικό κόστος, όταν η ζημιά ή η απώλεια συμβαίνει: με οδήγηση υπό την επήρεια αλκοόλ ή ουσιών, χωρίς έγκυρη άδεια για το όχημα, από οδηγό που δεν αναφέρεται στην ενότητα 2, εκτός της επιτρεπόμενης περιοχής, κατά απαγορευμένη χρήση (ενότητα 9), από δόλο ή βαριά αμέλεια, ή όταν τα κλειδιά αφέθηκαν στο όχημα. Ελαστικά, ζάντες, κρύσταλλα, κάτω μέρος, εσωτερικό, κλειδιά και εξοπλισμός καλύπτονται μόνο αν το δηλώσει γραπτώς ο Εκμισθωτής."
       - id: insurance.6
         en: Personal belongings left in or on the vehicle are not insured by the Owner, and the Owner is not responsible for their loss or damage except through its own fault.
@@ -549,7 +549,7 @@ sections:
         en: The Renter pays all traffic and parking fines, tolls, congestion and low-emission-zone charges, towing, impound and clamping costs arising during the rental, including those that reach the Owner after the vehicle is returned{{#if fine_admin_fee}}, plus a handling fee of {{currency}} {{fine_admin_fee}} for each fine or notice the Owner has to handle{{/if}}.
         local: Ο Μισθωτής πληρώνει όλα τα πρόστιμα κυκλοφορίας και στάθμευσης, τα διόδια, τα τέλη ζωνών χαμηλών εκπομπών, τα έξοδα ρυμούλκησης, φύλαξης και ακινητοποίησης που προκύπτουν κατά τη μίσθωση, ακόμη και όσα φτάνουν στον Εκμισθωτή μετά την επιστροφή{{#if fine_admin_fee}}, πλέον τέλους διαχείρισης {{currency}} {{fine_admin_fee}} για κάθε πρόστιμο ή ειδοποίηση που πρέπει να χειριστεί ο Εκμισθωτής{{/if}}.
       - id: fines.2
-        en: Traffic fines in Greece are issued to the driver; for offences recorded by camera, the Owner will identify the Renter to the authority as the law requires. For serious offences the police may remove the vehicle's number plates or the driver's licence; loss of use caused in this way is charged under section 12.
+        en: Traffic fines in Greece are issued to the driver; for offenses recorded by camera, the Owner will identify the Renter to the authority as the law requires. For serious offenses the police may remove the vehicle's number plates or the driver's license; loss of use caused in this way is charged under section 12.
         local: Τα πρόστιμα τροχαίας στην Ελλάδα επιβάλλονται στον οδηγό· για παραβάσεις που καταγράφονται από κάμερα, ο Εκμισθωτής θα γνωστοποιήσει τα στοιχεία του Μισθωτή στην αρχή, όπως απαιτεί ο νόμος. Για σοβαρές παραβάσεις η αστυνομία μπορεί να αφαιρέσει τις πινακίδες του οχήματος ή την άδεια του οδηγού· η ακινητοποίηση που προκαλείται έτσι χρεώνεται κατά την ενότητα 12.
         country: true
   - id: termination
@@ -573,11 +573,11 @@ sections:
         local: Το όχημα επιστρέφεται με τα κλειδιά, τα έγγραφα και τον εξοπλισμό του, με τη στάθμη καυσίμου της ενότητας 8 και εύλογα καθαρό. Τα μέρη ελέγχουν μαζί το όχημα και καταγράφουν κατάσταση, χιλιόμετρα και καύσιμο στο Παράρτημα Α με φωτογραφίες. Αν ο Μισθωτής επιλέξει να μην είναι παρών, οι χρονολογημένες φωτογραφίες του Εκμισθωτή κατά την επιστροφή αποτελούν την καταγραφή και ο Μισθωτής λαμβάνει αντίγραφο.
       - id: return.2
         if: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
         local: Όχημα που επιστρέφεται με υπερβολική βρωμιά, άμμο, λάσπη, λεκέδες, υπολείμματα φαγητού ή οσμές στο εσωτερικό χρεώνεται καθαρισμό {{currency}} {{cleaning_fee}} (περισσότερο μόνο αν απαιτείται ειδικός καθαρισμός, με απόδειξη).
       - id: return.3
         unless: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning.
         local: Όχημα που επιστρέφεται με υπερβολική βρωμιά, άμμο, λάσπη, λεκέδες, υπολείμματα φαγητού ή οσμές στο εσωτερικό μπορεί να χρεωθεί το εύλογο κόστος καθαρισμού.
   - id: data
     title:
@@ -585,7 +585,7 @@ sections:
       local: 17. Προσωπικά δεδομένα
     clauses:
       - id: data.1
-        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and licence details, copies of documents, vehicle photos and any tracker location data) under the GDPR and Law 4624/2019. It uses them to provide this rental, check identity and licence, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
+        en: The Owner is the controller of the personal data of the Renter and drivers (names, contact details, ID and license details, copies of documents, vehicle photos and any tracker location data) under the GDPR and Law 4624/2019. It uses them to provide this rental, check identity and license, meet legal duties (accounting, fines, police requests), handle claims and disputes, and protect the vehicle. It keeps them only as long as those purposes and the law require, keeps them secure and never sells them.
         local: Ο Εκμισθωτής είναι υπεύθυνος επεξεργασίας των προσωπικών δεδομένων του Μισθωτή και των οδηγών (ονοματεπώνυμο, στοιχεία επικοινωνίας, στοιχεία ταυτότητας και άδειας, αντίγραφα εγγράφων, φωτογραφίες του οχήματος και τυχόν δεδομένα θέσης GPS) κατά τον ΓΚΠΔ (Κανονισμός (ΕΕ) 2016/679) και τον ν. 4624/2019. Τα χρησιμοποιεί για την παροχή της μίσθωσης, τον έλεγχο ταυτότητας και άδειας, την εκπλήρωση νόμιμων υποχρεώσεων (λογιστικά, πρόστιμα, αιτήματα της αστυνομίας), τη διαχείριση ζημιών και διαφορών και την προστασία του οχήματος. Τα διατηρεί μόνο όσο απαιτούν οι σκοποί αυτοί και ο νόμος, τα προστατεύει και δεν τα πωλεί ποτέ.
         country: true
       - id: data.2
@@ -607,7 +607,7 @@ sections:
         en: "Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies."
         local: "Ολότητα: η σύμβαση, τα παραρτήματά της και οι ειδικοί όροι αποτελούν το σύνολο της συμφωνίας. Τροποποιήσεις ισχύουν μόνο γραπτώς (αρκεί μήνυμα και των δύο μερών). Αν κάποιος όρος κριθεί άκυρος, οι υπόλοιποι εξακολουθούν να ισχύουν."
       - id: general.4
-        en: "Language: this agreement is written in English and Greek, and the Owner will explain any term the Renter does not understand. If the two versions differ, the meaning more favourable to the Renter applies."
+        en: "Language: this agreement is written in English and Greek, and the Owner will explain any term the Renter does not understand. If the two versions differ, the meaning more favorable to the Renter applies."
         local: "Γλώσσα: η σύμβαση συντάσσεται στα αγγλικά και στα ελληνικά, και ο Εκμισθωτής εξηγεί κάθε όρο που δεν κατανοεί ο Μισθωτής. Αν οι δύο εκδοχές διαφέρουν, ισχύει η έννοια που είναι ευνοϊκότερη για τον Μισθωτή."
         country: true
       - id: general.5
@@ -660,7 +660,7 @@ sections:
         local: "Αμάξωμα: εμπρός / πίσω / αριστερά / δεξιά"
       - en: Windscreen, glass, mirrors and lights
         local: Παρμπρίζ, κρύσταλλα, καθρέφτες και φώτα
-      - en: Tyres and wheels
+      - en: Tires and wheels
         local: Ελαστικά και ζάντες
       - en: Interior and seats
         local: Εσωτερικό και καθίσματα
@@ -702,7 +702,7 @@ sections:
         local: Καθρέφτης
       - en: Headlight / tail light / indicator
         local: Φανάρι / πίσω φως / φλας
-      - en: Tyre (each)
+      - en: Tire (each)
         local: Ελαστικό (το καθένα)
       - en: Key / remote
         local: Κλειδί / τηλεχειριστήριο

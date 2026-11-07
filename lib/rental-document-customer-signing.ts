@@ -390,7 +390,7 @@ async function buildExecutionCertificatePdf(ctx: any, signerName: string, verifi
       <p><strong>Renter signature:</strong> ${stringValue(signerName)} at ${new Date().toISOString()}</p>
       <p class="muted">Customer-visible certificate excludes detailed IP address and user-agent data. Internal audit metadata remains stored privately.</p>
     </div>
-    <h2>Acknowledgements</h2>
+    <h2>Acknowledgments</h2>
     <ul>${acknowledgements}</ul>
     <p class="muted">RoveHQ is not a contracting party. The agreement is issued by the rental business.</p>
   </body></html>`;
@@ -429,7 +429,7 @@ export async function completeRentalDocumentCustomerSigning({
 
   const requiredTypes = CUSTOMER_SIGNING_ACKNOWLEDGEMENTS.map((ack) => ack.type);
   if (!requiredTypes.every((type) => acceptedAcknowledgementTypes.includes(type))) {
-    throw new Error("Please accept each required acknowledgement before signing.");
+    throw new Error("Please accept each required acknowledgment before signing.");
   }
 
   const normalizedSigner = stringValue(signerName);

@@ -1,6 +1,6 @@
 ---
 title: "Free Greece car, scooter and quad rental agreement (English–Greek)"
-description: "Free bilingual rental agreement for Greece and the islands: quad and motorbike licence categories, helmets, ferry permission, camera fines and plate removal, euro pricing."
+description: "Free bilingual rental agreement for Greece and the islands: quad and motorbike license categories, helmets, ferry permission, camera fines and plate removal, euro pricing."
 date: 2026-11-03
 updated: 2026-11-03
 listed: false
@@ -8,19 +8,19 @@ fileLabel: "Agreement · English + Greek"
 formats: [docx, pdf]
 inside:
   - "English beside Greek; if they differ, the reading better for the renter applies"
-  - "Licence categories for cars, scooters, motorbikes and quads (a car licence doesn't cover motorbikes)"
+  - "License categories for cars, scooters, motorbikes and quads (a car license doesn't cover motorbikes)"
   - "Helmets for rider and passenger, quads kept off beaches and tracks"
   - "Ferry trips to other islands only with your permission; no non-EU countries"
-  - "Camera fines, plate and licence removal under the 2025 Highway Code"
+  - "Camera fines, plate and license removal under the 2025 Highway Code"
   - "Handover check (Annex A), damage price list (Annex B) and signature blocks"
 ---
-On the Greek islands the quad and the scooter are the business, and they are where things go wrong: riders without the right licence, no helmet, a quad taken onto a beach. The new [Highway Code of 2025](https://www.athenstoolkit.com/2025/11/new-traffic-law-in-greece-Sept-2025.html) raised fines and lets the police remove plates and licences for serious offences. This agreement is written for that.
+On the Greek islands the quad and the scooter are the business, and they are where things go wrong: riders without the right license, no helmet, a quad taken onto a beach. The new [Highway Code of 2025](https://www.athenstoolkit.com/2025/11/new-traffic-law-in-greece-Sept-2025.html) raised fines and lets the police remove plates and licenses for serious offenses. This agreement is written for that.
 
 ## What the Greece version covers
 
-**Licences.** Category B for cars; AM, A1, A2 or A for motorbikes as the engine requires; for quads, the category the registration requires, checked at handover. A visitor from outside the EU carries an International Driving Permit unless Greece accepts the licence on its own, as it does UK licences.
+**Licenses.** Category B for cars; AM, A1, A2 or A for motorbikes as the engine requires; for quads, the category the registration requires, checked at handover. A visitor from outside the EU carries an International Driving Permit unless Greece accepts the license on its own, as it does UK licenses.
 
-**Helmets and quads.** Rider and passenger wear a helmet you provide; quads stay off beaches, dunes and tracks. In June 2026 the government [announced stricter quad rules](https://www.iefimerida.gr/english/greece-bans-rental-scooters-and-quads-without-helmets-and-bars-minors-e-scooters-tourism), including five years of licence-holding for quad renters; that is not written in as law until it is in force, so check before the season.
+**Helmets and quads.** Rider and passenger wear a helmet you provide; quads stay off beaches, dunes and tracks. In June 2026 the government [announced stricter quad rules](https://www.iefimerida.gr/english/greece-bans-rental-scooters-and-quads-without-helmets-and-bars-minors-e-scooters-tourism), including five years of license-holding for quad renters; that is not written in as law until it is in force, so check before the season.
 
 **Ferries and borders.** Another island only with your permission; never Albania, North Macedonia or Turkey.
 

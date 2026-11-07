@@ -11,7 +11,7 @@ steps:
   - "In RoveHQ, open Fleet, then Import, choose Rentware and upload the files. Several at once is fine."
   - "Check the vehicles, bookings and payments it found, then bring them in."
 ---
-Rentware is German rental software for bikes, boats, cars, trailers and equipment. Its help centre explains the revenue export for accounting (Datev or Lexoffice), which is a record of money, not a full list of your bookings and customers. RoveHQ reads the columns of whatever you upload, shows you what it found, and you correct anything before it's saved.
+Rentware is German rental software for bikes, boats, cars, trailers and equipment. Its help center explains the revenue export for accounting (Datev or Lexoffice), which is a record of money, not a full list of your bookings and customers. RoveHQ reads the columns of whatever you upload, shows you what it found, and you correct anything before it's saved.
 
 ## Free import
 

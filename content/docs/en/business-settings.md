@@ -1,6 +1,6 @@
 ---
 title: "Business details, logo and signature"
-description: "Set your business details, logo, brand colour, agreement details, signature and locations, and download your data."
+description: "Set your business details, logo, brand color, agreement details, signature and locations, and download your data."
 category: account
 order: 2
 appPath: "/settings"
@@ -25,12 +25,12 @@ Tap **Agreement details** for **Legal name**, **Registration or tax number**, **
 
 To change the agreement terms, tap **Edit agreement terms**. See [Rental agreements](/docs/rental-agreements).
 
-## Logo and colour
+## Logo and color
 
 - **Upload logo**: PNG or JPG, wide works best. It saves as soon as you pick it.
-- **Brand colour**: tap a colour or **Pick your own**, then **Save**.
+- **Brand color**: tap a color or **Pick your own**, then **Save**.
 
-Your logo and colour go on everything customers see. From the Pro plan your logo also replaces RoveHQ's inside the app, and you can untick **Show "Powered by RoveHQ"**.
+Your logo and color go on everything customers see. From the Pro plan your logo also replaces RoveHQ's inside the app, and you can untick **Show "Powered by RoveHQ"**.
 
 ## Your signature
 

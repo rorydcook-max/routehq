@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { niceMoney } from "@/lib/nice-money";
 import { getTranslations } from "next-intl/server";
 import { archiveVehicle, deleteVehicle, updateVehicle } from "@/app/actions/vehicles";
 import { ConfirmDeleteVehicleButton } from "@/app/(app)/fleet/fleet-actions";
@@ -78,7 +79,8 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
   const currency = organization.currency || "THB";
   const categoryName = (category: { code: string; name: string }) => (t.has(`cat_${category.code}` as never) ? say(`cat_${category.code}`) : category.name);
 
-  const money = (value: unknown) => (value == null || value === "" || Number(value) === 0 ? null : `${currency === "THB" ? "฿" : ""}${Number(value).toLocaleString("en-US")}`);
+  // With the business's own symbol (other currencies used to show a bare number).
+  const money = (value: unknown) => (value == null || value === "" || Number(value) === 0 ? null : niceMoney(value, currency));
   const ratesSummary =
     [
       money(vehicle.daily_rate) ? say("perDay", { amount: money(vehicle.daily_rate)! }) : null,

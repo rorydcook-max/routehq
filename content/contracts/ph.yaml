@@ -41,7 +41,7 @@ words:
   blank_hint: { en: "(fill in)", local: "(punan)" }
 sources:
   - url: https://lawphil.net/statutes/repacts/ra1964/ra_4136_1964.html
-    supports: "RA 4136 (Land Transportation and Traffic Code) Sec. 21: licensed foreign tourists may drive during but not after 90 days of their stay; Sec. 19 general licence duty (renter.2)."
+    supports: "RA 4136 (Land Transportation and Traffic Code) Sec. 21: licensed foreign tourists may drive during but not after 90 days of their stay; Sec. 19 general license duty (renter.2)."
   - url: https://lawphil.net/statutes/repacts/ra2010/ra_10054_2010.html
     supports: "RA 10054 (Motorcycle Helmet Act of 2009) Sec. 3: all riders and back riders must wear standard helmets at all times; Sec. 6: only PS/ICC-marked helmets may be sold (use.2)."
   - url: https://lawphil.net/statutes/repacts/ra2015/ra_10666_2015.html
@@ -57,7 +57,7 @@ sources:
   - url: https://lawphil.net/statutes/repacts/ra2013/ra_10607_2013.html
     supports: "RA 10607 (amended Insurance Code): compulsory motor vehicle liability insurance chapter; CTPL needed to register a vehicle with the LTO (vehicle.2, insurance.1)."
   - url: https://elibrary.judiciary.gov.ph/thebookshelf/showdocsfriendly/10/57714
-    supports: "LTFRB MC 2011-008 (Sept. 5, 2011): private vehicles rented out are exempt from the LTFRB franchise circular (MC 98-027) if under a long-term lease or exclusively used and driven by the lessee or the lessee's authorised representative; other rent-a-car services still need a franchise (vehicle.2)."
+    supports: "LTFRB MC 2011-008 (Sept. 5, 2011): private vehicles rented out are exempt from the LTFRB franchise circular (MC 98-027) if under a long-term lease or exclusively used and driven by the lessee or the lessee's authorized representative; other rent-a-car services still need a franchise (vehicle.2)."
   - url: https://lawphil.net/statutes/repacts/ra2012/ra_10173_2012.html
     supports: "RA 10173 (Data Privacy Act of 2012) Secs. 11, 12, 13, 16: proportionality, retention only as long as necessary, lawful bases incl. contract and consent, data subject rights (data.1, data.2)."
   - url: https://lawphil.net/statutes/repacts/ra2024/ra_11983_2024.html
@@ -75,9 +75,9 @@ sources:
   - url: https://lawphil.net/consti/cons1987.html
     supports: "1987 Constitution Art. XIV Sec. 7: Filipino and English are the official languages (general.4)."
   - url: https://ltoportal.ph/can-foreign-tourists-drive-in-the-philippines
-    supports: "Secondary: foreign licence usable for up to 90 days from arrival if in English or with an official embassy translation; IDP accepted with the original licence; carry passport as proof of entry date (renter.2)."
+    supports: "Secondary: foreign license usable for up to 90 days from arrival if in English or with an official embassy translation; IDP accepted with the original license; carry passport as proof of entry date (renter.2)."
   - url: https://buenosairespe.dfa.gov.ph/comunidad-filipina/87-comunidad-filipina/240-driving-in-the-philippines
-    supports: "DFA (Philippine Embassy) guidance: RA 4136 Sec. 21 90-day rule; non-English licences need an official English translation from the issuing country's embassy (renter.2)."
+    supports: "DFA (Philippine Embassy) guidance: RA 4136 Sec. 21 90-day rule; non-English licenses need an official English translation from the issuing country's embassy (renter.2)."
   - url: https://www.autoindustriya.com/features/what-can-you-drive-under-the-new-license-codes.html
     supports: "Secondary: LTO DL codes since 2021: A motorcycles, A1 tricycles, B cars/light vehicles up to 8 seats, B1 9+ seats, B2 goods vehicles up to 3,500 kg (renter.2)."
   - url: https://www.topgear.com.ph/features/feature-articles/anti-drunk-and-drugged-driving-law-explainer-a4682-20230821-lfrm
@@ -91,7 +91,7 @@ sources:
   - url: https://www.moneymax.ph/car-insurance/articles/acts-of-god-coverage
     supports: "Secondary: flood, typhoon and earthquake damage ('Acts of Nature / Acts of God') is usually an optional add-on to comprehensive car insurance (damage.nature_cc)."
   - url: https://pamasahe.com/posts/starlite-ferries-issues-vehicle-requirements-for-holy-week-travelers
-    supports: "Secondary: ferry operators ask for the vehicle's OR/CR and an authorisation letter from the owner when someone else ships the vehicle (area.2)."
+    supports: "Secondary: ferry operators ask for the vehicle's OR/CR and an authorization letter from the owner when someone else ships the vehicle (area.2)."
   - url: https://ptvnews.ph/doj-indicts-8-persons-estafa-raps-rent-sangla-modus/
     supports: "Secondary: 'rent-sangla' (renting and pawning cars) has been charged as syndicated estafa; charge depends on facts (period.nonreturn_cc)."
 title:
@@ -131,17 +131,17 @@ sections:
       - { key: renter_local_address, en: "Local address during the rental (hotel / resort / condo)", local: "Address habang nagrerenta (hotel / resort / condo)" }
       - { key: renter_phone, en: "Phone / Viber / WhatsApp", local: "Telepono / Viber / WhatsApp" }
       - { key: renter_email, en: "Email", local: "Email" }
-      - { key: renter_licence, en: "Driving licence number, code / class and issuing country", local: "Numero ng lisensya, code / klase at bansang nag-isyu" }
-      - { key: renter_licence_expiry, en: "Licence expiry date", local: "Petsa ng pag-expire ng lisensya" }
+      - { key: renter_licence, en: "Driver's license number, code / class and issuing country", local: "Numero ng lisensya, code / klase at bansang nag-isyu" }
+      - { key: renter_licence_expiry, en: "License expiry date", local: "Petsa ng pag-expire ng lisensya" }
       - { key: renter_idp, en: "International Driving Permit or official translation (number / not required)", local: "International Driving Permit o opisyal na salin (numero / hindi kailangan)" }
       - { key: renter_emergency, en: "Emergency contact (name and phone)", local: "Contact sa emergency (pangalan at telepono)" }
-      - { key: driver2_details, en: "Additional driver (name, ID, licence), if any", local: "Karagdagang drayber (pangalan, ID, lisensya), kung mayroon" }
+      - { key: driver2_details, en: "Additional driver (name, ID, license), if any", local: "Karagdagang drayber (pangalan, ID, lisensya), kung mayroon" }
     clauses:
       - id: renter.1
         en: "The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle."
         local: "Pinatutunayan ng Umuupa na totoo at kumpleto ang mga detalye sa itaas, at nakapangalan dito ang bawat taong magmamaneho o sasakay bilang drayber ng sasakyan. Ang Umuupa at ang karagdagang drayber na nakapangalan sa itaas lamang ang maaaring magmaneho ng sasakyan."
       - id: renter.2
-        en: "Every driver must hold a valid driving licence for this type of vehicle and carry it while driving. A foreign licence may be used only during the first 90 days of the driver's stay in the Philippines. It must be in English, or be carried with an official English translation or an International Driving Permit. The driver should also carry their passport as proof of arrival date. After 90 days, a Philippine licence is needed. A Philippine licence must show the right code: A for motorcycles and scooters, B for cars. A car licence does not allow a person to ride a motorbike."
+        en: "Every driver must hold a valid driver's license for this type of vehicle and carry it while driving. A foreign license may be used only during the first 90 days of the driver's stay in the Philippines. It must be in English, or be carried with an official English translation or an International Driving Permit. The driver should also carry their passport as proof of arrival date. After 90 days, a Philippine license is needed. A Philippine license must show the right code: A for motorcycles and scooters, B for cars. A car license does not allow a person to ride a motorbike."
         local: "Bawat drayber ay dapat may balidong lisensya para sa ganitong uri ng sasakyan at dala ito habang nagmamaneho. Ang lisensyang galing sa ibang bansa ay magagamit lamang sa unang 90 araw ng pananatili ng drayber sa Pilipinas. Dapat ito ay nasa Ingles, o may kasamang opisyal na salin sa Ingles o International Driving Permit. Dapat ding dala ng drayber ang kanyang pasaporte bilang patunay ng petsa ng pagdating. Pagkalipas ng 90 araw, kailangan na ng lisensyang Pilipino. Ang lisensyang Pilipino ay dapat may tamang code: A para sa motorsiklo at scooter, B para sa kotse. Ang lisensya para sa kotse ay hindi nagpapahintulot na magmaneho ng motorsiklo."
         country: true
 
@@ -152,7 +152,7 @@ sections:
       - { key: vehicle_make_model, en: "Make and model", local: "Brand at modelo" }
       - { key: vehicle_year, en: "Year", local: "Taon" }
       - { key: vehicle_plate, en: "Plate number", local: "Numero ng plaka" }
-      - { key: vehicle_colour, en: "Colour", local: "Kulay" }
+      - { key: vehicle_colour, en: "Color", local: "Kulay" }
       - { key: renter_vin, en: "Chassis / engine number", local: "Numero ng chassis / makina" }
       - { key: out_odometer, en: "Odometer at handover", local: "Odometer sa pag-abot" }
       - { key: out_fuel, en: "Fuel / battery level at handover", local: "Antas ng gasolina / baterya sa pag-abot" }
@@ -169,7 +169,7 @@ sections:
         en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies."
         local: "Pinananatili ng May-ari ang serbisyo ng sasakyan ayon sa rekomendasyon ng manufacturer, kasama ang pagpapalit ng langis, mga inspeksyon at pagpapalit ng mga piyesang luma na, at sinasagot nito ang karaniwang pagkumpuni ng makina at normal na pagkaluma, maliban kung iba ang sinasabi ng kasunduang ito. Sa mas mahahabang pag-upa, isinasaayos ng May-ari ang serbisyo kasama ang Umuupa sa maginhawang oras at agad na ibinabalik ang sasakyan; kung lumampas sa isang araw ang serbisyo, ang seksyon 13 ang susundin."
       - id: vehicle.4
-        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
         local: "Habang inuupahan, inaalagaan ng Umuupa ang pang-araw-araw na kondisyon ng sasakyan: tinitingnan kung normal ang mga gulong, ilaw, preno, langis at coolant, pinananatili itong sapat na malinis para ligtas na magmaneho, at hindi ito minamaneho o sinasakyan kung ito ay naging hindi ligtas o hindi na angkop sa kalsada."
 
   - id: period
@@ -286,7 +286,7 @@ sections:
         local: "Ang kulang na gasolina ay sisingilin ayon sa presyo sa lokal na gasolinahan, dagdag ang refuelling service fee na {{currency}} {{fuel_service_fee}}. Pananagutan ng Umuupa ang paggamit ng maling gasolina, kasama ang paghila (towing) at pagkumpuni."
       - id: fuel.4
         if: mileage_limit
-        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}."
         local: "Pinapayagang mileage: {{mileage_limit}} km bawat {{mileage_period_label}}. Bawat dagdag na kilometro ay may bayad na {{currency}} {{excess_km_fee}}."
       - id: fuel.5
         unless: mileage_limit
@@ -320,7 +320,7 @@ sections:
         local: "Ipinagbabawal ang: magmaneho nang lasing o nasa impluwensya ng droga, o lampas sa legal na limitasyon (Anti-Drunk and Drugged Driving Act, RA 10586); gumamit ng cellphone o ibang device habang nagmamaneho o nakahinto sa red light, maliban sa hands-free na hindi humaharang sa paningin ng drayber (Anti-Distracted Driving Act, RA 10913); makipagkarera, gumawa ng stunts o magmaneho sa labas ng kalsada (maliban kung para rito ang sasakyan at pumayag ang May-ari); humila o magtulak ng anumang bagay; magsakay ng pasahero sa labas ng cabin o sa kargahan sa likod; magsakay ng pasahero o kargamento nang may bayad, ilegal na bagay o mapanganib na karga; gamitin ang sasakyan sa ride-hailing, delivery, pagtuturo ng pagmamaneho o ipaupa ito sa iba; payagang magmaneho ang sinumang hindi nakapangalan sa seksyon 2."
       - id: use.5
         when: { smoking: no }
-        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}"
+        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}"
         local: "Bawal manigarilyo at mag-vape sa loob ng sasakyan.{{#if smoking_fee}} Ang paglabag dito ay may bayad na {{currency}} {{smoking_fee}} para sa pagtanggal ng amoy.{{/if}}"
       - id: use.6
         when: { pets: no }
@@ -340,7 +340,7 @@ sections:
         en: "The vehicle must stay within the permitted area above. Taking it further, on a ferry or to another island, needs the Owner's written permission first, and the Renter pays any ferry fees, delays and recovery costs."
         local: "Dapat manatili ang sasakyan sa loob ng pinapayagang lugar sa itaas. Ang pagdadala nito nang mas malayo, sakay ng barko o ferry o papunta sa ibang isla, ay nangangailangan muna ng nakasulat na pahintulot ng May-ari, at babayaran ng Umuupa ang anumang bayad sa ferry, pagkaantala at gastos sa pagbawi."
       - id: area.2
-        en: "Without the Owner's written permission, the vehicle must not leave the island or province where it was rented, including by ferry or RoRo. Ferry operators usually ask for the OR/CR and an authorisation letter from the registered owner; the Owner gives these only when permission is given. Outside the permitted area, insurance may not cover the vehicle and the Renter is responsible for all loss and damage."
+        en: "Without the Owner's written permission, the vehicle must not leave the island or province where it was rented, including by ferry or RoRo. Ferry operators usually ask for the OR/CR and an authorization letter from the registered owner; the Owner gives these only when permission is given. Outside the permitted area, insurance may not cover the vehicle and the Renter is responsible for all loss and damage."
         local: "Kung walang nakasulat na pahintulot ng May-ari, hindi dapat ilabas ang sasakyan sa isla o probinsya kung saan ito inupahan, kasama ang pagsakay sa ferry o RoRo. Karaniwang hinihingi ng mga ferry operator ang OR/CR at authorization letter mula sa rehistradong may-ari; ibibigay lamang ito ng May-ari kapag may pahintulot. Sa labas ng pinapayagang lugar, maaaring hindi sakop ng insurance ang sasakyan at pananagutan ng Umuupa ang lahat ng pagkawala at pinsala."
         country: true
       - id: area.3
@@ -370,7 +370,7 @@ sections:
         en: "The vehicle has only CTPL insurance. The Renter is responsible for damage to the rented vehicle, its theft, and damage to other people's property (section 12)."
         local: "CTPL insurance lamang ang mayroon ang sasakyan. Pananagutan ng Umuupa ang pinsala sa inupahang sasakyan, ang pagnanakaw nito, at ang pinsala sa ari-arian ng ibang tao (seksyon 12)."
       - id: insurance.5
-        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
+        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
         local: "Hindi poprotektahan ng insurance ang Umuupa, at buong babayaran ng Umuupa, ang pinsala o pagkawala na nangyari: habang nagmamaneho nang lasing o nasa impluwensya ng droga, nang walang balidong lisensya para sa sasakyan, ng drayber na hindi nakapangalan sa seksyon 2, sa labas ng pinapayagang lugar, habang ginagamit sa ipinagbabawal na paraan (seksyon 9), dahil sa sinadya o pabayang gawain, o kapag iniwan ang susi sa sasakyan. Ang gulong, rim, salamin, ilalim ng sasakyan, interior, susi at mga kagamitan ay kadalasang hindi sakop ng insurance at pananagutan ng Umuupa, maliban kung kinumpirma ng May-ari nang nakasulat na sakop ang mga ito."
       - id: insurance.6
         en: "Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage."
@@ -403,7 +403,7 @@ sections:
     title: { en: "13. Accidents and breakdowns", local: "13. Aksidente at pagkasira" }
     clauses:
       - id: accident.1
-        en: "In an accident, the Renter must: stop, make the area safe and get medical help if anyone is hurt (emergency hotline 911); call the Owner straight away on the number in section 1; report the accident to the police, as the law requires, and call the insurer's hotline when the Owner asks; take photos of all vehicles, plates, the place and any damage; note the other party's name, phone, plate, licence and insurance; and not admit fault, sign a settlement, pay or accept money without the Owner's agreement."
+        en: "In an accident, the Renter must: stop, make the area safe and get medical help if anyone is hurt (emergency hotline 911); call the Owner straight away on the number in section 1; report the accident to the police, as the law requires, and call the insurer's hotline when the Owner asks; take photos of all vehicles, plates, the place and any damage; note the other party's name, phone, plate, license and insurance; and not admit fault, sign a settlement, pay or accept money without the Owner's agreement."
         local: "Kapag may aksidente, dapat ang Umuupa ay: huminto, gawing ligtas ang lugar at humingi ng tulong medikal kung may nasaktan (emergency hotline 911); tawagan agad ang May-ari sa numerong nasa seksyon 1; iulat ang aksidente sa pulis, ayon sa hinihingi ng batas, at tawagan ang hotline ng insurance kapag hiniling ng May-ari; kumuha ng litrato ng lahat ng sasakyan, plaka, lugar at anumang pinsala; itala ang pangalan, telepono, plaka, lisensya at insurance ng kabilang partido; at huwag umamin ng kasalanan, pumirma ng areglo, magbayad o tumanggap ng pera nang walang pahintulot ng May-ari."
         country: true
       - id: accident.2
@@ -426,7 +426,7 @@ sections:
         en: "The Renter pays all traffic and parking fines, tolls, towing, impound and clamping costs arising during the rental, including fines that reach the Owner after the vehicle is returned, plus a handling fee of {{currency}} {{fine_admin_fee}} per fine."
         local: "Babayaran ng Umuupa ang lahat ng multa sa trapiko at paradahan, toll, towing, impound at clamping na nangyari habang nagrerenta, kasama ang mga multang dumating sa May-ari matapos maibalik ang sasakyan, dagdag ang handling fee na {{currency}} {{fine_admin_fee}} bawat multa."
       - id: fines.2
-        en: "Violation notices from the LTO, MMDA, local governments or No Contact Apprehension cameras are sent to the registered owner. The Owner may give the Renter's name, ID and licence details and a copy of this agreement to the issuing authority so that the violation is transferred to the Renter, where the authority's procedure allows. If it cannot be transferred, the Owner may pay it (an unpaid violation can block the vehicle's registration) and the Renter repays the Owner."
+        en: "Violation notices from the LTO, MMDA, local governments or No Contact Apprehension cameras are sent to the registered owner. The Owner may give the Renter's name, ID and license details and a copy of this agreement to the issuing authority so that the violation is transferred to the Renter, where the authority's procedure allows. If it cannot be transferred, the Owner may pay it (an unpaid violation can block the vehicle's registration) and the Renter repays the Owner."
         local: "Ang mga notice ng paglabag mula sa LTO, MMDA, lokal na pamahalaan o mga camera ng No Contact Apprehension ay ipinapadala sa rehistradong may-ari. Maaaring ibigay ng May-ari ang pangalan, ID at detalye ng lisensya ng Umuupa at kopya ng kasunduang ito sa ahensyang nag-isyu upang mailipat ang paglabag sa Umuupa, kung pinapayagan ito ng proseso ng ahensya. Kung hindi ito mailipat, maaaring bayaran ito ng May-ari (maaaring maharang ng hindi nabayarang paglabag ang rehistro ng sasakyan) at babayaran ng Umuupa ang May-ari."
         country: true
 
@@ -448,18 +448,18 @@ sections:
         local: "Dapat ibalik ang sasakyan kasama ang susi, mga dokumento at kagamitan, na may antas ng gasolina na napagkasunduan sa seksyon 8, at makatwirang malinis. Sabay na susuriin ng dalawang partido ang sasakyan at itatala ang kondisyon, odometer at gasolina sa Annex A kasama ang mga litrato. Kung wala ang Umuupa sa pagsusuri, ang mga litrato ng May-ari na may petsa ang tatanggaping talaan."
       - id: return.2
         if: cleaning_fee
-        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
         local: "Ang sasakyang ibinalik na may sobrang dumi, buhangin, putik, mantsa, pagkain o amoy sa loob ay may cleaning fee na {{currency}} {{cleaning_fee}} (mas mataas kung kailangan ng espesyal na paglilinis, may resibo)."
       - id: return.3
         unless: cleaning_fee
-        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning."
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning."
         local: "Ang sasakyang ibinalik na may sobrang dumi, buhangin, putik, mantsa, pagkain o amoy sa loob ay maaaring singilin ng makatwirang gastos sa paglilinis."
 
   - id: data
     title: { en: "17. Personal data and documents", local: "17. Personal na datos at mga dokumento" }
     clauses:
       - id: data.1
-        en: "Under the Data Privacy Act of 2012 (RA 10173), the Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner collects no more than is needed, keeps the data only as long as needed for those purposes and the law, keeps it secure, and does not sell it. The Renter may ask to access or correct their data, may ask for it to be deleted when it is no longer needed, and may complain to the National Privacy Commission."
+        en: "Under the Data Privacy Act of 2012 (RA 10173), the Owner collects the Renter's and drivers' names, contact details, ID and license details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner collects no more than is needed, keeps the data only as long as needed for those purposes and the law, keeps it secure, and does not sell it. The Renter may ask to access or correct their data, may ask for it to be deleted when it is no longer needed, and may complain to the National Privacy Commission."
         local: "Sa ilalim ng Data Privacy Act of 2012 (RA 10173), kinokolekta ng May-ari ang pangalan, contact details, detalye ng ID at lisensya, kopya ng mga dokumento ng Umuupa at mga drayber, at mga litrato ng sasakyan para lamang maibigay ang pag-upang ito, mapatunayan ang pagkakakilanlan, sumunod sa batas, asikasuhin ang mga multa, claim at hindi pagkakasundo, at magtago ng rekord ng negosyo. Hindi kumokolekta ang May-ari nang higit sa kailangan, itinatago ang datos hangga't kailangan lamang para sa mga layuning ito at ng batas, pinananatiling ligtas ito, at hindi ito ibinebenta. Maaaring hilingin ng Umuupa na makita o itama ang kanyang datos, hilingin na burahin ito kapag hindi na kailangan, at magreklamo sa National Privacy Commission."
         country: true
       - id: data.2
@@ -520,7 +520,7 @@ sections:
       - { en: "Fuel / battery level", local: "Antas ng gasolina / baterya" }
       - { en: "Body: front / rear / left / right", local: "Katawan: harap / likod / kaliwa / kanan" }
       - { en: "Glass, mirrors and lights", local: "Salamin, side mirror at ilaw" }
-      - { en: "Tyres and wheels", local: "Gulong at rim" }
+      - { en: "Tires and wheels", local: "Gulong at rim" }
       - { en: "Interior and seats", local: "Loob at upuan" }
       - { en: "Keys, remote, documents (OR/CR)", local: "Susi, remote, dokumento (OR/CR)" }
       - { en: "Helmets / child seat / accessories", local: "Helmet / child seat / kagamitan" }
@@ -540,7 +540,7 @@ sections:
       - { en: "Dent, per panel", local: "Yupi, bawat panel" }
       - { en: "Mirror", local: "Side mirror" }
       - { en: "Headlight / tail light / indicator", local: "Headlight / tail light / signal light" }
-      - { en: "Tyre (each)", local: "Gulong (bawat isa)" }
+      - { en: "Tire (each)", local: "Gulong (bawat isa)" }
       - { en: "Key / remote", local: "Susi / remote" }
       - { en: "Helmet", local: "Helmet" }
       - { en: "Number plate replacement", local: "Pagpapalit ng plaka" }

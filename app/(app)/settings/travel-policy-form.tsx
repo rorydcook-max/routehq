@@ -284,6 +284,7 @@ export function TravelPolicyForm({
             <FeeRow
               defaultValue={settings[fee.key]}
               key={fee.key}
+              currencyCode={fee.money ? currencyCode : undefined}
               label={say(fee.label === "tp_km" ? distanceKey("tp_km") : fee.label, { currency })}
               name={fee.name}
               offText={say(`tp_off_${fee.key}`)}
@@ -307,18 +308,19 @@ export function TravelPolicyForm({
   );
 }
 
-const FEES: Array<{ key: FeeKey; name: string; label: string; step: string }> = [
+// `money`: an amount in the business's currency, typed in a box with its symbol inside (not in the label).
+const FEES: Array<{ key: FeeKey; name: string; label: string; step: string; money?: boolean }> = [
   { key: "mileage_limit", name: "mileageLimit", label: "tp_km", step: "1" },
-  { key: "fuel_charge_per_increment", name: "fuelChargePerIncrement", label: "tp_fuel", step: "0.01" },
+  { key: "fuel_charge_per_increment", name: "fuelChargePerIncrement", label: "tp_fuel", step: "0.01", money: true },
   { key: "late_fee_percentage", name: "lateFeePercentage", label: "tp_late", step: "0.01" },
-  { key: "cleaning_fee_minimum", name: "cleaningFeeMinimum", label: "tp_cleaning", step: "0.01" },
-  { key: "smoking_fee_maximum", name: "smokingFeeMaximum", label: "tp_smoking", step: "0.01" },
-  { key: "emergency_repair_limit", name: "emergencyRepairLimit", label: "tp_repairs", step: "0.01" },
+  { key: "cleaning_fee_minimum", name: "cleaningFeeMinimum", label: "tp_cleaning", step: "0.01", money: true },
+  { key: "smoking_fee_maximum", name: "smokingFeeMaximum", label: "tp_smoking", step: "0.01", money: true },
+  { key: "emergency_repair_limit", name: "emergencyRepairLimit", label: "tp_repairs", step: "0.01", money: true },
   { key: "deposit_return_days", name: "depositReturnDays", label: "tp_depositDays", step: "1" }
 ];
 
 /** A fee or limit with its own switch. Switched off, the amount is kept (hidden) for when it comes back on. */
-function FeeRow({ defaultValue, label, name, on: initialOn, onName, offText, step }: { defaultValue: number; label: string; name: string; on: boolean; onName: string; offText: string; step: string }) {
+function FeeRow({ currencyCode, defaultValue, label, name, on: initialOn, onName, offText, step }: { currencyCode?: string; defaultValue: number; label: string; name: string; on: boolean; onName: string; offText: string; step: string }) {
   const [on, setOn] = useState(initialOn);
   const [value, setValue] = useState(String(defaultValue));
   return (
@@ -327,7 +329,9 @@ function FeeRow({ defaultValue, label, name, on: initialOn, onName, offText, ste
         <input checked={on} className="switch" name={onName} onChange={(event) => setOn(event.target.checked)} role="switch" type="checkbox" value="on" />
         <span className="min-w-0 font-semibold leading-6 text-[var(--foreground)]">{label}</span>
       </label>
-      {on ? (
+      {on && currencyCode ? (
+        <MoneyInput className="w-32 shrink-0" currency={currencyCode} defaultValue={value} label={label} name={name} onValueChange={setValue} required />
+      ) : on ? (
         <input
           aria-label={label}
           className="w-28 shrink-0 text-end"

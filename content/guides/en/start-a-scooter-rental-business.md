@@ -11,7 +11,7 @@ faq:
     a: "Most small shops start with 5 to 10 bikes. That is enough to cover a few long-term renters plus walk-in daily customers, without tying up too much cash before you know your local demand."
   - q: "Should I buy new or used scooters for rental?"
     a: "New bikes cost more but break down less and look better in photos. Used bikes cut your startup cost but need a careful inspection and a bigger maintenance budget. Many operators start with a mix and replace the oldest bikes first."
-  - q: "Do I need a licence to rent out motorbikes?"
+  - q: "Do I need a license to rent out motorbikes?"
     a: "In most countries you need at least a registered business, valid registration and road tax for every bike, and the country's compulsory motor insurance. Some countries or provinces add rental-specific permits, so check with your local transport office before you start."
   - q: "How much should I charge per day for a scooter?"
     a: "Start from what similar bikes rent for in your area, then set weekly and monthly prices that give a clear discount for longer rentals. Our free pricing calculator helps you check that each rate still covers your costs."
@@ -55,7 +55,7 @@ Choose models that are easy to rent, easy to repair and easy to resell:
 | 250–350cc maxi scooter | Honda Forza, ADV 350; Yamaha XMAX | Experienced riders, touring | Higher deposit and insurance; fewer customers |
 | Semi-automatic/manual | Honda Wave, Yamaha Sirius | Local renters, rural areas | Low cost; many tourists cannot ride them |
 
-A practical starting mix is mostly 125cc automatics, plus one or two 150–160cc bikes once you see demand. Stick to one or two brands so spare parts, keys and know-how carry across the fleet. Pick colours and models that are common locally, because they are easier to resell.
+A practical starting mix is mostly 125cc automatics, plus one or two 150–160cc bikes once you see demand. Stick to one or two brands so spare parts, keys and know-how carry across the fleet. Pick colors and models that are common locally, because they are easier to resell.
 
 ## Buying new, used or on finance
 
@@ -65,10 +65,10 @@ A practical starting mix is mostly 125cc automatics, plus one or two 150–160cc
 
 - The registration book matches the frame and engine numbers on the bike.
 - Road tax and compulsory insurance are current, and there is no outstanding finance on the bike.
-- Tyres, brakes, belt and battery condition (budget to replace anything doubtful).
+- Tires, brakes, belt and battery condition (budget to replace anything doubtful).
 - How it starts cold, idles and brakes on a test ride.
 
-**Finance (hire purchase)** lets you start with more bikes for less cash, but monthly instalments are due whether bikes are rented or not. In some countries the lender keeps the original registration book until the loan is paid, which can matter for registration paperwork. Only finance as many bikes as your low-season income can cover.
+**Finance (hire purchase)** lets you start with more bikes for less cash, but monthly installments are due whether bikes are rented or not. In some countries the lender keeps the original registration book until the loan is paid, which can matter for registration paperwork. Only finance as many bikes as your low-season income can cover.
 
 ## Registration, permits and insurance
 
@@ -77,16 +77,16 @@ Every country is different, but the same building blocks come up almost everywhe
 1. **A registered business.** A sole trader registration or a company, with a tax ID. Foreign owners often face ownership limits and need local advice.
 2. **Valid registration and road tax for every bike,** renewed on time, with the plate and tax sticker displayed.
 3. **Compulsory motor insurance.** This usually covers injury to people, not damage to the bike. Voluntary cover for theft or damage costs extra.
-4. **Rules for renters.** Most countries require the rider to hold a licence valid for that class of bike, often a home licence plus an International Driving Permit for tourists.
+4. **Rules for renters.** Most countries require the rider to hold a license valid for that class of bike, often a home license plus an International Driving Permit for tourists.
 5. **Any rental-specific permit.** Some places license rental vehicles separately, especially cars. Ask your local transport office whether this applies to motorbikes where you are.
 
 Start here for your country. Each link goes to the official body, and we note what we could confirm:
 
 | Country | Business registration | Vehicles and insurance | What to know |
 |---|---|---|---|
-| Thailand | [Department of Business Development](https://www.dbd.go.th) | [Department of Land Transport](https://www.dlt.go.th) for registration and tax; [Office of Insurance Commission](https://www.oic.or.th) for compulsory insurance (Por Ror Bor) | Rental *cars* are registered as rental-service vehicles with distinctive green plates ([plate colours](https://en.wikipedia.org/wiki/Vehicle_registration_plates_of_Thailand)). For motorbikes, ask your provincial DLT office what applies. Helmet fines rose to up to ฿2,000 from June 2025 ([The Star](https://www.thestar.com.my/aseanplus/aseanplus-news/2025/05/28/no-more-excuses-bikers-without-helmets-in-thailand-face-up-to-thb-2000-fine-starting-june-1)). |
-| Indonesia (Bali) | [OSS](https://oss.go.id) for your business ID number (NIB) | Compulsory accident cover (SWDKLLJ) is paid with each bike's annual registration to [Jasa Raharja](https://www.jasaraharja.co.id) ([detikOto](https://oto.detik.com/berita/d-6474541/apa-itu-swdkllj-wajib-dibayar-tiap-daftar-dan-perpanjangan-stnk)) | Bali officials have said foreign renters must hold a valid licence and an International Driving Permit ([Coconuts Bali, 2023](https://coconuts.co/?p=1081850)). Proposals to restrict tourist rentals come up regularly, so check current rules with the provincial transport office. |
-| Vietnam | [National Business Registration Portal](https://dangkykinhdoanh.gov.vn) | Owners must carry compulsory civil liability insurance under [Decree 67/2023/ND-CP](https://english.luatvietnam.vn/xay-dung/decree-67-2023-nd-cp-compulsory-insurance-for-motor-vehicle-owners-civil-liability-266177-d1.html) | Renters need a licence valid in Vietnam for the bike's class. Check any rental conditions with your provincial business registration office. |
+| Thailand | [Department of Business Development](https://www.dbd.go.th) | [Department of Land Transport](https://www.dlt.go.th) for registration and tax; [Office of Insurance Commission](https://www.oic.or.th) for compulsory insurance (Por Ror Bor) | Rental *cars* are registered as rental-service vehicles with distinctive green plates ([plate colors](https://en.wikipedia.org/wiki/Vehicle_registration_plates_of_Thailand)). For motorbikes, ask your provincial DLT office what applies. Helmet fines rose to up to ฿2,000 from June 2025 ([The Star](https://www.thestar.com.my/aseanplus/aseanplus-news/2025/05/28/no-more-excuses-bikers-without-helmets-in-thailand-face-up-to-thb-2000-fine-starting-june-1)). |
+| Indonesia (Bali) | [OSS](https://oss.go.id) for your business ID number (NIB) | Compulsory accident cover (SWDKLLJ) is paid with each bike's annual registration to [Jasa Raharja](https://www.jasaraharja.co.id) ([detikOto](https://oto.detik.com/berita/d-6474541/apa-itu-swdkllj-wajib-dibayar-tiap-daftar-dan-perpanjangan-stnk)) | Bali officials have said foreign renters must hold a valid license and an International Driving Permit ([Coconuts Bali, 2023](https://coconuts.co/?p=1081850)). Proposals to restrict tourist rentals come up regularly, so check current rules with the provincial transport office. |
+| Vietnam | [National Business Registration Portal](https://dangkykinhdoanh.gov.vn) | Owners must carry compulsory civil liability insurance under [Decree 67/2023/ND-CP](https://english.luatvietnam.vn/xay-dung/decree-67-2023-nd-cp-compulsory-insurance-for-motor-vehicle-owners-civil-liability-266177-d1.html) | Renters need a license valid in Vietnam for the bike's class. Check any rental conditions with your provincial business registration office. |
 | Philippines | [DTI Business Name Registration](https://bnrs.dti.gov.ph) plus your city or municipal business permit | [Land Transportation Office](https://lto.gov.ph) registration, which requires Compulsory Third Party Liability (CTPL) insurance ([Insurance Commission](https://www.insurance.gov.ph/wp-content/uploads/2022/02/CL2021_54.pdf)) | If you mainly serve tourists, ask the regional Department of Tourism office about accreditation. |
 | Malaysia | [SSM](https://www.ssm.com.my) | [JPJ](https://www.jpj.gov.my) registration; third-party insurance is compulsory under the [Road Transport Act 1987](https://en.wikipedia.org/wiki/Road_Transport_Act_1987) | Rental vehicles are licensed by [APAD](https://www.apad.gov.my), and APAD has said renting out private cars commercially is illegal and breaks insurance terms ([CarSifu](https://www.carsifu.my/news/no-to-renting-out-private-cars)). Ask APAD which permit applies to motorbikes. |
 
@@ -113,7 +113,7 @@ To set them:
 
 Monthly renters pay less than half the daily rate, but a bike rented for 30 days in a row with one handover often earns more over a season than a bike waiting for walk-ins. Most shops adjust daily prices up in high season and keep monthly prices steadier.
 
-Our free [pricing calculator](/resources/pricing-calculator) does this maths for you: enter your bike cost, running costs and target utilisation, and it shows the minimum daily, weekly and monthly prices that still make money.
+Our free [pricing calculator](/resources/pricing-calculator) does this maths for you: enter your bike cost, running costs and target utilization, and it shows the minimum daily, weekly and monthly prices that still make money.
 
 ## Deposits
 
@@ -125,7 +125,7 @@ Avoid holding passports. It is common, but it is restricted in several countries
 
 Every rental needs a written agreement, even for one day. It should state:
 
-- Renter's name, contact number, ID or passport number and licence details.
+- Renter's name, contact number, ID or passport number and license details.
 - Bike model, plate number, start and end date and time, and the price.
 - Deposit amount and the conditions for deductions.
 - Who pays for damage, theft, fines and towing.
@@ -142,7 +142,7 @@ Helmets are not optional. In Thailand, for example, both rider and passenger mus
 
 For each bike, keep:
 
-- **Two helmets in at least three sizes across the fleet** (M, L, XL), certified to a recognised standard, with working buckles. Replace any helmet that has been dropped hard or involved in a crash.
+- **Two helmets in at least three sizes across the fleet** (M, L, XL), certified to a recognized standard, with working buckles. Replace any helmet that has been dropped hard or involved in a crash.
 - **Disposable hairnets or helmet liners** and a cleaning spray. Renters notice smelly helmets in reviews.
 - **A phone holder,** which reduces renters riding one-handed while using maps.
 - **A rain poncho** in the seat box in wet season.
@@ -154,7 +154,7 @@ Rental bikes work harder than private bikes and are ridden by people who do not 
 
 | When | What to check or do |
 |---|---|
-| Every handover | Tyres (pressure, cuts, tread), brakes, lights, horn, mirrors, fuel, any new damage |
+| Every handover | Tires (pressure, cuts, tread), brakes, lights, horn, mirrors, fuel, any new damage |
 | Every week | Chain or belt condition, battery charge, oil level, clean the bike |
 | Every oil change interval (per manual; many shops do it sooner for rentals) | Engine oil, check air filter, spark plug, gear oil on schedule |
 | Every 3 months | Brake pads, drive belt and rollers (automatics), cables, suspension |
@@ -208,7 +208,7 @@ Run your own numbers in the [pricing calculator](/resources/pricing-calculator) 
 - **Mixing too many models.** Every extra model means different parts, keys and know-how.
 - **Holding passports instead of a proper deposit.** It causes arguments and, in several countries, legal trouble.
 - **No written agreement or photos.** Without them, a damage dispute becomes your word against the renter's.
-- **Skipping licence checks.** If a renter without a valid licence crashes, insurance may not pay and you may share the blame.
+- **Skipping license checks.** If a renter without a valid license crashes, insurance may not pay and you may share the blame.
 - **Letting insurance or tax lapse.** Put every renewal date in a calendar, per bike.
 - **Ignoring reviews.** One unanswered complaint about a deposit can cost you many bookings.
 - **Underpricing to win customers.** It is very hard to raise prices later, and your margin is your repair budget.
@@ -221,7 +221,7 @@ A simple order of work for the first month, once the bikes are bought and regist
 1. **Week 1: paperwork and kit.** Agreement printed or digital, damage price list, deposit rules, helmets, phone holders, a first-aid kit and a toolkit in the shop.
 2. **Week 1: listings.** Google Business Profile live with real photos, a booking page, a Rove listing and your chat app number on everything.
 3. **Week 2: partners.** Visit ten nearby guesthouses, villa managers and co-working spaces with a price card. Offer free delivery for their guests.
-4. **Week 2–3: routine.** Practise the handover photos until they take under five minutes. Keep a maintenance log from the first day.
+4. **Week 2–3: routine.** Practice the handover photos until they take under five minutes. Keep a maintenance log from the first day.
 5. **Week 4: review.** Which bikes rented most? Which messages took longest to answer? Which questions came up again and again? Adjust prices, write standard replies, and decide whether you need more of one model.
 
 After the first month, look at your numbers once a week: bikes rented, days empty, money taken, deposits held and repairs paid. Those five figures tell you more than any forecast.

@@ -141,7 +141,7 @@ export async function cancelPlanRequest(): Promise<Result> {
   if (error) return { ok: false, error: error.message };
   if (organization.plan_request_thread_id) {
     await admin.from("support_threads").update({ status: "closed" }).eq("id", organization.plan_request_thread_id);
-    await alertTeam(`${organization.name || "A business"} cancelled its plan change`, organization.plan_request_thread_id);
+    await alertTeam(`${organization.name || "A business"} canceled its plan change`, organization.plan_request_thread_id);
   }
   revalidatePath("/settings/billing");
   return { ok: true };

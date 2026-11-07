@@ -22,7 +22,7 @@ What's happening each day:
 - road tax, insurance, compulsory insurance and services due on your vehicles,
 - jobs from your To do list.
 
-Colours: blue is a handover, amber a return, purple a payment, red is late or overdue, green is done.
+Colors: blue is a handover, amber a return, purple a payment, red is late or overdue, green is done.
 
 Switch between **Day**, **Week**, **Month** and **Custom** (pick your own **From** and **To** dates). Use **Today** to jump back. Tap anything to open it.
 

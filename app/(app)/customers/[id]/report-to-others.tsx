@@ -159,7 +159,13 @@ export function ReportToOthers({ customerId, reports, rentals, canReport, curren
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("amount", { currency })}</span>
-              <input className="mt-1 w-full" inputMode="numeric" onChange={(event) => setAmount(event.target.value)} placeholder="0" value={amount} />
+              {/* The currency symbol inside the box, not in the label (7 Nov 2026). */}
+              <span className="relative block">
+                <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-3 mt-1 flex items-center font-semibold text-[var(--foreground-secondary)]">
+                  {currency}
+                </span>
+                <input className="mt-1 w-full" inputMode="numeric" onChange={(event) => setAmount(event.target.value)} placeholder="0" style={{ paddingInlineStart: `calc(1.25rem + ${Math.max(1, currency.length)}ch)` }} value={amount} />
+              </span>
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("when")}</span>

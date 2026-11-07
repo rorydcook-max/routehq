@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowDownLeft, ArrowUpRight, Camera, Loader2 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition, type InputHTMLAttributes } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { shortDate } from "@/lib/i18n/dates";
 import { createTransaction, findTransactionMatches } from "@/app/actions/transactions";
@@ -16,7 +16,25 @@ import { monthsCovered } from "@/lib/cost-spread";
 import type { MatchResult } from "@/lib/transaction-matching";
 import type { TransactionFormOptions, TransactionFormPrefill } from "@/lib/transactions";
 import { businessTimeZone } from "@/lib/business-time";
-import { distanceKey } from "@/lib/business-units";
+import { businessCurrency, distanceKey } from "@/lib/business-units";
+import { currencySymbol } from "@/components/currency-symbol";
+import { formatMoney } from "@/lib/regional";
+
+/** An amount box with the business's currency symbol inside it (7 Nov 2026). Kept a plain controlled input: the amount is also filled in from receipts and matches. */
+function AmountBox(props: InputHTMLAttributes<HTMLInputElement> & { className: string }) {
+  const symbol = currencySymbol(businessCurrency());
+  return (
+    <span className="relative block">
+      <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-3 z-[1] mt-1 flex items-center font-semibold text-[var(--foreground-secondary)]">
+        {symbol}
+      </span>
+      <input {...props} style={{ paddingInlineStart: `calc(1.25rem + ${Math.max(1, symbol.length)}ch)` }} />
+    </span>
+  );
+}
+
+/** Whole amounts in the business's currency, for the hints under the boxes. */
+const moneyText = (value: number) => formatMoney(Math.round(value), businessCurrency(), "en-GB");
 
 const MONEY_IN: string[] = ["rental_income", "charge_recovered", "deposit_received", "deposit_forfeited", "deposit_deduction"];
 // Costs a renter can be responsible for. Insurance, tax and finance are the owner's own.
@@ -513,7 +531,7 @@ export function TransactionForm({
 
           <label className="block">
             <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("amount")}</span>
-            <input className={inputClass} inputMode="decimal" min="0" name="amount" onChange={(event) => setAmount(event.target.value)} required step="0.01" type="number" value={amount} />
+            <AmountBox className={inputClass} inputMode="decimal" min="0" name="amount" onChange={(event) => setAmount(event.target.value)} required step="0.01" type="number" value={amount} />
           </label>
 
           <label className="block">
@@ -595,7 +613,7 @@ export function TransactionForm({
                   <input className={inputClass} name="coverTo" onChange={(event) => setCoverTo(event.target.value)} type="date" value={coverTo} />
                 </label>
                 {months >= 2 && total > 0 ? (
-                  <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{paperWords("f_spreadHint", { amount: `฿${Math.round(total / months).toLocaleString("en-US")}`, months })}</p>
+                  <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{paperWords("f_spreadHint", { amount: moneyText(total / months), months })}</p>
                 ) : (
                   <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{say("coverHint")}</p>
                 )}
@@ -653,7 +671,7 @@ export function TransactionForm({
                   </label>
                   <label className="block">
                     <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("billAmount")}</span>
-                    <input className={inputClass} inputMode="decimal" min="0" name="billAmount" onChange={(event) => setBillAmount(event.target.value)} required step="0.01" type="number" value={billAmount} />
+                    <AmountBox className={inputClass} inputMode="decimal" min="0" name="billAmount" onChange={(event) => setBillAmount(event.target.value)} required step="0.01" type="number" value={billAmount} />
                   </label>
                   {(() => {
                     const booking = rentalsForVehicle.find((rental) => rental.id === billRentalId);
@@ -661,7 +679,7 @@ export function TransactionForm({
                     const held = Number(booking?.depositHeld || 0);
                     const fromDeposit = Math.min(held, charge);
                     const rest = Math.max(0, charge - fromDeposit);
-                    const baht = (value: number) => `฿${Math.round(value).toLocaleString("en-US")}`;
+                    const baht = moneyText;
                     return (
                       <div className="space-y-2 sm:col-span-2">
                         {fromDeposit > 0 ? <p className="text-[14px] font-semibold text-[var(--foreground)]">{say("billFromDeposit", { amount: baht(fromDeposit), held: baht(held) })}</p> : null}

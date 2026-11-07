@@ -1,6 +1,6 @@
 ---
 title: "Free Cambodia motorbike & car rental agreement (English–Khmer)"
-description: "Free English–Khmer rental agreement for Cambodian motorbike and car shops: Prakas 0067 Khmer contracts, 125cc licence rule, helmets, Siem Reap."
+description: "Free English–Khmer rental agreement for Cambodian motorbike and car shops: Prakas 0067 Khmer contracts, 125cc license rule, helmets, Siem Reap."
 date: 2026-10-28
 updated: 2026-10-28
 listed: false
@@ -8,7 +8,7 @@ fileLabel: "Agreement · English + Khmer"
 formats: [docx, pdf]
 inside:
   - "English beside Khmer, with the Khmer text prevailing as consumer law expects"
-  - "Licence rules: cars and motorbikes over 125cc, and the IDP for foreign renters"
+  - "License rules: cars and motorbikes over 125cc, and the IDP for foreign renters"
   - "Helmets for every rider and passenger, children included"
   - "Fair-terms drafting under the Law on Consumer Protection and Prakas 0067"
   - "Local-rules clause for Siem Reap and other provinces that restrict rentals to foreigners"
@@ -16,7 +16,7 @@ inside:
   - "Handover check (Annex A), damage price list (Annex B) and signature blocks"
 ---
 
-Rental shops in Phnom Penh, Siem Reap, Kampot and Sihanoukville mostly rent scooters to tourists and expats, priced in US dollars, often against a passport left at the counter. That habit is the first thing to change: the UK and US governments both tell travellers [not to hand over a passport for a motorbike rental](https://www.gov.uk/foreign-travel-advice/cambodia/safety-and-security). The second is the language of the contract.
+Rental shops in Phnom Penh, Siem Reap, Kampot and Sihanoukville mostly rent scooters to tourists and expats, priced in US dollars, often against a passport left at the counter. That habit is the first thing to change: the UK and US governments both tell travelers [not to hand over a passport for a motorbike rental](https://www.gov.uk/foreign-travel-advice/cambodia/safety-and-security). The second is the language of the contract.
 
 ## Why the agreement is in Khmer as well as English
 
@@ -26,7 +26,7 @@ This page is in English only, but the agreement you download is bilingual. Cambo
 
 ## Cambodian rules built in
 
-**Licences.** The Australian government's advice is that a car or a motorbike over 125cc needs [a Cambodian licence, or a foreign licence plus an IDP](https://www.smartraveller.gov.au/destinations/asia/cambodia), carried together, and that bikes up to 125cc can be ridden without a licence under Cambodian law. Cambodia is party to the [1949 Geneva Convention](https://treatydatabase.overheid.nl/en/Treaty/Details/007193_p). The clause requires whatever licence the law requires, and warns that insurance may not apply to an unlicensed rider, even on a small bike.
+**Licenses.** The Australian government's advice is that a car or a motorbike over 125cc needs [a Cambodian license, or a foreign license plus an IDP](https://www.smartraveller.gov.au/destinations/asia/cambodia), carried together, and that bikes up to 125cc can be ridden without a license under Cambodian law. Cambodia is party to the [1949 Geneva Convention](https://treatydatabase.overheid.nl/en/Treaty/Details/007193_p). The clause requires whatever license the law requires, and warns that insurance may not apply to an unlicensed rider, even on a small bike.
 
 **Helmets.** The Road Traffic Law in force since 2016 requires [every rider and passenger, including children, to wear a helmet](https://khmer.voanews.com/a/new-law-to-address-the-high-death-toll-on-cambodia-roads/3121604.html), and police issue on-the-spot fines. The agreement limits the bike to one passenger and makes helmets fastened at all times.
 
@@ -40,7 +40,7 @@ This page is in English only, but the agreement you download is bilingual. Cambo
 
 **Personal data.** As of mid-2025, Cambodia's personal data protection law was [still a draft](https://www.hlc.com/en/publications/cambodia-moves-to-enact-comprehensive-data-privacy-law). The data clause applies good practice anyway.
 
-**Traffic fines.** Camera speeding fines are [paid at a payment centre within 30 days](https://www.smartraveller.gov.au/destinations/asia/cambodia) and can reach you after the renter has left. The agreement lets you hold part of the deposit for up to 30 days and pass fines to the renter where the law allows.
+**Traffic fines.** Camera speeding fines are [paid at a payment center within 30 days](https://www.smartraveller.gov.au/destinations/asia/cambodia) and can reach you after the renter has left. The agreement lets you hold part of the deposit for up to 30 days and pass fines to the renter where the law allows.
 
 **Accidents.** The Road Traffic Law lets parties settle property-only accidents between themselves. That makes it more important that the renter doesn't agree a private settlement without you, which the accident clause requires. Emergency numbers: police 117, ambulance 119.
 
@@ -57,4 +57,4 @@ Cambodia is preset. Add your shop, vehicle, rates, deposit and permitted area, l
 
 ## Let RoveHQ fill it in for you
 
-RoveHQ fills in the agreement from each booking automatically, the renter signs on their phone, and passport and licence details are read from a photo, so you never need to keep the passport. [Start free](/signup).
+RoveHQ fills in the agreement from each booking automatically, the renter signs on their phone, and passport and license details are read from a photo, so you never need to keep the passport. [Start free](/signup).

@@ -9,6 +9,8 @@
  * Either way, anything that fell due before the handover is due on the handover day.
  */
 
+import { niceMoney } from "@/lib/nice-money";
+
 export type LateStartChoice = "from_handover" | "as_booked";
 
 export type LateStart = {
@@ -150,7 +152,8 @@ export async function applyLateStart(
   }
 
   if (refundDue > 0) {
-    const baht = `฿${Math.round(refundDue).toLocaleString("en-US")}`;
+    // In the booking's (else the business's) own currency; was always baht.
+    const baht = niceMoney(Math.round(refundDue), (rental as { currency?: string | null }).currency || undefined);
     await supabase.from("tasks").insert({
       organization_id: args.organizationId,
       rental_id: args.rentalId,
@@ -169,7 +172,7 @@ export async function applyLateStart(
 export function lateStartNote(result: NonNullable<Awaited<ReturnType<typeof applyLateStart>>>) {
   const { late, choice, creditApplied, refundDue } = result;
   const days = `${late.days} ${late.days === 1 ? "day" : "days"}`;
-  const baht = (value: number) => `฿${Math.round(value).toLocaleString("en-US")}`;
+  const baht = (value: number) => niceMoney(Math.round(value));
   if (choice === "as_booked") return `Handed over ${days} after the booked start. Kept the booked dates and rent.`;
   if (late.openEnded) return `Handed over ${days} after the booked start. Rent starts from the handover; every payment date moved ${days} later.`;
   const parts = [`Handed over ${days} after the booked start. Rent starts from the handover; the return date stays.`];

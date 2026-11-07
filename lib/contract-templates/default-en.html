@@ -235,7 +235,7 @@
         <div class="info-cell"><div class="info-label">Model / รุ่น</div><div class="info-value">{{vehicle_model}}</div></div>
         <div class="info-cell"><div class="info-label">Year / ปี</div><div class="info-value">{{vehicle_year}}</div></div>
         <div class="info-cell"><div class="info-label">Registration / ทะเบียน</div><div class="info-value">{{vehicle_registration}}</div></div>
-        <div class="info-cell"><div class="info-label">Colour / สี</div><div class="info-value">{{vehicle_colour}}</div></div>
+        <div class="info-cell"><div class="info-label">Color / สี</div><div class="info-value">{{vehicle_colour}}</div></div>
         <div class="info-cell"><div class="info-label">Fuel / เชื้อเพลิง</div><div class="info-value">{{vehicle_fuel_type}}</div></div>
         <div class="info-cell"><div class="info-label">Home territory / พื้นที่ใช้งานหลัก</div><div class="info-value">{{home_territory}}</div></div>
         <div class="info-cell"><div class="info-label">Delivery method / วิธีรับส่ง</div><div class="info-value">{{delivery_method}}</div></div>
@@ -262,12 +262,12 @@
     <div class="section-title">4. Renter qualifications / คุณสมบัติผู้เช่า</div>
     <div class="section-body">
       <div class="info-grid grid-3">
-        <div class="info-cell"><div class="info-label">Licence number / เลขใบขับขี่</div><div class="info-value">{{renter_licence_number}}</div></div>
-        <div class="info-cell"><div class="info-label">Licence country / ประเทศที่ออกใบขับขี่</div><div class="info-value">{{renter_licence_country}}</div></div>
-        <div class="info-cell"><div class="info-label">Licence expiry / วันหมดอายุ</div><div class="info-value">{{renter_licence_expiry}}</div></div>
+        <div class="info-cell"><div class="info-label">License number / เลขใบขับขี่</div><div class="info-value">{{renter_licence_number}}</div></div>
+        <div class="info-cell"><div class="info-label">License country / ประเทศที่ออกใบขับขี่</div><div class="info-value">{{renter_licence_country}}</div></div>
+        <div class="info-cell"><div class="info-label">License expiry / วันหมดอายุ</div><div class="info-value">{{renter_licence_expiry}}</div></div>
       </div>
       <div class="bilingual-section">
-        <div class="lang-en">The Renter confirms they hold a valid driving licence for this class of vehicle and will not allow any unauthorised person to drive or control the vehicle.</div>
+        <div class="lang-en">The Renter confirms they hold a valid driver's license for this class of vehicle and will not allow any unauthorized person to drive or control the vehicle.</div>
         <div class="lang-th">ผู้เช่ายืนยันว่ามีใบอนุญาตขับขี่ที่ถูกต้องสำหรับยานพาหนะประเภทนี้ และจะไม่อนุญาตให้บุคคลที่ไม่ได้รับอนุญาตขับหรือควบคุมยานพาหนะ</div>
       </div>
     </div>
@@ -341,12 +341,12 @@
     <div class="section-title">9. Vehicle maintenance and care / การดูแลและบำรุงรักษา</div>
     <div class="section-body">
       <div class="bilingual-section">
-        <div class="lang-en">The Renter must use reasonable care, check warning lights, tyre condition, oil and fluids where appropriate, and immediately notify the Owner of any fault, accident, breakdown or unusual noise.</div>
+        <div class="lang-en">The Renter must use reasonable care, check warning lights, tire condition, oil and fluids where appropriate, and immediately notify the Owner of any fault, accident, breakdown or unusual noise.</div>
         <div class="lang-th">ผู้เช่าต้องดูแลยานพาหนะอย่างเหมาะสม ตรวจไฟเตือน สภาพยาง น้ำมันเครื่องและของเหลวตามความเหมาะสม และแจ้งผู้ให้เช่าทันทีเมื่อมีความผิดปกติ อุบัติเหตุ รถเสีย หรือเสียงผิดปกติ</div>
       </div>
       <div class="bilingual-section">
-        {{#if emergency_repair_enabled}}<div class="lang-en">The Renter may not authorise repairs except in an emergency and only up to ฿{{emergency_repair_limit}} without prior written approval.</div>
-        <div class="lang-th">ผู้เช่าไม่มีสิทธิอนุมัติการซ่อม เว้นแต่เป็นเหตุฉุกเฉินและไม่เกิน ฿{{emergency_repair_limit}} โดยไม่ได้รับอนุมัติเป็นลายลักษณ์อักษรล่วงหน้า</div>{{else}}<div class="lang-en">The Renter may not authorise any repair without the Owner's prior approval, except what is needed to keep people safe.</div>
+        {{#if emergency_repair_enabled}}<div class="lang-en">The Renter may not authorize repairs except in an emergency and only up to ฿{{emergency_repair_limit}} without prior written approval.</div>
+        <div class="lang-th">ผู้เช่าไม่มีสิทธิอนุมัติการซ่อม เว้นแต่เป็นเหตุฉุกเฉินและไม่เกิน ฿{{emergency_repair_limit}} โดยไม่ได้รับอนุมัติเป็นลายลักษณ์อักษรล่วงหน้า</div>{{else}}<div class="lang-en">The Renter may not authorize any repair without the Owner's prior approval, except what is needed to keep people safe.</div>
         <div class="lang-th">ผู้เช่าไม่มีสิทธิอนุมัติการซ่อมใด ๆ โดยไม่ได้รับอนุมัติจากผู้ให้เช่าล่วงหน้า เว้นแต่สิ่งที่จำเป็นเพื่อความปลอดภัยของบุคคล</div>{{/if}}
       </div>
     </div>
@@ -461,14 +461,14 @@
       </div>
       <div class="clause">
         <div class="bilingual-section">
-          {{#if smoking_fee_enabled}}<div class="lang-en"><span class="clause-num">18.2 Smoking and cleaning.</span> Smoking, pets, excessive sand, stains, odour or unreasonable dirt may incur cleaning charges up to ฿{{smoking_fee_maximum}} or more where professional cleaning is required.</div>
-          <div class="lang-th"><span class="clause-num">18.2 การสูบบุหรี่และทำความสะอาด.</span> การสูบบุหรี่ สัตว์เลี้ยง ทรายมากเกินไป คราบ กลิ่น หรือความสกปรกเกินสมควร อาจมีค่าทำความสะอาดสูงสุด ฿{{smoking_fee_maximum}} หรือมากกว่านั้นหากต้องทำความสะอาดโดยผู้เชี่ยวชาญ</div>{{else}}<div class="lang-en"><span class="clause-num">18.2 Smoking and cleaning.</span> Smoking, pets, excessive sand, stains, odour or unreasonable dirt may incur cleaning charges where professional cleaning is required.</div>
+          {{#if smoking_fee_enabled}}<div class="lang-en"><span class="clause-num">18.2 Smoking and cleaning.</span> Smoking, pets, excessive sand, stains, odor or unreasonable dirt may incur cleaning charges up to ฿{{smoking_fee_maximum}} or more where professional cleaning is required.</div>
+          <div class="lang-th"><span class="clause-num">18.2 การสูบบุหรี่และทำความสะอาด.</span> การสูบบุหรี่ สัตว์เลี้ยง ทรายมากเกินไป คราบ กลิ่น หรือความสกปรกเกินสมควร อาจมีค่าทำความสะอาดสูงสุด ฿{{smoking_fee_maximum}} หรือมากกว่านั้นหากต้องทำความสะอาดโดยผู้เชี่ยวชาญ</div>{{else}}<div class="lang-en"><span class="clause-num">18.2 Smoking and cleaning.</span> Smoking, pets, excessive sand, stains, odor or unreasonable dirt may incur cleaning charges where professional cleaning is required.</div>
           <div class="lang-th"><span class="clause-num">18.2 การสูบบุหรี่และทำความสะอาด.</span> การสูบบุหรี่ สัตว์เลี้ยง ทรายมากเกินไป คราบ กลิ่น หรือความสกปรกเกินสมควร อาจมีค่าทำความสะอาดหากต้องทำความสะอาดโดยผู้เชี่ยวชาญ</div>{{/if}}
         </div>
       </div>
       <div class="clause">
         <div class="bilingual-section">
-          <div class="lang-en"><span class="clause-num">18.3 Emergency repairs.</span> Emergency repairs require prior approval where possible and receipts must be provided. Unauthorised repairs may not be reimbursed.</div>
+          <div class="lang-en"><span class="clause-num">18.3 Emergency repairs.</span> Emergency repairs require prior approval where possible and receipts must be provided. Unauthorized repairs may not be reimbursed.</div>
           <div class="lang-th"><span class="clause-num">18.3 การซ่อมฉุกเฉิน.</span> การซ่อมฉุกเฉินควรได้รับอนุมัติก่อนเท่าที่ทำได้และต้องมีใบเสร็จ การซ่อมที่ไม่ได้รับอนุมัติอาจไม่ได้รับการชดใช้</div>
         </div>
       </div>

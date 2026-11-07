@@ -14,8 +14,8 @@ faq:
   - q: "We're on the older RentWorks desktop version. Does this work?"
     a: "If it can save a report to Excel or CSV, yes. Otherwise ask Bluebird support for an export and send it to us."
 ---
-RoveHQ recognises RentWorks exports by their RA, reservation and unit numbers and links each agreement to its vehicle by unit number. RentWorks is used mostly in the US, Canada and the UK, so mileage in miles is converted to your business's unit, and dates are read month first when the file can't say (RoveHQ asks you to confirm).
+RoveHQ recognizes RentWorks exports by their RA, reservation and unit numbers and links each agreement to its vehicle by unit number. RentWorks is used mostly in the US, Canada and the UK, so mileage in miles is converted to your business's unit, and dates are read month first when the file can't say (RoveHQ asks you to confirm).
 
 ## Free import
 
-Importing is free on every plan. RoveHQ recognises RentWorks / RentWorks Plus exports and reads them straight away. You see every vehicle, booking and payment before anything is saved, and you can take the whole import back within 30 days. If you'd rather not do it yourself, [send us the files](/contact) and we'll bring them in for you.
+Importing is free on every plan. RoveHQ recognizes RentWorks / RentWorks Plus exports and reads them straight away. You see every vehicle, booking and payment before anything is saved, and you can take the whole import back within 30 days. If you'd rather not do it yourself, [send us the files](/contact) and we'll bring them in for you.

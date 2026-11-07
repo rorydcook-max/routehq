@@ -80,9 +80,9 @@ sources:
 - url: https://www.dfdl.com/insights/legal-and-tax-updates/the-implementation-of-cambodias-new-civil-code/
   supports: 'Civil Code (Royal Kram NS/RKM/1207/030, 8 Dec 2007; in force 21 Dec 2011): contracts formed by consent; remedies for breach; advance exclusion of liability for intentional or grossly negligent non-performance is void; pre-agreed damages allowed.'
 - url: https://www.smartraveller.gov.au/destinations/asia/cambodia
-  supports: 'Australian Smartraveller: a car or motorcycle over 125cc needs a Cambodian licence, or a foreign licence plus IDP (carry both); up to 125cc can be ridden without a licence under Cambodian law; helmets compulsory; speeding fines paid at a payment centre within 30 days.'
+  supports: 'Australian Smartraveller: a car or motorcycle over 125cc needs a Cambodian license, or a foreign license plus IDP (carry both); up to 125cc can be ridden without a license under Cambodian law; helmets compulsory; speeding fines paid at a payment center within 30 days.'
 - url: https://www.gov.uk/foreign-travel-advice/cambodia/safety-and-security
-  supports: 'UK FCDO: to hire a car or motorcycle over 125cc you may need a 1949 IDP and national licence; long-term drivers need a Cambodian licence; on-the-spot fines for riding without a helmet; do not hand over a passport as a guarantee for a motorcycle or scooter.'
+  supports: 'UK FCDO: to hire a car or motorcycle over 125cc you may need a 1949 IDP and national license; long-term drivers need a Cambodian license; on-the-spot fines for riding without a helmet; do not hand over a passport as a guarantee for a motorcycle or scooter.'
 - url: https://khmer.voanews.com/a/new-law-to-address-the-high-death-toll-on-cambodia-roads/3121604.html
   supports: 'VOA (28 Dec 2015): new Road Traffic Law in force 1 Jan 2016; all riders on a motorbike, including a child passenger, must wear a helmet; Article 36 lets parties settle property-only accidents between themselves.'
 - url: https://grsproadsafety.org/?p=713
@@ -98,7 +98,7 @@ sources:
 - url: https://www.cambodianess.com/article/should-bicycle-and-motorcycle-rental-service-be-stopped-in-siem-reap
   supports: 'Cambodianess (7 Jan 2024): Siem Reap rental rules say international tourists may rent only bicycles or e-bikes; a later Cambodianess article (14 Oct 2026) describes the ban as a measure "previously implemented", so current enforcement is unclear.'
 - url: https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Cambodia.html
-  supports: 'US State Department: do not give your passport as collateral for motorcycle rentals; carry copies of passport and licence; cooperate with police after an accident.'
+  supports: 'US State Department: do not give your passport as collateral for motorcycle rentals; carry copies of passport and license; cooperate with police after an accident.'
 - url: https://www.gov.uk/foreign-travel-advice/cambodia/getting-help
   supports: 'UK FCDO emergency numbers for Cambodia: police 117, fire 118, ambulance 119.'
 - url: https://www.hlc.com/en/publications/cambodia-moves-to-enact-comprehensive-data-privacy-law
@@ -172,10 +172,10 @@ sections:
     en: Email
     local: អ៊ីមែល
   - key: renter_licence
-    en: Driving licence number, class and issuing country
+    en: Driver's license number, class and issuing country
     local: លេខប័ណ្ណបើកបរ ប្រភេទ និងប្រទេសដែលចេញ
   - key: renter_licence_expiry
-    en: Licence expiry date
+    en: License expiry date
     local: កាលបរិច្ឆេទផុតសុពលភាពប័ណ្ណបើកបរ
   - key: renter_idp
     en: International Driving Permit (number / not required)
@@ -184,14 +184,14 @@ sections:
     en: Emergency contact (name and phone)
     local: អ្នកទំនាក់ទំនងពេលអាសន្ន (ឈ្មោះ និងលេខទូរស័ព្ទ)
   - key: driver2_details
-    en: Additional driver (name, ID, licence), if any
+    en: Additional driver (name, ID, license), if any
     local: អ្នកបើកបរបន្ថែម (ឈ្មោះ អត្តសញ្ញាណ ប័ណ្ណបើកបរ) ប្រសិនបើមាន
   clauses:
   - id: renter.1
     en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
     local: អ្នកជួលបញ្ជាក់ថា ព័ត៌មានខាងលើពិតប្រាកដ និងពេញលេញ ហើយអ្នកដែលនឹងបើកបរ ឬជិះយានយន្តទាំងអស់ មានឈ្មោះនៅទីនេះ។ មានតែអ្នកជួល និងអ្នកបើកបរបន្ថែមដែលមានឈ្មោះខាងលើប៉ុណ្ណោះ ដែលអាចបើកបរ ឬជិះយានយន្តបាន។
   - id: renter.2
-    en: Every driver must hold any driving licence the law requires for this class of vehicle and carry it at all times while driving. For a car or a motorbike over 125cc, this is a Cambodian licence, or a foreign licence together with an International Driving Permit where the authorities accept it. Where the law does not require a licence (for some small motorbikes), the Renter must still be able to ride safely, and insurance may not apply to an unlicensed rider. A car licence does not allow a person to ride a motorbike.
+    en: Every driver must hold any driver's license the law requires for this class of vehicle and carry it at all times while driving. For a car or a motorbike over 125cc, this is a Cambodian license, or a foreign license together with an International Driving Permit where the authorities accept it. Where the law does not require a license (for some small motorbikes), the Renter must still be able to ride safely, and insurance may not apply to an unlicensed rider. A car license does not allow a person to ride a motorbike.
     local: អ្នកបើកបរគ្រប់រូបត្រូវមានប័ណ្ណបើកបរដែលច្បាប់តម្រូវ សម្រាប់ប្រភេទយានយន្តនេះ ហើយត្រូវយកតាមខ្លួនជានិច្ចពេលបើកបរ។ សម្រាប់រថយន្ត ឬម៉ូតូលើសពី 125cc គឺប័ណ្ណបើកបរកម្ពុជា ឬប័ណ្ណបើកបរបរទេសរួមជាមួយប័ណ្ណបើកបរអន្តរជាតិ ក្នុងករណីដែលអាជ្ញាធរទទួលស្គាល់។ ក្នុងករណីដែលច្បាប់មិនតម្រូវឱ្យមានប័ណ្ណបើកបរ (សម្រាប់ម៉ូតូតូចៗមួយចំនួន) អ្នកជួលនៅតែត្រូវមានសមត្ថភាពជិះប្រកបដោយសុវត្ថិភាព ហើយធានារ៉ាប់រងអាចមិនអនុវត្តចំពោះអ្នកជិះដែលគ្មានប័ណ្ណបើកបរ។ ប័ណ្ណបើកបររថយន្ត មិនអនុញ្ញាតឱ្យជិះម៉ូតូទេ។
     country: true
 - id: vehicle
@@ -212,7 +212,7 @@ sections:
     en: Registration (plate) number
     local: ផ្លាកលេខ
   - key: vehicle_colour
-    en: Colour
+    en: Color
     local: ពណ៌
   - key: renter_vin
     en: Chassis / VIN number
@@ -238,7 +238,7 @@ sections:
     en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies."
     local: "ម្ចាស់ថែទាំយានយន្តតាមការណែនាំរបស់ក្រុមហ៊ុនផលិត រួមទាំងការប្តូរប្រេងម៉ាស៊ីន ការត្រួតពិនិត្យ និងការប្តូរគ្រឿងបន្លាស់ដែលពុកផុយ ហើយចេញថ្លៃជួសជុលមេកានិចធម្មតា និងការពុកផុយតាមការប្រើប្រាស់ លើកលែងតែកិច្ចសន្យានេះចែងផ្សេងពីនេះ។ សម្រាប់ការជួលរយៈពេលវែង ម្ចាស់រៀបចំការថែទាំជាមួយអ្នកជួល នៅពេលវេលាដែលសមស្រប ហើយប្រគល់យានយន្តត្រឡប់មកវិញភ្លាមៗ; ប្រសិនបើការថែទាំចំណាយពេលលើសពីមួយថ្ងៃ ត្រូវអនុវត្តផ្នែកទី ១៣។"
   - id: vehicle.4
-    en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+    en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
     local: "ក្នុងអំឡុងពេលជួល អ្នកជួលថែរក្សាស្ថានភាពប្រចាំថ្ងៃរបស់យានយន្ត៖ ពិនិត្យមើលថាកង់ ភ្លើង ហ្វ្រាំង ប្រេងម៉ាស៊ីន និងទឹកត្រជាក់ម៉ាស៊ីន មានសភាពធម្មតា រក្សាយានយន្តឱ្យស្អាតល្មមសម្រាប់បើកបរដោយសុវត្ថិភាព ហើយមិនបើកបរ ឬជិះយានយន្ត ប្រសិនបើវាក្លាយជាគ្មានសុវត្ថិភាព ឬមិនសមស្របសម្រាប់ធ្វើដំណើរលើផ្លូវ។"
 - id: period
   title:
@@ -385,7 +385,7 @@ sections:
     local: ប្រេងដែលខ្វះ គិតតាមតម្លៃស្ថានីយប្រេងក្នុងតំបន់ បូកថ្លៃសេវាចាក់ប្រេង {{currency}} {{fuel_service_fee}}។ ការចាក់ប្រេងខុសប្រភេទ ជាការទទួលខុសត្រូវរបស់អ្នកជួល រួមទាំងថ្លៃអូស និងថ្លៃជួសជុល។
   - id: fuel.4
     if: mileage_limit
-    en: 'Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}.'
+    en: 'Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}.'
     local: ចម្ងាយផ្លូវដែលអនុញ្ញាត៖ {{mileage_limit}} គីឡូម៉ែត្រ ក្នុងមួយ{{mileage_period_label}}។ គីឡូម៉ែត្រនីមួយៗដែលលើស គិតថ្លៃ {{currency}} {{excess_km_fee}}។
   - id: fuel.5
     unless: mileage_limit
@@ -427,7 +427,7 @@ sections:
   - id: use.5
     when:
       smoking: false
-    en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+    en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}
     local: មិនអនុញ្ញាតឱ្យជក់បារី ឬបារីអេឡិចត្រូនិកក្នុងយានយន្តទេ។{{#if smoking_fee}} ការបំពានវិធាននេះ គិតថ្លៃ {{currency}} {{smoking_fee}} សម្រាប់ការលុបក្លិន។{{/if}}
   - id: use.6
     when:
@@ -494,7 +494,7 @@ sections:
     en: The vehicle has only the compulsory insurance. The Renter is responsible for damage to the rented vehicle, its theft, and damage to other people's property (section 12).
     local: យានយន្តមានតែធានារ៉ាប់រងកាតព្វកិច្ចប៉ុណ្ណោះ។ អ្នកជួលទទួលខុសត្រូវចំពោះការខូចខាតលើយានយន្តដែលជួល ការលួច និងការខូចខាតលើទ្រព្យសម្បត្តិរបស់អ្នកដទៃ (ផ្នែកទី ១២)។
   - id: insurance.5
-    en: 'Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter''s responsibility unless the Owner confirms in writing that they are covered.'
+    en: 'Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid license for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tires, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter''s responsibility unless the Owner confirms in writing that they are covered.'
     local: ធានារ៉ាប់រងមិនការពារអ្នកជួលទេ ហើយអ្នកជួលបង់ពេញចំនួន នៅពេលការខូចខាត ឬការបាត់បង់កើតឡើង៖ ពេលបើកបរក្រោមឥទ្ធិពលគ្រឿងស្រវឹង ឬគ្រឿងញៀន ដោយគ្មានប័ណ្ណបើកបរត្រឹមត្រូវសម្រាប់យានយន្ត ដោយអ្នកបើកបរដែលគ្មានឈ្មោះនៅផ្នែកទី ២ នៅក្រៅតំបន់ដែលអនុញ្ញាត អំឡុងពេលប្រើប្រាស់ដែលហាមឃាត់ (ផ្នែកទី ៩) តាមរយៈសកម្មភាពចេតនា ឬធ្វេសប្រហែសធ្ងន់ធ្ងរ ឬនៅពេលទុកសោជាមួយយានយន្ត។ សំបកកង់ កង់ កញ្ចក់ ផ្នែកខាងក្រោមតួ ផ្នែកខាងក្នុង សោ និងគ្រឿងបន្លាស់ ច្រើនតែត្រូវបានក្រុមហ៊ុនធានារ៉ាប់រងដកចេញ ហើយជាការទទួលខុសត្រូវរបស់អ្នកជួល លើកលែងតែម្ចាស់បញ្ជាក់ជាលាយលក្ខណ៍អក្សរថាត្រូវបានគ្របដណ្តប់។
   - id: insurance.6
     en: Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage, unless it is caused by the Owner's own fault.
@@ -574,11 +574,11 @@ sections:
     local: យានយន្តត្រូវប្រគល់មកវិញ ជាមួយសោ ឯកសារ និងគ្រឿងបន្លាស់ ជាមួយកម្រិតប្រេងដែលបានព្រមព្រៀងនៅផ្នែកទី ៨ និងស្អាតសមរម្យ។ ភាគីទាំងពីរត្រួតពិនិត្យយានយន្តជាមួយគ្នា ហើយកត់ត្រាស្ថានភាព លេខគីឡូម៉ែត្រ និងប្រេង ក្នុងឧបសម្ព័ន្ធ ក ជាមួយរូបថត។ ប្រសិនបើអ្នកជួលមិនមានវត្តមាននៅពេលត្រួតពិនិត្យ រូបថតដែលមានកាលបរិច្ឆេទរបស់ម្ចាស់ ត្រូវទទួលយកជាកំណត់ត្រា។
   - id: return.2
     if: cleaning_fee
-    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt).
+    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt).
     local: យានយន្តដែលប្រគល់មកវិញ ដោយមានធូលី ខ្សាច់ ភក់ ស្នាមប្រឡាក់ អាហារ ឬក្លិនច្រើនពេកនៅខាងក្នុង គិតថ្លៃសម្អាត {{currency}} {{cleaning_fee}} (ច្រើនជាងនេះ ប្រសិនបើត្រូវការការសម្អាតពិសេស ដោយមានបង្កាន់ដៃ)។
   - id: return.3
     unless: cleaning_fee
-    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning.
     local: យានយន្តដែលប្រគល់មកវិញ ដោយមានធូលី ខ្សាច់ ភក់ ស្នាមប្រឡាក់ អាហារ ឬក្លិនច្រើនពេកនៅខាងក្នុង អាចត្រូវគិតថ្លៃសម្អាតដែលសមរម្យ។
 - id: data
   title:
@@ -586,7 +586,7 @@ sections:
     local: ១៧. ទិន្នន័យផ្ទាល់ខ្លួន និងឯកសារ
   clauses:
   - id: data.1
-    en: The Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, does not sell them, and follows any personal data law that applies in Cambodia.
+    en: The Owner collects the Renter's and drivers' names, contact details, ID and license details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, does not sell them, and follows any personal data law that applies in Cambodia.
     local: ម្ចាស់ប្រមូលឈ្មោះ ព័ត៌មានទំនាក់ទំនង ព័ត៌មានអត្តសញ្ញាណ និងប័ណ្ណបើកបរ ច្បាប់ចម្លងឯកសារ និងរូបថតយានយន្ត របស់អ្នកជួល និងអ្នកបើកបរ តែដើម្បីផ្តល់ការជួលនេះ ផ្ទៀងផ្ទាត់អត្តសញ្ញាណ គោរពច្បាប់ ដោះស្រាយប្រាក់ពិន័យ ការទាមទារសំណង និងវិវាទ និងរក្សាកំណត់ត្រាអាជីវកម្ម។ ម្ចាស់រក្សាទុកព័ត៌មានទាំងនោះ តែក្នុងរយៈពេលដែលចាំបាច់សម្រាប់គោលបំណងទាំងនោះ និងតាមច្បាប់ រក្សាឱ្យមានសុវត្ថិភាព មិនលក់ ហើយគោរពច្បាប់ស្តីពីទិន្នន័យផ្ទាល់ខ្លួនណាមួយ ដែលអនុវត្តនៅកម្ពុជា។
     country: true
   - id: data.2
@@ -654,7 +654,7 @@ sections:
     local: តួ៖ មុខ / ក្រោយ / ឆ្វេង / ស្តាំ
   - en: Glass, mirrors and lights
     local: កញ្ចក់ កញ្ចក់ចំហៀង និងភ្លើង
-  - en: Tyres and wheels
+  - en: Tires and wheels
     local: សំបកកង់ និងកង់
   - en: Interior and seats
     local: ផ្នែកខាងក្នុង និងកៅអី
@@ -694,7 +694,7 @@ sections:
     local: កញ្ចក់ចំហៀង
   - en: Headlight / tail light / indicator
     local: ភ្លើងមុខ / ភ្លើងក្រោយ / ភ្លើងសេ
-  - en: Tyre (each)
+  - en: Tire (each)
     local: សំបកកង់ (មួយ)
   - en: Key / remote
     local: សោ / ឧបករណ៍បញ្ជា

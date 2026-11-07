@@ -2998,7 +2998,7 @@ export async function cancelBookingWithDisposition(formData: FormData) {
 
   if (rentalError || !rental) throw new Error(rentalError?.message || "Booking not found.");
   if (["completed", "cancelled"].includes(rental.status)) {
-    throw new Error("This booking cannot be cancelled from its current status.");
+    throw new Error("This booking cannot be canceled from its current status.");
   }
 
   const now = new Date().toISOString();
@@ -3207,7 +3207,7 @@ export async function cancelBookingWithDisposition(formData: FormData) {
     .in("status", ["scheduled", "pending", "overdue"]);
   throwCancellationError("Could not cancel the payment schedule", paymentScheduleResult.error);
   // Any refund chosen in this dialog settles a "Refund to decide" job.
-  if (refundOption) await completeRentalJobs(createSupabaseAdminClient() as any, rentalId, "refund", "Settled when the booking was cancelled");
+  if (refundOption) await completeRentalJobs(createSupabaseAdminClient() as any, rentalId, "refund", "Settled when the booking was canceled");
   await tellRentalCustomer(createSupabaseAdminClient() as any, rentalId, ({ say, t, vehicle }) => `${say("rentalCancelled", { vehicle })} ${t("anyQuestions")}`, { sentBy: user.id, withLink: false, replacesEarlier: true });
 
   const refundLabel = refundOption ? ` — ${refundOption.replace(/_/g, " ")}` : "";
@@ -3221,8 +3221,8 @@ export async function cancelBookingWithDisposition(formData: FormData) {
     rental_id: rentalId,
     customer_id: rental.customer_id,
     event_type: "booking_cancelled",
-    title: "Booking cancelled",
-    detail: `${rental.reference || rental.display_code || rentalId} cancelled — ${reasonLabel}${refundLabel}.${notes ? ` Notes: ${notes}` : ""}`
+    title: "Booking canceled",
+    detail: `${rental.reference || rental.display_code || rentalId} canceled — ${reasonLabel}${refundLabel}.${notes ? ` Notes: ${notes}` : ""}`
   });
 
   revalidatePath("/");
@@ -3358,7 +3358,7 @@ export async function undoCancellation(formData: FormData) {
     .maybeSingle();
 
   if (rentalError || !rental) throw new Error(rentalError?.message || "Booking not found.");
-  if (rental.status !== "cancelled") throw new Error("This booking is not cancelled.");
+  if (rental.status !== "cancelled") throw new Error("This booking is not canceled.");
 
   await ensureMembership(supabase, organizationId, user.id);
 

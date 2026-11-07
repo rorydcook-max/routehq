@@ -152,7 +152,7 @@ export async function renderRentalAgreementDraftTemplate({
   const warnings: RentalDocumentTemplateWarning[] = [];
   warningIfMissing("renter_full_name", "Renter full name", variables.renter_full_name, warnings, "blocking");
   warningIfMissing("renter_passport_number", "Renter passport or ID", variables.renter_passport_number || variables.customer_thai_id, warnings, "blocking");
-  warningIfMissing("renter_licence_number", "Renter licence number", variables.renter_licence_number, warnings, "blocking");
+  warningIfMissing("renter_licence_number", "Renter license number", variables.renter_licence_number, warnings, "blocking");
   warningIfMissing("vehicle_registration", "Vehicle registration", variables.vehicle_registration, warnings, "blocking");
   warningIfMissing("rental_start_date", "Rental start date", variables.rental_start_date, warnings, "blocking");
   warningIfMissing("rental_rate", "Rental rate", variables.rental_rate, warnings, "blocking");

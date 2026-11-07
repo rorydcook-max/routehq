@@ -10,12 +10,14 @@ import { smallReceipt } from "@/components/receipt-attach";
 import { setPendingReceipt } from "@/components/receipt-handoff";
 import { toast } from "@/components/toast";
 import { shortDate } from "@/lib/i18n/dates";
+import { niceMoney } from "@/lib/nice-money";
 
 export type ReceiptEntry = { id: string; type: string; amount: number; date: string; who: string; vehicle: string; notes: string };
 export type ReceiptPayment = { id: string; amount: number; due: string; who: string; vehicle: string };
 type Choice = "new" | "entry" | "payment";
 
-const baht = (value: number) => `฿${Math.round(value).toLocaleString("en-US")}`;
+// In the business's own currency (was always baht).
+const baht = (value: number) => niceMoney(value);
 
 /** One photo, then one question: a new entry, an entry already recorded, or a payment being waited for. */
 export function ReceiptFlow({ entries, payments }: { entries: ReceiptEntry[]; payments: ReceiptPayment[] }) {

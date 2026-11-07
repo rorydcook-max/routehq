@@ -62,7 +62,7 @@ export async function finaliseDocumentVersionWithRpc({
   const signatureReference = signatureReferenceFromSnapshot(snapshot);
   const signatory = authorisedSignatoryFromSnapshot(snapshot);
   if (!signatureReference || !signatory.name) {
-    const failure = new Error("Finalised version is missing snapshotted authorised signature details.");
+    const failure = new Error("Finalized version is missing snapshotted authorized signature details.");
     failure.name = "blocking_issues";
     throw failure;
   }
@@ -92,7 +92,7 @@ export async function finaliseDocumentVersionWithRpc({
   }
   const row = Array.isArray(data) ? data[0] : data;
   if (!row?.document_version_id) {
-    const failure = new Error("Finalisation did not return a document version.");
+    const failure = new Error("Finalization did not return a document version.");
     failure.name = "finalisation_failed";
     throw failure;
   }

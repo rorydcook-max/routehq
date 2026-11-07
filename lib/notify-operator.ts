@@ -1,11 +1,9 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendLineMessage } from "@/services/messaging/line";
 import { sendPushToOrganization } from "@/lib/push";
 import { alertSettings, wantsAlert } from "@/lib/alerts";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { operatorAlertEmail } from "@/lib/email/templates";
 import { emailWords } from "@/lib/email/words";
-import { isTelegramConfigured, sendTelegram } from "@/lib/telegram";
 import { isAlertText, operatorAlertText, operatorLocale, type AlertText } from "@/lib/operator-alert-text";
 
 export type { AlertText } from "@/lib/operator-alert-text";
@@ -24,7 +22,7 @@ async function alertEmails(supabase: any, organisationId: string, emailTo: strin
 }
 
 /**
- * Tells the business something happened: an alert on their devices, LINE, email and Telegram,
+ * Tells the business something happened: an alert on their devices and by email,
  * each only if switched on for this kind of event (Settings › Notifications).
  * `message` is a described alert (lib/operator-alert-text.ts), written in the operator's language on every channel:
  * the first active owner's app language, else the business's, else English. Ready-made words still work (as given;
@@ -43,18 +41,17 @@ export async function notifyOperator(
 
     const { data: org } = await supabase
       .from("organizations")
-      .select("name, default_locale, line_user_id, line_channel_access_token, line_notifications_enabled, settings")
+      .select("name, default_locale, settings")
       .eq("id", organisationId)
       .maybeSingle();
     if (!org) return;
     const settings = org.settings || {};
 
+    // Alerts go by push and email only (Rory, 7 Nov 2026). LINE carries just the optional morning summary
+    // (app/api/line/daily-summary); Telegram and WhatsApp are for customer chats, not alerts.
     const toPush = wantsAlert(settings, type, "push");
-    const accessToken: string = org.line_channel_access_token ?? process.env.LINE_CHANNEL_ACCESS_TOKEN ?? "";
-    const toLine = Boolean(org.line_user_id && org.line_notifications_enabled !== false && wantsAlert(settings, type, "line") && accessToken);
-    const toTelegram = Boolean(settings.telegram_chat_id && isTelegramConfigured() && wantsAlert(settings, type, "telegram"));
     const toEmail = isEmailConfigured() && wantsAlert(settings, type, "email");
-    if (!toPush && !toLine && !toTelegram && !toEmail) return;
+    if (!toPush && !toEmail) return;
 
     const locale = await operatorLocale(supabase, organisationId, org.default_locale);
     const words = await operatorAlertText(locale);
@@ -69,26 +66,6 @@ export async function notifyOperator(
 
     if (toPush) {
       jobs.push(sendPushToOrganization(supabase, organisationId, { title, body: plain, url }).catch(() => null));
-    }
-
-    if (toLine) {
-      jobs.push(
-        sendLineMessage(accessToken, org.line_user_id, [{ type: "text", text }]).then((result) =>
-          supabase.from("line_messages").insert({
-            organisation_id: organisationId,
-            type,
-            recipient_line_id: org.line_user_id,
-            message_content: { type: "text", text },
-            status: result.success ? "sent" : "failed",
-            sent_at: result.success ? new Date().toISOString() : null,
-            error: result.error ?? null
-          })
-        )
-      );
-    }
-
-    if (toTelegram) {
-      jobs.push(sendTelegram(settings.telegram_chat_id, link ? `${text}\n${link}` : text));
     }
 
     if (toEmail) {

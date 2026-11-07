@@ -275,6 +275,8 @@ const SCREEN_ARTICLES: Record<string, string> = {
   "/settings?tab=rentals": "booking-and-price-rules",
   "/settings?tab=messaging": "inbox-and-messaging",
   "/settings?tab=notifications": "notifications",
+  // Integrations (7 Nov 2026): the calendar feed is its only working row; the notifications article covers setting it up.
+  "/settings?tab=integrations": "notifications",
   "/settings?tab=team": "invite-your-team",
   "/settings?tab=more": "plans-and-billing",
   "/settings/billing": "plans-and-billing",

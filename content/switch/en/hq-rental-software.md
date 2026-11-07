@@ -15,14 +15,14 @@ faq:
   - q: "Do I need HQ's API?"
     a: "No. The Excel exports are enough. The API is there if a developer prefers it."
 ---
-HQ's knowledge base says you can export every table and report in the system to Excel. RoveHQ recognises HQ's reservation and vehicle exports by their headings (pick-up and return dates and locations, vehicle class, plate, odometer).
+HQ's knowledge base says you can export every table and report in the system to Excel. RoveHQ recognizes HQ's reservation and vehicle exports by their headings (pick-up and return dates and locations, vehicle class, plate, odometer).
 
 ## How statuses come across
 
 - **Open** and **Pending** reservations become upcoming bookings.
 - **Rental** reservations become rentals that are out now.
 - **Completed** reservations become past rentals.
-- **Quote**, **Cancelled** and **No Show** are listed but left out unless you tick them.
+- **Quote**, **Canceled** and **No Show** are listed but left out unless you tick them.
 
 Total paid and the security deposit come across separately, so a deposit you hold is never counted as income.
 
@@ -30,4 +30,4 @@ Still deciding? Read our [HQ Rental Software vs RoveHQ comparison](/guides/hq-re
 
 ## Free import
 
-Importing is free on every plan. RoveHQ recognises HQ Rental Software exports and reads them straight away. You see every vehicle, booking and payment before anything is saved, and you can take the whole import back within 30 days. If you'd rather not do it yourself, [send us the files](/contact) and we'll bring them in for you.
+Importing is free on every plan. RoveHQ recognizes HQ Rental Software exports and reads them straight away. You see every vehicle, booking and payment before anything is saved, and you can take the whole import back within 30 days. If you'd rather not do it yourself, [send us the files](/contact) and we'll bring them in for you.

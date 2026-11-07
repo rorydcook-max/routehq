@@ -14,7 +14,7 @@ inside:
   - "Daytime headlights in winter; vest, triangle and first-aid kit in the car"
   - "Handover check (Annex A), damage price list (Annex B) and signature blocks"
 ---
-Croatia's coast road to Dubrovnik [crosses Bosnia and Herzegovina](https://www.rac.co.uk/drive/travel/country/croatia) at Neum, which many renters don't realise is leaving the country. This agreement makes it a permitted crossing only with your written permission and a Green Card.
+Croatia's coast road to Dubrovnik [crosses Bosnia and Herzegovina](https://www.rac.co.uk/drive/travel/country/croatia) at Neum, which many renters don't realize is leaving the country. This agreement makes it a permitted crossing only with your written permission and a Green Card.
 
 ## What the Croatia version covers
 

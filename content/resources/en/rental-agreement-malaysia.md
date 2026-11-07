@@ -8,7 +8,7 @@ fileLabel: "Agreement · English + Malay"
 formats: [docx, pdf]
 inside:
   - "English beside Bahasa Melayu, with English prevailing as is usual for Malaysian commercial contracts"
-  - "Licence classes D/DA and B/B1/B2, and foreign licences with an IDP or translation"
+  - "License classes D/DA and B/B1/B2, and foreign licenses with an IDP or translation"
   - "Owner confirms road tax, rental-use insurance and APAD, LPKP or MOTAC licensing"
   - "AES/AwAS camera summonses: naming the driver within 30 days"
   - "No passport or MyKad kept as a deposit, and data handled under the amended PDPA"
@@ -16,15 +16,15 @@ inside:
   - "Fair-charges clause under section 75 of the Contracts Act 1950"
 ---
 
-Car rental in Malaysia is more regulated than in most of the region. Hire-and-drive cars need an operator licence, and the authorities have said so publicly: in 2023 APAD's director-general warned that [renting out private cars without a licence is illegal, may breach the insurance and can lead JPJ to seize the vehicle](https://www.carsifu.my/news/no-to-renting-out-private-cars). The same report noted that police treated some unreturned rental cars as a breach of contract rather than theft. That is exactly the situation where your written agreement becomes the main evidence you have.
+Car rental in Malaysia is more regulated than in most of the region. Hire-and-drive cars need an operator license, and the authorities have said so publicly: in 2023 APAD's director-general warned that [renting out private cars without a license is illegal, may breach the insurance and can lead JPJ to seize the vehicle](https://www.carsifu.my/news/no-to-renting-out-private-cars). The same report noted that police treated some unreturned rental cars as a breach of contract rather than theft. That is exactly the situation where your written agreement becomes the main evidence you have.
 
 Our free agreement for Malaysia is built for small car and motorcycle rental businesses, in English with a full Malay translation. Malaysia is preset in the form.
 
 ## Malaysian rules built in
 
-**Operator licensing.** The owner confirms that the vehicle is registered with JPJ, its road tax is valid, it is insured for rental use, and that you hold the right operator licence: [APAD in Peninsular Malaysia](https://www.apad.gov.my/index.php/en/services/taxi-and-ehailing) for "kereta sewa dan pandu", LPKP in Sabah and Sarawak under the [Commercial Vehicles Licensing Board Act](https://mylaw.my/legislation/commercial-vehicles-licensing-board-act-1987/section-1), or MOTAC for tourism hire-and-drive cars under the [Tourism Vehicles Licensing Act 1999](https://motac.gov.my/muat-turun/send/145-unit-perundangan/790-akta-594-akta-pelesenan-kenderaan-pelancongan-1999-terkini-bm).
+**Operator licensing.** The owner confirms that the vehicle is registered with JPJ, its road tax is valid, it is insured for rental use, and that you hold the right operator license: [APAD in Peninsular Malaysia](https://www.apad.gov.my/index.php/en/services/taxi-and-ehailing) for "kereta sewa dan pandu", LPKP in Sabah and Sarawak under the [Commercial Vehicles Licensing Board Act](https://mylaw.my/legislation/commercial-vehicles-licensing-board-act-1987/section-1), or MOTAC for tourism hire-and-drive cars under the [Tourism Vehicles Licensing Act 1999](https://motac.gov.my/muat-turun/send/145-unit-perundangan/790-akta-594-akta-pelesenan-kenderaan-pelancongan-1999-terkini-bm).
 
-**Licences and IDP.** Drivers need class D or DA for cars and B, B1 or B2 for motorcycles, or the foreign equivalent. Under [RTA section 28](https://mylaw.my/legislation/road-transport-act-1987/section-28), foreign licences count only where a treaty recognises them. [JPJ says](https://www.jpj.gov.my/pusat-media-3/informasi-perkhidmatan-jpj/pemandu/permohonan-permit-memandu-antarabangsa/) IDPs are valid for one year. We couldn't confirm on an official page exactly how long a visitor may drive on a foreign licence, so the clause refers to "the period JPJ allows" and asks for an IDP or official translation where required. Check with JPJ if your customers stay long.
+**Licenses and IDP.** Drivers need class D or DA for cars and B, B1 or B2 for motorcycles, or the foreign equivalent. Under [RTA section 28](https://mylaw.my/legislation/road-transport-act-1987/section-28), foreign licenses count only where a treaty recognizes them. [JPJ says](https://www.jpj.gov.my/pusat-media-3/informasi-perkhidmatan-jpj/pemandu/permohonan-permit-memandu-antarabangsa/) IDPs are valid for one year. We couldn't confirm on an official page exactly how long a visitor may drive on a foreign license, so the clause refers to "the period JPJ allows" and asks for an IDP or official translation where required. Check with JPJ if your customers stay long.
 
 **Helmets and pillion.** The [Motor Vehicles (Safety Helmets) Rules](https://www.sciencedirect.com/science/article/abs/pii/S1369847820305179) require helmets for rider and pillion, and [RTA section 49](https://mylaw.my/legislation/road-transport-act-1987/section-49) allows one pillion, sitting astride.
 
@@ -32,7 +32,7 @@ Our free agreement for Malaysia is built for small car and motorcycle rental bus
 
 **Compulsory insurance.** The [Road Transport Act section 91](https://mylaw.my/legislation/road-transport-act-1987/section-91) requires cover for death or bodily injury to others. It does not require property damage cover and never covers the rented vehicle. The insurance section explains this in plain words and links it to your excess.
 
-**Passports and MyKad.** Possessing another person's passport without lawful authority is an offence under the [Passports Act 1966](https://www.refworld.org/legal/legislation/natlegbod/1966/14712), and the National Registration Department says [holding someone else's MyKad is against the law](https://malaysia.news.yahoo.com/nrd-holding-another-individual-mykad-023125939.html). The agreement takes a cash or card deposit and a photo instead.
+**Passports and MyKad.** Possessing another person's passport without lawful authority is an offense under the [Passports Act 1966](https://www.refworld.org/legal/legislation/natlegbod/1966/14712), and the National Registration Department says [holding someone else's MyKad is against the law](https://malaysia.news.yahoo.com/nrd-holding-another-individual-mykad-023125939.html). The agreement takes a cash or card deposit and a photo instead.
 
 **Personal data.** The PDPA 2010, as amended in 2024, now uses "data controller" and brings [mandatory breach notification and data portability from June 2025](https://www.rajahtannasia.com/?p=161886). The data clause covers purpose, retention, breach notice and access requests.
 
@@ -50,8 +50,8 @@ Our free agreement for Malaysia is built for small car and motorcycle rental bus
 
 ## How to use the builder
 
-Malaysia is preset. Add your business and licence details, vehicle, rate, deposit and rules, leave anything blank to write in, and download Word or PDF. For other countries go to the main [free rental agreement page](/resources/rental-agreement). This is general information from public sources, not legal advice.
+Malaysia is preset. Add your business and license details, vehicle, rate, deposit and rules, leave anything blank to write in, and download Word or PDF. For other countries go to the main [free rental agreement page](/resources/rental-agreement). This is general information from public sources, not legal advice.
 
 ## Let RoveHQ fill it in for you
 
-RoveHQ fills in the agreement from each booking automatically, the renter signs on their phone, and passport and licence details are read from a photo. [Start free](/signup).
+RoveHQ fills in the agreement from each booking automatically, the renter signs on their phone, and passport and license details are read from a photo. [Start free](/signup).

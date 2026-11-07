@@ -63,7 +63,7 @@ Each plan includes one branch, with extra branches at $50 a month, and annual bi
 
 ## Where HQ is stronger
 
-- **Booking channels.** Channel management with sites such as Expedia, Kayak and Turo. If you sell to travellers through booking sites, this matters.
+- **Booking channels.** Channel management with sites such as Expedia, Kayak and Turo. If you sell to travelers through booking sites, this matters.
 - **Choice of payment gateway.** Stripe, PayPal, Braintree, Mollie and more, where RoveHQ works with Stripe only.
 - **Integrations.** QuickBooks and Xero, telematics from Geotab, Invers and Zubie, and US toll systems.
 - **Growth.** Multi-branch control, KPI dashboards and a path to hundreds of vehicles on one system.
@@ -96,6 +96,6 @@ We also compare HQ with RentWorks Plus in our guide to [RentWorks Plus and HQ Re
 
 ## Switching from HQ Rental Software
 
-HQ lets you export any table to Excel with the columns you choose. Our [guide to switching from HQ Rental Software](/switch/hq-rental-software) shows the clicks. RoveHQ recognises HQ's reservation and vehicle exports, turns open, rental and completed reservations into upcoming, current and past rentals, and keeps deposits separate from income. Importing is free, and you can undo it within 30 days.
+HQ lets you export any table to Excel with the columns you choose. Our [guide to switching from HQ Rental Software](/switch/hq-rental-software) shows the clicks. RoveHQ recognizes HQ's reservation and vehicle exports, turns open, rental and completed reservations into upcoming, current and past rentals, and keeps deposits separate from income. Importing is free, and you can undo it within 30 days.
 
 [Create a free RoveHQ account](/signup) to see your fleet in it first.

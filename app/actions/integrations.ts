@@ -33,12 +33,13 @@ export async function saveNotificationMatrix(formData: FormData): Promise<void> 
   if (!found) return;
   const settings = { ...(found.org.settings || {}) };
   const current = alertSettings(settings);
-  const matrix: NonNullable<AlertSettings["matrix"]> = {};
+  // Only push and email are on the grid; older choices for LINE and Telegram are kept as they were (no longer used).
+  const matrix: NonNullable<AlertSettings["matrix"]> = { ...(current.matrix || {}) };
   for (const event of ALERT_EVENTS) {
-    matrix[event] = {};
+    matrix[event] = { ...(current.matrix?.[event] || {}) };
     for (const channel of ALERT_CHANNELS) matrix[event]![channel] = formData.get(`${event}__${channel}`) === "on";
   }
-  const summary: NonNullable<AlertSettings["summary"]> = {};
+  const summary: NonNullable<AlertSettings["summary"]> = { ...(current.summary || {}) };
   for (const channel of ALERT_CHANNELS) summary[channel] = formData.get(`summary__${channel}`) === "on";
   settings.alerts = { ...current, matrix, summary };
   // The older per-event switches would otherwise silence an event the grid has switched on.
@@ -47,8 +48,7 @@ export async function saveNotificationMatrix(formData: FormData): Promise<void> 
     for (const event of ALERT_EVENTS) delete legacy[`event_${event}`];
     settings.line_notifications = legacy;
   }
-  // The morning summary on LINE follows the grid too.
-  await found.db.from("organizations").update({ line_daily_summary_enabled: summary.line }).eq("id", found.org.id);
+  // The morning summary on LINE has its own switch on the LINE card (Thailand), so the grid leaves it alone.
   await saveSettings(found.db, found.org.id, settings);
 }
 

@@ -251,7 +251,7 @@ ${input.notes ? `<h2>Notes</h2><div>${typedText(input.notes, input.translations)
 ${photoSection}
 ${depositSection}
 ${translationNote}
-<h2>Customer acknowledgement</h2>
+<h2>Customer acknowledgment</h2>
 <p>I confirm that I ${handover} in the condition recorded above${depositSection ? " and that I have been shown the deposit settlement above" : ""}.</p>
 <img class="sig" alt="Customer signature" src="${escapeHtml(input.signatureDataUrl)}">
 <p>${escapeHtml(input.signerName)}<br><span class="muted">Signed ${escapeHtml(inspectedAt)}</span></p>

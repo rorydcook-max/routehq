@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Smartphone, Zap } from "lucide-react";
 import { alertSettings } from "@/lib/alerts";
-import { isTelegramConfigured } from "@/lib/telegram";
-import { CalendarFeedCard, EmailAlertsCard, IntegrationCard, TelegramCard } from "@/app/(app)/settings/integrations-panel";
+import { CalendarFeedCard, EmailAlertsCard, IntegrationCard } from "@/app/(app)/settings/integrations-panel";
+import { NotificationGrid } from "@/app/(app)/settings/notification-grid";
 import { SwitchField } from "@/components/switch-field";
 import { InfoTip } from "@/components/info-tip";
 import { currencySymbol } from "@/components/currency-symbol";
@@ -28,6 +28,7 @@ import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { vehicleName } from "@/components/vehicle-identity";
 import { PublicBookingPanel } from "@/app/(app)/settings/public-booking-panel";
 import { UsualDepositPanel } from "@/app/(app)/settings/usual-deposit-panel";
+import { MoneyInput } from "@/components/money-input";
 import { PartnerNetworkPanel } from "@/app/(app)/settings/partner-network-panel";
 import { DirectoryPanel } from "@/app/(app)/settings/directory-panel";
 import { BookingAddressPanel } from "@/app/(app)/settings/booking-address-panel";
@@ -70,7 +71,8 @@ function browserSafeAssetFallback(value: string | null | undefined) {
 
 // The wording for the parts operators see is in locales/<language>/common.json under
 // "settingsPage".
-const SETTINGS_TABS = [{ key: "business" }, { key: "rentals" }, { key: "messaging" }, { key: "notifications" }, { key: "team" }, { key: "more" }] as const;
+// Messaging = customer chats; Notifications = alerts and the morning summary; Integrations = other apps (7 Nov 2026).
+const SETTINGS_TABS = [{ key: "business" }, { key: "rentals" }, { key: "messaging" }, { key: "notifications" }, { key: "integrations" }, { key: "team" }, { key: "more" }] as const;
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -392,6 +394,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             >
               <UsualDepositPanel
                 currency={money}
+                currencyCode={organization.currency || "THB"}
                 deposit={publicBookingSettings(organization.settings).deposit}
                 enabled={publicBookingSettings(organization.settings).enabled}
                 holdHours={bookingRules(organization.settings).holdHours}
@@ -421,14 +424,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   </label>
                   <label className="block">
                     <span className="font-semibold text-[var(--foreground-secondary)]">{say("ahead_price")}</span>
-                    <input
-                      className={inputClass}
+                    {/* In the business's currency, its symbol inside the box (7 Nov 2026). */}
+                    <MoneyInput
+                      currency={organization.currency || "THB"}
                       defaultValue={organization.upfront_discount_rate ? String(organization.upfront_discount_rate) : ""}
-                      min="0"
                       name="upfront_discount_rate"
-                      placeholder={say("ahead_pricePh")}
-                      step="0.01"
-                      type="number"
                     />
                   </label>
                   <label className="block">
@@ -539,36 +539,27 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       ) : null}
       {tab === "notifications" ? (
         <div className="space-y-4">
-        {/* What you hear about and where: one grid on its own page. Then each connection as a card. */}
-        <Card className="flex flex-wrap items-center justify-between gap-4 p-5">
-          <div className="min-w-0">
-            <h2 className="card-title">{say("ig_notifTitle")}</h2>
-            <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("ig_notifBody")}</p>
-          </div>
-          <Link className="primary-action pressable" href={"/settings/notifications" as Route}>
-            {say("ig_notifBtn")}
-          </Link>
-        </Card>
+        {/*
+          Alerts and the morning summary, by push and email (Rory, 7 Nov 2026): the grid first, then the two
+          channels. LINE only carries the optional morning summary (Thailand); Telegram and WhatsApp are not alert
+          channels any more (customer chats on them are on the Messaging tab).
+        */}
+        <NotificationGrid settings={organizationSettings} />
         <div className="grid items-start gap-4 lg:grid-cols-2">
           <IntegrationCard icon={<Smartphone size={20} />} title={say("push_title")}>
             <PushToggle />
+            <p className="mt-3 text-[14px] font-medium text-[var(--muted)]">{say("nt_iphone")}</p>
           </IntegrationCard>
           <EmailAlertsCard configured={isEmailConfigured()} emailTo={alertSettings(organizationSettings).email_to || null} ownerEmail={userEmail || null} />
-          <TelegramCard configured={isTelegramConfigured()} connected={Boolean(organizationSettings.telegram_chat_id)} />
-          <CalendarFeedCard
-            feedUrl={
-              organizationSettings.calendar_feed_token
-                ? `${String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "")}/api/calendar/${String(organizationSettings.calendar_feed_token)}.ics`
-                : null
-            }
-          />
         </div>
+        {/* Thailand only; also shown where LINE is already connected, so it can still be switched off. */}
+        {orgCountry(organization) === "TH" || lineUserId ? (
         <Card className="p-4" >
           <div id="line" className="scroll-mt-4" />
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
-              <h2 className="card-title">{say("line_title")}</h2>
-              <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("line_body")}</p>
+              <h2 className="card-title">{say("nt_lineTitle")}</h2>
+              <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("nt_lineBody")}</p>
             </div>
             <Badge tone={lineUserId ? "green" : "amber"}>{lineUserId ? say("line_connected") : say("line_notConnected")}</Badge>
           </div>
@@ -607,17 +598,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <form action={updateLineSettings} className="mt-4 space-y-3">
               <input name="organizationId" type="hidden" value={organization.id} />
               <input name="line_user_id" type="hidden" value={lineUserId} />
-              <div className="divide-y divide-[var(--border)]">
+              {/* LINE carries only the morning summary now, so its master switch stays on and the summary has the one switch. */}
+              <input name="line_notifications_enabled" type="hidden" value="on" />
+              <div>
                 <SwitchField
-                  className="pb-3"
-                  defaultChecked={organization.line_notifications_enabled ?? false}
-                  description={say("line_enableBody")}
-                  label={say("line_enable")}
-                  name="line_notifications_enabled"
-                  value="on"
-                />
-                <SwitchField
-                  className="pt-3"
                   defaultChecked={organization.line_daily_summary_enabled ?? true}
                   description={say("line_dailyBody")}
                   label={
@@ -692,20 +676,37 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           </div>
           ) : null}
         </Card>
-      
-        {/* What's coming, so operators know it's on the way rather than missing. */}
+        ) : null}
+        </div>
+      ) : null}
+      {tab === "integrations" ? (
+        <div className="space-y-4">
+        {/* What works today (only the calendar feed so far), then what's coming. Nothing here is built yet beyond the feed. */}
+        <div className="grid items-start gap-4 lg:grid-cols-2">
+          <CalendarFeedCard
+            feedUrl={
+              organizationSettings.calendar_feed_token
+                ? `${String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "")}/api/calendar/${String(organizationSettings.calendar_feed_token)}.ics`
+                : null
+            }
+          />
+        </div>
+        {/* What's coming, so operators know it's on the way rather than missing. Alphabetical; FlowAccount is Thai only. */}
         <Card className="p-5">
           <h2 className="card-title">{say("ig_soonTitle")}</h2>
           <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("ig_soonBody")}</p>
-          <ul className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-3">
-            {(["whatsapp", "messenger", "zapier", "make", "mailchimp", "klaviyo"] as const).map((key) => (
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {(["assistant", "flowaccount", "gbp", "mailchimp", "quickbooks", "xero", "zapierMake"] as const)
+              .filter((key) => key !== "flowaccount" || orgCountry(organization) === "TH")
+              .sort((a, b) => say(`ig_soon_${a}`).localeCompare(say(`ig_soon_${b}`), locale))
+              .map((key) => (
               <li className="flex items-start gap-3 rounded-2xl bg-[var(--panel-secondary)] p-3.5" key={key}>
                 <span className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[var(--muted)] sm:flex">
                   <Zap size={17} />
                 </span>
                 <span className="min-w-0">
                   <span className="block font-bold text-[var(--foreground)]">{say(`ig_soon_${key}`)}</span>
-                  <span className="hidden text-[14px] font-medium text-[var(--muted)] sm:block">{say(`ig_soon_${key}Body`)}</span>
+                  <span className="block text-[14px] font-medium text-[var(--muted)]">{say(`ig_soon_${key}Body`)}</span>
                 </span>
               </li>
             ))}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, type ReactNode } from "react";
+import { currencySymbol } from "@/components/currency-symbol";
 import { createPortal } from "react-dom";
 import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
@@ -47,6 +48,19 @@ const REASONS: { value: CancelReason }[] = [
   { value: "operator_cancelled" },
   { value: "other" }
 ];
+
+/** The currency symbol inside an amount box, not in its label (7 Nov 2026). */
+function SymbolInside({ currency, children }: { currency?: string | null; children: ReactNode }) {
+  const symbol = currencySymbol(currency);
+  return (
+    <span className="relative block [&>input]:!ps-[calc(1.25rem+var(--sym))]" style={{ ["--sym" as string]: `${Math.max(1, symbol.length)}ch` }}>
+      <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-3 mt-1 flex items-center text-sm font-semibold text-[var(--foreground-secondary)]">
+        {symbol}
+      </span>
+      {children}
+    </span>
+  );
+}
 
 function money(amount: number, currency = "THB") {
   return new Intl.NumberFormat("th-TH", {
@@ -386,6 +400,7 @@ export function CancelBookingButton({
                           <div className="grid gap-2 border-t border-[var(--danger-line)] px-3 pb-3 pt-3 sm:grid-cols-2">
                             <label className="block">
                               <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_refundAmount", { currency })}</span>
+                              <SymbolInside currency={currency}>
                               <input
                                 className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--danger)]"
                                 max={totalPaid}
@@ -396,10 +411,12 @@ export function CancelBookingButton({
                                 type="number"
                                 value={partialRefundAmount}
                               />
+                              </SymbolInside>
                             </label>
                             {opt.value === "partial_refund_deposit_retained" && hasDeposit ? (
                               <label className="block">
                                 <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_depositReturned", { currency })}</span>
+                                <SymbolInside currency={currency}>
                                 <input
                                   className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--danger)]"
                                   max={depositHeld}
@@ -410,6 +427,7 @@ export function CancelBookingButton({
                                   type="number"
                                   value={partialDepositReturn}
                                 />
+                                </SymbolInside>
                               </label>
                             ) : null}
                           </div>

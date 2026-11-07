@@ -3,6 +3,8 @@
  * Shown to customers as "about"; the business confirms the real price.
  */
 
+import { niceMoney } from "@/lib/nice-money";
+
 export type Rates = { dailyRate: number; weeklyRate: number; monthlyRate: number };
 
 export function daysBetween(startDate: string, endDate: string) {
@@ -19,7 +21,8 @@ export type StayQuote = {
   explain: string;
 };
 
-const baht = (value: number) => `฿${Math.round(value).toLocaleString("en-US")}`;
+// In the business's own currency (was always baht).
+const baht = (value: number) => niceMoney(Math.round(value));
 
 /**
  * The price of a number of days from a rate card, the way a rental desk

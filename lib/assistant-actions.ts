@@ -128,7 +128,7 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
       { label: "Vehicle", value: [make, model, year].filter(Boolean).join(" ") },
       { label: "Type", value: category.name },
       { label: "Plate", value: plate },
-      args.color ? { label: "Colour", value: args.color } : null,
+      args.color ? { label: "Color", value: args.color } : null,
       args.mileage ? { label: "Mileage", value: `${args.mileage.toLocaleString("en-US")} ${businessDistanceUnit()}` } : null,
       args.dailyRate ? { label: "Per day", value: money(args.dailyRate) } : null,
       args.weeklyRate ? { label: "Per week", value: money(args.weeklyRate) } : null,

@@ -30,7 +30,7 @@ Copy a message, replace everything in {braces}, check the numbers and send. Keep
 
 ---
 
-## 1. Booking enquiry: reply with price
+## 1. Booking inquiry: reply with price
 
 Hi {renter_name}, thanks for your message! Yes, we have a {vehicle} available from {start_date} to {end_date}.
 
@@ -38,7 +38,7 @@ Price: {price_per_day} per day, {total_price} in total.
 Deposit: {deposit_amount}, refunded when the vehicle comes back in the same condition.
 Included: {included_items, e.g. 2 helmets, phone holder, basic insurance}.
 
-Would you like me to reserve it for you? I just need your full name, a photo of your passport or ID and your driving licence.
+Would you like me to reserve it for you? I just need your full name, a photo of your passport or ID and your driver's license.
 
 ## 2. Booking confirmation
 
@@ -49,7 +49,7 @@ Pickup: {start_date} at {pickup_time}, {location}
 Return: {end_date} at {return_time}
 Total: {total_price}, deposit {deposit_amount}
 
-Please bring your passport or ID and your driving licence. See you on {start_date}!
+Please bring your passport or ID and your driver's license. See you on {start_date}!
 
 ## 3. Payment or deposit request
 
@@ -76,7 +76,7 @@ Hi {renter_name}, a quick reminder about tomorrow.
 
 Pickup: {start_date} at {pickup_time}
 Where: {location}
-Please bring: passport or ID, driving licence, and {remaining_payment} if not yet paid.
+Please bring: passport or ID, driver's license, and {remaining_payment} if not yet paid.
 
 The handover takes about 15 minutes: we walk round the vehicle together, take photos and sign the checklist. See you tomorrow!
 
@@ -87,7 +87,7 @@ Hi {renter_name}, we're delivering your {vehicle} tomorrow, {start_date}, at aro
 Delivery address: {delivery_address}
 Our staff member {staff_name} will call you on arrival.
 
-Please have your passport or ID and driving licence ready. If your plans change, just message us here.
+Please have your passport or ID and driver's license ready. If your plans change, just message us here.
 
 ## 7. Welcome message at handover
 
@@ -105,7 +105,7 @@ Your handover photos and checklist are saved. Enjoy your ride!
 
 Hi {renter_name}, just checking in. How's the {vehicle} running?
 
-If you notice anything (a warning light, a soft tyre, strange noises), please tell us early and we'll sort it. The next service is due at {service_km} km; we'll arrange it with you when it's close. Thanks for looking after it!
+If you notice anything (a warning light, a soft tire, strange noises), please tell us early and we'll sort it. The next service is due at {service_km} km; we'll arrange it with you when it's close. Thanks for looking after it!
 
 ---
 
@@ -194,7 +194,7 @@ Please let us know by {reply_by_date}. Thank you.
 
 ## 19. Cancellation reply: refund due
 
-Hi {renter_name}, no problem, your booking for {start_date} to {end_date} is cancelled.
+Hi {renter_name}, no problem, your booking for {start_date} to {end_date} is canceled.
 
 Under our cancellation policy, you'll receive {refund_amount}. We'll send it to {refund_method} within {refund_days} days and message you when it's done.
 
@@ -202,7 +202,7 @@ We hope to see you another time!
 
 ## 20. Cancellation reply: outside the free cancellation period
 
-Hi {renter_name}, we're sorry your plans have changed. Your booking for {start_date} is cancelled.
+Hi {renter_name}, we're sorry your plans have changed. Your booking for {start_date} is canceled.
 
 As the cancellation was made {notice_given, e.g. less than 48 hours} before pickup, our policy allows a refund of {refund_amount} out of the {amount_paid} paid. If you'd prefer, we can move your booking to new dates within {rebook_window} instead, at no extra charge.
 

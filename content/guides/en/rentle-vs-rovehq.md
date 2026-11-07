@@ -12,7 +12,7 @@ faq:
   - q: "How much does TWICE Commerce (Rentle) cost?"
     a: "As of November 2026, TWICE's pricing page lists €199 per inventory location a month, with the first location at 50% off (€99). The Standard tier adds no monthly fee but takes a 1.5% commission on payments processed through TWICE. Onboarding packages are optional at €999 or €1,990. There's a 14-day free trial with no card."
   - q: "Is Rentle or TWICE good for car or scooter rental?"
-    a: "TWICE is built for businesses that rent and resell physical products, such as bikes and sports gear. It can suit bike and e-bike rental. For cars, motorbikes and quads, where you need licence checks, mileage and fuel records and a vehicle rental agreement, a vehicle rental tool fits better."
+    a: "TWICE is built for businesses that rent and resell physical products, such as bikes and sports gear. It can suit bike and e-bike rental. For cars, motorbikes and quads, where you need license checks, mileage and fuel records and a vehicle rental agreement, a vehicle rental tool fits better."
   - q: "Does RoveHQ take a commission on payments?"
     a: "Yes, on payments taken through Stripe: 5% on the Free plan, 2.5% on Starter, 2% on Pro, 1.5% on Business and 1% on any yearly plan, on top of Stripe's own processing fee. That's more than TWICE's 1.5% on Free, Starter and Pro paid monthly, the same on Business and less on a yearly plan. Cash, bank transfer and QR payments that customers pay you directly carry no RoveHQ fee."
   - q: "Can I move from Rentle to RoveHQ?"
@@ -52,14 +52,14 @@ The feature list is long: serialised and pooled inventory, rental and resale pri
 
 ## Where TWICE is stronger
 
-- **Multi-store retail.** One system for several shops and warehouses, with hours and fulfilment rules per location.
+- **Multi-store retail.** One system for several shops and warehouses, with hours and fulfillment rules per location.
 - **Rental plus resale.** Rent, sell, buy back and run subscriptions on the same items. Good for shops that sell ex-rental stock.
 - **Online store.** A built-in storefront with a theme editor, checkout builder, custom domains and multiple languages.
 - **Automation and API.** Workflows, webhooks, a bulk API and an MCP server for AI tools.
 
 ## Where RoveHQ is stronger
 
-- **Vehicle rental features.** Handover and return checks with odometer and fuel photos, a damage diagram and signature; passport and licence photos read automatically; a rental agreement written for each booking in English and the local language.
+- **Vehicle rental features.** Handover and return checks with odometer and fuel photos, a damage diagram and signature; passport and license photos read automatically; a rental agreement written for each booking in English and the local language.
 - **Card deposits for vehicles.** Hold a deposit on the customer's card at pickup, then release it or capture what's owed at return.
 - **Cost for a small shop.** A free plan and flat monthly prices by fleet size, from €13 a month. The platform fee on card payments is 1% on a yearly plan; on monthly plans it's 1.5% to 5%, so compare it with TWICE's 1.5% using your own card takings.
 - **Every way customers pay.** Card, wallets and European methods online, and cash, transfer or QR with slips checked against what's owed (including PromptPay and QRIS).
@@ -69,7 +69,7 @@ The feature list is long: serialised and pooled inventory, rental and resale pri
 
 **Choose TWICE Commerce if** you run a bike, sports or similar shop, maybe with several locations, you rent and resell products, and you want a strong online store.
 
-**Choose RoveHQ if** you rent cars, motorbikes, scooters, quads or vans from one or two bases, run things from your phone, and want card payments and deposits, vehicle handovers, licence checks and agreements handled for you.
+**Choose RoveHQ if** you rent cars, motorbikes, scooters, quads or vans from one or two bases, run things from your phone, and want card payments and deposits, vehicle handovers, license checks and agreements handled for you.
 
 For more options, see our [roundup of car and scooter rental software for small businesses](/guides/best-car-scooter-rental-software).
 

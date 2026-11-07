@@ -4,6 +4,7 @@ import { daysFromToday } from "@/lib/business-time";
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
+import { niceMoney } from "@/lib/nice-money";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 import { Copy, Instagram, Mail, MessageCircle, Phone, Send, StickyNote } from "lucide-react";
@@ -349,8 +350,9 @@ function lineTextUrl(text: string) {
   return `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
 }
 
+// In the business's own currency (was always baht).
 function formatMoney(value: number) {
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(Number(value || 0));
+  return niceMoney(value);
 }
 
 function formatDate(value: string) {

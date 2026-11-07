@@ -21,9 +21,9 @@ export const IMPORT_VARIABLES = [
   { key: "renter_passport_number", label: "Passport or ID number" },
   { key: "renter_nationality", label: "Nationality" },
   { key: "customer_date_of_birth", label: "Date of birth" },
-  { key: "renter_licence_number", label: "Driving licence number" },
-  { key: "renter_licence_country", label: "Licence country" },
-  { key: "renter_licence_expiry", label: "Licence expiry" },
+  { key: "renter_licence_number", label: "Driver's license number" },
+  { key: "renter_licence_country", label: "License country" },
+  { key: "renter_licence_expiry", label: "License expiry" },
   { key: "renter_phone", label: "Renter's phone" },
   { key: "renter_email", label: "Renter's email" },
   { key: "renter_address", label: "Renter's address" },
@@ -32,7 +32,7 @@ export const IMPORT_VARIABLES = [
   { key: "vehicle_model", label: "Vehicle model" },
   { key: "vehicle_year", label: "Vehicle year" },
   { key: "vehicle_registration", label: "Number plate" },
-  { key: "vehicle_colour", label: "Vehicle colour" },
+  { key: "vehicle_colour", label: "Vehicle color" },
   { key: "vehicle_fuel_type", label: "Fuel type" },
   { key: "vehicle_vin", label: "Chassis / VIN" },
   { key: "rental_start_date", label: "Start date" },
@@ -153,7 +153,7 @@ function detailsBlock(thai: boolean) {
       <div class="info-grid grid-4">
         ${cell("Renter", "ผู้เช่า", "{{renter_full_name}}")}
         ${cell("Passport or ID", "หนังสือเดินทาง", "{{renter_passport_number}}")}
-        ${cell("Licence", "ใบขับขี่", "{{renter_licence_number}}")}
+        ${cell("License", "ใบขับขี่", "{{renter_licence_number}}")}
         ${cell("Phone", "โทรศัพท์", "{{renter_phone}}")}
         ${cell("Vehicle", "รถ", "{{vehicle_make}} {{vehicle_model}}")}
         ${cell("Plate", "ทะเบียน", "{{vehicle_registration}}")}

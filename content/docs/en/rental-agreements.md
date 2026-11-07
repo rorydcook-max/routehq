@@ -35,7 +35,7 @@ Or do it in **Settings** > **Business** > **Your signature**: tick the box, then
 
 ## Check your business details
 
-**Settings** > **Business** > **Agreement details**: legal name, tax number, who signs and the line at the bottom. Tap **Save**. Your logo and brand colour go on the agreement too.
+**Settings** > **Business** > **Agreement details**: legal name, tax number, who signs and the line at the bottom. Tap **Save**. Your logo and brand color go on the agreement too.
 
 ## Add your own terms
 
@@ -49,7 +49,7 @@ Fees and limits in the agreement (late fee, fuel charge, cleaning, how far the v
 
 ## How the customer signs
 
-On their booking link the customer adds their details and passport and licence photos, taps **Save details and go to signing**, reads the final agreement, ticks the box and signs with their finger. They must sign with the name on the booking.
+On their booking link the customer adds their details and passport and license photos, taps **Save details and go to signing**, reads the final agreement, ticks the box and signs with their finger. They must sign with the name on the booking.
 
 To find it later, open the booking and go to the **Agreement** tab. You can view or download each document there, plus a **Signing certificate** showing who signed and when. The customer sees it on their own booking page too.
 

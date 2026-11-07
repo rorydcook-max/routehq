@@ -8,6 +8,9 @@ import { adjustRental, rescheduleBooking } from "@/app/actions/bookings";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
 import { quoteExplainIn } from "@/lib/i18n/quote-text";
+import { niceMoney } from "@/lib/nice-money";
+import { currencySymbol } from "@/components/currency-symbol";
+import { businessCurrency } from "@/lib/business-units";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 import { amendmentShareText, cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, makeRentalOpenEnded, type AmendmentSummary } from "@/app/actions/amendments";
@@ -109,8 +112,9 @@ function formatAmountInput(value: string) {
   return amount ? amount.toLocaleString("en-US") : "";
 }
 
+// In the business's own currency (was always baht).
 function money(value: unknown) {
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(Number(value || 0));
+  return niceMoney(value);
 }
 
 // Dates here are calendar days held at midnight UTC, so adding days and writing them out never slips a day.
@@ -215,7 +219,7 @@ function CurrencyInput({
 }) {
   return (
     <div className="mt-1 flex h-11 items-center rounded-lg border border-[var(--border-strong)] bg-white focus-within:border-[var(--primary)] focus-within:ring-2 focus-within:ring-[rgba(14,116,144,0.12)]">
-      <span className="shrink-0 pl-3 pr-1 font-mono-data text-[13px] font-bold text-[var(--foreground-secondary)]">THB</span>
+      <span className="shrink-0 pl-3 pr-1 font-mono-data text-[13px] font-bold text-[var(--foreground-secondary)]">{currencySymbol(businessCurrency())}</span>
       <input
         className="font-mono-data h-full min-w-0 flex-1 border-0 bg-transparent px-1 text-[13px] text-[var(--foreground)] outline-none"
         inputMode="numeric"

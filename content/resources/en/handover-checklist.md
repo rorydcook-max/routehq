@@ -6,7 +6,7 @@ fileLabel: "Checklist · 3 pages"
 formats: [docx, pdf]
 inside:
   - "Header for your business, the renter and the vehicle, with space for booking dates and deposit"
-  - "Side-by-side handover and return table: odometer, fuel, every body side, glass, lights, tyres, interior, keys and documents"
+  - "Side-by-side handover and return table: odometer, fuel, every body side, glass, lights, tires, interior, keys and documents"
   - "Accessories row for helmets, child seats, phone holders and chargers, with initials at each stage"
   - "Car damage grid by zone, from front bumper to rear lights, to mark scratches, dents and chips"
   - "Scooter damage grid: front fairing, side panels, seat, exhaust, mirrors, wheels and more"

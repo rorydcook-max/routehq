@@ -1,6 +1,6 @@
 ---
 title: "Free Spain car and scooter rental agreement (English–Spanish)"
-description: "Free bilingual rental agreement for Spain: DGT driver identification, consumer's own court, low-emission zones, B licence 125 cc rule, co-official languages, euro pricing."
+description: "Free bilingual rental agreement for Spain: DGT driver identification, consumer's own court, low-emission zones, B license 125 cc rule, co-official languages, euro pricing."
 date: 2026-11-03
 updated: 2026-11-03
 listed: false
@@ -10,17 +10,17 @@ inside:
   - "English beside Spanish, with a copy in Catalan, Basque or Galician on request where official"
   - "DGT driver identification so fines and points go to the renter"
   - "Consumers sue at home: no clause sending them to another court"
-  - "B licence held three years allows 125 cc motorbikes in Spain"
+  - "B license held three years allows 125 cc motorbikes in Spain"
   - "Low-emission zones (ZBE) and complaint forms"
   - "Handover check (Annex A), damage price list (Annex B) and signature blocks"
 ---
-Spain's consumer law treats a clause sending a consumer to a court other than their own as unfair ([Royal Legislative Decree 1/2007](https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555)), and courts have been strict about car-hire fuel and damage practices. This version is written to stay inside those rules.
+Spain's consumer law treats a clause sending a consumer to a court other than their own as unfair ([Royal Legislative Decree 1/2007](https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555)), and courts have been strict about car rental fuel and damage practices. This version is written to stay inside those rules.
 
 ## What the Spain version covers
 
 **Fines.** The owner must [identify the driver](https://www.boe.es/buscar/act.php?id=BOE-A-2015-11722) when the DGT or a city asks; the agreement says you will name the renter, so fines and points go to them.
 
-**Licences.** EU and EEA licences are valid; other visitors can drive for up to six months. A B licence held over three years also covers 125 cc motorbikes in Spain.
+**Licenses.** EU and EEA licenses are valid; other visitors can drive for up to six months. A B license held over three years also covers 125 cc motorbikes in Spain.
 
 **Language.** English beside Spanish; in regions with a co-official language the renter can ask for a copy in it (for example under the [Catalan Consumer Code](https://portaljuridic.gencat.cat/eli/es-ct/l/2010/07/20/22)).
 

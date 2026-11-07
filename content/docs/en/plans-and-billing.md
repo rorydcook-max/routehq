@@ -56,7 +56,7 @@ If you picked Free during the trial, you just carry on with Free.
 
 ## If a payment is late
 
-If your payment is more than 7 days overdue, or your plan is cancelled, you see **Your plan needs renewing**. Your data is safe. Tap **See plans** to renew.
+If your payment is more than 7 days overdue, or your plan is canceled, you see **Your plan needs renewing**. Your data is safe. Tap **See plans** to renew.
 
 Questions about paying? Tap **Write to us in Help** at the bottom of the page. See [Get help](/docs/get-help).
 

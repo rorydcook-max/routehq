@@ -18,7 +18,7 @@ Go to **Fleet** and tap **Add vehicle** (or **+**, then **Add a vehicle**). Only
 ## From a photo of the blue book
 
 1. Tap **Take or choose a photo** and take or pick a photo or PDF of the blue book (BPKB, OR/CR or your country's registration document).
-2. RoveHQ fills in what it can read: plate, make, model, year, colour, frame number, engine, and tax and insurance dates.
+2. RoveHQ fills in what it can read: plate, make, model, year, color, frame number, engine, and tax and insurance dates.
 3. Check every field before saving.
 
 If it can't read it, fill it in by hand or tap **Use a different photo**. The photo is kept with the vehicle's papers.
@@ -27,7 +27,7 @@ If it can't read it, fill it in by hand or tap **Use a different photo**. The ph
 
 - **Type of vehicle**: Car, Van, Motorbike, Scooter, E-bike or ATV.
 - **Make** and **Model**: pick from the list, or choose **Another make** / **Another model** and type it.
-- **Year**, **Version**, **Number plate**, **Colour**.
+- **Year**, **Version**, **Number plate**, **Color**.
 
 **More about the vehicle** (frame number, gearbox, seats, engine) is optional.
 

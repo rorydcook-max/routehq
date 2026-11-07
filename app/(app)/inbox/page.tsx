@@ -57,7 +57,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
     selected?.customer_id
       ? supabase
           .from("rentals")
-          .select("id, status, start_date, end_date, balance_due, reference, display_code, vehicles(make, model, registration_number)")
+          .select("id, status, start_date, end_date, balance_due, currency, reference, display_code, vehicles(make, model, registration_number)")
           .eq("organization_id", organization.id)
           .eq("customer_id", selected.customer_id)
           .is("deleted_at", null)

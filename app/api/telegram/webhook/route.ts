@@ -18,7 +18,8 @@ export async function POST(request: Request) {
 
   const match = text.match(/^\/start(?:@\w+)?\s+([A-Za-z0-9]{6,64})$/);
   if (!match) {
-    await sendTelegram(chatId, "Hello! To get RoveHQ alerts here, open RoveHQ › Settings › Integrations and tap \"Connect Telegram\".");
+    // Telegram is no longer an alert channel (Rory, 7 Nov 2026): alerts come by push and email.
+    await sendTelegram(chatId, "Hello! RoveHQ alerts now come by push and email. Turn them on in RoveHQ › Settings › Notifications.");
     return Response.json({ ok: true });
   }
 
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
   const settings = (org?.settings || {}) as Record<string, any>;
   const expired = !settings.telegram_link_expires || Date.parse(settings.telegram_link_expires) < Date.now();
   if (!org || expired) {
-    await sendTelegram(chatId, "That link has expired. Open RoveHQ › Settings › Integrations and tap \"Connect Telegram\" again.");
+    await sendTelegram(chatId, "That link has expired. RoveHQ alerts now come by push and email: turn them on in RoveHQ › Settings › Notifications.");
     return Response.json({ ok: true });
   }
 

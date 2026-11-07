@@ -10,7 +10,7 @@ faq:
   - q: "Do I need a written rental agreement if I only rent out a few scooters?"
     a: "It is strongly recommended. A short signed agreement with photos of the vehicle gives you and the renter the same record of what was agreed, which makes disagreements about damage, fuel or late return much easier to settle. Whether a written contract is legally required depends on your country and how your business is registered, so check locally."
   - q: "Can I keep a renter's passport as a deposit?"
-    a: "Many places restrict or prohibit holding someone's passport, and travellers may need it for hotels and checkpoints. A cash or card deposit plus a photocopy or photo of the passport and licence is the safer, more common approach. Check the rules where you operate."
+    a: "Many places restrict or prohibit holding someone's passport, and travelers may need it for hotels and checkpoints. A cash or card deposit plus a photocopy or photo of the passport and license is the safer, more common approach. Check the rules where you operate."
   - q: "Should the agreement be in English or the local language?"
     a: "Ideally both. A bilingual agreement means the renter understands what they sign and the document still works if it ever has to be shown to local police, an insurer or a court. If you use only one language, ask a local adviser which version would be relied on in a dispute."
   - q: "Is a template enough, or do I need a lawyer?"
@@ -27,7 +27,7 @@ This guide walks through what a good vehicle rental agreement covers, clause by 
 
 Start with who is renting what. Write the full legal name of your business (or your own name if you trade as an individual), your address and how to reach you. For the renter, record their full name as it appears on their passport or ID, their nationality, a phone number they will answer during the rental, and where they are staying.
 
-Then describe the vehicle precisely: make, model, year, colour, registration (plate) number and, if you track it, the chassis or engine number. Add the odometer reading and fuel level at handover. If a helmet, child seat, phone holder or second key goes with the vehicle, list it, so a missing item is never a matter of opinion.
+Then describe the vehicle precisely: make, model, year, color, registration (plate) number and, if you track it, the chassis or engine number. Add the odometer reading and fuel level at handover. If a helmet, child seat, phone holder or second key goes with the vehicle, list it, so a missing item is never a matter of opinion.
 
 ## Rental period and return
 
@@ -51,19 +51,19 @@ Then explain what happens if there is new damage:
 
 ## Fuel and mileage
 
-Say what fuel level the vehicle goes out with and how it must come back. A common rule is "same level as at pickup", with a refuelling charge if it comes back lower. If there is a daily or total kilometre limit, state it, along with the charge per extra kilometre. If there is no limit, write "unlimited" so nobody has to wonder.
+Say what fuel level the vehicle goes out with and how it must come back. A common rule is "same level as at pickup", with a refuelling charge if it comes back lower. If there is a daily or total kilometer limit, state it, along with the charge per extra kilometer. If there is no limit, write "unlimited" so nobody has to wonder.
 
-## Who may drive, and licences
+## Who may drive, and licenses
 
-List every person allowed to drive, with their licence number, issuing country and expiry date. Require a licence valid for that class of vehicle: a car licence does not always cover a motorbike, and many countries expect foreign drivers to carry an International Driving Permit alongside their home licence. Make the renter responsible for anyone they let drive who is not on the agreement.
+List every person allowed to drive, with their license number, issuing country and expiry date. Require a license valid for that class of vehicle: a car license does not always cover a motorbike, and many countries expect foreign drivers to carry an International Driving Permit alongside their home license. Make the renter responsible for anyone they let drive who is not on the agreement.
 
 ## Insurance and what it doesn't cover
 
-Describe the insurance on the vehicle in plain words: what type it is, roughly what it covers, and the excess. Just as important is what it does **not** cover. Typical exclusions include driving without a valid licence, driving under the influence of alcohol or drugs, off-road use, and unauthorised drivers. Tell renters about these exclusions before they sign, because these are the cases where they may have to pay for everything themselves.
+Describe the insurance on the vehicle in plain words: what type it is, roughly what it covers, and the excess. Just as important is what it does **not** cover. Typical exclusions include driving without a valid license, driving under the influence of alcohol or drugs, off-road use, and unauthorized drivers. Tell renters about these exclusions before they sign, because these are the cases where they may have to pay for everything themselves.
 
 ## Accidents, breakdowns and police reports
 
-Set out what the renter must do after an accident: make sure everyone is safe, call you straight away, not admit liability or agree a private settlement without you, take photos, and get a police report where one is needed for the insurance claim. For breakdowns, say who to call and that the renter must not authorise repairs without your approval, except to keep people safe.
+Set out what the renter must do after an accident: make sure everyone is safe, call you straight away, not admit liability or agree a private settlement without you, take photos, and get a police report where one is needed for the insurance claim. For breakdowns, say who to call and that the renter must not authorize repairs without your approval, except to keep people safe.
 
 ## Traffic fines and tolls
 
@@ -85,7 +85,7 @@ Say which country's law applies to the agreement and where any dispute would be 
 
 ## Signatures and ID copies
 
-Finish with the date, the names and signatures of both parties, and a note of the ID documents you have seen or copied (passport, licence, International Driving Permit). Keep a copy of the signed agreement, the condition photos and the ID copies together for each rental, for as long as fines or claims could still arrive.
+Finish with the date, the names and signatures of both parties, and a note of the ID documents you have seen or copied (passport, license, International Driving Permit). Keep a copy of the signed agreement, the condition photos and the ID copies together for each rental, for as long as fines or claims could still arrive.
 
 ## Make it easy to sign
 

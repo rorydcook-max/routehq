@@ -7,8 +7,8 @@ appPath: "/bookings"
 related: ["rental-agreements", "deposits", "handover-checks", "create-a-booking"]
 updated: 2026-11-02
 faq:
-  - q: "I cancelled by mistake. Can I undo it?"
-    a: "Yes. Open the booking and tap Undo cancellation. Refunds you recorded when cancelling are not reversed."
+  - q: "I canceled by mistake. Can I undo it?"
+    a: "Yes. Open the booking and tap Undo cancellation. Refunds you recorded when canceling are not reversed."
   - q: "Why can't I edit the price on the edit page?"
     a: "Once the customer has signed, the terms are fixed. Use Change terms on the booking so they sign the change."
 ---
@@ -48,19 +48,19 @@ If the vehicle hasn't gone out and the customer hasn't signed, **Change terms** 
 ## Cancel a booking
 
 1. **More** > **Cancel booking**.
-2. Tick why (customer cancelled before handover, ended early, breakdown, cancelled by us, other).
+2. Tick why (customer canceled before handover, ended early, breakdown, canceled by us, other).
 3. Choose how money is handled: full, part or no refund, and whether the deposit is returned or kept. This only updates your records. The money itself moves outside RoveHQ.
 4. Choose what happens to the vehicle: **Available to rent**, **Send for repair**, or **Keep current status**.
 5. Check **What will happen** and tap **Confirm cancellation**.
 
-The customer's link stops working. Unpaid future payments are cancelled.
+The customer's link stops working. Unpaid future payments are canceled.
 
 For a test or duplicate booking, use **Delete booking** from the menu in the bookings list instead. Use **Cancel booking** for real ones.
 
 ## Common questions
 
-**I cancelled by mistake. Can I undo it?**
-Yes. Open the booking and tap **Undo cancellation**. Refunds you recorded when cancelling are not reversed.
+**I canceled by mistake. Can I undo it?**
+Yes. Open the booking and tap **Undo cancellation**. Refunds you recorded when canceling are not reversed.
 
 **Why can't I edit the price on the edit page?**
 Once the customer has signed, the terms are fixed. Use **Change terms** on the booking so they sign the change.

@@ -9,7 +9,7 @@ const TABS = [
   { href: "/platform/businesses", label: "Businesses" },
   { href: "/platform/setup", label: "Set it up for me" },
   { href: "/platform/users", label: "Users" },
-  { href: "/platform/catalog", label: "Vehicle catalogue" },
+  { href: "/platform/catalog", label: "Vehicle catalog" },
   { href: "/platform/log", label: "Admin log" },
   { href: "/platform/renters", label: "Renters" },
   { href: "/platform/messages", label: "Messages" },
@@ -58,6 +58,6 @@ export function StatusPill({ status }: { status: string }) {
     expired: "bg-[var(--panel-tertiary)] text-[var(--muted)]",
     cancelled: "bg-[var(--danger-light)] text-[var(--danger)]"
   };
-  const label: Record<string, string> = { trial: "Free trial", active: "Paying", past_due: "Payment late", expired: "Trial ended", cancelled: "Cancelled" };
+  const label: Record<string, string> = { trial: "Free trial", active: "Paying", past_due: "Payment late", expired: "Trial ended", cancelled: "Canceled" };
   return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[13px] font-bold ${tone[status] || tone.expired}`}>{label[status] || status}</span>;
 }

@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { savePublicBookingSettings } from "@/app/actions/online-booking";
+import { MoneyInput } from "@/components/money-input";
+import { businessCurrency } from "@/lib/business-units";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -12,7 +14,7 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
  * bookings the owner makes and on online ones. It used to sit inside the
  * online booking settings, out of reach for a business with that switched off.
  */
-export function UsualDepositPanel({ currency = "฿", deposit, enabled, holdHours, offer }: { currency?: string; deposit: number; enabled: boolean; holdHours: number; offer: string }) {
+export function UsualDepositPanel({ currency = "", currencyCode = businessCurrency(), deposit, enabled, holdHours, offer }: { currency?: string; currencyCode?: string; deposit: number; enabled: boolean; holdHours: number; offer: string }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const router = useRouter();
   const [value, setValue] = useState(deposit > 0 ? String(deposit) : "");
@@ -33,27 +35,26 @@ export function UsualDepositPanel({ currency = "฿", deposit, enabled, holdHour
   return (
     <div className="space-y-2">
       <p className="font-medium text-[var(--foreground-secondary)]">{say("ud_body")}</p>
-      <label className="block sm:max-w-xs">
+      {/* The business's currency symbol sits inside the box (7 Nov 2026); saved when you leave the box or press Enter. */}
+      <label
+        className="block sm:max-w-xs"
+        onBlur={save}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            save();
+          }
+        }}
+      >
         <span className="font-semibold text-[var(--foreground)]">{say("ud_label", { currency })}</span>
-        <input
-          className="mt-1 block w-full"
-          disabled={isPending}
-          inputMode="numeric"
-          min="0"
-          onBlur={save}
-          onChange={(event) => {
-            setValue(event.target.value);
+        <MoneyInput
+          currency={currencyCode}
+          defaultValue={value}
+          name="usual_deposit"
+          onValueChange={(amount) => {
+            setValue(amount);
             setState("idle");
           }}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              save();
-            }
-          }}
-          placeholder="0"
-          type="number"
-          value={value}
         />
       </label>
       {state === "saved" ? <p className="font-semibold text-[var(--success)]">{say("saved")}</p> : null}

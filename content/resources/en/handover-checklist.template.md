@@ -16,9 +16,9 @@ tall: ["Renter signature", "Staff signature", "Notes"]
 | Booking or agreement number | ______________________________ |
 | Renter name | ______________________________ |
 | Renter phone | ______________________________ |
-| Passport / ID / licence number | ______________________________ |
+| Passport / ID / license number | ______________________________ |
 | Vehicle make and model | ______________________________ |
-| Colour | ______________________________ |
+| Color | ______________________________ |
 | Plate number | ______________________________ |
 | Handover date and time | ______________________________ |
 | Agreed return date and time | ______________________________ |
@@ -39,7 +39,7 @@ tall: ["Renter signature", "Staff signature", "Notes"]
 | Roof / top | ______ | ______ |
 | Glass and mirrors | ______ | ______ |
 | Lights and indicators (working?) | ______ | ______ |
-| Tyres and wheels | ______ | ______ |
+| Tires and wheels | ______ | ______ |
 | Interior and seats (clean, no burns or stains) | ______ | ______ |
 | Keys (number of keys) | ______ | ______ |
 | Registration copy / tax disc / insurance papers | ______ | ______ |
@@ -86,8 +86,8 @@ Mark each zone at handover (H) and return (R) using the marking key. Leave blank
 | Front mudguard | ___ | ___ | Rear mudguard | ___ | ___ |
 | Floorboard / footrests | ___ | ___ | Seat | ___ | ___ |
 | Under-seat storage | ___ | ___ | Exhaust | ___ | ___ |
-| Front wheel and tyre | ___ | ___ | Rear wheel and tyre | ___ | ___ |
-| Brake levers | ___ | ___ | Kickstand / centre stand | ___ | ___ |
+| Front wheel and tire | ___ | ___ | Rear wheel and tire | ___ | ___ |
+| Brake levers | ___ | ___ | Kickstand / center stand | ___ | ___ |
 | Number plate | ___ | ___ | Top box / rack | ___ | ___ |
 
 ---
@@ -108,7 +108,7 @@ Take the same 12 photos at handover and at return, in the same order. Check that
 | 8 | Front right corner | ☐ | ☐ |
 | 9 | Odometer and fuel gauge (engine on) | ☐ | ☐ |
 | 10 | Interior / seat and storage | ☐ | ☐ |
-| 11 | Tyres and wheels (close-up of any wear) | ☐ | ☐ |
+| 11 | Tires and wheels (close-up of any wear) | ☐ | ☐ |
 | 12 | Close-up of every existing mark found | ☐ | ☐ |
 
 ## Notes

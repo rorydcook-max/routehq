@@ -23,16 +23,16 @@ Most customers add themselves through the booking link. To add one yourself:
 
 1. **Customers** > **Add customer**.
 2. Name and phone are enough. Pick the **Country code** and type the number.
-3. Optional: chat apps and email, photos of their passport and driving licence, an emergency contact, and notes.
+3. Optional: chat apps and email, photos of their passport and driver's license, an emergency contact, and notes.
 4. Tap **Save customer**.
 
 If that phone number is already saved, RoveHQ tells you and lets you open the existing customer.
 
-## Passport and licence photos
+## Passport and license photos
 
-When a customer adds their passport and licence on their booking link, RoveHQ reads the photos and fills in their name and document numbers for them to check. Returning customers don't have to add them again.
+When a customer adds their passport and license on their booking link, RoveHQ reads the photos and fills in their name and document numbers for them to check. Returning customers don't have to add them again.
 
-On the customer's page, the **Documents** tab shows what you have (passport, driving licence, photo of the customer). Tap **Add a photo** to add one yourself (these aren't read for you; type the numbers in **Edit details**). RoveHQ warns you when a passport or licence has run out.
+On the customer's page, the **Documents** tab shows what you have (passport, driver's license, photo of the customer). Tap **Add a photo** to add one yourself (these aren't read for you; type the numbers in **Edit details**). RoveHQ warns you when a passport or license has run out.
 
 ## The customer page
 
@@ -40,11 +40,11 @@ At the top: what they owe now, total spent, days rented, and buttons to **Call**
 
 Tabs:
 
-- **Documents**: passport, licence, photo and other files.
+- **Documents**: passport, license, photo and other files.
 - **Rentals**: every rental, with dates, rent paid, km driven and what happened to the deposit.
 - **Payments**: everything they've paid.
 - **Messages**: ready-made messages and a record of contact.
-- **Details**: contact info, passport and licence numbers, language for their messages and agreement, and **Notes** (only your team sees these; they save when you tap away). Tap **Edit details** to change them.
+- **Details**: contact info, passport and license numbers, language for their messages and agreement, and **Notes** (only your team sees these; they save when you tap away). Tap **Edit details** to change them.
 
 ## Don't rent to them again
 

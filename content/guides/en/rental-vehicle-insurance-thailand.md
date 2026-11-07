@@ -56,7 +56,7 @@ Voluntary insurance (ประกันภัยภาคสมัครใจ) 
 | Fire | Yes | Yes | No | Yes | No |
 | Flood | Yes | Add-on | No | No | No |
 
-For rental cars, ชั้น 1 is the usual choice because renters have single-vehicle accidents: hitting a wall, a ditch or a kerb. Under ชั้น 2+ or 3+ those are not covered, because there is no identified other vehicle. Since 1 January 2026, the minimum third-party death and permanent disability limit on new voluntary car policies is ฿20 million per accident at existing premium rates ([Daily News](https://www.dailynews.co.th/news/5067409/)).
+For rental cars, ชั้น 1 is the usual choice because renters have single-vehicle accidents: hitting a wall, a ditch or a curb. Under ชั้น 2+ or 3+ those are not covered, because there is no identified other vehicle. Since 1 January 2026, the minimum third-party death and permanent disability limit on new voluntary car policies is ฿20 million per accident at existing premium rates ([Daily News](https://www.dailynews.co.th/news/5067409/)).
 
 Green-plate rental cars have an extra requirement. The DLT's rules on registering service cars require insurance beyond พ.ร.บ., and the standard rental contract asks you to write in that policy's insurer and number. See [which registration you need](/guides/thailand-rental-vehicle-plates).
 
@@ -82,9 +82,9 @@ The voluntary car insurance rules changed recently. Under the OIC's new tariff, 
 For a rental business this matters in two ways:
 
 - A personal-use, named-driver policy does not fit a car driven by a different renter every week. If an unnamed driver crashes, Chubb's summary lists a compulsory excess of at least ฿2,000 for third-party property damage and ฿6,000 for damage to the insured car.
-- A policy written for rental or commercial use, on an any-driver basis, is what you want. Ask the insurer which drivers are acceptable: minimum age, licence held for how long, foreign licences and international driving permits.
+- A policy written for rental or commercial use, on an any-driver basis, is what you want. Ask the insurer which drivers are acceptable: minimum age, license held for how long, foreign licenses and international driving permits.
 
-Then match your contract to the policy. If the insurer covers drivers aged 21 and over with a valid licence for that class, your agreement should say the same, and only the renters you record may drive.
+Then match your contract to the policy. If the insurer covers drivers aged 21 and over with a valid license for that class, your agreement should say the same, and only the renters you record may drive.
 
 ## Excess (ค่าเสียหายส่วนแรก) and passing it to renters fairly
 
@@ -122,7 +122,7 @@ Give every renter a short card or message with these steps, and follow your own:
 1. **Safety first.** Injured people get help; call 1669 for medical emergencies and 191 for police. Tourist Police are on 1155.
 2. **Don't move the vehicles** until photos are taken, unless they block traffic dangerously.
 3. **Call the insurer's claims line**, printed on the policy, and wait for the assessor. Most Thai insurers send someone to the scene.
-4. **Photos and video**: all vehicles, plates, damage, road, signs, the other party's licence and insurance.
+4. **Photos and video**: all vehicles, plates, damage, road, signs, the other party's license and insurance.
 5. **Don't sign anything** admitting fault without the assessor; the renter should call you first.
 6. **Police report** if anyone is injured, the other party disputes fault, or the vehicle is stolen.
 7. **Replacement vehicle.** Under the standard contract forms, you must provide a similar vehicle if the rented one is off the road for more than one day because of an accident, unless the renter caused it by breaking the law.
@@ -135,9 +135,9 @@ RoveHQ stores timestamped handover photos with each booking, so you can show the
 Your agreement should leave no doubt about what's covered. The official forms require you to list your compulsory insurer and policy number, and the voluntary policy if required. Beyond that, include:
 
 - **Policy summary**: insurer, class, policy number, expiry date and the excess.
-- **Who may drive**: the named renter and any additional drivers you approve, matching the policy's age and licence rules.
+- **Who may drive**: the named renter and any additional drivers you approve, matching the policy's age and license rules.
 - **Renter's liability**: the maximum they pay per incident when at fault, and the exclusions where they pay everything.
-- **What's not covered**: personal belongings, tyres and windscreens (if your policy excludes them), and off-road use.
+- **What's not covered**: personal belongings, tires and windscreens (if your policy excludes them), and off-road use.
 - **Accident procedure**: call you and the insurer, no private settlements without your agreement.
 - **Theft procedure** for motorbikes, including returning the keys.
 - **Fines**: renter pays fines incurred during the rental, at actual cost.

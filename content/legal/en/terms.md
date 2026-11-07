@@ -27,7 +27,7 @@ RoveHQ is software for running a vehicle rental business: vehicles, bookings, re
 
 - New businesses get a free trial. After it, you choose a plan or move to the free plan if one is offered.
 - Prices are shown on our [pricing page](/pricing) in your currency. Taxes are added where required.
-- Paid plans renew each month or year until cancelled. You can cancel at any time; the plan runs until the end of the period you paid for. We don't refund partial periods, except where these terms or the law say so.
+- Paid plans renew each month or year until canceled. You can cancel at any time; the plan runs until the end of the period you paid for. We don't refund partial periods, except where these terms or the law say so.
 - If a payment is late, we may limit your account after 7 days' notice. We never delete your data for late payment without telling you first.
 - We may change prices with at least 30 days' notice. The new price applies from your next renewal.
 
@@ -35,7 +35,7 @@ RoveHQ is software for running a vehicle rental business: vehicles, bookings, re
 
 - **Your data and your renters.** You are the *controller* of the information about your renters, drivers and team that you put in RoveHQ. You must have a lawful basis for it, tell your renters how you use it (your own privacy notice; you can link to how RoveHQ handles it), answer their requests, and keep only what you need.
 - **Lawful use.** Use RoveHQ only for lawful rental business. Don't upload anything you don't have the right to, don't try to break or overload RoveHQ, and don't use it to harass, discriminate against or spy on people.
-- **Agreements and prices.** Rental agreements, prices, deposits and fees are between you and your renters. You're responsible for checking that your agreement, insurance and local licences are right for your country. Templates in RoveHQ are a starting point, not legal advice.
+- **Agreements and prices.** Rental agreements, prices, deposits and fees are between you and your renters. You're responsible for checking that your agreement, insurance and local licenses are right for your country. Templates in RoveHQ are a starting point, not legal advice.
 - **Payments from renters.** Renters pay you directly by the methods you choose. RoveHQ records payments; it doesn't hold your money unless a feature clearly says so.
 
 ## 6. Shared customer history
@@ -55,7 +55,7 @@ RoveHQ combines the prices businesses set for each vehicle model into **unnamed 
 ## 8. Public booking pages, the directory and the marketplace
 
 - If you turn on a public booking page or a directory listing, your **business name, vehicles, photos, prices and availability are shown publicly** on RoveHQ's sites (including rove.rent) and may be found by search engines.
-- Keep them accurate. Honour bookings made at the prices and availability you showed.
+- Keep them accurate. Honor bookings made at the prices and availability you showed.
 - When a renter books through RoveHQ's marketplace, **a service fee applies**. The fee and how it's charged are shown in the app before you turn the marketplace on, and on each booking. Bookings through your own booking link carry no RoveHQ fee unless your plan says otherwise.
 - We may remove a listing that is misleading, unsafe or breaks these terms.
 

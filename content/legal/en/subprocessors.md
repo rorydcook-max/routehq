@@ -21,7 +21,7 @@ A sub-processor is a company RoveHQ uses that may handle personal information th
 
 | Company | What it does | Where | Safeguard |
 |---|---|---|---|
-| Anthropic, PBC | Reads passports, licences, receipts and payment slips (main provider) | United States | EU SCCs + UK Addendum in Anthropic's commercial terms; no training on customer data |
+| Anthropic, PBC | Reads passports, licenses, receipts and payment slips (main provider) | United States | EU SCCs + UK Addendum in Anthropic's commercial terms; no training on customer data |
 | OpenAI, L.L.C. | Back-up photo reading, used only if Anthropic is unavailable | United States | EU SCCs + UK Addendum in OpenAI's DPA; API data not used for training |
 | Google LLC (Gemini API) | Second back-up photo reading | United States / Google's global network | EU SCCs + UK Addendum in Google's data processing terms |
 

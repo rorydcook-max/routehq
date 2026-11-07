@@ -143,7 +143,7 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
       <AdminHeader
         active="/platform/catalog"
         subtitle={waiting > 0 ? `${waiting} suggestion${waiting === 1 ? "" : "s"} from operators waiting for review. The makes, models and trims every business picks from.` : "The makes, models and trims every business picks from, and operators' suggestions."}
-        title="Vehicle catalogue"
+        title="Vehicle catalog"
       />
       <div className="card p-4">
           <div className="mt-3">
@@ -153,7 +153,7 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
                 {waiting > 0 ? <span className="rounded-full bg-[var(--warning-light)] px-3 py-1 text-sm font-bold text-[var(--warning)]">{waiting} to review</span> : null}
               </div>
               <p className="mt-2 text-xs text-[var(--muted)]">
-                Captured when an operator saves a vehicle with a make, model or trim that isn't in the catalogue.
+                Captured when an operator saves a vehicle with a make, model or trim that isn't in the catalog.
               </p>
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex flex-wrap gap-2">

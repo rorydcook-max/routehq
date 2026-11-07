@@ -65,7 +65,7 @@ For payments, RentSyst's FAQ has integration guides for [Stripe](https://rentsys
 - **Very small fleets.** Free for up to 2 cars and 5 motorbikes, with no time limit, and €13 (US$15, £11) a month for up to 5 cars and 10 motorbikes. Cars and motorbikes are counted separately, so a scooter-heavy shop pays less.
 - **Set up yourself.** Sign up and start in a few minutes, with no onboarding package to buy, and import your RentSyst data free.
 - **Handover on a phone.** Odometer read from a photo, fuel, walkaround video, damage diagram and signature, compared automatically at return. Hold a deposit on the customer's card and release or capture it at return.
-- **Agreements and ID.** An agreement for every booking in English and the local language in 18 countries across Southeast Asia and Europe, signed on the customer's phone, with passport and licence photos read for you.
+- **Agreements and ID.** An agreement for every booking in English and the local language in 18 countries across Southeast Asia and Europe, signed on the customer's phone, with passport and license photos read for you.
 - **Every way customers pay.** Card, Apple Pay, Google Pay and European methods online, and cash, transfer or QR with slips checked against what's owed (including PromptPay and QRIS).
 - **Languages and chat.** 28 languages for staff and customers; LINE and Telegram in one inbox with automatic reminders.
 
@@ -73,12 +73,12 @@ For payments, RentSyst's FAQ has integration guides for [Stripe](https://rentsys
 
 **Choose RentSyst if** GPS tracking and telematics matter to you, you want a European payment gateway other than Stripe, or you have 15 vehicles or more and expect to grow. It also suits car sharing and taxi fleets.
 
-**Choose RoveHQ if** you run a small shop with up to a few dozen cars, scooters, motorbikes, quads or vans and want to work from your phone: card payments and deposits online, agreements written for you, licence checks and handover photos, with a free plan to start.
+**Choose RoveHQ if** you run a small shop with up to a few dozen cars, scooters, motorbikes, quads or vans and want to work from your phone: card payments and deposits online, agreements written for you, license checks and handover photos, with a free plan to start.
 
 Comparing more tools? See our [roundup of car and scooter rental software for small businesses](/guides/best-car-scooter-rental-software).
 
 ## Switching from RentSyst
 
-RentSyst's FAQ explains how to download your vehicle list from the Park tab as XLS or CSV, and orders and clients the same way. Our [guide to switching from RentSyst](/switch/rentsyst) has the steps. RoveHQ recognises RentSyst's files and links each order to its car and client. The import is free, you check everything before it's saved, and you can undo it within 30 days.
+RentSyst's FAQ explains how to download your vehicle list from the Park tab as XLS or CSV, and orders and clients the same way. Our [guide to switching from RentSyst](/switch/rentsyst) has the steps. RoveHQ recognizes RentSyst's files and links each order to its car and client. The import is free, you check everything before it's saved, and you can undo it within 30 days.
 
 [Create a free RoveHQ account](/signup) and try it with your own vehicles.

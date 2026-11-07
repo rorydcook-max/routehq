@@ -10,6 +10,7 @@ import { buildAssumptions, evaluate, flatResaleCurve, yearlyLossPct } from "@/li
 import { rentForAge } from "@/lib/rent-age";
 import { businessDistanceUnit, distanceKey } from "@/lib/business-units";
 import { fromKm, toKm } from "@/lib/regional";
+import { currencySymbol } from "@/components/currency-symbol";
 import type { Assumptions, Outcome, RentStyle, Research, Verdict } from "@/lib/vehicle-investment";
 import type { ChecksLeft } from "@/lib/purchase-checks";
 import Link from "next/link";
@@ -610,7 +611,7 @@ export function CalculatorClient({
             </label>
           ) : null}
           {/* No empty half-row beside Year: the price moves up next to it when there is no version to choose. */}
-          <Num label={t("price")} onChange={setPrice} prefix={currency === "THB" ? "฿" : currency} value={price} />
+          <Num label={t("price")} onChange={setPrice} prefix={currencySymbol(currency)} value={price} />
           {/* Typed in the business's unit; kept in km for the sums and the used-car research. */}
           <Num label={t(distanceKey("mileage"))} onChange={(value) => setMileage(Math.round(toKm(value, distanceUnit)))} suffix={distanceUnit} value={Math.round(fromKm(mileage, distanceUnit))} />
         </div>
@@ -748,7 +749,7 @@ export function CalculatorClient({
                   }
                   label={style === "daily" ? t("rentYoursDaily") : style === "mix" ? t("rentYoursMix") : t("rentYours")}
                   onChange={setRent}
-                  suffix={currency === "THB" ? "฿" : currency}
+                  suffix={currencySymbol(currency)}
                   value={assumptions.rentMonthly}
                 />
               </div>
@@ -801,7 +802,7 @@ export function CalculatorClient({
                 <Stat label={say("b_total", { years: best.year })} value={about(best.profit)} />
                 <Stat label={t("moneyBack")} value={outcome.expected.paybackMonths ? say("monthsCount", { months: outcome.expected.paybackMonths }) : t("notFromRent")} />
                 <Stat
-                  hint={say("b_returnHint", { amount: Math.round(assumptions.financed ? outcome.expected.cashReturnPct : outcome.expected.returnPct) })}
+                  hint={say("b_returnHint", { amount: Math.round(assumptions.financed ? outcome.expected.cashReturnPct : outcome.expected.returnPct), symbol: currencySymbol(currency) })}
                   label={assumptions.financed ? t("returnOnCash") : t("b_return")}
                   value={say("pctYear", { pct: (assumptions.financed ? outcome.expected.cashReturnPct : outcome.expected.returnPct).toFixed(1) })}
                 />

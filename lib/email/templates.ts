@@ -14,7 +14,8 @@ import type { EmailWords } from "@/lib/email/words";
 
 export type BuiltEmail = { subject: string; text: string; html: string };
 
-const settingsUrl = (appUrl: string) => (appUrl ? `${appUrl}/settings/notifications` : "");
+// Settings › Notifications is a tab on the settings page (7 Nov 2026); /settings/notifications redirects there too.
+const settingsUrl = (appUrl: string) => (appUrl ? `${appUrl}/settings?tab=notifications` : "");
 
 /** Split text around a marker (used to drop a designed block where a translated sentence had a placeholder). */
 function around(text: string, marker: string): [string, string] {

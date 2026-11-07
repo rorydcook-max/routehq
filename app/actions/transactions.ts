@@ -18,7 +18,6 @@ import { normalizeTransactionType } from "@/lib/import/normalize";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildDocumentStoragePath } from "@/services/documents/storage-path";
-import { notifyPaymentReceived } from "@/lib/line/notifications";
 import { buildPaymentReminderMessage, sendLineMessage } from "@/services/messaging/line";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { findMatchingOutstandingItems } from "@/lib/transaction-matching";
@@ -475,13 +474,8 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     customer_id: customerId,
     event_type: "payment_received",
     title: "Cash payment received",
-    detail: `Rental payment ${rentalPaymentAmount} THB and deposit ${depositAmount} THB received at handover.`
+    detail: `Rental payment ${niceMoney(rentalPaymentAmount)} and deposit ${niceMoney(depositAmount)} received at handover.`
   });
-
-  if (rentalPaymentAmount > 0) {
-    const vehicleLabel = [vehicleMakeModel, vehiclePlate].filter(Boolean).join(" ");
-    notifyPaymentReceived({ organizationId, amount: rentalPaymentAmount, customerName, vehicleLabel }).catch(() => null);
-  }
 
   // No revalidatePath here on purpose: it re-renders the open handover form mid-way (slow on a phone signal).
   // Finishing the handover refreshes every page that shows this money.
@@ -764,19 +758,10 @@ export async function createTransaction(formData: FormData) {
     customer_id: customerId,
     event_type: "transaction_created",
     title: `Transaction recorded: ${type}`,
-    detail: rentalPaymentId ? `Amount ${amount} THB linked to rental payment.` : `Amount ${amount} THB`
+    detail: rentalPaymentId ? `Amount ${niceMoney(amount)} linked to rental payment.` : `Amount ${niceMoney(amount)}`
   });
 
-  if (type === "rental_income" && vehicleId) {
-    const [vehicleRes, customerRes] = await Promise.all([
-      supabase.from("vehicles").select("make, model, registration_number").eq("id", vehicleId).maybeSingle(),
-      customerId ? supabase.from("customers").select("full_name").eq("id", customerId).maybeSingle() : Promise.resolve({ data: null })
-    ]);
-    const v = vehicleRes.data;
-    const vehicleLabel = v ? `${v.make} ${v.model} (${v.registration_number})` : vehicleId;
-    const customerName = customerRes.data?.full_name || "Customer";
-    notifyPaymentReceived({ organizationId, amount, customerName, vehicleLabel }).catch(() => null);
-  }
+  // No LINE message here any more: alerts go by push and email (Rory, 7 Nov 2026); LINE is only the morning summary.
 
   revalidatePath("/");
   revalidatePath("/transactions");
@@ -1063,7 +1048,7 @@ export async function deleteTransaction(transactionId: string) {
       customer_id: transaction.customer_id,
       event_type: "correction",
       title: "Transaction deleted",
-      detail: `Transaction deleted: ${String(transaction.type || "").replace(/_/g, " ")} THB ${Math.round(Math.abs(Number(transaction.amount || 0))).toLocaleString()}`,
+      detail: `Transaction deleted: ${String(transaction.type || "").replace(/_/g, " ")} ${niceMoney(Math.abs(Number(transaction.amount || 0)), transaction.currency || undefined)}`,
       metadata: { deleted_transaction_id: transaction.id, is_deposit: isDeposit }
     });
   }

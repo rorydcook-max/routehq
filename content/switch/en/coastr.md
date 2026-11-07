@@ -11,7 +11,7 @@ steps:
   - "In RoveHQ, open Fleet, then Import, choose Coastr and upload the files. Several at once is fine."
   - "Check the vehicles, bookings and payments it found, then bring them in."
 ---
-Coastr is UK car and van hire software. Its help centre explains how to download vehicle tracking and trip data as CSV from Reports, but we couldn't find an article on exporting bookings or customers, so those steps are general. Any Excel or CSV file works: RoveHQ reads the columns, shows you what it found, and you correct anything before it's saved.
+Coastr is UK car and van hire software. Its help center explains how to download vehicle tracking and trip data as CSV from Reports, but we couldn't find an article on exporting bookings or customers, so those steps are general. Any Excel or CSV file works: RoveHQ reads the columns, shows you what it found, and you correct anything before it's saved.
 
 ## Free import
 

@@ -11,7 +11,7 @@ export const ADMIN_SEGMENTS = [
   { key: "starter", label: "Starter" },
   { key: "pro", label: "Pro" },
   { key: "business", label: "Business" },
-  { key: "cancelled", label: "Cancelled" },
+  { key: "cancelled", label: "Canceled" },
   { key: "no_vehicles", label: "No vehicles" },
   { key: "inactive_14", label: "Inactive 14 days" }
 ] as const;

@@ -30,7 +30,7 @@ You paid for a repair, a fine or fuel, and the customer should cover it. You rec
 
 ## Traffic fines
 
-Fines often arrive weeks later. Open the vehicle and tap **Record a fine**. Set the date of the offence: whoever had the vehicle that day is billed, and it comes out of their deposit if you still hold it.
+Fines often arrive weeks later. Open the vehicle and tap **Record a fine**. Set the date of the offense: whoever had the vehicle that day is billed, and it comes out of their deposit if you still hold it.
 
 ## From any cost
 

@@ -18,7 +18,7 @@ The question every Cyprus renter asks is whether they can drive to the north. In
 
 ## What the Cyprus version covers
 
-**Language.** English beside Greek. Instead of making one version prevail, the meaning more favourable to the renter applies, as EU unfair-terms law reads doubtful terms anyway.
+**Language.** English beside Greek. Instead of making one version prevail, the meaning more favorable to the renter applies, as EU unfair-terms law reads doubtful terms anyway.
 
 **Driving.** Left-hand traffic, child restraints under 12 years and 150 cm, and the alcohol limits for new and professional drivers.
 

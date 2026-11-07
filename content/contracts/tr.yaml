@@ -16,7 +16,7 @@ locale: tr
 language: Turkish
 currency: TRY
 prevailing_language:
-  en: the version more favourable to the Renter
+  en: the version more favorable to the Renter
   local: Kiracı lehine olan metin
 local_language:
   en: Turkish
@@ -87,9 +87,9 @@ sources:
   - url: https://www.resmigazete.gov.tr/eskiler/2014/11/20141127-6.htm
     supports: "Distance Contracts Regulation (Resmî Gazete 27 Nov 2014, No. 29188), art. 15(1)(ğ): no right of withdrawal for car rental to be performed on a specific date or period (cancellation.7)."
   - url: https://www.hukukihaber.net/motorlu-kara-tasitlarinin-kiralanmasi-hakkinda-yonetmelik/amp
-    supports: "Regulation on the Rental of Motor Land Vehicles (Ministry of Trade, Resmî Gazete 15 Aug 2026, No. 33341, in force 1 Jan 2027; text as reproduced, check against the Gazette): art. 4 short-term rental up to 29 days, M1/M1G/N1/N1G; art. 5-6 authorisation certificate (yetki belgesi); art. 10 written or electronic contract, pre-contract information and its required content (authorisation number, MERSİS/tax number, vehicle, fuel, gearbox, deposit, insurance excess, tolls and fines); art. 11 cancellation and no-show limits; art. 12 handover and return documents; art. 13(8) no charge up to one hour late; art. 14 deposit caps, permitted deductions, no cheques or promissory notes, refund within 7 days; art. 16 damage only on an independent expert report, no loss-of-value charge without an arbitration or court decision, faults presumed not the renter's; art. 17 cover without forced extras, child seat on 2 days' notice, winter tyres; art. 21 records kept 5 years. Basis for period.2, deposit, cancellation, damage, accident.3, insurance.2, insurance.5, use.3, use.8_tr."
+    supports: "Regulation on the Rental of Motor Land Vehicles (Ministry of Trade, Resmî Gazete 15 Aug 2026, No. 33341, in force 1 Jan 2027; text as reproduced, check against the Gazette): art. 4 short-term rental up to 29 days, M1/M1G/N1/N1G; art. 5-6 authorization certificate (yetki belgesi); art. 10 written or electronic contract, pre-contract information and its required content (authorization number, MERSİS/tax number, vehicle, fuel, gearbox, deposit, insurance excess, tolls and fines); art. 11 cancellation and no-show limits; art. 12 handover and return documents; art. 13(8) no charge up to one hour late; art. 14 deposit caps, permitted deductions, no checks or promissory notes, refund within 7 days; art. 16 damage only on an independent expert report, no loss-of-value charge without an arbitration or court decision, faults presumed not the renter's; art. 17 cover without forced extras, child seat on 2 days' notice, winter tires; art. 21 records kept 5 years. Basis for period.2, deposit, cancellation, damage, accident.3, insurance.2, insurance.5, use.3, use.8_tr."
   - url: https://www.alomaliye.com/2026/08/15/motorlu-kara-tasitlarinin-kiralanmasi-hakkinda-yonetmelikle-ilgili-kapsamli-ozet-ve-sss/
-    supports: "Summary and FAQ of the same regulation: issuer, dates, transition (authorisation by 1 Jul 2027, fleet and vehicle-age rules by 1 Jan 2028), scope excluding long-term and non-consumer rentals."
+    supports: "Summary and FAQ of the same regulation: issuer, dates, transition (authorization by 1 Jul 2027, fleet and vehicle-age rules by 1 Jan 2028), scope excluding long-term and non-consumer rentals."
   - url: https://orgtr.org/7574-karayollari-trafik-kanununda-degisiklik-yapilmasina-dair-kanun/
     supports: "Law No. 7574 amending the Highway Traffic Act (Resmî Gazete 27 Feb 2026, No. 33181): art. 31 adds to art. 116 that a fine on a rented vehicle is issued to and collected from the renter when the police data kept under Law 1774 identify them and they have a notifiable address; art. 26 helmet and goggles duty and fines; art. 30 unpaid fines of foreigners collected on re-entry (fines.2, use.2)."
   - url: https://hukukcularevi.com/yabanci-surucu-kiralik-arac-trafik-cezalari-2026/
@@ -99,11 +99,11 @@ sources:
   - url: https://yolcu360.com/blog/kiralik-arac-bildirim-sistemi-nedir-nasil-kayit-olunur/
     supports: "KABİS in practice: run by the General Directorate of Security (EGM) at arackiralama.egm.gov.tr since 2015; registration through the local police; vehicle plate and registration plus renter name and T.C. identity number (renter.4)."
   - url: https://www.mevzuat.gov.tr/mevzuatmetin/1.5.2918.pdf
-    supports: "Highway Traffic Act No. 2918: art. 39 licence classes (M, A1, A2, A, B1, B, BE...), art. 78 helmets and seat belts, art. 91 compulsory motor third-party insurance (renter.2, use.2, use.3, insurance.1)."
+    supports: "Highway Traffic Act No. 2918: art. 39 license classes (M, A1, A2, A, B1, B, BE...), art. 78 helmets and seat belts, art. 91 compulsory motor third-party insurance (renter.2, use.2, use.3, insurance.1)."
   - url: https://www.alomaliye.com/2020/06/05/karayollari-trafik-yonetmeliginde-degisiklik-05-06-2020/
-    supports: "Highway Traffic Regulation art. 88 (as amended 5 Jun 2020): a foreign national may drive in Türkiye on a foreign licence for up to six months from entry (renter.2)."
+    supports: "Highway Traffic Regulation art. 88 (as amended 5 Jun 2020): a foreign national may drive in Türkiye on a foreign license for up to six months from entry (renter.2)."
   - url: https://www.haberturk.com/motosiklette-beklenen-duzenleme-hayata-gecti-b-sinifi-otomobil-ehliyetine-125-cc-motosiklet-izni-3660326-ekonomi
-    supports: "Highway Traffic Regulation art. 85 amendment (Resmî Gazete 10 Feb 2024, No. 32456): a Turkish B licence holder of 2+ years may ride up to 125 cc only after a course and practical exam (A1 right recorded on the system); not automatic (renter.2)."
+    supports: "Highway Traffic Regulation art. 85 amendment (Resmî Gazete 10 Feb 2024, No. 32456): a Turkish B license holder of 2+ years may ride up to 125 cc only after a course and practical exam (A1 right recorded on the system); not automatic (renter.2)."
   - url: https://www.sozcu.com.tr/arac-muayenesi-nedir-ne-zaman-ve-nasil-yaptirilir-wp5421833
     supports: "Periodic inspection (TÜVTÜRK): private cars first after 3 years then every 2; commercial vehicles yearly (vehicle.2)."
   - url: https://www.kvkk.gov.tr/Icerik/6909/2020-335
@@ -138,7 +138,7 @@ sections:
         en: Owner (rental business)
         local: Kiraya veren (kiralama işletmesi)
       - key: business_reg_no
-        en: Tax number / MERSİS number / authorisation certificate number
+        en: Tax number / MERSİS number / authorization certificate number
         local: Vergi numarası / MERSİS numarası / yetki belgesi numarası
       - key: business_address
         en: Business address
@@ -187,13 +187,13 @@ sections:
         en: Email
         local: E-posta
       - key: renter_licence
-        en: Driving licence number, classes and issuing country
+        en: Driver's license number, classes and issuing country
         local: Sürücü belgesi numarası, sınıfları ve veren ülke
       - key: renter_licence_expiry
-        en: Licence date of issue / expiry date
+        en: License date of issue / expiry date
         local: Sürücü belgesi veriliş / geçerlilik tarihi
       - key: renter_entry_date
-        en: Date of entry into Türkiye (foreign licence holders)
+        en: Date of entry into Türkiye (foreign license holders)
         local: Türkiye'ye giriş tarihi (yabancı sürücü belgesi sahipleri)
       - key: renter_idp
         en: International Driving Permit (number / not required)
@@ -202,21 +202,21 @@ sections:
         en: Emergency contact (name and phone)
         local: Acil durumda aranacak kişi (adı ve telefonu)
       - key: driver2_details
-        en: Additional driver (name, ID, licence), if any
+        en: Additional driver (name, ID, license), if any
         local: Ek sürücü (adı, kimliği, sürücü belgesi), varsa
     clauses:
       - id: renter.1
         en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
         local: Kiracı, yukarıdaki bilgilerin doğru ve eksiksiz olduğunu ve aracı kullanacak herkesin burada belirtildiğini beyan eder. Aracı yalnızca Kiracı ve yukarıda adı geçen ek sürücü kullanabilir.
       - id: renter.2
-        en: "Every driver must hold a valid driving licence for this class of vehicle and carry it while driving: class B for cars; M for mopeds; A1, A2 or A for motorbikes according to their power; B1 or the class the law requires for quads (ATVs). A car (B) licence on its own does not allow riding a motorbike above moped class in Türkiye. A foreign national may drive on a foreign licence for up to six months from entering Türkiye; a licence not written in Latin letters should be carried with an International Driving Permit or a notarised translation."
+        en: "Every driver must hold a valid driver's license for this class of vehicle and carry it while driving: class B for cars; M for mopeds; A1, A2 or A for motorbikes according to their power; B1 or the class the law requires for quads (ATVs). A car (B) license on its own does not allow riding a motorbike above moped class in Türkiye. A foreign national may drive on a foreign license for up to six months from entering Türkiye; a license not written in Latin letters should be carried with an International Driving Permit or a notarised translation."
         local: "Her sürücü, aracın sınıfına uygun geçerli bir sürücü belgesine sahip olmalı ve araç kullanırken yanında bulundurmalıdır: otomobil için B sınıfı; motorlu bisiklet (moped) için M sınıfı; motosiklet için gücüne göre A1, A2 veya A sınıfı; ATV için B1 sınıfı veya mevzuatın öngördüğü sınıf. Türkiye'de tek başına B sınıfı sürücü belgesi, moped sınıfının üzerindeki motosikletleri kullanma hakkı vermez. Yabancı uyruklu kişiler yabancı sürücü belgesi ile Türkiye'ye giriş tarihinden itibaren en fazla altı ay araç kullanabilir; Latin harfleriyle yazılmamış bir sürücü belgesi, uluslararası sürücü belgesi veya noter onaylı tercümesi ile birlikte taşınmalıdır."
         country: true
       - id: renter.3
-        en: Each driver must meet the minimum age and the minimum period of holding a full licence that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
+        en: Each driver must meet the minimum age and the minimum period of holding a full license that the Owner stated at booking. Any young-driver or additional-driver charge is shown in this agreement before it is signed.
         local: Her sürücü, Kiraya Verenin rezervasyon sırasında belirttiği asgari yaş ve asgari sürücü belgesi süresi şartlarını karşılamalıdır. Genç sürücü veya ek sürücü ücreti varsa, sözleşme imzalanmadan önce işbu sözleşmede gösterilir.
       - id: renter.4
-        en: "The law requires the Owner to record the Renter's and each driver's identity (T.C. identity number, or passport number and nationality), licence and the rental on the police's rental vehicle notification system (KABİS) under Identity Notification Law No. 1774. The Renter must show the original documents at handover."
+        en: "The law requires the Owner to record the Renter's and each driver's identity (T.C. identity number, or passport number and nationality), license and the rental on the police's rental vehicle notification system (KABİS) under Identity Notification Law No. 1774. The Renter must show the original documents at handover."
         local: "Kiraya Veren, 1774 sayılı Kimlik Bildirme Kanunu uyarınca Kiracının ve her sürücünün kimlik bilgilerini (T.C. kimlik numarası veya pasaport numarası ve uyruğu), sürücü belgesi bilgilerini ve kiralamayı Kiralık Araç Bildirim Sistemine (KABİS) kaydetmekle yükümlüdür. Kiracı, teslim sırasında belgelerin asıllarını göstermelidir."
         country: true
   - id: vehicle
@@ -237,7 +237,7 @@ sections:
         en: Registration (plate) number
         local: Plaka
       - key: vehicle_colour
-        en: Colour
+        en: Color
         local: Rengi
       - key: renter_vin
         en: Chassis / VIN number
@@ -267,7 +267,7 @@ sections:
         local: Kiraya Veren, aracın bakımını üreticinin önerdiği şekilde yaptırır; işbu sözleşmede aksi belirtilmedikçe olağan mekanik onarım ve aşınma giderlerini karşılar. Kiralama süresi içindeki bakım Kiraya Verene aittir ve bakım için geçen süre kiralama süresine ücretsiz olarak eklenir.
         country: true
       - id: vehicle.4
-        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tires, lights, brakes, oil and coolant look normal, and not driving or riding it if it becomes unsafe or unroadworthy."
         local: "Kiralama süresince Kiracı aracın günlük durumunu gözetir: lastiklerin, farların, frenlerin, yağ ve soğutma suyunun olağan görünüp görünmediğini kontrol eder ve araç güvensiz veya trafiğe elverişsiz hâle gelirse kullanmaz."
   - id: period
     title:
@@ -336,7 +336,7 @@ sections:
         en: "Monthly rentals: rent is paid monthly in advance on the same day each month. If a payment is more than 7 days late and the Owner has reminded the Renter in writing, the Owner may end the rental and collect the vehicle (section 15)."
         local: "Aylık kiralamalar: kira bedeli her ay aynı gün peşin olarak ödenir. Ödeme 7 günden fazla gecikirse ve Kiraya Veren Kiracıya yazılı olarak hatırlatmışsa, Kiraya Veren kiralamayı sona erdirebilir ve aracı geri alabilir (15. bölüm)."
       - id: charges.3
-        en: Extras (child seats, delivery, additional drivers, excess reduction, winter tyres or snow chains and similar) cost what is written in this agreement or what the Owner confirmed in writing before the rental.
+        en: Extras (child seats, delivery, additional drivers, excess reduction, winter tires or snow chains and similar) cost what is written in this agreement or what the Owner confirmed in writing before the rental.
         local: Ek hizmetler (çocuk koltuğu, teslimat, ek sürücü, muafiyet indirimi, kış lastiği veya kar zinciri ve benzerleri), işbu sözleşmede yazılı olan veya Kiraya Verenin kiralamadan önce yazılı olarak teyit ettiği bedeldedir.
   - id: deposit
     title:
@@ -354,7 +354,7 @@ sections:
         local: İade veya serbest bırakma süresi
     clauses:
       - id: deposit.1
-        en: "The deposit secures only these amounts owed under this agreement: unpaid rent and charges, extra kilometres, late return, tolls and traffic fines that arrive after the return, fuel or charging, and damage the Renter is at fault for that the insurance or the Owner's guarantee does not cover."
+        en: "The deposit secures only these amounts owed under this agreement: unpaid rent and charges, extra kilometers, late return, tolls and traffic fines that arrive after the return, fuel or charging, and damage the Renter is at fault for that the insurance or the Owner's guarantee does not cover."
         local: "Depozito yalnızca işbu sözleşmeden doğan şu alacakları teminat altına alır: ödenmemiş kira bedeli ve ücretler, ilave kilometre, geç iade, iadeden sonra gelen köprü/otoyol geçiş ücretleri ve trafik cezaları, yakıt veya şarj gideri ile Kiracının kusurundan kaynaklanan ve sigorta ya da Kiraya Verenin güvencesi kapsamında olmayan hasar."
         country: true
       - id: deposit.2
@@ -362,7 +362,7 @@ sections:
         local: Kiraya Veren depozitoyu, sözleşmenin sona ermesi ve aracın iadesinden itibaren 7 gün içinde iade eder (veya karttaki provizyonu kaldırır); yalnızca Kiracının fiilen borçlu olduğu, işbu sözleşmede kabul ettiği ve tahsilattan önce kanıtlarıyla birlikte yazılı olarak bildirilen tutarlar mahsup edilir. Olağan aşınma ve teslim sırasında kolayca fark edilemeyecek hasarlar hiçbir zaman mahsup edilmez.
         country: true
       - id: deposit.3
-        en: The deposit is no more than three days' rent for a rental of up to six days, and no more than seven days' rent for a rental of seven to twenty-nine days. The Owner does not take cheques, promissory notes (senet), guarantee letters or guarantors as a deposit.
+        en: The deposit is no more than three days' rent for a rental of up to six days, and no more than seven days' rent for a rental of seven to twenty-nine days. The Owner does not take checks, promissory notes (senet), guarantee letters or guarantors as a deposit.
         local: Depozito, altı güne kadar olan kiralamalarda üç günlük kira bedelini, yedi ile yirmi dokuz gün arasındaki kiralamalarda yedi günlük kira bedelini aşamaz. Kiraya Veren depozito olarak çek, senet, teminat mektubu veya kefil kabul etmez.
         country: true
       - id: deposit.4
@@ -427,7 +427,7 @@ sections:
         local: Eksik yakıt, gereken miktar için yerel pompa fiyatı üzerinden ve belgelendirilerek ücretlendirilir{{#if fuel_service_fee}}; buna ek olarak {{currency}} {{fuel_service_fee}} tutarında yakıt ikmal hizmet bedeli alınır{{/if}}.
       - id: fuel.4
         if: mileage_limit
-        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometer costs {{currency}} {{excess_km_fee}}."
         local: "Kilometre sınırı: {{mileage_period_label}} başına {{mileage_limit}} km. Her ilave kilometre için {{currency}} {{excess_km_fee}} ücret alınır."
       - id: fuel.5
         unless: mileage_limit
@@ -468,13 +468,13 @@ sections:
         local: "Şunlar yasaktır: yasal sınırın üzerinde alkollü veya uyuşturucu etkisi altında araç kullanmak; araç kullanırken elde cep telefonu kullanmak; yarış, akrobatik hareket veya arazi sürüşü yapmak (araç buna uygun değilse ve Kiraya Veren kabul etmemişse); herhangi bir şeyi çekmek veya itmek; ücret karşılığı yolcu veya yük, yasa dışı mal ya da tehlikeli yük taşımak; aracı izinsiz taksi (korsan taşımacılık), çağrı ile yolcu taşıma, kurye, sürücü kursu amacıyla kullanmak veya başkasına kiralamak; 2. bölümde adı geçmeyen birinin aracı kullanmasına izin vermek."
         country: true
       - id: use.8_tr
-        en: The Owner fits winter tyres when the season, the weather or the road conditions call for them. Quads (ATVs) may be ridden only on roads and routes where their use is allowed; beaches, protected areas and forest roads closed to traffic are excluded.
+        en: The Owner fits winter tires when the season, the weather or the road conditions call for them. Quads (ATVs) may be ridden only on roads and routes where their use is allowed; beaches, protected areas and forest roads closed to traffic are excluded.
         local: Mevsim, hava veya yol koşulları gerektirdiğinde Kiraya Veren araca kış lastiği takar. ATV'ler yalnızca kullanımına izin verilen yol ve güzergâhlarda kullanılabilir; sahiller, koruma alanları ve trafiğe kapalı orman yolları hariçtir.
         country: true
       - id: use.5
         when:
           smoking: no
-        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+        en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odor removal.{{/if}}
         local: Araç içinde sigara ve elektronik sigara içilmesi yasaktır.{{#if smoking_fee}} Bu kurala uyulmaması hâlinde koku giderimi için {{currency}} {{smoking_fee}} ücret alınır.{{/if}}
       - id: use.6
         when:
@@ -499,7 +499,7 @@ sections:
         en: The vehicle must stay within the permitted area above. Taking it further, on a ferry or to an island, needs the Owner's written permission first, and the Renter pays any ferry fees agreed and any recovery costs caused by breaking this rule.
         local: Araç yukarıda belirtilen bölgenin dışına çıkarılamaz. Daha uzağa, feribotla veya bir adaya götürülmesi için önceden Kiraya Verenin yazılı izni gerekir; kararlaştırılan feribot ücretleri ve bu kuralın ihlali nedeniyle doğan geri alma masrafları Kiracıya aittir.
       - id: area.2
-        en: The vehicle may leave Türkiye (including by ferry to Northern Cyprus or the Greek islands) only with the Owner's prior written permission, the documents the border authorities require (such as a notarised authorisation from the Owner) and insurance valid in the country visited (a Green Card where needed), at the Renter's cost as agreed in advance.
+        en: The vehicle may leave Türkiye (including by ferry to Northern Cyprus or the Greek islands) only with the Owner's prior written permission, the documents the border authorities require (such as a notarised authorization from the Owner) and insurance valid in the country visited (a Green Card where needed), at the Renter's cost as agreed in advance.
         local: Araç, Türkiye dışına (Kuzey Kıbrıs'a veya Yunan adalarına feribotla gidiş dâhil) ancak Kiraya Verenin önceden yazılı izni, sınır makamlarının istediği belgeler (Kiraya Verenden noter onaylı izin belgesi gibi) ve gidilen ülkede geçerli sigorta (gerektiğinde Yeşil Kart) ile ve önceden kararlaştırılan masrafları Kiracıya ait olmak üzere çıkarılabilir.
         country: true
       - id: area.3
@@ -541,7 +541,7 @@ sections:
         local: Araçta yalnızca zorunlu trafik sigortası bulunur. Kiralanan aracın hasarı veya çalınmasından, kusurlu olduğu hâllerde Kiracı sorumludur (12. bölüm) ve bu sorumluluk bağımsız eksper raporuyla belirlenen fiilî masrafla sınırlıdır.
         country: true
       - id: insurance.5
-        en: "The cover and any damage waiver do not protect the Renter, and the Renter pays the actual cost, when damage or loss is caused: while driving under the influence of alcohol or drugs; without a valid licence for the vehicle; by a driver not named in section 2; by racing, running a red light or another serious traffic offence; deliberately; during use against section 9 or outside the permitted area; or because keys were left with the vehicle."
+        en: "The cover and any damage waiver do not protect the Renter, and the Renter pays the actual cost, when damage or loss is caused: while driving under the influence of alcohol or drugs; without a valid license for the vehicle; by a driver not named in section 2; by racing, running a red light or another serious traffic offense; deliberately; during use against section 9 or outside the permitted area; or because keys were left with the vehicle."
         local: "Teminat ve hasar muafiyeti, hasar veya kayıp şu hâllerde meydana gelmişse Kiracıyı korumaz ve fiilî masraf Kiracıya aittir: alkol veya uyuşturucu etkisi altında araç kullanılması; araca uygun geçerli sürücü belgesi olmaksızın kullanılması; 2. bölümde adı geçmeyen bir sürücü tarafından kullanılması; yarış, kırmızı ışık ihlali veya başka bir ağır trafik ihlali; kasıt; 9. bölüme aykırı veya izin verilen bölge dışında kullanım; anahtarın araçta bırakılması."
         country: true
       - id: insurance.6
@@ -561,7 +561,7 @@ sections:
         local: Kiracı, teslimden aracın iade edilip kontrol edilmesine kadar araçtan sorumludur. Teslimdeki durum fotoğraflarla birlikte teslim belgesine (Ek A), iadedeki durum ise iade belgesine kaydedilir ve her birinin bir nüshası Kiracıya verilir. Teslimde kaydedilmemiş bir hasar, ancak iade belgesine kaydedilmişse yeni kabul edilir; olağan aşınma hiçbir zaman ücretlendirilmez.
         country: true
       - id: damage.2
-        en: Damage is charged only when both the damage and its cost are shown in a report by an authorised, independent expert (eksper); a report by the Owner's own staff or a related business is not enough. Damage not recorded in the return document is not charged, and the charge is never more than the excess where a damage waiver applies. The Owner sends the Renter the report and any charge in writing within 30 days of the return. Loss of value (değer kaybı) is not charged unless an insurance arbitration or court decision awards it.
+        en: Damage is charged only when both the damage and its cost are shown in a report by an authorized, independent expert (eksper); a report by the Owner's own staff or a related business is not enough. Damage not recorded in the return document is not charged, and the charge is never more than the excess where a damage waiver applies. The Owner sends the Renter the report and any charge in writing within 30 days of the return. Loss of value (değer kaybı) is not charged unless an insurance arbitration or court decision awards it.
         local: Hasar bedeli, yalnızca hasar ve tutarı yetkili ve bağımsız bir eksper raporuyla belgelendiğinde talep edilebilir; Kiraya Verenin kendi personeli veya bağlantılı bir işletme tarafından hazırlanan rapor yeterli değildir. İade belgesine kaydedilmemiş hasar ücretlendirilmez ve hasar muafiyeti varsa talep edilen tutar muafiyet tutarını aşamaz. Kiraya Veren raporu ve varsa talebini iadeden itibaren 30 gün içinde Kiracıya yazılı olarak bildirir. Değer kaybı, bir sigorta tahkim kararı veya mahkeme kararı ile hükmedilmedikçe talep edilmez.
         country: true
       - id: damage.3
@@ -608,7 +608,7 @@ sections:
         local: Kiracı, kiralama süresince doğan ve araç iade edildikten sonra Kiraya Verene ulaşanlar dâhil tüm trafik ve park cezalarını, otoyol ve köprü geçiş ücretlerini (HGS), çekici ve otopark (yed-i emin) masraflarını öder{{#if fine_admin_fee}}; ayrıca Kiraya Verenin işlem yapmak zorunda kaldığı her ceza veya bildirim için {{currency}} {{fine_admin_fee}} işlem ücreti alınır{{/if}}. Yalnızca fiilen yapılan ve geçiş işletmecisinin kaydıyla belgelenen geçişlerin ücreti talep edilir.
         country: true
       - id: fines.2
-        en: Under the Highway Traffic Act (article 116, as amended by Law No. 7574), a traffic fine for an offence during the rental is issued directly to the Renter, using the rental record the Owner keeps on KABİS (section 2). The Renter may object to a fine within 15 days of being notified of it. A fine that cannot be issued to the Renter and that the Owner pays is charged to the Renter at its amount, with the fine notice. Fines left unpaid by a foreign renter can be collected when they next enter Türkiye.
+        en: Under the Highway Traffic Act (article 116, as amended by Law No. 7574), a traffic fine for an offense during the rental is issued directly to the Renter, using the rental record the Owner keeps on KABİS (section 2). The Renter may object to a fine within 15 days of being notified of it. A fine that cannot be issued to the Renter and that the Owner pays is charged to the Renter at its amount, with the fine notice. Fines left unpaid by a foreign renter can be collected when they next enter Türkiye.
         local: Karayolları Trafik Kanunu'nun 7574 sayılı Kanunla değişik 116. maddesi uyarınca, kiralama süresince işlenen bir trafik suçuna ilişkin idari para cezası, Kiraya Verenin KABİS'e kaydettiği kiralama bilgisi esas alınarak doğrudan Kiracı adına düzenlenir (2. bölüm). Kiracı cezaya, tebliğinden itibaren 15 gün içinde itiraz edebilir. Kiracı adına düzenlenemeyen ve Kiraya Veren tarafından ödenen bir ceza, ceza tutanağı ile birlikte aynı tutarda Kiracıdan talep edilir. Yabancı uyruklu kiracının ödenmemiş cezaları, Türkiye'ye bir sonraki girişinde tahsil edilebilir.
         country: true
   - id: termination
@@ -634,11 +634,11 @@ sections:
         country: true
       - id: return.2
         if: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more only if specialist cleaning is needed, against a receipt).
         local: İç kısmında aşırı kir, kum, çamur, leke, yiyecek artığı veya koku bulunan bir araç için {{currency}} {{cleaning_fee}} temizlik ücreti alınır (yalnızca özel temizlik gerekirse, fatura karşılığında daha fazlası).
       - id: return.3
         unless: cleaning_fee
-        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+        en: A vehicle returned with excessive dirt, sand, mud, stains, food or odor inside may be charged the reasonable cost of cleaning.
         local: İç kısmında aşırı kir, kum, çamur, leke, yiyecek artığı veya koku bulunan bir araç için makul temizlik masrafı talep edilebilir.
   - id: data
     title:
@@ -646,7 +646,7 @@ sections:
       local: 17. Kişisel veriler
     clauses:
       - id: data.1
-        en: The Owner is the data controller of the personal data of the Renter and drivers (names, contact details, identity and licence details, copies of documents, vehicle photos and any tracker location data) under the Personal Data Protection Law No. 6698 (KVKK). It processes them to perform this rental (KVKK article 5(2)(c)), to meet legal duties such as the KABİS rental notification under Law No. 1774, tax and accounting records and police or court requests (article 5(2)(ç)), and for its legitimate interest in protecting the vehicle and handling claims (article 5(2)(f)). It keeps them only as long as those purposes and the law require (rental records 5 years), keeps them secure and never sells them.
+        en: The Owner is the data controller of the personal data of the Renter and drivers (names, contact details, identity and license details, copies of documents, vehicle photos and any tracker location data) under the Personal Data Protection Law No. 6698 (KVKK). It processes them to perform this rental (KVKK article 5(2)(c)), to meet legal duties such as the KABİS rental notification under Law No. 1774, tax and accounting records and police or court requests (article 5(2)(ç)), and for its legitimate interest in protecting the vehicle and handling claims (article 5(2)(f)). It keeps them only as long as those purposes and the law require (rental records 5 years), keeps them secure and never sells them.
         local: Kiraya Veren, Kiracının ve sürücülerin kişisel verilerinin (ad, iletişim bilgileri, kimlik ve sürücü belgesi bilgileri, belge suretleri, araç fotoğrafları ve varsa takip cihazının konum verileri) 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında veri sorumlusudur. Bu verileri, işbu kiralamanın ifası (KVKK m. 5/2-c), 1774 sayılı Kanun kapsamındaki KABİS bildirimi, vergi ve muhasebe kayıtları ile kolluk ve yargı talepleri gibi hukuki yükümlülüklerin yerine getirilmesi (m. 5/2-ç) ve aracın korunması ile taleplerin yönetilmesine ilişkin meşru menfaati (m. 5/2-f) için işler. Verileri yalnızca bu amaçların ve mevzuatın gerektirdiği süre boyunca (kiralama kayıtları için 5 yıl) saklar, güvenliğini sağlar ve hiçbir zaman satmaz.
         country: true
       - id: data.2
@@ -668,7 +668,7 @@ sections:
         en: "Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies."
         local: "Sözleşmenin bütünlüğü: işbu sözleşme, ekleri ve varsa özel şartlar tarafların anlaşmasının tamamını oluşturur. Değişiklikler yalnızca yazılı olarak (her iki taraftan gelen mesaj yeterlidir) geçerlidir. Herhangi bir hükmün geçersiz sayılması, diğer hükümlerin geçerliliğini etkilemez."
       - id: general.4
-        en: "Language: this agreement is written in Turkish and English. If the versions differ, the meaning more favourable to the Renter applies."
+        en: "Language: this agreement is written in Turkish and English. If the versions differ, the meaning more favorable to the Renter applies."
         local: "Dil: işbu sözleşme Türkçe ve İngilizce olarak düzenlenmiştir. Metinler arasında farklılık olması hâlinde Kiracı lehine olan anlam uygulanır."
         country: true
       - id: general.5
@@ -722,7 +722,7 @@ sections:
         local: "Kaporta: ön / arka / sol / sağ"
       - en: Windscreen, glass, mirrors and lights
         local: Ön cam, camlar, aynalar ve farlar
-      - en: Tyres and wheels
+      - en: Tires and wheels
         local: Lastikler ve jantlar
       - en: Interior and seats
         local: İç kısım ve koltuklar
@@ -765,7 +765,7 @@ sections:
         local: Ayna
       - en: Headlight / tail light / indicator
         local: Far / stop lambası / sinyal
-      - en: Tyre (each)
+      - en: Tire (each)
         local: Lastik (adet)
       - en: Key / remote
         local: Anahtar / kumanda

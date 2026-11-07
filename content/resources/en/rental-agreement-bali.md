@@ -8,7 +8,7 @@ fileLabel: "Agreement · English + Indonesian"
 formats: [docx, pdf]
 inside:
   - "English beside bahasa Indonesia, so tourists and the police can both read it"
-  - "Licence and IDP check before handover, with the right to refuse riders without one"
+  - "License and IDP check before handover, with the right to refuse riders without one"
   - "Two SNI helmets, one passenger, and the rider's duty to wear the helmet fastened"
   - "Theft, lost keys, lost STNK and plates, priced in your damage list"
   - "Permitted area and ferry clause for Nusa Penida, Nusa Lembongan, Lombok and the Gilis"
@@ -24,7 +24,7 @@ This is our free English–Indonesian agreement (Indonesian prevails) with Bali'
 
 Bali police run regular traffic operations around tourist areas. In one three-day operation in May 2025 covering Canggu, Uluwatu, Kuta and Seminyak, [81 drivers were cited, 30 of them tourists, and 56 vehicles seized](https://www.indailysa.com.au/news/in-depth/2025/05/13/bali-scooter-tourists). In November 2025, at the launch of Operation Zebra Agung, the provincial traffic director [advised foreigners without riding skills not to ride motorbikes themselves](https://inp.polri.go.id/artikel/bali-police-crack-down-unskilled-foreign-motorbike-riders-now-banned).
 
-The [Bali provincial circular SE 7/2025](https://bali.antaranews.com/berita/373757/bali-luncurkan-edaran-tatanan-baru-bagi-turis-asing) tells foreign tourists to carry an international or Indonesian licence and wear helmets. The agreement makes the renter confirm they hold a licence for the vehicle class and an IDP where needed, and lets you refuse handover if they can't show one. A car licence does not cover a scooter.
+The [Bali provincial circular SE 7/2025](https://bali.antaranews.com/berita/373757/bali-luncurkan-edaran-tatanan-baru-bagi-turis-asing) tells foreign tourists to carry an international or Indonesian license and wear helmets. The agreement makes the renter confirm they hold a license for the vehicle class and an IDP where needed, and lets you refuse handover if they can't show one. A car license does not cover a scooter.
 
 The often-reported 2023 plan to ban tourists from renting motorbikes [was never put into force](https://www.antaranews.com/berita/3530361/kadishub-bali-s), so the agreement treats licensed foreign renters as normal customers.
 
@@ -60,4 +60,4 @@ Indonesia is preset. Add your shop details, vehicle, prices, deposit and permitt
 
 ## Let RoveHQ fill it in for you
 
-RoveHQ fills in the agreement from each booking automatically, the renter signs on their phone at the villa, and passport and licence details are read from a photo. [Start free](/signup).
+RoveHQ fills in the agreement from each booking automatically, the renter signs on their phone at the villa, and passport and license details are read from a photo. [Start free](/signup).

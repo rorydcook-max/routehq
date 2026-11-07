@@ -64,7 +64,7 @@ The [pricing page](https://www.rentallsoftware.com/pricing/) doesn't show prices
 - **Fleets under 10.** No minimum fleet size, and a free plan for up to 2 cars and 5 motorbikes.
 - **Published prices and self-serve.** You can see the price, including the platform fee on card payments, and start today without a quote or sales call.
 - **Online booking on every plan.** A booking page and website booking box where customers pay by card, Apple Pay, Google Pay or European methods, with deposits held on the card.
-- **Agreements and ID on a phone.** An agreement for each booking in English and the local language in 18 countries, passport and licence photos read for you, and handover photos with a damage diagram and signature.
+- **Agreements and ID on a phone.** An agreement for each booking in English and the local language in 18 countries, passport and license photos read for you, and handover photos with a damage diagram and signature.
 - **Every way customers pay.** Card and wallets online, and cash, transfer or QR with slips checked against what's owed (including PromptPay and QRIS), with LINE and Telegram in one inbox.
 
 ## Who should pick which
@@ -77,6 +77,6 @@ For other options with published prices, see our [roundup of car and scooter ren
 
 ## Switching from Navotar or RENTALL
 
-We couldn't find a public help article on exports, so our [guide to switching from Navotar](/switch/navotar) gives general steps: look for Excel export on your reservation and agreement lists or reports, or ask support for a copy of your data. RoveHQ recognises reservation exports with agreement numbers, vehicle types and pickup and return dates, converts miles to your unit, and asks you to confirm date order. Importing is free, and you can undo it within 30 days.
+We couldn't find a public help article on exports, so our [guide to switching from Navotar](/switch/navotar) gives general steps: look for Excel export on your reservation and agreement lists or reports, or ask support for a copy of your data. RoveHQ recognizes reservation exports with agreement numbers, vehicle types and pickup and return dates, converts miles to your unit, and asks you to confirm date order. Importing is free, and you can undo it within 30 days.
 
 [Create a free RoveHQ account](/signup) to see your fleet in it first.

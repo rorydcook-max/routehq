@@ -175,7 +175,7 @@ function validatedEmail(formData: FormData, key: string) {
 function validatedAccentColour(value: string | null) {
   if (!value) return "#0e5e6f";
   if (!/^#[0-9a-fA-F]{6}$/.test(value)) {
-    throw new Error("Contract accent colour must be a six-digit hex colour.");
+    throw new Error("Contract accent color must be a six-digit hex color.");
   }
   return value.toLowerCase();
 }
@@ -480,10 +480,10 @@ export async function updateOwnerSignature(formData: FormData) {
   const signatoryTitle = submittedSignatoryTitle || String(organization?.authorised_signatory_title || "").trim() || null;
 
   if (replacingSignature && !acknowledgementAccepted) {
-    throw new Error("You must accept the signature authorisation before saving a new authorised signature.");
+    throw new Error("You must accept the signature authorization before saving a new authorized signature.");
   }
   if (replacingSignature && !signatoryName) {
-    throw new Error("Authorised signatory full name is required before saving a signature.");
+    throw new Error("Authorized signatory full name is required before saving a signature.");
   }
 
   if (removeSignature || (signatureFile instanceof File && signatureFile.size > 0)) {
@@ -545,8 +545,8 @@ export async function updateOwnerSignature(formData: FormData) {
     entity_type: "organization",
     entity_id: organizationId,
     event_type: replacingSignature ? "authorised_signature_updated" : "contract_branding_updated",
-    title: replacingSignature ? "Authorised signature updated" : "Contract branding updated",
-    detail: removeSignature ? "Authorised signature removed." : replacingSignature ? "Authorised business signature replaced." : "Authorised signature settings updated."
+    title: replacingSignature ? "Authorized signature updated" : "Contract branding updated",
+    detail: removeSignature ? "Authorized signature removed." : replacingSignature ? "Authorized business signature replaced." : "Authorized signature settings updated."
   });
 
   revalidatePath("/");
@@ -562,7 +562,7 @@ export async function updateOwnerSignature(formData: FormData) {
       entity_type: "organization",
       entity_id: organizationId,
       event_type: "signature_authorisation_accepted",
-      title: "Signature authorisation accepted",
+      title: "Signature authorization accepted",
       detail: signatureAuthorisationTextVersion
     });
   }

@@ -183,7 +183,24 @@ export function MessagingPanel({ channels, publicUrl }: { channels: Channel[]; p
         .map((provider) => (
           <ConnectForm key={provider} provider={provider} publicUrl={publicUrl} />
         ))}
-      <p className="measure text-sm font-medium text-[var(--muted)]">{say("mp_soon")}</p>
+      {/* Not built yet: shown so operators know they're on the way (Rory, 7 Nov 2026). Alphabetical by name. */}
+      <ul className="space-y-2.5">
+        {(["mp_soonEmail", "mp_soonMessenger", "mp_soonInstagram", "mp_soonWhatsapp"] as const)
+          .map((key) => ({ key, name: say(key), body: say(`${key}Body`) }))
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((row) => (
+            <li className="flex items-start justify-between gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5" key={row.key}>
+              <span className="min-w-0">
+                <span className="card-subtitle block">{row.name}</span>
+                <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{row.body}</span>
+              </span>
+              <span className="shrink-0 rounded-full bg-[var(--panel-tertiary)] px-2.5 py-0.5 text-[13px] font-bold text-[var(--muted)]">{say("ig_soon")}</span>
+            </li>
+          ))}
+      </ul>
+      <p className="text-sm font-medium text-[var(--muted)]">
+        <span className="font-bold text-[var(--foreground-secondary)]">{say("mp_marketplaceName")}:</span> {say("mp_marketplace")}
+      </p>
     </div>
   );
 }

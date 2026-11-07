@@ -168,6 +168,8 @@ export function BookingPageTool({
           <Fold id="brand" title={say("bt_brand")}>
             <div className="space-y-4">
               <LogoUploadSection logoUrl={logoUrl} onDone={reload} orgName={businessName} />
+              {/* Part of the website draft (published with it): a wordmark logo already says the name. */}
+              <SwitchField checked={site.draft.showName} description={say("bt_showNameHint")} label={say("bt_showName")} onChange={(event) => site.update({ showName: event.target.checked })} />
               <BrandColourPart colour={colour} onSaved={reload} />
             </div>
           </Fold>
@@ -227,7 +229,7 @@ function PagePart({ booking, vehicles, onSaved }: { booking: { enabled: boolean;
           <label className="block">
             <span className="font-semibold text-[var(--foreground)]">{say("pb_offer")}</span>
             <select className="mt-1 block w-full" disabled={pending} onChange={(event) => save({ enabled: on, offer: event.target.value })} value={offer}>
-              {["both_monthly", "both_dates", "monthly", "dates"].map((value) => (
+              {[offer === "both_dates" ? "both_dates" : "both_monthly", "monthly", "dates"].map((value) => (
                 <option key={value} value={value}>
                   {say(`pb_offer_${value}`)}
                 </option>

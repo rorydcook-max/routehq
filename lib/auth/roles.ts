@@ -1,3 +1,4 @@
+import { openBusinessScope } from "@/lib/business-time-scope";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -26,6 +27,8 @@ export { APP_ROLES, appRoleFromDb, appRoleFromForm, canDecideMoney, dbRoleFromAp
 export type { AppRole } from "@/lib/auth/role-types";
 
 export async function getCurrentMembership() {
+  // Opened before the first await, so the business loaded here stays with the code that awaited this (server actions too).
+  openBusinessScope();
   const [supabase, user] = (await Promise.all([createSupabaseServerClient(), getRequestUser()])) as [any, Awaited<ReturnType<typeof getRequestUser>>];
   if (!user) return null;
 

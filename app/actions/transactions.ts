@@ -13,6 +13,8 @@ import { currencySymbol } from "@/components/currency-symbol";
 import { formatMoney, moneyLocale, orgCountry, vatBreakdown, vatSettings } from "@/lib/regional";
 import { businessToday, businessTimeZone } from "@/lib/business-time";
 import { adoptBusinessClock } from "@/lib/auth/active-organization-server";
+import { attachCustomerByName } from "@/lib/rental-customer";
+import { said } from "@/lib/i18n/server-text";
 import { enterBusinessTimeZone } from "@/lib/business-time-scope";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -268,7 +270,7 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
   const organizationId = String(formData.get("organizationId") || "");
   const rentalId = String(formData.get("rentalId") || "");
   const vehicleId = String(formData.get("vehicleId") || "");
-  const customerId = optionalString(formData, "customerId");
+  let customerId = optionalString(formData, "customerId");
   const fallbackAmount = numberField(formData, "amount") || 0;
   const rentalPaymentAmount = Math.max(0, numberField(formData, "rentalPaymentAmount") ?? fallbackAmount);
   const depositAmount = Math.max(0, numberField(formData, "depositAmount") || 0);
@@ -295,6 +297,14 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
 
   if (rentalError || !rental) {
     throw new Error(rentalError?.message || "Rental could not be found.");
+  }
+
+  // Paid at handover before the renter filled in their link: the name typed on the payment step becomes the customer
+  // now (payments are recorded against a customer), the same way the handover's signed name would at the end.
+  if (!rental.customer_id && !customerId) {
+    const name = String(formData.get("customerName") || "").trim();
+    if (!name || name === "Customer") throw new Error(await said("Add the customer's name to hand over."));
+    customerId = rental.customer_id = await attachCustomerByName(supabase, { organizationId, rentalId, name });
   }
 
   if (String(formData.get("earlyStart") || "") === "charge") {

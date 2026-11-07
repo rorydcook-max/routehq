@@ -1,3 +1,4 @@
+import { openBusinessScope } from "@/lib/business-time-scope";
 import { cookies } from "next/headers";
 import { ACTIVE_ORGANIZATION_COOKIE, loadActiveMembership } from "@/lib/auth/active-organization";
 import { setBusinessTimeZone } from "@/lib/business-time";
@@ -10,6 +11,8 @@ import { distanceUnitFor } from "@/lib/regional";
  * needs "the current user's business" - never take the first membership.
  */
 export async function getActiveMembership(supabase: any, userId: string) {
+  // Opened before the first await, so the business loaded here stays with the code that awaited this (server actions too).
+  openBusinessScope();
   const cookieStore = await cookies();
   const preferred = cookieStore.get(ACTIVE_ORGANIZATION_COOKIE)?.value || null;
   const result = await loadActiveMembership(supabase, userId, preferred);
@@ -27,6 +30,8 @@ export async function getActiveMembership(supabase: any, userId: string) {
  * New York at 1 pm was dated the next day.
  */
 export async function adoptBusinessClock(supabase: any, organizationId: string | null | undefined): Promise<string | null> {
+  // Opened before the first await, so the business loaded here stays with the code that awaited this (server actions too).
+  openBusinessScope();
   if (!organizationId) return null;
   const { data } = await supabase.from("organizations").select("timezone, currency, country_code, settings").eq("id", organizationId).maybeSingle();
   if (!data) return null;

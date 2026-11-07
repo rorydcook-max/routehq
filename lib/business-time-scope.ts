@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import type { BusinessScope } from "@/lib/business-time";
 
 /**
  * Server only. Scheduled jobs (morning summary, customer reminders) work through many businesses in one run, with no
@@ -31,4 +32,24 @@ export function enterBusinessTimeZone(zone: string | null | undefined) {
     return;
   }
   store.enterWith(text);
+}
+
+const SCOPE_KEY = Symbol.for("rovehq.businessScope");
+const scopes = globalThis as unknown as Record<symbol, AsyncLocalStorage<BusinessScope> | undefined>;
+const scopeStore: AsyncLocalStorage<BusinessScope> = scopes[SCOPE_KEY] || (scopes[SCOPE_KEY] = new AsyncLocalStorage<BusinessScope>());
+
+/**
+ * Opens the holder for this request's business (zone, currency, country, distance unit; read by businessScope() in
+ * lib/business-time.ts), or returns the one already open. Call it synchronously as the first thing in a function that
+ * loads the business (before its first await): the holder then carries on into the code that awaited it, so a server
+ * action that loads its business through getActiveMembership, getCurrentMembership, getDefaultOrganization or
+ * adoptBusinessClock keeps that business's clock, money and date format to the end. setBusinessTimeZone() and
+ * the setters in lib/business-units.ts fill it.
+ */
+export function openBusinessScope(): BusinessScope {
+  const open = scopeStore.getStore();
+  if (open) return open;
+  const fresh: BusinessScope = {};
+  scopeStore.enterWith(fresh);
+  return fresh;
 }

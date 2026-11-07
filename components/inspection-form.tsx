@@ -650,7 +650,10 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
     } catch {
       localStorage.removeItem(draftKey);
     }
-  }, [draftKey, context.customer?.full_name]);
+    // Once per form: a customer added during the handover (named at the payment step) refreshes the page, and
+    // restoring the draft again then sent the form back to its first photo step.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftKey]);
 
   useEffect(() => {
     localStorage.setItem(
@@ -784,7 +787,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
     formData.set("paymentMethod", "cash");
     formData.set("earlyStart", early ? earlyChoice : "");
     if (late) formData.set("lateStart", lateChoice);
-    formData.set("customerName", context.customer?.full_name || "Customer");
+    formData.set("customerName", context.customer?.full_name || signedName.trim());
     formData.set("vehicleMakeModel", [context.vehicle.make, context.vehicle.model, context.vehicle.trim].filter(Boolean).join(" "));
     formData.set("vehiclePlate", context.vehicle.registration_number || "");
     formData.set("rentalPeriod", rentalPeriod);
@@ -813,7 +816,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
     formData.set("paymentMethod", method);
     formData.set("earlyStart", early ? earlyChoice : "");
     if (late) formData.set("lateStart", lateChoice);
-    formData.set("customerName", context.customer?.full_name || "Customer");
+    // No customer yet (the renter hasn't filled in their link): the name typed on this step becomes the customer.
+    formData.set("customerName", context.customer?.full_name || signedName.trim());
     formData.set("vehicleMakeModel", [context.vehicle.make, context.vehicle.model, context.vehicle.trim].filter(Boolean).join(" "));
     formData.set("vehiclePlate", context.vehicle.registration_number || "");
     formData.set("rentalPeriod", rentalPeriod);
@@ -1417,7 +1421,14 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
         // Kept mounted (hidden) off its step, so what was recorded stays counted when stepping back and forth.
         <div className={steps[step] === "Payment" ? "" : "hidden"}>
           <StepShell title={tp("title")}>
-            <HandoverPaymentStep currency={formCurrency} depositDue={payDue.deposit} money={exactMoney} onLeftChange={setPayLeft} onRecord={recordHandoverPayment} pay={payOptions} rentDue={payDue.rent} />
+            {/* No customer on the booking yet: their name first, as payments are recorded against the customer. The same name is signed with at the end. */}
+            {!context.customer ? (
+              <label className="mb-4 block">
+                <span className="text-sm font-semibold text-[var(--foreground)]">{t("customerPrintedName")}</span>
+                <input autoComplete="name" className={inputClass} onChange={(event) => setSignedName(event.target.value)} value={signedName} />
+              </label>
+            ) : null}
+            <HandoverPaymentStep currency={formCurrency} depositDue={payDue.deposit} locked={!context.customer && !signedName.trim()} money={exactMoney} onLeftChange={setPayLeft} onRecord={recordHandoverPayment} pay={payOptions} rentDue={payDue.rent} />
           </StepShell>
         </div>
       ) : null}

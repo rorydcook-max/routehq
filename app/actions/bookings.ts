@@ -1,5 +1,6 @@
 "use server";
 
+import { openBusinessScope } from "@/lib/business-time-scope";
 import { extrasFrom, priceExtras } from "@/lib/price-rules";
 import { extrasIncomeTag } from "@/lib/extras";
 import { toInternationalPhone } from "@/lib/phone";
@@ -2479,6 +2480,8 @@ type RecordPaymentReceivedInput = {
 };
 
 async function ensureMembership(supabase: any, organizationId: string, userId: string) {
+  // Opened before the first await, so the business loaded here stays with the code that awaited this (server actions too).
+  openBusinessScope();
   const { data, error } = await supabase
     .from("organization_members")
     .select("id")

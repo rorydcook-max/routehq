@@ -52,7 +52,8 @@ export function HandoverPaymentStep({
   pay,
   money,
   onRecord,
-  onLeftChange
+  onLeftChange,
+  locked = false
 }: {
   currency: string;
   rentDue: number;
@@ -63,6 +64,8 @@ export function HandoverPaymentStep({
   onRecord: (method: Method, rent: number, deposit: number) => Promise<HandoverPayResult>;
   /** What is still unpaid, each time it changes. */
   onLeftChange?: (left: number) => void;
+  /** Nothing can be recorded yet (the customer's name, asked for above, is still empty). */
+  locked?: boolean;
 }) {
   const t = useTranslations("handoverPay");
   const methods = useMemo(() => handoverMethods(pay), [pay]);
@@ -136,7 +139,7 @@ export function HandoverPaymentStep({
           {t("paidInFull")}
         </p>
       ) : (
-        <>
+        <fieldset className="min-w-0 space-y-4 disabled:opacity-50" disabled={locked}>
           <div>
             <p className="mb-2 text-base font-semibold text-[var(--foreground)]">{t("howPay")}</p>
             <div className="grid grid-cols-2 gap-2">
@@ -211,7 +214,7 @@ export function HandoverPaymentStep({
               {t("showCustomer")}
             </button>
           ) : null}
-        </>
+        </fieldset>
       )}
 
       {error ? <p className="rounded-xl bg-[var(--danger-light)] px-3 py-2 text-sm font-bold text-[var(--danger)]" role="alert">{error}</p> : null}

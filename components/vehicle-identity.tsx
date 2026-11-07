@@ -60,7 +60,8 @@ export function VehicleTitle({
     <Wrap className={`flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 ${className}`}>
       <Tag className={`min-w-0 ${nameClassName}`}>
         {name}
-        {year ? <span className="ms-1.5 font-medium text-[var(--muted)]">{year}</span> : null}
+        {/* A real space before the year (a margin alone read "Ford Tourneo Custom2022" when copied or read aloud). */}
+        {year ? <>{" "}<span className="ms-1 font-medium text-[var(--muted)]">{year}</span></> : null}
       </Tag>
       <PlateChip className={plateClassName} plate={plate} province={province} />
       {children}

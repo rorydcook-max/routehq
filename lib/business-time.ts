@@ -50,6 +50,8 @@ function usable(zone: unknown): string | null {
 export function setBusinessTimeZone(zone: unknown) {
   const valid = usable(zone);
   if (!valid) return;
+  const scope = businessScope();
+  if (scope) scope.zone = valid;
   try {
     requestZone().zone = valid;
   } catch {
@@ -60,7 +62,11 @@ export function setBusinessTimeZone(zone: unknown) {
 /** Record it for client components (called while the app shell draws). */
 export function rememberPageTimeZone(zone: unknown) {
   const valid = usable(zone);
-  if (valid) pageZone = valid;
+  if (!valid) return;
+  pageZone = valid;
+  // Drawn on the server: client components there read the same zone the browser will.
+  const scope = businessScope();
+  if (scope) scope.zone = valid;
 }
 
 /**
@@ -76,11 +82,31 @@ function jobZone(): string | null {
   }
 }
 
+/**
+ * The business this request is for, kept where server actions can see it (server only; null in the browser).
+ * Server actions get no React request cache, so values set with setBusinessTimeZone() and friends were forgotten
+ * there and "today", money and dates fell back to Bangkok, baht and day-first. lib/business-time-scope.ts opens
+ * this holder (openBusinessScope) at the start of loading the business (getActiveMembership, getCurrentMembership,
+ * getDefaultOrganization, adoptBusinessClock); the setters here and in lib/business-units.ts fill it.
+ */
+export type BusinessScope = { zone?: string | null; currency?: string | null; country?: string | null; unit?: string | null };
+export function businessScope(): BusinessScope | null {
+  if (typeof window !== "undefined") return null;
+  try {
+    const store = (globalThis as any)[Symbol.for("rovehq.businessScope")];
+    return store?.getStore?.() || null;
+  } catch {
+    return null;
+  }
+}
+
 /** The business's time zone: the one a scheduled job is working in, else the one recorded for this request or page, else Bangkok. */
 export function businessTimeZone(): string {
   if (typeof window !== "undefined") return pageZone || BUSINESS_TIME_ZONE;
   const scoped = jobZone();
   if (scoped) return scoped;
+  const held = businessScope()?.zone;
+  if (held) return held;
   try {
     return requestZone().zone || pageZone || BUSINESS_TIME_ZONE;
   } catch {

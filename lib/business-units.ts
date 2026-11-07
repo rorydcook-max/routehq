@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type { DistanceUnit } from "@/lib/regional";
+import { businessScope } from "@/lib/business-time";
 
 /**
  * Miles or kilometres for the signed-in business (Settings › Rentals; miles by default in the UK), available anywhere
@@ -16,6 +17,8 @@ const clean = (unit: unknown): DistanceUnit | null => (unit === "mi" || unit ===
 export function setBusinessDistanceUnit(unit: unknown) {
   const valid = clean(unit);
   if (!valid) return;
+  const scope = businessScope();
+  if (scope) scope.unit = valid;
   try {
     requestUnit().unit = valid;
   } catch {
@@ -25,11 +28,16 @@ export function setBusinessDistanceUnit(unit: unknown) {
 
 export function rememberPageDistanceUnit(unit: unknown) {
   const valid = clean(unit);
-  if (valid) pageUnit = valid;
+  if (!valid) return;
+  pageUnit = valid;
+  const scope = businessScope();
+  if (scope) scope.unit = valid;
 }
 
 export function businessDistanceUnit(): DistanceUnit {
   if (typeof window !== "undefined") return pageUnit || "km";
+  const held = clean(businessScope()?.unit);
+  if (held) return held;
   try {
     return requestUnit().unit || pageUnit || "km";
   } catch {
@@ -53,6 +61,8 @@ const cleanCurrency = (code: unknown) => (/^[A-Z]{3}$/.test(String(code || "").t
 export function setBusinessCurrency(code: unknown) {
   const valid = cleanCurrency(code);
   if (!valid) return;
+  const scope = businessScope();
+  if (scope) scope.currency = valid;
   try {
     requestCurrency().code = valid;
   } catch {
@@ -62,11 +72,16 @@ export function setBusinessCurrency(code: unknown) {
 
 export function rememberPageCurrency(code: unknown) {
   const valid = cleanCurrency(code);
-  if (valid) pageCurrency = valid;
+  if (!valid) return;
+  pageCurrency = valid;
+  const scope = businessScope();
+  if (scope) scope.currency = valid;
 }
 
 export function businessCurrency(): string {
   if (typeof window !== "undefined") return pageCurrency || "THB";
+  const held = businessScope()?.currency;
+  if (held) return held;
   try {
     return requestCurrency().code || pageCurrency || "THB";
   } catch {
@@ -85,6 +100,8 @@ const cleanCountry = (code: unknown) => (/^[A-Z]{2}$/.test(String(code || "").to
 export function setBusinessCountry(code: unknown) {
   const valid = cleanCountry(code);
   if (!valid) return;
+  const scope = businessScope();
+  if (scope) scope.country = valid;
   try {
     requestCountry().code = valid;
   } catch {
@@ -98,10 +115,15 @@ export function setBusinessCountry(code: unknown) {
  */
 export function rememberPageCountry(code: unknown) {
   pageCountry = cleanCountry(code);
+  // Drawn on the server: client components there write dates the same way the browser will.
+  const scope = businessScope();
+  if (scope) scope.country = pageCountry;
 }
 
 export function businessCountry(): string | null {
   if (typeof window !== "undefined") return pageCountry;
+  const scope = businessScope();
+  if (scope && scope.country !== undefined) return scope.country || null;
   try {
     return requestCountry().code || pageCountry;
   } catch {

@@ -1,6 +1,5 @@
 import type { Route } from "next";
 import { Check } from "lucide-react";
-import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { BackLink, Badge } from "@/components/ui";
@@ -13,7 +12,6 @@ import { changeWaitsForRenewal, effectiveLimits, fleetMix, fleetText, planById, 
 import { getCustomPlan } from "@/lib/custom-plan";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { PendingPlan } from "./pending-plan";
-import { supportContacts } from "@/lib/support";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PlanCards } from "./plan-cards";
 
@@ -69,7 +67,6 @@ export default async function BillingPage() {
   const longDate = (value: string) => dateFormat(locale, { day: "numeric", month: "long", year: "numeric" }).format(new Date(value));
 
   const trialDays = daysUntil(organization?.trial_ends_at);
-  const contacts = supportContacts();
   const plan = planById(organization?.subscription_tier);
   // What this business actually gets: the plan, with any custom limits RoveHQ set for it on top.
   const limits = effectiveLimits({ subscription_tier: organization?.subscription_tier, custom_limits: customPlan.custom_limits });
@@ -180,33 +177,6 @@ export default async function BillingPage() {
             </li>
           ))}
         </ul>
-      </section>
-
-      <section className="card mt-3 p-4">
-        <h2 className="card-title">{say("bl_howTitle")}</h2>
-        <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("bl_howBody")}</p>
-        {/* Support channels come from the environment so no placeholder number or address ships.
-            All secondary: the way to pay starts from a plan's Choose button above. */}
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          <Link className="secondary-action pressable" href={"/help?topic=billing" as Route}>
-            {say("bl_help")}
-          </Link>
-          {contacts.lineUrl ? (
-            <a className="secondary-action pressable" href={contacts.lineUrl} rel="noreferrer" target="_blank">
-              {say("bl_line")}
-            </a>
-          ) : null}
-          {contacts.whatsappUrl ? (
-            <a className="secondary-action pressable" href={contacts.whatsappUrl} rel="noreferrer" target="_blank">
-              {say("bl_whatsapp")}
-            </a>
-          ) : null}
-          {contacts.email ? (
-            <a className="secondary-action pressable" href={`mailto:${contacts.email}?subject=${encodeURIComponent("RoveHQ subscription")}`}>
-              {say("bl_email")}
-            </a>
-          ) : null}
-        </div>
       </section>
     </AppShell>
   );

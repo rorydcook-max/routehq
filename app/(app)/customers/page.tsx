@@ -8,11 +8,19 @@ import { businessCurrency } from "@/lib/business-units";
 import { getCustomerList, getCustomerMonths } from "@/lib/customer-detail";
 import { getDefaultOrganization } from "@/lib/organization";
 import { formatMoney } from "@/lib/regional";
+import { averageOf, listReviews } from "@/lib/reviews";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function CustomersPage({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
   const { show } = await searchParams;
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
-  const [customers, months] = await Promise.all([getCustomerList(organization.id), getCustomerMonths(organization.id)]);
+  const [customers, months, reviews] = await Promise.all([
+    getCustomerList(organization.id),
+    getCustomerMonths(organization.id),
+    createSupabaseServerClient().then((supabase) => listReviews(supabase, organization.id)).catch(() => [])
+  ]);
+  const reviewStats = averageOf(reviews);
+  const reviewsToCheck = reviews.filter((review) => !review.checked).length;
   const say = await getTranslations("customers");
   // The counts on the band are filters: tap "3 renting now" to see just them, tap again for everyone.
   const link = (key: string) => (show === key ? "/customers" : `/customers?show=${key}`);
@@ -40,7 +48,15 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
                     { count: rentalCount, value: say("daysShort", { count: Math.round(rentalDays / Math.max(1, rentalCount)) }), label: say("pillAvgLength") },
                     { count: rentalCount, value: formatMoney(Math.round(revenue / Math.max(1, rentalCount)), businessCurrency(), "en-US"), label: say("pillAvgSpend") }
                   ]
-                : [])
+                : []),
+              // Reviews renters left (app/(app)/customers/reviews): "★ 4.8 · 12 reviews". New ones are also on To do.
+              {
+                count: reviewStats.count,
+                value: reviewStats.count ? `★ ${reviewStats.average.toFixed(1)}` : undefined,
+                label: say("pillReviews", { count: reviewStats.count }),
+                dot: reviewsToCheck > 0 ? "var(--warning)" : null,
+                href: "/customers/reviews"
+              }
             ]}
           />
         </PageBand>

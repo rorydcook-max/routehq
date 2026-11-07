@@ -23,6 +23,7 @@ export type AlertKey =
   | "extensionRequested"
   | "extensionRequestedReason"
   | "extensionHoldReturning"
+  | "reviewReceived"
   | "returnConfirmed"
   | "problemReported"
   | "questionAsked"

@@ -96,7 +96,7 @@ export function customerMessagesOn(settings: any) {
 }
 
 /** The automatic daily reminders, each of which a business can turn off in Settings. */
-export const REMINDER_KINDS = ["handover", "return", "rent_due", "rent_late", "vehicle_due", "signature"] as const;
+export const REMINDER_KINDS = ["handover", "return", "rent_due", "rent_late", "vehicle_due", "signature", "review"] as const;
 export type ReminderKind = (typeof REMINDER_KINDS)[number];
 
 export function remindersOff(settings: any): ReminderKind[] {

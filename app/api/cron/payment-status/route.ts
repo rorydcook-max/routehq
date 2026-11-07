@@ -13,6 +13,7 @@ import { sendTrialNudges } from "@/lib/trial-nudges";
 import { postDueComplianceInstalments } from "@/lib/compliance-billing";
 import { runIdPhotoRetention } from "@/lib/privacy/erase";
 import { addDaysIso, orgTimeZone, runDailyJob, supabaseRunStore } from "@/lib/scheduled-runs";
+import { sendReviewRequests } from "@/lib/reviews";
 
 /**
  * Called every hour by Vercel Cron (vercel.json).
@@ -23,6 +24,7 @@ import { addDaysIso, orgTimeZone, runDailyJob, supabaseRunStore } from "@/lib/sc
  *  - At 09:00 on each business's own clock (lib/scheduled-runs.ts), once per local day: customer reminders, late
  *    returns, rent top-ups, vehicle statuses, trial nudges, monthly paperwork costs, scheduled -> pending -> overdue
  *    and "payment due tomorrow" jobs, all on that business's date.
+ *  - At 10:00 on each business's own clock, once per local day: review requests for rentals returned yesterday.
  */
 const HOUSEKEEPING_UTC_HOUR = 1;
 
@@ -197,11 +199,25 @@ export async function GET(req: NextRequest) {
     }
   });
 
+  // ── 10:00 on each business's clock: "How was it?" the day after a return (lib/reviews.ts) ──
+  let reviewRequests = 0;
+  const reviewRun = await runDailyJob({
+    job: "review_requests",
+    orgs: (orgs || []) as any[],
+    store,
+    at: now,
+    work: async ({ localDate, orgs: due }) => {
+      reviewRequests += await sendReviewRequests(supabase, due.map((org) => String(org.id)), localDate).catch(() => 0);
+    }
+  });
+
   return NextResponse.json({
     success: errors.length === 0,
     ...(errors.length ? { errors } : {}),
     holdsReleased,
     housekeeping,
+    reviewRequests,
+    reviewRequestsRan: reviewRun.ran.length,
     remindersRan: run.ran,
     remindersAlreadyDone: run.alreadyDone,
     guard: run.guard,

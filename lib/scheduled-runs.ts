@@ -7,6 +7,7 @@ import { countryInfo, defaultTimeZone, orgCountry } from "@/lib/regional";
  *
  *   morning_summary     08:00 local  (app/api/line/daily-summary)
  *   customer_reminders  09:00 local  (app/api/cron/payment-status), after the summary as before
+ *   review_requests     10:00 local  (app/api/cron/payment-status), the day after a return (lib/reviews.ts)
  *
  * A business is also taken up to CATCH_UP_HOURS later if the run at its hour never happened (a missed or failed
  * cron call), so a missed hour costs a late message, not a lost day. Each job runs once per business per local day:
@@ -16,10 +17,10 @@ import { countryInfo, defaultTimeZone, orgCountry } from "@/lib/regional";
  * Plain functions apart from the store, so scripts/simulate-hourly-crons.ts can run them without a database.
  */
 
-export type DailyJob = "morning_summary" | "customer_reminders";
+export type DailyJob = "morning_summary" | "customer_reminders" | "review_requests";
 
 /** The local hour each job runs at. */
-export const JOB_HOURS: Record<DailyJob, number> = { morning_summary: 8, customer_reminders: 9 };
+export const JOB_HOURS: Record<DailyJob, number> = { morning_summary: 8, customer_reminders: 9, review_requests: 10 };
 
 /** How many hours after its hour a business is still taken when the run at its hour was missed. */
 export const CATCH_UP_HOURS = 3;

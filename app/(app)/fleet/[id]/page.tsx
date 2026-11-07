@@ -21,6 +21,7 @@ import { Dot, ElapsedBar, InOutBars, PartBar, Ring } from "@/components/glance";
 import { PageTabs, type PageTab } from "@/components/page-tabs";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
 import { RenewalForm, RenewalHelp } from "./renewal";
+import { VehicleReviews } from "./vehicle-reviews";
 import { partnerQuote } from "@/lib/insurance-partners";
 import { countryCode, paperApplies, paperField, paperworkFor } from "@/lib/country-paperwork";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
@@ -1256,7 +1257,16 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
         </div>
       )
     },
-    { id: "rentals", label: tx.say("tab_rentals"), content: <UtilizationSection detail={detail} isOwner={isOwner} /> },
+    {
+      id: "rentals",
+      label: tx.say("tab_rentals"),
+      content: (
+        <>
+          <UtilizationSection detail={detail} isOwner={isOwner} />
+          <VehicleReviews organizationId={organization.id} vehicleId={vehicle.id} />
+        </>
+      )
+    },
     { id: "checks", label: tx.say("tab_checks"), content: <InspectionsSection detail={detail} /> },
     {
       id: "details",

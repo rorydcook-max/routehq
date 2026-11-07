@@ -6,7 +6,7 @@ import { saveCustomerMessages, saveReminderKinds } from "@/app/actions/online-bo
 import { SwitchField } from "@/components/switch-field";
 import { InfoTip } from "@/components/info-tip";
 
-const KINDS = ["handover", "return", "rent_due", "rent_late", "vehicle_due", "signature"];
+const KINDS = ["handover", "return", "rent_due", "rent_late", "vehicle_due", "signature", "review"];
 
 /** One switch for the messages RoveHQ sends customers on the business's behalf. Saves on change. */
 export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, off: initialOff = [] }: { enabled: boolean; hasChannel: boolean; emailOn?: boolean; off?: string[] }) {

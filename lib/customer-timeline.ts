@@ -1,7 +1,7 @@
 /**
  * A customer's life with the business, oldest to newest: first contact, each booking, money in and out, deposits,
  * agreements, documents, extensions, damage and partner referrals. Built only from records the app already keeps
- * (rentals, transactions, booking links, rental documents, inspections, extensions, conversations, activity),
+ * (rentals, transactions, booking links, rental documents, inspections, extensions, conversations, activity, reviews),
  * in one round of parallel queries for the customer, never one per booking.
  */
 import { toWallTime } from "@/lib/business-time";
@@ -49,7 +49,7 @@ export async function getCustomerTimeline(
   const none = { data: [] as any[], error: null, count: 0 };
   const byRental = (query: () => any): Promise<any> => (rentalIds.length ? Promise.resolve(query()) : Promise.resolve(none));
 
-  const [linksResult, extensionsResult, papersResult, inspectionsResult, conversationsResult, requestsResult, activityResult, lineResult] = await Promise.all([
+  const [linksResult, extensionsResult, papersResult, inspectionsResult, conversationsResult, requestsResult, activityResult, lineResult, reviewsResult] = await Promise.all([
     byRental(() => supabase.from("booking_links").select("rental_id, share_channels, booking_data, created_at").eq("organization_id", organizationId).in("rental_id", rentalIds).is("deleted_at", null)),
     byRental(() => supabase.from("rental_extensions").select("id, rental_id, new_end_date, created_at").eq("organization_id", organizationId).in("rental_id", rentalIds)),
     byRental(() =>
@@ -72,7 +72,9 @@ export async function getCustomerTimeline(
       .in("event_type", Array.from(ACTIVITY_TYPES))
       .order("occurred_at", { ascending: false })
       .limit(100),
-    supabase.from("line_messages").select("id", { count: "exact", head: true }).eq("organisation_id", organizationId).eq("customer_id", customer.id)
+    supabase.from("line_messages").select("id", { count: "exact", head: true }).eq("organisation_id", organizationId).eq("customer_id", customer.id),
+    // Reviews they left (lib/reviews.ts).
+    supabase.from("rental_reviews").select("id, rental_id, rating, submitted_at").eq("organization_id", organizationId).eq("customer_id", customer.id).not("submitted_at", "is", null)
   ]);
 
   const conversations = (conversationsResult.data || []) as any[];
@@ -142,6 +144,9 @@ export async function getCustomerTimeline(
     }
   }
 
+  for (const review of (reviewsResult?.data || []) as any[]) {
+    events.push({ id: `rev-${review.id}`, date: review.submitted_at, kind: "contact", key: "review", values: { rating: Number(review.rating || 0) }, rentalId: review.rental_id });
+  }
   for (const extension of (extensionsResult.data || []) as any[]) {
     events.push({ id: `ext-${extension.id}`, date: extension.created_at, kind: "change", key: "extended", values: { date: String(extension.new_end_date || "").slice(0, 10) }, rentalId: extension.rental_id });
   }

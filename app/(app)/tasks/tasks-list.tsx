@@ -157,6 +157,8 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   }
   // Türkiye: raised at handover (lib/rental-activation.ts); the booking's KABİS block has every line to copy.
   if (item.action === "kabis") return { title: tx.say("job_kabis"), detail: tx.say("job_kabis_detail") };
+  // A renter's review came in (lib/reviews.ts): "Review from Anna M. to check".
+  if (item.action === "review") return { title: tx.say("job_review", { name: raw.match(/^Review from (.+) to check$/)?.[1] || "" }), detail: null };
   // Left unpaid at the handover's payment step: "Collect ฿2,000 from Jane Doe" (app/actions/inspections.ts).
   if (item.action === "collect_payment") {
     const amount = raw.match(/^Collect (.+?) from /)?.[1];
@@ -592,6 +594,11 @@ function TaskRow({
               {tx.say("openBooking")}
             </Link>
           </>
+        ) : null}
+        {item.kind === "task" && !item.completedAt && item.action === "review" ? (
+          <Link className="primary-action pressable min-h-9 px-3 text-xs" href={"/customers/reviews?show=check" as Route}>
+            {tx.say("job_review_open")}
+          </Link>
         ) : null}
         {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "kabis" ? (
           <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#kabis`}>

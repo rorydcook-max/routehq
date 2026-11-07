@@ -19,6 +19,10 @@ export function jobNameFor(todo: Todo, action: string | null | undefined, title:
     const amount = String(title || "").match(/pro rata (\S+?)\)/)?.[1];
     if (amount && todo.has("job_refund_amount" as never)) return todo("job_refund_amount" as never, { amount });
   }
+  if (action === "review") {
+    // "Review from Anna M. to check" (lib/reviews.ts)
+    return todo(key, { name: String(title || "").match(/^Review from (.+) to check$/)?.[1] || "" });
+  }
   // Other names that need a figure are only built where the figure is known (To do).
   if (action === "extension" || action === "handover_collect") return null;
   return todo(key);

@@ -33,7 +33,7 @@ console.log("Time zones used:");
 for (const org of orgs) console.log(`  ${org.name.padEnd(30)} -> ${orgTimeZone(org)}`);
 
 async function simulateDay(day: string, skipUtcHours: number[] = []) {
-  const stores: Record<DailyJob, ReturnType<typeof memoryRunStore>> = { morning_summary: memoryRunStore(), customer_reminders: memoryRunStore() };
+  const stores: Record<DailyJob, ReturnType<typeof memoryRunStore>> = { morning_summary: memoryRunStore(), customer_reminders: memoryRunStore(), review_requests: memoryRunStore() };
   const sent: string[] = [];
   let duplicates = 0;
   console.log(`\n=== ${day} (UTC hours${skipUtcHours.length ? `, no cron call at ${skipUtcHours.map((h) => `${h}:00`).join(", ")} UTC` : ""}) ===`);

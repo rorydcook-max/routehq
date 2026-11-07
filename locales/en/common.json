@@ -1025,7 +1025,8 @@
     "extrasRemoved": "{names} has been taken off your booking.",
     "extrasRefunded": "we've refunded {amount} for your extras. Thank you.",
     "extrasCredited": "the {amount} you paid for extras will come off your rent due {date}.",
-    "extendCheck": "your rental of the {vehicle} ends on {date}. Are you extending? Tap Extend or Returning here: {link}"
+    "extendCheck": "your rental of the {vehicle} ends on {date}. Are you extending? Tap Extend or Returning here: {link}",
+    "reviewRequest": "thank you for renting the {vehicle}. How was it? Leave a short review here: {link}"
   },
   "common": {
     "kinds_car": "Cars",
@@ -1252,7 +1253,9 @@
     "collect_deposit": "Collect deposit",
     "collect_top_up": "Collect top-up",
     "collect_extension": "Collect extension",
-    "collect_extras": "Collect extras"
+    "collect_extras": "Collect extras",
+    "job_review": "Review from {name} to check",
+    "job_review_open": "Open reviews"
   },
   "bookings": {
     "eyebrow": "Bookings",
@@ -2915,7 +2918,8 @@
     "in_share": "{count} · {percent}%",
     "in_trend": "Rental length and spend",
     "in_avgLength": "Average length",
-    "in_avgSpend": "Average spend"
+    "in_avgSpend": "Average spend",
+    "pillReviews": "{count, plural, one {# review} other {# reviews}}"
   },
   "calendar": {
     "title": "Calendar",
@@ -3563,7 +3567,8 @@
     "tl_paid": "Payment",
     "tl_paidCharge": "Paid a charge",
     "tl_refunded": "Refund",
-    "tl_damage": "Damage found on return: {count, plural, one {# item} other {# items}}"
+    "tl_damage": "Damage found on return: {count, plural, one {# item} other {# items}}",
+    "tl_review": "Left a review: {rating}/5"
   },
   "vehicleForm": {
     "addTitle": "Add vehicle",
@@ -4742,7 +4747,8 @@
     "kv_motorbikes": "Motorbikes",
     "kv_onRental": "On rental",
     "kv_parked": "Parked",
-    "kv_confirm": "Continue"
+    "kv_confirm": "Continue",
+    "rem_review": "Ask for a review after return"
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -7262,7 +7268,8 @@
     "nudgeBookingPage": "Put your booking page on your Facebook page, Google Maps and LINE profile so customers can book any time.",
     "nudgeSignature": "Add your signature once, and customers can sign the rental agreement on their phone.",
     "nudgePaymentMethods": "Add your PromptPay or bank details so customers can pay straight from their booking page.",
-    "extensionHoldReturning": "{customer} isn't extending: the {vehicle} is due back on {date}. The days after it are open for booking again."
+    "extensionHoldReturning": "{customer} isn't extending: the {vehicle} is due back on {date}. The days after it are open for booking again.",
+    "reviewReceived": "{customer} left a {rating}-star review."
   },
   "handoverPay": {
     "title": "Payment",
@@ -7296,5 +7303,48 @@
     "receipt": "Receipt {number}",
     "failed": "Payment couldn't be recorded. Try again.",
     "later": "Later"
+  },
+  "renterReview": {
+    "title": "How was your rental?",
+    "titleVehicle": "How was the {vehicle}?",
+    "stars": "Your rating",
+    "starCount": "{count, plural, one {# star} other {# stars}}",
+    "yourWords": "Your review (optional)",
+    "shownAs": "Shown as",
+    "consent": "Show my review on {business}'s website",
+    "send": "Send review",
+    "sending": "Sending…",
+    "pickStars": "Choose 1 to 5 stars.",
+    "failed": "Couldn't send. Please try again.",
+    "thanks": "Thank you for your review!",
+    "google": "Also post it on Google",
+    "notFound": "This review link isn't valid."
+  },
+  "reviewsPage": {
+    "title": "Reviews",
+    "back": "Customers",
+    "average": "average",
+    "count": "{count, plural, one {# review} other {# reviews}}",
+    "all": "All reviews",
+    "pillAll": "all",
+    "pillToCheck": "to check",
+    "pillPublished": "on website",
+    "empty": "No reviews yet",
+    "new": "New",
+    "test": "Test",
+    "published": "On website",
+    "hidden": "Hidden",
+    "noConsent": "Not for website",
+    "booking": "Booking",
+    "yourReply": "Your reply",
+    "reply": "Reply",
+    "editReply": "Edit reply",
+    "publish": "Publish",
+    "hide": "Hide",
+    "save": "Save",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "failed": "Couldn't save. Please try again.",
+    "googleLink": "Google review link"
   }
 }

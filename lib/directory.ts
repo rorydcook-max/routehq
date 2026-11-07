@@ -90,6 +90,7 @@ export async function listedBusinessesForSitemap(): Promise<Array<{ slug: string
     .select("organization_id, daily_rate, weekly_rate, monthly_rate")
     .in("organization_id", listed.map((organization) => organization.id))
     .is("deleted_at", null)
+    .is("parked_at", null)
     .not("status", "in", "(maintenance,inactive,retired)");
   const withVehicles = new Set(
     ((vehicles || []) as any[]).filter((vehicle) => Number(vehicle.daily_rate) > 0 || Number(vehicle.weekly_rate) > 0 || Number(vehicle.monthly_rate) > 0).map((vehicle) => vehicle.organization_id)
@@ -122,6 +123,8 @@ export async function searchDirectory(input: DirectorySearch): Promise<Directory
     .select("id, organization_id, make, model, year, color, status, daily_rate, weekly_rate, monthly_rate, deposit_amount, specifications, vehicle_categories(code)")
     .in("organization_id", listed.map((organization) => organization.id))
     .is("deleted_at", null)
+    // Parked (over the plan's vehicle limit): not listed.
+    .is("parked_at", null)
     .not("status", "in", "(maintenance,inactive,retired)");
   const priced = ((vehicles || []) as any[]).filter((vehicle) => Number(vehicle.daily_rate) > 0 || Number(vehicle.weekly_rate) > 0 || Number(vehicle.monthly_rate) > 0);
   const wanted = input.kind && input.kind !== "any" ? priced.filter((vehicle) => String(vehicle.vehicle_categories?.code || "") === input.kind) : priced;

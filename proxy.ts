@@ -258,7 +258,9 @@ export async function proxy(request: NextRequest) {
     pathname === "/api/line/daily-summary" ||
     // Calendar apps subscribing to a business's booking feed (a secret token in the address), and the RoveHQ Telegram bot.
     pathname.startsWith("/api/calendar/") ||
-    pathname === "/api/telegram/webhook";
+    pathname === "/api/telegram/webhook" ||
+    // Stripe events for RoveHQ's plans; the route checks Stripe's signature itself.
+    pathname.startsWith("/api/stripe/webhook/");
   // Customer pages take their language from the customer (their choice, or their phone's language), never from whoever is signed in.
   if (pathname.startsWith("/book/") || pathname.startsWith("/amend/") || pathname === "/rent" || pathname.startsWith("/rent/")) {
     request.headers.set("x-routehq-customer-page", "1");

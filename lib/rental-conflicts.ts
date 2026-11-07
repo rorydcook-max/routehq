@@ -150,11 +150,24 @@ export async function loadBusyPeriods(supabase: any, organizationId: string, veh
   return byVehicle;
 }
 
+export const PARKED_MESSAGE = "This vehicle is parked: your plan has room for fewer vehicles. Choose another vehicle or move up a plan.";
+
+/** The database refused a booking on a parked vehicle (trigger rentals_block_parked_vehicle). */
+export function isParkedVehicleError(error: { message?: string } | null | undefined) {
+  return !!error && String(error.message || "").includes("vehicle_parked");
+}
+
 /** Returns a friendly message when the dates clash with another booking, else null. */
 export async function vehicleConflictMessage(
   supabase: any,
   args: { organizationId: string; vehicleId: string; startDate: string; endDate: string | null; excludeRentalId?: string | null }
 ) {
+  // Parked (over the plan's vehicle limit): no new bookings and nothing moved onto it; its own rental carries on.
+  const { data: vehicle } = await supabase.from("vehicles").select("parked_at").eq("id", args.vehicleId).maybeSingle();
+  if (vehicle?.parked_at) {
+    const { data: own } = args.excludeRentalId ? await supabase.from("rentals").select("vehicle_id").eq("id", args.excludeRentalId).maybeSingle() : { data: null };
+    if (own?.vehicle_id !== args.vehicleId) return PARKED_MESSAGE;
+  }
   const busy = await loadBusyPeriods(supabase, args.organizationId, [args.vehicleId]);
   const conflict = findConflict(busy[args.vehicleId] || [], args.startDate, args.endDate, args.excludeRentalId);
   return conflict ? conflictMessage(conflict) : null;

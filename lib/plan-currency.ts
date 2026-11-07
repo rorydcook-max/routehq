@@ -47,6 +47,9 @@ const PER_THB: Record<string, number> = {
  */
 const PLAN_CURRENCY_FOR: Record<string, string> = { TRY: "EUR" };
 
+/** Every currency a plan can be charged in (the Stripe prices carry one amount for each). */
+export const PLAN_CURRENCIES = Object.keys(PER_THB);
+
 export function planCurrency(currency: string | null | undefined) {
   const code = String(currency || "THB").toUpperCase();
   const mapped = PLAN_CURRENCY_FOR[code] || code;

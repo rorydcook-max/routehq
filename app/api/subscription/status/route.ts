@@ -19,7 +19,7 @@ export async function GET() {
 
   const { data: organization, error } = await supabase
     .from("organizations")
-    .select("id, subscription_status, subscription_tier, trial_ends_at, next_payment_due")
+    .select("id, subscription_status, subscription_tier, trial_ends_at, next_payment_due, stripe_subscription_id")
     .eq("id", membership.organization_id)
     .is("deleted_at", null)
     .maybeSingle();
@@ -30,6 +30,8 @@ export async function GET() {
 
   const trialEndsAt = organization?.trial_ends_at ? new Date(organization.trial_ends_at).getTime() : null;
   const daysRemaining = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt - Date.now()) / (24 * 60 * 60 * 1000))) : null;
+  // Whether a Stripe subscription runs (a trial with a card on file needs no "Subscribe" reminder); the id stays server-side.
+  const { stripe_subscription_id: subscriptionId, ...shown } = (organization || {}) as Record<string, unknown>;
 
-  return NextResponse.json({ authenticated: true, organization, daysRemaining });
+  return NextResponse.json({ authenticated: true, organization: organization ? { ...shown, subscribed: Boolean(subscriptionId) } : null, daysRemaining });
 }

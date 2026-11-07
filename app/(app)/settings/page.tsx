@@ -9,6 +9,7 @@ import { InfoTip } from "@/components/info-tip";
 import { currencySymbol } from "@/components/currency-symbol";
 import { effectiveLimits, fleetMix, planById } from "@/lib/plans";
 import { getCustomPlan } from "@/lib/custom-plan";
+import { BillingSummary } from "@/app/(app)/settings/billing/billing-summary";
 import { SettingsTabs } from "@/app/(app)/settings/settings-tabs";
 import { isEmailConfigured } from "@/lib/email";
 import type { Route } from "next";
@@ -719,30 +720,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 </div>
                 {planStatus === "trial" && trialDaysLeft !== null ? <p className="mt-1 font-semibold text-[var(--foreground-secondary)]">{say("bl_trialLeft", { days: trialDaysLeft })}</p> : null}
               </div>
-              <Link className="primary-action pressable" href={"/settings/billing" as Route}>
-                {say("plan_btn")}
+              <Link className="primary-action pressable" href={"/settings/billing#plans" as Route}>
+                {say("sb_changePlan")}
               </Link>
             </div>
-            {/*
-              The plan's facts, one row each. Price and interval, renewal date and payment method join this list once
-              plans are billed through Stripe (feedback plan F); until then only what is known is shown.
-            */}
-            {(() => {
-              const facts: Array<{ label: string; value: string }> = [];
-              if (planStatus === "trial" && trialEndsAt) {
-                facts.push({ label: say("plan_trialEnds"), value: dateFormat(locale, { day: "numeric", month: "long", year: "numeric", timeZone: businessTimeZone() }).format(new Date(trialEndsAt)) });
-              }
-              return facts.length ? (
-                <dl className="mt-4 grid gap-x-6 gap-y-2 border-t border-[var(--border)] pt-4 sm:grid-cols-2">
-                  {facts.map((fact) => (
-                    <div className="flex items-baseline justify-between gap-3 sm:block" key={fact.label}>
-                      <dt className="text-[14px] font-semibold text-[var(--muted)]">{fact.label}</dt>
-                      <dd className="font-semibold text-[var(--foreground)]">{fact.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : null;
-            })()}
+            {/* The plan's facts (price, renewal, payment method, billing address, invoices) and its buttons, from Stripe. */}
+            <BillingSummary canChange={viewerIsOwner} customLimits={customPlan.custom_limits} organizationId={organization.id} showChangePlan={false} />
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
               {[
                 { label: say("use_cars"), used: fleetNow.cars, limit: currentPlan.cars },

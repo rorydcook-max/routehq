@@ -13,6 +13,8 @@ type SubscriptionPayload = {
     subscription_status?: string | null;
     subscription_tier?: string | null;
     trial_ends_at?: string | null;
+    /** A Stripe subscription runs (a trial with a card on file needs no reminder). */
+    subscribed?: boolean;
   } | null;
   daysRemaining?: number | null;
 };
@@ -80,19 +82,27 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
   const t = useTranslations("shell");
   const [payload, setPayload] = useState<SubscriptionPayload | null>(null);
   const [hidden, setHidden] = useState(true);
+  const [pastDue, setPastDue] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    const dismissedUntil = Number(window.localStorage.getItem(dismissKey) || 0);
-    if (dismissedUntil > Date.now()) {
-      return;
-    }
-
     loadSubscriptionStatus()
       .then((data) => {
+        // A plan payment failed: shown until the card is updated, whatever was dismissed.
+        if (data?.organization?.subscription_status === "past_due") {
+          setPastDue(true);
+          return;
+        }
+        let dismissedUntil = 0;
+        try {
+          dismissedUntil = Number(window.localStorage.getItem(dismissKey) || 0);
+        } catch {
+          dismissedUntil = 0;
+        }
+        if (dismissedUntil > Date.now()) return;
         // Free chosen and the trial over: they are simply on Free now, nothing to remind them of.
         const onFreeAfterTrial = data?.organization?.subscription_tier === "free" && data?.daysRemaining === 0;
-        if (data?.organization?.subscription_status === "trial" && !onFreeAfterTrial) {
+        if (data?.organization?.subscription_status === "trial" && !onFreeAfterTrial && !data.organization.subscribed) {
           setPayload(data);
           setHidden(false);
         }
@@ -108,7 +118,7 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
   const lastWeek = days !== null && days !== undefined && days <= 7;
   // While it floats, the page gets extra room at the end so the last row and its buttons can scroll
   // up from underneath it (globals.css reads this flag).
-  const floating = placement === "floating" && !hidden && !!payload?.organization && !onForm && lastWeek;
+  const floating = placement === "floating" && !onForm && (pastDue || (!hidden && !!payload?.organization && lastWeek));
   useEffect(() => {
     if (!floating) return;
     document.body.dataset.trialBanner = "1";
@@ -116,6 +126,27 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
       delete document.body.dataset.trialBanner;
     };
   }, [floating]);
+
+  // Plan payment failed: one line to the Plan page, where the card is updated. Not on the Plan page itself.
+  if (pastDue) {
+    if (placement === "inline" || (onForm && placement === "floating") || pathname?.startsWith("/settings/billing")) return null;
+    return (
+      <div
+        className={clsx(
+          placement === "sidebar"
+            ? "mt-3 hidden items-center gap-2 rounded-lg border px-2.5 py-2 lg:flex"
+            : "fixed bottom-[calc(86px+env(safe-area-inset-bottom))] left-6 right-6 z-[29] flex items-center justify-between gap-2 rounded-t-xl border border-b-0 px-3 py-1 lg:hidden",
+          "border-[var(--danger-line)] bg-[var(--danger-light)] text-[var(--danger)]"
+        )}
+        role="alert"
+      >
+        <Link className="flex min-w-0 flex-1 items-center gap-2 hover:underline" href={"/settings/billing" as Route}>
+          <span aria-hidden="true" className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[var(--danger)]" />
+          <span className="truncate text-xs font-bold leading-4">{t("paymentFailed")}</span>
+        </Link>
+      </div>
+    );
+  }
 
   // The sidebar copy sits in the page flow, so it never covers anything.
   if (hidden || !payload?.organization || (onForm && placement === "floating")) {

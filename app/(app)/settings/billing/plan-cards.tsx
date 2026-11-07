@@ -4,10 +4,12 @@ import { Check } from "lucide-react";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { choosePlan } from "@/app/actions/plan";
+import { chooseFreePlan, choosePaidPlan, completeCheckout } from "@/app/actions/billing";
 import { Badge } from "@/components/ui";
+import { forgetSubscriptionStatus } from "@/components/trial-banner";
 import { numberLocale } from "@/lib/i18n/dates";
-import { BUSINESS_INCLUDED, PLANS, YEARLY_MONTHS, businessExtras, fleetText, overBy, type FleetMix, type Plan } from "@/lib/plans";
+import { BUSINESS_INCLUDED, PLANS, YEARLY_MONTHS, businessExtras, effectiveLimits, fleetText, overBy, type FleetMix, type Plan } from "@/lib/plans";
+import { CheckoutDialog, KeepVehiclesDialog, needsParking, type FleetVehicleRow } from "./billing-dialogs";
 import { fleetMonthly, formatPlanPrice, planCurrency, planPrices, yearlyOf } from "@/lib/plan-currency";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -33,7 +35,12 @@ export function PlanCards({
   canChange,
   fleet,
   currency: rawCurrency,
-  suggestedTier = null
+  suggestedTier = null,
+  vehicles = [],
+  customLimits = null,
+  subscribed = false,
+  scheduledPlan = null,
+  scheduledDate = null
 }: {
   currentTier: string;
   currentInterval: string;
@@ -44,6 +51,14 @@ export function PlanCards({
   currency: string;
   /** The smallest plan that fits the fleet: badged, and the one primary button when it isn't the current plan. */
   suggestedTier?: string | null;
+  /** Every vehicle, for choosing which stay active on a smaller plan. */
+  vehicles?: FleetVehicleRow[];
+  customLimits?: unknown;
+  /** A Stripe subscription is running (paid, or card on file in the trial). */
+  subscribed?: boolean;
+  /** A smaller plan (or Free) that starts at the end of the paid period. */
+  scheduledPlan?: string | null;
+  scheduledDate?: string | null;
 }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const locale = useLocale();
@@ -51,20 +66,52 @@ export function PlanCards({
   const [yearly, setYearly] = useState(currentInterval === "yearly");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [checkout, setCheckout] = useState<string | null>(null);
+  const [keepFor, setKeepFor] = useState<string | null>(null);
   const [, startTransition] = useTransition();
-  const choose = (planId: string) => {
+  const rank = (id: string) => PLANS.findIndex((plan) => plan.id === id);
+  const limitsOf = (planId: string) => effectiveLimits({ subscription_tier: planId, custom_limits: customLimits });
+  const done = () => {
+    forgetSubscriptionStatus();
+    router.refresh();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const run = (planId: string, keep: string[] | null) => {
     setBusy(planId);
     setError(null);
     startTransition(async () => {
-      const result = await choosePlan({ plan: planId, interval: yearly ? "yearly" : "monthly" }).catch(() => ({ ok: false as const, error: say("pl_tryAgain") }));
+      const result =
+        planId === "free"
+          ? await chooseFreePlan({ keep }).catch(() => ({ ok: false as const, error: say("pl_tryAgain") }))
+          : await choosePaidPlan({ plan: planId, interval: yearly ? "yearly" : "monthly", keep }).catch(() => ({ ok: false as const, error: say("pl_tryAgain") }));
       setBusy(null);
+      setKeepFor(null);
       if (!result.ok) {
         setError(result.error);
         return;
       }
-      router.refresh();
-      // The outcome (what to pay, or that Free is on) shows at the top of the page.
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if ("clientSecret" in result && result.clientSecret) {
+        setCheckout(result.clientSecret);
+        return;
+      }
+      done();
+    });
+  };
+  const choose = (planId: string) => {
+    // Moving to a plan with room for fewer vehicles: the owner picks which stay active first.
+    const smaller = status !== "trial" && rank(planId) < rank(currentTier);
+    if (smaller && needsParking(vehicles, limitsOf(planId))) {
+      setKeepFor(planId);
+      return;
+    }
+    run(planId, null);
+  };
+  const finishCheckout = (sessionId: string) => {
+    startTransition(async () => {
+      const result = await completeCheckout(sessionId).catch(() => ({ ok: false as const, error: say("pl_tryAgain") }));
+      setCheckout(null);
+      if (!result.ok) setError(result.error);
+      done();
     });
   };
   const currency = planCurrency(rawCurrency);
@@ -111,7 +158,7 @@ export function PlanCards({
           const suggested = plan.id === suggestedTier;
           const primary = plan.id === emphasis;
           // On a plan already (Free, or paid up on this billing period): a quiet, disabled "Your plan".
-          const settled = current && (plan.monthly === 0 || (status === "active" && currentInterval === (yearly ? "yearly" : "monthly")));
+          const settled = current && (plan.monthly === 0 || ((status === "active" || subscribed) && currentInterval === (yearly ? "yearly" : "monthly")));
           // Trying a paid plan in the trial: keeping it afterwards is a choice, not the page's main action.
           const keepAfterTrial = current && !settled && status === "trial";
           const over = overBy(plan, fleet);
@@ -176,7 +223,9 @@ export function PlanCards({
               {!current && !fits ? <p className="mt-3 text-sm font-semibold text-[var(--muted)]">{say("pl_tooSmall")}</p> : null}
 
               <div className="mt-auto pt-4">
-                {pendingPlan === plan.id ? (
+                {scheduledPlan === plan.id && scheduledDate ? (
+                  <p className="rounded-lg bg-[var(--warning-light)] px-3 py-2 text-center text-sm font-bold text-[var(--foreground)]">{say("sb_fromDate", { date: scheduledDate })}</p>
+                ) : pendingPlan === plan.id ? (
                   <p className="rounded-lg bg-[var(--warning-light)] px-3 py-2 text-center text-sm font-bold text-[var(--foreground)]">{say("pl_pendingBadge")}</p>
                 ) : settled ? (
                   <button className="secondary-action w-full disabled:opacity-60" disabled type="button">
@@ -214,6 +263,17 @@ export function PlanCards({
         {say("pl_bikesNote")}
         {currency !== "THB" ? ` ${say("pl_currencyNote", { currency })}` : ""}
       </p>
+      {keepFor ? (
+        <KeepVehiclesDialog
+          busy={busy !== null}
+          limits={limitsOf(keepFor)}
+          onClose={() => setKeepFor(null)}
+          onConfirm={(keep) => run(keepFor, keep)}
+          title={say("kv_title", { plan: say(`bl_${keepFor}`) })}
+          vehicles={vehicles}
+        />
+      ) : null}
+      {checkout ? <CheckoutDialog clientSecret={checkout} onClose={() => setCheckout(null)} onComplete={finishCheckout} /> : null}
     </div>
   );
 }

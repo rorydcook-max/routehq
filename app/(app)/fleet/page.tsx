@@ -21,6 +21,7 @@ import { getCustomPlan } from "@/lib/custom-plan";
 import { groupVehiclesByKind, kindLabel } from "@/lib/vehicle-groups";
 import { dateFormat } from "@/lib/i18n/dates";
 import { businessDistanceUnit } from "@/lib/business-units";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const statusTone = {
   Rented: "blue",
@@ -84,7 +85,14 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   // Profit, importing and the bulk archive/delete are the owner's; teammates see the fleet without them.
   const membership = await getCurrentMembership();
   const isOwner = membership?.role === "owner";
-  const [{ vehicles }, categories, customPlan] = await Promise.all([getDashboardData(), getVehicleCategories(organization.id), getCustomPlan(organization.id)]);
+  const [{ vehicles }, categories, customPlan, parkedResult] = await Promise.all([
+    getDashboardData(),
+    getVehicleCategories(organization.id),
+    getCustomPlan(organization.id),
+    // Parked (over the plan's vehicle limit after a downgrade): shown, marked, and not counted towards the plan.
+    createSupabaseServerClient().then((supabase: any) => supabase.from("vehicles").select("id").eq("organization_id", organization.id).not("parked_at", "is", null))
+  ]);
+  const parked = new Set(((parkedResult?.data || []) as Array<{ id: string }>).map((row) => row.id));
   // The counts at the top are filters: tap "4 out earning" to see just those.
   const matches = (vehicle: (typeof vehicles)[number]) =>
     filter === "out"
@@ -98,7 +106,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const groups = filter ? groupVehiclesByKind(vehicles.filter(matches), categories) : allGroups;
   // Over the plan's vehicle limit: a nudge, never a block (Rory, 11 Oct).
   const plan = effectiveLimits({ subscription_tier: organization.subscription_tier, custom_limits: customPlan.custom_limits });
-  const fleet = fleetMix(vehicles, categories);
+  const fleet = fleetMix(vehicles.filter((vehicle) => !parked.has(vehicle.id)), categories);
   const over = vehiclesOverLimit(plan, fleet, organization.subscription_status);
   const isOver = over.cars + over.motorbikes > 0;
   const fitting = planForFleet(fleet);
@@ -349,8 +357,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                           </Link>
                         </td>
                         <td className="px-3 py-3">
-                          <span className="inline-block whitespace-nowrap">
+                          <span className="inline-flex flex-wrap gap-1 whitespace-nowrap">
                             {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <StatusPill label={t(`status_${vehicle.status}`)} status={vehicle.status} />}
+                            {parked.has(vehicle.id) ? <Badge tone="neutral">{plansSay("kv_parked")}</Badge> : null}
                           </span>
                         </td>
                         <td className="px-3 py-3">
@@ -395,8 +404,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         <p className="line-clamp-2 min-w-0 text-[17px] font-bold leading-tight text-[var(--foreground)]">
                           {vehicle.make} {vehicle.model}
                         </p>
-                        <span className="shrink-0 whitespace-nowrap">
+                        <span className="flex shrink-0 flex-col items-end gap-1 whitespace-nowrap">
                           {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <StatusPill label={t(`status_${vehicle.status}`)} status={vehicle.status} />}
+                          {parked.has(vehicle.id) ? <Badge tone="neutral">{plansSay("kv_parked")}</Badge> : null}
                         </span>
                       </div>
                       {/* Plate and price each stay whole; on a narrow phone the price drops to its own line instead of being cut off. */}

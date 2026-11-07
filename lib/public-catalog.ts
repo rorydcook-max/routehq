@@ -82,6 +82,8 @@ export async function getPublicCatalog(slug: string) {
       .select("id, make, model, trim, year, color, status, daily_rate, weekly_rate, monthly_rate, deposit_amount, specifications, vehicle_categories(code, name)")
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
+      // Parked (over the plan's vehicle limit): not offered on the booking page, rove.rent or the partner network.
+      .is("parked_at", null)
       .order("monthly_rate", { ascending: true }),
     admin
       .from("rentals")

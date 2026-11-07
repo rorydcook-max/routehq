@@ -6,6 +6,7 @@ import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages"
 import { revalidatePath } from "next/cache";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -19,7 +20,9 @@ function optionalString(formData: FormData, key: string) {
   return String(formData.get(key) || "").trim() || null;
 }
 
-function money(value: number) {
+function money(value: number, currency: string | null | undefined = "THB") {
+  const code = String(currency || "THB").toUpperCase();
+  if (code !== "THB") return formatRegionalMoney(value, code, "en-GB");
   return new Intl.NumberFormat("th-TH", {
     style: "currency",
     currency: "THB",
@@ -225,13 +228,13 @@ export async function returnDeposit(formData: FormData) {
     customer_id: rental.customer_id,
     event_type: "deposit_refunded",
     title: "Deposit returned",
-    detail: `Deposit of ${money(returnAmount)} returned to customer.`,
+    detail: `Deposit of ${money(returnAmount, rental.currency)} returned to customer.`,
     metadata: { transaction_id: transaction.id, amount: returnAmount, notes }
   });
   {
     const admin = createSupabaseAdminClient() as any;
     // Only the deposit job: a "refund to decide" job is about rent paid for time not used, a separate decision.
-    await completeRentalJobs(admin, rentalId, "settle_deposit", `Deposit of ${money(returnAmount)} returned`);
+    await completeRentalJobs(admin, rentalId, "settle_deposit", `Deposit of ${money(returnAmount, rental.currency)} returned`);
     // The return inspection sends one message covering the whole settlement instead.
     if (String(formData.get("quiet") || "") !== "true") {
       await tellRentalCustomer(
@@ -330,7 +333,7 @@ export async function applyDepositDeduction(formData: FormData) {
     customer_id: rental.customer_id,
     event_type: "deposit_deduction_applied",
     title: "Deposit deduction applied",
-    detail: `Deposit deduction of ${money(deductionAmount)} applied — ${reason}.`,
+    detail: `Deposit deduction of ${money(deductionAmount, rental.currency)} applied — ${reason}.`,
     metadata: { transaction_id: transaction.id, amount: deductionAmount, reason, notes }
   });
 

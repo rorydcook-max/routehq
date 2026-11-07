@@ -24,6 +24,7 @@ import { bulkDeleteTransactions, deleteTransaction, updateTransaction } from "@/
 import { isIncomeTransactionType, TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import type { TransactionListItem } from "@/lib/transactions";
 import { withShares } from "@/lib/cost-spread";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 /** The real entry behind a row: a month's share of a yearly payment is edited and deleted as that payment. */
 const baseId = (transaction: TransactionListItem) => transaction.shareOf?.id || transaction.id;
@@ -32,6 +33,7 @@ type VehicleOption = { id: string; label: string };
 type TransactionKind = "income" | "refund" | "expense" | "deposit_received" | "deposit_refunded";
 
 function money(value: number, currency = "THB") {
+  if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(Math.abs(value), currency, "en-GB");
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Math.abs(value));
 }
 

@@ -51,7 +51,8 @@ export function PhoneField({
   const national = text.replace(/[^\d]/g, "");
 
   useEffect(() => {
-    if (followCountry && !national && allCountries.some((item) => item.code === followCountry)) setCountry(followCountry);
+    // A number typed before any country was chosen ("+" only) takes the country too, else it is saved without a code.
+    if (followCountry && (!national || !current) && allCountries.some((item) => item.code === followCountry)) setCountry(followCountry);
     // Only when the other choice changes: a number already typed keeps its own country.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [followCountry]);

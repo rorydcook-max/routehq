@@ -9,6 +9,7 @@ import { allCountries, countriesSorted, flagForNationality } from "@/lib/custome
 import { initialsOf } from "@/components/glance";
 import { PhoneField } from "@/components/phone-field";
 import { ContactChoice } from "@/components/contact-choice";
+import { businessCountry } from "@/lib/business-units";
 
 type SelectorCustomer = {
   id: string;
@@ -46,7 +47,9 @@ export function CustomerSelector({
   const formRef = useRef<HTMLDivElement>(null);
   const [contact, setContact] = useState("whatsapp");
   const nationalityOptions = useMemo(() => countriesSorted(locale), [locale]);
-  const [nationality, setNationality] = useState("Thai");
+  // The business's own country to start (it was always "Thai"); the phone number's country replaces it when found.
+  const homeCountry = businessCountry();
+  const [nationality, setNationality] = useState(() => allCountries.find((country) => country.code === homeCountry)?.name || "");
   const [nationalityTouched, setNationalityTouched] = useState(false);
 
   const selectedCustomer = localCustomers.find((customer) => customer.id === selectedId);
@@ -221,6 +224,7 @@ export function CustomerSelector({
                   <input className={inputClass} defaultValue={/\d/.test(search) ? "" : search.trim()} name="fullName" placeholder={say("sel_fullName")} required />
                   {/* Type or paste the whole number; the country code is found from it. */}
                   <PhoneField
+                    defaultCountry={homeCountry || undefined}
                     inputClass={inputClass}
                     onCountryFound={(code) => {
                       if (nationalityTouched) return;

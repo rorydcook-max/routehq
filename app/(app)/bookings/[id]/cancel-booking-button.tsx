@@ -7,6 +7,7 @@ import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, XCircle } from "lucide-react";
 import { cancelBookingWithDisposition } from "@/app/actions/bookings";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 type CancelReason =
   | "customer_cancelled_before_delivery"
@@ -63,6 +64,7 @@ function SymbolInside({ currency, children }: { currency?: string | null; childr
 }
 
 function money(amount: number, currency = "THB") {
+  if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(amount, currency, "en-GB");
   return new Intl.NumberFormat("th-TH", {
     style: "currency",
     currency,

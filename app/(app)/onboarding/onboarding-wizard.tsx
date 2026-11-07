@@ -164,7 +164,7 @@ export function OnboardingWizard({
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className={labelClass}>{t("country")}</span>
-                  <select className={fieldClass} onChange={(event) => setCountry(event.target.value)} required value={country}>
+                  <select className={fieldClass} onChange={(event) => { setCountry(event.target.value); setError(""); }} required value={country}>
                     {!country ? (
                       <option disabled value="">
                         {t("countryChoose")}

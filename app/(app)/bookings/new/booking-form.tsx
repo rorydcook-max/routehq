@@ -6,6 +6,7 @@ import { includedOptions } from "@/lib/included-items";
 import { shownError } from "@/lib/error-text";
 import { businessToday, toWallTime } from "@/lib/business-time";
 import { businessOffersPromptPay } from "@/lib/payment-methods";
+import { businessCountry } from "@/lib/business-units";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
@@ -21,6 +22,7 @@ import { QuickDocs } from "@/components/quick-docs";
 import { Badge, ProgressBar } from "@/components/ui";
 import { findConflict, type BusyPeriod } from "@/lib/rental-conflicts";
 import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 type BookingVehicle = {
   id: string;
@@ -142,6 +144,7 @@ const CURRENCY_INFO: Record<string, { symbol: string; locale: string; label: str
 };
 
 function money(value: unknown, currency = "THB") {
+  if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(Number(value || 0), currency, "en-GB");
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
@@ -313,7 +316,8 @@ export function BookingForm({
   const [existingPaid, setExistingPaid] = useState<"up_to_date" | "until" | "none">("up_to_date");
   const [existingPaidUntil, setExistingPaidUntil] = useState("");
   const [existingDepositHeld, setExistingDepositHeld] = useState(true);
-  const [includedItems, setIncludedItems] = useState<string[]>([includedOptions[1]]);
+  // Thailand's compulsory insurance (Por Ror Bor) comes ticked only for a business in Thailand.
+  const [includedItems, setIncludedItems] = useState<string[]>(() => (businessCountry() === "TH" ? [includedOptions[1]] : []));
   // The tick boxes stay folded when the vehicle already has its usual list.
   const [includedOpen, setIncludedOpen] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState<"delivery" | "collection" | "tbd">("delivery");

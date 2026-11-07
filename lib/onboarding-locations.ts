@@ -1,6 +1,19 @@
 /** Countries, provinces and towns offered in setup (moved from the old setup screen, 2 Nov 2026). */
 export const locationOptions = [
   {
+    country: "United States",
+    regions: [
+      { name: "Florida", towns: ["Miami", "Miami Beach", "Orlando", "Fort Lauderdale", "Tampa", "Key West", "Fort Myers"] },
+      { name: "California", towns: ["Los Angeles", "San Diego", "San Francisco", "Santa Monica", "Palm Springs", "Sacramento"] },
+      { name: "Hawaii", towns: ["Honolulu", "Waikiki", "Kahului (Maui)", "Lahaina (Maui)", "Kona", "Lihue (Kauai)"] },
+      { name: "Nevada", towns: ["Las Vegas", "Reno"] },
+      { name: "New York", towns: ["Manhattan", "Brooklyn", "Queens", "JFK Airport"] },
+      { name: "Texas", towns: ["Austin", "Houston", "Dallas", "San Antonio"] },
+      { name: "Arizona", towns: ["Phoenix", "Scottsdale", "Sedona", "Tucson"] },
+      { name: "Colorado", towns: ["Denver", "Boulder", "Aspen"] }
+    ]
+  },
+  {
     country: "Thailand",
     regions: [
       { name: "Bangkok", towns: ["Sukhumvit", "Silom / Sathorn", "Ari", "Ratchada", "Ladprao", "Don Mueang", "Suvarnabhumi"] },
@@ -357,6 +370,7 @@ export const currencyOptionsByCountry: Record<string, string[]> = {
   India: ["INR", "USD"],
   Bangladesh: ["BDT", "USD"],
   "Sri Lanka": ["LKR", "USD"],
+  "United States": ["USD"],
   "United Kingdom": ["GBP", "EUR"],
   Ireland: ["EUR", "GBP"],
   Spain: ["EUR", "GBP"],

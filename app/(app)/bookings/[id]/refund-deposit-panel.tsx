@@ -9,6 +9,7 @@ import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
 import { recordPaymentRefund } from "@/app/actions/bookings";
 import { MoneyInput } from "@/components/money-input";
 import { businessOffersPromptPay } from "@/lib/payment-methods";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 type Props = {
   rentalId: string;
@@ -28,6 +29,7 @@ type Props = {
 type ActiveForm = "return" | "deduction" | "refund" | null;
 
 function money(value: number, currency = "THB") {
+  if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(Number(value || 0), currency, "en-GB");
   return new Intl.NumberFormat("th-TH", {
     style: "currency",
     currency,

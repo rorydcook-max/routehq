@@ -12,6 +12,7 @@ import { longDate } from "@/lib/i18n/dates";
 import { monthPeriod } from "@/lib/i18n/period";
 import { addRentalPayment, deleteRentalPayment, recordPaymentReceived, setupExistingRentalPayments, updateRentalEndDate, updateRentalPayment } from "@/app/actions/bookings";
 import { deleteTransaction, updateTransaction } from "@/app/actions/transactions";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 type RentalPayment = {
   id: string;
@@ -76,6 +77,7 @@ function useCtl(): Ctl {
 }
 
 function money(value: unknown, currency = "THB") {
+  if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(Number(value || 0), currency, "en-GB");
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
@@ -97,7 +99,7 @@ function amountInput(value: unknown) {
 /** What a payment is for, with any extras moved onto it or taken off it said after. */
 function paymentDescription(payment: RentalPayment, tx: Ctl) {
   const metadata = payment.metadata || {};
-  const amount = (value: unknown) => new Intl.NumberFormat("th-TH", { style: "currency", currency: (payment as any).currency || "THB", maximumFractionDigits: 0 }).format(Number(value || 0));
+  const amount = (value: unknown) => money(value, (payment as any).currency || "THB");
   if (metadata.type === "extras" && metadata.moved_to_payment) return tx.say("pc_extrasMoved", { names: (Array.isArray(metadata.extras) ? metadata.extras : []).join(", ") || "-" });
   if (metadata.type === "extras" && metadata.removed_extras) return tx.say("pc_extrasRemoved", { names: (Array.isArray(metadata.extras) ? metadata.extras : []).join(", ") || "-" });
   const base = basePaymentDescription(payment, tx);

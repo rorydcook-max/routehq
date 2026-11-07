@@ -52,7 +52,19 @@ export const COUNTRIES: CountryInfo[] = [
   // Türkiye (4 Nov 2026): KDV general rate 20% since 10 July 2023 (Presidential Decision 7346, Resmî Gazete 7 Jul 2023);
   // vehicle rental is not on the reduced-rate lists (accommodation is 10%). Prices to the public normally include KDV.
   // One time zone (Europe/Istanbul, UTC+3 all year). The name is the one Intl and the customer lists use ("Türkiye").
-  { code: "TR", name: "Türkiye", currency: "TRY", zones: ["Europe/Istanbul"], unit: "km", vat: 20, vatName: "KDV" }
+  { code: "TR", name: "Türkiye", currency: "TRY", zones: ["Europe/Istanbul"], unit: "km", vat: 20, vatName: "KDV" },
+  // e2e 8 Nov 2026: countries offered in setup (lib/onboarding-locations.ts) that were missing here, so their businesses
+  // fell back to Thailand (baht clock, PromptPay, Por Ror Bor). Rates are a starting point only: the owner changes them.
+  { code: "JP", name: "Japan", currency: "JPY", zones: ["Asia/Tokyo"], unit: "km", vat: 10, vatName: "Consumption tax" },
+  { code: "KR", name: "South Korea", currency: "KRW", zones: ["Asia/Seoul"], unit: "km", vat: 10 },
+  { code: "TW", name: "Taiwan", currency: "TWD", zones: ["Asia/Taipei"], unit: "km", vat: 5 },
+  { code: "CN", name: "China", currency: "CNY", zones: ["Asia/Shanghai"], unit: "km", vat: 13 },
+  { code: "BN", name: "Brunei", currency: "BND", zones: ["Asia/Brunei"], unit: "km", vat: 0 },
+  { code: "IN", name: "India", currency: "INR", zones: ["Asia/Kolkata"], unit: "km", vat: 18, vatName: "GST" },
+  { code: "BD", name: "Bangladesh", currency: "BDT", zones: ["Asia/Dhaka"], unit: "km", vat: 15 },
+  { code: "LK", name: "Sri Lanka", currency: "LKR", zones: ["Asia/Colombo"], unit: "km", vat: 18 },
+  // Sales tax differs by state and city; none is set until the owner adds theirs.
+  { code: "US", name: "United States", currency: "USD", zones: ["America/New_York", "America/Chicago", "America/Denver", "America/Phoenix", "America/Los_Angeles", "America/Anchorage", "Pacific/Honolulu"], unit: "mi", vat: 0, vatName: "Sales tax" }
 ];
 
 const BY_CODE = new Map(COUNTRIES.map((country) => [country.code, country]));
@@ -62,7 +74,7 @@ const BY_NAME: Record<string, string> = {
   "united kingdom of great britain and northern ireland": "GB", "republic of ireland": "IE", eire: "IE", éire: "IE",
   españa: "ES", espana: "ES", "canary islands": "ES", canarias: "ES", "balearic islands": "ES", mallorca: "ES",
   italia: "IT", "ελλάδα": "GR", hellas: "GR", hrvatska: "HR", "κύπρος": "CY", deutschland: "DE", "viet nam": "VN",
-  madeira: "PT", azores: "PT", açores: "PT", "lao pdr": "LA", "kingdom of thailand": "TH", "ประเทศไทย": "TH", "ไทย": "TH",
+  madeira: "PT", azores: "PT", açores: "PT", "lao pdr": "LA", usa: "US", "united states of america": "US", america: "US", korea: "KR", "republic of korea": "KR", "kingdom of thailand": "TH", "ประเทศไทย": "TH", "ไทย": "TH",
   turkey: "TR", turkiye: "TR", "türkiye": "TR", "republic of türkiye": "TR", "republic of turkey": "TR", "türkiye cumhuriyeti": "TR"
 };
 

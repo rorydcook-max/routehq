@@ -140,7 +140,7 @@ export default async function NewCustomerPage() {
               </label>
               <label className="block sm:col-span-2">
                 <span className={labelClass}>{say("f_licenceCountry")}</span>
-                <input className={inputClass} list="licence-country-options" name="driverLicenseCountry" placeholder="Thailand" />
+                <input className={inputClass} list="licence-country-options" name="driverLicenseCountry" />
               </label>
               <label className="block">
                 <span className={labelClass}>{say("new_photoPassport")}</span>

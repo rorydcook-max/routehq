@@ -287,7 +287,8 @@ export function legacyLocationRules(settings: Record<string, any> | null | undef
     radius: 0,
     anchor: String(main.town || source.home_territory || "").trim(),
     places,
-    law: savedLaw || defaultLawFor(countryCode, [main.region, main.town]) || travelPolicyDefaults.jurisdiction
+    // Thailand's law only for a business in Thailand (a US business has no default: the owner picks, e.g. a state).
+    law: savedLaw || defaultLawFor(countryCode, [main.region, main.town]) || (countryCode === "TH" ? travelPolicyDefaults.jurisdiction : "")
   };
 }
 

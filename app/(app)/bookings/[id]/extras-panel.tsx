@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { creditExtrasToRent, moveExtrasToRent, refundExtras, removeExtras } from "@/app/actions/extras";
 import { MoneyInput } from "@/components/money-input";
 import { businessOffersPromptPay } from "@/lib/payment-methods";
+import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 type Line = { name: string; amount: number; index: number };
@@ -29,6 +30,7 @@ type Props = {
 };
 
 function money(value: number, currency = "THB") {
+  if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(Number(value || 0), currency, "en-GB");
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 

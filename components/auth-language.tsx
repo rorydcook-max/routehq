@@ -15,7 +15,8 @@ export function chooseSignedOutLanguage(code: string) {
   document.cookie = `${STAFF_LOCALE_COOKIE}=${code}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
   const { locale, rest } = splitSiteLocale(window.location.pathname);
   if (locale || isSitePath(rest)) {
-    window.location.assign(`${localizeSitePath(rest, code)}${window.location.search}${window.location.hash}`);
+    // No #hash: after "Features" (#how) every language change used to land back on that section.
+    window.location.assign(`${localizeSitePath(rest, code)}${window.location.search}`);
     return;
   }
   window.location.reload();

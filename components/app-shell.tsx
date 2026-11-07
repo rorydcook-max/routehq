@@ -269,7 +269,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           <button
             aria-hidden={onFocusedFlow || undefined}
             tabIndex={onFocusedFlow ? -1 : undefined}
-            className={`${onFocusedFlow ? "invisible" : ""} flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-3 text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)]`}
+            className={`${onFocusedFlow ? "invisible" : ""} flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[var(--primary)] pl-3 pr-[38px] text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)]`}
             onClick={() => setFastActionOpen(true)}
             type="button"
           >

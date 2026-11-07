@@ -110,7 +110,9 @@ async function loadMessages(locale: string): Promise<Messages> {
 // The words the customer pages (booking link, change to sign, online booking, directory) and their error and
 // not-found screens use. The staff app's other ~200 KB of text never reaches a customer's phone.
 // "bsite": the business's own website (components/site).
-const CUSTOMER_NAMESPACES = ["customer", "directory", "errorPages", "gallery", "renterReview", "bsite"];
+// "directory" (rove.rent's words) is not here since 7 Nov 2026 (task "roverent"): rove.rent's pages have their own
+// layout (app/(rove)) that reads its words on the server, so booking pages don't carry them.
+const CUSTOMER_NAMESPACES = ["customer", "errorPages", "gallery", "renterReview", "bsite"];
 
 async function isDirectoryPage(): Promise<boolean> {
   try {

@@ -8,12 +8,14 @@
  * - "Basic" Consent Mode: GTM is not loaded at all until the visitor accepts analytics cookies (lib/consent.ts).
  * - Nothing personal is ever pushed (no email, name, phone, business name or user id).
  *
- * - rove.rent (4 Nov 2026): its own container GTM-NZL8J5FN (its own GA4 property), on the directory search page only
- *   (rove.rent/ and /rent). Each business's booking page there (rove.rent/<their-name>) is the business's, not tracked.
+ * - rove.rent (4 Nov 2026): its own container GTM-NZL8J5FN (its own GA4 property), on Rove's own pages only (the home
+ *   page, search, vehicle, destination and guide pages since 7 Nov 2026). Each business's booking page there
+ *   (rove.rent/<their-name>) is the business's, not tracked.
  *
  * Local testing only: NEXT_PUBLIC_GTM_ALLOW_LOCAL=1 also allows localhost / 127.0.0.1 / site.localhost. Never set it
  * on Vercel.
  */
+import { isRoveOwnPath } from "@/lib/rove/paths";
 
 export const GTM_ID = "GTM-NX2B3BSS";
 /** The GA4 property GTM sends to: used for Google's per-page off switch (window["ga-disable-<id>"]). */
@@ -50,8 +52,9 @@ export function isTrackedHost(hostname: string) {
 
 /** Customer pages (a business's booking page, the directory, booking links, changes): never tracked. */
 export function isUntrackedPath(pathname: string, hostname = "") {
-  // On rove.rent only the directory search is ours; everything else there is a business's page or a booking link.
-  if (isRenterAnalyticsHost(hostname)) return !(pathname === "/" || pathname === "/rent");
+  // On rove.rent only Rove's own pages are ours (home, search, vehicles, destinations, guides: lib/rove/paths.ts);
+  // everything else there is a business's page (rove.rent/<slug>) or a booking link, never measured.
+  if (isRenterAnalyticsHost(hostname)) return !isRoveOwnPath(pathname);
   return pathname === "/rent" || pathname.startsWith("/rent/") || pathname === "/book" || pathname.startsWith("/book/") || pathname.startsWith("/amend/");
 }
 

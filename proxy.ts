@@ -9,6 +9,8 @@ import { signedOutLocale, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
 import { DEFAULT_SITE_LOCALE, isSitePath, localizeSitePath, splitSiteLocale } from "@/lib/site/locale-path";
 import { SITE_INTERNAL_PREFIX, siteInternalPath } from "@/lib/site/internal-path";
 import { LEGAL_SLUGS } from "@/lib/site/legal-slugs";
+import { CUSTOMER_LOCALE_COOKIE, pickLocale } from "@/lib/i18n/customer-locale";
+import { parseRovePath, ROVE_DEFAULT_LOCALE, ROVE_INTERNAL_PREFIX, roveHasLocale, roveHref, roveInternalPath } from "@/lib/rove/paths";
 
 // custom_limits: an admin-set custom plan (returned by resolve_booking_host_v2, migration 0108).
 type BookingSite = { slug: string; tier: string | null; status: string | null; has_domain: boolean; custom_limits: unknown };
@@ -122,6 +124,43 @@ export async function proxy(request: NextRequest) {
       url.pathname = pathname === "/robots.txt" ? "/rove-robots.txt" : "/rove-sitemap.xml";
       return NextResponse.rewrite(url);
     }
+    // Rove's own pages (task "roverent", 7 Nov 2026): home, search, vehicles, destinations and guides, drawn from
+    // app/(rove)/rove/[locale] (lib/rove/paths.ts). They read nothing from the request, so no session is checked here.
+    const rovePage = parseRovePath(pathname);
+    if (rovePage && (request.method === "GET" || request.method === "HEAD")) {
+      // A page not written in this language yet: its English address.
+      if (!roveHasLocale(rovePage.section, rovePage.locale)) {
+        const url = request.nextUrl.clone();
+        url.pathname = rovePage.rest;
+        return NextResponse.redirect(url);
+      }
+      // An English address for someone who reads another language Rove is written in: that language's address
+      // (their choice on the language list, else their phone's). Search engines index each address as it is.
+      if (!rovePage.prefixed) {
+        const chosen = request.cookies.get(CUSTOMER_LOCALE_COOKIE)?.value;
+        const wanted = !chosen && BOT.test(request.headers.get("user-agent") || "") ? ROVE_DEFAULT_LOCALE : pickLocale(chosen, request.headers.get("accept-language"));
+        if (wanted !== ROVE_DEFAULT_LOCALE && roveHasLocale(rovePage.section, wanted)) {
+          const url = request.nextUrl.clone();
+          url.pathname = roveHref(rovePage.rest, wanted);
+          return NextResponse.redirect(url);
+        }
+      }
+      const url = request.nextUrl.clone();
+      url.pathname = roveInternalPath(rovePage);
+      return NextResponse.rewrite(url);
+    }
+    // Under one of Rove's sections but not a page (an unknown guide, vehicle or place): Rove's "not found".
+    if (/^\/(?:[a-z]{2,3}(?:-[A-Z]{2})?\/)?(?:guides|vehicles|thailand|indonesia)\//.test(pathname)) {
+      const url = request.nextUrl.clone();
+      url.pathname = `${ROVE_INTERNAL_PREFIX}/${ROVE_DEFAULT_LOCALE}/guides/not-a-page`;
+      return NextResponse.rewrite(url, { status: 404 });
+    }
+    // The old search address (rove.rent/rent?place=…): the new search page, same question.
+    if (pathname === "/rent") {
+      const url = request.nextUrl.clone();
+      url.pathname = request.nextUrl.search ? "/search" : "/";
+      return NextResponse.redirect(url, 308);
+    }
     // A business's booking page at its short address, rove.rent/<their-name> (Rory, 1 Nov 2026): served from
     // /rent/<their-name>. One renter domain for the search page and every business's page.
     if (/^\/[a-z0-9][a-z0-9-]{1,62}$/.test(pathname) && !isRenterSitePath(pathname) && !APP_TOP_LEVEL.has(pathname.slice(1))) {
@@ -134,14 +173,10 @@ export async function proxy(request: NextRequest) {
       const appHome = String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "");
       if (!/\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(appHome)) return NextResponse.redirect(new URL(`${pathname}${request.nextUrl.search}`, appHome));
     }
-    if (pathname === "/") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/rent";
-      request.headers.set("x-routehq-customer-page", "1");
-      // The directory itself is Rove's own page: it gets the cookie notice and Rove's analytics (lib/analytics.ts).
-      request.headers.set("x-routehq-directory", "1");
-      return NextResponse.rewrite(url, { request });
-    }
+  }
+  // Rove's pages live at internal addresses (/rove/<language>/…) that only the proxy serves them from.
+  if (pathname === ROVE_INTERNAL_PREFIX || pathname.startsWith(`${ROVE_INTERNAL_PREFIX}/`)) {
+    return new NextResponse("Not found", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
   }
   // The website's pages live at internal addresses (/site/<language>/…, lib/site/internal-path.ts) that only this
   // proxy serves them from: asked for directly, they are not a page.
@@ -260,7 +295,10 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/api/calendar/") ||
     pathname === "/api/telegram/webhook" ||
     // Stripe events for RoveHQ's plans; the route checks Stripe's signature itself.
-    pathname.startsWith("/api/stripe/webhook/");
+    pathname.startsWith("/api/stripe/webhook/") ||
+    // rove.rent's vehicle photos (listed vehicles only; the route checks) and its share pictures.
+    pathname.startsWith("/api/rove-photo/") ||
+    pathname === "/api/rove-og";
   // Customer pages take their language from the customer (their choice, or their phone's language), never from whoever is signed in.
   if (pathname.startsWith("/book/") || pathname.startsWith("/amend/") || pathname === "/rent" || pathname.startsWith("/rent/")) {
     request.headers.set("x-routehq-customer-page", "1");

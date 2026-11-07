@@ -289,7 +289,7 @@ export function CalculatorClient({
     setModels([]);
     setModelId("");
     if (makeId && makeId !== OTHER) {
-      fetchVehicleModels(makeId, category)
+      fetchVehicleModels(makeId, category, { makeSlug: makes.find((item) => item.id === makeId)?.slug, country })
         .then((rows) => live && setModels(rows))
         .catch(() => live && setModels([]));
     }

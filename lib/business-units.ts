@@ -92,9 +92,12 @@ export function setBusinessCountry(code: unknown) {
   }
 }
 
+/**
+ * Recorded as given, none included: the country decides how dates are written, so one left over from an earlier
+ * page (another business, or a staff page drawn on the same server) must not carry over to a page with none.
+ */
 export function rememberPageCountry(code: unknown) {
-  const valid = cleanCountry(code);
-  if (valid) pageCountry = valid;
+  pageCountry = cleanCountry(code);
 }
 
 export function businessCountry(): string | null {

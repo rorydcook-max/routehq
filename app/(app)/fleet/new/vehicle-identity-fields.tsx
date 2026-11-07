@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Camera, ChevronDown } from "lucide-react";
 import { Fold } from "@/components/ui";
 import { regDocKey } from "@/lib/registration-document";
+import { makeMatchesSearch } from "@/lib/vehicle-make-ranking";
 import {
   fetchVehicleMakesForCategory,
   fetchVehicleModels,
@@ -175,7 +176,8 @@ export function VehicleIdentityFields({
   const visibleTrims = useMemo(() => dedupeTrimsForPicker(trims.filter((item) => trimCoversYear(item, year))), [trims, year]);
   const searchedMakes = useMemo(() => {
     const needle = normalizeMatch(makeSearch);
-    return needle ? makes.filter((item) => normalizeMatch(item.name).includes(needle)) : makes;
+    // A nickname counts too: "chevy" finds Chevrolet, "vw" Volkswagen, "merc" Mercedes-Benz.
+    return needle ? makes.filter((item) => makeMatchesSearch(item, needle, normalizeMatch)) : makes;
   }, [makeSearch, makes]);
 
   useEffect(() => {
@@ -214,7 +216,7 @@ export function VehicleIdentityFields({
     }
 
     let mounted = true;
-    fetchVehicleModels(selectedMakeId, categoryCode)
+    fetchVehicleModels(selectedMakeId, categoryCode, { makeSlug: makes.find((item) => item.id === selectedMakeId)?.slug, country })
       .then((nextModels) => {
         if (!mounted) {
           return;
@@ -389,7 +391,7 @@ export function VehicleIdentityFields({
 
     setSelectedMakeId(matchedMake.id);
     setManualMake(false);
-    const nextModels = await fetchVehicleModels(matchedMake.id, categoryCode);
+    const nextModels = await fetchVehicleModels(matchedMake.id, categoryCode, { makeSlug: matchedMake.slug, country });
     setModels(nextModels);
 
     const matchedModel = nextModels.find((item) => normalizeMatch(item.name) === normalizeMatch(result.Model || ""));

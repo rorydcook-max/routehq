@@ -1,3 +1,4 @@
+import { englishDateLocale } from "@/lib/i18n/customer-dates";
 import { createHash, randomUUID } from "node:crypto";
 import { htmlToPdf } from "@/lib/html-to-pdf";
 import { businessTimeZone } from "@/lib/business-time";
@@ -133,7 +134,7 @@ function labelFor(labels: Record<string, string>, value: string) {
 export function formatReportTime(iso: string, timeZone = businessTimeZone()) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
-  const text = new Intl.DateTimeFormat("en-GB", {
+  const text = new Intl.DateTimeFormat(englishDateLocale(), {
     day: "numeric",
     month: "short",
     year: "numeric",

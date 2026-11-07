@@ -12,6 +12,7 @@ import { permanentRedirect } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { SitePage } from "@/components/site/site-page";
+import { PageCountry } from "@/components/page-country";
 import { loadSiteData, loadSiteRow, uploadUrls } from "@/lib/sites/data";
 import { ldScript, siteJsonLd } from "@/lib/sites/seo";
 import { fleetNoun } from "@/lib/sites/format";
@@ -147,7 +148,9 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
             <p className="text-sm font-semibold text-[var(--muted)]">{t("embedPoweredBy", { business: catalog.name })}</p>
             <CustomerLanguagePicker />
           </div>
-          <Catalog {...catalogProps} embedded organizationName={catalog.name} slug={slug} vehicles={catalog.vehicles} />
+          <PageCountry country={catalog.country}>
+            <Catalog {...catalogProps} embedded organizationName={catalog.name} slug={slug} vehicles={catalog.vehicles} />
+          </PageCountry>
         </div>
       </main>
     );
@@ -164,7 +167,9 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
     <>
       <BrandStyle colour={catalog.brandColour} />
       {ld ? <script dangerouslySetInnerHTML={{ __html: ldScript(ld) }} type="application/ld+json" /> : null}
-      <SitePage config={config} data={data} edit={owner && query.edit === "1"} />
+      <PageCountry country={catalog.country}>
+        <SitePage config={config} data={data} edit={owner && query.edit === "1"} />
+      </PageCountry>
     </>
   );
 }

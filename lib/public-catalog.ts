@@ -4,6 +4,8 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { bookingRules, earliestStart } from "@/lib/booking-rules";
 import { businessToday, setBusinessTimeZone } from "@/lib/business-time";
+import { setBusinessCountry } from "@/lib/business-units";
+import { displayPhone } from "@/lib/phone";
 import { kindFromCategory, type VehicleKind } from "@/lib/vehicle-groups";
 import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { vatSettings, withVat } from "@/lib/regional";
@@ -70,6 +72,7 @@ export async function getPublicCatalog(slug: string, options: { includeOff?: boo
   const settings = publicBookingSettings(organization.settings);
   // Its own clock for the first bookable day, and prices typed before VAT shown and charged with it (Country and units).
   setBusinessTimeZone(organization.timezone);
+  setBusinessCountry(organization.country_code);
   const vat = vatSettings(organization);
   const gross = (value: unknown) => Math.round(withVat(Number(value || 0), vat) * 100) / 100;
   if (!settings.enabled && !options.includeOff) return { enabled: false as const, name: String(organization.name || "") };
@@ -145,8 +148,10 @@ export async function getPublicCatalog(slug: string, options: { includeOff?: boo
     logoUrl: (branding as any)?.logoUrl || null,
     brandColour: (organization.contract_accent_colour as string | null) || null,
     location: String(orgSettings.main_location?.label || orgSettings.location || ""),
-    phone: String(orgSettings.business_phone || orgSettings.phone || ""),
+    phone: displayPhone(organization.business_phone || orgSettings.business_phone || orgSettings.phone || "", organization.country_code),
     currency: String(organization.currency || "THB"),
+    /** The business's country, for how dates are written on the page. */
+    country: String(organization.country_code || ""),
     holdHours: rules.holdHours,
     /** First date a booking may start, from the lead-time rule. */
     minStart: earliestStart(businessToday(), rules.leadHours),

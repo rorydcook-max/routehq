@@ -5,8 +5,10 @@
  * after the return day.
  */
 
+import { roundQuote } from "@/lib/rental-estimate";
+
 export type EarlyReturn = {
-  /** Suggested refund, rounded to the nearest 10. */
+  /** Suggested refund, rounded as its currency is quoted. */
   amount: number;
   unusedDays: number;
   /** Days in the paid period(s) the unused days belong to. */
@@ -46,7 +48,7 @@ const isDeposit = (payment: any) => payment.metadata?.is_deposit === true || ["d
  * `payments` is every payment on the rental (any status). `previousEnd` is the
  * return date the rental had before the vehicle came back, if it had one.
  */
-export function earlyReturnSuggestion(input: { payments: any[]; returnDate: string; previousEnd: string | null; interval: string }): EarlyReturn | null {
+export function earlyReturnSuggestion(input: { payments: any[]; returnDate: string; previousEnd: string | null; interval: string; currency?: string | null }): EarlyReturn | null {
   const { returnDate, previousEnd } = input;
   const interval = String(input.interval || "monthly").toLowerCase();
   const rent = input.payments.filter((payment) => !isDeposit(payment) && payment.due_date).sort((a, b) => day(a.due_date).localeCompare(day(b.due_date)));
@@ -72,7 +74,8 @@ export function earlyReturnSuggestion(input: { payments: any[]; returnDate: stri
     amount += share.amount;
   });
 
-  const rounded = Math.round(amount / 10) * 10;
+  // Baht to the nearest 10; other currencies to the cent (lib/rental-estimate.ts).
+  const rounded = input.currency ? roundQuote(amount, input.currency) : Math.round(amount / 10) * 10;
   return rounded > 0 ? { amount: rounded, unusedDays, periodDays, paid } : null;
 }
 

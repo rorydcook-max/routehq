@@ -1,4 +1,4 @@
-import { customerDate } from "@/lib/i18n/customer-dates";
+import { customerDate, englishDateLocale } from "@/lib/i18n/customer-dates";
 import { businessTimeZone } from "@/lib/business-time";
 
 /**
@@ -10,9 +10,9 @@ import { businessTimeZone } from "@/lib/business-time";
  * (see customer-dates.ts) because browsers do not all carry them.
  */
 
-/** The locale to hand to Intl for this language. */
+/** The locale to hand to Intl for this language (English: month first for a US business, day first elsewhere). */
 export function intlLocale(locale: string) {
-  return locale === "en" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`;
+  return locale === "en" ? englishDateLocale() : `${locale}-u-ca-gregory-nu-latn`;
 }
 
 /**

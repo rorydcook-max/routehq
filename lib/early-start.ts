@@ -1,4 +1,5 @@
 import { daysBetween, quoteStay, rentalRateCard } from "@/lib/rental-estimate";
+import { niceMoney } from "@/lib/nice-money";
 
 /**
  * Handing a vehicle over before the booked start date. The customer has it for extra days, and the owner
@@ -27,7 +28,7 @@ function addDays(iso: string, days: number) {
 }
 
 export function earlyStartFor(
-  rental: { start_date?: unknown; end_date?: unknown; rental_rate?: unknown; pricing_model?: unknown; billing_interval?: unknown } | null | undefined,
+  rental: { start_date?: unknown; end_date?: unknown; rental_rate?: unknown; pricing_model?: unknown; billing_interval?: unknown; currency?: unknown } | null | undefined,
   vehicle: { daily_rate?: unknown; weekly_rate?: unknown; monthly_rate?: unknown } | null | undefined,
   today: string
 ): EarlyStart | null {
@@ -35,7 +36,8 @@ export function earlyStartFor(
   if (!bookedStart || bookedStart <= today) return null;
   const days = daysBetween(today, bookedStart);
   const bookedEnd = rental?.end_date ? String(rental.end_date).slice(0, 10) : null;
-  const quote = quoteStay(rentalRateCard(vehicle, rental || {}), days);
+  // Rounded as the booking's currency is (baht to 10, dollars to the cent).
+  const quote = rental?.currency ? quoteStay(rentalRateCard(vehicle, rental || {}), days, String(rental.currency)) : quoteStay(rentalRateCard(vehicle, rental || {}), days);
   const shortenedEnd = bookedEnd ? addDays(bookedEnd, -days) : null;
   return { days, amount: quote?.amount || 0, bookedStart, bookedEnd, shortenedEnd: shortenedEnd && shortenedEnd > today ? shortenedEnd : null };
 }
@@ -68,11 +70,13 @@ export async function requestEarlyWaiver(
   }
   const { data: open } = await admin.from("tasks").select("id").eq("rental_id", args.rentalId).eq("action", "waive_early").is("completed_at", null).limit(1);
   if ((open || []).length) return;
+  // In the booking's own currency (was always baht).
+  const { data: booked } = await admin.from("rentals").select("currency").eq("id", args.rentalId).maybeSingle();
   await admin.from("tasks").insert({
     organization_id: args.organizationId,
     rental_id: args.rentalId,
     vehicle_id: args.vehicleId,
-    title: `Free early days asked - ${args.early.days} days (฿${Math.round(args.early.amount).toLocaleString("en-US")}) for ${args.customerName}`,
+    title: `Free early days asked - ${args.early.days} days (${niceMoney(args.early.amount, booked?.currency || null)}) for ${args.customerName}`,
     task_type: "admin",
     action: "waive_early",
     due_at: new Date().toISOString()

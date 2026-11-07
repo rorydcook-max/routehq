@@ -99,7 +99,7 @@ export function findConflict(periods: BusyPeriod[], startDate: string, endDate: 
 }
 
 function shortDate(iso: string) {
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+  return new Intl.DateTimeFormat(englishDateLocale(), { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
 }
 
 export function conflictMessage(period: BusyPeriod) {
@@ -192,4 +192,5 @@ export async function earlyHandoverBlocker(
   return findConflict(busy[args.vehicleId] || [], args.today, args.endDate || booked, args.rentalId);
 }
 
-export const DOUBLE_BOOKING_MESSAGE = "This vehicle is already booked for some of those dates. Choose other dates or another vehicle.";
+export const DOUBLE_BOOKING_MESSAGE = "This vehicle is already booked for some of those dates. Choose other dates or another vehicle.";import { englishDateLocale } from "@/lib/i18n/customer-dates";
+

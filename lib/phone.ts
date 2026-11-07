@@ -1,4 +1,4 @@
-import { getCountries, getCountryCallingCode, type CountryCode } from "libphonenumber-js/min";
+import { getCountries, getCountryCallingCode, parsePhoneNumberFromString, type CountryCode } from "libphonenumber-js/min";
 import { businessCountry } from "@/lib/business-units";
 
 /** The dialling code for a country ("PT" -> "+351"), or "" when the country is unknown. */
@@ -30,6 +30,23 @@ export function toInternationalPhone(value: unknown, defaultCode?: string): stri
   if (code === "+66" && digits.startsWith("66") && digits.length >= 11) return `+${digits}`;
   if (!code) return digits;
   return `${code}${digits.replace(/^0/, "")}`;
+}
+
+/**
+ * A phone number to show people, in international format with the business's country code: "3055550142" for a
+ * Miami business reads "+1 305 555 0142". Kept as given when it can't be read as a number.
+ */
+export function displayPhone(value: unknown, country?: unknown): string {
+  const raw = String(value ?? "").trim();
+  if (!raw) return "";
+  const international = toInternationalPhone(raw, dialCodeFor(country ?? businessCountry()));
+  if (!international || !international.startsWith("+")) return raw;
+  try {
+    const parsed = parsePhoneNumberFromString(international);
+    return parsed ? parsed.formatInternational() : international;
+  } catch {
+    return international;
+  }
 }
 
 /** The same number written either way, for finding a customer: "+66812345670" and "0812345670" both give "+66812345670" and "0812345670". */

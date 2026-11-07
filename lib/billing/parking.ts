@@ -100,3 +100,34 @@ export async function applyPlanToFleet(admin: any, organizationId: string, optio
   if (toUnpark.length) await admin.from("vehicles").update({ parked_at: null }).in("id", toUnpark).eq("organization_id", organizationId);
   return { parked: toPark.length, unparked: toUnpark.length };
 }
+
+/**
+ * A trial with no card that ends on Free (the owner chose "Free after the trial"): nothing else switched it, so the
+ * business stayed "trial" with every vehicle on. On its first daily run after the trial end it moves to Free and
+ * vehicles over Free's limit are parked, keeping the ones the owner picked when choosing Free (plan_keep_vehicle_ids).
+ * A trial with a card is switched by Stripe's webhook instead (lib/billing/sync.ts).
+ */
+export async function endFreeTrials(admin: any, organizationIds: string[]): Promise<number> {
+  if (!organizationIds.length) return 0;
+  const { data: ended } = await admin
+    .from("organizations")
+    .select("id, subscription_started_at")
+    .in("id", organizationIds)
+    .eq("subscription_status", "trial")
+    .eq("subscription_tier", "free")
+    .is("stripe_subscription_id", null)
+    .lt("trial_ends_at", new Date().toISOString());
+  let moved = 0;
+  for (const organization of (ended || []) as Array<{ id: string; subscription_started_at: string | null }>) {
+    const { error } = await admin
+      .from("organizations")
+      .update({ subscription_status: "active", next_payment_due: null, subscription_started_at: organization.subscription_started_at || new Date().toISOString() })
+      .eq("id", organization.id)
+      .eq("subscription_status", "trial");
+    if (error) continue;
+    await applyPlanToFleet(admin, organization.id, { park: true });
+    await admin.from("organizations").update({ plan_keep_vehicle_ids: null }).eq("id", organization.id);
+    moved += 1;
+  }
+  return moved;
+}

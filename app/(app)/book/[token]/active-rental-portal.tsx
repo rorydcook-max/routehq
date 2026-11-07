@@ -163,6 +163,7 @@ export function ActiveRentalPortal({
               </button>
               {openAction === card.type ? (
                 <ActionForm
+                  currency={String(rental?.currency || "")}
                   deliveryLocation={deliveryLocation}
                   endDate={endDate}
                   isPending={isPending}
@@ -242,8 +243,11 @@ function ActionForm({
   isPending,
   onSubmit,
   organizationName,
-  ownerContact
+  ownerContact,
+  currency = ""
 }: {
+  /** The booking's currency, for the price of extra days. */
+  currency?: string;
   type: ActionType;
   endDate: string;
   minExtensionDate: string;
@@ -261,7 +265,7 @@ function ActionForm({
   const [newEnd, setNewEnd] = useState("");
   const [noEnd, setNoEnd] = useState(false);
   const extraDays = endDate && newEnd > endDate ? Math.round((new Date(`${newEnd}T00:00:00Z`).getTime() - new Date(`${String(endDate).slice(0, 10)}T00:00:00Z`).getTime()) / 86_400_000) : 0;
-  const extensionQuote = extensionRates && extraDays > 0 ? quoteStay(extensionRates, extraDays) : null;
+  const extensionQuote = extensionRates && extraDays > 0 ? quoteStay(extensionRates, extraDays, currency || undefined) : null;
   if (type === "extension_request") {
     return (
       <form action={(formData) => onSubmit(formData, t("requestSent", { business: organizationName }))} className="mt-4 space-y-3">
@@ -291,7 +295,7 @@ function ActionForm({
         )}
         {!noEnd && extensionQuote && extensionRates && planFor(extensionRates, extraDays) ? (
           <p className="rounded-xl bg-[var(--primary-light)] p-3 text-sm text-[var(--foreground)]">
-            {t.rich("extensionPrice", { amount: `฿${extensionQuote.amount.toLocaleString("en-US")}`, days: extraDays, b: (chunks) => <span className="font-semibold">{chunks}</span> })}
+            {t.rich("extensionPrice", { amount: currency && currency !== "THB" ? formatRegionalMoney(extensionQuote.amount, currency, "en-GB") : `฿${extensionQuote.amount.toLocaleString("en-US")}`, days: extraDays, b: (chunks) => <span className="font-semibold">{chunks}</span> })}
           </p>
         ) : !noEnd && extraDays > 0 ? (
           // No rate meant for a stay this short (or no rates at all): the business sets the price, so none is promised here.

@@ -123,8 +123,11 @@ async function clearScheduledChange(subscription: Stripe.Subscription) {
     const scheduleId = typeof subscription.schedule === "string" ? subscription.schedule : subscription.schedule.id;
     await stripe.subscriptionSchedules.release(scheduleId).catch(() => null);
   }
-  if (subscription.cancel_at_period_end || subscription.cancel_at) {
-    await stripe.subscriptions.update(subscription.id, { cancel_at_period_end: false, cancel_at: "" as any });
+  // Stripe refuses both in one call ("Received both cancel_at_period_end and cancel_at"), which broke "Keep plan".
+  if (subscription.cancel_at_period_end) {
+    await stripe.subscriptions.update(subscription.id, { cancel_at_period_end: false });
+  } else if (subscription.cancel_at) {
+    await stripe.subscriptions.update(subscription.id, { cancel_at: "" as any });
   }
 }
 
@@ -251,6 +254,9 @@ export async function chooseFreePlan(input: { keep?: string[] | null } = {}): Pr
     if (result.outcome === "free") {
       await admin.from("organizations").update({ plan_keep_vehicle_ids: keep }).eq("id", organization.id);
       await applyPlanToFleet(admin, organization.id, { park: before !== "free", keep });
+    } else if (result.outcome === "freeAfterTrial") {
+      // Free once the trial ends: the vehicles the owner picked stay active then, the rest are parked (endFreeTrials).
+      await admin.from("organizations").update({ plan_keep_vehicle_ids: keep }).eq("id", organization.id);
     }
     paths();
     return { ok: true, outcome: result.outcome === "freeAfterTrial" ? "freeAfterTrial" : "free" };

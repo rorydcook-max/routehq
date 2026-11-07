@@ -19,6 +19,7 @@ import { lateStartFor, type LateStartChoice } from "@/lib/late-start";
 import { dateFormat } from "@/lib/i18n/dates";
 import { distanceKey } from "@/lib/business-units";
 import { methodsFor } from "@/lib/payment-methods";
+import { firstRentCharge } from "@/lib/payment-schedule";
 import { HandoverPaymentStep, type HandoverPayOptions } from "@/components/handover-payment-step";
 
 type DamageItem = {
@@ -557,15 +558,16 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   const [uploadProgress, setUploadProgress] = useState("");
   const [uploadError, setUploadError] = useState("");
   const [isReceiptPending, startReceiptTransition] = useTransition();
-  // Pre-fill with rent that is due now and still unpaid; the full monthly rate
-  // is only a fallback when the booking has no payment schedule at all.
+  // Pre-fill with rent that is due now and still unpaid. With no payment schedule yet (a booking whose renter has
+  // not filled in their details), it is the booking's first rent charge: the whole stay for a daily price (it was
+  // one day's rate, so a 4-day booking asked for one day), one period otherwise.
   const [deliveryPaymentAmount, setDeliveryPaymentAmount] = useState(() => {
     const unpaid = (context.unpaidPayments || []).filter((payment: any) => payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true);
     if (context.hasPaymentSchedule) {
       const due = unpaid.reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
       return due > 0 ? String(due) : "";
     }
-    return String(Number(context.rental?.rental_rate || 0) || "");
+    return String(firstRentCharge(context.rental) || "");
   });
   const [deliveryDepositAmount, setDeliveryDepositAmount] = useState(() => {
     const expectedDeposit = Number(context.rental?.deposit_payment_amount || context.rental?.deposit_amount || 0);

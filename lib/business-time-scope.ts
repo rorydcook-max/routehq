@@ -15,3 +15,20 @@ const store: AsyncLocalStorage<string> = holder[KEY] || (holder[KEY] = new Async
 export function inBusinessTimeZone<T>(zone: string, work: () => T): T {
   return store.run(zone, work);
 }
+
+/**
+ * For a save (server action) that knows its business: from here on, the rest of this save's work, however deep and
+ * across awaits, uses that business's zone. Server actions get no React request cache, so setBusinessTimeZone() there
+ * was forgotten and "today" fell back to Bangkok (a New York handover at 1 pm dated the next day). Call it in the
+ * action's own body, not inside a helper it awaits, so the zone carries on through the action.
+ */
+export function enterBusinessTimeZone(zone: string | null | undefined) {
+  const text = String(zone || "").trim();
+  if (!text) return;
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: text });
+  } catch {
+    return;
+  }
+  store.enterWith(text);
+}

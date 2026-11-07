@@ -98,8 +98,9 @@ export function PlanCards({
     });
   };
   const choose = (planId: string) => {
-    // Moving to a plan with room for fewer vehicles: the owner picks which stay active first.
-    const smaller = status !== "trial" && rank(planId) < rank(currentTier);
+    // Moving to a plan with room for fewer vehicles: the owner picks which stay active first. In the trial everything
+    // is on, but Free after the trial parks what is over its limit then, so the choice is asked for now too.
+    const smaller = status === "trial" ? planId === "free" : rank(planId) < rank(currentTier);
     if (smaller && needsParking(vehicles, limitsOf(planId))) {
       setKeepFor(planId);
       return;

@@ -5,6 +5,7 @@ import { getPublishedReviews, getReviewStats, googleReviewUrl } from "@/lib/revi
 import { serviceAreasFor, type BranchRow } from "@/lib/service-area";
 import { siteConfigFrom, siteConfigFromLegacy, templateForFleet, type SiteConfig } from "@/lib/sites/config";
 import { buildPolicies } from "@/lib/sites/policies";
+import { displayPhone } from "@/lib/phone";
 import type { SiteCatalog, SiteData } from "@/lib/sites/types";
 import type { getPublicCatalog } from "@/lib/public-catalog";
 
@@ -74,7 +75,8 @@ export async function loadSiteData(input: { catalog: Catalog; slug: string; conf
       logoUrl: catalog.logoUrl,
       place,
       address: String(organization?.business_address || catalog.address || ""),
-      phone: String(organization?.business_phone || catalog.phone || ""),
+      // International format with the business's country code ("+1 305 555 0142", not "3055550142").
+      phone: displayPhone(organization?.business_phone || catalog.phone || "", organization?.country_code),
       email: String(organization?.business_email || ""),
       whatsapp: String(organization?.whatsapp || ""),
       line: String(organization?.line_id || ""),

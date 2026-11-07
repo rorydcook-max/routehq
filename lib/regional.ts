@@ -91,9 +91,12 @@ export function countryInfo(value: unknown): CountryInfo | null {
   return BY_CODE.get(toCountryCode(value)) || null;
 }
 
-/** The business's country code: the saved column, else the setup answer, else Thailand. */
+/**
+ * The business's country code: the saved column, else the setup answer, else "" (not chosen yet: a new business
+ * starts with no country, migration 0138, so it sees no Thai-only choices before setup).
+ */
 export function orgCountry(organization: any): string {
-  return toCountryCode(organization?.country_code) || toCountryCode(organization?.settings?.main_location?.country) || "TH";
+  return toCountryCode(organization?.country_code) || toCountryCode(organization?.settings?.main_location?.country) || "";
 }
 
 const settingsOf = (organization: any): Record<string, any> =>
@@ -108,7 +111,8 @@ export function distanceUnitFor(organization: any): DistanceUnit {
 
 /** The time zone a business in this country (and, for Spain and Portugal, region) normally uses. */
 export function defaultTimeZone(country: unknown): string {
-  return countryInfo(country)?.zones[0] || "Asia/Bangkok";
+  // No country chosen yet: UTC, not Bangkok.
+  return countryInfo(country)?.zones[0] || (toCountryCode(country) ? "Asia/Bangkok" : "UTC");
 }
 
 export function defaultCurrency(country: unknown): string {

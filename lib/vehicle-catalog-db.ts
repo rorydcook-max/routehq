@@ -1,5 +1,5 @@
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { rankMakesForCountry } from "@/lib/vehicle-make-ranking";
+import { rankMakesForCountry, rankModelsForCountry } from "@/lib/vehicle-make-ranking";
 
 export type VehicleMake = {
   id: string;
@@ -64,7 +64,8 @@ export async function fetchVehicleMakesForCategory(categoryCode: string, country
   return rankMakesForCountry((data || []) as VehicleMake[], country, categoryCode);
 }
 
-export async function fetchVehicleModels(makeId: string, categoryCode: string) {
+/** A make's models in the category, the ones common in the business's part of the world first (alphabetical without a country). */
+export async function fetchVehicleModels(makeId: string, categoryCode: string, ranking?: { makeSlug?: string | null; country?: string | null }) {
   const supabase = createSupabaseBrowserClient() as any;
   const { data, error } = await supabase
     .from("vehicle_models")
@@ -78,7 +79,7 @@ export async function fetchVehicleModels(makeId: string, categoryCode: string) {
     throw new Error(error.message);
   }
 
-  return (data || []) as VehicleModel[];
+  return rankModelsForCountry((data || []) as VehicleModel[], ranking?.makeSlug, ranking?.country);
 }
 
 export async function fetchVehicleTrims(modelId: string) {

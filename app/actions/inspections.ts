@@ -23,6 +23,8 @@ import { said } from "@/lib/i18n/server-text";
 import { earlyStartFor, ensureEarlyStartCharge, requestEarlyWaiver, settleEarlyChoice } from "@/lib/early-start";
 import { applyLateStart, lateStartNote } from "@/lib/late-start";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
+import { adoptBusinessClock } from "@/lib/auth/active-organization-server";
+import { enterBusinessTimeZone } from "@/lib/business-time-scope";
 import { businessDistanceUnit } from "@/lib/business-units";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
@@ -510,6 +512,9 @@ export async function submitInspection(formData: FormData) {
     throw new Error("A rental is required for delivery and return inspections.");
   }
 
+  // Handover and return dates are the business's own day (New York, Tokyo...), not Bangkok's.
+  enterBusinessTimeZone(await adoptBusinessClock(supabase, organizationId));
+
   if (odometerReading === null) {
     throw new Error("Confirm the odometer reading before submitting.");
   }
@@ -951,7 +956,7 @@ export async function submitInspection(formData: FormData) {
         const admin = createSupabaseAdminClient() as any;
         const { data: allPayments } = await admin.from("rental_payments").select("id, amount, status, due_date, metadata").eq("rental_id", rentalId).is("deleted_at", null);
         const previousEnd = rental?.end_date ? String(rental.end_date).slice(0, 10) : null;
-        const suggestion = earlyReturnSuggestion({ payments: allPayments || [], returnDate, previousEnd: previousEnd && previousEnd > returnDate ? previousEnd : null, interval: String(rental?.billing_interval || rental?.pricing_model || "monthly") });
+        const suggestion = earlyReturnSuggestion({ payments: allPayments || [], returnDate, previousEnd: previousEnd && previousEnd > returnDate ? previousEnd : null, interval: String(rental?.billing_interval || rental?.pricing_model || "monthly"), currency: rental?.currency || null });
         if (suggestion) {
           const lastPaid = (allPayments || [])
             .filter((payment: any) => ["paid", "reconciled"].includes(String(payment.status)) && payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true)

@@ -1,5 +1,6 @@
 "use server";
 
+import { englishDateLocale } from "@/lib/i18n/customer-dates";
 import { earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
 import { applyLateStart } from "@/lib/late-start";
 import { tellRentalCustomer } from "@/lib/customer-messages";
@@ -11,6 +12,8 @@ import { niceMoney } from "@/lib/nice-money";
 import { currencySymbol } from "@/components/currency-symbol";
 import { formatMoney, moneyLocale, orgCountry, vatBreakdown, vatSettings } from "@/lib/regional";
 import { businessToday, businessTimeZone } from "@/lib/business-time";
+import { adoptBusinessClock } from "@/lib/auth/active-organization-server";
+import { enterBusinessTimeZone } from "@/lib/business-time-scope";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { logoUrlToDataUri } from "@/lib/contracts";
@@ -126,7 +129,7 @@ export async function generateReceipt(input: GenerateReceiptInput) {
   const prefix = String(organization.receipt_prefix || "REC").trim() || "REC";
   const receiptNumber = `${prefix}-${year}-${String((count || 0) + 1).padStart(4, "0")}`;
   const receiptId = crypto.randomUUID();
-  const receiptDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: businessTimeZone() }).format(new Date());
+  const receiptDate = new Intl.DateTimeFormat(englishDateLocale(), { day: "numeric", month: "short", year: "numeric", timeZone: businessTimeZone() }).format(new Date());
   const vehicle = [input.vehicleMakeModel, input.vehiclePlate].filter(Boolean).join(" - ");
   const footerHtml = organization.receipt_footer_text
     ? `<p style="font-size: 12px; color: #717d86; text-align: center; border-top: 1px solid #e3e6e8; padding-top: 12px; margin: 0;">${escapeHtml(organization.receipt_footer_text)}</p>`
@@ -280,6 +283,7 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     throw new Error("A positive cash payment amount is required.");
   }
 
+  enterBusinessTimeZone(await adoptBusinessClock(supabase, organizationId));
   const today = businessToday();
   const now = new Date().toISOString();
   const { data: rental, error: rentalError } = await supabase
@@ -294,7 +298,7 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
   }
 
   if (String(formData.get("earlyStart") || "") === "charge") {
-    const { data: booked } = await supabase.from("rentals").select("start_date, end_date, rental_rate, pricing_model, billing_interval").eq("id", rentalId).eq("organization_id", organizationId).maybeSingle();
+    const { data: booked } = await supabase.from("rentals").select("start_date, end_date, rental_rate, pricing_model, billing_interval, currency").eq("id", rentalId).eq("organization_id", organizationId).maybeSingle();
     const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
     const early = earlyStartFor(booked, rates, today);
     if (early) await ensureEarlyStartCharge(supabase, { organizationId, rentalId, vehicleId, customerId: customerId || rental.customer_id || null, currency: rental.currency || "THB", today, early });

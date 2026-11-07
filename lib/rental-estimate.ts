@@ -4,6 +4,7 @@
  */
 
 import { niceMoney } from "@/lib/nice-money";
+import { businessCurrency } from "@/lib/business-units";
 
 export type Rates = { dailyRate: number; weeklyRate: number; monthlyRate: number };
 
@@ -21,8 +22,22 @@ export type StayQuote = {
   explain: string;
 };
 
-// In the business's own currency (was always baht).
-const baht = (value: number) => niceMoney(Math.round(value));
+/**
+ * A quoted amount, rounded the way that currency is quoted: baht to the nearest 10 (as a Thai rental desk would),
+ * every other currency to its minor unit (cents; whole yen), so 3 days at $95 is $285, not $290.
+ */
+export function roundQuote(amount: number, currency: string | null | undefined = businessCurrency()): number {
+  const code = String(currency || businessCurrency()).toUpperCase();
+  if (code === "THB") return Math.round(amount / 10) * 10;
+  let digits = 2;
+  try {
+    digits = new Intl.NumberFormat("en", { style: "currency", currency: code || "USD" }).resolvedOptions().maximumFractionDigits ?? 2;
+  } catch {
+    digits = 2;
+  }
+  const factor = 10 ** digits;
+  return Math.round(amount * factor) / factor;
+}
 
 /**
  * The price of a number of days from a rate card, the way a rental desk
@@ -32,8 +47,9 @@ const baht = (value: number) => niceMoney(Math.round(value));
  * stay never costs more than the next longer rate (six days at the daily rate
  * is capped at the weekly rate, three weeks at the monthly rate).
  */
-export function quoteStay(rates: Rates, days: number): StayQuote | null {
+export function quoteStay(rates: Rates, days: number, currency: string | null | undefined = businessCurrency()): StayQuote | null {
   if (!(days > 0)) return null;
+  const baht = (value: number) => niceMoney(value, currency);
   const order: Array<StayQuote["basis"]> = days >= 28 ? ["monthly", "weekly", "daily"] : days >= 7 ? ["weekly", "daily", "monthly"] : ["daily", "weekly", "monthly"];
   const rateOf = { daily: rates.dailyRate, weekly: rates.weeklyRate, monthly: rates.monthlyRate };
   const basis = order.find((key) => rateOf[key] > 0);
@@ -56,8 +72,8 @@ export function quoteStay(rates: Rates, days: number): StayQuote | null {
     amount = rates.monthlyRate;
     explain = `${days} ${dayWord}, charged as one month (${baht(rates.monthlyRate)})`;
   }
-  // To the nearest 10, the way a person would quote it.
-  return { amount: Math.max(0, Math.round(amount / 10) * 10), basis, explain };
+  // Baht to the nearest 10, the way a person would quote it; other currencies to the cent.
+  return { amount: Math.max(0, roundQuote(amount, currency)), basis, explain };
 }
 
 /**

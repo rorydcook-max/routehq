@@ -86,7 +86,7 @@ export async function extensionPicture(admin: any, organizationId: string, renta
   let worth: ExtensionPicture["worth"] = null;
   if (openEnded && card.monthlyRate > 0) worth = { amount: card.monthlyRate, explain: null, perMonth: true };
   else if (!openEnded && currentEnd && requestedEnd && requestedEnd > currentEnd) {
-    const quote = quoteStay(card, daysBetween(currentEnd, requestedEnd));
+    const quote = quoteStay(card, daysBetween(currentEnd, requestedEnd), rental.currency || null);
     if (quote && quote.amount > 0) worth = { amount: quote.amount, explain: quote.explain || null, perMonth: false };
   }
 

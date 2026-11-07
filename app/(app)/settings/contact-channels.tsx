@@ -30,7 +30,10 @@ export function ContactChannels({ values, inputClass, form }: { values: Record<s
   // Phone numbers start with the business's own dialling code; LINE sits up front only where it is the everyday app.
   const country = businessCountry();
   const phonePlaceholder = phonePlaceholderFor(country);
-  const CHANNELS = lineFirst(country) ? ALL_CHANNELS : [...ALL_CHANNELS.filter((channel) => channel.key !== "line"), ...ALL_CHANNELS.filter((channel) => channel.key === "line")];
+  // LINE first where it is the everyday app (Thailand, Japan, Taiwan), last elsewhere: the same order as the contact-method choices.
+  const line = ALL_CHANNELS.filter((channel) => channel.key === "line");
+  const others = ALL_CHANNELS.filter((channel) => channel.key !== "line");
+  const CHANNELS = lineFirst(country) ? [...line, ...others] : [...others, ...line];
   const placeholderOf = (channel: (typeof ALL_CHANNELS)[number]) => channel.placeholder || phonePlaceholder;
   const [on, setOn] = useState<Record<string, boolean>>(() => Object.fromEntries(CHANNELS.map((channel) => [channel.key, Boolean(values[channel.field])])));
   const [text, setText] = useState<Record<string, string>>(() => Object.fromEntries(CHANNELS.map((channel) => [channel.key, values[channel.field] || ""])));

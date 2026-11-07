@@ -27,6 +27,8 @@ import { earlyStartFor, ensureEarlyStartCharge, requestEarlyWaiver, settleEarlyC
 import { applyLateStart, lateStartNote } from "@/lib/late-start";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
+import { adoptBusinessClock } from "@/lib/auth/active-organization-server";
+import { enterBusinessTimeZone } from "@/lib/business-time-scope";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
 import { bookingRules } from "@/lib/booking-rules";
 import { removeStoredFiles } from "@/lib/supabase/remove-stored-files";
@@ -997,7 +999,7 @@ export async function deleteBooking(rentalId: string, confirmed = false): Promis
 
   if (rentalError || !rental) return { success: false, error: rentalError?.message || "Booking not found." };
 
-  await ensureMembership(supabase, rental.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, rental.organization_id, user.id));
 
   const membership = await getCurrentMembership();
   if (!membership || membership.organizationId !== rental.organization_id || membership.role !== "owner") {
@@ -1069,7 +1071,7 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
 
   if (rentalError || !rental) return { success: false, error: rentalError?.message || "Rental not found." };
 
-  await ensureMembership(supabase, rental.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, rental.organization_id, user.id));
 
   // Going out before the customer filled in their link: the name typed here becomes the customer, so the rent
   // schedule can be written and anything unpaid shows as owed. (The link later fills in this same record.)
@@ -1243,7 +1245,7 @@ export async function updateBooking(formData: FormData) {
     throw new Error(rentalError?.message || "Booking was not found.");
   }
 
-  await ensureMembership(supabase, rental.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, rental.organization_id, user.id));
 
   if (rental.vehicle_id && !["cancelled", "completed", "draft"].includes(String(rental.status))) {
     const conflict = await vehicleConflictMessage(supabase, {
@@ -1464,7 +1466,7 @@ export async function addRentalPayment(formData: FormData) {
     throw new Error("Assign a customer before adding payment rows.");
   }
 
-  await ensureMembership(supabase, rental.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, rental.organization_id, user.id));
 
   const { data: existingPendingPayments, error: existingPaymentsError } = await supabase
     .from("rental_payments")
@@ -1571,7 +1573,7 @@ export async function setupExistingRentalPayments(formData: FormData) {
     throw new Error("Assign a customer before setting up payment records.");
   }
 
-  await ensureMembership(supabase, rental.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, rental.organization_id, user.id));
 
   const { data: existingPayments, error: existingError } = await supabase
     .from("rental_payments")
@@ -1939,7 +1941,7 @@ export async function generatePaymentScheduleForRental(rentalId: string) {
     throw new Error(rentalError?.message || "Rental was not found.");
   }
 
-  await ensureMembership(supabase, rental.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, rental.organization_id, user.id));
 
   if (!rental.customer_id || !rental.vehicle_id) {
     throw new Error("A customer and vehicle are required before generating a payment schedule.");
@@ -2488,6 +2490,8 @@ async function ensureMembership(supabase: any, organizationId: string, userId: s
   if (error || !data) {
     throw new Error(error?.message || "You do not have access to this organization.");
   }
+  // "Today" for the rest of this save is this business's day, not Bangkok's (the caller enters it: enterBusinessTimeZone).
+  return adoptBusinessClock(supabase, organizationId);
 }
 
 export async function updateRentalEndDate(rentalId: string, newEndDate: string): Promise<{ success: boolean; error?: string }> {
@@ -2526,7 +2530,7 @@ async function updateRentalEndDateOrThrow(rentalId: string, newEndDate: string) 
     throw new Error(error?.message || "Rental was not found.");
   }
 
-  await ensureMembership(supabase, rental.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, rental.organization_id, user.id));
 
   if (rental.vehicle_id && rental.start_date) {
     const conflict = await vehicleConflictMessage(supabase, {
@@ -2608,7 +2612,7 @@ export async function updateRentalPayment(paymentId: string, fields: RentalPayme
     throw new Error(error?.message || "Payment was not found.");
   }
 
-  await ensureMembership(supabase, payment.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, payment.organization_id, user.id));
 
   const oldAmount = Number(payment.amount || 0);
   const oldDueDate = dateOnly(payment.due_date);
@@ -2707,7 +2711,7 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
     throw new Error(error?.message || "Payment was not found.");
   }
 
-  await ensureMembership(supabase, payment.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, payment.organization_id, user.id));
 
   const paymentType = String(payment.metadata?.type || "");
   const description =
@@ -2917,7 +2921,7 @@ export async function deleteRentalPayment(paymentId: string) {
     .maybeSingle();
 
   const orgId: string = rentalForAuth?.organization_id || payment.organization_id;
-  await ensureMembership(supabase, orgId, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, orgId, user.id));
 
   // Clear the transaction link before deleting
   if (payment.transaction_id) {
@@ -3252,7 +3256,7 @@ export async function recordPaymentRefund(formData: FormData) {
 
   if (rentalError || !rental) throw new Error(rentalError?.message || "Booking not found.");
 
-  await ensureMembership(supabase, organizationId, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, organizationId, user.id));
 
   const { error } = await supabase
     .from("transactions")
@@ -3352,7 +3356,7 @@ export async function undoCancellation(formData: FormData) {
   if (rentalError || !rental) throw new Error(rentalError?.message || "Booking not found.");
   if (rental.status !== "cancelled") throw new Error("This booking is not canceled.");
 
-  await ensureMembership(supabase, organizationId, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, organizationId, user.id));
 
   const resolvedVehicleId = vehicleId || rental.vehicle_id;
   // Back on rent only if the vehicle really went out (a handover form, a reading at handover, or "handed over
@@ -3500,7 +3504,7 @@ export async function confirmReceiptPayment(input: ConfirmReceiptInput) {
     .is("deleted_at", null)
     .maybeSingle();
   if (error || !primary) throw new Error(error?.message || "Payment was not found.");
-  await ensureMembership(supabase, primary.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, primary.organization_id, user.id));
 
   const receipt = primary.metadata?.receipt?.path ? primary.metadata.receipt : null;
   const open = await openPaymentsForRental(supabase, primary.organization_id, primary.rental_id);
@@ -3579,7 +3583,7 @@ export async function declinePaymentReceipt(paymentId: string) {
     .maybeSingle();
   if (error || !payment) throw new Error(error?.message || "Payment was not found.");
 
-  await ensureMembership(supabase, payment.organization_id, user.id);
+  enterBusinessTimeZone(await ensureMembership(supabase, payment.organization_id, user.id));
 
   const path = payment.metadata?.receipt?.path;
   if (!path) return { success: true };
@@ -3671,7 +3675,7 @@ export async function rescheduleBooking(rentalId: string, startDate: string, end
       .is("deleted_at", null)
       .maybeSingle();
     if (!rental) return { ok: false, error: await said("Rental not found.") };
-    await ensureMembership(supabase, rental.organization_id, user.id);
+    enterBusinessTimeZone(await ensureMembership(supabase, rental.organization_id, user.id));
     if (String(rental.status) !== "booked") return { ok: false, error: await said("This rental has already started. Use Extend or end early instead.") };
 
     const { data: links } = await supabase.from("booking_links").select("contract_signed_at").eq("rental_id", rental.id).is("deleted_at", null);

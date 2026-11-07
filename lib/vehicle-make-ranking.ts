@@ -158,3 +158,113 @@ export function rankMakesForCountry<T extends { slug: string; name: string }>(ma
     return leftRank !== rightRank ? leftRank - rightRank : alphabetical(left.name, right.name);
   });
 }
+
+// ── Models ────────────────────────────────────────────────────────────────────
+// The model list for a make follows the same idea: the models rental fleets in that part of the world run come
+// first (a Miami shop sees Camry and Corolla, not Alphard; a Lisbon shop sees Clio and Yaris), the rest follow
+// alphabetically. Names match vehicle_models.name.
+
+const MODEL_MARKET: Record<string, "us" | "europe" | "asia"> = {
+  northAmerica: "us",
+  westEurope: "europe",
+  uk: "europe",
+  eastEurope: "europe",
+  nordics: "europe",
+  turkey: "europe",
+  japan: "asia",
+  korea: "asia",
+  thailand: "asia",
+  southeastAsia: "asia",
+  southAsia: "asia"
+};
+
+const MARKET_MODELS: Record<"us" | "europe" | "asia", Record<string, string[]>> = {
+  us: {
+    toyota: ["Camry", "Corolla", "RAV4", "Highlander", "Prius", "Tacoma", "Corolla Cross", "Tundra", "Sienna", "4Runner", "Yaris"],
+    ford: ["Escape", "Explorer", "F-150", "Mustang", "Edge", "Bronco Sport", "Expedition", "Maverick", "Bronco", "Ranger", "Mustang Mach-E"],
+    chevrolet: ["Malibu", "Equinox", "Trax", "Tahoe", "Suburban", "Silverado", "Traverse", "Trailblazer", "Camaro", "Colorado", "Spark"],
+    honda: ["Civic", "Accord", "CR-V", "HR-V", "Pilot", "Passport", "Fit"],
+    nissan: ["Altima", "Sentra", "Rogue", "Versa", "Kicks", "Pathfinder", "Frontier", "Leaf"],
+    hyundai: ["Elantra", "Sonata", "Tucson", "Santa Fe", "Kona", "Venue", "Palisade", "Accent", "Ioniq 5", "Ioniq 6"],
+    kia: ["Forte", "K5", "Sportage", "Sorento", "Soul", "Seltos", "Telluride", "Niro", "Rio", "EV6", "EV9"],
+    jeep: ["Grand Cherokee", "Wrangler", "Compass", "Cherokee", "Renegade", "Gladiator"],
+    tesla: ["Model 3", "Model Y", "Model S", "Model X"],
+    volkswagen: ["Jetta", "Tiguan", "Atlas", "Taos", "Passat", "Golf", "ID.4"],
+    mazda: ["Mazda 3", "CX-5", "CX-30", "CX-50", "CX-90", "Mazda 6", "MX-5"],
+    subaru: ["Outback", "Forester", "Crosstrek", "Impreza", "Legacy", "Ascent"],
+    bmw: ["3 Series", "X3", "X5", "5 Series", "X1", "i4"],
+    "mercedes-benz": ["C-Class", "GLC", "E-Class", "GLE", "A-Class", "CLA", "GLA"]
+  },
+  europe: {
+    toyota: ["Yaris", "Corolla", "Yaris Cross", "Aygo X", "C-HR", "RAV4", "Prius", "Camry", "Land Cruiser", "Hilux"],
+    volkswagen: ["Polo", "Golf", "T-Roc", "T-Cross", "Tiguan", "Passat", "Up!", "Taigo", "ID.3", "ID.4", "Touran"],
+    renault: ["Clio", "Captur", "Mégane", "Twingo", "Arkana", "Austral", "Scenic", "Zoe"],
+    peugeot: ["208", "2008", "308", "3008", "5008", "Rifter"],
+    fiat: ["500", "Panda", "Tipo", "500X", "600", "500e"],
+    dacia: ["Sandero", "Sandero Stepway", "Duster", "Logan", "Jogger", "Spring"],
+    citroen: ["C3", "C3 Aircross", "C4", "C1", "C5 Aircross"],
+    skoda: ["Fabia", "Octavia", "Kamiq", "Scala", "Karoq", "Kodiaq", "Superb", "Enyaq"],
+    opel: ["Corsa", "Astra", "Mokka", "Crossland", "Grandland"],
+    ford: ["Fiesta", "Focus", "Puma", "Kuga", "Mustang Mach-E", "Ranger", "Mustang"],
+    hyundai: ["i10", "i20", "i30", "Kona", "Tucson", "Bayon", "Ioniq 5", "Santa Fe"],
+    kia: ["Picanto", "Rio", "Ceed", "Stonic", "Sportage", "Niro", "EV6", "Sorento"],
+    nissan: ["Micra", "Juke", "Qashqai", "X-Trail", "Leaf", "Ariya"],
+    "mercedes-benz": ["A-Class", "C-Class", "CLA", "GLA", "E-Class", "GLC", "B-Class"],
+    bmw: ["1 Series", "3 Series", "X1", "2 Series", "X3", "5 Series", "i4"],
+    audi: ["A1", "A3", "Q2", "Q3", "A4", "Q5", "A6"],
+    tesla: ["Model Y", "Model 3", "Model S", "Model X"],
+    suzuki: ["Swift", "Ignis", "Vitara", "S-Cross", "Jimny"],
+    mazda: ["Mazda 2", "CX-30", "Mazda 3", "CX-5", "MX-5", "CX-60"]
+  },
+  asia: {
+    toyota: ["Vios", "Yaris", "Yaris Ativ", "Corolla Altis", "Corolla Cross", "Fortuner", "Hilux Revo", "Innova", "Avanza", "Veloz", "Camry", "Alphard", "Aqua", "Prius", "Sienta", "Noah", "Voxy"],
+    honda: ["City", "City Hatchback", "Civic", "Jazz", "HR-V", "CR-V", "Brio", "BR-V", "Fit", "Freed", "N-Box", "Accord"],
+    mitsubishi: ["Xpander", "Mirage", "Attrage", "Triton", "Pajero Sport", "Outlander"],
+    nissan: ["Almera", "Kicks", "Note", "Serena", "Navara", "Terra", "X-Trail", "Sylphy"],
+    suzuki: ["Swift", "Ertiga", "Celerio", "Ciaz", "XL7", "Wagon R", "Spacia", "Hustler", "Jimny"],
+    mazda: ["Mazda 2", "Mazda 3", "CX-3", "CX-30", "CX-5", "BT-50"],
+    hyundai: ["Creta", "Accent", "Avante", "Elantra", "Venue", "Tucson", "Santa Fe", "Casper", "Grandeur"],
+    kia: ["Morning", "K3", "Seltos", "Sonet", "Carnival", "Sportage", "Sorento", "Ray", "Picanto"],
+    isuzu: ["D-Max", "MU-X"],
+    ford: ["Ranger", "Everest", "Territory", "EcoSport"],
+    chevrolet: ["Spark", "Trailblazer", "Colorado", "Captiva"]
+  }
+};
+
+/** Models of one make, the ones common in the business's part of the world first, then alphabetical. */
+export function rankModelsForCountry<T extends { name: string }>(models: T[], makeSlug?: string | null, country?: string | null): T[] {
+  const region = COUNTRY_REGION[String(country || "").trim().toUpperCase()];
+  const market = region ? MODEL_MARKET[region] : undefined;
+  const preferred = market ? MARKET_MODELS[market][String(makeSlug || "").toLowerCase()] || [] : [];
+  const rank = new Map(preferred.map((name, index) => [name.toLowerCase(), index]));
+  return [...models].sort((left, right) => {
+    const leftRank = rank.get(left.name.toLowerCase()) ?? Number.MAX_SAFE_INTEGER;
+    const rightRank = rank.get(right.name.toLowerCase()) ?? Number.MAX_SAFE_INTEGER;
+    return leftRank !== rightRank ? leftRank - rightRank : alphabetical(left.name, right.name);
+  });
+}
+
+// What people type for a make: "chevy" finds Chevrolet, "vw" Volkswagen, "merc" Mercedes-Benz.
+const MAKE_ALIASES: Record<string, string> = {
+  chevy: "chevrolet",
+  vw: "volkswagen",
+  vdub: "volkswagen",
+  merc: "mercedes-benz",
+  mercedes: "mercedes-benz",
+  benz: "mercedes-benz",
+  mb: "mercedes-benz",
+  bimmer: "bmw",
+  beemer: "bmw",
+  landrover: "land-rover",
+  rangerover: "land-rover",
+  alfa: "alfa-romeo",
+  harley: "harley-davidson",
+  enfield: "royal-enfield"
+};
+
+/** Whether a make matches what was typed in the make search: its name, or a common nickname ("chevy", "vw", "merc"). */
+export function makeMatchesSearch(make: { name: string; slug: string }, needle: string, normalize: (value: string) => string): boolean {
+  if (!needle) return true;
+  if (normalize(make.name).includes(needle)) return true;
+  return Object.entries(MAKE_ALIASES).some(([alias, slug]) => slug === make.slug && (alias.startsWith(needle) || (needle.startsWith(alias) && needle.length <= alias.length + 2)));
+}

@@ -17,6 +17,28 @@ export type BillingDetails = {
   invoices: Array<{ id: string; number: string | null; date: string; amount: number; currency: string; status: string; url: string | null; pdf: string | null }>;
 };
 
+type PostalAddress = { line1?: string | null; line2?: string | null; city?: string | null; state?: string | null; postal_code?: string | null; country?: string | null };
+
+/** Countries that write "City, ST 12345": the postal code after the city and state. */
+const CITY_STATE_POSTAL = new Set(["US", "CA", "AU", "PR", "GU", "VI", "AS", "MP"]);
+/** Countries that put the postal code on a line of its own after the town (UK style). */
+const POSTAL_OWN_LINE = new Set(["GB", "IE", "IM", "JE", "GG"]);
+
+/** A billing address in the order its country writes it: "Miami, FL 33132" in the US, "10115 Berlin" in Germany. */
+export function addressLines(address: PostalAddress): string[] {
+  const country = String(address.country || "").toUpperCase();
+  const city = address.city || "";
+  const state = address.state || "";
+  const postal = address.postal_code || "";
+  const streets = [address.line1 || "", address.line2 || ""];
+  if (CITY_STATE_POSTAL.has(country)) {
+    const place = [[city, state].filter(Boolean).join(", "), postal].filter(Boolean).join(" ");
+    return [...streets, place, country];
+  }
+  if (POSTAL_OWN_LINE.has(country)) return [...streets, [city, state].filter(Boolean).join(", "), postal, country];
+  return [...streets, [postal, city].filter(Boolean).join(" "), [state, country].filter(Boolean).join(", ")];
+}
+
 function paymentMethodText(method: Stripe.PaymentMethod | null | undefined): BillingDetails["card"] {
   if (!method) return null;
   if (method.type === "card" && method.card) {
@@ -60,9 +82,7 @@ export async function getBillingDetails(organization: { stripe_customer_id?: str
       (subscription?.default_payment_method && typeof subscription.default_payment_method === "object" ? subscription.default_payment_method : null) ||
       (live.invoice_settings?.default_payment_method && typeof live.invoice_settings.default_payment_method === "object" ? live.invoice_settings.default_payment_method : null);
 
-    const address = live.address
-      ? [live.name || "", live.address.line1 || "", live.address.line2 || "", [live.address.postal_code, live.address.city].filter(Boolean).join(" "), [live.address.state, live.address.country].filter(Boolean).join(", ")].filter((line) => line.trim())
-      : [];
+    const address = live.address ? [live.name || "", ...addressLines(live.address)].filter((line) => line.trim()) : [];
     const taxId = live.tax_ids?.data?.[0]?.value || null;
 
     return {

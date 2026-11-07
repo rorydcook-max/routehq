@@ -1,4 +1,16 @@
 import { toWallTime } from "@/lib/business-time";
+import { businessCountry } from "@/lib/business-units";
+
+/** Countries that write the month first ("Nov 16, 2026"): the US and its territories, the Philippines, Canada. */
+const MONTH_FIRST = new Set(["US", "PH", "CA", "PR", "GU", "VI", "AS", "MP", "UM", "FM", "MH", "PW"]);
+
+/**
+ * The Intl locale for English dates: month first for a business in the US (and other month-first countries),
+ * day first everywhere else. Uses the business's country recorded for this request or page (lib/business-units.ts).
+ */
+export function englishDateLocale(country: string | null | undefined = businessCountry()): "en-US" | "en-GB" {
+  return MONTH_FIRST.has(String(country || "").toUpperCase()) ? "en-US" : "en-GB";
+}
 
 /**
  * Dates on customer pages, written the same way on the server and in the browser.
@@ -32,7 +44,7 @@ export function customerDate(iso: string, locale: string, withYear = true): stri
     if (!withYear) return `${day} ${name}`;
     return own.yearFirst ? `${year} ${name} ${day}` : `${day} ${name} ${year}`;
   }
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, {
+  return new Intl.DateTimeFormat(locale === "en" ? englishDateLocale() : `${locale}-u-ca-gregory-nu-latn`, {
     day: "numeric",
     month: "short",
     ...(withYear ? { year: "numeric" as const } : {}),

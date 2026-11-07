@@ -6,6 +6,8 @@ import { dialCodeFor, toInternationalPhone } from "@/lib/phone";
 import type { AlertText } from "@/lib/operator-alert-text";
 import { processCustomerPortalAction } from "@/lib/portal-notifications";
 import { BLOCKING_RENTAL_STATUSES, OUT_RENTAL_STATUSES } from "@/lib/rental-conflicts";
+import { setBusinessTimeZone } from "@/lib/business-time";
+import { setBusinessCountry, setBusinessCurrency } from "@/lib/business-units";
 
 /**
  * Hold for extension (Rory, 7 Nov 2026): Settings > Holds and notice > "Hold for extension".
@@ -126,13 +128,17 @@ export async function loadExtensionCheck(admin: any, token: string): Promise<Ext
   const { data: rental } = await admin
     .from("rentals")
     .select(
-      "id, organization_id, status, end_date, extension_check_end, extension_answer, vehicles!rentals_vehicle_id_fkey(make, model), organizations!rentals_organization_id_fkey(name, trading_name, business_phone, whatsapp, contract_accent_colour, country_code)"
+      "id, organization_id, status, end_date, extension_check_end, extension_answer, vehicles!rentals_vehicle_id_fkey(make, model), organizations!rentals_organization_id_fkey(name, trading_name, business_phone, whatsapp, contract_accent_colour, country_code, timezone, currency)"
     )
     .eq("extension_check_token", token)
     .is("deleted_at", null)
     .maybeSingle();
   if (!rental) return { state: "not_found" };
   const organization = rental.organizations || {};
+  // The page's dates follow the business's country ("Nov 16, 2026" in the US) and clock.
+  setBusinessTimeZone(organization.timezone);
+  setBusinessCountry(organization.country_code);
+  setBusinessCurrency(organization.currency);
   const end = iso(rental.end_date);
   const checkEnd = iso(rental.extension_check_end);
   const answeredNow = checkEnd === end ? (rental.extension_answer as ExtensionAnswer | null) : null;

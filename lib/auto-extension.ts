@@ -109,7 +109,7 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
   } else {
     const endDate = String(newEndDate);
     const extraDays = daysBetween(currentEnd, endDate);
-    const quote = quoteStay(card, extraDays);
+    const quote = quoteStay(card, extraDays, currency);
     const amount = quote?.amount ?? 0;
     // With nobody looking, extra days are only added at a rate meant for a stay of that length
     // (the same rule as booking online). A few days on a monthly-only vehicle, or a vehicle with

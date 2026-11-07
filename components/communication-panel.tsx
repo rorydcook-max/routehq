@@ -1,5 +1,6 @@
 "use client";
 
+import { englishDateLocale } from "@/lib/i18n/customer-dates";
 import { daysFromToday } from "@/lib/business-time";
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -359,7 +360,7 @@ function formatDate(value: string) {
   const day = value.slice(0, 10);
   const parsed = new Date(`${day}T00:00:00Z`);
   if (Number.isNaN(parsed.getTime())) return day;
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(parsed);
+  return new Intl.DateTimeFormat(englishDateLocale(), { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(parsed);
 }
 
 function returnDateTone(value: string | null | undefined): "green" | "amber" | "red" | "neutral" {

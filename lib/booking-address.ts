@@ -122,7 +122,9 @@ export function subdomainProblem(value: string): SubdomainProblem {
   return null;
 }
 
-/** "https://Book.MyShop.com/path" → "book.myshop.com"; null when it isn't a usable domain. */
+const RESERVED_TLDS = new Set(["example", "test", "invalid", "localhost", "local", "internal", "onion", "arpa", "lan", "intranet", "corp", "home", "localdomain"]);
+
+/** "https://Book.MyShop.com/path" → "book.myshop.com"; null when it isn't a usable domain (reserved names and IPs too). */
 export function cleanDomain(value: string) {
   const host = String(value || "")
     .trim()
@@ -131,7 +133,11 @@ export function cleanDomain(value: string) {
     .replace(/[/?#].*$/, "")
     .replace(/:\d+$/, "")
     .replace(/\.$/, "");
+  // A bare IP address is not a domain (the pattern below needs a letter TLD, but say it plainly).
+  if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host) || host.includes(":") || host.startsWith("[")) return null;
   if (!/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/.test(host)) return null;
+  // Reserved and special-use names that can never point at a booking page (RFC 2606 / 6761 / 6762).
+  if (RESERVED_TLDS.has(host.split(".").pop() || "") || /(^|\.)example\.(com|net|org)$/.test(host)) return null;
   const root = rootDomain();
   if (host === root || host.endsWith(`.${root}`) || host.endsWith(".vercel.app")) return null;
   // A business can't claim one of our own domains as its booking address.

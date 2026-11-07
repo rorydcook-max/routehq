@@ -10,6 +10,7 @@ import { alertLateReturns } from "@/lib/late-returns";
 import { syncAllVehicleStatuses } from "@/lib/vehicle-status";
 import { refreshAllRenters } from "@/lib/renters";
 import { sendTrialNudges } from "@/lib/trial-nudges";
+import { endFreeTrials } from "@/lib/billing/parking";
 import { postDueComplianceInstalments } from "@/lib/compliance-billing";
 import { runIdPhotoRetention } from "@/lib/privacy/erase";
 import { addDaysIso, orgTimeZone, runDailyJob, supabaseRunStore } from "@/lib/scheduled-runs";
@@ -117,6 +118,8 @@ export async function GET(req: NextRequest) {
       totals.extensionHoldsLapsed += holds?.lapsed || 0;
       // New businesses that stalled in their first week: one nudge towards their next step on day 1, 3 and 7.
       totals.trialNudges += await sendTrialNudges(supabase, ids).catch(() => 0);
+      // A card-free trial that ends on Free: switch it and park what is over Free's limit (the owner's picks stay).
+      await endFreeTrials(supabase, ids).catch(() => 0);
       // Insurance or tax paid every month: this month's instalment is added as a cost on its day, until the cover runs out.
       totals.complianceInstalments += await postDueComplianceInstalments(supabase, { organizationIds: ids, today }).catch(() => 0);
 

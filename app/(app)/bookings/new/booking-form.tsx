@@ -882,7 +882,8 @@ export function BookingForm({
           {selectedVehicle ? (
             <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
               {[selectedVehicle.make, selectedVehicle.model].filter(Boolean).join(" ")}
-              {selectedVehicle.registration_number ? <span className="font-mono-data ml-2 text-[var(--muted)]">{selectedVehicle.registration_number}</span> : null}{" "}
+              {/* A real space and a dot between model and plate (a margin alone read "Toyota AlphardFLA 1234" when copied or read aloud). */}
+              {selectedVehicle.registration_number ? <span className="font-mono-data text-[var(--muted)]">{" · "}{selectedVehicle.registration_number}</span> : null}{" "}
               <button className="ml-1 font-semibold text-[var(--primary)] underline" onClick={() => setStep(0)} type="button">
                 {say("change")}
               </button>

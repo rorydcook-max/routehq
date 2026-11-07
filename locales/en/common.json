@@ -1247,7 +1247,11 @@
     "nothingHere": "Nothing here",
     "showAllJobs": "Show all jobs",
     "laterLink": "{count, plural, one {# job} other {# jobs}} later or with no date",
-    "job_collectFrom": "Collect {amount}"
+    "job_collectFrom": "Collect {amount}",
+    "collect_deposit": "Collect deposit",
+    "collect_top_up": "Collect top-up",
+    "collect_extension": "Collect extension",
+    "collect_extras": "Collect extras"
   },
   "bookings": {
     "eyebrow": "Bookings",

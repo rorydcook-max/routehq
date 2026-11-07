@@ -24,6 +24,10 @@ import { findMatchingOutstandingItems } from "@/lib/transaction-matching";
 import { recordService, SERVICE_COST_TYPES } from "@/lib/vehicle-service";
 import { monthsCovered } from "@/lib/cost-spread";
 import { recordPaperworkDate } from "@/lib/paperwork-renewal";
+import { noteReferralFee } from "@/lib/partner-network";
+
+/** How a handover payment came in, as the money record names it. */
+const HANDOVER_METHOD_NAMES: Record<string, string> = { cash: "Cash", promptpay: "PromptPay", bank_transfer: "Bank transfer", wise: "Wise", revolut: "Revolut", card: "Card" };
 
 function optionalString(formData: FormData, key: string) {
   return String(formData.get(key) || "").trim() || null;
@@ -412,7 +416,7 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
         amount: transactionAmount,
         currency: rental.currency || "THB",
         transaction_date: today,
-        supplier: "Cash",
+        supplier: HANDOVER_METHOD_NAMES[paymentMethod] || "Cash",
         notes: type === "deposit_received" ? "Security deposit received at handover." : "Rental payment received at handover.",
         metadata: { source: "delivery_inspection", payment_method: paymentMethod },
         is_deposit: type === "deposit_received",
@@ -473,9 +477,14 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     rental_id: rentalId,
     customer_id: customerId,
     event_type: "payment_received",
-    title: "Cash payment received",
+    title: paymentMethod === "cash" ? "Cash payment received" : `Payment received (${HANDOVER_METHOD_NAMES[paymentMethod] || paymentMethod})`,
     detail: `Rental payment ${niceMoney(rentalPaymentAmount)} and deposit ${niceMoney(depositAmount)} received at handover.`
   });
+
+  // A customer a partner referred: their share of this rent is noted, as when a payment is recorded on the booking.
+  if (rentalPaymentAmount > 0) {
+    await noteReferralFee(supabase, rentalId, rentalPaymentAmount, { type: "rent" }, rentPaymentId, rental.currency).catch((error) => console.error("referral fee failed", error));
+  }
 
   // No revalidatePath here on purpose: it re-renders the open handover form mid-way (slow on a phone signal).
   // Finishing the handover refreshes every page that shows this money.

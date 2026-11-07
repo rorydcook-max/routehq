@@ -18,6 +18,7 @@ import { earlyStartFor, type EarlyStartChoice } from "@/lib/early-start";
 import { lateStartFor, type LateStartChoice } from "@/lib/late-start";
 import { dateFormat } from "@/lib/i18n/dates";
 import { distanceKey } from "@/lib/business-units";
+import { HandoverPaymentStep, type HandoverPayOptions } from "@/components/handover-payment-step";
 
 type DamageItem = {
   id: string;
@@ -71,6 +72,15 @@ function money(value: unknown) {
     return new Intl.NumberFormat("en", { style: "currency", currency: formCurrency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(Number(value || 0));
   } catch {
     return `${formCurrency} ${Math.round(Number(value || 0)).toLocaleString("en-US")}`;
+  }
+}
+
+/** As money(), keeping satang/cents when there are any (amounts at the payment step). */
+function exactMoney(value: number) {
+  try {
+    return new Intl.NumberFormat("en", { style: "currency", currency: formCurrency, currencyDisplay: "narrowSymbol", minimumFractionDigits: 0, maximumFractionDigits: Number.isInteger(value) ? 0 : 2 }).format(Number(value || 0));
+  } catch {
+    return `${formCurrency} ${Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
   }
 }
 
@@ -468,7 +478,7 @@ function SignaturePad({
   );
 }
 
-export function InspectionForm({ context, unsigned = false, blocker = null, blockerLinks = null, canWaive = true }: { context: InspectionContext; /** The booking in the way, so the owner can go straight to it. */ blockerLinks?: { otherRentalId: string; code: string } | null; /** Owners can give early days for free; teammates charge them or keep the length. */ canWaive?: boolean; /** The customer has not signed the agreement yet. */ unsigned?: boolean; /** Why the handover cannot go ahead right now (another customer still has the vehicle). */ blocker?: string | null }) {
+export function InspectionForm({ context, unsigned = false, blocker = null, blockerLinks = null, canWaive = true, pay = null }: { context: InspectionContext; /** How the business takes money, for the handover's payment step. */ pay?: HandoverPayOptions | null; /** The booking in the way, so the owner can go straight to it. */ blockerLinks?: { otherRentalId: string; code: string } | null; /** Owners can give early days for free; teammates charge them or keep the length. */ canWaive?: boolean; /** The customer has not signed the agreement yet. */ unsigned?: boolean; /** Why the handover cannot go ahead right now (another customer still has the vehicle). */ blocker?: string | null }) {
   const t = useTranslations("inspection");
   const locale = useLocale();
   formCurrency = String(context.rental?.currency || "THB");
@@ -562,6 +572,13 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   const [collectOpen, setCollectOpen] = useState(() => mode === "delivery" && (Boolean(deliveryPaymentAmount || deliveryDepositAmount) || !context.hasPaymentSchedule));
   const [receiptResult, setReceiptResult] = useState<ReceiptResult | null>(null);
   const [receiptError, setReceiptError] = useState("");
+  // The handover's payment step: what is due now (rent, with any early/late change made on the first screen, and the deposit).
+  // Whether the step is there is fixed when the form opens, so the steps don't shift.
+  const payDue = { rent: Math.max(0, Number(deliveryPaymentAmount || 0)), deposit: Math.max(0, Number(deliveryDepositAmount || 0)) };
+  const [payStep] = useState(() => mode === "delivery" && !isSwap && Boolean(context.rental?.id) && payDue.rent + payDue.deposit > 0);
+  const [payLeft, setPayLeft] = useState(payDue.rent + payDue.deposit);
+  const tp = useTranslations("handoverPay");
+  const payOptions: HandoverPayOptions = pay || { accepted: ["cash"], defaultMethod: "cash", promptpayId: null, promptpayQrUrl: null, bankName: null, bankAccountNumber: null, bankAccountName: null, wiseLink: null, revolutLink: null, portalPath: null, portalUrl: null };
 
   const draftKey = `routehq-inspection-${mode}-${context.rental?.id || context.vehicle.id}${isSwap ? `-swap-${context.vehicle.id}` : ""}`;
   const deliveryFuel = Number(context.deliveryInspection?.fuel_level || 0);
@@ -583,7 +600,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   // on its own is said on the signature screen, where it can be collected.
   const nothingToSettle = mode === "return" && !isSwap && availableToReconcile <= 0 && fuelDeficitCharge + damageCharge + cleaningCharge <= 0;
   const skipDepositStep = depositAlreadyReturned || (mode === "return" && isSwap) || nothingToSettle;
-  const steps = mode === "return" ? (skipDepositStep ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : withoutGps(mode === "condition_report" ? conditionSteps : deliverySteps);
+  const steps = mode === "return" ? (skipDepositStep ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : withoutGps(mode === "condition_report" ? conditionSteps : payStep ? deliverySteps.flatMap((item) => (item === "Signature" ? ["Payment", item] : [item])) : deliverySteps);
   const preExistingDamage = useMemo(() => {
     const items = Array.isArray(context.deliveryInspection?.damage_items) ? context.deliveryInspection.damage_items : [];
     return items.filter((item: any) => item?.is_pre_existing);
@@ -773,6 +790,26 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
     });
   }
 
+  /** The payment step: money taken now, recorded by the same action as the handover's cash boxes (rent as income, deposit held). */
+  async function recordHandoverPayment(method: string, rent: number, deposit: number) {
+    const formData = new FormData();
+    formData.set("organizationId", context.organizationId);
+    formData.set("rentalId", context.rental?.id || "");
+    formData.set("vehicleId", context.vehicle.id);
+    formData.set("customerId", context.customer?.id || "");
+    formData.set("amount", String(rent + deposit));
+    formData.set("rentalPaymentAmount", String(rent));
+    formData.set("depositAmount", String(deposit));
+    formData.set("paymentMethod", method);
+    formData.set("earlyStart", early ? earlyChoice : "");
+    if (late) formData.set("lateStart", lateChoice);
+    formData.set("customerName", context.customer?.full_name || "Customer");
+    formData.set("vehicleMakeModel", [context.vehicle.make, context.vehicle.model, context.vehicle.trim].filter(Boolean).join(" "));
+    formData.set("vehiclePlate", context.vehicle.registration_number || "");
+    formData.set("rentalPeriod", rentalPeriod);
+    return recordDeliveryCashPaymentAndReceipt(formData);
+  }
+
   async function shareReceipt() {
     if (!receiptResult?.pdf_url) {
       return;
@@ -825,7 +862,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
             onClick={() => setStep((current) => Math.min(steps.length - 1, current + 1))}
             type="button"
           >
-            {t("next")}
+            {steps[step] === "Payment" && payLeft > 0 ? tp("later") : t("next")}
             <ChevronRight size={18} />
           </button>
         ) : (
@@ -905,6 +942,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
       <input name="depositCleaningCharge" type="hidden" value={cleaningCharge} />
       <input name="billUncoveredCharges" type="hidden" value={billUncovered && uncoveredCharges > 0 ? "true" : ""} />
       <input name="holdDepositForDamage" type="hidden" value={holdForDamage ? "true" : ""} />
+      <input name="handoverPayLeft" type="hidden" value={payStep ? payLeft : ""} />
 
       {/* The way back sits above everything, like every other sub-page. */}
       <BackLink
@@ -1364,6 +1402,15 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
         </StepShell>
       ) : null}
 
+      {payStep ? (
+        // Kept mounted (hidden) off its step, so what was recorded stays counted when stepping back and forth.
+        <div className={steps[step] === "Payment" ? "" : "hidden"}>
+          <StepShell title={tp("title")}>
+            <HandoverPaymentStep currency={formCurrency} depositDue={payDue.deposit} money={exactMoney} onLeftChange={setPayLeft} onRecord={recordHandoverPayment} pay={payOptions} rentDue={payDue.rent} />
+          </StepShell>
+        </div>
+      ) : null}
+
       {step === steps.length - 1 ? (
         <StepShell eyebrow={t("eyebrowReview")} title={mode === "return" ? t("reviewReturn") : mode === "condition_report" ? t("reviewCondition") : t("reviewHandover")}>
           <div className="grid grid-cols-2 gap-3">
@@ -1418,18 +1465,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               {t("backEarly", { count: Math.round((Date.parse(`${String(context.rental.end_date).slice(0, 10)}T00:00:00Z`) - Date.parse(`${businessToday()}T00:00:00Z`)) / 86_400_000) })}
             </p>
           ) : null}
-          {mode === "delivery" && context.rental?.id && !isSwap && !collectOpen ? (
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-4">
-              <p className="flex items-center gap-2 text-sm font-semibold text-[var(--success)]">
-                <CheckCircle2 size={18} />
-                {t("nothingToCollect")}
-              </p>
-              <button className="text-sm font-bold text-[var(--primary)] underline" onClick={() => setCollectOpen(true)} type="button">
-                {t("recordCashAnyway")}
-              </button>
-            </div>
-          ) : null}
-          {(mode === "delivery" || mode === "return") && context.rental?.id && !isSwap && collectOpen ? (
+          {/* At a handover, money is taken at the payment step before this one; these boxes are for a return. */}
+          {mode === "return" && context.rental?.id && !isSwap && collectOpen ? (
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>

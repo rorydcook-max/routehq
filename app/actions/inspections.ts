@@ -424,6 +424,59 @@ async function createOnDeliveryPaymentRecords(supabase: any, organizationId: str
   }
 }
 
+/**
+ * Money left unpaid at the handover's payment step. Unpaid payment rows due by now already show on To do as
+ * "Collect rent" / "Collect deposit" (lib/tasks.ts), so only what no row covers becomes a job of its own,
+ * and only once (an open one is not repeated).
+ */
+async function ensureHandoverCollectTask(
+  supabase: any,
+  args: { organizationId: string; rentalId: string; vehicleId: string; customerName: string; left: number; userId: string }
+) {
+  const left = Math.round(Number(args.left || 0) * 100) / 100;
+  if (!(left >= 1)) return;
+  const today = todayDate();
+  const [{ data: rows }, { data: rental }] = await Promise.all([
+    supabase
+      .from("rental_payments")
+      .select("amount, status, voided, due_date")
+      .eq("organization_id", args.organizationId)
+      .eq("rental_id", args.rentalId)
+      .is("deleted_at", null)
+      .in("status", ["scheduled", "pending", "failed", "overdue"]),
+    supabase.from("rentals").select("currency").eq("id", args.rentalId).eq("organization_id", args.organizationId).maybeSingle()
+  ]);
+  const onToDo = (rows || [])
+    .filter((row: any) => row.voided !== true && (!row.due_date || String(row.due_date).slice(0, 10) <= today))
+    .reduce((sum: number, row: any) => sum + Number(row.amount || 0), 0);
+  const uncovered = Math.round((left - onToDo) * 100) / 100;
+  if (!(uncovered >= 1)) return;
+  const admin = createSupabaseAdminClient() as any;
+  const { data: open } = await admin
+    .from("tasks")
+    .select("id")
+    .eq("organization_id", args.organizationId)
+    .eq("rental_id", args.rentalId)
+    .eq("action", "collect_payment")
+    .is("completed_at", null)
+    .is("deleted_at", null)
+    .limit(1);
+  if (open?.length) return;
+  const currency = String(rental?.currency || "THB");
+  const symbol = currency === "THB" ? "฿" : `${currency} `;
+  await admin.from("tasks").insert({
+    organization_id: args.organizationId,
+    vehicle_id: args.vehicleId,
+    rental_id: args.rentalId,
+    title_key: null,
+    created_by: args.userId,
+    title: `Collect ${symbol}${uncovered.toLocaleString("en-US", { maximumFractionDigits: 2 })} from ${args.customerName || "the customer"}`,
+    task_type: "admin",
+    action: "collect_payment",
+    due_at: new Date().toISOString()
+  });
+}
+
 export async function submitInspection(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -726,6 +779,8 @@ export async function submitInspection(formData: FormData) {
     // Generate payment schedule (idempotent — skips if already exists)
     // Out early: rent is for the booked dates (the early days are charged above, or free). Shortened: same length from today.
     await activateRental(rentalId, supabase, { scheduleFrom: early && earlyChoice !== "shorten" ? early.bookedStart : null }).catch(() => null);
+    // Left unpaid at the payment step (part paid, not paid or "Later"): it must be on To do.
+    await ensureHandoverCollectTask(supabase, { organizationId, rentalId, vehicleId, customerName: customerSignedName || customerName, left: numberField(formData, "handoverPayLeft") || 0, userId: user.id }).catch((error) => console.error("handover collect task failed", error));
   }
 
   if (mode === "return" && rentalId && !isSwap) {

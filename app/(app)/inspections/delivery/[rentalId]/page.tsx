@@ -10,6 +10,8 @@ import { businessToday } from "@/lib/business-time";
 import { getTranslations } from "next-intl/server";
 import { longDate } from "@/lib/i18n/dates";
 import { getLocale } from "next-intl/server";
+import { freshPromptPayQrUrl } from "@/lib/promptpay-qr";
+import type { HandoverPayOptions } from "@/components/handover-payment-step";
 
 export default async function DeliveryInspectionPage({ params, searchParams }: { params: Promise<{ rentalId: string }>; searchParams: Promise<{ swap?: string; vehicle?: string }> }) {
   const { rentalId } = await params;
@@ -40,9 +42,31 @@ export default async function DeliveryInspectionPage({ params, searchParams }: {
     }
   }
 
+  // The payment step: the business's ways of being paid, and the customer's booking page (pay there and send a slip).
+  let pay: HandoverPayOptions | null = null;
+  if (query.swap !== "1") {
+    const supabase = (await createSupabaseServerClient()) as any;
+    const { data: link } = await supabase.from("booking_links").select("token, public_url").eq("rental_id", rentalId).is("deleted_at", null).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const org = organization as any;
+    const base = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
+    pay = {
+      accepted: Array.isArray(org.accepted_payment_methods) ? org.accepted_payment_methods : ["cash"],
+      defaultMethod: org.default_payment_method || null,
+      promptpayId: org.promptpay_id || null,
+      promptpayQrUrl: org.promptpay_qr_url ? await freshPromptPayQrUrl(supabase, org.promptpay_qr_url, 60 * 60).catch(() => null) : null,
+      bankName: org.bank_name || null,
+      bankAccountNumber: org.bank_account_number || null,
+      bankAccountName: org.bank_account_name || null,
+      wiseLink: org.wise_link || null,
+      revolutLink: org.revolut_link || null,
+      portalPath: link?.token ? `/book/${link.token}` : null,
+      portalUrl: link?.public_url || (link?.token && base ? `${base}/book/${link.token}` : null)
+    };
+  }
+
   return (
     <AppShell userEmail={userEmail}>
-      <InspectionForm blocker={blocker} blockerLinks={blockerLinks} canWaive={canDecideMoney(membership?.role)} context={context} unsigned={unsigned} />
+      <InspectionForm blocker={blocker} blockerLinks={blockerLinks} canWaive={canDecideMoney(membership?.role)} context={context} pay={pay} unsigned={unsigned} />
     </AppShell>
   );
 }

@@ -157,6 +157,11 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   }
   // Türkiye: raised at handover (lib/rental-activation.ts); the booking's KABİS block has every line to copy.
   if (item.action === "kabis") return { title: tx.say("job_kabis"), detail: tx.say("job_kabis_detail") };
+  // Left unpaid at the handover's payment step: "Collect ฿2,000 from Jane Doe" (app/actions/inspections.ts).
+  if (item.action === "collect_payment") {
+    const amount = raw.match(/^Collect (.+?) from /)?.[1];
+    if (amount) return { title: tx.say("job_collectFrom", { amount }), detail: null };
+  }
   const [first, ...rest] = raw.split(" - ");
   const detail = rest.join(" - ").trim();
   if (item.action === "refund") {

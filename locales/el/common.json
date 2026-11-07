@@ -163,7 +163,8 @@
     "helpLoading": "Φόρτωση…",
     "helpNoArticle": "Κέντρο βοήθειας",
     "helpNoArticleBody": "Δεν υπάρχει ακόμη άρθρο για αυτή τη σελίδα. Στο Κέντρο βοήθειας θα βρείτε οδηγούς για κάθε μέρος του RoveHQ.",
-    "helpOpenCentre": "Άνοιγμα στο Κέντρο βοήθειας"
+    "helpOpenCentre": "Άνοιγμα στο Κέντρο βοήθειας",
+    "bookingPage": "Σελίδα κρατήσεων"
   },
   "vehicles": {
     "addVehicle": "Προσθήκη οχήματος"
@@ -262,7 +263,8 @@
       "GPS": "GPS",
       "Signature": "Υπογραφή",
       "Deposit": "Εγγύηση",
-      "Review": "Έλεγχος"
+      "Review": "Έλεγχος",
+      "Payment": "Πληρωμή"
     },
     "signatureCaptured": "Η υπογραφή καταγράφηκε",
     "signInBox": "Υπογράψτε στο παραπάνω πλαίσιο",
@@ -1244,7 +1246,12 @@
     "group_next30": "Επόμενες 30 ημέρες",
     "nothingHere": "Τίποτα εδώ",
     "showAllJobs": "Όλες οι εργασίες",
-    "laterLink": "{count, plural, one {# εργασία} other {# εργασίες}} αργότερα ή χωρίς ημερομηνία"
+    "laterLink": "{count, plural, one {# εργασία} other {# εργασίες}} αργότερα ή χωρίς ημερομηνία",
+    "job_collectFrom": "Είσπραξη {amount}",
+    "collect_deposit": "Είσπραξη εγγύησης",
+    "collect_top_up": "Είσπραξη συμπληρωματικού ποσού",
+    "collect_extension": "Είσπραξη παράτασης",
+    "collect_extras": "Είσπραξη έξτρα"
   },
   "bookings": {
     "eyebrow": "Κρατήσεις",
@@ -4682,7 +4689,20 @@
     "br_unitMi": "μίλια",
     "br_pickupOnly": "Οι πελάτες έρχονται στο κατάστημα",
     "br_deliversWithin": "Παράδοση και παραλαβή σε ακτίνα {distance}",
-    "br_setArea": "Δεν έχει οριστεί περιοχή εξυπηρέτησης"
+    "br_setArea": "Δεν έχει οριστεί περιοχή εξυπηρέτησης",
+    "bt_title": "Σελίδα κρατήσεων",
+    "bt_edit": "Επεξεργασία",
+    "bt_preview": "Προεπισκόπηση",
+    "bt_mobile": "Κινητό",
+    "bt_desktop": "Υπολογιστής",
+    "bt_open": "Άνοιγμα σελίδας",
+    "bt_page": "Σελίδα",
+    "bt_address": "Διεύθυνση",
+    "bt_design": "Σχεδίαση",
+    "bt_brand": "Brand",
+    "bt_saveChanges": "Αποθήκευση αλλαγών",
+    "bt_unsaved": "Μη αποθηκευμένες αλλαγές",
+    "bt_sectionsOn": "{count, plural, one {Εμφανίζεται # ενότητα} other {Εμφανίζονται # ενότητες}}"
   },
   "accountPage": {
     "roleOwner": "Ιδιοκτήτης",
@@ -7203,5 +7223,38 @@
     "nudgeSignature": "Προσθέστε την υπογραφή σας μία φορά και οι πελάτες υπογράφουν τη σύμβαση ενοικίασης στο κινητό τους.",
     "nudgePaymentMethods": "Προσθέστε PromptPay ή τα τραπεζικά σας στοιχεία ώστε οι πελάτες να πληρώνουν απευθείας από τη σελίδα της κράτησής τους.",
     "extensionHoldReturning": "Ο/Η {customer} δεν παρατείνει: το {vehicle} επιστρέφεται στις {date}. Οι επόμενες ημέρες είναι ξανά διαθέσιμες για κράτηση."
+  },
+  "handoverPay": {
+    "title": "Πληρωμή",
+    "rent": "Ενοίκιο",
+    "deposit": "Εγγύηση",
+    "total": "Σύνολο προς πληρωμή",
+    "paid": "Πληρώθηκαν",
+    "left": "Υπόλοιπο",
+    "paidInFull": "Εξοφλήθηκε",
+    "howPay": "Πώς πληρώνει ο πελάτης;",
+    "m_cash": "Μετρητά",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Τραπεζική μεταφορά",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Πλήρωσε ο πελάτης {amount} σε μετρητά;",
+    "yes": "Ναι",
+    "part": "Μέρος",
+    "no": "Όχι",
+    "amountPaid": "Ποσό που πληρώθηκε",
+    "record": "Καταχώριση",
+    "saving": "Αποθήκευση...",
+    "showCustomer": "Εμφάνιση στον πελάτη",
+    "markPaid": "Πληρώθηκε",
+    "notYet": "Όχι ακόμη",
+    "close": "Κλείσιμο",
+    "promptpayId": "PromptPay ID",
+    "bank": "Τράπεζα",
+    "account": "Λογαριασμός",
+    "accountName": "Όνομα",
+    "receipt": "Απόδειξη {number}",
+    "failed": "Δεν ήταν δυνατή η καταχώριση της πληρωμής. Δοκιμάστε ξανά.",
+    "later": "Αργότερα"
   }
 }

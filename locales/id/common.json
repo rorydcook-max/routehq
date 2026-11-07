@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "Tanda tangan",
       "Deposit": "Uang jaminan",
-      "Review": "Tinjau"
+      "Review": "Tinjau",
+      "Payment": "Pembayaran"
     },
     "signatureCaptured": "Tanda tangan telah diambil",
     "signInBox": "Tandatangani di kotak atas",
@@ -440,7 +441,8 @@
     "helpLoading": "Memuat…",
     "helpNoArticle": "Pusat bantuan",
     "helpNoArticleBody": "Belum ada artikel tentang halaman ini. Pusat bantuan punya panduan untuk setiap bagian RoveHQ.",
-    "helpOpenCentre": "Buka di Pusat bantuan"
+    "helpOpenCentre": "Buka di Pusat bantuan",
+    "bookingPage": "Halaman booking"
   },
   "customer": {
     "cur_also": "Tampilkan juga harga dalam",
@@ -1310,7 +1312,12 @@
     "group_next30": "30 hari ke depan",
     "laterLink": "{count} tugas nanti atau tanpa tanggal",
     "nothingHere": "Tidak ada apa-apa",
-    "showAllJobs": "Tampilkan semua tugas"
+    "showAllJobs": "Tampilkan semua tugas",
+    "job_collectFrom": "Tagih {amount}",
+    "collect_deposit": "Tagih deposit",
+    "collect_top_up": "Tagih tambahan",
+    "collect_extension": "Tagih perpanjangan",
+    "collect_extras": "Tagih ekstra"
   },
   "bookings": {
     "eyebrow": "Pemesanan",
@@ -4749,7 +4756,20 @@
     "br_unitMi": "mil",
     "br_pickupOnly": "Pelanggan datang ke cabang",
     "br_deliversWithin": "Antar dan jemput dalam radius {distance}",
-    "br_setArea": "Area layanan belum diatur"
+    "br_setArea": "Area layanan belum diatur",
+    "bt_title": "Halaman booking",
+    "bt_edit": "Edit",
+    "bt_preview": "Pratinjau",
+    "bt_mobile": "Ponsel",
+    "bt_desktop": "Desktop",
+    "bt_open": "Buka halaman",
+    "bt_page": "Halaman",
+    "bt_address": "Alamat",
+    "bt_design": "Desain",
+    "bt_brand": "Merek",
+    "bt_saveChanges": "Simpan perubahan",
+    "bt_unsaved": "Perubahan belum disimpan",
+    "bt_sectionsOn": "{count, plural, other {# bagian ditampilkan}}"
   },
   "accountPage": {
     "roleOwner": "Pemilik",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "Tambahkan tanda tangan Anda sekali, dan pelanggan bisa menandatangani perjanjian sewa di ponsel.",
     "nudgePaymentMethods": "Tambahkan PromptPay atau detail bank agar pelanggan bisa membayar langsung dari halaman pemesanannya.",
     "extensionHoldReturning": "{customer} tidak memperpanjang: {vehicle} dikembalikan pada {date}. Hari-hari setelahnya terbuka lagi untuk dipesan."
+  },
+  "handoverPay": {
+    "title": "Pembayaran",
+    "rent": "Sewa",
+    "deposit": "Deposit",
+    "total": "Total tagihan",
+    "paid": "Sudah dibayar",
+    "left": "Sisa tagihan",
+    "paidInFull": "Lunas",
+    "howPay": "Pelanggan bayar pakai apa?",
+    "m_cash": "Tunai",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Transfer bank",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Apakah pelanggan sudah bayar {amount} tunai?",
+    "yes": "Ya",
+    "part": "Sebagian",
+    "no": "Belum",
+    "amountPaid": "Jumlah dibayar",
+    "record": "Catat",
+    "saving": "Menyimpan...",
+    "showCustomer": "Tunjukkan ke pelanggan",
+    "markPaid": "Sudah bayar",
+    "notYet": "Belum",
+    "close": "Tutup",
+    "promptpayId": "ID PromptPay",
+    "bank": "Bank",
+    "account": "Rekening",
+    "accountName": "Nama",
+    "receipt": "Kuitansi {number}",
+    "failed": "Pembayaran gagal dicatat. Coba lagi.",
+    "later": "Nanti"
   }
 }

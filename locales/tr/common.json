@@ -3015,7 +3015,20 @@
     "br_unitMi": "mil",
     "br_pickupOnly": "Müşteriler şubeye gelir",
     "br_deliversWithin": "{distance} içinde teslim eder ve alır",
-    "br_setArea": "Hizmet bölgesi ayarlanmadı"
+    "br_setArea": "Hizmet bölgesi ayarlanmadı",
+    "bt_title": "Rezervasyon sayfası",
+    "bt_edit": "Düzenle",
+    "bt_preview": "Önizleme",
+    "bt_mobile": "Mobil",
+    "bt_desktop": "Masaüstü",
+    "bt_open": "Sayfayı aç",
+    "bt_page": "Sayfa",
+    "bt_address": "Adres",
+    "bt_design": "Tasarım",
+    "bt_brand": "Marka",
+    "bt_saveChanges": "Değişiklikleri kaydet",
+    "bt_unsaved": "Kaydedilmemiş değişiklikler",
+    "bt_sectionsOn": "{count, plural, one {# bölüm gösteriliyor} other {# bölüm gösteriliyor}}"
   },
   "customerPage": {
     "back": "Müşteriler",
@@ -3517,7 +3530,8 @@
     "helpLoading": "Yükleniyor…",
     "helpNoArticle": "Yardım merkezi",
     "helpNoArticleBody": "Bu sayfa hakkında henüz bir makale yok. Yardım merkezinde RoveHQ'nun her bölümü için kılavuzlar var.",
-    "helpOpenCentre": "Yardım merkezinde aç"
+    "helpOpenCentre": "Yardım merkezinde aç",
+    "bookingPage": "Rezervasyon sayfası"
   },
   "vehicles": {
     "addVehicle": "Araç ekle"
@@ -3989,7 +4003,8 @@
       "GPS": "GPS",
       "Signature": "İmza",
       "Deposit": "Depozito",
-      "Review": "Gözden geçir"
+      "Review": "Gözden geçir",
+      "Payment": "Ödeme"
     },
     "signatureCaptured": "İmza alındı",
     "signInBox": "Yukarıdaki kutuya imza atın",
@@ -4515,7 +4530,12 @@
     "group_next30": "Önümüzdeki 30 gün",
     "nothingHere": "Burada bir şey yok",
     "showAllJobs": "Tüm işleri göster",
-    "laterLink": "Daha sonra veya tarihsiz {count, plural, one {# iş} other {# iş}}"
+    "laterLink": "Daha sonra veya tarihsiz {count, plural, one {# iş} other {# iş}}",
+    "job_collectFrom": "{amount} tahsil et",
+    "collect_deposit": "Depozito tahsil et",
+    "collect_top_up": "Ek ödeme tahsil et",
+    "collect_extension": "Uzatma ücretini tahsil et",
+    "collect_extras": "Ekstraları tahsil et"
   },
   "chat": {
     "launcher": "RoveHQ ile sohbet",
@@ -7207,5 +7227,38 @@
     "nudgeBookingPage": "Rezervasyon sayfanızı Facebook sayfanıza, Google Haritalar'a ve LINE profilinize ekleyin, müşteriler istedikleri zaman rezervasyon yapabilsin.",
     "nudgeSignature": "İmzanızı bir kez ekleyin, müşteriler kiralama sözleşmesini telefonlarından imzalayabilsin.",
     "nudgePaymentMethods": "PromptPay veya banka bilgilerinizi ekleyin, müşteriler doğrudan rezervasyon sayfalarından ödeme yapabilsin."
+  },
+  "handoverPay": {
+    "title": "Ödeme",
+    "rent": "Kira",
+    "deposit": "Depozito",
+    "total": "Toplam ödenecek",
+    "paid": "Ödendi",
+    "left": "Kalan",
+    "paidInFull": "Tamamı ödendi",
+    "howPay": "Müşteri nasıl ödüyor?",
+    "m_cash": "Nakit",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Banka havalesi",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Müşteri {amount} nakit ödedi mi?",
+    "yes": "Evet",
+    "part": "Kısmen",
+    "no": "Hayır",
+    "amountPaid": "Ödenen tutar",
+    "record": "Kaydet",
+    "saving": "Kaydediliyor...",
+    "showCustomer": "Müşteriye göster",
+    "markPaid": "Ödendi",
+    "notYet": "Henüz değil",
+    "close": "Kapat",
+    "promptpayId": "PromptPay ID",
+    "bank": "Banka",
+    "account": "Hesap",
+    "accountName": "Ad",
+    "receipt": "Makbuz {number}",
+    "failed": "Ödeme kaydedilemedi. Tekrar deneyin.",
+    "later": "Sonra"
   }
 }

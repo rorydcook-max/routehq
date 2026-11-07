@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "簽名",
       "Deposit": "押金",
-      "Review": "檢查"
+      "Review": "檢查",
+      "Payment": "付款"
     },
     "signatureCaptured": "已捕捉簽名",
     "signInBox": "在上框簽名",
@@ -440,7 +441,8 @@
     "helpLoading": "載入中…",
     "helpNoArticle": "說明中心",
     "helpNoArticleBody": "本頁還沒有相關文章。說明中心有 RoveHQ 各部分的使用指南。",
-    "helpOpenCentre": "在說明中心開啟"
+    "helpOpenCentre": "在說明中心開啟",
+    "bookingPage": "預訂頁面"
   },
   "customer": {
     "cur_also": "同時顯示價格為",
@@ -1270,7 +1272,12 @@
     "group_next30": "未來 30 天",
     "laterLink": "另有 {count} 項工作在之後或無日期",
     "nothingHere": "目前沒有內容",
-    "showAllJobs": "顯示所有工作"
+    "showAllJobs": "顯示所有工作",
+    "job_collectFrom": "收取 {amount}",
+    "collect_deposit": "收取押金",
+    "collect_top_up": "收取補繳款",
+    "collect_extension": "收取續租費",
+    "collect_extras": "收取加購費用"
   },
   "bookings": {
     "eyebrow": "預訂",
@@ -4709,7 +4716,20 @@
     "br_unitMi": "英里",
     "br_pickupOnly": "客戶到據點取車",
     "br_deliversWithin": "{distance} 內送車和取車",
-    "br_setArea": "尚未設定服務範圍"
+    "br_setArea": "尚未設定服務範圍",
+    "bt_title": "預訂頁面",
+    "bt_edit": "編輯",
+    "bt_preview": "預覽",
+    "bt_mobile": "手機",
+    "bt_desktop": "電腦",
+    "bt_open": "開啟頁面",
+    "bt_page": "頁面",
+    "bt_address": "網址",
+    "bt_design": "設計",
+    "bt_brand": "品牌",
+    "bt_saveChanges": "儲存變更",
+    "bt_unsaved": "有未儲存的變更",
+    "bt_sectionsOn": "{count, plural, other {顯示 # 個區塊}}"
   },
   "accountPage": {
     "roleOwner": "負責人",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "加入一次簽名，顧客就能在手機上簽署租賃合約。",
     "nudgePaymentMethods": "加入 PromptPay 或銀行資料，顧客即可直接在預約頁面付款。",
     "extensionHoldReturning": "{customer} 不續租：{vehicle}將於 {date} 歸還。之後的日期已重新開放預訂。"
+  },
+  "handoverPay": {
+    "title": "付款",
+    "rent": "租金",
+    "deposit": "押金",
+    "total": "應付總額",
+    "paid": "已付",
+    "left": "待付",
+    "paidInFull": "已付清",
+    "howPay": "客戶怎麼付款？",
+    "m_cash": "現金",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "銀行轉帳",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "客戶已用現金支付 {amount} 了嗎？",
+    "yes": "是",
+    "part": "部分",
+    "no": "否",
+    "amountPaid": "已付金額",
+    "record": "記錄",
+    "saving": "正在儲存...",
+    "showCustomer": "給客戶看",
+    "markPaid": "已付",
+    "notYet": "還沒",
+    "close": "關閉",
+    "promptpayId": "PromptPay ID",
+    "bank": "銀行",
+    "account": "帳號",
+    "accountName": "戶名",
+    "receipt": "收據 {number}",
+    "failed": "無法記錄付款，請再試一次。",
+    "later": "稍後"
   }
 }

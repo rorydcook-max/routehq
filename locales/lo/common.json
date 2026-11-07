@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "ລາຍເຊັນ",
       "Deposit": "ເງິນມັດຈຳ",
-      "Review": "ທົບທວນ"
+      "Review": "ທົບທວນ",
+      "Payment": "ຊຳລະເງິນ"
     },
     "signatureCaptured": "ບັນທຶກລາຍເຊັນແລ້ວ",
     "signInBox": "ເຊັນໃນກ່ອງຂ້າງເທິງ",
@@ -440,7 +441,8 @@
     "helpLoading": "ກຳລັງໂຫຼດ…",
     "helpNoArticle": "ສູນຊ່ວຍເຫຼືອ",
     "helpNoArticleBody": "ຍັງບໍ່ມີບົດຄວາມກ່ຽວກັບໜ້ານີ້. ສູນຊ່ວຍເຫຼືອມີຄູ່ມືສຳລັບທຸກສ່ວນຂອງ RoveHQ.",
-    "helpOpenCentre": "ເປີດໃນສູນຊ່ວຍເຫຼືອ"
+    "helpOpenCentre": "ເປີດໃນສູນຊ່ວຍເຫຼືອ",
+    "bookingPage": "ໜ້າຈອງ"
   },
   "customer": {
     "cur_also": "ສະແດງລາຄາເປັນສະກຸນເງິນ",
@@ -1270,7 +1272,12 @@
     "group_next30": "30 ມື້ຕໍ່ໄປ",
     "laterLink": "ອີກ {count} ວຽກໃນພາຍຫຼັງ ຫຼື ບໍ່ມີວັນທີ",
     "nothingHere": "ບໍ່ມີລາຍການ",
-    "showAllJobs": "ສະແດງວຽກທັງໝົດ"
+    "showAllJobs": "ສະແດງວຽກທັງໝົດ",
+    "job_collectFrom": "ເກັບເງິນ {amount}",
+    "collect_deposit": "ເກັບມັດຈຳ",
+    "collect_top_up": "ເກັບເງິນເພີ່ມ",
+    "collect_extension": "ເກັບຄ່າຕໍ່ສັນຍາ",
+    "collect_extras": "ເກັບຄ່າບໍລິການເສີມ"
   },
   "bookings": {
     "eyebrow": "ການຈອງ",
@@ -4709,7 +4716,20 @@
     "br_unitMi": "ໄມລ໌",
     "br_pickupOnly": "ລູກຄ້າມາຮັບທີ່ສາຂາ",
     "br_deliversWithin": "ສົ່ງ ແລະ ຮັບລົດພາຍໃນ {distance}",
-    "br_setArea": "ຍັງບໍ່ໄດ້ຕັ້ງພື້ນທີ່ບໍລິການ"
+    "br_setArea": "ຍັງບໍ່ໄດ້ຕັ້ງພື້ນທີ່ບໍລິການ",
+    "bt_title": "ໜ້າຈອງ",
+    "bt_edit": "ແກ້ໄຂ",
+    "bt_preview": "ຕົວຢ່າງ",
+    "bt_mobile": "ມືຖື",
+    "bt_desktop": "ຄອມພິວເຕີ",
+    "bt_open": "ເປີດໜ້າເວັບ",
+    "bt_page": "ໜ້າເວັບ",
+    "bt_address": "ທີ່ຢູ່ເວັບ",
+    "bt_design": "ດີໄຊ",
+    "bt_brand": "ແບຣນ",
+    "bt_saveChanges": "ບັນທຶກການປ່ຽນແປງ",
+    "bt_unsaved": "ຍັງບໍ່ໄດ້ບັນທຶກ",
+    "bt_sectionsOn": "{count, plural, other {ສະແດງ # ສ່ວນ}}"
   },
   "accountPage": {
     "roleOwner": "ເຈົ້າຂອງ",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "ເພີ່ມລາຍເຊັນຂອງທ່ານຄັ້ງດຽວ ແລ້ວລູກຄ້າເຊັນສັນຍາເຊົ່າໃນມືຖືໄດ້ເລີຍ.",
     "nudgePaymentMethods": "ເພີ່ມ PromptPay ຫຼື ບັນຊີທະນາຄານ ເພື່ອໃຫ້ລູກຄ້າຈ່າຍເງິນຈາກໜ້າຈອງໄດ້ທັນທີ.",
     "extensionHoldReturning": "{customer} ບໍ່ຕໍ່ສັນຍາ: {vehicle} ຈະສົ່ງຄືນວັນທີ {date}. ມື້ຫຼັງຈາກນັ້ນເປີດໃຫ້ຈອງໄດ້ອີກ."
+  },
+  "handoverPay": {
+    "title": "ຊຳລະເງິນ",
+    "rent": "ຄ່າເຊົ່າ",
+    "deposit": "ມັດຈຳ",
+    "total": "ຍອດທີ່ຕ້ອງຊຳລະ",
+    "paid": "ຊຳລະແລ້ວ",
+    "left": "ຍັງຕ້ອງຊຳລະ",
+    "paidInFull": "ຊຳລະຄົບແລ້ວ",
+    "howPay": "ລູກຄ້າຈ່າຍດ້ວຍວິທີໃດ?",
+    "m_cash": "ເງິນສົດ",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "ໂອນເງິນ",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "ລູກຄ້າຈ່າຍເງິນສົດ {amount} ແລ້ວບໍ?",
+    "yes": "ຈ່າຍແລ້ວ",
+    "part": "ຈ່າຍບາງສ່ວນ",
+    "no": "ຍັງບໍ່ຈ່າຍ",
+    "amountPaid": "ຍອດທີ່ຈ່າຍ",
+    "record": "ບັນທຶກ",
+    "saving": "ກຳລັງບັນທຶກ...",
+    "showCustomer": "ສະແດງໃຫ້ລູກຄ້າເບິ່ງ",
+    "markPaid": "ຈ່າຍແລ້ວ",
+    "notYet": "ຍັງບໍ່ຈ່າຍ",
+    "close": "ປິດ",
+    "promptpayId": "PromptPay ID",
+    "bank": "ທະນາຄານ",
+    "account": "ເລກບັນຊີ",
+    "accountName": "ຊື່ບັນຊີ",
+    "receipt": "ໃບຮັບເງິນ {number}",
+    "failed": "ບັນທຶກການຊຳລະບໍ່ສຳເລັດ ລອງອີກຄັ້ງ",
+    "later": "ໄວ້ພາຍຫຼັງ"
   }
 }

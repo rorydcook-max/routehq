@@ -259,7 +259,8 @@
       "GPS": "GPS",
       "Signature": "ลายเซ็น",
       "Deposit": "เงินมัดจำ",
-      "Review": "ตรวจทาน"
+      "Review": "ตรวจทาน",
+      "Payment": "ชำระเงิน"
     },
     "signatureCaptured": "บันทึกลายเซ็นแล้ว",
     "signInBox": "เซ็นชื่อในกรอบด้านบน",
@@ -475,7 +476,8 @@
     "helpLoading": "กำลังโหลด…",
     "helpNoArticle": "ศูนย์ช่วยเหลือ",
     "helpNoArticleBody": "ยังไม่มีบทความเกี่ยวกับหน้านี้ ศูนย์ช่วยเหลือมีคู่มือสำหรับทุกส่วนของ RoveHQ",
-    "helpOpenCentre": "เปิดในศูนย์ช่วยเหลือ"
+    "helpOpenCentre": "เปิดในศูนย์ช่วยเหลือ",
+    "bookingPage": "หน้าจอง"
   },
   "customer": {
     "cur_also": "แสดงราคาเป็นสกุลเงิน",
@@ -1305,7 +1307,12 @@
     "group_next30": "30 วันข้างหน้า",
     "laterLink": "อีก {count} งานในภายหลังหรือไม่มีวันที่",
     "nothingHere": "ไม่มีรายการ",
-    "showAllJobs": "แสดงงานทั้งหมด"
+    "showAllJobs": "แสดงงานทั้งหมด",
+    "job_collectFrom": "เก็บเงิน {amount}",
+    "collect_deposit": "เก็บมัดจำ",
+    "collect_top_up": "เก็บเงินเพิ่ม",
+    "collect_extension": "เก็บค่าต่อสัญญา",
+    "collect_extras": "เก็บค่าบริการเสริม"
   },
   "bookings": {
     "eyebrow": "การจอง",
@@ -4745,7 +4752,20 @@
     "br_unitMi": "ไมล์",
     "br_pickupOnly": "ลูกค้ามารับที่สาขา",
     "br_deliversWithin": "ส่งและรับรถภายใน {distance}",
-    "br_setArea": "ยังไม่ได้ตั้งพื้นที่บริการ"
+    "br_setArea": "ยังไม่ได้ตั้งพื้นที่บริการ",
+    "bt_title": "หน้าจอง",
+    "bt_edit": "แก้ไข",
+    "bt_preview": "ตัวอย่าง",
+    "bt_mobile": "มือถือ",
+    "bt_desktop": "เดสก์ท็อป",
+    "bt_open": "เปิดหน้าเว็บ",
+    "bt_page": "หน้าเว็บ",
+    "bt_address": "ที่อยู่เว็บ",
+    "bt_design": "ดีไซน์",
+    "bt_brand": "แบรนด์",
+    "bt_saveChanges": "บันทึกการเปลี่ยนแปลง",
+    "bt_unsaved": "ยังไม่ได้บันทึก",
+    "bt_sectionsOn": "{count, plural, other {แสดง # ส่วน}}"
   },
   "accountPage": {
     "roleOwner": "เจ้าของ",
@@ -7283,5 +7303,38 @@
     "nudgeSignature": "เพิ่มลายเซ็นของคุณครั้งเดียว แล้วลูกค้าเซ็นสัญญาเช่าบนมือถือได้เลย",
     "nudgePaymentMethods": "เพิ่ม PromptPay หรือบัญชีธนาคาร ให้ลูกค้าชำระเงินจากหน้าจองได้ทันที",
     "extensionHoldReturning": "{customer} ไม่ต่อสัญญา: {vehicle} จะคืนวันที่ {date} วันหลังจากนั้นเปิดให้จองได้อีกครั้ง"
+  },
+  "handoverPay": {
+    "title": "ชำระเงิน",
+    "rent": "ค่าเช่า",
+    "deposit": "มัดจำ",
+    "total": "ยอดที่ต้องชำระ",
+    "paid": "ชำระแล้ว",
+    "left": "ยังต้องชำระ",
+    "paidInFull": "ชำระครบแล้ว",
+    "howPay": "ลูกค้าจ่ายด้วยวิธีไหน",
+    "m_cash": "เงินสด",
+    "m_promptpay": "พร้อมเพย์",
+    "m_bank_transfer": "โอนเงิน",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "ลูกค้าจ่ายเงินสด {amount} แล้วหรือยัง",
+    "yes": "จ่ายแล้ว",
+    "part": "จ่ายบางส่วน",
+    "no": "ยังไม่จ่าย",
+    "amountPaid": "ยอดที่จ่าย",
+    "record": "บันทึก",
+    "saving": "กำลังบันทึก...",
+    "showCustomer": "แสดงให้ลูกค้าดู",
+    "markPaid": "จ่ายแล้ว",
+    "notYet": "ยังไม่จ่าย",
+    "close": "ปิด",
+    "promptpayId": "พร้อมเพย์",
+    "bank": "ธนาคาร",
+    "account": "เลขบัญชี",
+    "accountName": "ชื่อบัญชี",
+    "receipt": "ใบเสร็จ {number}",
+    "failed": "บันทึกการชำระเงินไม่สำเร็จ ลองอีกครั้ง",
+    "later": "ไว้ทีหลัง"
   }
 }

@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "हस्ताक्षर",
       "Deposit": "जमा",
-      "Review": "समीक्षा"
+      "Review": "समीक्षा",
+      "Payment": "पेमेंट"
     },
     "signatureCaptured": "हस्ताक्षर कैप्चर किया गया",
     "signInBox": "ऊपर बॉक्स में हस्ताक्षर करें",
@@ -440,7 +441,8 @@
     "helpLoading": "लोड हो रहा है…",
     "helpNoArticle": "हेल्प सेंटर",
     "helpNoArticleBody": "इस पेज के बारे में अभी कोई लेख नहीं है। हेल्प सेंटर में RoveHQ के हर हिस्से के लिए गाइड हैं।",
-    "helpOpenCentre": "हेल्प सेंटर में खोलें"
+    "helpOpenCentre": "हेल्प सेंटर में खोलें",
+    "bookingPage": "बुकिंग पेज"
   },
   "customer": {
     "cur_also": "कीमतें इसमें भी दिखाएं",
@@ -1270,7 +1272,12 @@
     "group_next30": "अगले 30 दिन",
     "laterLink": "{count, plural, one {# काम} other {# काम}} बाद में या बिना तारीख के",
     "nothingHere": "यहाँ कुछ नहीं है",
-    "showAllJobs": "सभी काम दिखाएँ"
+    "showAllJobs": "सभी काम दिखाएँ",
+    "job_collectFrom": "{amount} लें",
+    "collect_deposit": "डिपॉज़िट लें",
+    "collect_top_up": "टॉप-अप लें",
+    "collect_extension": "एक्सटेंशन का पैसा लें",
+    "collect_extras": "एक्स्ट्रा का पैसा लें"
   },
   "bookings": {
     "eyebrow": "बुकिंग",
@@ -4709,7 +4716,20 @@
     "br_unitMi": "मील",
     "br_pickupOnly": "ग्राहक ब्रांच पर आते हैं",
     "br_deliversWithin": "{distance} तक डिलीवरी और पिकअप",
-    "br_setArea": "सर्विस एरिया सेट नहीं है"
+    "br_setArea": "सर्विस एरिया सेट नहीं है",
+    "bt_title": "बुकिंग पेज",
+    "bt_edit": "बदलें",
+    "bt_preview": "प्रीव्यू",
+    "bt_mobile": "मोबाइल",
+    "bt_desktop": "डेस्कटॉप",
+    "bt_open": "पेज खोलें",
+    "bt_page": "पेज",
+    "bt_address": "पता",
+    "bt_design": "डिज़ाइन",
+    "bt_brand": "ब्रांड",
+    "bt_saveChanges": "बदलाव सेव करें",
+    "bt_unsaved": "बदलाव सेव नहीं हुए",
+    "bt_sectionsOn": "{count, plural, one {# सेक्शन दिख रहा है} other {# सेक्शन दिख रहे हैं}}"
   },
   "accountPage": {
     "roleOwner": "मालिक",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "अपना हस्ताक्षर एक बार जोड़ें, फिर ग्राहक फ़ोन पर रेंटल एग्रीमेंट पर हस्ताक्षर कर सकते हैं।",
     "nudgePaymentMethods": "PromptPay या बैंक विवरण जोड़ें ताकि ग्राहक सीधे अपने बुकिंग पेज से भुगतान कर सकें।",
     "extensionHoldReturning": "{customer} अवधि नहीं बढ़ा रहे: {vehicle} {date} को वापस आना है। उसके बाद के दिन फिर से बुकिंग के लिए खुले हैं।"
+  },
+  "handoverPay": {
+    "title": "पेमेंट",
+    "rent": "किराया",
+    "deposit": "डिपॉज़िट",
+    "total": "कुल देय",
+    "paid": "चुकाया",
+    "left": "बाकी",
+    "paidInFull": "पूरा चुकाया",
+    "howPay": "ग्राहक कैसे पेमेंट कर रहा है?",
+    "m_cash": "नकद",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "बैंक ट्रांसफ़र",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "क्या ग्राहक ने {amount} नकद दिए?",
+    "yes": "हाँ",
+    "part": "कुछ",
+    "no": "नहीं",
+    "amountPaid": "चुकाई गई रकम",
+    "record": "दर्ज करें",
+    "saving": "सेव हो रहा है...",
+    "showCustomer": "ग्राहक को दिखाएँ",
+    "markPaid": "चुकाया",
+    "notYet": "अभी नहीं",
+    "close": "बंद करें",
+    "promptpayId": "PromptPay ID",
+    "bank": "बैंक",
+    "account": "खाता",
+    "accountName": "नाम",
+    "receipt": "रसीद {number}",
+    "failed": "पेमेंट दर्ज नहीं हुआ। फिर कोशिश करें।",
+    "later": "बाद में"
   }
 }

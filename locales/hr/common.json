@@ -163,7 +163,8 @@
     "helpLoading": "Učitavanje…",
     "helpNoArticle": "Centar za pomoć",
     "helpNoArticleBody": "Za ovu stranicu još nema članka. U Centru za pomoć nalaze se vodiči za svaki dio RoveHQ-a.",
-    "helpOpenCentre": "Otvori u Centru za pomoć"
+    "helpOpenCentre": "Otvori u Centru za pomoć",
+    "bookingPage": "Stranica za rezervacije"
   },
   "vehicles": {
     "addVehicle": "Dodaj vozilo"
@@ -262,7 +263,8 @@
       "GPS": "GPS",
       "Signature": "Potpis",
       "Deposit": "Polog",
-      "Review": "Pregled"
+      "Review": "Pregled",
+      "Payment": "Plaćanje"
     },
     "signatureCaptured": "Potpis zabilježen",
     "signInBox": "Potpišite se u okvir iznad",
@@ -1244,7 +1246,12 @@
     "group_next30": "Sljedećih 30 dana",
     "nothingHere": "Ovdje nema ničega",
     "showAllJobs": "Prikaži sve zadatke",
-    "laterLink": "{count, plural, one {# zadatak} few {# zadatka} other {# zadataka}} kasnije ili bez datuma"
+    "laterLink": "{count, plural, one {# zadatak} few {# zadatka} other {# zadataka}} kasnije ili bez datuma",
+    "job_collectFrom": "Naplati {amount}",
+    "collect_deposit": "Naplati polog",
+    "collect_top_up": "Naplati nadoplatu",
+    "collect_extension": "Naplati produljenje",
+    "collect_extras": "Naplati dodatke"
   },
   "bookings": {
     "eyebrow": "Rezervacije",
@@ -4682,7 +4689,20 @@
     "br_unitMi": "milja",
     "br_pickupOnly": "Klijenti dolaze u poslovnicu",
     "br_deliversWithin": "Dostavlja i preuzima unutar {distance}",
-    "br_setArea": "Područje usluge nije postavljeno"
+    "br_setArea": "Područje usluge nije postavljeno",
+    "bt_title": "Stranica za rezervacije",
+    "bt_edit": "Uredi",
+    "bt_preview": "Pregled",
+    "bt_mobile": "Mobitel",
+    "bt_desktop": "Računalo",
+    "bt_open": "Otvori stranicu",
+    "bt_page": "Stranica",
+    "bt_address": "Adresa",
+    "bt_design": "Dizajn",
+    "bt_brand": "Brend",
+    "bt_saveChanges": "Spremi promjene",
+    "bt_unsaved": "Nespremljene promjene",
+    "bt_sectionsOn": "{count, plural, one {Prikazan # odjeljak} few {Prikazana # odjeljka} other {Prikazano # odjeljaka}}"
   },
   "accountPage": {
     "roleOwner": "Vlasnik",
@@ -7203,5 +7223,38 @@
     "nudgeSignature": "Dodajte svoj potpis jednom i klijenti mogu potpisati ugovor o najmu na mobitelu.",
     "nudgePaymentMethods": "Dodajte PromptPay ili bankovne podatke kako bi klijenti plaćali izravno sa svoje stranice rezervacije.",
     "extensionHoldReturning": "{customer} ne produljuje: vozilo {vehicle} vraća se {date}. Dani nakon toga ponovno su slobodni za rezervaciju."
+  },
+  "handoverPay": {
+    "title": "Plaćanje",
+    "rent": "Najam",
+    "deposit": "Polog",
+    "total": "Ukupno za platiti",
+    "paid": "Plaćeno",
+    "left": "Preostalo",
+    "paidInFull": "Plaćeno u cijelosti",
+    "howPay": "Kako klijent plaća?",
+    "m_cash": "Gotovina",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Bankovni prijenos",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Je li klijent platio {amount} u gotovini?",
+    "yes": "Da",
+    "part": "Djelomično",
+    "no": "Ne",
+    "amountPaid": "Plaćeni iznos",
+    "record": "Zabilježi",
+    "saving": "Spremanje...",
+    "showCustomer": "Pokaži klijentu",
+    "markPaid": "Plaćeno",
+    "notYet": "Još ne",
+    "close": "Zatvori",
+    "promptpayId": "PromptPay ID",
+    "bank": "Banka",
+    "account": "Račun",
+    "accountName": "Ime",
+    "receipt": "Potvrda {number}",
+    "failed": "Plaćanje nije zabilježeno. Pokušajte ponovno.",
+    "later": "Kasnije"
   }
 }

@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "Pirma",
       "Deposit": "Deposito",
-      "Review": "Suriin"
+      "Review": "Suriin",
+      "Payment": "Bayad"
     },
     "signatureCaptured": "Nakuha ang pirma",
     "signInBox": "Pirmahan sa kahon sa itaas",
@@ -440,7 +441,8 @@
     "helpLoading": "Naglo-load…",
     "helpNoArticle": "Help centre",
     "helpNoArticleBody": "Wala pang artikulo tungkol sa page na ito. May mga gabay ang Help centre para sa bawat bahagi ng RoveHQ.",
-    "helpOpenCentre": "Buksan sa Help centre"
+    "helpOpenCentre": "Buksan sa Help centre",
+    "bookingPage": "Booking page"
   },
   "customer": {
     "cur_also": "Ipakita rin ang presyo sa",
@@ -1244,7 +1246,12 @@
     "group_next30": "Susunod na 30 araw",
     "laterLink": "{count, plural, one {# gawain} other {# gawain}} sa ibang araw o walang petsa",
     "nothingHere": "Walang laman dito",
-    "showAllJobs": "Ipakita ang lahat ng gawain"
+    "showAllJobs": "Ipakita ang lahat ng gawain",
+    "job_collectFrom": "Singilin ang {amount}",
+    "collect_deposit": "Singilin ang deposito",
+    "collect_top_up": "Singilin ang dagdag na bayad",
+    "collect_extension": "Singilin ang extension",
+    "collect_extras": "Singilin ang extras"
   },
   "bookings": {
     "eyebrow": "Mga Booking",
@@ -4683,7 +4690,20 @@
     "br_unitMi": "milya",
     "br_pickupOnly": "Pumupunta ang customer sa branch",
     "br_deliversWithin": "Nagde-deliver at kumukuha sa loob ng {distance}",
-    "br_setArea": "Hindi pa naka-set ang service area"
+    "br_setArea": "Hindi pa naka-set ang service area",
+    "bt_title": "Booking page",
+    "bt_edit": "I-edit",
+    "bt_preview": "Preview",
+    "bt_mobile": "Mobile",
+    "bt_desktop": "Desktop",
+    "bt_open": "Buksan ang page",
+    "bt_page": "Page",
+    "bt_address": "Address",
+    "bt_design": "Disenyo",
+    "bt_brand": "Brand",
+    "bt_saveChanges": "I-save ang mga pagbabago",
+    "bt_unsaved": "May hindi pa naka-save",
+    "bt_sectionsOn": "{count, plural, one {# seksyon ang ipinapakita} other {# seksyon ang ipinapakita}}"
   },
   "accountPage": {
     "roleOwner": "May-ari",
@@ -7208,5 +7228,38 @@
     "nudgeSignature": "Idagdag ang iyong pirma nang isang beses, at makakapirma ang mga customer sa kasunduan sa pagrenta sa kanilang phone.",
     "nudgePaymentMethods": "Idagdag ang PromptPay o detalye ng bangko para direktang makapagbayad ang mga customer mula sa kanilang booking page.",
     "extensionHoldReturning": "Hindi mag-e-extend si {customer}: dapat maisauli ang {vehicle} sa {date}. Bukas na ulit para sa booking ang mga susunod na araw."
+  },
+  "handoverPay": {
+    "title": "Bayad",
+    "rent": "Upa",
+    "deposit": "Deposito",
+    "total": "Kabuuang babayaran",
+    "paid": "Nabayaran",
+    "left": "Natitirang babayaran",
+    "paidInFull": "Bayad nang buo",
+    "howPay": "Paano magbabayad ang customer?",
+    "m_cash": "Cash",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Bank transfer",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Nagbayad na ba ang customer ng {amount} na cash?",
+    "yes": "Oo",
+    "part": "Bahagya",
+    "no": "Hindi",
+    "amountPaid": "Halagang binayaran",
+    "record": "I-record",
+    "saving": "Sine-save...",
+    "showCustomer": "Ipakita sa customer",
+    "markPaid": "Bayad na",
+    "notYet": "Hindi pa",
+    "close": "Isara",
+    "promptpayId": "PromptPay ID",
+    "bank": "Bangko",
+    "account": "Account",
+    "accountName": "Pangalan",
+    "receipt": "Resibo {number}",
+    "failed": "Hindi na-record ang bayad. Subukan ulit.",
+    "later": "Mamaya"
   }
 }

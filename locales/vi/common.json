@@ -218,7 +218,8 @@
       "GPS": "GPS",
       "Signature": "Chữ ký",
       "Deposit": "Tiền cọc",
-      "Review": "Xem lại"
+      "Review": "Xem lại",
+      "Payment": "Thanh toán"
     },
     "signatureCaptured": "Đã có chữ ký",
     "signInBox": "Ký vào ô phía trên",
@@ -440,7 +441,8 @@
     "helpLoading": "Đang tải…",
     "helpNoArticle": "Trung tâm trợ giúp",
     "helpNoArticleBody": "Chưa có bài viết về trang này. Trung tâm trợ giúp có hướng dẫn cho mọi phần của RoveHQ.",
-    "helpOpenCentre": "Mở trong Trung tâm trợ giúp"
+    "helpOpenCentre": "Mở trong Trung tâm trợ giúp",
+    "bookingPage": "Trang đặt xe"
   },
   "customer": {
     "cur_also": "Hiển thị thêm giá bằng",
@@ -1310,7 +1312,12 @@
     "group_next30": "30 ngày tới",
     "laterLink": "{count} việc sau này hoặc chưa có ngày",
     "nothingHere": "Không có gì",
-    "showAllJobs": "Xem tất cả công việc"
+    "showAllJobs": "Xem tất cả công việc",
+    "job_collectFrom": "Thu {amount}",
+    "collect_deposit": "Thu tiền cọc",
+    "collect_top_up": "Thu tiền bù",
+    "collect_extension": "Thu tiền gia hạn",
+    "collect_extras": "Thu tiền dịch vụ thêm"
   },
   "bookings": {
     "eyebrow": "Đặt xe",
@@ -4749,7 +4756,20 @@
     "br_unitMi": "dặm",
     "br_pickupOnly": "Khách đến chi nhánh nhận xe",
     "br_deliversWithin": "Giao và nhận xe trong bán kính {distance}",
-    "br_setArea": "Chưa đặt khu vực phục vụ"
+    "br_setArea": "Chưa đặt khu vực phục vụ",
+    "bt_title": "Trang đặt xe",
+    "bt_edit": "Sửa",
+    "bt_preview": "Xem trước",
+    "bt_mobile": "Điện thoại",
+    "bt_desktop": "Máy tính",
+    "bt_open": "Mở trang",
+    "bt_page": "Trang",
+    "bt_address": "Địa chỉ",
+    "bt_design": "Thiết kế",
+    "bt_brand": "Thương hiệu",
+    "bt_saveChanges": "Lưu thay đổi",
+    "bt_unsaved": "Có thay đổi chưa lưu",
+    "bt_sectionsOn": "{count, plural, other {Đang hiện # mục}}"
   },
   "accountPage": {
     "roleOwner": "Chủ sở hữu",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "Thêm chữ ký của bạn một lần, khách có thể ký hợp đồng thuê xe ngay trên điện thoại.",
     "nudgePaymentMethods": "Thêm PromptPay hoặc thông tin ngân hàng để khách thanh toán ngay từ trang đặt xe.",
     "extensionHoldReturning": "{customer} không gia hạn: {vehicle} sẽ được trả vào {date}. Những ngày sau đó đã mở lại để đặt."
+  },
+  "handoverPay": {
+    "title": "Thanh toán",
+    "rent": "Tiền thuê",
+    "deposit": "Tiền cọc",
+    "total": "Tổng phải trả",
+    "paid": "Đã trả",
+    "left": "Còn lại",
+    "paidInFull": "Đã trả đủ",
+    "howPay": "Khách thanh toán bằng cách nào?",
+    "m_cash": "Tiền mặt",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Chuyển khoản",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Khách đã trả {amount} tiền mặt chưa?",
+    "yes": "Rồi",
+    "part": "Một phần",
+    "no": "Chưa",
+    "amountPaid": "Số tiền đã trả",
+    "record": "Ghi nhận",
+    "saving": "Đang lưu...",
+    "showCustomer": "Cho khách xem",
+    "markPaid": "Đã trả",
+    "notYet": "Chưa",
+    "close": "Đóng",
+    "promptpayId": "ID PromptPay",
+    "bank": "Ngân hàng",
+    "account": "Số tài khoản",
+    "accountName": "Tên tài khoản",
+    "receipt": "Biên lai {number}",
+    "failed": "Không thể ghi nhận thanh toán. Hãy thử lại.",
+    "later": "Để sau"
   }
 }

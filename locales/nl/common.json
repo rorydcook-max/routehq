@@ -163,7 +163,8 @@
     "helpLoading": "Laden…",
     "helpNoArticle": "Helpcentrum",
     "helpNoArticleBody": "Er is nog geen artikel over deze pagina. Het Helpcentrum heeft handleidingen voor elk onderdeel van RoveHQ.",
-    "helpOpenCentre": "Openen in het Helpcentrum"
+    "helpOpenCentre": "Openen in het Helpcentrum",
+    "bookingPage": "Boekingspagina"
   },
   "vehicles": {
     "addVehicle": "Voertuig toevoegen"
@@ -262,7 +263,8 @@
       "GPS": "GPS",
       "Signature": "Handtekening",
       "Deposit": "Borg",
-      "Review": "Controle"
+      "Review": "Controle",
+      "Payment": "Betaling"
     },
     "signatureCaptured": "Handtekening vastgelegd",
     "signInBox": "Teken in het vak hierboven",
@@ -1244,7 +1246,12 @@
     "group_next30": "Komende 30 dagen",
     "nothingHere": "Niets hier",
     "showAllJobs": "Toon alle taken",
-    "laterLink": "{count, plural, one {# taak} other {# taken}} later of zonder datum"
+    "laterLink": "{count, plural, one {# taak} other {# taken}} later of zonder datum",
+    "job_collectFrom": "{amount} innen",
+    "collect_deposit": "Borg innen",
+    "collect_top_up": "Bijbetaling innen",
+    "collect_extension": "Verlenging innen",
+    "collect_extras": "Extra's innen"
   },
   "bookings": {
     "eyebrow": "Boekingen",
@@ -4682,7 +4689,20 @@
     "br_unitMi": "mijl",
     "br_pickupOnly": "Klanten komen naar de vestiging",
     "br_deliversWithin": "Bezorgt en haalt op binnen {distance}",
-    "br_setArea": "Servicegebied niet ingesteld"
+    "br_setArea": "Servicegebied niet ingesteld",
+    "bt_title": "Boekingspagina",
+    "bt_edit": "Bewerken",
+    "bt_preview": "Voorbeeld",
+    "bt_mobile": "Mobiel",
+    "bt_desktop": "Desktop",
+    "bt_open": "Pagina openen",
+    "bt_page": "Pagina",
+    "bt_address": "Adres",
+    "bt_design": "Ontwerp",
+    "bt_brand": "Merk",
+    "bt_saveChanges": "Wijzigingen opslaan",
+    "bt_unsaved": "Niet-opgeslagen wijzigingen",
+    "bt_sectionsOn": "{count, plural, one {# onderdeel zichtbaar} other {# onderdelen zichtbaar}}"
   },
   "accountPage": {
     "roleOwner": "Eigenaar",
@@ -7203,5 +7223,38 @@
     "nudgeSignature": "Voeg één keer je handtekening toe en klanten kunnen de huurovereenkomst op hun telefoon ondertekenen.",
     "nudgePaymentMethods": "Voeg PromptPay of je bankgegevens toe zodat klanten direct vanaf hun boekingspagina kunnen betalen.",
     "extensionHoldReturning": "{customer} verlengt niet: {vehicle} moet op {date} terug. De dagen daarna zijn weer te boeken."
+  },
+  "handoverPay": {
+    "title": "Betaling",
+    "rent": "Huur",
+    "deposit": "Borg",
+    "total": "Totaal te betalen",
+    "paid": "Betaald",
+    "left": "Nog te betalen",
+    "paidInFull": "Volledig betaald",
+    "howPay": "Hoe betaalt de klant?",
+    "m_cash": "Contant",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Overschrijving",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Heeft de klant {amount} contant betaald?",
+    "yes": "Ja",
+    "part": "Deels",
+    "no": "Nee",
+    "amountPaid": "Betaald bedrag",
+    "record": "Vastleggen",
+    "saving": "Opslaan...",
+    "showCustomer": "Aan klant tonen",
+    "markPaid": "Betaald",
+    "notYet": "Nog niet",
+    "close": "Sluiten",
+    "promptpayId": "PromptPay-ID",
+    "bank": "Bank",
+    "account": "Rekening",
+    "accountName": "Naam",
+    "receipt": "Bon {number}",
+    "failed": "Betaling kon niet worden vastgelegd. Probeer het opnieuw.",
+    "later": "Later"
   }
 }

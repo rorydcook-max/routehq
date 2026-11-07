@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "Подпись",
       "Deposit": "Депозит",
-      "Review": "Обзор"
+      "Review": "Обзор",
+      "Payment": "Оплата"
     },
     "signatureCaptured": "Подпись зафиксирована",
     "signInBox": "Подпишите в поле выше",
@@ -440,7 +441,8 @@
     "helpLoading": "Загрузка…",
     "helpNoArticle": "Центр помощи",
     "helpNoArticleBody": "Статьи об этой странице пока нет. В Центре помощи есть руководства по каждому разделу RoveHQ.",
-    "helpOpenCentre": "Открыть в Центре помощи"
+    "helpOpenCentre": "Открыть в Центре помощи",
+    "bookingPage": "Страница бронирования"
   },
   "customer": {
     "cur_also": "Также показывать цены в",
@@ -1310,7 +1312,12 @@
     "group_next30": "Ближайшие 30 дней",
     "laterLink": "{count, plural, one {# задача} few {# задачи} many {# задач} other {# задачи}} позже или без даты",
     "nothingHere": "Здесь пусто",
-    "showAllJobs": "Показать все задачи"
+    "showAllJobs": "Показать все задачи",
+    "job_collectFrom": "Получить {amount}",
+    "collect_deposit": "Получить залог",
+    "collect_top_up": "Получить доплату",
+    "collect_extension": "Получить оплату продления",
+    "collect_extras": "Получить оплату доп. услуг"
   },
   "bookings": {
     "eyebrow": "Бронирования",
@@ -4749,7 +4756,20 @@
     "br_unitMi": "миль",
     "br_pickupOnly": "Клиенты приходят в офис",
     "br_deliversWithin": "Доставка и возврат в радиусе {distance}",
-    "br_setArea": "Зона обслуживания не задана"
+    "br_setArea": "Зона обслуживания не задана",
+    "bt_title": "Страница бронирования",
+    "bt_edit": "Изменить",
+    "bt_preview": "Предпросмотр",
+    "bt_mobile": "Телефон",
+    "bt_desktop": "Компьютер",
+    "bt_open": "Открыть страницу",
+    "bt_page": "Страница",
+    "bt_address": "Адрес",
+    "bt_design": "Дизайн",
+    "bt_brand": "Бренд",
+    "bt_saveChanges": "Сохранить изменения",
+    "bt_unsaved": "Несохранённые изменения",
+    "bt_sectionsOn": "{count, plural, one {Показан # раздел} few {Показано # раздела} many {Показано # разделов} other {Показано # раздела}}"
   },
   "accountPage": {
     "roleOwner": "Владелец",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "Добавьте свою подпись один раз, и клиенты смогут подписывать договор аренды в телефоне.",
     "nudgePaymentMethods": "Добавьте PromptPay или банковские реквизиты, чтобы клиенты платили прямо со страницы бронирования.",
     "extensionHoldReturning": "{customer} не продлевает: {vehicle} нужно вернуть {date}. Следующие дни снова открыты для бронирования."
+  },
+  "handoverPay": {
+    "title": "Оплата",
+    "rent": "Аренда",
+    "deposit": "Залог",
+    "total": "Итого к оплате",
+    "paid": "Оплачено",
+    "left": "Осталось",
+    "paidInFull": "Оплачено полностью",
+    "howPay": "Как платит клиент?",
+    "m_cash": "Наличные",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Банковский перевод",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Клиент заплатил {amount} наличными?",
+    "yes": "Да",
+    "part": "Частично",
+    "no": "Нет",
+    "amountPaid": "Оплаченная сумма",
+    "record": "Записать",
+    "saving": "Сохраняем...",
+    "showCustomer": "Показать клиенту",
+    "markPaid": "Оплачено",
+    "notYet": "Ещё нет",
+    "close": "Закрыть",
+    "promptpayId": "PromptPay ID",
+    "bank": "Банк",
+    "account": "Счёт",
+    "accountName": "Имя",
+    "receipt": "Чек {number}",
+    "failed": "Не удалось записать оплату. Попробуйте ещё раз.",
+    "later": "Позже"
   }
 }

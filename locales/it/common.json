@@ -163,7 +163,8 @@
     "helpLoading": "Caricamento…",
     "helpNoArticle": "Centro assistenza",
     "helpNoArticleBody": "Non c’è ancora un articolo su questa pagina. Il Centro assistenza ha guide per ogni parte di RoveHQ.",
-    "helpOpenCentre": "Apri nel Centro assistenza"
+    "helpOpenCentre": "Apri nel Centro assistenza",
+    "bookingPage": "Pagina di prenotazione"
   },
   "vehicles": {
     "addVehicle": "Aggiungi veicolo"
@@ -262,7 +263,8 @@
       "GPS": "GPS",
       "Signature": "Firma",
       "Deposit": "Cauzione",
-      "Review": "Riepilogo"
+      "Review": "Riepilogo",
+      "Payment": "Pagamento"
     },
     "signatureCaptured": "Firma acquisita",
     "signInBox": "Firma nel riquadro qui sopra",
@@ -1244,7 +1246,12 @@
     "group_next30": "Prossimi 30 giorni",
     "nothingHere": "Niente qui",
     "showAllJobs": "Mostra tutti i lavori",
-    "laterLink": "{count, plural, one {# lavoro} other {# lavori}} più avanti o senza data"
+    "laterLink": "{count, plural, one {# lavoro} other {# lavori}} più avanti o senza data",
+    "job_collectFrom": "Incassa {amount}",
+    "collect_deposit": "Incassa la cauzione",
+    "collect_top_up": "Incassa l'integrazione",
+    "collect_extension": "Incassa la proroga",
+    "collect_extras": "Incassa gli extra"
   },
   "bookings": {
     "eyebrow": "Prenotazioni",
@@ -4682,7 +4689,20 @@
     "br_unitMi": "miglia",
     "br_pickupOnly": "I clienti vengono in sede",
     "br_deliversWithin": "Consegna e ritira entro {distance}",
-    "br_setArea": "Zona di servizio non impostata"
+    "br_setArea": "Zona di servizio non impostata",
+    "bt_title": "Pagina di prenotazione",
+    "bt_edit": "Modifica",
+    "bt_preview": "Anteprima",
+    "bt_mobile": "Mobile",
+    "bt_desktop": "Desktop",
+    "bt_open": "Apri pagina",
+    "bt_page": "Pagina",
+    "bt_address": "Indirizzo",
+    "bt_design": "Design",
+    "bt_brand": "Marchio",
+    "bt_saveChanges": "Salva modifiche",
+    "bt_unsaved": "Modifiche non salvate",
+    "bt_sectionsOn": "{count, plural, one {# sezione visibile} other {# sezioni visibili}}"
   },
   "accountPage": {
     "roleOwner": "Titolare",
@@ -7203,5 +7223,38 @@
     "nudgeSignature": "Aggiungi la tua firma una volta e i clienti potranno firmare il contratto di noleggio dal telefono.",
     "nudgePaymentMethods": "Aggiungi PromptPay o i tuoi dati bancari così i clienti pagano direttamente dalla loro pagina di prenotazione.",
     "extensionHoldReturning": "{customer} non prolunga: il veicolo {vehicle} va riconsegnato il {date}. I giorni successivi sono di nuovo prenotabili."
+  },
+  "handoverPay": {
+    "title": "Pagamento",
+    "rent": "Noleggio",
+    "deposit": "Cauzione",
+    "total": "Totale dovuto",
+    "paid": "Pagato",
+    "left": "Da pagare",
+    "paidInFull": "Pagato per intero",
+    "howPay": "Come paga il cliente?",
+    "m_cash": "Contanti",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Bonifico",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Il cliente ha pagato {amount} in contanti?",
+    "yes": "Sì",
+    "part": "In parte",
+    "no": "No",
+    "amountPaid": "Importo pagato",
+    "record": "Registra",
+    "saving": "Salvataggio...",
+    "showCustomer": "Mostra al cliente",
+    "markPaid": "Pagato",
+    "notYet": "Non ancora",
+    "close": "Chiudi",
+    "promptpayId": "ID PromptPay",
+    "bank": "Banca",
+    "account": "Conto",
+    "accountName": "Nome",
+    "receipt": "Ricevuta {number}",
+    "failed": "Impossibile registrare il pagamento. Riprova.",
+    "later": "Più tardi"
   }
 }

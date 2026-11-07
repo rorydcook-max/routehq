@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "署名",
       "Deposit": "保証金",
-      "Review": "レビュー"
+      "Review": "レビュー",
+      "Payment": "支払い"
     },
     "signatureCaptured": "署名を取得しました",
     "signInBox": "上のボックスに署名してください",
@@ -440,7 +441,8 @@
     "helpLoading": "読み込み中…",
     "helpNoArticle": "ヘルプセンター",
     "helpNoArticleBody": "このページの記事はまだありません。ヘルプセンターにはRoveHQの各機能のガイドがあります。",
-    "helpOpenCentre": "ヘルプセンターで開く"
+    "helpOpenCentre": "ヘルプセンターで開く",
+    "bookingPage": "予約ページ"
   },
   "customer": {
     "cur_also": "価格をこの通貨でも表示",
@@ -1270,7 +1272,12 @@
     "group_next30": "今後 30 日間",
     "laterLink": "それ以降または日付なしの作業 {count} 件",
     "nothingHere": "何もありません",
-    "showAllJobs": "すべての作業を表示"
+    "showAllJobs": "すべての作業を表示",
+    "job_collectFrom": "{amount}を回収",
+    "collect_deposit": "保証金を回収",
+    "collect_top_up": "追加料金を回収",
+    "collect_extension": "延長料金を回収",
+    "collect_extras": "オプション料金を回収"
   },
   "bookings": {
     "eyebrow": "予約",
@@ -4709,7 +4716,20 @@
     "br_unitMi": "マイル",
     "br_pickupOnly": "お客様が店舗に来店",
     "br_deliversWithin": "{distance}以内で配達・回収",
-    "br_setArea": "サービスエリア未設定"
+    "br_setArea": "サービスエリア未設定",
+    "bt_title": "予約ページ",
+    "bt_edit": "編集",
+    "bt_preview": "プレビュー",
+    "bt_mobile": "スマホ",
+    "bt_desktop": "パソコン",
+    "bt_open": "ページを開く",
+    "bt_page": "ページ",
+    "bt_address": "アドレス",
+    "bt_design": "デザイン",
+    "bt_brand": "ブランド",
+    "bt_saveChanges": "変更を保存",
+    "bt_unsaved": "未保存の変更があります",
+    "bt_sectionsOn": "{count, plural, other {#セクションを表示中}}"
   },
   "accountPage": {
     "roleOwner": "オーナー",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "署名を一度追加すれば、お客様はスマホでレンタル契約書に署名できます。",
     "nudgePaymentMethods": "PromptPay または銀行口座を追加すると、お客様は予約ページから直接支払えます。",
     "extensionHoldReturning": "{customer}さんは延長しません：{vehicle}は{date}に返却予定です。それ以降の日程は再び予約可能になりました。"
+  },
+  "handoverPay": {
+    "title": "支払い",
+    "rent": "レンタル料金",
+    "deposit": "保証金",
+    "total": "合計",
+    "paid": "支払い済み",
+    "left": "残額",
+    "paidInFull": "支払い完了",
+    "howPay": "お支払い方法は？",
+    "m_cash": "現金",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "銀行振込",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "お客様は{amount}を現金で支払いましたか？",
+    "yes": "はい",
+    "part": "一部",
+    "no": "いいえ",
+    "amountPaid": "支払額",
+    "record": "記録する",
+    "saving": "保存中...",
+    "showCustomer": "お客様に見せる",
+    "markPaid": "支払い済み",
+    "notYet": "まだ",
+    "close": "閉じる",
+    "promptpayId": "PromptPay ID",
+    "bank": "銀行",
+    "account": "口座番号",
+    "accountName": "口座名義",
+    "receipt": "領収書 {number}",
+    "failed": "支払いを記録できませんでした。もう一度お試しください。",
+    "later": "あとで"
   }
 }

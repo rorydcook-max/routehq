@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "Tandatangan",
       "Deposit": "Wang cagaran",
-      "Review": "Semak"
+      "Review": "Semak",
+      "Payment": "Bayaran"
     },
     "signatureCaptured": "Tandatangan ditangkap",
     "signInBox": "Tandatangan dalam kotak di atas",
@@ -440,7 +441,8 @@
     "helpLoading": "Memuatkan…",
     "helpNoArticle": "Pusat bantuan",
     "helpNoArticleBody": "Belum ada artikel tentang halaman ini. Pusat bantuan ada panduan untuk setiap bahagian RoveHQ.",
-    "helpOpenCentre": "Buka dalam Pusat bantuan"
+    "helpOpenCentre": "Buka dalam Pusat bantuan",
+    "bookingPage": "Halaman tempahan"
   },
   "customer": {
     "cur_also": "Tunjukkan juga harga dalam",
@@ -1310,7 +1312,12 @@
     "group_next30": "30 hari akan datang",
     "laterLink": "{count} tugasan kemudian atau tanpa tarikh",
     "nothingHere": "Tiada apa-apa di sini",
-    "showAllJobs": "Tunjukkan semua tugasan"
+    "showAllJobs": "Tunjukkan semua tugasan",
+    "job_collectFrom": "Kutip {amount}",
+    "collect_deposit": "Kutip deposit",
+    "collect_top_up": "Kutip bayaran tambahan",
+    "collect_extension": "Kutip lanjutan",
+    "collect_extras": "Kutip bayaran ekstra"
   },
   "bookings": {
     "eyebrow": "Tempahan",
@@ -4749,7 +4756,20 @@
     "br_unitMi": "batu",
     "br_pickupOnly": "Pelanggan datang ke cawangan",
     "br_deliversWithin": "Hantar dan ambil dalam lingkungan {distance}",
-    "br_setArea": "Kawasan servis belum ditetapkan"
+    "br_setArea": "Kawasan servis belum ditetapkan",
+    "bt_title": "Halaman tempahan",
+    "bt_edit": "Edit",
+    "bt_preview": "Pratonton",
+    "bt_mobile": "Mudah alih",
+    "bt_desktop": "Desktop",
+    "bt_open": "Buka halaman",
+    "bt_page": "Halaman",
+    "bt_address": "Alamat",
+    "bt_design": "Reka bentuk",
+    "bt_brand": "Jenama",
+    "bt_saveChanges": "Simpan perubahan",
+    "bt_unsaved": "Perubahan belum disimpan",
+    "bt_sectionsOn": "{count, plural, other {# bahagian dipaparkan}}"
   },
   "accountPage": {
     "roleOwner": "Pemilik",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "Tambah tandatangan anda sekali, dan pelanggan boleh menandatangani perjanjian sewa di telefon.",
     "nudgePaymentMethods": "Tambah PromptPay atau butiran bank supaya pelanggan boleh membayar terus dari halaman tempahan mereka.",
     "extensionHoldReturning": "{customer} tidak melanjutkan: {vehicle} dipulangkan pada {date}. Hari selepasnya dibuka semula untuk tempahan."
+  },
+  "handoverPay": {
+    "title": "Bayaran",
+    "rent": "Sewa",
+    "deposit": "Deposit",
+    "total": "Jumlah perlu dibayar",
+    "paid": "Dibayar",
+    "left": "Baki",
+    "paidInFull": "Dibayar penuh",
+    "howPay": "Bagaimana pelanggan membayar?",
+    "m_cash": "Tunai",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Pindahan bank",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Sudahkah pelanggan membayar {amount} secara tunai?",
+    "yes": "Ya",
+    "part": "Sebahagian",
+    "no": "Tidak",
+    "amountPaid": "Jumlah dibayar",
+    "record": "Rekod",
+    "saving": "Menyimpan...",
+    "showCustomer": "Tunjuk kepada pelanggan",
+    "markPaid": "Dibayar",
+    "notYet": "Belum lagi",
+    "close": "Tutup",
+    "promptpayId": "ID PromptPay",
+    "bank": "Bank",
+    "account": "Akaun",
+    "accountName": "Nama",
+    "receipt": "Resit {number}",
+    "failed": "Bayaran tidak dapat direkod. Cuba lagi.",
+    "later": "Kemudian"
   }
 }

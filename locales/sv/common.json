@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "Signatur",
       "Deposit": "Deposition",
-      "Review": "Granska"
+      "Review": "Granska",
+      "Payment": "Betalning"
     },
     "signatureCaptured": "Signatur fångad",
     "signInBox": "Skriv under i rutan ovan",
@@ -440,7 +441,8 @@
     "helpLoading": "Laddar…",
     "helpNoArticle": "Hjälpcenter",
     "helpNoArticleBody": "Det finns ingen artikel om den här sidan än. Hjälpcentret har guider för alla delar av RoveHQ.",
-    "helpOpenCentre": "Öppna i hjälpcentret"
+    "helpOpenCentre": "Öppna i hjälpcentret",
+    "bookingPage": "Bokningssida"
   },
   "customer": {
     "cur_also": "Visa även priser i",
@@ -1270,7 +1272,12 @@
     "group_next30": "Kommande 30 dagar",
     "laterLink": "{count, plural, one {# uppgift} other {# uppgifter}} senare eller utan datum",
     "nothingHere": "Inget här",
-    "showAllJobs": "Visa alla uppgifter"
+    "showAllJobs": "Visa alla uppgifter",
+    "job_collectFrom": "Ta betalt {amount}",
+    "collect_deposit": "Ta betalt för deposition",
+    "collect_top_up": "Ta betalt för tillägg",
+    "collect_extension": "Ta betalt för förlängning",
+    "collect_extras": "Ta betalt för tillval"
   },
   "bookings": {
     "eyebrow": "Bokningar",
@@ -4709,7 +4716,20 @@
     "br_unitMi": "miles",
     "br_pickupOnly": "Kunderna kommer till kontoret",
     "br_deliversWithin": "Levererar och hämtar inom {distance}",
-    "br_setArea": "Serviceområde inte angivet"
+    "br_setArea": "Serviceområde inte angivet",
+    "bt_title": "Bokningssida",
+    "bt_edit": "Redigera",
+    "bt_preview": "Förhandsvisa",
+    "bt_mobile": "Mobil",
+    "bt_desktop": "Dator",
+    "bt_open": "Öppna sidan",
+    "bt_page": "Sida",
+    "bt_address": "Adress",
+    "bt_design": "Design",
+    "bt_brand": "Varumärke",
+    "bt_saveChanges": "Spara ändringar",
+    "bt_unsaved": "Osparade ändringar",
+    "bt_sectionsOn": "{count, plural, one {# sektion visas} other {# sektioner visas}}"
   },
   "accountPage": {
     "roleOwner": "Ägare",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "Lägg till din signatur en gång så kan kunderna signera hyresavtalet i mobilen.",
     "nudgePaymentMethods": "Lägg till PromptPay eller dina bankuppgifter så kan kunderna betala direkt från sin bokningssida.",
     "extensionHoldReturning": "{customer} förlänger inte: {vehicle} ska lämnas tillbaka den {date}. Dagarna efter går att boka igen."
+  },
+  "handoverPay": {
+    "title": "Betalning",
+    "rent": "Hyra",
+    "deposit": "Deposition",
+    "total": "Totalt att betala",
+    "paid": "Betalt",
+    "left": "Kvar att betala",
+    "paidInFull": "Fullt betalt",
+    "howPay": "Hur betalar kunden?",
+    "m_cash": "Kontant",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Banköverföring",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Har kunden betalat {amount} kontant?",
+    "yes": "Ja",
+    "part": "Delvis",
+    "no": "Nej",
+    "amountPaid": "Betalt belopp",
+    "record": "Registrera",
+    "saving": "Sparar...",
+    "showCustomer": "Visa för kunden",
+    "markPaid": "Betalt",
+    "notYet": "Inte än",
+    "close": "Stäng",
+    "promptpayId": "PromptPay-ID",
+    "bank": "Bank",
+    "account": "Konto",
+    "accountName": "Namn",
+    "receipt": "Kvitto {number}",
+    "failed": "Betalningen kunde inte registreras. Försök igen.",
+    "later": "Senare"
   }
 }

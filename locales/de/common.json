@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "Unterschrift",
       "Deposit": "Kaution",
-      "Review": "Überprüfen"
+      "Review": "Überprüfen",
+      "Payment": "Zahlung"
     },
     "signatureCaptured": "Unterschrift erfasst",
     "signInBox": "Im obigen Feld unterschreiben",
@@ -440,7 +441,8 @@
     "helpLoading": "Wird geladen…",
     "helpNoArticle": "Hilfecenter",
     "helpNoArticleBody": "Zu dieser Seite gibt es noch keinen Artikel. Im Hilfecenter findest du Anleitungen zu allen Bereichen von RoveHQ.",
-    "helpOpenCentre": "Im Hilfecenter öffnen"
+    "helpOpenCentre": "Im Hilfecenter öffnen",
+    "bookingPage": "Buchungsseite"
   },
   "customer": {
     "cur_also": "Preise auch anzeigen in",
@@ -1284,7 +1286,12 @@
     "group_next30": "Nächste 30 Tage",
     "laterLink": "{count, plural, one {# Aufgabe} other {# Aufgaben}} später oder ohne Datum",
     "nothingHere": "Hier ist nichts",
-    "showAllJobs": "Alle Aufgaben anzeigen"
+    "showAllJobs": "Alle Aufgaben anzeigen",
+    "job_collectFrom": "{amount} kassieren",
+    "collect_deposit": "Kaution kassieren",
+    "collect_top_up": "Nachzahlung kassieren",
+    "collect_extension": "Verlängerung kassieren",
+    "collect_extras": "Extras kassieren"
   },
   "bookings": {
     "eyebrow": "Buchungen",
@@ -4722,7 +4729,20 @@
     "br_unitMi": "Meilen",
     "br_pickupOnly": "Kunden kommen in die Filiale",
     "br_deliversWithin": "Liefert und holt ab im Umkreis von {distance}",
-    "br_setArea": "Servicegebiet nicht festgelegt"
+    "br_setArea": "Servicegebiet nicht festgelegt",
+    "bt_title": "Buchungsseite",
+    "bt_edit": "Bearbeiten",
+    "bt_preview": "Vorschau",
+    "bt_mobile": "Mobil",
+    "bt_desktop": "Desktop",
+    "bt_open": "Seite öffnen",
+    "bt_page": "Seite",
+    "bt_address": "Adresse",
+    "bt_design": "Design",
+    "bt_brand": "Marke",
+    "bt_saveChanges": "Änderungen speichern",
+    "bt_unsaved": "Ungespeicherte Änderungen",
+    "bt_sectionsOn": "{count, plural, one {# Abschnitt sichtbar} other {# Abschnitte sichtbar}}"
   },
   "accountPage": {
     "roleOwner": "Inhaber",
@@ -7203,5 +7223,38 @@
     "nudgeSignature": "Hinterlegen Sie einmal Ihre Unterschrift, dann können Kunden den Mietvertrag auf dem Handy unterschreiben.",
     "nudgePaymentMethods": "Hinterlegen Sie PromptPay oder Ihre Bankdaten, damit Kunden direkt auf ihrer Buchungsseite bezahlen können.",
     "extensionHoldReturning": "{customer} verlängert nicht: {vehicle} kommt am {date} zurück. Die Tage danach sind wieder buchbar."
+  },
+  "handoverPay": {
+    "title": "Zahlung",
+    "rent": "Miete",
+    "deposit": "Kaution",
+    "total": "Fällig gesamt",
+    "paid": "Bezahlt",
+    "left": "Noch offen",
+    "paidInFull": "Vollständig bezahlt",
+    "howPay": "Wie zahlt der Kunde?",
+    "m_cash": "Bar",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Überweisung",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Hat der Kunde {amount} bar bezahlt?",
+    "yes": "Ja",
+    "part": "Teilweise",
+    "no": "Nein",
+    "amountPaid": "Bezahlter Betrag",
+    "record": "Erfassen",
+    "saving": "Wird gespeichert...",
+    "showCustomer": "Dem Kunden zeigen",
+    "markPaid": "Bezahlt",
+    "notYet": "Noch nicht",
+    "close": "Schließen",
+    "promptpayId": "PromptPay-ID",
+    "bank": "Bank",
+    "account": "Konto",
+    "accountName": "Name",
+    "receipt": "Beleg {number}",
+    "failed": "Zahlung konnte nicht erfasst werden. Bitte erneut versuchen.",
+    "later": "Später"
   }
 }

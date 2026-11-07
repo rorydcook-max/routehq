@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "חתימה",
       "Deposit": "פיקדון",
-      "Review": "סקירה"
+      "Review": "סקירה",
+      "Payment": "תשלום"
     },
     "signatureCaptured": "חתימה נקלטה",
     "signInBox": "חתום בתיבה למעלה",
@@ -440,7 +441,8 @@
     "helpLoading": "טוען…",
     "helpNoArticle": "מרכז העזרה",
     "helpNoArticleBody": "עדיין אין מאמר על הדף הזה. במרכז העזרה יש מדריכים לכל חלק ב-RoveHQ.",
-    "helpOpenCentre": "פתיחה במרכז העזרה"
+    "helpOpenCentre": "פתיחה במרכז העזרה",
+    "bookingPage": "דף הזמנות"
   },
   "customer": {
     "cur_also": "להציג מחירים גם ב-",
@@ -1310,7 +1312,12 @@
     "group_next30": "30 הימים הקרובים",
     "laterLink": "{count, plural, one {משימה אחת} two {שתי משימות} other {# משימות}} בהמשך או ללא תאריך",
     "nothingHere": "אין כאן כלום",
-    "showAllJobs": "הצגת כל המשימות"
+    "showAllJobs": "הצגת כל המשימות",
+    "job_collectFrom": "לגבות {amount}",
+    "collect_deposit": "לגבות פיקדון",
+    "collect_top_up": "לגבות השלמה",
+    "collect_extension": "לגבות הארכה",
+    "collect_extras": "לגבות תוספות"
   },
   "bookings": {
     "eyebrow": "הזמנות",
@@ -4749,7 +4756,20 @@
     "br_unitMi": "מייל",
     "br_pickupOnly": "הלקוחות מגיעים לסניף",
     "br_deliversWithin": "מסירה ואיסוף ברדיוס {distance}",
-    "br_setArea": "אזור שירות לא הוגדר"
+    "br_setArea": "אזור שירות לא הוגדר",
+    "bt_title": "דף הזמנות",
+    "bt_edit": "עריכה",
+    "bt_preview": "תצוגה מקדימה",
+    "bt_mobile": "נייד",
+    "bt_desktop": "מחשב",
+    "bt_open": "פתיחת הדף",
+    "bt_page": "דף",
+    "bt_address": "כתובת",
+    "bt_design": "עיצוב",
+    "bt_brand": "מותג",
+    "bt_saveChanges": "שמירת שינויים",
+    "bt_unsaved": "יש שינויים שלא נשמרו",
+    "bt_sectionsOn": "{count, plural, one {מוצג חלק #} other {מוצגים # חלקים}}"
   },
   "accountPage": {
     "roleOwner": "בעלים",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "הוסיפו את החתימה שלכם פעם אחת, והלקוחות יוכלו לחתום על הסכם ההשכרה בטלפון.",
     "nudgePaymentMethods": "הוסיפו PromptPay או פרטי בנק כדי שהלקוחות ישלמו ישירות מדף ההזמנה שלהם.",
     "extensionHoldReturning": "{customer} לא מאריך/ה: {vehicle} צריך לחזור ב-{date}. הימים שאחרי פתוחים שוב להזמנה."
+  },
+  "handoverPay": {
+    "title": "תשלום",
+    "rent": "שכירות",
+    "deposit": "פיקדון",
+    "total": "סה״כ לתשלום",
+    "paid": "שולם",
+    "left": "נותר לתשלום",
+    "paidInFull": "שולם במלואו",
+    "howPay": "איך הלקוח משלם?",
+    "m_cash": "מזומן",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "העברה בנקאית",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "האם הלקוח שילם {amount} במזומן?",
+    "yes": "כן",
+    "part": "חלק",
+    "no": "לא",
+    "amountPaid": "סכום ששולם",
+    "record": "רישום",
+    "saving": "שומר...",
+    "showCustomer": "להציג ללקוח",
+    "markPaid": "שולם",
+    "notYet": "עדיין לא",
+    "close": "סגירה",
+    "promptpayId": "מזהה PromptPay",
+    "bank": "בנק",
+    "account": "חשבון",
+    "accountName": "שם",
+    "receipt": "קבלה {number}",
+    "failed": "לא הצלחנו לרשום את התשלום. נסו שוב.",
+    "later": "אחר כך"
   }
 }

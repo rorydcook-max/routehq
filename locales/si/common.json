@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "අත්සන",
       "Deposit": "මුදල් තැන්පතු",
-      "Review": "සමාලෝචනය"
+      "Review": "සමාලෝචනය",
+      "Payment": "ගෙවීම"
     },
     "signatureCaptured": "අත්සන ගෙන ඇත",
     "signInBox": "ඉහත කොටුවේ අත්සන් කරන්න",
@@ -440,7 +441,8 @@
     "helpLoading": "පූරණය වෙමින්…",
     "helpNoArticle": "උදව් මධ්‍යස්ථානය",
     "helpNoArticleBody": "මෙම පිටුව ගැන තවම ලිපියක් නැත. උදව් මධ්‍යස්ථානයේ RoveHQ හි සෑම කොටසක් සඳහාම මාර්ගෝපදේශ ඇත.",
-    "helpOpenCentre": "උදව් මධ්‍යස්ථානයේ විවෘත කරන්න"
+    "helpOpenCentre": "උදව් මධ්‍යස්ථානයේ විවෘත කරන්න",
+    "bookingPage": "බුකින් පිටුව"
   },
   "customer": {
     "cur_also": "මිල ගණන් මෙම මුදලින්ද පෙන්වන්න",
@@ -1270,7 +1272,12 @@
     "group_next30": "ඉදිරි දින 30",
     "laterLink": "{count, plural, one {කාර්යය #} other {කාර්යයන් #}} පසුව හෝ දිනයක් නොමැතිව",
     "nothingHere": "මෙහි කිසිවක් නැත",
-    "showAllJobs": "සියලු කාර්යයන් පෙන්වන්න"
+    "showAllJobs": "සියලු කාර්යයන් පෙන්වන්න",
+    "job_collectFrom": "{amount} එකතු කරන්න",
+    "collect_deposit": "තැන්පතුව එකතු කරන්න",
+    "collect_top_up": "අමතර මුදල එකතු කරන්න",
+    "collect_extension": "දිගු කිරීමේ මුදල එකතු කරන්න",
+    "collect_extras": "අමතර දේවල මුදල එකතු කරන්න"
   },
   "bookings": {
     "eyebrow": "බුකින්",
@@ -4709,7 +4716,20 @@
     "br_unitMi": "සැතපුම්",
     "br_pickupOnly": "පාරිභෝගිකයින් ශාඛාවට පැමිණේ",
     "br_deliversWithin": "{distance} ඇතුළත ගෙනැවිත් දී ආපසු ගනී",
-    "br_setArea": "සේවා ප්‍රදේශය සකසා නැත"
+    "br_setArea": "සේවා ප්‍රදේශය සකසා නැත",
+    "bt_title": "බුකින් පිටුව",
+    "bt_edit": "සංස්කරණය",
+    "bt_preview": "පෙරදසුන",
+    "bt_mobile": "ජංගම",
+    "bt_desktop": "ඩෙස්ක්ටොප්",
+    "bt_open": "පිටුව විවෘත කරන්න",
+    "bt_page": "පිටුව",
+    "bt_address": "ලිපිනය",
+    "bt_design": "සැලසුම",
+    "bt_brand": "වෙළඳ නාමය",
+    "bt_saveChanges": "වෙනස්කම් සුරකින්න",
+    "bt_unsaved": "නොසුරැකි වෙනස්කම්",
+    "bt_sectionsOn": "{count, plural, one {කොටස් # පෙන්වයි} other {කොටස් # පෙන්වයි}}"
   },
   "accountPage": {
     "roleOwner": "හිමිකරු",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "ඔබේ අත්සන එක් වරක් එක් කරන්න, පාරිභෝගිකයින්ට දුරකථනයෙන්ම කුලී ගිවිසුම අත්සන් කළ හැක.",
     "nudgePaymentMethods": "පාරිභෝගිකයින්ට තම වෙන්කිරීමේ පිටුවෙන්ම ගෙවිය හැකි වන ලෙස PromptPay හෝ බැංකු විස්තර එක් කරන්න.",
     "extensionHoldReturning": "{customer} දිගු නොකරයි: {vehicle} {date} දින ආපසු ලැබිය යුතුය. ඉන් පසු දින නැවත බුකින් සඳහා විවෘතයි."
+  },
+  "handoverPay": {
+    "title": "ගෙවීම",
+    "rent": "කුලිය",
+    "deposit": "තැන්පතුව",
+    "total": "මුළු ගෙවිය යුතු මුදල",
+    "paid": "ගෙවා ඇත",
+    "left": "ඉතිරි",
+    "paidInFull": "සම්පූර්ණයෙන් ගෙවා ඇත",
+    "howPay": "පාරිභෝගිකයා ගෙවන්නේ කෙසේද?",
+    "m_cash": "මුදල්",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "බැංකු මාරු කිරීම",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "පාරිභෝගිකයා {amount} මුදලින් ගෙව්වාද?",
+    "yes": "ඔව්",
+    "part": "කොටසක්",
+    "no": "නැත",
+    "amountPaid": "ගෙවූ මුදල",
+    "record": "සටහන් කරන්න",
+    "saving": "සුරකිමින්...",
+    "showCustomer": "පාරිභෝගිකයාට පෙන්වන්න",
+    "markPaid": "ගෙවා ඇත",
+    "notYet": "තවම නැත",
+    "close": "වසන්න",
+    "promptpayId": "PromptPay ID",
+    "bank": "බැංකුව",
+    "account": "ගිණුම",
+    "accountName": "නම",
+    "receipt": "රිසිට්පත {number}",
+    "failed": "ගෙවීම සටහන් කළ නොහැකි විය. නැවත උත්සාහ කරන්න.",
+    "later": "පසුව"
   }
 }

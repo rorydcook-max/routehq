@@ -163,7 +163,8 @@
     "helpLoading": "Ładowanie…",
     "helpNoArticle": "Centrum pomocy",
     "helpNoArticleBody": "Nie ma jeszcze artykułu o tej stronie. W Centrum pomocy znajdziesz poradniki do każdej części RoveHQ.",
-    "helpOpenCentre": "Otwórz w Centrum pomocy"
+    "helpOpenCentre": "Otwórz w Centrum pomocy",
+    "bookingPage": "Strona rezerwacji"
   },
   "vehicles": {
     "addVehicle": "Dodaj pojazd"
@@ -262,7 +263,8 @@
       "GPS": "GPS",
       "Signature": "Podpis",
       "Deposit": "Kaucja",
-      "Review": "Podsumowanie"
+      "Review": "Podsumowanie",
+      "Payment": "Płatność"
     },
     "signatureCaptured": "Podpis zapisany",
     "signInBox": "Podpisz się w polu powyżej",
@@ -1244,7 +1246,12 @@
     "group_next30": "Następne 30 dni",
     "nothingHere": "Nic tu nie ma",
     "showAllJobs": "Pokaż wszystkie zadania",
-    "laterLink": "Zadania później lub bez daty: {count}"
+    "laterLink": "Zadania później lub bez daty: {count}",
+    "job_collectFrom": "Pobierz {amount}",
+    "collect_deposit": "Pobierz kaucję",
+    "collect_top_up": "Pobierz dopłatę",
+    "collect_extension": "Pobierz za przedłużenie",
+    "collect_extras": "Pobierz za dodatki"
   },
   "bookings": {
     "eyebrow": "Rezerwacje",
@@ -4682,7 +4689,20 @@
     "br_unitMi": "mil",
     "br_pickupOnly": "Klienci przychodzą do oddziału",
     "br_deliversWithin": "Dowozi i odbiera w promieniu {distance}",
-    "br_setArea": "Obszar obsługi nieustawiony"
+    "br_setArea": "Obszar obsługi nieustawiony",
+    "bt_title": "Strona rezerwacji",
+    "bt_edit": "Edytuj",
+    "bt_preview": "Podgląd",
+    "bt_mobile": "Telefon",
+    "bt_desktop": "Komputer",
+    "bt_open": "Otwórz stronę",
+    "bt_page": "Strona",
+    "bt_address": "Adres",
+    "bt_design": "Wygląd",
+    "bt_brand": "Marka",
+    "bt_saveChanges": "Zapisz zmiany",
+    "bt_unsaved": "Niezapisane zmiany",
+    "bt_sectionsOn": "{count, plural, one {# sekcja widoczna} few {# sekcje widoczne} many {# sekcji widocznych} other {# sekcji widocznej}}"
   },
   "accountPage": {
     "roleOwner": "Właściciel",
@@ -7203,5 +7223,38 @@
     "nudgeSignature": "Dodaj swój podpis raz, a klienci podpiszą umowę najmu na telefonie.",
     "nudgePaymentMethods": "Dodaj PromptPay lub dane bankowe, aby klienci płacili bezpośrednio ze swojej strony rezerwacji.",
     "extensionHoldReturning": "{customer} nie przedłuża: pojazd {vehicle} ma wrócić {date}. Kolejne dni są znów dostępne do rezerwacji."
+  },
+  "handoverPay": {
+    "title": "Płatność",
+    "rent": "Czynsz",
+    "deposit": "Kaucja",
+    "total": "Razem do zapłaty",
+    "paid": "Zapłacono",
+    "left": "Pozostało",
+    "paidInFull": "Zapłacono w całości",
+    "howPay": "Jak płaci klient?",
+    "m_cash": "Gotówka",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Przelew",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Czy klient zapłacił {amount} gotówką?",
+    "yes": "Tak",
+    "part": "Część",
+    "no": "Nie",
+    "amountPaid": "Zapłacona kwota",
+    "record": "Zapisz",
+    "saving": "Zapisywanie...",
+    "showCustomer": "Pokaż klientowi",
+    "markPaid": "Zapłacono",
+    "notYet": "Jeszcze nie",
+    "close": "Zamknij",
+    "promptpayId": "ID PromptPay",
+    "bank": "Bank",
+    "account": "Konto",
+    "accountName": "Nazwa",
+    "receipt": "Paragon {number}",
+    "failed": "Nie udało się zapisać płatności. Spróbuj ponownie.",
+    "later": "Później"
   }
 }

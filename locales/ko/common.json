@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "서명",
       "Deposit": "보증금",
-      "Review": "검토"
+      "Review": "검토",
+      "Payment": "결제"
     },
     "signatureCaptured": "서명 완료",
     "signInBox": "위 상자에 서명하세요",
@@ -440,7 +441,8 @@
     "helpLoading": "불러오는 중…",
     "helpNoArticle": "도움말 센터",
     "helpNoArticleBody": "이 페이지에 대한 글이 아직 없습니다. 도움말 센터에서 RoveHQ의 모든 기능 안내를 볼 수 있습니다.",
-    "helpOpenCentre": "도움말 센터에서 열기"
+    "helpOpenCentre": "도움말 센터에서 열기",
+    "bookingPage": "예약 페이지"
   },
   "customer": {
     "cur_also": "가격을 이 통화로도 표시",
@@ -1270,7 +1272,12 @@
     "group_next30": "향후 30일",
     "laterLink": "이후 또는 날짜 없는 작업 {count}건",
     "nothingHere": "항목이 없어요",
-    "showAllJobs": "모든 작업 보기"
+    "showAllJobs": "모든 작업 보기",
+    "job_collectFrom": "{amount} 받기",
+    "collect_deposit": "보증금 받기",
+    "collect_top_up": "추가금 받기",
+    "collect_extension": "연장 요금 받기",
+    "collect_extras": "옵션 요금 받기"
   },
   "bookings": {
     "eyebrow": "예약",
@@ -4709,7 +4716,20 @@
     "br_unitMi": "마일",
     "br_pickupOnly": "고객이 지점으로 방문",
     "br_deliversWithin": "{distance} 이내 배달 및 회수",
-    "br_setArea": "서비스 지역 미설정"
+    "br_setArea": "서비스 지역 미설정",
+    "bt_title": "예약 페이지",
+    "bt_edit": "편집",
+    "bt_preview": "미리보기",
+    "bt_mobile": "모바일",
+    "bt_desktop": "데스크톱",
+    "bt_open": "페이지 열기",
+    "bt_page": "페이지",
+    "bt_address": "주소",
+    "bt_design": "디자인",
+    "bt_brand": "브랜드",
+    "bt_saveChanges": "변경 사항 저장",
+    "bt_unsaved": "저장하지 않은 변경 사항",
+    "bt_sectionsOn": "{count, plural, other {섹션 #개 표시 중}}"
   },
   "accountPage": {
     "roleOwner": "대표",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "서명을 한 번 추가하면 고객이 휴대폰에서 대여 계약서에 서명할 수 있습니다.",
     "nudgePaymentMethods": "PromptPay 또는 은행 정보를 추가하면 고객이 예약 페이지에서 바로 결제할 수 있습니다.",
     "extensionHoldReturning": "{customer} 님은 연장하지 않아요: {vehicle}은(는) {date}에 반납될 예정이에요. 그 이후 날짜는 다시 예약할 수 있어요."
+  },
+  "handoverPay": {
+    "title": "결제",
+    "rent": "대여료",
+    "deposit": "보증금",
+    "total": "총 결제 금액",
+    "paid": "결제됨",
+    "left": "남은 금액",
+    "paidInFull": "전액 결제됨",
+    "howPay": "고객이 어떻게 결제하나요?",
+    "m_cash": "현금",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "계좌이체",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "고객이 {amount}을(를) 현금으로 냈나요?",
+    "yes": "네",
+    "part": "일부",
+    "no": "아니요",
+    "amountPaid": "결제 금액",
+    "record": "기록",
+    "saving": "저장 중...",
+    "showCustomer": "고객에게 보여주기",
+    "markPaid": "결제됨",
+    "notYet": "아직",
+    "close": "닫기",
+    "promptpayId": "PromptPay ID",
+    "bank": "은행",
+    "account": "계좌번호",
+    "accountName": "예금주",
+    "receipt": "영수증 {number}",
+    "failed": "결제를 기록하지 못했어요. 다시 시도해 주세요.",
+    "later": "나중에"
   }
 }

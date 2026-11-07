@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "Signatur",
       "Deposit": "Depositum",
-      "Review": "Gjennomgang"
+      "Review": "Gjennomgang",
+      "Payment": "Betaling"
     },
     "signatureCaptured": "Signatur registrert",
     "signInBox": "Signer i boksen ovenfor",
@@ -440,7 +441,8 @@
     "helpLoading": "Laster…",
     "helpNoArticle": "Hjelpesenter",
     "helpNoArticleBody": "Det finnes ingen artikkel om denne siden ennå. Hjelpesenteret har veiledninger for alle deler av RoveHQ.",
-    "helpOpenCentre": "Åpne i hjelpesenteret"
+    "helpOpenCentre": "Åpne i hjelpesenteret",
+    "bookingPage": "Bookingside"
   },
   "customer": {
     "cur_also": "Vis også priser i",
@@ -1270,7 +1272,12 @@
     "group_next30": "Neste 30 dager",
     "laterLink": "{count, plural, one {# oppgave} other {# oppgaver}} senere eller uten dato",
     "nothingHere": "Ingenting her",
-    "showAllJobs": "Vis alle oppgaver"
+    "showAllJobs": "Vis alle oppgaver",
+    "job_collectFrom": "Ta betalt {amount}",
+    "collect_deposit": "Ta betalt for depositum",
+    "collect_top_up": "Ta betalt for tillegg",
+    "collect_extension": "Ta betalt for forlengelse",
+    "collect_extras": "Ta betalt for ekstrautstyr"
   },
   "bookings": {
     "eyebrow": "Bestillinger",
@@ -4709,7 +4716,20 @@
     "br_unitMi": "miles",
     "br_pickupOnly": "Kundene kommer til avdelingen",
     "br_deliversWithin": "Leverer og henter innenfor {distance}",
-    "br_setArea": "Serviceområde ikke satt"
+    "br_setArea": "Serviceområde ikke satt",
+    "bt_title": "Bookingside",
+    "bt_edit": "Rediger",
+    "bt_preview": "Forhåndsvis",
+    "bt_mobile": "Mobil",
+    "bt_desktop": "Datamaskin",
+    "bt_open": "Åpne siden",
+    "bt_page": "Side",
+    "bt_address": "Adresse",
+    "bt_design": "Design",
+    "bt_brand": "Merkevare",
+    "bt_saveChanges": "Lagre endringer",
+    "bt_unsaved": "Ulagrede endringer",
+    "bt_sectionsOn": "{count, plural, one {# seksjon vises} other {# seksjoner vises}}"
   },
   "accountPage": {
     "roleOwner": "Eier",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "Legg til signaturen din én gang, så kan kundene signere leiekontrakten på mobilen.",
     "nudgePaymentMethods": "Legg til PromptPay eller bankopplysningene dine, så kan kundene betale rett fra bestillingssiden sin.",
     "extensionHoldReturning": "{customer} forlenger ikke: {vehicle} skal leveres tilbake {date}. Dagene etter er åpne for booking igjen."
+  },
+  "handoverPay": {
+    "title": "Betaling",
+    "rent": "Leie",
+    "deposit": "Depositum",
+    "total": "Totalt å betale",
+    "paid": "Betalt",
+    "left": "Gjenstår",
+    "paidInFull": "Fullt betalt",
+    "howPay": "Hvordan betaler kunden?",
+    "m_cash": "Kontant",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Bankoverføring",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Har kunden betalt {amount} kontant?",
+    "yes": "Ja",
+    "part": "Delvis",
+    "no": "Nei",
+    "amountPaid": "Betalt beløp",
+    "record": "Registrer",
+    "saving": "Lagrer...",
+    "showCustomer": "Vis til kunden",
+    "markPaid": "Betalt",
+    "notYet": "Ikke ennå",
+    "close": "Lukk",
+    "promptpayId": "PromptPay-ID",
+    "bank": "Bank",
+    "account": "Konto",
+    "accountName": "Navn",
+    "receipt": "Kvittering {number}",
+    "failed": "Betalingen kunne ikke registreres. Prøv igjen.",
+    "later": "Senere"
   }
 }

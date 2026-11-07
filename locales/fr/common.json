@@ -218,7 +218,8 @@
       "GPS": "GPS",
       "Signature": "Signature",
       "Deposit": "Caution",
-      "Review": "Revue"
+      "Review": "Revue",
+      "Payment": "Paiement"
     },
     "signatureCaptured": "Signature capturée",
     "signInBox": "Signez dans la case ci-dessus",
@@ -440,7 +441,8 @@
     "helpLoading": "Chargement…",
     "helpNoArticle": "Centre d’aide",
     "helpNoArticleBody": "Il n’y a pas encore d’article sur cette page. Le Centre d’aide propose des guides pour chaque partie de RoveHQ.",
-    "helpOpenCentre": "Ouvrir dans le Centre d’aide"
+    "helpOpenCentre": "Ouvrir dans le Centre d’aide",
+    "bookingPage": "Page de réservation"
   },
   "customer": {
     "cur_also": "Afficher aussi les prix en",
@@ -1310,7 +1312,12 @@
     "group_next30": "30 prochains jours",
     "laterLink": "{count, plural, one {# tâche} many {# tâches} other {# tâches}} plus tard ou sans date",
     "nothingHere": "Rien ici",
-    "showAllJobs": "Afficher toutes les tâches"
+    "showAllJobs": "Afficher toutes les tâches",
+    "job_collectFrom": "Encaisser {amount}",
+    "collect_deposit": "Encaisser la caution",
+    "collect_top_up": "Encaisser le complément",
+    "collect_extension": "Encaisser la prolongation",
+    "collect_extras": "Encaisser les options"
   },
   "bookings": {
     "eyebrow": "Réservations",
@@ -4749,7 +4756,20 @@
     "br_unitMi": "miles",
     "br_pickupOnly": "Les clients viennent à l’agence",
     "br_deliversWithin": "Livre et récupère dans un rayon de {distance}",
-    "br_setArea": "Zone de service non définie"
+    "br_setArea": "Zone de service non définie",
+    "bt_title": "Page de réservation",
+    "bt_edit": "Modifier",
+    "bt_preview": "Aperçu",
+    "bt_mobile": "Mobile",
+    "bt_desktop": "Ordinateur",
+    "bt_open": "Ouvrir la page",
+    "bt_page": "Page",
+    "bt_address": "Adresse",
+    "bt_design": "Design",
+    "bt_brand": "Marque",
+    "bt_saveChanges": "Enregistrer les modifications",
+    "bt_unsaved": "Modifications non enregistrées",
+    "bt_sectionsOn": "{count, plural, one {# section affichée} other {# sections affichées}}"
   },
   "accountPage": {
     "roleOwner": "Propriétaire",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "Ajoutez votre signature une fois, et vos clients pourront signer le contrat de location sur leur téléphone.",
     "nudgePaymentMethods": "Ajoutez PromptPay ou vos coordonnées bancaires pour que vos clients paient directement depuis leur page de réservation.",
     "extensionHoldReturning": "{customer} ne prolonge pas : le véhicule {vehicle} doit être rendu le {date}. Les jours suivants sont de nouveau réservables."
+  },
+  "handoverPay": {
+    "title": "Paiement",
+    "rent": "Location",
+    "deposit": "Caution",
+    "total": "Total dû",
+    "paid": "Payé",
+    "left": "Reste à payer",
+    "paidInFull": "Payé en totalité",
+    "howPay": "Comment le client paie-t-il ?",
+    "m_cash": "Espèces",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Virement",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Le client a-t-il payé {amount} en espèces ?",
+    "yes": "Oui",
+    "part": "En partie",
+    "no": "Non",
+    "amountPaid": "Montant payé",
+    "record": "Enregistrer",
+    "saving": "Enregistrement...",
+    "showCustomer": "Montrer au client",
+    "markPaid": "Payé",
+    "notYet": "Pas encore",
+    "close": "Fermer",
+    "promptpayId": "ID PromptPay",
+    "bank": "Banque",
+    "account": "Compte",
+    "accountName": "Nom",
+    "receipt": "Reçu {number}",
+    "failed": "Le paiement n’a pas pu être enregistré. Réessayez.",
+    "later": "Plus tard"
   }
 }

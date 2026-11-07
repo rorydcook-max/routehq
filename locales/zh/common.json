@@ -224,7 +224,8 @@
       "GPS": "GPS",
       "Signature": "签名",
       "Deposit": "押金",
-      "Review": "审核"
+      "Review": "审核",
+      "Payment": "付款"
     },
     "signatureCaptured": "签名已捕获",
     "signInBox": "在上框中签名",
@@ -440,7 +441,8 @@
     "helpLoading": "加载中…",
     "helpNoArticle": "帮助中心",
     "helpNoArticleBody": "本页还没有相关文章。帮助中心有 RoveHQ 各部分的使用指南。",
-    "helpOpenCentre": "在帮助中心打开"
+    "helpOpenCentre": "在帮助中心打开",
+    "bookingPage": "预订页面"
   },
   "customer": {
     "cur_also": "同时显示价格为",
@@ -1310,7 +1312,12 @@
     "group_next30": "未来 30 天",
     "laterLink": "另有 {count} 项任务在之后或无日期",
     "nothingHere": "暂无内容",
-    "showAllJobs": "显示所有任务"
+    "showAllJobs": "显示所有任务",
+    "job_collectFrom": "收取 {amount}",
+    "collect_deposit": "收取押金",
+    "collect_top_up": "收取补缴款",
+    "collect_extension": "收取续租费",
+    "collect_extras": "收取附加项费用"
   },
   "bookings": {
     "eyebrow": "预订",
@@ -4749,7 +4756,20 @@
     "br_unitMi": "英里",
     "br_pickupOnly": "客户到店取车",
     "br_deliversWithin": "{distance} 内送车和取车",
-    "br_setArea": "未设置服务范围"
+    "br_setArea": "未设置服务范围",
+    "bt_title": "预订页面",
+    "bt_edit": "编辑",
+    "bt_preview": "预览",
+    "bt_mobile": "手机",
+    "bt_desktop": "电脑",
+    "bt_open": "打开页面",
+    "bt_page": "页面",
+    "bt_address": "网址",
+    "bt_design": "设计",
+    "bt_brand": "品牌",
+    "bt_saveChanges": "保存更改",
+    "bt_unsaved": "有未保存的更改",
+    "bt_sectionsOn": "{count, plural, other {显示 # 个板块}}"
   },
   "accountPage": {
     "roleOwner": "所有者",
@@ -7276,5 +7296,38 @@
     "nudgeSignature": "添加一次签名，客户就能在手机上签署租车合同。",
     "nudgePaymentMethods": "添加 PromptPay 或银行信息，客户即可直接在预订页面付款。",
     "extensionHoldReturning": "{customer} 不续租：{vehicle}将于 {date} 归还。之后的日期已重新开放预订。"
+  },
+  "handoverPay": {
+    "title": "付款",
+    "rent": "租金",
+    "deposit": "押金",
+    "total": "应付总额",
+    "paid": "已付",
+    "left": "待付",
+    "paidInFull": "已付清",
+    "howPay": "客户怎么付款？",
+    "m_cash": "现金",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "银行转账",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "客户已用现金支付 {amount} 了吗？",
+    "yes": "是",
+    "part": "部分",
+    "no": "否",
+    "amountPaid": "已付金额",
+    "record": "记录",
+    "saving": "正在保存...",
+    "showCustomer": "给客户看",
+    "markPaid": "已付",
+    "notYet": "还没有",
+    "close": "关闭",
+    "promptpayId": "PromptPay ID",
+    "bank": "银行",
+    "account": "账号",
+    "accountName": "户名",
+    "receipt": "收据 {number}",
+    "failed": "无法记录付款，请重试。",
+    "later": "稍后"
   }
 }

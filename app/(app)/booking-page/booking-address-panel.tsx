@@ -13,8 +13,8 @@ import { RoveNameField } from "@/app/(app)/booking-page/rove-name-field";
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * Where customers book: the RoveHQ address (always), theirshop.rovehq.app (Pro and above)
- * and their own domain (Business plan).
+ * Where customers book: the rove.rent address (always), then a subdomain (Pro and above) OR a custom domain
+ * (Business plan). Labels and controls only (Rory, 7 Nov 2026).
  */
 export function BookingAddressPanel({
   pathUrl,
@@ -70,21 +70,26 @@ export function BookingAddressPanel({
     });
   }
 
-  const addressRow = (url: string, note?: string) => (
-    <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
-      <p className="break-all text-[16px] font-bold text-[var(--foreground)]">{url.replace(/^https?:\/\//, "")}</p>
-      {note ? <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{note}</p> : null}
-      <div className="mt-2.5 flex flex-wrap gap-2">
-        <button className="secondary-action pressable" onClick={() => copy(url)} type="button">
-          <Copy size={17} />
-          {copied === url ? say("copied") : say("pb_copy")}
-        </button>
-        <a className="secondary-action pressable" href={url} rel="noreferrer" target="_blank">
-          <ExternalLink size={17} />
-          {say("pb_open")}
-        </a>
-      </div>
+  // A live address: one line with copy and open.
+  const liveRow = (url: string) => (
+    <div className="flex items-center gap-2 rounded-xl bg-[var(--panel-secondary)] px-3.5 py-2.5">
+      <p className="min-w-0 flex-1 break-all font-bold text-[var(--foreground)]">{url.replace(/^https?:\/\//, "")}</p>
+      <button aria-label={say("pb_copy")} className="icon-action pressable" onClick={() => copy(url)} title={copied === url ? say("copied") : say("pb_copy")} type="button">
+        <Copy size={17} />
+      </button>
+      <a aria-label={say("pb_open")} className="icon-action pressable" href={url} rel="noreferrer" target="_blank" title={say("pb_open")}>
+        <ExternalLink size={17} />
+      </a>
     </div>
+  );
+
+  const planLink = (text: string) => (
+    <p className="font-medium text-[var(--foreground-secondary)]">
+      {text}{" "}
+      <Link className="font-semibold text-[var(--primary)]" href={"/settings/billing" as Route}>
+        {say("ba_seePlans")}
+      </Link>
+    </p>
   );
 
   const apex = domain ? isApexDomain(domain) : false;
@@ -94,17 +99,15 @@ export function BookingAddressPanel({
         <p className="font-semibold text-[var(--foreground)]">{say("rn_title")}</p>
         {/* The name after rove.rent/ is the business's to choose (Rory, 1 Nov 2026). */}
         <RoveNameField current={pathUrl.replace(/\/$/, "").split("/").pop() || ""} host={pathUrl.replace(/^https?:\/\//, "").replace(/\/[^/]*$/, "")} />
-        {addressRow(pathUrl, say("ba_routehqNote"))}
       </div>
 
       <div className="space-y-2">
-        <p className="font-semibold text-[var(--foreground)]">{say("ba_subTitle")}</p>
+        <p className="font-semibold text-[var(--foreground)]">{say("ba_subLabel")}</p>
         {canSubdomain ? (
           <>
-            <p className="font-medium text-[var(--foreground-secondary)]">{say("ba_subBody")}</p>
             <div className="flex max-w-md items-stretch overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel)]">
               <input
-                aria-label={say("ba_subTitle")}
+                aria-label={say("ba_subLabel")}
                 autoCapitalize="none"
                 autoCorrect="off"
                 className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-[16px] font-semibold"
@@ -134,24 +137,25 @@ export function BookingAddressPanel({
                 </button>
               ) : null}
             </div>
-            {subdomain && subdomainUrl ? addressRow(subdomainUrl, say("ba_subLive")) : null}
+            {subdomain && subdomainUrl ? liveRow(subdomainUrl) : null}
           </>
         ) : (
-          <p className="font-medium text-[var(--foreground-secondary)]">
-            {say("ba_subPlan", { example: `${suggestion}.${rootDomain}` })}{" "}
-            <Link className="font-semibold text-[var(--primary)]" href={"/settings/billing" as Route}>
-              {say("ba_seePlans")}
-            </Link>
-          </p>
+          planLink(say("ba_subPlan", { example: `${suggestion}.${rootDomain}` }))
         )}
       </div>
 
+      <div className="flex items-center gap-3 text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]">
+        <span className="h-px flex-1 bg-[var(--border)]" />
+        {say("ba_or")}
+        <span className="h-px flex-1 bg-[var(--border)]" />
+      </div>
+
       <div className="space-y-2">
-        <p className="font-semibold text-[var(--foreground)]">{say("ba_ownTitle")}</p>
+        <p className="font-semibold text-[var(--foreground)]">{say("ba_ownLabel")}</p>
         {canDomain ? (
           <>
-            <p className="font-medium text-[var(--foreground-secondary)]">{say("ba_ownBody")}</p>
             <input
+              aria-label={say("ba_ownLabel")}
               autoCapitalize="none"
               autoCorrect="off"
               className="block w-full max-w-md"
@@ -181,11 +185,10 @@ export function BookingAddressPanel({
             </div>
             {domain ? (
               domainStatus === "live" ? (
-                addressRow(`https://${domain}`, say("ba_ownLive"))
+                liveRow(`https://${domain}`)
               ) : (
                 <div className="rounded-xl border border-[var(--border)] p-3.5">
                   <p className="font-bold text-[var(--foreground)]">{domainStatus === "waiting_team" ? say("ba_ownWaitingTeam", { domain }) : say("ba_ownWaitingDns", { domain })}</p>
-                  <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("ba_dnsIntro")}</p>
                   <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 font-mono text-[15px]">
                     <dt className="font-sans font-semibold text-[var(--muted)]">{say("ba_dnsType")}</dt>
                     <dd className="font-bold">{apex ? "A" : "CNAME"}</dd>
@@ -194,27 +197,18 @@ export function BookingAddressPanel({
                     <dt className="font-sans font-semibold text-[var(--muted)]">{say("ba_dnsValue")}</dt>
                     <dd className="break-all font-bold">{apex ? DNS_A_TARGET : DNS_CNAME_TARGET}</dd>
                   </dl>
-                  <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("ba_dnsHelp")}</p>
                   <div className="mt-2.5 flex flex-wrap gap-2">
                     <button className="secondary-action pressable" disabled={pending} onClick={() => run(() => checkOwnDomain())} type="button">
                       <RefreshCw size={17} />
                       {say("ba_checkAgain")}
                     </button>
-                    <Link className="secondary-action pressable" href={"/help?topic=domain" as Route}>
-                      {say("ba_askUs")}
-                    </Link>
                   </div>
                 </div>
               )
             ) : null}
           </>
         ) : (
-          <p className="font-medium text-[var(--foreground-secondary)]">
-            {say("ba_ownPlan")}{" "}
-            <Link className="font-semibold text-[var(--primary)]" href={"/settings/billing" as Route}>
-              {say("ba_seePlans")}
-            </Link>
-          </p>
+          planLink(say("ba_ownPlan"))
         )}
       </div>
       {error ? <p className="font-bold text-[var(--danger)]">{error}</p> : null}

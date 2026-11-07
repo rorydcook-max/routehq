@@ -9,15 +9,22 @@ import { SiteImage } from "../site-image";
 import { imageTreatment } from "./parts";
 import s from "../site.module.css";
 
-/** The lowest day price on the page, else the lowest month price, as "From ฿250 a day". */
-export function useFromLine() {
-  const { data, money, t } = useSite();
+/** The lowest day price on the page, else the lowest month price, in the business's currency ("€35", "Rp 75,000"). */
+function useFrom(): { per: "day" | "month"; amount: string } | null {
+  const { data, money } = useSite();
   const lowest = (values: number[]) => (values.length ? Math.min(...values) : null);
   const day = lowest(data.vehicles.map((vehicle) => vehicle.dailyRate).filter((rate) => rate > 0));
   const month = lowest(data.vehicles.map((vehicle) => vehicle.monthlyRate).filter((rate) => rate > 0));
-  if (data.catalog.offer !== "monthly" && day) return t("from_day", { amount: money(day) });
-  if (month) return t("from_month", { amount: money(month) });
-  return day ? t("from_day", { amount: money(day) }) : null;
+  if (data.catalog.offer !== "monthly" && day) return { per: "day", amount: money(day) };
+  if (month) return { per: "month", amount: money(month) };
+  return day ? { per: "day", amount: money(day) } : null;
+}
+
+/** The lowest price as a line: "From €35 a day". */
+export function useFromLine() {
+  const { t } = useSite();
+  const from = useFrom();
+  return from ? t(from.per === "day" ? "from_day" : "from_month", { amount: from.amount }) : null;
 }
 
 /** Today's opening hours, when set (on the business's week: Monday first). */
@@ -33,11 +40,13 @@ export type Fact = { value: string; label: string; star?: boolean };
 /** Real figures from the business (never made up): vehicles, lowest price, rating, delivery radius. */
 export function useFacts(all = false): Fact[] {
   const { data, t } = useSite();
-  const from = useFromLine();
+  // "From €35 a day" without its lead-in ("€35 a day"), whatever the language and currency symbol ("kr 690", "AED 99").
+  const from = useFrom();
+  const fromValue = from ? `${from.amount}${t(from.per === "day" ? "from_day" : "from_month", { amount: "\u0001" }).split("\u0001")[1] || ""}`.trim() : null;
   const delivery = data.areas.find((area) => area.radiusKm && area.radiusKm > 0);
   return [
     { value: String(data.vehicles.length), label: t("fact_vehicles", { count: data.vehicles.length }) },
-    from ? { value: from.replace(/^[^\d฿$€£]*/, ""), label: t("fact_from") } : null,
+    fromValue ? { value: fromValue, label: t("fact_from") } : null,
     data.reviewStats.count > 0 ? { value: data.reviewStats.average.toFixed(1), label: t("fact_rating", { count: data.reviewStats.count }), star: true } : null,
     (all || !data.reviewStats.count) && delivery ? { value: `${delivery.radiusKm} km`, label: t("fact_delivery") } : null
   ].filter(Boolean) as Fact[];

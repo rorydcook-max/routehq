@@ -50,16 +50,39 @@ function toBooking() {
   requestAnimationFrame(() => document.getElementById("book")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
 }
 
-function Brand({ business }: { business: SiteBusiness }) {
+/** Logos at or below this width-to-height ratio are marks or icons, so the name goes beside them. */
+const ICON_RATIO = 1.4;
+
+/**
+ * The name in the top bar (owner feedback, 7 Nov 2026: a wordmark logo followed by the same name read twice). With a
+ * logo, the logo shows alone unless it turns out to be square or icon-like (decided once its size is known; the box
+ * keeps its height meanwhile, so nothing jumps) or the owner switched "Show business name next to logo" on.
+ */
+function Brand({ business, showName }: { business: SiteBusiness; showName: boolean }) {
+  const [logo, setLogo] = useState<"loading" | "wide" | "icon" | "failed">("loading");
   const tile = (
-    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[calc(var(--s-r-card)*0.5)] bg-[var(--s-accent)] text-[17px] font-bold text-[var(--s-accent-ink)]">
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[calc(var(--s-r-card)*0.5)] bg-[var(--s-accent)] text-[15px] font-bold text-[var(--s-accent-ink)] sm:h-10 sm:w-10 sm:text-[17px]">
       {business.name.slice(0, 1).toUpperCase()}
     </span>
   );
+  const nameShown = !business.logoUrl || showName || logo === "icon" || logo === "failed";
   return (
     <a className={`${s.focus} flex min-w-0 items-center gap-3`} href="#top">
-      {business.logoUrl ? <BusinessLogoImage alt={`${business.name} logo`} className="max-h-10 max-w-[120px] object-contain" fallback={tile} src={business.logoUrl} /> : tile}
-      <span className="truncate text-[17px] font-bold leading-tight">{business.name}</span>
+      {business.logoUrl ? (
+        <span className="flex h-8 min-w-0 shrink-0 items-center sm:h-10">
+          <BusinessLogoImage
+            alt={nameShown ? "" : `${business.name} logo`}
+            className="block h-7 w-auto max-w-[170px] object-contain object-left sm:h-9 sm:max-w-[220px]"
+            fallback={tile}
+            onFail={() => setLogo("failed")}
+            onSize={(width, height) => setLogo(height > 0 && width / height <= ICON_RATIO ? "icon" : "wide")}
+            src={business.logoUrl}
+          />
+        </span>
+      ) : (
+        tile
+      )}
+      {nameShown ? <span className="truncate text-[17px] font-bold leading-tight">{business.name}</span> : null}
     </a>
   );
 }
@@ -173,7 +196,7 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
 
         <header className={`${s.header} sticky top-0 z-30`}>
           <div className={`${s.wrap} flex h-16 items-center justify-between gap-4${centered ? " lg:grid lg:grid-cols-[1fr_auto_1fr]" : ""}`}>
-            {centered ? null : <Brand business={data.business} />}
+            {centered ? null : <Brand business={data.business} showName={config.showName} />}
             <nav aria-label={t("nav_label")} className={`hidden items-center gap-1 lg:flex${centered ? " -ms-3.5" : ""}`}>
               {nav.map((item) => (
                 <a className={`${s.focus} rounded-full px-3.5 py-2 text-[15px] font-semibold ${s.soft} hover:text-[var(--s-ink)]`} href={`#${item.id}`} key={item.id}>
@@ -181,7 +204,7 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
                 </a>
               ))}
             </nav>
-            {centered ? <Brand business={data.business} /> : null}
+            {centered ? <Brand business={data.business} showName={config.showName} /> : null}
             <div className={`flex shrink-0 items-center gap-2${centered ? " justify-self-end" : ""}`}>
               {edit ? null : <CustomerLanguagePicker className="max-sm:hidden" />}
               <a className={`${s.btn} !min-h-11 !px-5 text-[15px]`} href="#book">

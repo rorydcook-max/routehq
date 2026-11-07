@@ -29,12 +29,18 @@ export function BusinessLogoImage({
   alt,
   className,
   src,
-  fallback
+  fallback,
+  onSize,
+  onFail
 }: {
   alt: string;
   className?: string;
   src: string | null | undefined;
   fallback?: ReactNode;
+  /** The file's own width and height once it has loaded (the website's top bar decides from it whether to add the name). */
+  onSize?: (width: number, height: number) => void;
+  /** The file could not be loaded (the fallback shows). */
+  onFail?: () => void;
 }) {
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -73,11 +79,20 @@ export function BusinessLogoImage({
       <img
         alt={alt}
         className={`${className || ""}${loaded ? "" : " hidden"}`}
-        onError={() => setFailed(true)}
-        onLoad={() => setLoaded(true)}
+        onError={() => {
+          setFailed(true);
+          onFail?.();
+        }}
+        onLoad={(event) => {
+          setLoaded(true);
+          onSize?.(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight);
+        }}
         ref={(node) => {
           // Cached files fire no load event once hydrated: read the flag straight off the element.
-          if (node && node.complete && node.naturalWidth > 0 && !loaded) setLoaded(true);
+          if (node && node.complete && node.naturalWidth > 0 && !loaded) {
+            setLoaded(true);
+            onSize?.(node.naturalWidth, node.naturalHeight);
+          }
         }}
         src={effectiveSrc}
       />

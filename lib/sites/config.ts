@@ -83,6 +83,11 @@ export type SiteConfig = {
   policyNotes: { cancellation: string; requirements: string };
   /** Vehicles in Fleet highlights, in order; empty picks them automatically. */
   featured: string[];
+  /**
+   * The business name beside the logo in the top bar. Off (default): a wide logo (usually a wordmark) shows alone and
+   * a square or icon-like one gets the name beside it; on: the name always shows. With no logo the name always shows.
+   */
+  showName: boolean;
 };
 
 export const LIMITS = { highlights: 4, highlight: 90, faqs: 8, faqQ: 140, faqA: 600, url: 300, map: 200, social: 120, note: 600, featured: 8 };
@@ -160,7 +165,8 @@ export function defaultSiteConfig(template: TemplateId = "coast"): SiteConfig {
     reviewsUrl: "",
     mapQuery: "",
     policyNotes: { cancellation: "", requirements: "" },
-    featured: []
+    featured: [],
+    showName: false
   };
 }
 
@@ -193,7 +199,8 @@ export function siteConfigFrom(value: unknown, fallbackTemplate: TemplateId = "c
     featured: (Array.isArray(raw.featured) ? raw.featured : [])
       .map((id: unknown) => String(id || "").slice(0, 60))
       .filter((id: string, index: number, list: string[]) => id && list.indexOf(id) === index)
-      .slice(0, LIMITS.featured)
+      .slice(0, LIMITS.featured),
+    showName: raw.showName === true
   };
 }
 

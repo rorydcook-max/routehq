@@ -132,7 +132,7 @@ export const TEMPLATES: Record<TemplateId, TemplateDef> = {
     tags: ["car"]
   },
 
-  // Bali and Thai-island tropical: leafy page, arched photos, a collage hero.
+  // Tropical (Bali, the Caribbean, Pacific islands): leafy page, arched photos, a collage hero.
   lagoon: {
     ...BASE,
     id: "lagoon",

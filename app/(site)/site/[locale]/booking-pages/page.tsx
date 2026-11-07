@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { siteLocale, type SiteParams } from "@/lib/site/static-page";
 import { siteMetadata } from "@/lib/site/seo";
 import { breadcrumbLd } from "@/lib/site/schema";
-import { SITE_DEMOS } from "@/lib/sites/demos";
+import { demoWhere, SITE_DEMOS, templateDemo, type SiteDemo } from "@/lib/sites/demos";
 import { JsonLd } from "../_components/content-ui";
 import { FinalCta } from "../_components/final-cta";
 import { Check, Container, Eyebrow, SITE_LINKS, SiteLink } from "../_components/site-ui";
@@ -12,6 +12,16 @@ import s from "../site.module.css";
 const CHANGES = [1, 2, 3, 4, 5, 6];
 /** Twelve of the 24 templates, across kinds of business (pictures from scripts/site-template-previews.mjs). */
 const RANGE = ["lagoon", "riviera", "swell", "metro", "runway", "noir", "trail", "dolce", "nomad", "washi", "folio", "neon"] as const;
+
+/** Where a made-up example is and its currency ("Lisbon, Portugal · EUR"): the examples span the world, like RoveHQ's customers. */
+function Where({ demo }: { demo: SiteDemo | null }) {
+  if (!demo) return null;
+  return (
+    <p className="mt-1 text-[14px] font-semibold text-[#3d5560]">
+      {demoWhere(demo)} · {demo.currency}
+    </p>
+  );
+}
 
 export async function generateMetadata({ params }: SiteParams): Promise<Metadata> {
   await siteLocale(params);
@@ -70,6 +80,7 @@ export default async function BookingPagesPage({ params }: SiteParams) {
                 </a>
                 <p className="mt-4 inline-flex self-start rounded-full bg-[#fff1c2] px-3 py-1 text-[13px] font-bold text-[#4a3700]">{m("bxRangeLabel")}</p>
                 <h3 className="mt-2 text-[19px] font-semibold leading-tight">{m(`bxT_${id}`)}</h3>
+                <Where demo={templateDemo(id)} />
                 <p className="mt-1 text-[15px] leading-6">{m(`bxTd_${id}`)}</p>
               </li>
             ))}
@@ -101,6 +112,7 @@ export default async function BookingPagesPage({ params }: SiteParams) {
                   </a>
                   <p className="mt-5 inline-flex self-start rounded-full bg-[#fff1c2] px-3 py-1 text-[13px] font-bold text-[#4a3700]">{m("bxDemoLabel")}</p>
                   <h3 className="mt-2 text-[20px] font-semibold leading-tight">{demo.name}</h3>
+                  <Where demo={demo} />
                   <p className="mt-1 text-[15px] font-semibold text-[#0e5e6f]">{m(`bxT_${template}`)}</p>
                   <p className="mt-1 text-[15px] leading-6">{m(`bxTd_${template}`)}</p>
                   <a className={`${s.link} mt-3`} href={`/rent/demo/${demo.id}`} rel="noopener" target="_blank">

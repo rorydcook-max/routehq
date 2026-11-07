@@ -11,7 +11,7 @@ import type { SiteSocial } from "@/lib/sites/config";
 export type SiteBusiness = {
   name: string;
   logoUrl: string | null;
-  /** Their town or area ("Koh Samui"), for headlines. */
+  /** Their town or area ("Lisbon", "Algarve"), for headlines. */
   place: string;
   address: string;
   phone: string;

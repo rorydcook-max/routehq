@@ -1,10 +1,11 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { VehicleArt } from "@/components/vehicle-art";
 import { headlineRate } from "@/lib/rental-estimate";
 import type { CatalogVehicle } from "@/lib/public-catalog";
 import { useSite } from "../site-context";
-import { SectionHead } from "./parts";
+import { imageTreatment, SectionHead } from "./parts";
 import s from "../site.module.css";
 
 /** The vehicles shown: the owner's picks in their order, else up to six with photos first, then cheapest. */
@@ -54,7 +55,13 @@ export function Fleet() {
           <p className={`${s.muted} text-[15px] font-semibold`}>{t("fleet_count", { count: data.vehicles.length })}</p>
         </SectionHead>
 
-        {layout === "rail" ? (
+        {layout === "list" ? (
+          <FleetList book={book} details={details} price={price} vehicles={vehicles} />
+        ) : layout === "spotlight" ? (
+          <FleetSpotlight book={book} price={price} vehicles={vehicles} />
+        ) : layout === "masonry" ? (
+          <FleetMasonry book={book} details={details} price={price} vehicles={vehicles} />
+        ) : layout === "rail" ? (
           // Coast: tall cards in a row that swipes on phones.
           <ul className={`${s.rail} mt-10`}>
             {vehicles.map((vehicle) => (
@@ -121,5 +128,117 @@ export function Fleet() {
         )}
       </div>
     </section>
+  );
+}
+
+/* Phase 2 (sites2) layouts. */
+
+type LayoutProps = {
+  vehicles: CatalogVehicle[];
+  price: (vehicle: CatalogVehicle) => string | null;
+  book: (vehicle: CatalogVehicle, className: string) => ReactNode;
+  details?: (vehicle: CatalogVehicle) => string;
+};
+
+const LINK_BOOK = `${s.focus} min-h-11 px-1 text-[15px] font-semibold text-[var(--s-accent)] underline decoration-2 underline-offset-4`;
+
+/** Metro, Runway, Nomad, Washi, Fjord, Block: one row per vehicle with its specs, like a price list. */
+function FleetList({ vehicles, price, book }: LayoutProps) {
+  return (
+    <ul className={`mt-10 divide-y border-y ${s.line} [&>li]:border-[var(--s-line)]`}>
+      {vehicles.map((vehicle) => (
+        <li className="grid grid-cols-[104px_1fr] items-center gap-x-4 gap-y-3 py-5 sm:grid-cols-[180px_1fr_auto] sm:gap-x-8" key={vehicle.id}>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[calc(var(--s-r-image)*0.6)] bg-[var(--s-raised)]">
+            <Picture vehicle={vehicle} />
+          </div>
+          <div className="min-w-0">
+            <h3 className={`${s.display} text-[22px] sm:text-[30px]`}>{vehicle.name}</h3>
+            {[vehicle.year, ...vehicle.details].filter(Boolean).length ? (
+              <ul className={`${s.muted} mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-medium`}>
+                {[vehicle.year, ...vehicle.details].filter(Boolean).map((detail) => (
+                  <li key={String(detail)}>{detail}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+          <div className="col-span-2 flex items-center justify-between gap-4 sm:col-span-1 sm:flex-col sm:items-end">
+            <p className="text-[17px] font-bold">{price(vehicle)}</p>
+            {book(vehicle, `${s.btn} !min-h-11 !px-5 text-[15px]`)}
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Noir, Villa, Riviera, Dolce, Roam: the first vehicle large, the rest in a row under it. */
+function FleetSpotlight({ vehicles, price, book }: LayoutProps) {
+  const { template, money, t } = useSite();
+  const [first, ...rest] = vehicles;
+  const treat = imageTreatment(template);
+  return (
+    <>
+      <div className="mt-10 grid items-center gap-8 lg:grid-cols-[1.45fr_1fr] lg:gap-14">
+        <div className={`${s.image} ${template.image === "slant" ? "" : treat} aspect-[4/3] bg-[var(--s-raised)] sm:aspect-[16/10]`}>
+          <Picture vehicle={first} />
+        </div>
+        <div>
+          <h3 className={`${s.display} text-[36px] sm:text-[52px]`}>{first.name}</h3>
+          <ul className={`mt-6 divide-y border-y text-[16px] ${s.line} [&>li]:border-[var(--s-line)]`}>
+            {(
+              [first.year ? { k: t("spec_year"), v: String(first.year) } : null, ...first.details.slice(0, 4).map((detail) => ({ k: "", v: detail })), first.deposit > 0 ? { k: t("spec_deposit"), v: money(first.deposit) } : null].filter(Boolean) as Array<{ k: string; v: string }>
+            ).map((row, index) => (
+              <li className="flex justify-between gap-6 py-3" key={index}>
+                {row.k ? <span className={s.muted}>{row.k}</span> : null}
+                <span className="font-semibold">{row.v}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+            <p className={`${s.display} text-[26px]`}>{price(first)}</p>
+            {book(first, `${s.btn}`)}
+          </div>
+        </div>
+      </div>
+      {rest.length ? (
+        <ul className="mt-12 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
+          {rest.map((vehicle) => (
+            <li className="flex flex-col" key={vehicle.id}>
+              <div className={`${s.image} aspect-[4/3] bg-[var(--s-raised)]`}>
+                <Picture vehicle={vehicle} />
+              </div>
+              <h3 className="mt-3 text-[17px] font-bold leading-tight">{vehicle.name}</h3>
+              <p className={`${s.muted} mt-1 text-[15px]`}>{price(vehicle)}</p>
+              <div className="mt-1">{book(vehicle, LINK_BOOK)}</div>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </>
+  );
+}
+
+const MASONRY_SHAPES = ["aspect-[4/5]", "aspect-square", "aspect-[4/3]", "aspect-[3/4]", "aspect-[5/4]", "aspect-[4/5]"];
+
+/** Lagoon, Folio, Amber: columns of pictures in different shapes, like a magazine spread. */
+function FleetMasonry({ vehicles, price, book, details }: LayoutProps) {
+  const { template } = useSite();
+  const treat = template.image === "frame" ? s.frame : "";
+  return (
+    <ul className={`${s.masonry} mt-10`}>
+      {vehicles.map((vehicle, index) => (
+        <li key={vehicle.id}>
+          <div className={`${s.image} ${treat} ${MASONRY_SHAPES[index % MASONRY_SHAPES.length]} bg-[var(--s-raised)]`}>
+            <Picture vehicle={vehicle} />
+          </div>
+          <h3 className={`${s.display} mt-4 text-[22px] sm:text-[28px]`}>{vehicle.name}</h3>
+          {details?.(vehicle) ? <p className={`${s.muted} mt-1 text-[14.5px]`}>{details(vehicle)}</p> : null}
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3">
+            <p className="text-[16px] font-semibold">{price(vehicle)}</p>
+            {book(vehicle, LINK_BOOK)}
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }

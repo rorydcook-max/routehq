@@ -9,15 +9,16 @@ import { LIMITS, SECTION_IDS, SOCIAL_KEYS, type SectionId, type SiteConfig, type
 import { FONT_PAIRINGS, fontPairing, fontPreviewHref, fontStack } from "@/lib/sites/fonts";
 import { ART_IDS, type ImageRef } from "@/lib/sites/images";
 import { generatePalettes, sitePalette, siteVars, type Palette } from "@/lib/sites/palettes";
-import { TEMPLATE_IDS, templateDef, type TemplateId } from "@/lib/sites/templates";
+import { TEMPLATE_IDS, TEMPLATE_TAGS, TEMPLATES, templateDef, type TemplateId, type TemplateTag } from "@/lib/sites/templates";
 import type { SiteDraft } from "./use-site-draft";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 export type EditorVehicle = { id: string; name: string; photoUrl: string | null };
 export type EditorPart = { id: string; title: string; summary?: string; body: ReactNode };
 
-/** The example business each template is shown with (lib/sites/demos.ts; pictures in public/site/booking-pages). */
-const TEMPLATE_DEMO: Record<TemplateId, string> = { coast: "saltwater", moto: "redline", summit: "northpoint" };
+/** Each template's gallery picture, taken from its example at /rent/demo/<id> by scripts/site-template-previews.mjs. */
+const templatePicture = (id: TemplateId) => `/site/templates/${id}.webp`;
+const TAG_LABEL: Record<"all" | TemplateTag, string> = { all: "tag_all", car: "tag_car", "two-wheel": "tag_twoWheel", premium: "tag_premium", island: "tag_island" };
 const SOCIAL_LABELS: Record<keyof SiteSocial, string> = { facebook: "Facebook", instagram: "Instagram", line: "LINE", tiktok: "TikTok", whatsapp: "WhatsApp" };
 const DEFAULT_HOURS = Array.from({ length: 7 }, (_, index) => (index < 6 ? { open: "09:00", close: "18:00" } : null));
 
@@ -47,7 +48,7 @@ export function SiteEditorParts({ site, brandColour, vehicles, renderPart }: { s
         <p className="font-semibold text-[var(--foreground)]">{say("template")}</p>
         <div className="mt-2 flex flex-wrap items-center gap-3 rounded-2xl bg-[var(--panel-secondary)] p-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt="" className="h-16 w-24 shrink-0 rounded-xl object-cover object-top" height={64} src={`/site/booking-pages/${TEMPLATE_DEMO[draft.template]}-desktop.webp`} width={96} />
+          <img alt="" className="h-16 w-24 shrink-0 rounded-xl object-cover object-top" height={64} src={templatePicture(draft.template)} width={96} />
           <span className="min-w-0 flex-1 text-[17px] font-bold text-[var(--foreground)]">{say(`t_${draft.template}`)}</span>
           <button className="secondary-action pressable shrink-0 max-sm:w-full" onClick={() => setGallery(true)} type="button">
             <LayoutTemplate size={17} />
@@ -143,10 +144,12 @@ export function SiteEditorParts({ site, brandColour, vehicles, renderPart }: { s
   );
 }
 
-/** Choose template: a large preview of each, as a phone and a computer. */
+/** Choose template: a large picture of each, filtered by the kind of business, with the one in use marked. */
 function TemplateGallery({ current, onPick, onClose }: { current: TemplateId; onPick: (id: TemplateId) => void; onClose: () => void }) {
   const say = useTranslations("siteEditor") as unknown as Say;
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [filter, setFilter] = useState<"all" | TemplateTag>("all");
+  const shown = TEMPLATE_IDS.filter((id) => filter === "all" || TEMPLATES[id].tags.includes(filter));
   useEffect(() => {
     closeRef.current?.focus();
     const key = (event: KeyboardEvent) => event.key === "Escape" && onClose();
@@ -169,35 +172,53 @@ function TemplateGallery({ current, onPick, onClose }: { current: TemplateId; on
             <X size={20} />
           </button>
         </div>
-        <ul className="grid gap-6 overflow-y-auto p-5 md:grid-cols-3">
-          {TEMPLATE_IDS.map((id) => {
+        <div aria-label={say("filter")} className="flex shrink-0 gap-2 overflow-x-auto border-b border-[var(--border)] px-5 py-3" role="group">
+          {(["all", ...TEMPLATE_TAGS] as const).map((value) => (
+            <button
+              aria-pressed={filter === value}
+              className={`min-h-10 shrink-0 rounded-full px-4 text-[15px] font-bold ${filter === value ? "bg-[var(--foreground)] text-[var(--panel)]" : "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"}`}
+              key={value}
+              onClick={() => setFilter(value)}
+              type="button"
+            >
+              {say(TAG_LABEL[value])}
+            </button>
+          ))}
+        </div>
+        <ul className="grid gap-x-5 gap-y-7 overflow-y-auto p-5 sm:grid-cols-2 lg:grid-cols-3">
+          {shown.map((id) => {
             const on = current === id;
-            const demo = TEMPLATE_DEMO[id];
             return (
-              <li className={`flex flex-col rounded-[22px] p-3 ${on ? "bg-[var(--primary-light)] ring-2 ring-[var(--primary)]" : "bg-[var(--panel-secondary)]"}`} key={id}>
-                <div className="relative">
+              <li className={`flex flex-col rounded-[22px] p-2.5 ${on ? "bg-[var(--primary-light)] ring-2 ring-[var(--primary)]" : "bg-[var(--panel-secondary)]"}`} key={id}>
+                <div className="relative overflow-hidden rounded-2xl bg-[var(--panel-tertiary)] shadow-[var(--shadow-card)]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img alt={say("previewOf", { name: say(`t_${id}`) })} className="aspect-[16/10] w-full rounded-2xl object-cover object-top shadow-[var(--shadow-card)]" height={500} loading="lazy" src={`/site/booking-pages/${demo}-desktop.webp`} width={800} />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img alt="" className="absolute -bottom-4 right-3 aspect-[9/19] w-[26%] rounded-[14px] border-[3px] border-[#1f2329] object-cover object-top shadow-xl" height={760} loading="lazy" src={`/site/booking-pages/${demo}.webp`} width={360} />
+                  <img alt={say("previewOf", { name: say(`t_${id}`) })} className="block aspect-[16/10] w-full object-cover object-top" height={500} loading="lazy" src={templatePicture(id)} width={800} />
+                  {on ? (
+                    <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-[var(--primary)] px-2.5 py-1 text-[13px] font-bold text-white">
+                      <Check size={14} strokeWidth={3} />
+                      {say("current")}
+                    </span>
+                  ) : null}
                 </div>
-                <p className="mt-6 text-[20px] font-bold text-[var(--foreground)]">{say(`t_${id}`)}</p>
-                <p className="text-[15px] font-semibold text-[var(--foreground-secondary)]">{say(`td_${id}`)}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button
-                    className={`${on ? "secondary-action" : "primary-action"} pressable flex-1`}
-                    disabled={on}
-                    onClick={() => {
-                      onPick(id);
-                      onClose();
-                    }}
-                    type="button"
-                  >
-                    {on ? say("current") : say("useTemplate")}
-                  </button>
-                  <a className="secondary-action pressable" href={`/rent/demo/${demo}`} rel="noopener" target="_blank">
-                    {say("example")}
-                  </a>
+                <div className="flex flex-1 flex-col px-1.5 pb-1">
+                  <p className="mt-3 text-[19px] font-bold text-[var(--foreground)]">{say(`t_${id}`)}</p>
+                  <p className="text-[15px] font-semibold text-[var(--foreground-secondary)]">{say(`td_${id}`)}</p>
+                  <div className="mt-auto flex flex-wrap gap-2 pt-4">
+                    <button
+                      className={`${on ? "secondary-action" : "primary-action"} pressable flex-1`}
+                      disabled={on}
+                      onClick={() => {
+                        onPick(id);
+                        onClose();
+                      }}
+                      type="button"
+                    >
+                      {on ? say("current") : say("useTemplate")}
+                    </button>
+                    <a className="secondary-action pressable" href={`/rent/demo/${id}`} rel="noopener" target="_blank">
+                      {say("example")}
+                    </a>
+                  </div>
                 </div>
               </li>
             );

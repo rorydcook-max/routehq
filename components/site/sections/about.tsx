@@ -1,8 +1,10 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, Star } from "lucide-react";
 import { Txt, useSite } from "../site-context";
 import { SiteImage } from "../site-image";
+import { useFacts } from "./hero";
+import { imageTreatment } from "./parts";
 import s from "../site.module.css";
 
 /** About: who they are, in their words (or a plain line from their details), with up to four highlights. */
@@ -73,11 +75,16 @@ export function About() {
     );
   }
 
-  // Coast: editorial. A tall picture beside large, unhurried text.
+  if (layout === "steps") return <StepsAbout />;
+  if (layout === "stats") return <StatsAbout />;
+  if (layout === "quote") return <QuoteAbout />;
+
+  // Coast: editorial. A tall picture beside large, unhurried text. (Riviera, Dolce and Villa frame the picture.)
+  const treat = imageTreatment(template);
   return (
     <section aria-labelledby="about-title" className={s.section} id="about">
       <div className={`${s.wrap} grid items-center gap-10 lg:grid-cols-[5fr_7fr] lg:gap-20`}>
-        <div className={`${s.image} aspect-[4/5] max-lg:order-2 max-lg:aspect-[16/11]`}>
+        <div className={`${s.image} aspect-[4/5] max-lg:order-2 max-lg:aspect-[16/11]${treat ? ` ${treat}` : ""}`}>
           <SiteImage image={images.about} />
         </div>
         <div>
@@ -94,6 +101,123 @@ export function About() {
             </ul>
           ) : null}
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* Phase 2 (sites2) layouts. */
+
+function Highlights({ className = "" }: { className?: string }) {
+  const { config } = useSite();
+  if (!config.highlights.length) return null;
+  return (
+    <ul className={`grid gap-x-6 gap-y-3 sm:grid-cols-2 ${className}`}>
+      {config.highlights.map((line) => (
+        <li className="flex items-start gap-3 text-[16.5px] font-semibold leading-snug" key={line}>
+          <Check aria-hidden="true" className="mt-0.5 shrink-0 text-[var(--s-accent)]" size={19} strokeWidth={2.6} />
+          {line}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Runway, Haven, Nomad, Roam: who they are, then how renting works, in three real steps. */
+function StepsAbout() {
+  const { data, t } = useSite();
+  const delivery = data.areas.find((area) => area.radiusKm && area.radiusKm > 0);
+  const values = { business: data.business.name, place: data.business.place || data.areas[0]?.name || "", km: delivery?.radiusKm || 0 };
+  const steps = [
+    { title: t("step1_t"), body: t("step1_b") },
+    { title: t("step2_t"), body: t("step2_b", values) },
+    delivery ? { title: t("step3d_t"), body: t("step3d_b", { ...values, place: delivery.name }) } : { title: t("step3p_t"), body: values.place ? t("step3p_b", values) : t("step3p_b_np", values) }
+  ];
+  return (
+    <section aria-labelledby="about-title" className={s.section} id="about">
+      <div className={`${s.wrap} grid items-start gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-20`}>
+        <div>
+          <Txt as="h2" className={`${s.display} text-[36px] sm:text-[48px]`} id="about-title" slot="about.title" />
+          <Txt as="p" className={`${s.soft} mt-5 whitespace-pre-line text-[18px] leading-relaxed sm:text-[19px]`} slot="about.body" />
+          <Highlights className="mt-8" />
+        </div>
+        <div className={`${s.card} p-6 sm:p-10`}>
+          <h3 className={`${s.display} text-[26px] sm:text-[30px]`}>{t("steps_title")}</h3>
+          <ol className="mt-7 space-y-7">
+            {steps.map((step, index) => (
+              <li className="grid grid-cols-[44px_1fr] gap-4" key={index}>
+                <span aria-hidden="true" className={`${s.display} flex h-11 w-11 items-center justify-center rounded-full bg-[var(--s-accent)] text-[20px] text-[var(--s-accent-ink)]`}>
+                  {index + 1}
+                </span>
+                <div>
+                  <p className="text-[18px] font-bold leading-snug">{step.title}</p>
+                  <p className={`${s.soft} mt-1 text-[16px] leading-relaxed`}>{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Swell, Metro, Trail, Volt: the business's real figures as a bold band, then who they are. */
+function StatsAbout() {
+  const facts = useFacts(true);
+  return (
+    <section aria-labelledby="about-title" className={s.section} id="about">
+      <div className={s.wrap}>
+        {facts.length > 1 ? (
+          <dl className={`${s.card} grid grid-cols-2 gap-x-6 gap-y-8 !bg-[var(--s-accent)] p-6 text-[var(--s-accent-ink)] sm:p-10 ${facts.length >= 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
+            {facts.slice(0, 4).map((fact) => (
+              <div key={fact.label}>
+                <dt className="sr-only">{fact.label}</dt>
+                <dd className={`${s.display} flex items-center gap-1.5 text-[38px] sm:text-[56px]`}>
+                  {fact.value}
+                  {fact.star ? <Star aria-hidden="true" className="fill-current" size={28} /> : null}
+                </dd>
+                <dd className="mt-1 text-[15px] font-semibold leading-snug opacity-85">{fact.label}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
+        <div className="mt-12 grid gap-8 lg:mt-16 lg:grid-cols-[1fr_1.3fr] lg:gap-20">
+          <Txt as="h2" className={`${s.display} text-[36px] sm:text-[52px]`} id="about-title" slot="about.title" />
+          <div>
+            <Txt as="p" className={`${s.soft} whitespace-pre-line text-[18px] leading-relaxed sm:text-[20px]`} slot="about.body" />
+            <Highlights className="mt-8" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Lagoon, Noir, Washi, Folio, Amber: their words set large as a pull quote, highlights under it. */
+function QuoteAbout() {
+  const { config, text } = useSite();
+  const long = text("about.body").length > 260;
+  return (
+    <section aria-labelledby="about-title" className={s.section} id="about">
+      <div className={`${s.wrap} flex flex-col items-center text-center`}>
+        <Txt as="h2" className={`${s.muted} text-[16px] font-semibold`} id="about-title" slot="about.title" />
+        <span aria-hidden="true" className="mt-6 block h-px w-16 bg-[var(--s-accent)]" />
+        <Txt
+          as="p"
+          className={`${s.display} mt-8 max-w-[30ch] whitespace-pre-line ${long ? "text-[24px] sm:text-[30px]" : "text-[30px] sm:text-[44px] lg:text-[52px]"}`}
+          slot="about.body"
+        />
+        {config.highlights.length ? (
+          <ul className="mt-12 flex max-w-[900px] flex-wrap justify-center gap-2.5">
+            {config.highlights.map((line) => (
+              <li className={`${s.card} inline-flex min-h-11 items-center gap-2 px-4 text-[15.5px] font-semibold`} key={line}>
+                <Check aria-hidden="true" className="text-[var(--s-accent)]" size={17} strokeWidth={2.6} />
+                {line}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
     </section>
   );

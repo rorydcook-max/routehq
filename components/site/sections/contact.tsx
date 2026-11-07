@@ -50,14 +50,19 @@ function Hours() {
   );
 }
 
-function MapBlock({ tall = false }: { tall?: boolean }) {
-  const { config, data, t } = useSite();
-  const query = config.mapQuery || data.business.address || data.business.place;
+function useMapQuery() {
+  const { config, data } = useSite();
+  return config.mapQuery || data.business.address || data.business.place;
+}
+
+function MapBlock({ tall = false, big = false }: { tall?: boolean; big?: boolean }) {
+  const { t } = useSite();
+  const query = useMapQuery();
   if (!query) return null;
   const links = mapLinks(query);
   return (
     <div className={`${s.image} border ${s.line} bg-[var(--s-raised)]`}>
-      <iframe className={`block w-full border-0 ${tall ? "h-[360px] lg:h-full lg:min-h-[420px]" : "h-[300px]"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={links.embed} title={t("map_title")} />
+      <iframe className={`block w-full border-0 ${big ? "h-[380px] sm:h-[460px] lg:h-[580px]" : tall ? "h-[360px] lg:h-full lg:min-h-[420px]" : "h-[300px]"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={links.embed} title={t("map_title")} />
       <a className={`${s.focus} flex items-center gap-2 bg-[var(--s-surface)] px-4 py-3 text-[15px] font-semibold`} href={links.open} rel="noopener noreferrer" target="_blank">
         <MapPin aria-hidden="true" className="shrink-0 text-[var(--s-accent)]" size={17} />
         <span className="min-w-0 flex-1 truncate">{query}</span>
@@ -116,7 +121,9 @@ function ContactForm() {
 export function Contact() {
   const { template, config } = useSite();
   const { chats, others, phone, email } = useChannels();
-  const layout = template.layout.contact;
+  const mapQuery = useMapQuery();
+  // Map first needs somewhere to point; without one it falls back to the split layout.
+  const layout = template.layout.contact === "mapfirst" && !mapQuery ? "split" : template.layout.contact;
   const row = "flex items-center gap-3 text-[17px] font-semibold";
   const icon = "shrink-0 text-[var(--s-accent)]";
   const details = (
@@ -162,6 +169,67 @@ export function Contact() {
       <Txt as="p" className={`${s.soft} mt-3 max-w-[44ch] text-[18px]`} slot="contact.subline" />
     </>
   );
+
+  if (layout === "mapfirst") {
+    // Lagoon, Pier, Villa, Haven, Nomad, Roam, Amber: the map across the page, how to reach them resting on it.
+    return (
+      <section aria-labelledby="contact-title" className={s.section} id="contact">
+        <div className={s.wrap}>
+          <div className="relative">
+            <MapBlock big />
+            <div className={`${s.card} mt-4 p-6 shadow-[0_24px_60px_-30px_rgba(10,20,30,0.45)] sm:p-8 lg:absolute lg:start-6 lg:top-6 lg:mt-0 lg:max-h-[calc(100%-96px)] lg:w-[420px] lg:overflow-y-auto`}>
+              {heading}
+              <div className="mt-8 space-y-8">
+                {details}
+                <Hours />
+              </div>
+            </div>
+          </div>
+          <div className="mt-10 max-w-[760px]">
+            <ContactForm />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (layout === "minimal") {
+    // Swell, Noir, Fjord, Block: centered, the number and chats as large links, then the form.
+    return (
+      <section aria-labelledby="contact-title" className={s.section} id="contact">
+        <div className={`${s.wrap} max-w-[880px]`}>
+          <div className="flex flex-col items-center text-center">
+            {heading}
+            {phone ? (
+              <a className={`${s.focus} ${s.display} mt-8 text-[34px] sm:text-[52px]`} href={telHref(phone)}>
+                {phone}
+              </a>
+            ) : null}
+            {chats.length || email || others.length ? (
+              <p className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-3 text-[18px] font-semibold">
+                {[...chats, ...(email ? [{ key: "email", label: email, href: `mailto:${email}` }] : []), ...others].map((link) => (
+                  <a className={`${s.focus} break-all text-[var(--s-accent)] underline decoration-2 underline-offset-[6px]`} href={link.href} key={link.key} rel="noopener noreferrer" target={link.key === "email" ? undefined : "_blank"}>
+                    {link.label}
+                  </a>
+                ))}
+              </p>
+            ) : null}
+          </div>
+          {config.hours ? (
+            <div className={`mx-auto mt-10 max-w-[420px] border-y py-6 ${s.line}`}>
+              <Hours />
+            </div>
+          ) : null}
+          <div className="mt-10">
+            <ContactForm />
+          </div>
+          <div className="mt-8">
+            <MapBlock />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (layout === "bold") {
     // Moto: one tap to chat or call, as big buttons.

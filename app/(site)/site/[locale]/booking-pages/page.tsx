@@ -10,6 +10,8 @@ import { Check, Container, Eyebrow, SITE_LINKS, SiteLink } from "../_components/
 import s from "../site.module.css";
 
 const CHANGES = [1, 2, 3, 4, 5, 6];
+/** Twelve of the 24 templates, across kinds of business (pictures from scripts/site-template-previews.mjs). */
+const RANGE = ["lagoon", "riviera", "swell", "metro", "runway", "noir", "trail", "dolce", "nomad", "washi", "folio", "neon"] as const;
 
 export async function generateMetadata({ params }: SiteParams): Promise<Metadata> {
   await siteLocale(params);
@@ -53,7 +55,29 @@ export default async function BookingPagesPage({ params }: SiteParams) {
         </Container>
       </section>
 
-      <section aria-labelledby="examples" className={s.section}>
+      <section aria-labelledby="range" className={s.section}>
+        <Container>
+          <h2 className={s.h3} id="range">
+            {m("bxRangeTitle")}
+          </h2>
+          <p className="mt-2 max-w-3xl">{m("bxRangeBody")}</p>
+          <ul className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {RANGE.map((id) => (
+              <li className="flex flex-col" key={id}>
+                <a aria-label={`${m("bxRangeOpen")}: ${m(`bxT_${id}`)}`} className="block overflow-hidden rounded-[14px] border border-[#d5dde0] bg-white shadow-[0_18px_40px_-24px_rgba(6,22,43,0.45)]" href={`/rent/demo/${id}`} rel="noopener" target="_blank">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img alt={m("bxRangeAlt", { name: m(`bxT_${id}`) })} className="block aspect-[16/10] w-full object-cover object-top" height={500} loading="lazy" src={`/site/templates/${id}.webp`} width={800} />
+                </a>
+                <p className="mt-4 inline-flex self-start rounded-full bg-[#fff1c2] px-3 py-1 text-[13px] font-bold text-[#4a3700]">{m("bxRangeLabel")}</p>
+                <h3 className="mt-2 text-[19px] font-semibold leading-tight">{m(`bxT_${id}`)}</h3>
+                <p className="mt-1 text-[15px] leading-6">{m(`bxTd_${id}`)}</p>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      <section aria-labelledby="examples" className={`${s.mist} ${s.section}`}>
         <Container>
           <h2 className={s.h3} id="examples">
             {m("bxExamplesTitle")}
@@ -89,7 +113,7 @@ export default async function BookingPagesPage({ params }: SiteParams) {
         </Container>
       </section>
 
-      <section aria-labelledby="change" className={`${s.mist} ${s.section}`}>
+      <section aria-labelledby="change" className={s.section}>
         <Container>
           <h2 className={s.h3} id="change">
             {m("bxChangeTitle")}

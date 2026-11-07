@@ -85,6 +85,70 @@ export const FONT_PAIRINGS: FontPairing[] = [
     display: { family: "Space Grotesk", spec: "wght@400..700", fallback: "sans-serif" },
     body: { family: "IBM Plex Sans", spec: "wght@400;500;600;700", fallback: "sans-serif" },
     displayWeight: 600
+  },
+  // Phase 2 (sites2): pairings the new templates are set in.
+  {
+    id: "instrument",
+    name: "Instrument Serif & Sans",
+    display: { family: "Instrument Serif", spec: "", fallback: "serif" },
+    body: { family: "Instrument Sans", spec: "wght@400..700", fallback: "sans-serif" },
+    displayWeight: 400
+  },
+  {
+    id: "bodoni-jost",
+    name: "Bodoni Moda & Jost",
+    display: { family: "Bodoni Moda", spec: "opsz,wght@6..96,400..700", fallback: "serif" },
+    body: { family: "Jost", spec: "wght@400..700", fallback: "sans-serif" },
+    displayWeight: 500
+  },
+  {
+    id: "youngserif-karla",
+    name: "Young Serif & Karla",
+    display: { family: "Young Serif", spec: "", fallback: "serif" },
+    body: { family: "Karla", spec: "wght@400..700", fallback: "sans-serif" },
+    displayWeight: 400
+  },
+  {
+    id: "shippori-zen",
+    name: "Shippori Mincho & Zen Kaku",
+    display: { family: "Shippori Mincho", spec: "wght@600;700", fallback: "serif" },
+    body: { family: "Zen Kaku Gothic New", spec: "wght@400;500;700", fallback: "sans-serif" },
+    displayWeight: 600
+  },
+  {
+    id: "shrikhand-rubik",
+    name: "Shrikhand & Rubik",
+    display: { family: "Shrikhand", spec: "", fallback: "serif" },
+    body: { family: "Rubik", spec: "wght@400..700", fallback: "sans-serif" },
+    displayWeight: 400
+  },
+  {
+    id: "alfaslab-sourcesans",
+    name: "Alfa Slab & Source Sans",
+    display: { family: "Alfa Slab One", spec: "", fallback: "serif" },
+    body: { family: "Source Sans 3", spec: "wght@400..700", fallback: "sans-serif" },
+    displayWeight: 400
+  },
+  {
+    id: "archivoblack-archivo",
+    name: "Archivo Black & Archivo",
+    display: { family: "Archivo Black", spec: "", fallback: "sans-serif" },
+    body: { family: "Archivo", spec: "wght@400..700", fallback: "sans-serif" },
+    displayWeight: 400
+  },
+  {
+    id: "bricolage-hanken",
+    name: "Bricolage & Hanken Grotesk",
+    display: { family: "Bricolage Grotesque", spec: "opsz,wght@12..96,400..800", fallback: "sans-serif" },
+    body: { family: "Hanken Grotesk", spec: "wght@400..700", fallback: "sans-serif" },
+    displayWeight: 700
+  },
+  {
+    id: "schibsted-publicsans",
+    name: "Schibsted Grotesk & Public Sans",
+    display: { family: "Schibsted Grotesk", spec: "wght@400..900", fallback: "sans-serif" },
+    body: { family: "Public Sans", spec: "wght@400..700", fallback: "sans-serif" },
+    displayWeight: 700
   }
 ];
 

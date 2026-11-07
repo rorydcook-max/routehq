@@ -45,6 +45,11 @@ function defaultText(template: TemplateDef, business: SiteBusiness, noun: string
 
 const SECTIONS: Record<SectionId, () => ReactNode> = { about: About, booking: Booking, fleet: Fleet, reviews: Reviews, faqs: Faqs, contact: Contact };
 
+/** Brings the booking section into view (smoothly, unless reduced motion is on). */
+function toBooking() {
+  requestAnimationFrame(() => document.getElementById("book")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
+}
+
 function Brand({ business }: { business: SiteBusiness }) {
   const tile = (
     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[calc(var(--s-r-card)*0.5)] bg-[var(--s-accent)] text-[17px] font-bold text-[var(--s-accent-ink)]">
@@ -113,7 +118,12 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
 
   const pickVehicle = useCallback((id: string) => {
     setPicked((current) => ({ id, n: (current?.n || 0) + 1 }));
-    requestAnimationFrame(() => document.getElementById("book")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
+    toBooking();
+  }, []);
+  const [search, setSearch] = useState<SiteContextValue["search"]>(null);
+  const searchDates = useCallback((start: string, end: string, kind: string) => {
+    setSearch((current) => ({ start, end, kind, n: (current?.n || 0) + 1 }));
+    toBooking();
   }, []);
 
   const value: SiteContextValue = {
@@ -129,7 +139,9 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
     noun,
     money: (amount) => sitePrice(amount, data.business.currency),
     pickVehicle,
-    picked
+    picked,
+    searchDates,
+    search
   };
 
   const sections = config.sections.filter((section) => section.on || section.id === "booking");
@@ -138,14 +150,21 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
     .filter((section) => section.id !== "reviews" || data.reviews.length || config.reviewsUrl || data.googleReviewsUrl)
     .map((section) => ({ id: section.id === "booking" ? "book" : section.id, label: t(`nav_${section.id}`) }));
   const whatsapp = socialHref("whatsapp", config.social.whatsapp || data.business.whatsapp);
-  const chatBar = template.id === "moto" && whatsapp;
+  const chatBar = template.chatBar && whatsapp;
+  const centered = template.header === "center";
   // Each model once (a shop often has several of the same scooter).
   const models = data.vehicles.filter((vehicle, index, list) => list.findIndex((other) => other.name === vehicle.name) === index);
   const ticker = template.ticker && models.length > 1 ? models.slice(0, 10) : [];
 
   return (
     <SiteContext.Provider value={value}>
-      <div className={`${s.root} ${chatBar ? "pb-24 sm:pb-0" : ""}`} data-template={template.id} id="top" style={{ ...(siteVars(palette, template, font) as CSSProperties), colorScheme: palette.dark ? "dark" : "light" }}>
+      <div
+        className={`${s.root} ${chatBar ? "pb-24 sm:pb-0" : ""}`}
+        data-caps={template.caps ? "" : undefined}
+        data-edge={template.edge}
+        data-template={template.id}
+        id="top"
+        style={{ ...(siteVars(palette, template, font) as CSSProperties), colorScheme: palette.dark ? "dark" : "light" }}>
         {/* Only this pairing is loaded (display=swap: text shows at once in the fallback face). */}
         <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect" />
         <link href={fontHref(font)} key={font.id} rel="stylesheet" />
@@ -153,16 +172,17 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
         {data.demo ? <p className="bg-[var(--s-accent)] px-4 py-2.5 text-center text-[14px] font-semibold text-[var(--s-accent-ink)]">{t("demo_banner")}</p> : null}
 
         <header className={`${s.header} sticky top-0 z-30`}>
-          <div className={`${s.wrap} flex h-16 items-center justify-between gap-4`}>
-            <Brand business={data.business} />
-            <nav aria-label={t("nav_label")} className="hidden items-center gap-1 lg:flex">
+          <div className={`${s.wrap} flex h-16 items-center justify-between gap-4${centered ? " lg:grid lg:grid-cols-[1fr_auto_1fr]" : ""}`}>
+            {centered ? null : <Brand business={data.business} />}
+            <nav aria-label={t("nav_label")} className={`hidden items-center gap-1 lg:flex${centered ? " -ms-3.5" : ""}`}>
               {nav.map((item) => (
                 <a className={`${s.focus} rounded-full px-3.5 py-2 text-[15px] font-semibold ${s.soft} hover:text-[var(--s-ink)]`} href={`#${item.id}`} key={item.id}>
                   {item.label}
                 </a>
               ))}
             </nav>
-            <div className="flex shrink-0 items-center gap-2">
+            {centered ? <Brand business={data.business} /> : null}
+            <div className={`flex shrink-0 items-center gap-2${centered ? " justify-self-end" : ""}`}>
               {edit ? null : <CustomerLanguagePicker className="max-sm:hidden" />}
               <a className={`${s.btn} !min-h-11 !px-5 text-[15px]`} href="#book">
                 {t("book_now")}
@@ -209,7 +229,7 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
         </footer>
 
         {chatBar ? (
-          // Moto on phones: one tap to message the shop or book, always in reach.
+          // Moto, Reef and Trail on phones: one tap to message the shop or book, always in reach.
           <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-[var(--s-line)] bg-[color-mix(in_oklab,var(--s-bg)_92%,transparent)] p-3 pb-[calc(12px+env(safe-area-inset-bottom))] backdrop-blur sm:hidden">
             <a className={`${s.btn} ${s.btnGhost} flex-1`} href={whatsapp as string} rel="noopener noreferrer" target="_blank">
               <MessageCircle aria-hidden="true" size={18} />

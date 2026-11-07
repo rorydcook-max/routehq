@@ -24,7 +24,7 @@ function tidy(value: number) {
  * flow (the shared Catalog, the same one every RoveHQ booking page uses), and the business's policies from Settings.
  */
 export function Booking() {
-  const { data, template, palette, t, money, picked } = useSite();
+  const { data, template, palette, t, money, picked, search } = useSite();
   const layout = template.layout.booking;
   const kinds = kindsOffered(data.vehicles.map((vehicle) => vehicle.kind));
   const [kind, setKind] = useState<string>("all");
@@ -47,6 +47,14 @@ export function Booking() {
     setKind("all");
     setBudget(0);
   }, [picked]);
+
+  // The hero's search bar: its kind of vehicle, and (through the Catalog's key below) its dates.
+  useEffect(() => {
+    if (!search) return;
+    setKind(search.kind && kinds.includes(search.kind) ? search.kind : "all");
+    setBudget(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
   const vehicles = data.vehicles.filter((vehicle) => {
     if (kind !== "all" && vehicle.kind !== kind) return false;
@@ -116,10 +124,10 @@ export function Booking() {
           extras={data.catalog.extras}
           gapDays={data.catalog.gapDays}
           holdHours={data.catalog.holdHours}
-          initialEnd={data.catalog.initialEnd}
-          initialStart={data.catalog.initialStart}
+          initialEnd={search?.end || data.catalog.initialEnd}
+          initialStart={search?.start || data.catalog.initialStart}
           initialVehicleId={picked?.id || data.catalog.initialVehicleId}
-          key={picked ? `${picked.id}-${picked.n}` : "catalog"}
+          key={`${picked ? `${picked.id}-${picked.n}` : "catalog"}${search ? `-s${search.n}` : ""}`}
           offer={data.catalog.offer}
           organizationName={data.business.name}
           rates={data.catalog.rates}

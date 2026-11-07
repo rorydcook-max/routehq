@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { TextSlot } from "@/lib/sites/config";
+import type { TemplateDef } from "@/lib/sites/templates";
 import { Txt } from "../site-context";
 import s from "../site.module.css";
 
@@ -16,6 +17,11 @@ export function SectionHead({ id, title, sub, align = "start", children }: { id:
       {children}
     </div>
   );
+}
+
+/** The template's photo framing as a class: Moto-style slant, arch or printed frame (none for soft and crisp). */
+export function imageTreatment(template: TemplateDef) {
+  return template.image === "slant" ? s.slant : template.image === "arch" ? s.arch : template.image === "frame" ? s.frame : "";
 }
 
 /** Five stars, filled to the rating (read out as "4 out of 5"). */

@@ -1,7 +1,9 @@
 import type { CatalogVehicle } from "@/lib/public-catalog";
 import type { Extra } from "@/lib/price-rules";
 import { siteConfigFrom, type SiteConfig } from "@/lib/sites/config";
+import type { ArtId, ImageRef } from "@/lib/sites/images";
 import { buildPolicies } from "@/lib/sites/policies";
+import { isTemplateId, type TemplateId } from "@/lib/sites/templates";
 import type { SiteArea, SiteData } from "@/lib/sites/types";
 
 /**
@@ -143,7 +145,115 @@ export const SITE_DEMOS: SiteDemo[] = [
 ];
 
 export function siteDemo(id: string) {
-  return SITE_DEMOS.find((demo) => demo.id === id) || null;
+  return SITE_DEMOS.find((demo) => demo.id === id) || templateDemo(id);
+}
+
+/*
+ * Template previews (sites2): every template can be opened as an example at /rent/demo/<template id>, and its gallery
+ * picture (public/site/templates/<id>.webp, scripts/site-template-previews.mjs) is taken from there. Each borrows one
+ * of the three demo businesses above with its own made-up name, place and brand colour; a few bring their own fleet
+ * (no photos for those: the vehicle drawings stand in). Like the demos, all are labelled and nothing can be booked.
+ */
+
+const PREMIUM: CatalogVehicle[] = [
+  vehicle("demo-sw4", "Mitsubishi Pajero Sport", "car", { day: 2400, week: 15500, month: 45000 }, { color: "Grey", details: ["Automatic", "Diesel", "7 seats"], deposit: 20000, ...withPhoto("mitsubishi-pajero-sport") }),
+  vehicle("demo-px1", "Mercedes-Benz E 300", "car", { day: 4800, week: 30000, month: 85000 }, { color: "Black", details: ["Automatic", "Petrol", "5 seats"], deposit: 30000 }),
+  vehicle("demo-px2", "BMW X5 xDrive45e", "car", { day: 6500, week: 41000, month: 115000 }, { color: "White", details: ["Automatic", "Plug-in hybrid", "5 seats"], deposit: 40000 }),
+  vehicle("demo-px3", "Toyota Alphard", "van", { day: 5200, week: 33000 }, { color: "Black", details: ["Automatic", "Chauffeur on request", "7 seats"], deposit: 30000 }),
+  vehicle("demo-sw2", "Toyota Corolla Altis", "car", { day: 1450, week: 9000, month: 26000 }, { color: "Silver", details: ["Automatic", "Hybrid", "5 seats"], deposit: 10000, ...withPhoto("toyota-corolla") })
+];
+const ELECTRIC: CatalogVehicle[] = [
+  vehicle("demo-sw2", "Toyota Corolla Altis Hybrid", "car", { day: 1250, week: 7800, month: 22000 }, { color: "Silver", details: ["Automatic", "Hybrid", "5 seats"], deposit: 5000, ...withPhoto("toyota-corolla") }),
+  vehicle("demo-ev1", "BYD Atto 3", "car", { day: 1600, week: 10000, month: 29000 }, { color: "Blue", details: ["Electric", "420 km range", "5 seats"], deposit: 10000 }),
+  vehicle("demo-ev2", "MG4 Electric", "car", { day: 1400, week: 8800, month: 25000 }, { color: "White", details: ["Electric", "350 km range", "5 seats"], deposit: 10000 }),
+  vehicle("demo-ev3", "Tesla Model 3", "car", { day: 2600, week: 16500, month: 48000 }, { color: "Red", details: ["Electric", "510 km range", "5 seats"], deposit: 20000 }),
+  vehicle("demo-ev4", "NIU MQi GT", "ebike", { day: 350, week: 2100, month: 5500 }, { color: "Grey", details: ["Electric", "70 km range"], deposit: 3000 })
+];
+const CAMPERS: CatalogVehicle[] = [
+  vehicle("demo-cv1", "Toyota Hiace Camper", "van", { day: 3200, week: 20000 }, { color: "White", details: ["Manual", "Sleeps 2", "Kitchen"], deposit: 20000 }),
+  vehicle("demo-cv2", "Volkswagen California", "van", { day: 4200, week: 26500 }, { color: "Blue", details: ["Automatic", "Sleeps 4", "Pop-up roof"], deposit: 25000 }),
+  vehicle("demo-cv3", "Isuzu D-Max with roof tent", "car", { day: 2200, week: 13800 }, { color: "Orange", details: ["Manual", "4x4", "Sleeps 2"], deposit: 15000 }),
+  vehicle("demo-sw4", "Mitsubishi Pajero Sport", "car", { day: 1850, week: 11800, month: 36000 }, { color: "Grey", details: ["Automatic", "Diesel", "7 seats"], deposit: 10000, ...withPhoto("mitsubishi-pajero-sport") })
+];
+const ADVENTURE: CatalogVehicle[] = [
+  vehicle("demo-tr1", "Honda CRF300L", "motorbike", { day: 1100, week: 6900 }, { color: "Red", details: ["Manual", "300cc", "Off-road"], deposit: 10000 }),
+  vehicle("demo-tr2", "Royal Enfield Himalayan 450", "motorbike", { day: 1500, week: 9500 }, { color: "Sand", details: ["Manual", "450cc", "Adventure"], deposit: 15000 }),
+  vehicle("demo-tr3", "Kawasaki KLX230", "motorbike", { day: 900, week: 5600 }, { color: "Green", details: ["Manual", "230cc", "Off-road"], deposit: 8000 }),
+  vehicle("demo-rl5", "Honda CB500X", "motorbike", { day: 1400, week: 8800 }, { color: "Red", details: ["Manual", "500cc"], deposit: 10000 }),
+  vehicle("demo-rl6", "Kawasaki Versys 650", "motorbike", { day: 1600, week: 9900 }, { color: "Green", details: ["Manual", "650cc"], deposit: 10000 })
+];
+const CLASSICS: CatalogVehicle[] = [
+  vehicle("demo-rl1", "Vespa VXL 150", "scooter", { day: 550, week: 3300, month: 9000 }, { color: "Mint", details: ["Automatic", "150cc"], deposit: 5000, ...withPhoto("vespa-vxl") }),
+  vehicle("demo-dv1", "Vespa Primavera 125", "scooter", { day: 600, week: 3600, month: 9500 }, { color: "Cream", details: ["Automatic", "125cc"], deposit: 5000 }),
+  vehicle("demo-dv2", "Lambretta V200 Special", "scooter", { day: 700, week: 4200 }, { color: "Red", details: ["Automatic", "200cc"], deposit: 6000 }),
+  vehicle("demo-dv3", "Royal Alloy GP150", "scooter", { day: 500, week: 3000 }, { color: "Blue", details: ["Automatic", "150cc"], deposit: 5000 }),
+  vehicle("demo-dv4", "Vespa GTS 300", "scooter", { day: 900, week: 5400 }, { color: "Grey", details: ["Automatic", "300cc"], deposit: 8000 })
+];
+const MONTHLY: CatalogVehicle[] = [
+  vehicle("demo-np2", "Toyota Corolla Altis", "car", { month: 21000 }, { color: "Silver", details: ["Automatic", "Hybrid", "5 seats"], deposit: 10000, ...withPhoto("toyota-corolla") }),
+  vehicle("demo-np1", "Toyota Yaris Ativ", "car", { month: 15500 }, { color: "White", details: ["Automatic", "Petrol", "5 seats"], deposit: 8000, ...withPhoto("toyota-yaris") }),
+  vehicle("demo-np3", "Mitsubishi Pajero Sport", "car", { month: 34000 }, { color: "Grey", details: ["Automatic", "Diesel", "7 seats"], deposit: 15000, ...withPhoto("mitsubishi-pajero-sport") }),
+  vehicle("demo-nm1", "Honda City", "car", { month: 16500 }, { color: "Blue", details: ["Automatic", "Petrol", "5 seats"], deposit: 8000 }),
+  vehicle("demo-nm2", "Honda Click 125", "scooter", { month: 3500 }, { color: "White", details: ["Automatic", "125cc"], deposit: 2000 }),
+  vehicle("demo-nm3", "Yamaha NMAX 155", "scooter", { month: 5000 }, { color: "Black", details: ["Automatic", "155cc"], deposit: 3000 })
+];
+
+type Preview = { base: "saltwater" | "redline" | "northpoint"; name: string; place: string; brand: string; hero: ImageRef | null; about?: ImageRef | null; vehicles?: CatalogVehicle[]; offer?: string };
+const art = (id: ArtId): ImageRef => ({ kind: "art", id });
+const car = (vehicleId: string): ImageRef => ({ kind: "vehicle", vehicleId });
+
+const PREVIEWS: Partial<Record<TemplateId, Preview>> = {
+  lagoon: { base: "saltwater", name: "Green Lagoon Rentals", place: "Koh Phangan", brand: "#2f7d5b", hero: art("palms"), about: car("demo-sw2") },
+  riviera: { base: "saltwater", name: "Riviera Car & Vespa", place: "Koh Samet", brand: "#1d5fa8", hero: art("arches"), about: car("demo-sw3") },
+  reef: { base: "redline", name: "Reef Scooters", place: "Koh Lanta", brand: "#f0573b", hero: art("sun"), about: null },
+  swell: { base: "saltwater", name: "Swell Surf Rentals", place: "Kata Beach", brand: "#e2711d", hero: car("demo-sw3"), about: null },
+  pier: { base: "saltwater", name: "Pier 9 Rentals", place: "Koh Tao", brand: "#1b3a6b", hero: car("demo-sw1"), about: car("demo-sw3") },
+  villa: { base: "saltwater", name: "Villa Drive Collection", place: "Koh Samui", brand: "#8a6d3b", hero: car("demo-sw4"), about: car("demo-sw2"), vehicles: PREMIUM },
+  metro: { base: "northpoint", name: "Metro Car Rental", place: "Bangkok", brand: "#2b59ff", hero: art("city"), about: null },
+  runway: { base: "northpoint", name: "Runway Airport Cars", place: "Phuket Airport", brand: "#f2b705", hero: car("demo-np1"), about: null },
+  noir: { base: "saltwater", name: "Noir Prestige Cars", place: "Bangkok", brand: "#c9a96e", hero: car("demo-sw4"), about: null, vehicles: PREMIUM },
+  trail: { base: "redline", name: "High Trail Moto", place: "Mae Hong Son", brand: "#d9822b", hero: art("peaks"), about: null, vehicles: ADVENTURE },
+  dolce: { base: "redline", name: "Dolce Vespa Club", place: "Hua Hin", brand: "#c0392b", hero: car("demo-rl1"), about: art("sun"), vehicles: CLASSICS },
+  haven: { base: "northpoint", name: "Haven Family Cars", place: "Rayong", brand: "#3a86ff", hero: car("demo-np3"), about: car("demo-np2") },
+  nomad: { base: "northpoint", name: "Nomad Monthly Rentals", place: "Chiang Mai", brand: "#5f6b3a", hero: car("demo-np2"), about: null, vehicles: MONTHLY, offer: "monthly" },
+  volt: { base: "northpoint", name: "Volt EV Rentals", place: "Bangkok", brand: "#0f9f5f", hero: car("demo-sw2"), about: null, vehicles: ELECTRIC },
+  roam: { base: "northpoint", name: "Roam Campervans", place: "Chiang Rai", brand: "#b5562f", hero: art("peaks"), about: null, vehicles: CAMPERS },
+  washi: { base: "saltwater", name: "Washi Rentals", place: "Pai", brand: "#b7282e", hero: art("ripple"), about: null },
+  fjord: { base: "northpoint", name: "Fjord Car Hire", place: "Udon Thani", brand: "#d7141a", hero: car("demo-np1"), about: car("demo-np3") },
+  folio: { base: "saltwater", name: "Folio Rentals", place: "Krabi", brand: "#7b2d26", hero: car("demo-sw3"), about: null },
+  block: { base: "saltwater", name: "Block Rentals", place: "Khon Kaen", brand: "#1f3fff", hero: art("grid"), about: null },
+  amber: { base: "saltwater", name: "Amber House Rentals", place: "Koh Chang", brand: "#7a2e4d", hero: car("demo-sw2"), about: car("demo-sw3") },
+  neon: { base: "saltwater", name: "Neon Nights Rentals", place: "Pattaya", brand: "#ff2bd6", hero: art("city"), about: null }
+};
+
+/** The original example each phase 1 template is shown with. */
+const ORIGINAL: Partial<Record<TemplateId, string>> = { coast: "saltwater", moto: "redline", summit: "northpoint" };
+
+/** The example business a template is shown with: /rent/demo/<template id>. */
+export function templateDemo(id: string): SiteDemo | null {
+  if (!isTemplateId(id)) return null;
+  if (ORIGINAL[id]) return SITE_DEMOS.find((demo) => demo.id === ORIGINAL[id]) || null;
+  const preview = PREVIEWS[id];
+  const base = preview && SITE_DEMOS.find((demo) => demo.id === preview.base);
+  if (!preview || !base) return null;
+  const name = id.charAt(0).toUpperCase() + id.slice(1);
+  const vehicles = preview.vehicles || base.vehicles;
+  return {
+    ...base,
+    id,
+    name: `Demo: ${preview.name}`,
+    place: preview.place,
+    brandColour: preview.brand,
+    offer: preview.offer || base.offer,
+    vehicles,
+    areas: base.areas.map((area, index) => (index === 0 ? { ...area, name: preview.place } : area)).filter((area, index, list) => list.findIndex((other) => other.name === area.name) === index),
+    config: siteConfigFrom({
+      ...base.config,
+      template: id,
+      images: { hero: preview.hero, about: preview.about === undefined ? base.config.images.about : preview.about },
+      text: { "about.body": `A made-up rental business used to show the ${name} template. Every vehicle and price here is an example, and nothing can be booked.` }
+    })
+  };
 }
 
 type Say = (key: string, values?: Record<string, string | number>) => string;

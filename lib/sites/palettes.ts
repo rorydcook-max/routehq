@@ -152,6 +152,13 @@ export function sitePalette(input: { palette: string; customAccent: string | nul
     const [h] = toHsl(toRgb(input.customAccent));
     return input.customDark ? dark("custom", input.customAccent, h, 0.25, 0.08) : light("custom", input.customAccent, h, 0.14, 0.972);
   }
+  if (input.palette === "auto" && template.tone) {
+    // Phase 2 templates bring their own page colours; the accent is still the brand colour.
+    const brand = isBrandColour(brandColour) ? brandColour : ROUTEHQ_BRAND;
+    const tone = template.tone;
+    const hue = tone.hue ?? toHsl(toRgb(brand))[0];
+    return tone.dark ? dark("auto", brand, hue, tone.sat, tone.light) : light("auto", brand, hue, tone.sat, tone.light);
+  }
   const all = generatePalettes(brandColour);
   const wanted = input.palette === "auto" ? (template.mode === "dark" ? "night" : template.id === "coast" ? "mist" : "brand") : input.palette;
   return all.find((palette) => palette.id === wanted) || all[0];

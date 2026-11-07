@@ -235,3 +235,108 @@
     transition: none;
   }
 }
+
+/* Phase 2 (sites2): treatments the new templates switch on through data attributes on .root (lib/sites/templates.ts).
+   Coast, Moto and Summit set none of them. */
+
+.root[data-caps] .display {
+  text-transform: uppercase;
+}
+
+/* Photos with a rounded top, like a doorway (Lagoon, Riviera, Villa). */
+.arch {
+  border-radius: 50% 50% var(--s-r-image) var(--s-r-image) / 34% 34% var(--s-r-image) var(--s-r-image);
+}
+
+/* Photos printed with a border (Swell, Dolce, Pier, Amber). */
+.frame {
+  box-shadow: 0 22px 44px -26px rgba(20, 16, 10, 0.55);
+}
+.frame::after {
+  border: clamp(7px, 1.2vw, 12px) solid var(--s-surface);
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--s-ink) 10%, transparent);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Hairline outlines instead of filled cards (Washi, Fjord, Folio). */
+.root[data-edge="hairline"] .card {
+  border: 1px solid var(--s-line);
+  box-shadow: none;
+}
+.root[data-edge="hairline"] .header {
+  border-bottom: 1px solid var(--s-line);
+}
+
+/* Heavy ink borders with hard shadows (Block). */
+.root[data-edge="heavy"] .card {
+  border: 2.5px solid var(--s-ink);
+  box-shadow: 6px 6px 0 var(--s-ink);
+}
+.root[data-edge="heavy"] .image {
+  border: 2.5px solid var(--s-ink);
+}
+.root[data-edge="heavy"] .btn {
+  border: 2.5px solid var(--s-ink);
+  box-shadow: 4px 4px 0 var(--s-ink);
+}
+.root[data-edge="heavy"] .btn:active {
+  box-shadow: 1px 1px 0 var(--s-ink);
+  transform: translate(3px, 3px);
+}
+.root[data-edge="heavy"] .header {
+  border-bottom: 2.5px solid var(--s-ink);
+}
+
+/* Neon: the big headings glow in the accent. */
+.root[data-template="neon"] h1.display,
+.root[data-template="neon"] .glow {
+  text-shadow: 0 0 28px color-mix(in oklab, var(--s-accent) 60%, transparent);
+}
+
+/* The magazine cover's masthead: the business name across the page. */
+.masthead {
+  font-size: clamp(54px, 12.5vw, 196px);
+  line-height: 0.86;
+  overflow-wrap: anywhere;
+}
+
+/* Masonry fleet: columns of cards with different picture shapes. */
+.masonry {
+  column-gap: 14px;
+  columns: 2;
+}
+.masonry > li {
+  break-inside: avoid;
+  margin-bottom: 22px;
+}
+@media (min-width: 1024px) {
+  .masonry {
+    column-gap: 28px;
+    columns: 3;
+  }
+  .masonry > li {
+    margin-bottom: 36px;
+  }
+}
+
+/* The search bar's date fields. */
+.root .searchField {
+  background: transparent;
+  border: 0;
+  color: var(--s-ink);
+  font-size: 16px;
+  font-weight: 600;
+  min-height: 30px;
+  padding: 0;
+  width: 100%;
+}
+.root .searchField:focus {
+  outline: none;
+}
+.searchCell:focus-within {
+  box-shadow: inset 0 -3px 0 var(--s-accent);
+}

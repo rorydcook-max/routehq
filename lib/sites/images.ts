@@ -14,8 +14,8 @@
  * Safe to import from the browser.
  */
 
-export type ArtId = "tide" | "dunes" | "sun" | "road" | "contour" | "bloom";
-export const ART_IDS: ArtId[] = ["tide", "dunes", "sun", "road", "contour", "bloom"];
+export type ArtId = "tide" | "dunes" | "sun" | "road" | "contour" | "bloom" | "palms" | "arches" | "groove" | "city" | "peaks" | "ripple" | "grid";
+export const ART_IDS: ArtId[] = ["tide", "dunes", "sun", "road", "contour", "bloom", "palms", "arches", "groove", "city", "peaks", "ripple", "grid"];
 
 export type ImageRef =
   | { kind: "upload"; path: string }

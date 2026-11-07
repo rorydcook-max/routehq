@@ -27,6 +27,9 @@ export type SiteContextValue = {
   /** A fleet card's Book: opens that vehicle in the booking section. */
   pickVehicle: (vehicleId: string) => void;
   picked: { id: string; n: number } | null;
+  /** The hero's search bar: opens the booking section on those dates (and kind of vehicle). */
+  searchDates: (start: string, end: string, kind: string) => void;
+  search: { start: string; end: string; kind: string; n: number } | null;
 };
 
 export const SiteContext = createContext<SiteContextValue | null>(null);

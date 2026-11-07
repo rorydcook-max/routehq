@@ -28,21 +28,21 @@ const GOVUK_IDP: Source = { label: "GOV.UK: international driving permits", url:
 export const GUIDES: Guide[] = [
   {
     slug: "renting-a-scooter-in-thailand",
-    title: "Renting a scooter in Thailand: licences, helmets and insurance",
-    description: "What you need to ride a rented scooter legally in Thailand: the right licence and IDP, helmet rules and fines, deposits and insurance.",
+    title: "Renting a scooter in Thailand: licenses, helmets and insurance",
+    description: "What you need to ride a rented scooter legally in Thailand: the right license and IDP, helmet rules and fines, deposits and insurance.",
     standfirst: "A scooter is the easiest way around most Thai islands. Here's what you need to ride one legally, and what to check before you set off.",
     published: "2026-11-07",
     updated: "2026-11-07",
     related: ["thailand/koh-samui", "thailand/koh-phangan", "thailand/phuket", "thailand/chiang-mai"],
     body: [
-      { type: "h2", text: "The licence you need" },
+      { type: "h2", text: "The license you need" },
       {
         type: "p",
-        text: "To ride a scooter or motorbike in Thailand as a visitor you need a driving licence that covers motorcycles, plus an International Driving Permit (IDP) that shows the motorcycle category. A car licence alone doesn't cover a scooter, whatever a rental shop tells you."
+        text: "To ride a scooter or motorbike in Thailand as a visitor you need a driving license that covers motorcycles, plus an International Driving Permit (IDP) that shows the motorcycle category. A car license alone doesn't cover a scooter, whatever a rental shop tells you."
       },
       {
         type: "p",
-        text: "Thailand's government lists IDPs issued under the 1949 Geneva Convention, and licences from other ASEAN countries are accepted too. The UK government advises UK drivers to carry the 1968 version. Get your IDP in your home country before you travel: you can't buy one once you're in Thailand."
+        text: "Thailand's government lists IDPs issued under the 1949 Geneva Convention, and licenses from other ASEAN countries are accepted too. The UK government advises UK drivers to carry the 1968 version. Get your IDP in your home country before you travel: you can't buy one once you're in Thailand."
       },
       { type: "h2", text: "Helmets are the law, for both of you" },
       {
@@ -53,9 +53,9 @@ export const GUIDES: Guide[] = [
       {
         type: "ul",
         items: [
-          "Every registered vehicle must carry compulsory motor insurance (Por Ror Bor). It pays towards injury and death, but not damage to the scooter or to anyone's property.",
+          "Every registered vehicle must carry compulsory motor insurance (Por Ror Bor). It pays toward injury and death, but not damage to the scooter or to anyone's property.",
           "Ask the business what else the scooter is insured for, and what you'd pay if it's damaged or stolen.",
-          "Check your travel insurance covers riding a motorbike. Many policies only pay out if you hold the right licence for the vehicle, so riding without one can leave you uncovered."
+          "Check your travel insurance covers riding a motorbike. Many policies only pay out if you hold the right license for the vehicle, so riding without one can leave you uncovered."
         ]
       },
       { type: "h2", text: "Deposits" },
@@ -68,7 +68,7 @@ export const GUIDES: Guide[] = [
         type: "ul",
         items: [
           "Walk round the scooter with the business and photograph any scratches or dents, so nobody argues about them later.",
-          "Check the brakes, tyres, lights and horn, and that the registration and insurance papers are with the scooter.",
+          "Check the brakes, tires, lights and horn, and that the registration and insurance papers are with the scooter.",
           "Agree the fuel arrangement, the return time, and who to call if it breaks down.",
           "Save the business's phone or chat number before you leave."
         ]
@@ -97,32 +97,32 @@ export const GUIDES: Guide[] = [
       { type: "h2", text: "What an IDP is" },
       {
         type: "p",
-        text: "An International Driving Permit is a translation of your driving licence in a standard format, recognised under international agreements. It doesn't replace your licence: you carry both, all the time you're driving."
+        text: "An International Driving Permit is a translation of your driving license in a standard format, recognized under international agreements. It doesn't replace your license; you carry both, all the time you're driving."
       },
       { type: "h2", text: "Do you need one in Thailand?" },
       {
         type: "p",
-        text: "Yes, unless you hold a Thai licence or a licence from another ASEAN country. Thailand's government lists IDPs issued under the 1949 Geneva Convention. The UK government tells UK drivers to carry the 1968 version for Thailand, so check with your own licensing authority which type it issues for Thailand."
+        text: "Yes, unless you hold a Thai license or a license from another ASEAN country. Thailand's government lists IDPs issued under the 1949 Geneva Convention. The UK government tells UK drivers to carry the 1968 version for Thailand, so check with your own licensing authority which type it issues for Thailand."
       },
       {
         type: "p",
-        text: "Without a valid licence you can be fined, and your travel insurance may refuse a claim after an accident. The Australian government warns that driving without the correct licence can lead to arrest."
+        text: "Without a valid license you can be fined, and your travel insurance may refuse a claim after an accident. The Australian government warns that driving without the correct license can lead to arrest."
       },
       { type: "h2", text: "Scooters and motorbikes" },
       {
         type: "p",
-        text: "Your IDP only covers what your home licence covers. To ride a scooter or motorbike, both must include the motorcycle category; a car-only licence and IDP don't cover a scooter."
+        text: "Your IDP only covers what your home license covers. To ride a scooter or motorbike, both must include the motorcycle category; a car-only license and IDP don't cover a scooter."
       },
       { type: "h2", text: "Where to get one" },
       {
         type: "p",
-        text: "You get an IDP in the country that issued your licence, before you travel: you can't buy one once you're in Thailand. In the UK, for example, IDPs are sold in person at shops offering PayPoint services, for £5.50."
+        text: "You get an IDP in the country that issued your license, before you travel: you can't buy one once you're in Thailand. In the UK, for example, IDPs are sold in person at shops offering PayPoint services, for £5.50."
       },
       { type: "h2", text: "What to carry" },
       {
         type: "ul",
         items: [
-          "Your full driving licence from home (a digital licence may not be accepted).",
+          "Your full driving license from home (a digital license may not be accepted).",
           "Your IDP.",
           "Your passport or a copy, and the vehicle's papers, which the rental business keeps with the vehicle."
         ]
@@ -130,7 +130,7 @@ export const GUIDES: Guide[] = [
       { type: "h2", text: "Staying longer?" },
       {
         type: "p",
-        text: "If you live in Thailand, you can apply for a Thai driving licence. Thailand's government also describes a 30-day temporary licence for tourists whose licence can't be used, issued by the Provincial Land Transport Office."
+        text: "If you live in Thailand, you can apply for a Thai driving license. Thailand's government also describes a 30-day temporary license for tourists whose license can't be used, issued by the Provincial Land Transport Office."
       }
     ],
     sources: [S.thGov, S.tat, S.ukTh, S.auTh, GOVUK_IDP]
@@ -174,10 +174,10 @@ export const GUIDES: Guide[] = [
           "Whether delivery and collection are included."
         ]
       },
-      { type: "h2", text: "Your licence still matters" },
+      { type: "h2", text: "Your license still matters" },
       {
         type: "p",
-        text: "Visitors need their home licence plus an International Driving Permit to drive in Thailand. If you're living in Thailand, you can apply for a Thai licence instead."
+        text: "Visitors need their home license plus an International Driving Permit to drive in Thailand. If you're living in Thailand, you can apply for a Thai license instead."
       }
     ],
     sources: [S.thGov, S.ukTh, S.auTh, S.cmi]
@@ -191,10 +191,10 @@ export const GUIDES: Guide[] = [
     updated: "2026-11-07",
     related: ["indonesia/bali"],
     body: [
-      { type: "h2", text: "The licence you need" },
+      { type: "h2", text: "The license you need" },
       {
         type: "p",
-        text: "Your home licence isn't enough on its own in Indonesia: you need an International Driving Permit (or an Indonesian licence), and it must cover motorcycles. Get your IDP in your home country before you travel."
+        text: "Your home license isn't enough on its own in Indonesia: you need an International Driving Permit (or an Indonesian license), and it must cover motorcycles. Get your IDP in your home country before you travel."
       },
       {
         type: "p",
@@ -210,7 +210,7 @@ export const GUIDES: Guide[] = [
       { type: "h2", text: "Insurance" },
       {
         type: "p",
-        text: "Check your travel insurance covers riding a motorbike in Indonesia with the licence you hold. Riding without the right licence, or without following the rules, can mean a claim is refused."
+        text: "Check your travel insurance covers riding a motorbike in Indonesia with the license you hold. Riding without the right license, or without following the rules, can mean a claim is refused."
       },
       { type: "h2", text: "On the road" },
       {
@@ -227,7 +227,7 @@ export const GUIDES: Guide[] = [
         type: "ul",
         items: [
           "Photograph the scooter with the business, including any existing damage.",
-          "Check the brakes, tyres and lights, and agree the deposit, fuel and return time.",
+          "Check the brakes, tires and lights, and agree the deposit, fuel and return time.",
           "Save the business's phone or chat number."
         ]
       }

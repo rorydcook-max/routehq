@@ -15,8 +15,11 @@ export const dynamicParams = false;
 
 type Props = { params: Promise<{ locale: string; country: string }> };
 
-export function generateStaticParams({ params }: { params: { locale: string } }) {
-  return params.locale === "en" ? Object.keys(COUNTRIES).map((country) => ({ country })) : [];
+// The full address, language included (English only for now), as the website's /switch/[slug] does. Reading the
+// language from the parent's params gave nothing in a production build, so no page was drawn and, with
+// dynamicParams off, production answered 404 for every country.
+export function generateStaticParams() {
+  return Object.keys(COUNTRIES).map((country) => ({ locale: "en", country }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

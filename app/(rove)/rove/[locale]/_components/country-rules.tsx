@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import type { CountryRules, Source } from "@/lib/rove/destinations";
 import s from "../rove.module.css";
 
-/** A country's renting rules (licence, motorbikes, helmets, deposits, insurance, road safety), each topic in a row. */
+/** A country's renting rules (license, motorbikes, helmets, deposits, insurance, road safety), each topic in a row. */
 export async function CountryRulesList({ rules }: { rules: CountryRules }) {
   const t = await getTranslations("directory");
   const rows: Array<{ title: string; items: string[] }> = [

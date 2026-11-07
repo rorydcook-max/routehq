@@ -21,9 +21,9 @@ export const dynamicParams = false;
 
 type Props = { params: Promise<{ locale: string; country: string; place: string }> };
 
-export function generateStaticParams({ params }: { params: { locale: string; country: string } }) {
-  if (params.locale !== "en") return [];
-  return DESTINATIONS.filter((destination) => destination.country === params.country).map((destination) => ({ place: destination.slug }));
+// The full address, language included (English only for now): see [country]/page.tsx for why.
+export function generateStaticParams() {
+  return DESTINATIONS.map((destination) => ({ locale: "en", country: destination.country, place: destination.slug }));
 }
 
 const CHECKED = "7 November 2026";

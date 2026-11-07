@@ -35,7 +35,7 @@ export type Destination = {
   /** The place's name in lib/place-coords.ts, so the search can start there. */
   placeName: string;
   center: { lat: number; lng: number };
-  /** A listed vehicle counts here when its home location is within this distance of the centre. */
+  /** A listed vehicle counts here when its home location is within this distance of the center. */
   radiusKm: number;
   /** One or two sentences for the top of the page and the search-result snippet. */
   intro: string;
@@ -47,7 +47,7 @@ export type Destination = {
 };
 
 const SRC = {
-  thGov: { label: "Thailand.go.th: temporary driving licence for foreign tourists", url: "https://thailand.go.th/event-detail/001_01_226" },
+  thGov: { label: "Thailand.go.th: temporary driving license for foreign tourists", url: "https://thailand.go.th/event-detail/001_01_226" },
   tat: { label: "Tourism Authority of Thailand: visitor information (driving)", url: "https://www.tatnews.org/?p=80727" },
   ukTh: { label: "GOV.UK foreign travel advice: Thailand", url: "https://www.gov.uk/foreign-travel-advice/thailand" },
   auTh: { label: "Smartraveller (Australian Government): Thailand", url: "https://www.smartraveller.gov.au/destinations/asia/thailand" },
@@ -70,13 +70,13 @@ export const COUNTRIES: Record<string, CountryRules> = {
     name: "Thailand",
     placeCountry: "Thailand",
     licence: [
-      "As a visitor you need your home driving licence plus an International Driving Permit (IDP). Thailand's government lists IDPs issued under the 1949 Geneva Convention; the UK government tells UK drivers to carry the 1968 version. Get the type your licensing authority says is valid for Thailand before you travel.",
-      "A driving licence from another ASEAN country is also accepted.",
+      "As a visitor you need your home driving license plus an International Driving Permit (IDP). Thailand's government lists IDPs issued under the 1949 Geneva Convention; the UK government tells UK drivers to carry the 1968 version. Get the type your licensing authority says is valid for Thailand before you travel.",
+      "A driving license from another ASEAN country is also accepted.",
       "The legal driving age is 18."
     ],
     motorbike: [
-      "To ride a scooter or motorbike you need a licence that covers motorcycles. A car licence alone doesn't cover a scooter, even if a rental shop tells you otherwise.",
-      "Riding without the right licence can invalidate your travel insurance, so a claim after an accident may be refused."
+      "To ride a scooter or motorbike you need a license that covers motorcycles. A car license alone doesn't cover a scooter, even if a rental shop tells you otherwise.",
+      "Riding without the right license can invalidate your travel insurance, so a claim after an accident may be refused."
     ],
     helmet: [
       "Riders and passengers must both wear a helmet (Land Traffic Act, section 122). Police can fine you up to 2,000 baht, and checks were stepped up nationwide from 1 June 2025."
@@ -86,8 +86,8 @@ export const COUNTRIES: Record<string, CountryRules> = {
       "Businesses on Rove show the deposit for each vehicle before you book, so you know what you'll pay at handover."
     ],
     insurance: [
-      "Every registered vehicle must carry compulsory motor insurance (Por Ror Bor). It pays towards injury and death only, not damage to the vehicle or to property, so ask the business what other cover the vehicle has.",
-      "Check your travel insurance covers driving or riding in Thailand: many policies expect you to hold the right licence for the vehicle."
+      "Every registered vehicle must carry compulsory motor insurance (Por Ror Bor). It pays toward injury and death only, not damage to the vehicle or to property, so ask the business what other cover the vehicle has.",
+      "Check your travel insurance covers driving or riding in Thailand: many policies expect you to hold the right license for the vehicle."
     ],
     safety: [
       "Thailand drives on the left.",
@@ -101,10 +101,10 @@ export const COUNTRIES: Record<string, CountryRules> = {
     name: "Indonesia",
     placeCountry: "Indonesia",
     licence: [
-      "A foreign driving licence on its own isn't enough in Indonesia: you need an International Driving Permit (or an Indonesian licence). Make sure it covers the type of vehicle you'll drive."
+      "A foreign driving license on its own isn't enough in Indonesia: you need an International Driving Permit (or an Indonesian license). Make sure it covers the type of vehicle you'll drive."
     ],
     motorbike: [
-      "For a scooter or motorbike your licence and permit must include motorcycles. In May 2025 a three-day police operation in Badung (Canggu, Kuta, Seminyak, Uluwatu) cited 81 riders, 30 of them tourists.",
+      "For a scooter or motorbike your license and permit must include motorcycles. In May 2025 a three-day police operation in Badung (Canggu, Kuta, Seminyak, Uluwatu) cited 81 riders, 30 of them tourists.",
       "Bali's provincial government has proposed limiting motorbike rental for short-stay tourists. Check the current rules with the business before you book."
     ],
     helmet: ["Wear a helmet in good condition whenever you ride a motorbike or moped."],
@@ -112,7 +112,7 @@ export const COUNTRIES: Record<string, CountryRules> = {
       "Businesses on Rove show the deposit for each vehicle before you book. Agree how and when it's returned before you take the keys."
     ],
     insurance: [
-      "Check your travel insurance covers riding or driving in Indonesia with the licence you hold. If you ride without the right licence, a claim can be refused."
+      "Check your travel insurance covers riding or driving in Indonesia with the license you hold. If you ride without the right license, a claim can be refused."
     ],
     safety: [
       "Indonesia drives on the left.",
@@ -151,7 +151,7 @@ export const DESTINATIONS: Destination[] = [
     intro: "A smaller, hillier island north of Koh Samui. Most visitors arrive by ferry, and a scooter or small car is how people get between Thong Sala, Haad Rin and the quieter north coast.",
     gettingAround: [
       "Most visitors arrive by ferry from Koh Samui or the mainland, so rent on the island rather than bringing a vehicle across.",
-      "Some roads are steep and narrow, especially towards the beaches on the east and north coasts. Ride slowly and only on a vehicle you're confident with."
+      "Some roads are steep and narrow, especially toward the beaches on the east and north coasts. Ride slowly and only on a vehicle you're confident with."
     ],
     monthly: "Long stays are common on Phangan, and a monthly rental usually costs far less per day than renting day by day.",
     sources: []
@@ -182,7 +182,7 @@ export const DESTINATIONS: Destination[] = [
     radiusKm: 30,
     intro: "Northern Thailand's main city, and the starting point for the mountain roads to Pai and Mae Hong Son. Rent for the city, the temples on Doi Suthep, or a road trip north.",
     gettingAround: [
-      "Highway 1095 runs about 245 km from Chiang Mai through Pai to Mae Hong Son, with steep slopes and a great many tight bends. Only take it on a vehicle and licence you're comfortable with.",
+      "Highway 1095 runs about 245 km from Chiang Mai through Pai to Mae Hong Son, with steep slopes and a great many tight bends. Only take it on a vehicle and license you're comfortable with.",
       "Chiang Mai International Airport (CNX) is on the south-west edge of the city, a short drive from the old city."
     ],
     monthly: "Chiang Mai is popular for long stays, and renting by the month usually brings the daily cost right down.",
@@ -199,7 +199,7 @@ export const DESTINATIONS: Destination[] = [
     intro: "Thailand's capital. Inside the city the Skytrain and metro are usually quicker than driving; a rental car comes into its own for trips out to the coast, Ayutthaya or Khao Yai.",
     gettingAround: [
       "The BTS Skytrain and MRT metro cover much of central Bangkok, and traffic can be very heavy at rush hour, so many visitors only rent for days out of the city.",
-      "Both airports, Suvarnabhumi and Don Mueang, are a long way from the centre; delivery to your hotel can save the trip."
+      "Both airports, Suvarnabhumi and Don Mueang, are a long way from the center; delivery to your hotel can save the trip."
     ],
     monthly: "If you live in Bangkok for a few months, a monthly rental gives you a car for weekends away without buying one.",
     sources: []
@@ -215,7 +215,7 @@ export const DESTINATIONS: Destination[] = [
     intro: "A beach city on the Gulf of Thailand, about 150 km by road from Bangkok, with Jomtien and Naklua either side. Your own wheels make it easy to reach quieter beaches further south.",
     gettingAround: [
       "Central Pattaya has several one-way streets. Follow the signs and watch for scooters passing on both sides.",
-      "Carry your licence and IDP every time you drive or ride: police can ask for them, and the helmet fine is up to 2,000 baht."
+      "Carry your license and IDP every time you drive or ride: police can ask for them, and the helmet fine is up to 2,000 baht."
     ],
     monthly: "Many people stay in Pattaya for the season; a monthly rental is usually the cheapest way to have a car or scooter for it.",
     sources: [{ label: "Pattaya Mail: two-way traffic for Second Road debated", url: "https://www.pattayamail.com/news/2-way-traffic-second-road-table-pattaya-mulls-traffic-fixes-148779" }, SRC.helmet]
@@ -230,7 +230,7 @@ export const DESTINATIONS: Destination[] = [
     radiusKm: 30,
     intro: "Limestone cliffs, Ao Nang's beaches and the boats to the islands. A rental covers the mainland: Krabi Town, the beaches, hot springs and viewpoints inland.",
     gettingAround: [
-      "Ao Nang is the main beach area and Krabi Town the provincial centre; the airport is east of Krabi Town.",
+      "Ao Nang is the main beach area and Krabi Town the provincial center; the airport is east of Krabi Town.",
       "Islands such as Koh Phi Phi are reached by boat, so you won't need a vehicle on the day you visit them."
     ],
     monthly: "For a long stay in Ao Nang or Krabi Town, compare the monthly price: it's usually far lower per day than renting day by day.",

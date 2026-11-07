@@ -14,8 +14,9 @@ export const dynamicParams = false;
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
-export function generateStaticParams({ params }: { params: { locale: string } }) {
-  return params.locale === "en" ? GUIDES.map((guide) => ({ slug: guide.slug })) : [];
+// The full address, language included (English only for now): see [country]/page.tsx for why.
+export function generateStaticParams() {
+  return GUIDES.map((guide) => ({ locale: "en", slug: guide.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

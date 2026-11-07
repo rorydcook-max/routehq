@@ -35,7 +35,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ token: 
   }
 
   return (
-    <PublicShell brand={<PublicBrand name={page.businessName} />} width="narrow">
+    <PublicShell brand={<PublicBrand logoOnly logoUrl={page.logoUrl} name={page.businessName} />} width="narrow">
       <BrandStyle colour={page.brandColour} />
       <FlagFont />
       <section className="rounded-2xl border border-[var(--border)] bg-white p-6 shadow-sm">

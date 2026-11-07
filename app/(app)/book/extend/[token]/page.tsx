@@ -17,7 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
 function contactHref(phone: string | null) {
   const digits = String(phone || "").replace(/\D/g, "");
   if (!digits) return null;
-  return `https://wa.me/${digits.startsWith("0") ? `66${digits.slice(1)}` : digits}`;
+  // The number arrives with the business's country code (lib/extension-hold.ts).
+  return `https://wa.me/${digits}`;
 }
 
 /** The same date next month (the last day of next month when it is shorter): the usual monthly extension. */

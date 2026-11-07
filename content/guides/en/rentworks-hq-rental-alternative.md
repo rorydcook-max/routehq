@@ -101,7 +101,7 @@ Then compare that with your income. For example, a motorbike rented at ฿250 a 
 
 **Choose HQ Rental Software if** you want published pricing, a broad set of integrations, channel management with sites like Expedia and Turo, and a booking engine on your own website. It suits growing car and van rental businesses, especially those taking card payments through Stripe or PayPal, and fleets of 10 to 50 vehicles that want to start without a sales process. The 30+ languages and Singapore hosting help in Asia.
 
-**Choose RoveHQ if** you're a small independent operator, roughly 1 to 30 vehicles, renting cars, motorbikes or scooters in Southeast Asia, running the business from your phone, and talking to customers on LINE, WhatsApp or Telegram. RoveHQ reads PromptPay and QRIS payment slips and matches them to bookings, produces bilingual agreements with e-signature, and records handover photos with a timestamp. It's available in 28 languages, has a free plan, and you can sign up yourself in a few minutes.
+**Choose RoveHQ if** you're a small independent operator, roughly 1 to 30 vehicles, renting cars, motorbikes or scooters in Southeast Asia, running the business from your phone, and talking to customers on LINE, WhatsApp or Telegram. RoveHQ reads PromptPay and QRIS payment slips and matches them to bookings, produces bilingual agreements with e-signature, and records handover photos with a timestamp. It's available in 29 languages, has a free plan, and you can sign up yourself in a few minutes.
 
 If you're still on a notebook and chat apps, our guide on [when spreadsheets and chat apps stop working](/guides/rental-software-vs-spreadsheets) covers what to fix first.
 

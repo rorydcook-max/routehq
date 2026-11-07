@@ -54,15 +54,19 @@ export function useSiteDraft({ draft: initialDraft, published: initialPublished,
     return () => window.removeEventListener("message", listen);
   }, [frame, send, update]);
 
-  // Saved as they go, a moment after the last change.
+  // Saved as they go, a moment after the last change. Nothing is saved until the draft really differs from the last
+  // saved copy (opening the page, or React running this twice in development, must not write a draft).
+  const saved = useRef(initialDraft);
   useEffect(() => {
     if (first.current) {
       first.current = false;
       return;
     }
+    if (sameSite(siteConfigFrom(draft, draft.template), siteConfigFrom(saved.current, saved.current.template))) return;
     setSave("saving");
     const timer = setTimeout(async () => {
       const result = await saveSiteDraft(draft).catch(() => ({ ok: false as const, error: "" }));
+      if (result.ok) saved.current = draft;
       setSave(result.ok ? "saved" : "failed");
     }, 700);
     return () => clearTimeout(timer);
@@ -81,6 +85,7 @@ export function useSiteDraft({ draft: initialDraft, published: initialPublished,
     if (!result.ok) return setSave("failed");
     setUploads((current) => ({ ...current, ...result.uploads }));
     first.current = true;
+    saved.current = result.config;
     setDraft(result.config);
     setPublished(result.config);
     setSave("saved");

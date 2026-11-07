@@ -11,6 +11,8 @@ import { assistantRole, mayConfirm } from "@/lib/assistant/permissions";
 import { loadAssistantRecords, matchCustomer } from "@/lib/assistant/records";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getDefaultOrganization } from "@/lib/organization";
+import { dialCodeFor } from "@/lib/phone";
+import { toCountryCode } from "@/lib/regional";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { SUPPORT_BUCKET } from "@/lib/support";
 
@@ -30,7 +32,6 @@ function form(organizationId: string, values: Record<string, string | number | b
   return data;
 }
 
-const DIAL_CODES: Record<string, string> = { TH: "+66", MY: "+60", ID: "+62", PH: "+63", VN: "+84", SG: "+65", KH: "+855", LA: "+856" };
 const TASKS = new Set(["record_cost", "record_payment", "create_booking"]);
 
 /**
@@ -138,8 +139,9 @@ async function confirmTask(kind: "record_cost" | "record_payment" | "create_book
       if (found) customerId = found.id;
       else {
         const organization = (await getDefaultOrganization()) as any;
-        const country = String(organization.country_code || organization.settings?.main_location?.country || "TH").toUpperCase();
-        const created = await createInlineCustomer(form(organizationId, { fullName: a.customerName, phone: a.customerPhone, phoneCountryCode: DIAL_CODES[country] || "+66" }));
+        // The business's own dialling code for a number given without one (none when its country isn't set).
+        const phoneCountryCode = dialCodeFor(organization.country_code || toCountryCode(organization.settings?.main_location?.country));
+        const created = await createInlineCustomer(form(organizationId, { fullName: a.customerName, phone: a.customerPhone, phoneCountryCode }));
         customerId = created.id;
       }
     }

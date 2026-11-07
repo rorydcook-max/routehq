@@ -35,6 +35,15 @@ export type ServiceArea = {
   radiusSet: boolean;
 };
 
+/**
+ * The delivery radius a business has actually promised, for anything a customer reads ("Delivers here", "Delivery
+ * and collection within 10 km"): 0 (pickup only) when the owner hasn't set one. DEFAULT_RADIUS_KM is only for
+ * matching distance, never a public claim.
+ */
+export function publicDeliveryKm(area: Pick<ServiceArea, "radiusKm" | "radiusSet"> | null | undefined): number {
+  return area && area.radiusSet && area.radiusKm > 0 ? area.radiusKm : 0;
+}
+
 const record = (value: unknown): Record<string, any> => (value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, any>) : {});
 
 /** The business's town from setup (settings.main_location), as a known place. */

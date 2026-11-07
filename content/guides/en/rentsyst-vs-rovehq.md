@@ -39,7 +39,7 @@ Everything about RentSyst here comes from its own website **as of November 2026*
 | Free plan or trial | 14-day free version | Free plan with no time limit (2 cars, 5 motorbikes); 30-day trial with everything on |
 | Payments | Integrations with Stripe, Paysera, ePay and others | Your own Stripe account: cards on the booking page, embedded checkout and payment links; Apple Pay, Google Pay; SEPA Direct Debit, iDEAL, Bancontact, Klarna, MB Way, BLIK; card deposit holds. Plus cash, bank transfer and QR with slip checking |
 | GPS and telematics | Built in; remote lock and engine block on supported trackers | Not built in; handover records whether the tracker works |
-| Languages | Website in several languages; app languages not listed on the pricing page | 28 languages for the app and customer pages |
+| Languages | Website in several languages; app languages not listed on the pricing page | 29 languages for the app and customer pages |
 | Mobile | Web app that works on any device, including phones | Phone-first web app |
 | Contracts | Create and edit documents; e-invoicing on higher plans | Rental agreement written for you in English and the local language (18 countries across Southeast Asia and Europe), e-signature on the customer's phone |
 | Customer chat | Not listed | LINE and Telegram inbox, automatic reminders; WhatsApp opens with the message ready |
@@ -69,7 +69,7 @@ For payments, RentSyst's FAQ has integration guides for [Stripe](https://rentsys
 - **Handover on a phone.** Odometer read from a photo, fuel, walkaround video, damage diagram and signature, compared automatically at return. Hold a deposit on the customer's card and release or capture it at return.
 - **Agreements and ID.** An agreement for every booking in English and the local language in 18 countries across Southeast Asia and Europe, signed on the customer's phone, with passport and license photos read for you.
 - **Every way customers pay.** Card, Apple Pay, Google Pay and European methods online, and cash, transfer or QR with slips checked against what's owed (including PromptPay and QRIS).
-- **Languages and chat.** 28 languages for staff and customers; LINE and Telegram in one inbox with automatic reminders.
+- **Languages and chat.** 29 languages for staff and customers; LINE and Telegram in one inbox with automatic reminders.
 
 ## Who should pick which
 

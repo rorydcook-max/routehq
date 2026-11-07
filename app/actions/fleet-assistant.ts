@@ -13,6 +13,7 @@ import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/serve
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { googleSheetToSpreadsheetInput, parseSpreadsheetFile } from "@/lib/import/spreadsheet";
 import { paperworkFor } from "@/lib/country-paperwork";
+import { toInternationalPhone } from "@/lib/phone";
 
 /**
  * The fleet assistant (Rory, 2 Nov 2026): an owner tells it about their vehicles in their own words, by typing,
@@ -436,7 +437,8 @@ async function findOrCreateCustomer(supabase: any, organizationId: string, userI
     .limit(1)
     .maybeSingle();
   if (byName?.id) return byName.id as string;
-  const international = digits ? (phone.trim().startsWith("+") ? `+${digits}` : digits.startsWith("0") ? `+66${digits.slice(1)}` : `+${digits}`) : null;
+  // A local number gets the business's own country code (lib/phone.ts), not a fixed one.
+  const international = digits ? toInternationalPhone(phone) || digits : null;
   const { data: created } = await supabase
     .from("customers")
     .insert({ organization_id: organizationId, full_name: name, phone: international, created_by: userId })

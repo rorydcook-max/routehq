@@ -45,7 +45,7 @@ import { publicBookingSettings } from "@/lib/public-catalog";
 import { TravelPolicyForm } from "@/app/(app)/settings/travel-policy-form";
 import { territoryText, travelCountryCode, travelLocationsFor } from "@/lib/travel-policy";
 import { RegionalPanel } from "@/app/(app)/settings/regional-panel";
-import { defaultTimeZone, distanceUnitFor, orgCountry, vatSettings } from "@/lib/regional";
+import { defaultTimeZone, distanceUnitFor, orgCountry, vatSettings, zoneLabel } from "@/lib/regional";
 import { AppShell } from "@/components/app-shell";
 import { PageBand, bandTab } from "@/components/page-band";
 import { PendingButton } from "@/components/pending-button";
@@ -223,7 +223,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const fleetNow = fleetMix((vehicleRates || []) as Array<{ category_id: string | null }>, categories);
   // Friendly names for the currency and time zone line; anything else is shown as stored.
   const currencyName = organization.currency === "THB" ? say("currencyThb") : organization.currency;
-  const zoneName = organization.timezone === "Asia/Bangkok" ? say("zoneBangkok") : organization.timezone.replace("_", " ");
+  // "Lisbon (UTC+0)", as in the country and units panel.
+  const zoneName = zoneLabel(String(organization.timezone || ""));
   const money = currencySymbol(organization.currency);
   // Country and units (Settings › Rentals): what the business saved, else its country's usual choices.
   const regionalVat = vatSettings(organization);

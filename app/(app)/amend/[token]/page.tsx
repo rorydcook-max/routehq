@@ -16,7 +16,8 @@ export async function generateMetadata(): Promise<Metadata> {
 function contactHref(phone: string | null) {
   const digits = String(phone || "").replace(/\D/g, "");
   if (!digits) return null;
-  return `https://wa.me/${digits.startsWith("0") ? `66${digits.slice(1)}` : digits}`;
+  // The number arrives with the business's country code (lib/public-amendment.ts).
+  return `https://wa.me/${digits}`;
 }
 
 function Message({ tone, title, children, colour = null, business = null }: { tone: "red" | "green"; title: string; children: React.ReactNode; colour?: string | null; business?: string | null }) {

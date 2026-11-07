@@ -110,7 +110,8 @@ export async function BillingSummary({ organizationId, canChange, showChangePlan
           canKeep={Boolean(scheduled) && subscribed}
           cancelDate={due ? longDate(due) : null}
           freeLimits={{ cars: freeLimits.cars, motorbikes: freeLimits.motorbikes }}
-          hasCustomer={Boolean(organization.stripe_customer_id)}
+          // Only with a saved card or a subscription: opening checkout makes a Stripe customer with nothing to update.
+          hasCustomer={Boolean(organization.stripe_customer_id) && (subscribed || Boolean(details?.card))}
           keepLabel={say("sb_keepPlan", { plan: say(`bl_${plan.id}`) })}
           showChangePlan={showChangePlan}
           trial={status === "trial"}

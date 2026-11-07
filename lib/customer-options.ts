@@ -124,7 +124,8 @@ export function readPhone(input: string, fallbackCountry: string) {
       return { country, phoneCode: `+${parsed.countryCallingCode}`, national: String(parsed.nationalNumber), detected: true, valid: parsed.isValid() };
     }
   }
-  return { country: fallbackCountry, phoneCode: allCountries.find((item) => item.code === fallbackCountry)?.phoneCode || "+66", national: cleaned.replace(/^\+/, ""), detected: false, valid: false };
+  // No country to fall back on: no code (never a guessed one).
+  return { country: fallbackCountry, phoneCode: allCountries.find((item) => item.code === fallbackCountry)?.phoneCode || "", national: cleaned.replace(/^\+/, ""), detected: false, valid: false };
 }
 
 /** True when the digits are already a valid number for that country without any code. */

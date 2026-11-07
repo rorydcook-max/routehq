@@ -3,24 +3,12 @@
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { saveRegionalSettings, type RegionalInput } from "@/app/actions/regional";
-import { COUNTRIES, countryInfo, type DistanceUnit } from "@/lib/regional";
+import { COUNTRIES, countryInfo, zoneName, zoneOffset, type DistanceUnit } from "@/lib/regional";
 import { displayNamesLocale } from "@/lib/i18n/dates";
 import { InfoTip } from "@/components/info-tip";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const small = "text-[13px] font-semibold text-[var(--foreground-secondary)]";
-// Places a time zone name doesn't say plainly.
-const ZONE_NAMES: Record<string, string> = { "Atlantic/Canary": "Canary Islands", "Atlantic/Madeira": "Madeira", "Atlantic/Azores": "Azores", "Asia/Nicosia": "Cyprus" };
-const zoneName = (zone: string) => ZONE_NAMES[zone] || (zone.split("/").pop() || zone).replace(/_/g, " ");
-// "(UTC+7)", so the owner can see the zone is right at a glance.
-const zoneOffset = (zone: string) => {
-  try {
-    const part = new Intl.DateTimeFormat("en-US", { timeZone: zone, timeZoneName: "shortOffset" }).formatToParts(new Date()).find((p) => p.type === "timeZoneName");
-    return part ? `(${part.value.replace("GMT", "UTC")})` : "";
-  } catch {
-    return "";
-  }
-};
 
 /**
  * Country and units (Settings › Rentals): the country sets sensible defaults for time zone, currency, miles or km and the

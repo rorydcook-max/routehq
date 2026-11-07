@@ -5,6 +5,8 @@ import { emailWords } from "@/lib/email/words";
 import { customerDate } from "@/lib/i18n/customer-dates";
 import { customerMessageText } from "@/lib/i18n/customer-message-text";
 import { linePush, PROVIDER_LABELS, telegramSend } from "@/lib/inbox/providers";
+import { niceMoney } from "@/lib/nice-money";
+import { toInternationalPhone } from "@/lib/phone";
 
 /**
  * Messages the business sends its customers automatically: an extension was
@@ -134,9 +136,10 @@ const digitsOf = (value: unknown) => String(value || "").replace(/\D/g, "");
  */
 export function handoffFor(customer: any, body: string): { channel: string; label: string; url: string | null } {
   const text = encodeURIComponent(body);
-  const phone = digitsOf(customer?.whatsapp_number || customer?.phone);
+  // A local number gets the business's own country code (lib/phone.ts), not a fixed one.
+  const phone = digitsOf(toInternationalPhone(customer?.whatsapp_number || customer?.phone));
   const options: Record<string, () => { channel: string; label: string; url: string | null } | null> = {
-    whatsapp: () => (phone ? { channel: "whatsapp", label: "Send on WhatsApp", url: `https://wa.me/${phone.startsWith("0") ? `66${phone.slice(1)}` : phone}?text=${text}` } : null),
+    whatsapp: () => (phone ? { channel: "whatsapp", label: "Send on WhatsApp", url: `https://wa.me/${phone}?text=${text}` } : null),
     telegram: () => (customer?.telegram_username ? { channel: "telegram", label: "Send on Telegram", url: `https://t.me/${String(customer.telegram_username).replace(/^@/, "")}?text=${text}` } : null),
     email: () => (customer?.email ? { channel: "email", label: "Send by email", url: `mailto:${customer.email}?body=${text}` } : null),
     // LINE and Messenger can't be opened to a person with text filled in.
@@ -321,7 +324,7 @@ export async function tellRentalCustomer(
       firstName: String(rental.customers?.full_name || "").trim().split(/\s+/)[0] || "there",
       vehicle: [rental.vehicles?.make, rental.vehicles?.model].filter(Boolean).join(" ") || "vehicle",
       currency,
-      money: (amount: number) => `${currency === "THB" ? "฿" : `${currency} `}${Math.round(amount).toLocaleString("en-US")}`
+      money: (amount: number) => niceMoney(amount, currency)
     };
     return await messageCustomer(admin, {
       organizationId: rental.organization_id,

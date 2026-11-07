@@ -8,7 +8,7 @@ import { PendingButton } from "@/components/pending-button";
 import { Badge } from "@/components/ui";
 import type { Branch } from "@/lib/branches";
 import { validPoint } from "@/lib/place-coords";
-import { fromKm, type DistanceUnit } from "@/lib/regional";
+import { fromKm, placeLabel, type DistanceUnit } from "@/lib/regional";
 import type { ServiceArea } from "@/lib/service-area";
 import { BranchServiceArea } from "./branch-service-area";
 
@@ -73,7 +73,7 @@ export function BranchList({
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="card-subtitle leading-tight">{branch.name}</p>
-                <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{branch.address || say("br_noAddress")}</p>
+                <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{branch.address ? placeLabel(branch.address.split(",")) : say("br_noAddress")}</p>
                 {/* Contact details on their own line, muted when there are none. */}
                 <p className={`mt-0.5 text-sm font-medium ${contact ? "text-[var(--foreground-secondary)]" : "text-[var(--muted)]"}`}>{contact || say("br_noContact")}</p>
                 {/* Service area at a glance, with a nudge while it isn't set (partners search by it). */}

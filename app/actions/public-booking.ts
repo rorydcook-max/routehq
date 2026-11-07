@@ -64,7 +64,9 @@ function fullPhone(formData: FormData, codeKey: string, localKey: string) {
   if (raw.startsWith("+")) {
     return raw;
   }
-  const code = String(formData.get(codeKey) || "+66").trim();
+  // No country code chosen: keep the number as typed rather than guess a country.
+  const code = String(formData.get(codeKey) || "").trim();
+  if (!/^\+\d{1,4}$/.test(code)) return raw;
   const normalized = raw.startsWith("0") ? raw.slice(1) : raw;
   return `${code}${normalized}`;
 }
@@ -1462,7 +1464,9 @@ export async function checkReturningCustomer(
   const local = String(phoneLocal || "").replace(/[\s\-().]/g, "");
   const dob = String(dateOfBirth || "").slice(0, 10);
   if (!token || local.length < 6 || !/^\d{4}-\d{2}-\d{2}$/.test(dob)) return { found: false };
-  const phone = local.startsWith("+") ? local : `${String(phoneCode || "+66").trim()}${local.startsWith("0") ? local.slice(1) : local}`;
+  const code = String(phoneCode || "").trim();
+  if (!local.startsWith("+") && !code) return { found: false };
+  const phone = local.startsWith("+") ? local : `${code}${local.startsWith("0") ? local.slice(1) : local}`;
   if (!/^\+\d{7,15}$/.test(phone)) return { found: false };
 
   const supabase = createSupabaseAdminClient() as any;

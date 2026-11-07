@@ -58,7 +58,7 @@ Built for small fleets, from one vehicle to a few dozen cars, scooters, motorbik
 
 Customers can pay by card on your booking page, through embedded checkout or a payment link, with Apple Pay or Google Pay, or with SEPA Direct Debit, iDEAL, Bancontact, Klarna, MB Way or BLIK where Stripe offers them. You can hold a deposit on the card and release or capture it. Money goes to your own Stripe account. Payments through Stripe carry a RoveHQ platform fee (5% on Free, 2.5% Starter, 2% Pro, 1.5% Business, 1% on any yearly plan) on top of Stripe's fee. Cash, bank transfer and QR payments work too, with slip checking for PromptPay, QRIS and bank transfers.
 
-It writes a rental agreement for each booking in English and the local language in 18 countries across Southeast Asia and Europe, signed on the customer's phone, reads passport and license photos, and records handovers with photos, a damage diagram and signature. LINE and Telegram chats sit in one inbox, with automatic reminders. The app and customer pages come in 28 languages, and RoveHQ imports your data from your current software for free.
+It writes a rental agreement for each booking in English and the local language in 18 countries across Southeast Asia and Europe, signed on the customer's phone, reads passport and license photos, and records handovers with photos, a damage diagram and signature. LINE and Telegram chats sit in one inbox, with automatic reminders. The app and customer pages come in 29 languages, and RoveHQ imports your data from your current software for free.
 
 **Not for you if** you need bookings from travel sites, telematics, a payment provider other than Stripe, or a large multi-branch operation.
 

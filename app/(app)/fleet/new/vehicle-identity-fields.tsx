@@ -34,7 +34,8 @@ type VinDecodeResult = {
 };
 
 function normalizeMatch(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+  // Accents dropped first, so "skoda" finds Škoda and "citroen" finds Citroën.
+  return value.normalize("NFD").replace(/\p{Mn}/gu, "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
 function yearsForTrims(trims: VehicleTrim[]) {
@@ -181,7 +182,7 @@ export function VehicleIdentityFields({
     let mounted = true;
     setCatalogStatus(initialMakes.length > 0 && makes.length > 0 ? "ready" : "loading");
 
-    fetchVehicleMakesForCategory(categoryCode)
+    fetchVehicleMakesForCategory(categoryCode, country)
       .then((nextMakes) => {
         if (!mounted) {
           return;
@@ -373,7 +374,7 @@ export function VehicleIdentityFields({
   }
 
   async function syncCatalogSelection(result: VinDecodeResult) {
-    const nextMakes = makes.length ? makes : await fetchVehicleMakesForCategory(categoryCode);
+    const nextMakes = makes.length ? makes : await fetchVehicleMakesForCategory(categoryCode, country);
     if (!makes.length) {
       setMakes(nextMakes);
     }

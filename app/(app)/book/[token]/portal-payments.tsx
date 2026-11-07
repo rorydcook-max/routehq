@@ -8,6 +8,7 @@ import { CheckCircle2, Clock, Copy, Wallet } from "lucide-react";
 import { submitPaymentReceipt } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 import { SlipMatcher } from "./slip-matcher";
+import { niceMoney } from "@/lib/nice-money";
 
 type OrgPayment = {
   promptpay_id?: string | null;
@@ -23,8 +24,7 @@ function shortDate(iso: string, locale: string) {
 }
 
 function money(amount: number, currency: string) {
-  const value = amount.toLocaleString("en-US", { maximumFractionDigits: 2 });
-  return currency === "THB" ? `฿${value}` : `${currency} ${value}`;
+  return niceMoney(amount, currency);
 }
 
 /** Phone photos are several MB; a receipt reads fine at 1600px. PDFs and small files go as they are. */

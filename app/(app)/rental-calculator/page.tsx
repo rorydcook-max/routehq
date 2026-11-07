@@ -54,6 +54,7 @@ export default async function RentalCalculatorPage() {
     <AppShell hero={<PageBand keepSubtitle subtitle={t("subtitle")} title={t("title")} />} userEmail={userEmail}>
       <CalculatorClient
         checks={checks}
+        country={(organization as any).country_code || null}
         currency={organization.currency || "THB"}
         defaultCategory={defaultCategory}
         defaultStyle={defaultStyle}

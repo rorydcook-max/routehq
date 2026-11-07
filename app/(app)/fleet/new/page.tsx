@@ -18,6 +18,7 @@ import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { distanceKey } from "@/lib/business-units";
 import { orgCountry } from "@/lib/regional";
+import { rankMakesForCountry } from "@/lib/vehicle-make-ranking";
 
 // The wording for this page is in locales/<language>/common.json under "vehicleForm".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -60,7 +61,7 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
     .eq("category_code", defaultCategoryCode)
     .eq("is_active", true);
   const initialMakeIds = Array.from(new Set<string>((initialModelRows || []).map((row: { make_id: string }) => row.make_id))).filter(Boolean);
-  const { data: vehicleMakes } = initialMakeIds.length
+  const { data: unrankedMakes } = initialMakeIds.length
     ? await supabase
         .from("vehicle_makes")
         .select("id, name, slug, origin_country, logo_url, sort_order")
@@ -69,6 +70,8 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
         .order("sort_order", { ascending: true })
         .order("name", { ascending: true })
     : { data: [] };
+  // Most common makes in the business's country first (alphabetical when no country is set).
+  const vehicleMakes = rankMakesForCountry((unrankedMakes || []) as Array<{ id: string; name: string; slug: string; origin_country: string | null; logo_url: string | null; sort_order: number }>, (organization as any).country_code, defaultCategoryCode);
   const defaultBranch = branches.find((branch) => branch.is_active) || branches[0];
   const currency = organization.currency || "THB";
 

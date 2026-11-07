@@ -207,6 +207,45 @@ export function fromKm(km: number, unit: DistanceUnit) {
   return unit === "mi" ? km / KM_PER_MILE : km;
 }
 
+/** ["Lisbon", "Lisbon", "Portugal"] -> "Lisbon, Portugal": the parts of a place, empty and repeated ones left out. */
+export function placeLabel(parts: unknown[]): string {
+  const seen = new Set<string>();
+  return parts
+    .map((part) => String(part || "").trim())
+    .filter((part) => {
+      const key = part.toLowerCase();
+      if (!part || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .join(", ");
+}
+
+// Places a time zone name doesn't say plainly.
+const ZONE_NAMES: Record<string, string> = { "Atlantic/Canary": "Canary Islands", "Atlantic/Madeira": "Madeira", "Atlantic/Azores": "Azores", "Asia/Nicosia": "Cyprus" };
+
+/** "Europe/Lisbon" -> "Lisbon". */
+export function zoneName(zone: string): string {
+  return ZONE_NAMES[zone] || (zone.split("/").pop() || zone).replace(/_/g, " ");
+}
+
+/** "(UTC+7)", "(UTC+0)": so the owner can see the zone is right at a glance. Empty when the zone is unknown. */
+export function zoneOffset(zone: string): string {
+  try {
+    const part = new Intl.DateTimeFormat("en-US", { timeZone: zone, timeZoneName: "shortOffset" }).formatToParts(new Date()).find((p) => p.type === "timeZoneName");
+    if (!part) return "";
+    const value = part.value === "GMT" ? "UTC+0" : part.value.replace("GMT", "UTC");
+    return `(${value})`;
+  } catch {
+    return "";
+  }
+}
+
+/** "Europe/Lisbon" -> "Lisbon (UTC+0)". */
+export function zoneLabel(zone: string): string {
+  return `${zoneName(zone)} ${zoneOffset(zone)}`.trim();
+}
+
 /** The time zone for a place: the Canaries, Madeira and the Azores keep their own clocks; elsewhere the country's. */
 export function timeZoneForPlace(country: unknown, region?: unknown, town?: unknown): string {
   const code = toCountryCode(country);

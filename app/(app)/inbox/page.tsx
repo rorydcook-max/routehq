@@ -11,6 +11,7 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import type { InboxConversation, InboxMessage } from "@/lib/inbox/store";
 import { getDefaultOrganization } from "@/lib/organization";
+import { lineFirst } from "@/lib/messaging-order";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -122,7 +123,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
           </span>
           <h2 className="card-title mt-4">{t("emptyTitle")}</h2>
           <p className="mx-auto mt-1 max-w-md font-medium text-[var(--foreground-secondary)]">
-            {t("emptyBody")}
+            {t(lineFirst((organization as any)?.country_code) ? "emptyBody" : "emptyBodyGlobal")}
           </p>
           {membership?.role === "owner" ? (
             <Link className="primary-action pressable mt-5 inline-flex" href={"/settings?tab=messaging" as Route}>

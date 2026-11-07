@@ -1,6 +1,6 @@
 "use server";
 
-import { phoneVariants, toInternationalPhone } from "@/lib/phone";
+import { dialCodeFor, phoneVariants, toInternationalPhone } from "@/lib/phone";
 
 import { said } from "@/lib/i18n/server-text";
 import { revalidatePath } from "next/cache";
@@ -43,9 +43,9 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
   const startDate = String(formData.get("startDate") || "").trim();
   const endDate = String(formData.get("endDate") || "").trim() || null;
   const name = String(formData.get("name") || "").trim().slice(0, 120);
-  // Stored the way the rest of RoveHQ stores numbers: +66812345670.
+  // Stored the way the rest of RoveHQ stores numbers: +351912345678 (the business's code once its catalog is loaded).
   const typedPhone = String(formData.get("phone") || "").replace(/[\s\-().]/g, "").slice(0, 24);
-  const phone = toInternationalPhone(typedPhone) || typedPhone;
+  let phone = toInternationalPhone(typedPhone, "") || typedPhone;
 
   // Bots fill every field; people never see this one.
   if (String(formData.get("website") || "").trim()) return { ok: false, error: await said("Please try again.") };
@@ -82,6 +82,9 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
 
   const admin = createSupabaseAdminClient() as any;
   const organizationId = catalog.organizationId;
+  // A number typed without a code gets the business's own country code (none when its country isn't set).
+  const { data: phoneOrg } = await admin.from("organizations").select("country_code").eq("id", organizationId).maybeSingle();
+  phone = toInternationalPhone(typedPhone, dialCodeFor(phoneOrg?.country_code)) || typedPhone;
 
   // One person can't tie up the fleet: a couple of unfinished online bookings at most.
   const { data: unfinished } = await admin

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ClipboardEvent, type ElementType, type KeyboardEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ClipboardEvent, type CSSProperties, type ElementType, type KeyboardEvent, type ReactNode } from "react";
 import { useLocale } from "next-intl";
 import { LONG_SLOTS, SLOT_MAX, type SiteConfig, type TextSlot } from "@/lib/sites/config";
 import { siteTime } from "@/lib/sites/format";
@@ -58,6 +58,17 @@ export function useSiteTime() {
 }
 
 /**
+ * Big display text (the hero headline, the cover's masthead) with a long word in it, e.g. a long business name: the
+ * size is brought down until the longest word fits the page's width, so it wraps between words, never inside one.
+ * Applied to an inner span so `1em` is the size the template set for that heading at that screen width.
+ */
+export function fitLongestWord(value: string): CSSProperties | undefined {
+  const longest = Math.max(0, ...String(value || "").split(/\s+/).map((word) => Array.from(word).length));
+  if (longest < 9) return undefined;
+  return { fontSize: `min(1em, calc((min(100vw, 1200px) - 72px) / ${(longest * 0.62).toFixed(2)}))` };
+}
+
+/**
  * A piece of the site's text. In the editor's preview it can be clicked and typed into; leaving it saves it to the
  * draft (emptying it puts the default back). Elsewhere it is plain text.
  */
@@ -65,10 +76,12 @@ export function Txt({ slot, as, id, className = "", children }: { slot: TextSlot
   const { edit, text, setText, t } = useSite();
   const Tag = (as || "span") as ElementType;
   const value = text(slot);
+  const fit = as === "h1" ? fitLongestWord(value) : undefined;
+  const shown = fit ? <span style={fit}>{value}</span> : value;
   if (!edit) {
     return (
       <Tag className={className} id={id}>
-        {value}
+        {shown}
         {children}
       </Tag>
     );
@@ -104,7 +117,7 @@ export function Txt({ slot, as, id, className = "", children }: { slot: TextSlot
       suppressContentEditableWarning
       tabIndex={0}
     >
-      {value}
+      {shown}
     </Tag>
   );
 }

@@ -2,6 +2,7 @@
 
 import { extrasFrom, priceExtras } from "@/lib/price-rules";
 import { extrasIncomeTag } from "@/lib/extras";
+import { toInternationalPhone } from "@/lib/phone";
 import { vatSettings, withVat } from "@/lib/regional";
 import { billingPeriodAmounts, generatePaymentSchedule } from "@/lib/payment-schedule";
 
@@ -57,18 +58,9 @@ function safeJsonArray(formData: FormData, key: string) {
   }
 }
 
-function normalizeThaiWhatsapp(phone: string | null | undefined) {
-  const digits = String(phone || "").replace(/\D/g, "");
-  if (!digits) {
-    return "";
-  }
-  if (digits.startsWith("66")) {
-    return digits;
-  }
-  if (digits.startsWith("0")) {
-    return `66${digits.slice(1)}`;
-  }
-  return digits;
+/** The number for a wa.me link: international digits, a local number getting the business's own country code. */
+function whatsappDigits(phone: string | null | undefined) {
+  return String(toInternationalPhone(phone) || "").replace(/\D/g, "");
 }
 
 function shareUrls({
@@ -81,7 +73,7 @@ function shareUrls({
   organizationName: string;
 }) {
   const encodedMessage = encodeURIComponent(message);
-  const whatsappPhone = normalizeThaiWhatsapp(phone);
+  const whatsappPhone = whatsappDigits(phone);
   return {
     whatsappUrl: whatsappPhone ? `https://wa.me/${whatsappPhone}?text=${encodedMessage}` : "",
     lineUrl: `https://line.me/R/msg/text/${encodedMessage}`,

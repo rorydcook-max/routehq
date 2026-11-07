@@ -151,8 +151,11 @@ function numberSetting(settings: Record<string, any>, currency: string | null | 
 /** The travel rules and fees a business saved, else the defaults (money defaults in `currency`, the business's). */
 export function getTravelPolicySettings(settings: Record<string, any> | null | undefined, currency?: string | null): TravelPolicySettings {
   const source = settings || {};
-  const country = String(source.country || source.main_location?.country || travelPolicyDefaults.country);
-  const territory = String(source.home_territory || source.main_location?.town || source.location || travelPolicyDefaults.home_territory);
+  // The business's own country and area. Thailand / Koh Samui only for a business in Thailand (it works in baht);
+  // anywhere else nothing rather than a Thai place (global audience, 7 Nov 2026).
+  const thai = String(currency || "").toUpperCase() === "THB";
+  const country = String(source.country || source.main_location?.country || (thai ? travelPolicyDefaults.country : ""));
+  const territory = String(source.home_territory || source.main_location?.town || source.location || (thai ? travelPolicyDefaults.home_territory : ""));
   const homeTerritoryType = source.home_territory_type === "mainland" ? "mainland" : "island";
   const islandTravelPolicy = ["deposit_required", "notice_only", "not_permitted"].includes(source.island_travel_policy)
     ? source.island_travel_policy
@@ -165,7 +168,7 @@ export function getTravelPolicySettings(settings: Record<string, any> | null | u
     secondary_deposit_amount: numberSetting(source, currency, "secondary_deposit_amount"),
     geofence_monitoring_enabled: Boolean(source.geofence_monitoring_enabled),
     country,
-    jurisdiction: String(source.jurisdiction || jurisdictionByCountry[country] || travelPolicyDefaults.jurisdiction),
+    jurisdiction: String(source.jurisdiction || jurisdictionByCountry[country] || (thai ? travelPolicyDefaults.jurisdiction : "")),
     mileage_limit: numberSetting(source, currency, "mileage_limit"),
     fuel_charge_per_increment: numberSetting(source, currency, "fuel_charge_per_increment"),
     late_fee_percentage: numberSetting(source, currency, "late_fee_percentage"),

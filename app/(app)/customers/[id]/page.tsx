@@ -29,6 +29,7 @@ import { longDate } from "@/lib/i18n/dates";
 import { getDefaultOrganization } from "@/lib/organization";
 import { licenceCategoriesFor, licenceCategoriesOf } from "@/lib/licence";
 import { orgCountry } from "@/lib/regional";
+import { phonePlaceholderFor } from "@/lib/phone";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
@@ -243,7 +244,7 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
       </label>
       <label className="block">
         <span className={labelClass}>{cx.say("f_phone")}</span>
-        <input className={inputClass} defaultValue={customer.phone || ""} inputMode="tel" name="phone" placeholder="+66812345678" type="tel" />
+        <input className={inputClass} defaultValue={customer.phone || ""} inputMode="tel" name="phone" placeholder={phonePlaceholderFor(country)} type="tel" />
         <span className="mt-1 block font-medium text-[var(--muted)]">{cx.say("f_phoneHint")}</span>
       </label>
       <label className="block">
@@ -332,7 +333,7 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
       </label>
       <label className="block">
         <span className={labelClass}>{cx.say("f_emPhone")}</span>
-        <input className={inputClass} defaultValue={customer.emergency_contact_phone || ""} inputMode="tel" name="emergencyContactPhone" placeholder="+66812345678" type="tel" />
+        <input className={inputClass} defaultValue={customer.emergency_contact_phone || ""} inputMode="tel" name="emergencyContactPhone" placeholder={phonePlaceholderFor(country)} type="tel" />
       </label>
       <PendingButton className="primary-action sm:col-span-2" pendingLabel={cx.say("saving")} type="submit">
         {cx.say("save")}
@@ -341,7 +342,7 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
   );
 }
 
-function ContactChannelsForm({ customer, organizationId }: { customer: any; organizationId: string }) {
+function ContactChannelsForm({ customer, organizationId, country }: { customer: any; organizationId: string; country?: string | null }) {
   const cx = useCx();
   const methods = ["whatsapp", "messenger", "line", "telegram", "sms", "email", "phone"];
   return (
@@ -350,7 +351,7 @@ function ContactChannelsForm({ customer, organizationId }: { customer: any; orga
       <input name="organizationId" type="hidden" value={organizationId} />
       <label className="block">
         <span className={labelClass}>{cx.say("ch_whatsapp")}</span>
-        <input className={inputClass} defaultValue={customer.whatsapp_number || ""} name="whatsappNumber" placeholder="+66812345678" type="tel" />
+        <input className={inputClass} defaultValue={customer.whatsapp_number || ""} name="whatsappNumber" placeholder={phonePlaceholderFor(country)} type="tel" />
       </label>
       <label className="block">
         <span className={labelClass}>{cx.say("ch_line")}</span>
@@ -594,6 +595,25 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   const stats = statsMap.get(customer.id);
   const lifeRentals = stats?.rentals ?? detail.rentals.filter((rental: any) => isHandedOver(rental.status)).length;
   const lifeDays = stats?.rentalDays ?? detail.totalRentalDays;
+  // Average daily rate from each rental's own price as a day rate (a month / 30, a week / 7), weighted by its days
+  // (at least one). Income / days said €750 a day for a monthly rental returned the day it started.
+  const dailyRate = (() => {
+    let weighted = 0;
+    let days = 0;
+    for (const rental of detail.rentals as any[]) {
+      if (!isHandedOver(rental.status)) continue;
+      const rate = Number(rental.rental_rate || 0);
+      const model = String(rental.pricing_model || rental.billing_interval || "daily").toLowerCase();
+      const perDay = model.startsWith("month") ? rate / 30 : model.startsWith("week") ? rate / 7 : rate;
+      if (!(perDay > 0) || !rental.start_date) continue;
+      const end = String(rental.end_date || businessToday()).slice(0, 10);
+      const span = Math.round((Date.parse(`${end}T00:00:00Z`) - Date.parse(`${String(rental.start_date).slice(0, 10)}T00:00:00Z`)) / 86_400_000);
+      const length = Math.max(1, Number.isFinite(span) ? span : 1);
+      weighted += perDay * length;
+      days += length;
+    }
+    return days > 0 ? weighted / days : 0;
+  })();
   const customerSince = [String(customer.created_at || "").slice(0, 10), stats?.firstStart || ""].filter(Boolean).sort()[0] || null;
   const messageCount = timeline.messages.fromThem + timeline.messages.toThem;
   const sortKey = (date: string) => Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T12:00:00Z` : date) || 0;
@@ -737,7 +757,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                         [cx.say("lc_since"), customerSince ? formatDate(customerSince, cx) : cx.say("notSet"), false],
                         [cx.say("lc_rentals"), cx.say("lc_rentalsDays", { count: lifeRentals, days: lifeDays }), false],
                         [cx.say("lc_spent"), money(totalIncome), false],
-                        [cx.say("lc_rate"), lifeDays > 0 && totalIncome > 0 ? cx.say("lc_perDay", { amount: money(totalIncome / lifeDays) }) : "—", false],
+                        [cx.say("lc_rate"), dailyRate > 0 ? cx.say("lc_perDay", { amount: money(dailyRate) }) : "—", false],
                         [cx.say("lc_owes"), money(owedNow), owedNow > 0],
                         [cx.say("lc_messages"), messageCount > 0 ? cx.say("lc_messageCount", { count: messageCount, theirs: timeline.messages.fromThem }) : cx.say("lc_noMessages"), false],
                         [cx.say("lc_damage"), stats?.damageCount ? cx.say("lc_damageCount", { count: stats.damageCount }) : cx.say("lc_noDamage"), Boolean(stats?.damageCount)],
@@ -833,7 +853,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             </Pane>
                   <div className="grid gap-3">
             <Pane summary={cx.say("ch_summary")} title={cx.say("ch_title")}>
-              <ContactChannelsForm customer={customer} organizationId={organization.id} />
+              <ContactChannelsForm country={(organization as any).country_code} customer={customer} organizationId={organization.id} />
             </Pane>
             <Pane id="notes" open={Boolean(customer.notes)} summary={customer.notes ? undefined : cx.say("n_none")} title={cx.say("n_title")}>
               <CustomerNotesForm customerId={customer.id} notes={customer.notes || ""} organizationId={organization.id} />

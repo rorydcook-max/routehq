@@ -15,7 +15,7 @@ import { allCountries, countriesSorted, isLocalNumber, readPhone } from "@/lib/c
 export function PhoneField({
   codeName = "phoneCountryCode",
   inputName = "phone",
-  defaultCountry = "TH",
+  defaultCountry = "",
   defaultNumber = "",
   required = false,
   placeholder,
@@ -46,7 +46,8 @@ export function PhoneField({
   const [text, setText] = useState(start.national);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const current = allCountries.find((item) => item.code === country) || allCountries.find((item) => item.code === "TH")!;
+  // No country yet (the business's country isn't set): just "+", and the number is kept as typed.
+  const current = allCountries.find((item) => item.code === country) || null;
   const national = text.replace(/[^\d]/g, "");
 
   useEffect(() => {
@@ -58,10 +59,11 @@ export function PhoneField({
   useEffect(() => {
     if (!onValueChange) return;
     if (!national) return onValueChange("");
+    if (!current) return onValueChange(national);
     const parsed = parsePhoneNumberFromString(national, current.code as CountryCode);
     onValueChange(parsed?.number || `${current.phoneCode}${national.replace(/^0/, "")}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [national, current.code]);
+  }, [national, current?.code]);
 
   function typed(value: string) {
     const trimmed = value.trim();
@@ -91,7 +93,7 @@ export function PhoneField({
 
   return (
     <div className="grid grid-cols-[auto_1fr] gap-2">
-      <input name={codeName} type="hidden" value={current.phoneCode} />
+      <input name={codeName} type="hidden" value={current?.phoneCode || ""} />
       <input name={inputName} type="hidden" value={national} />
       {/* The country: a small button showing the flag and code, with the full alphabetical list behind it. */}
       {/* Drawn like the fields next to it (their border comes from the global field style, which a div doesn't get). */}
@@ -104,8 +106,8 @@ export function PhoneField({
           .join(" ")}`}
         style={{ border: "1.5px solid var(--border-strong)", borderRadius: 12, background: "var(--surface, #fff)", height: 44 }}
       >
-        <span aria-hidden="true">{current.flag}</span>
-        <span className="tabular-nums">{current.phoneCode}</span>
+        {current ? <span aria-hidden="true">{current.flag}</span> : null}
+        <span className="tabular-nums">{current?.phoneCode || "+"}</span>
         <ChevronDown aria-hidden="true" className="shrink-0 text-[var(--muted)]" size={14} />
         <select
           aria-label={t("sel_countryCode")}
@@ -114,6 +116,7 @@ export function PhoneField({
           value={country}
         >
           {/* Country names come from the browser's own list, which can differ from the server's: build the list after loading. */}
+          {!current ? <option value="">+</option> : null}
           {(mounted ? options : options.filter((option) => option.code === country)).map((option) => (
             <option key={option.code} value={option.code}>
               {option.flag} {option.label} {option.phoneCode}

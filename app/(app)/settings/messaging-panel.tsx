@@ -6,6 +6,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { AlertTriangle, CheckCircle2, ChevronDown, Copy } from "lucide-react";
 import { connectChannel, disconnectChannel } from "@/app/actions/inbox";
 import { shortDate } from "@/lib/i18n/dates";
+import { businessCountry } from "@/lib/business-units";
+import { lineFirst } from "@/lib/messaging-order";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 type Channel = { id: string; provider: string; display_name: string | null; status: string; last_error: string | null; webhook: string; send_error?: string | null; send_failed_at?: string | null };
@@ -178,7 +180,8 @@ export function MessagingPanel({ channels, publicUrl }: { channels: Channel[]; p
       {channels.map((channel) => (
         <ConnectedChannel channel={channel} key={channel.id} publicUrl={publicUrl} />
       ))}
-      {(Object.keys(GUIDES) as ProviderKey[])
+      {/* LINE leads only where it is the everyday app (lib/messaging-order.ts); Telegram first everywhere else. */}
+      {(lineFirst(businessCountry()) ? (["line", "telegram"] as ProviderKey[]) : (["telegram", "line"] as ProviderKey[]))
         .filter((provider) => !connected.has(provider))
         .map((provider) => (
           <ConnectForm key={provider} provider={provider} publicUrl={publicUrl} />

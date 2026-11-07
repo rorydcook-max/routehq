@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { dialCodeFor, toInternationalPhone } from "@/lib/phone";
 import { amendmentRows, hashFragment, type AmendmentChanges, type AmendmentRow } from "@/lib/rental-amendments";
 
 export type PublicAmendment =
@@ -34,7 +35,7 @@ export async function loadPublicAmendment(token: string): Promise<PublicAmendmen
 
   const [{ data: rental }, { data: organization }] = await Promise.all([
     admin.from("rentals").select("id, vehicle_id, customer_id").eq("id", amendment.rental_id).maybeSingle(),
-    admin.from("organizations").select("name, trading_name, business_phone, settings, contract_accent_colour").eq("id", amendment.organization_id).maybeSingle()
+    admin.from("organizations").select("name, trading_name, business_phone, settings, contract_accent_colour, country_code").eq("id", amendment.organization_id).maybeSingle()
   ]);
   const [{ data: vehicle }, { data: customer }] = await Promise.all([
     rental?.vehicle_id ? admin.from("vehicles").select("make, model, year, registration_number").eq("id", rental.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
@@ -69,7 +70,9 @@ export async function loadPublicAmendment(token: string): Promise<PublicAmendmen
     signedAt: amendment.signed_at || null,
     signerName: amendment.signer_name || null,
     pdfUrl,
-    contactPhone: String(organization?.business_phone || settings.phone || settings.business_phone || "") || null,
+    // In international form with the business's own country code, so the WhatsApp link works anywhere.
+    contactPhone:
+      toInternationalPhone(organization?.business_phone || settings.phone || settings.business_phone, dialCodeFor(organization?.country_code)) || null,
     brandColour: (organization?.contract_accent_colour as string | null) || null
   };
 }

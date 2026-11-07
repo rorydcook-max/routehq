@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { MapPin, MessageCircle, Star } from "lucide-react";
 import { kindsOffered, socialHref } from "@/lib/sites/format";
 import type { ResolvedImage } from "@/lib/sites/images";
-import { Txt, useSite, useSiteTime } from "../site-context";
+import { fitLongestWord, Txt, useSite, useSiteTime } from "../site-context";
 import { SiteImage } from "../site-image";
 import { imageTreatment } from "./parts";
 import s from "../site.module.css";
@@ -364,7 +364,9 @@ function CoverHero() {
   return (
     <section aria-labelledby="hero-title" className="pb-12 pt-6 sm:pb-20 sm:pt-10">
       <div className={s.wrap}>
-        <p className={`${s.display} ${s.masthead}`}>{data.business.name}</p>
+        <p className={`${s.display} ${s.masthead}`}>
+          <span style={fitLongestWord(data.business.name)}>{data.business.name}</span>
+        </p>
         <div className={`mt-4 flex flex-wrap items-center justify-between gap-3 border-y py-3 text-[15px] font-semibold ${s.line}`}>
           <Place className={s.soft} />
           {from ? <span>{from}</span> : null}

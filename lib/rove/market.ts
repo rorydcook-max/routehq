@@ -8,7 +8,7 @@ import { distanceKm } from "@/lib/place-coords";
 import { extrasFor, seasonalRate, type Extra, type Season } from "@/lib/price-rules";
 import { getPublicCatalog, publicBookingSettings, type BookingOffer, type CatalogVehicle } from "@/lib/public-catalog";
 import { daysBetween, headlineRate, planFor } from "@/lib/rental-estimate";
-import { PICKUP_REACH_KM, serviceAreasFor, type ServiceArea } from "@/lib/service-area";
+import { PICKUP_REACH_KM, publicDeliveryKm, serviceAreasFor, type ServiceArea } from "@/lib/service-area";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { carSizeOf, engineCcOf, gearboxOf, passesVehicleFilter, seatsOf, type CarSize, type Gearbox, type VehicleFilter } from "@/lib/vehicle-filters";
 import { isTwoWheeler, type VehicleKind } from "@/lib/vehicle-groups";
@@ -127,7 +127,7 @@ async function loadMarketUncached(): Promise<{ businesses: RoveBusiness[]; vehic
       gapDays: catalog.gapDays,
       seasons: catalog.seasons,
       extras: catalog.extras as Extra[],
-      deliveryKm: areas[0]?.radiusKm || 0
+      deliveryKm: publicDeliveryKm(areas[0])
     };
     businesses.push(business);
     for (const vehicle of catalog.vehicles) {
@@ -221,11 +221,13 @@ export function nextFree(vehicle: RoveVehicle, start: string): string | null | "
 /** Distance from a searched point to where the vehicle is based, and whether it's delivered there. Null: out of reach. */
 export function reachFrom(vehicle: RoveVehicle, point: { lat: number; lng: number } | null): { km: number | null; delivers: boolean } | null {
   const area = vehicle.area;
-  if (!point) return { km: null, delivers: Boolean(area && area.radiusKm > 0) };
+  // Reach (who sees it) may use the assumed radius; "delivers" only the radius the owner set (publicDeliveryKm).
+  const delivery = publicDeliveryKm(area);
+  if (!point) return { km: null, delivers: delivery > 0 };
   if (!area) return null;
   const km = distanceKm(point, area);
   if (km > area.radiusKm + PICKUP_REACH_KM) return null;
-  return { km: Math.round(km * 10) / 10, delivers: area.radiusKm > 0 && km <= area.radiusKm };
+  return { km: Math.round(km * 10) / 10, delivers: delivery > 0 && km <= delivery };
 }
 
 export type SearchSort = "price" | "price_desc" | "deposit" | "nearest";
@@ -249,7 +251,7 @@ export async function searchMarket(input: MarketSearch): Promise<SearchResult[]>
   for (const vehicle of vehicles) {
     if (!passesVehicleFilter(input.filter, vehicle.kind, vehicle.specs)) continue;
     const inside = input.within && vehicle.area ? distanceKm(input.within.center, vehicle.area) <= input.within.radiusKm : false;
-    const reach = reachFrom(vehicle, input.point) || (inside ? { km: null, delivers: Boolean(vehicle.area && vehicle.area.radiusKm > 0) } : null);
+    const reach = reachFrom(vehicle, input.point) || (inside ? { km: null, delivers: publicDeliveryKm(vehicle.area) > 0 } : null);
     if (!reach) continue;
     if (input.deliveryOnly && !reach.delivers) continue;
     const quote = quoteFor(vehicle, input.stay);

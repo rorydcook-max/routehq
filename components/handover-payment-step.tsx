@@ -75,6 +75,8 @@ export function HandoverPaymentStep({
   const [receipts, setReceipts] = useState<HandoverPayResult[]>([]);
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+  // Which button is saving, so only that one says "Saving...".
+  const [savingFrom, setSavingFrom] = useState<"yes" | "part" | "screen">("screen");
 
   const rentLeft = round2(Math.max(0, rentDue - paidRent));
   const depositLeft = round2(Math.max(0, depositDue - paidDeposit));
@@ -85,13 +87,14 @@ export function HandoverPaymentStep({
     onLeftChange?.(left);
   }, [left, onLeftChange]);
 
-  function record(chosen: Method, amount: number, after?: () => void) {
+  function record(chosen: Method, amount: number, after?: () => void, from: "yes" | "part" | "screen" = "screen") {
     const take = round2(Math.min(amount, left));
     if (!(take > 0)) return;
     // Rent first, then the deposit (held, not income).
     const rent = round2(Math.min(take, rentLeft));
     const deposit = round2(Math.min(take - rent, depositLeft));
     setError("");
+    setSavingFrom(from);
     startTransition(async () => {
       try {
         const result = await onRecord(chosen, rent, deposit);
@@ -173,11 +176,11 @@ export function HandoverPaymentStep({
                     onClick={() => {
                       setCashAnswer(answer);
                       setError("");
-                      if (answer === "yes") record("cash", left);
+                      if (answer === "yes") record("cash", left, undefined, "yes");
                     }}
                     type="button"
                   >
-                    {answer === "yes" && isPending ? t("saving") : t(answer)}
+                    {answer === "yes" && isPending && savingFrom === "yes" ? t("saving") : t(answer)}
                   </button>
                 ))}
               </div>
@@ -190,10 +193,10 @@ export function HandoverPaymentStep({
                   <button
                     className="pressable min-h-12 shrink-0 whitespace-nowrap rounded-full bg-[var(--primary)] px-5 text-base font-semibold text-white disabled:opacity-40"
                     disabled={isPending || !(Number(partAmount) > 0)}
-                    onClick={() => record("cash", Number(partAmount))}
+                    onClick={() => record("cash", Number(partAmount), undefined, "part")}
                     type="button"
                   >
-                    {isPending ? t("saving") : t("record")}
+                    {isPending && savingFrom === "part" ? t("saving") : t("record")}
                   </button>
                 </div>
               ) : null}

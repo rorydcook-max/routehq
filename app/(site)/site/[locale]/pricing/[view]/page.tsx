@@ -7,7 +7,7 @@ import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { BUSINESS_INCLUDED, PLANS, TRIAL_DAYS, YEARLY_MONTHS, fleetText, type Plan } from "@/lib/plans";
 import { formatPlanPrice, planCurrency, planPrices, yearlyOf } from "@/lib/plan-currency";
 import { notFound } from "next/navigation";
-import { isSiteCurrency, PRICING_CURRENCIES } from "@/lib/site-currency";
+import { isSiteCurrency, pricingCurrenciesFor } from "@/lib/site-currency";
 import { parsePricingView, pricingView } from "@/lib/site/internal-path";
 import { siteLocale } from "@/lib/site/static-page";
 import { localizeSitePath } from "@/lib/site/locale-path";
@@ -17,9 +17,6 @@ import { JsonLd } from "../../_components/content-ui";
 import { FinalCta } from "../../_components/final-cta";
 import { Check, Container, Eyebrow, Plus, RICH, SITE_LINKS, SiteLink, r } from "../../_components/site-ui";
 import s from "../../site.module.css";
-
-/** Currencies offered in the switcher (lib/site-currency.ts). */
-const CURRENCIES = PRICING_CURRENCIES;
 
 /** Lines shown on a card; the rest go in "Compare everything". */
 const CARD_LINES = 6;
@@ -72,7 +69,8 @@ export default async function PricingPage({ params }: Props) {
   const [m, t, settings, locale] = await Promise.all([getTranslations("marketing"), getTranslations("site"), getTranslations("settingsPage"), getLocale()]);
   const say = settings as unknown as Say;
   const nl = numberLocale(locale);
-  const currencies = CURRENCIES.includes(detected) ? CURRENCIES : [detected, ...CURRENCIES];
+  // The visitor's own currency first, then the global list (lib/site-currency.ts).
+  const currencies = pricingCurrenciesFor(detected);
   const asked = chosen;
   const currency = planCurrency(currencies.includes(asked) && isSiteCurrency(asked) ? asked : detected);
   const price = (amount: number) => formatPlanPrice(amount, currency, nl);

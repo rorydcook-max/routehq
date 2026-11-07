@@ -35,14 +35,16 @@ function operatorAddressFromSettings(settings: unknown, businessName = "") {
   return [businessName.trim(), town].filter(Boolean).join(", ");
 }
 
+/** Where the delivery map opens: the business's own area from setup ("Lisbon, Portugal"), or nothing (never a fixed place). */
 function homeTerritoryFromSettings(settings: unknown) {
   if (!settings || typeof settings !== "object") {
-    return "Koh Samui, Thailand";
+    return "";
   }
 
   const values = settings as Record<string, unknown>;
   const mainLocation = values.main_location && typeof values.main_location === "object" ? values.main_location as Record<string, unknown> : {};
-  return String(values.home_territory || mainLocation.town || mainLocation.province || "Koh Samui, Thailand").trim();
+  const area = [mainLocation.town || mainLocation.province, mainLocation.country].map((part) => String(part || "").trim()).filter(Boolean).join(", ");
+  return String(values.home_territory || area || "").trim();
 }
 
 export default async function NewBookingPage({ searchParams }: { searchParams: Promise<SearchParams> }) {

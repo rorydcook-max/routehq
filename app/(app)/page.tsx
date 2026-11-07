@@ -31,7 +31,8 @@ import { Dot, FleetLot, InOutBars, Ring, Spark, TileHead, type LotState, type Lo
 import { AgendaCalendar } from "@/components/agenda-calendar";
 import { getCalendarEventsBetween, type CalendarEvent } from "@/lib/calendar";
 import { taskCalendarEvents } from "@/lib/calendar-tasks";
-import { distanceKey } from "@/lib/business-units";
+import { businessCountry, distanceKey } from "@/lib/business-units";
+import { lineFirst } from "@/lib/messaging-order";
 
 // Dates and counts are worded by the translation files (see lib/i18n/dates.ts and locales/).
 function addDays(isoDate: string, days: number) {
@@ -815,7 +816,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         <p className="px-1 pb-1 text-[var(--muted)]">{t("msgNone")}</p>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-3 px-1 pb-1">
-          <p className="min-w-0 flex-1 basis-48 text-[var(--foreground-secondary)]">{t("msgConnect")}</p>
+          <p className="min-w-0 flex-1 basis-48 text-[var(--foreground-secondary)]">{t(lineFirst(businessCountry()) ? "msgConnect" : "msgConnectGlobal")}</p>
           <Link className="secondary-action pressable" href={"/settings?tab=messaging" as Route}>{t("msgConnectBtn")}</Link>
         </div>
       )}

@@ -66,9 +66,10 @@ export function SiteEditorParts({ site, brandColour, vehicles, renderPart }: { s
           <link href={fontPreviewHref(pairing)} key={pairing.id} rel="stylesheet" />
         ))}
         <div className="mt-2 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-1" role="radiogroup">
-          {[null, ...FONT_PAIRINGS.map((pairing) => pairing.id)].map((id) => {
+          {/* The template's own pairing is listed once, as "Template default" (not again further down). */}
+          {[null, ...FONT_PAIRINGS.map((pairing) => pairing.id).filter((id) => id !== template.font)].map((id) => {
             const pairing = fontPairing(id, template.font);
-            const on = draft.font === id;
+            const on = id === null ? draft.font === null || draft.font === template.font : draft.font === id;
             return (
               <button aria-checked={on} className={`flex min-h-14 items-center justify-between gap-2 rounded-xl px-3 py-2 text-start ${on ? "bg-[var(--primary-light)] ring-2 ring-[var(--primary)]" : "bg-[var(--panel-secondary)]"}`} key={id || "auto"} onClick={() => update({ font: id })} role="radio" type="button">
                 <span className="min-w-0">
@@ -98,7 +99,7 @@ export function SiteEditorParts({ site, brandColour, vehicles, renderPart }: { s
     <>
       {renderPart({ id: "look", title: say("look"), summary: `${say(`t_${draft.template}`)}, ${paletteName}, ${font.name}`, body: look })}
       {renderPart({ id: "images", title: say("images"), body: images })}
-      {renderPart({ id: "sections", title: say("sections"), summary: say("sectionsOn", { count: shown + 1 }), body: <SectionList site={site} vehicles={vehicles} /> })}
+      {renderPart({ id: "sections", title: say("sections"), summary: say("sectionsOn", { count: shown }), body: <SectionList site={site} vehicles={vehicles} /> })}
       {gallery ? <TemplateGallery current={draft.template} onClose={() => setGallery(false)} onPick={(id) => update({ template: id })} /> : null}
     </>
   );

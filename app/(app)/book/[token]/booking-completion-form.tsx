@@ -17,6 +17,8 @@ import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places"
 import { displayNamesLocale } from "@/lib/i18n/dates";
 import { legalUrl } from "@/lib/site/legal-slugs";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
+import { allCountries, countryLabel } from "@/lib/customer-options";
+import { dialCodeFor, phonePlaceholderFor } from "@/lib/phone";
 
 declare global {
   interface Window {
@@ -72,6 +74,8 @@ type PublicBookingDetail = {
   outstandingBalance?: number;
   depositAmount?: number;
   currency?: string;
+  /** The business's country (ISO code): the phone code boxes start with its dialling code. */
+  businessCountry?: string | null;
   billingPeriod?: string;
   rentalDocumentAgreement?: {
     eligibility: {
@@ -432,64 +436,38 @@ function resolveNationality(value: string) {
   );
 }
 
-/** A saved number like "+66812345678" shown as its country code and the rest, so the code isn't shown twice. */
-function splitSavedPhone(value: unknown): { code: string; local: string } {
+/**
+ * A saved number like "+351912345678" shown as its country code and the rest, so the code isn't shown twice.
+ * With nothing saved, the code is the business's own (`fallbackCode`), or none when its country isn't known.
+ */
+function splitSavedPhone(value: unknown, fallbackCode = ""): { code: string; local: string } {
   const raw = String(value || "").replace(/[\s\-().]/g, "");
-  if (!raw.startsWith("+")) return { code: "+66", local: raw };
-  const match = phoneCountrySvgOptions
-    .map((option) => option.callingCode)
+  if (!raw.startsWith("+")) return { code: fallbackCode, local: raw };
+  const match = Array.from(new Set(phoneCountrySvgOptions.map((option) => option.callingCode)))
     .sort((a, b) => b.length - a.length)
     .find((code) => raw.startsWith(code));
   // An unlisted country: leave the full number in the box, where the server accepts it as written.
-  return match ? { code: match, local: raw.slice(match.length) } : { code: "+66", local: raw };
+  return match ? { code: match, local: raw.slice(match.length) } : { code: fallbackCode, local: raw };
 }
 
-const phoneCountrySvgOptions = [
-  { flagCode: "th", code: "TH", callingCode: "+66", name: "Thailand" },
-  { flagCode: "gb", code: "GB", callingCode: "+44", name: "United Kingdom" },
-  { flagCode: "us", code: "US", callingCode: "+1", name: "United States" },
-  { flagCode: "au", code: "AU", callingCode: "+61", name: "Australia" },
-  { flagCode: "de", code: "DE", callingCode: "+49", name: "Germany" },
-  { flagCode: "fr", code: "FR", callingCode: "+33", name: "France" },
-  { flagCode: "ru", code: "RU", callingCode: "+7", name: "Russia" },
-  { flagCode: "ua", code: "UA", callingCode: "+380", name: "Ukraine" },
-  { flagCode: "cn", code: "CN", callingCode: "+86", name: "China" },
-  { flagCode: "jp", code: "JP", callingCode: "+81", name: "Japan" },
-  { flagCode: "kr", code: "KR", callingCode: "+82", name: "South Korea" },
-  { flagCode: "in", code: "IN", callingCode: "+91", name: "India" },
-  { flagCode: "id", code: "ID", callingCode: "+62", name: "Indonesia" },
-  { flagCode: "my", code: "MY", callingCode: "+60", name: "Malaysia" },
-  { flagCode: "sg", code: "SG", callingCode: "+65", name: "Singapore" },
-  { flagCode: "vn", code: "VN", callingCode: "+84", name: "Vietnam" },
-  { flagCode: "ph", code: "PH", callingCode: "+63", name: "Philippines" },
-  { flagCode: "kh", code: "KH", callingCode: "+855", name: "Cambodia" },
-  { flagCode: "la", code: "LA", callingCode: "+856", name: "Laos" },
-  { flagCode: "mm", code: "MM", callingCode: "+95", name: "Myanmar" },
-  { flagCode: "nl", code: "NL", callingCode: "+31", name: "Netherlands" },
-  { flagCode: "se", code: "SE", callingCode: "+46", name: "Sweden" },
-  { flagCode: "ch", code: "CH", callingCode: "+41", name: "Switzerland" },
-  { flagCode: "no", code: "NO", callingCode: "+47", name: "Norway" },
-  { flagCode: "dk", code: "DK", callingCode: "+45", name: "Denmark" },
-  { flagCode: "fi", code: "FI", callingCode: "+358", name: "Finland" },
-  { flagCode: "il", code: "IL", callingCode: "+972", name: "Israel" },
-  { flagCode: "es", code: "ES", callingCode: "+34", name: "Spain" },
-  { flagCode: "it", code: "IT", callingCode: "+39", name: "Italy" },
-  { flagCode: "pt", code: "PT", callingCode: "+351", name: "Portugal" },
-  { flagCode: "pl", code: "PL", callingCode: "+48", name: "Poland" },
-  { flagCode: "cz", code: "CZ", callingCode: "+420", name: "Czech Republic" },
-  { flagCode: "at", code: "AT", callingCode: "+43", name: "Austria" },
-  { flagCode: "be", code: "BE", callingCode: "+32", name: "Belgium" },
-  { flagCode: "ca", code: "CA", callingCode: "+1", name: "Canada" },
-  { flagCode: "nz", code: "NZ", callingCode: "+64", name: "New Zealand" },
-  { flagCode: "za", code: "ZA", callingCode: "+27", name: "South Africa" },
-  { flagCode: "ae", code: "AE", callingCode: "+971", name: "UAE" },
-  { flagCode: "sa", code: "SA", callingCode: "+966", name: "Saudi Arabia" },
-  { flagCode: "tr", code: "TR", callingCode: "+90", name: "Turkey" },
-  { flagCode: "tw", code: "TW", callingCode: "+886", name: "Taiwan" },
-  { flagCode: "hk", code: "HK", callingCode: "+852", name: "Hong Kong" },
-  { flagCode: "mo", code: "MO", callingCode: "+853", name: "Macau" },
-];
+/** Where several countries share a code, the one its flag shows unless the business is in another of them. */
+const MAIN_COUNTRY_FOR_CODE: Record<string, string> = { "+1": "US", "+7": "RU", "+44": "GB", "+61": "AU", "+47": "NO", "+358": "FI", "+590": "GP", "+262": "RE", "+599": "CW", "+212": "MA", "+290": "SH", "+672": "NF", "+39": "IT", "+64": "NZ", "+33": "FR" };
 
+/** Every country with a dialling code, for the code picker (alphabetical when shown). */
+const phoneCountrySvgOptions = allCountries.map((country) => ({
+  flagCode: country.code.toLowerCase(),
+  code: country.code,
+  callingCode: country.phoneCode,
+  name: country.country
+}));
+
+/** The country shown for a code: the business's own when it uses that code, else the main one. */
+function phoneOptionFor(callingCode: string, businessCountry?: string | null) {
+  const matches = phoneCountrySvgOptions.filter((option) => option.callingCode === callingCode);
+  if (!matches.length) return null;
+  const own = String(businessCountry || "").toUpperCase();
+  return matches.find((option) => option.code === own) || matches.find((option) => option.code === MAIN_COUNTRY_FOR_CODE[callingCode]) || matches[0];
+}
 
 const loadPublicGooglePlaces = loadSharedGooglePlaces;
 export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail }) {
@@ -501,9 +479,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [executionCertificateUrl, setExecutionCertificateUrl] = useState<string | null>(detail.executedAgreementDownloads?.executionCertificateUrl || null);
   const [originalAgreementUrl, setOriginalAgreementUrl] = useState<string | null>(detail.executedAgreementDownloads?.originalAgreementUrl || null);
   const [signature, setSignature] = useState("");
-  const savedPhone = splitSavedPhone(detail.customer?.phone);
+  // Phone codes start at the business's own country's (none when its country isn't set).
+  const businessDialCode = dialCodeFor(detail.businessCountry);
+  // The business's country in English, where the "drop a pin" map opens when no address is typed yet.
+  const businessCountryName = detail.businessCountry ? countryLabel(String(detail.businessCountry).toUpperCase(), "", "en") : "";
+  const savedPhone = splitSavedPhone(detail.customer?.phone, businessDialCode);
+  const savedEmergencyPhone = splitSavedPhone(detail.customer?.emergency_contact_phone, businessDialCode);
   const [phoneCountryCode, setPhoneCountryCode] = useState(savedPhone.code);
-  const [emergencyPhoneCountryCode, setEmergencyPhoneCountryCode] = useState("+66");
+  const [emergencyPhoneCountryCode, setEmergencyPhoneCountryCode] = useState(savedEmergencyPhone.code);
   const [currentAddress, setCurrentAddress] = useState(String(detail.customer?.address || ""));
   const [contactChannelError, setContactChannelError] = useState("");
   const [preferredContactMethod, setPreferredContactMethod] = useState<string>(() => {
@@ -1053,7 +1036,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           <label>
             <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("phone")}</span>
             <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
-              <PhoneCountrySelect name="phoneCountryCode" onChange={setPhoneCountryCode} value={phoneCountryCode} />
+              <PhoneCountrySelect country={detail.businessCountry} name="phoneCountryCode" onChange={setPhoneCountryCode} value={phoneCountryCode} />
               <input defaultValue={savedPhone.local} name="phone" onClick={(e) => e.stopPropagation()} required style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
             </div>
           </label>
@@ -1069,7 +1052,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
               {t("whereStaying")} <span className="font-normal text-[var(--muted)]">{t("optionalBrackets")}</span>
             </span>
-            <GoogleAddressInput onChange={setCurrentAddress} value={currentAddress} />
+            <GoogleAddressInput near={businessCountryName} onChange={setCurrentAddress} value={currentAddress} />
           </label>
           <details className="sm:col-span-2" open={Boolean(detail.customer?.emergency_contact_name || detail.customer?.emergency_contact_phone)}>
             <summary className="cursor-pointer text-sm font-semibold text-[var(--primary)]">{t("addEmergencyContact")}</summary>
@@ -1085,8 +1068,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               {t("emergencyPhone")}
             </span>
             <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
-              <PhoneCountrySelect name="emergencyPhoneCountryCode" onChange={setEmergencyPhoneCountryCode} value={emergencyPhoneCountryCode} />
-              <input defaultValue={detail.customer?.emergency_contact_phone || ""} name="emergencyContactPhone" onClick={(e) => e.stopPropagation()} style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
+              <PhoneCountrySelect country={detail.businessCountry} name="emergencyPhoneCountryCode" onChange={setEmergencyPhoneCountryCode} value={emergencyPhoneCountryCode} />
+              <input defaultValue={savedEmergencyPhone.local} name="emergencyContactPhone" onClick={(e) => e.stopPropagation()} style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
             </div>
           </label>
             </div>
@@ -1167,7 +1150,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             <input
               name="whatsappNumber"
               onChange={(e) => setWhatsappNumber(e.target.value)}
-              placeholder={livePhone || "+66812345678"}
+              placeholder={livePhone || phonePlaceholderFor(detail.businessCountry)}
               style={{ ...fieldStyle, marginTop: 4 }}
               type="tel"
               value={whatsappNumber}
@@ -1214,7 +1197,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             {preferredContactMethod !== "whatsapp" ? (
               <div>
                 <label style={{ fontSize: 14, fontWeight: 500, color: "var(--foreground)", display: "block" }}>WhatsApp</label>
-                <input name="whatsappNumber" onChange={(e) => setWhatsappNumber(e.target.value)} placeholder="+66812345678" style={{ ...fieldStyle, marginTop: 4 }} type="tel" value={whatsappNumber} />
+                <input name="whatsappNumber" onChange={(e) => setWhatsappNumber(e.target.value)} placeholder={phonePlaceholderFor(detail.businessCountry)} style={{ ...fieldStyle, marginTop: 4 }} type="tel" value={whatsappNumber} />
               </div>
             ) : null}
             {preferredContactMethod !== "messenger" ? (
@@ -1259,7 +1242,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           {customerCollects ? null : (
             <label className="sm:col-span-2">
               <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("preferredPlace")}</span>
-              <GoogleAddressInput name="preferredDeliveryLocation" onChange={setPreferredDeliveryLocation} value={preferredDeliveryLocation} />
+              <GoogleAddressInput name="preferredDeliveryLocation" near={businessCountryName} onChange={setPreferredDeliveryLocation} value={preferredDeliveryLocation} />
             </label>
           )}
           <label className="sm:col-span-2">
@@ -1770,12 +1753,16 @@ function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string;
   );
 }
 
-function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange: (value: string) => void; value: string }) {
+function PhoneCountrySelect({ name, onChange, value, country }: { name: string; onChange: (value: string) => void; value: string; country?: string | null }) {
   const t = useTranslations("customer");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  // The country picked from the list, so Canada stays Canada although it shares +1 with the US.
+  const [picked, setPicked] = useState("");
   const searchRef = useRef<HTMLInputElement | null>(null);
-  const selected = phoneCountrySvgOptions.find((country) => country.callingCode === value) || phoneCountrySvgOptions[0];
+  // No code yet (the business's country isn't set): just "+", for the renter to choose.
+  const selected =
+    phoneCountrySvgOptions.find((option) => option.code === picked && option.callingCode === value) || (value ? phoneOptionFor(value, country) : null);
 
   // Alphabetical by country name (Rory, 1 Nov 2026).
   const filtered = (search.trim()
@@ -1794,7 +1781,7 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
 
   return (
     <>
-      <input name={name} type="hidden" value={selected.callingCode} />
+      <input name={name} type="hidden" value={selected?.callingCode || ""} />
       <button
         aria-expanded={open}
         onClick={openDropdown}
@@ -1818,8 +1805,8 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
         }}
         type="button"
       >
-        <FlagSvg code={selected.flagCode} label={selected.code} />
-        <span style={{ fontSize: 14 }}>{selected.callingCode}</span>
+        {selected ? <FlagSvg code={selected.flagCode} label={selected.code} /> : null}
+        <span style={{ fontSize: 14 }}>{selected?.callingCode || "+"}</span>
       </button>
       {open ? (
         <>
@@ -1860,7 +1847,7 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
               ) : filtered.map((country) => (
                 <button
                   key={`${name}-${country.callingCode}-${country.code}`}
-                  onClick={() => { onChange(country.callingCode); setOpen(false); setSearch(""); }}
+                  onClick={() => { setPicked(country.code); onChange(country.callingCode); setOpen(false); setSearch(""); }}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -1900,7 +1887,7 @@ function FlagSvg({ code, label }: { code: string; label: string }) {
   );
 }
 
-function GoogleAddressInput({ name = "address", onChange, value }: { name?: string; onChange: (value: string) => void; value: string }) {
+function GoogleAddressInput({ name = "address", onChange, value, near = "" }: { name?: string; onChange: (value: string) => void; value: string; near?: string }) {
   const t = useTranslations("customer");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
@@ -1963,6 +1950,9 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
       {isEnabled ? <p className="mt-2 text-xs text-[var(--muted)]">{t("addressHint")}</p> : null}
       {pinModalOpen ? (
         <PublicGooglePinModal
+          // The map opens on what they typed, else the business's country (never a fixed place).
+          start={value.trim() || near}
+          wide={!value.trim()}
           onClose={() => setPinModalOpen(false)}
           onConfirm={(address) => {
             onChange(address);
@@ -1974,11 +1964,11 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
   );
 }
 
-function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onConfirm: (address: string) => void }) {
+function PublicGooglePinModal({ onClose, onConfirm, start, wide = false }: { onClose: () => void; onConfirm: (address: string) => void; start: string; wide?: boolean }) {
   const t = useTranslations("customer");
   const mapRef = useRef<HTMLDivElement | null>(null);
   const markerRef = useRef<any>(null);
-  const [address, setAddress] = useState("Koh Samui, Thailand");
+  const [address, setAddress] = useState(start);
 
   useEffect(() => {
     let cancelled = false;
@@ -1990,7 +1980,8 @@ function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onC
       if (cancelled || !mapRef.current || !maps?.Map || !maps?.Marker || !maps?.Geocoder) return;
 
       const geocoder = new maps.Geocoder();
-      const fallbackCenter = { lat: 9.512, lng: 100.013 };
+      // Nothing to look up: the whole map, for them to zoom to their place.
+      const fallbackCenter = { lat: 20, lng: 0 };
 
       const updateFromPosition = (position: { lat: number; lng: number }) => {
         geocoder.geocode({ location: position }, (results: Array<{ formatted_address: string }> | null, status: string) => {
@@ -2000,15 +1991,17 @@ function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onC
         });
       };
 
-      geocoder.geocode({ address: address || "Koh Samui, Thailand" }, (results: Array<{ geometry?: { location?: { lat: () => number; lng: () => number } }; formatted_address: string }> | null, status: string) => {
-        const location = status === "OK" && results?.[0]?.geometry?.location
-          ? { lat: results[0].geometry.location.lat(), lng: results[0].geometry.location.lng() }
+      geocoder.geocode({ address: address || " " }, (results: Array<{ geometry?: { location?: { lat: () => number; lng: () => number } }; formatted_address: string }> | null, status: string) => {
+        const found = Boolean(address) && status === "OK" && results?.[0]?.geometry?.location;
+        const location = found
+          ? { lat: results![0].geometry!.location!.lat(), lng: results![0].geometry!.location!.lng() }
           : fallbackCenter;
         const map = new maps.Map(mapRef.current, {
           center: location,
           mapTypeControl: false,
           streetViewControl: false,
-          zoom: 13
+          // A typed address opens close up; just a country opens wide enough to see it.
+          zoom: found ? (wide ? 6 : 13) : 2
         });
         const marker = new maps.Marker({
           draggable: true,
@@ -2288,7 +2281,7 @@ function ReturningCustomerCheck({ token, defaultCode, onFound }: {
   onFound: (found: { passport?: boolean; driver_license?: boolean; selfie?: boolean; numbers?: boolean }, phone: { code: string; local: string }, dob: string) => void;
 }) {
   const t = useTranslations("customer");
-  const [code, setCode] = useState(defaultCode || "+66");
+  const [code, setCode] = useState(defaultCode || "");
   const [local, setLocal] = useState("");
   const [dob, setDob] = useState("");
   const [result, setResult] = useState<"found" | "partial" | "none" | null>(null);

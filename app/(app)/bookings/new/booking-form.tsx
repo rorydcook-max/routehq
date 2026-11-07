@@ -230,7 +230,7 @@ export function BookingForm({
   preselectedCustomerId = "",
   defaultCurrency = "THB",
   defaultDeposit = 0,
-  homeTerritory = "Koh Samui, Thailand",
+  homeTerritory = "",
   busyPeriods = {},
   seasons = [],
   extras = []
@@ -1838,7 +1838,7 @@ function GooglePinModal({
   const say = useTranslations("newBooking") as unknown as Say;
   const mapRef = useRef<HTMLDivElement | null>(null);
   const markerRef = useRef<GoogleMarker | null>(null);
-  const [pin, setPin] = useState<GoogleLatLngLiteral>({ lat: 9.512, lng: 100.013 });
+  const [pin, setPin] = useState<GoogleLatLngLiteral>({ lat: 20, lng: 0 });
   const [address, setAddress] = useState(homeTerritory);
   const [placeId, setPlaceId] = useState("");
 
@@ -1856,16 +1856,17 @@ function GooglePinModal({
       }
 
       const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ address: homeTerritory || "Koh Samui, Thailand" }, (results, status) => {
-        const fallbackCenter = { lat: 9.512, lng: 100.013 };
-        const location = status === "OK" && results?.[0]?.geometry?.location
-          ? { lat: results[0].geometry.location.lat(), lng: results[0].geometry.location.lng() }
-          : fallbackCenter;
+      // The business's own area; with none set, the whole map (never a fixed place).
+      geocoder.geocode({ address: homeTerritory || " " }, (results, status) => {
+        const fallbackCenter = { lat: 20, lng: 0 };
+        const point = homeTerritory && status === "OK" ? results?.[0]?.geometry?.location : undefined;
+        const found = Boolean(point);
+        const location = point ? { lat: point.lat(), lng: point.lng() } : fallbackCenter;
         const map = new window.google!.maps!.Map(mapRef.current!, {
           center: location,
           mapTypeControl: false,
           streetViewControl: false,
-          zoom: 13
+          zoom: found ? 13 : 2
         });
         const marker = new window.google!.maps!.Marker({
           draggable: true,

@@ -127,7 +127,8 @@
     "bkTitle": "Bookings",
     "bkAll": "All bookings",
     "emailVerified": "Email verified. Thanks!",
-    "emailLinkOld": "That link has expired. Tap \"Verify your email\" to get a new one."
+    "emailLinkOld": "That link has expired. Tap \"Verify your email\" to get a new one.",
+    "msgConnectGlobal": "Connect Telegram or LINE to see customer messages here. WhatsApp coming soon."
   },
   "nav": {
     "main": "Main",
@@ -178,7 +179,7 @@
       "businessIdentity": "Business identity",
       "documentBranding": "Document branding",
       "authorisedSignatory": "Authorized signatory",
-      "signatureAuthorisation": "I authorise this electronic signature to be applied to rental agreements and related rental documents issued by this business through authorised users of this RoveHQ account.",
+      "signatureAuthorisation": "I authorize this electronic signature to be applied to rental agreements and related rental documents issued by this business, either by authorized users of this RoveHQ account or automatically by RoveHQ when a customer completes an online booking.",
       "previewTitle": "Rental agreement preview",
       "poweredBy": "Powered by RoveHQ"
     }
@@ -1398,7 +1399,8 @@
     "toSendCount": "{count, plural, one {1 message} other {# messages}}",
     "toSendOpen": "Open",
     "toSendNoName": "Customer",
-    "toSendBooking": "Open the booking"
+    "toSendBooking": "Open the booking",
+    "emptyBodyGlobal": "Connect a Telegram bot or a LINE Official Account to get customer messages here, next to their bookings. WhatsApp coming soon."
   },
   "money": {
     "sv_title": "Service details",
@@ -2507,7 +2509,10 @@
     "holdExtWantsToExtend": "The renter wants to extend. Answer their request to set the new date.",
     "holdExtRelease": "Release hold",
     "holdExtReleasing": "Releasing…",
-    "holdExtFailed": "Couldn't release the hold. Please try again."
+    "holdExtFailed": "Couldn't release the hold. Please try again.",
+    "review_ask": "Ask for a review",
+    "review_sent": "Sent",
+    "dateRange": "{start} to {end}"
   },
   "newBooking": {
     "docsSelfie": "Photo of the customer",
@@ -3400,7 +3405,7 @@
     "d_ok": "All filled in",
     "f_name": "Full name",
     "f_phone": "Phone",
-    "f_phoneHint": "With the country code, like +66812345678",
+    "f_phoneHint": "With the country code",
     "f_email": "Email",
     "f_nationality": "Nationality",
     "f_language": "Language for their messages and agreement",
@@ -3932,7 +3937,7 @@
     "cm_title": "Send automatic reminders",
     "cm_body": "Reminders and booking updates, by chat or email.",
     "cm_noChannel": "No chat account connected yet. Messages wait in your Inbox, marked \"not sent\", for you to pass on.",
-    "cm_firstMessage": "LINE and Telegram only reach customers who message you first. Their booking page invites them to.",
+    "cm_firstMessage": "Telegram and LINE only reach customers who message you first. Their booking page invites them to.",
     "ru_hours": "{count, plural, one {# hour} other {# hours}}",
     "ru_days": "{count, plural, one {# day} other {# days}}",
     "ru_hold": "Hold a vehicle for an unsigned booking for",
@@ -4289,7 +4294,7 @@
     "inc_payments": "Payments, deposits and receipts",
     "inc_extras": "Paid extras, tracked separately",
     "inc_seasons": "High-season prices",
-    "inc_reminders": "Automatic reminders to customers (LINE, Telegram, email)",
+    "inc_reminders": "Automatic reminders to customers (email, Telegram, LINE)",
     "inc_inbox": "Customer chats in one Inbox",
     "inc_calendar": "Calendar by day and by vehicle",
     "inc_reports": "Money in and out, reports",
@@ -4298,7 +4303,7 @@
     "inc_partners": "Partner network: refer customers you can't serve, earn a finder's fee",
     "inc_owners": "Owner statements for vehicles you run for their owners",
     "inc_calculator": "Vehicle purchase calculator: what a vehicle would earn before you buy it",
-    "inc_languages": "Customers served in 28 languages",
+    "inc_languages": "Customers served in 29 languages",
     "inc_phone": "Works on any phone, no app store needed",
     "pl_choose": "Plans",
     "pl_monthly": "Monthly",
@@ -4569,8 +4574,8 @@
     "extra_saveFailed": "Couldn't save. Please try again.",
     "pn_share": "Share my fleet with the partner network",
     "pn_shareBody": "Other businesses in the network see your vehicles and when they're free, and you can search theirs. When a customer books a partner's vehicle through your link, the partner pays you {pct}% of every rental payment.",
-    "st_pnShareOn": "<b>On:</b> your fleet is shared and you can search partners' vehicles",
-    "st_pnShareOff": "<b>Off:</b> your fleet is hidden from the partner network",
+    "st_pnShareOn": "<b>Enabled:</b> your fleet is shared and you can search partners' vehicles",
+    "st_pnShareOff": "<b>Disabled:</b> your fleet is hidden from the partner network",
     "ru_extHold": "Hold for extension",
     "ru_extHoldBody": "Keep a vehicle off new bookings for {days, plural, one {# day} other {# days}} after a monthly rental ends, in case the renter extends.",
     "ru_extHoldDays": "Days to hold after a monthly rental ends",
@@ -5440,7 +5445,7 @@
     "f_booking_status": "Booking status (canceled ones are left out)",
     "chatOpen": "Or paste messages from WhatsApp or LINE",
     "chatLabel": "Messages from your chat",
-    "chatPlaceholder": "Paste the messages here, for example:\nClick 1กข 2345 – John, 5–12 Oct, 250/day, 081 234 5678\nNMAX 2กค 7788 – Anna from 1 Nov, 3,500 a month, deposit 2,000",
+    "chatPlaceholder": "Paste the messages here, for example:\nClio AB-12-CD – John, 5–12 Oct, 45/day, +351 912 345 678\nNMAX – Anna from 1 Nov, 600 a month, deposit 300",
     "chatWorks": "Bookings, vehicles, customers and payments are picked out of the messages. A whole chat exported as a .txt file works too: choose it as the file.",
     "fromMessages": "From your messages",
     "fromPhotos": "From your photos",
@@ -6500,7 +6505,7 @@
     "fact1Body": "Up to 2 cars and 5 motorbikes",
     "fact2Title": "Runs on your phone",
     "fact2Body": "Android, iPhone, tablet or computer",
-    "fact3Title": "28 languages",
+    "fact3Title": "29 languages",
     "fact3Body": "For you, your staff and your customers",
     "fact4Title": "No app for customers",
     "fact4Body": "Booking links open in the browser",
@@ -7116,7 +7121,9 @@
     "later": "I'll add vehicles later",
     "laterHint": "\"Add your vehicles\" will be waiting on your dashboard.",
     "optHelp": "Send us your records, we'll set it up",
-    "optHelpBody": "Send photos of your notebook, a spreadsheet or chats. We bring it all in."
+    "optHelpBody": "Send photos of your notebook, a spreadsheet or chats. We bring it all in.",
+    "countryChoose": "Choose your country",
+    "needCountry": "Choose your country."
   },
   "fleetAssistant": {
     "title": "Fleet assistant",
@@ -7154,7 +7161,7 @@
     "rentalsAdded": "{count, plural, one {Done: # rental is in. You'll see what's due on your dashboard.} other {Done: # rentals are in. You'll see what's due on your dashboard.}}",
     "rentalsReminders": "Connect a chat app so reminders go to customers by themselves, and add how they pay you.",
     "rentalsFailed": "Couldn't add: {names}. Check them and try again.",
-    "linkChats": "Connect LINE or Telegram",
+    "linkChats": "Connect Telegram or LINE",
     "linkPayments": "Add payment details",
     "sugSheet": "Read my Google Sheet",
     "sugSheetText": "Here's the Google Sheet with my vehicles: ",
@@ -7454,7 +7461,7 @@
     "lateHandoverSoon": "The handover to {next} is on {start}.",
     "nudgeFirstVehicle": "Add your vehicles to RoveHQ: tell the assistant, send a photo, or bring in a list. It takes a minute.",
     "nudgeCurrentRentals": "Who's renting your vehicles now? Add them and RoveHQ shows what's due and reminds them before rent is due.",
-    "nudgeReminders": "Connect LINE or Telegram so payment reminders go to your customers by themselves.",
+    "nudgeReminders": "Connect Telegram or LINE so payment reminders go to your customers by themselves.",
     "nudgeBookingPage": "Put your booking page on your Google Maps listing, Instagram or Facebook page and your WhatsApp or LINE profile so customers can book any time.",
     "nudgeSignature": "Add your signature once, and customers can sign the rental agreement on their phone.",
     "nudgePaymentMethods": "Add how customers can pay you (bank details, Wise, Revolut or PromptPay) so they can pay straight from their booking page.",

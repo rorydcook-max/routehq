@@ -279,7 +279,15 @@ export function listGuides(locale: string): GuideMeta[] {
     .filter((name) => name.endsWith(".md") && !name.startsWith("_"))
     .map((name) => getGuide(locale, name.slice(0, -3)))
     .filter((guide): guide is Guide => Boolean(guide))
-    .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
+    // Guides for every market first, then the ones about one country (Thailand's plates, insurance...): the
+    // audience is global (7 Nov 2026). Newest first within each.
+    .sort((a, b) => regionRank(a) - regionRank(b) || b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
+}
+
+/** 0 for a guide that applies everywhere ("global" or no country), 1 for one about a single country. */
+function regionRank(guide: GuideMeta) {
+  const country = String(guide.country || "").trim().toLowerCase();
+  return !country || country === "global" ? 0 : 1;
 }
 
 /** The languages a guide has been written in. */

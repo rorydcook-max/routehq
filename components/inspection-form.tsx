@@ -53,17 +53,22 @@ function titleFor(context: InspectionContext) {
   return [context.vehicle.make, context.vehicle.model, context.vehicle.trim, context.vehicle.year].filter(Boolean).join(" ");
 }
 
+/** A stored date or instant as the business's calendar day (never the phone's own time zone), held at midnight UTC. */
+function businessDayOf(value: string) {
+  return new Date(`${toWallTime(value).slice(0, 10)}T00:00:00Z`);
+}
+
 function formatDate(value: string | null | undefined, locale = "en-GB") {
   if (!value) {
     return "Not set";
   }
-  return dateFormat(locale === "en-GB" ? "en" : locale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
+  return dateFormat(locale === "en-GB" ? "en" : locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(businessDayOf(value));
 }
 
 /** "31 Oct": the year is clear from the booking, so the short choice lines leave it out. */
 function shortDate(value: string | null | undefined, locale = "en-GB") {
   if (!value) return "";
-  return dateFormat(locale === "en-GB" ? "en" : locale, { day: "numeric", month: "short" }).format(new Date(value));
+  return dateFormat(locale === "en-GB" ? "en" : locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(businessDayOf(value));
 }
 
 // The booking's currency (set when the form opens; one form per page). Was always THB, which showed ฿ to businesses elsewhere.
@@ -865,7 +870,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
             onClick={() => setStep((current) => Math.min(steps.length - 1, current + 1))}
             type="button"
           >
-            {steps[step] === "Payment" && payLeft > 0 ? tp("later") : t("next")}
+            {/* "Later" only when nothing was taken; after a part payment the rest goes to To do, so it's "Next". */}
+            {steps[step] === "Payment" && payLeft > 0 && payLeft >= payDue.rent + payDue.deposit ? tp("later") : t("next")}
             <ChevronRight size={18} />
           </button>
         ) : (

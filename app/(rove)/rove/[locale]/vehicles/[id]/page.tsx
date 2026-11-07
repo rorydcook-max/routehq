@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { getPublishedReviews, getReviewStats } from "@/lib/reviews";
 import { DESTINATIONS, destinationPath } from "@/lib/rove/destinations";
 import { distanceKm } from "@/lib/place-coords";
+import { publicDeliveryKm } from "@/lib/service-area";
 import { extrasForVehicle, findVehicle, loadMarket, quoteFor, roveToday, type Stay } from "@/lib/rove/market";
 import { roveHref } from "@/lib/rove/paths";
 import { parseRoveQuery, type RoveQuery } from "@/lib/rove/query";
@@ -163,7 +164,7 @@ export default async function VehiclePage({ params, searchParams }: Props) {
           <section className={s.sectionTight} style={{ paddingTop: 0 }}>
             <h2 className={s.h3}>{t("rv.includedTitle")}</h2>
             <ul className={s.list}>
-              {vehicle.area && vehicle.area.radiusKm > 0 ? <li>{t("rv.includedDelivery", { km: Math.round(vehicle.area.radiusKm), place })}</li> : <li>{t("rv.includedPickup", { place })}</li>}
+              {publicDeliveryKm(vehicle.area) > 0 ? <li>{t("rv.includedDelivery", { km: Math.round(publicDeliveryKm(vehicle.area)), place })}</li> : <li>{t("rv.includedPickup", { place })}</li>}
               <li>{t("rv.includedDirect", { business: business.name })}</li>
               {/* Thailand's compulsory motor insurance: only for vehicles of a business in Thailand. */}
               {business.country.toLowerCase() === "thailand" ? <li>{t("rv.includedCmi", { business: business.name })}</li> : null}

@@ -8,14 +8,14 @@ import { CheckCircle2, Loader2, Receipt } from "lucide-react";
 import { readPaymentSlip, submitPaymentReceipt } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 import type { SlipMatch } from "@/lib/slip-matching";
+import { niceMoney } from "@/lib/nice-money";
 
 type Read = { amount: number | null; date: string | null; reference: string | null; paidBy: string | null } | null;
 type Choice = { paymentId: string; covers: string[]; amount: number; name: string; due: string };
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 function money(amount: number, currency: string) {
-  const value = amount.toLocaleString("en-US", { maximumFractionDigits: 2 });
-  return currency === "THB" ? `฿${value}` : `${currency} ${value}`;
+  return niceMoney(amount, currency);
 }
 
 /**

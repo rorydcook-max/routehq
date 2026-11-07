@@ -25,6 +25,8 @@ import { promptPayQrSvg } from "@/lib/promptpay";
 import { PortalPayments } from "./portal-payments";
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
+import { businessCountry } from "@/lib/business-units";
+import { dialCodeFor, toInternationalPhone } from "@/lib/phone";
 
 /** The page's words in the customer's language. Passed to the helpers below so they stay plain functions. */
 type T = Awaited<ReturnType<typeof getTranslations>>;
@@ -81,10 +83,11 @@ function includedItems(value: unknown) {
 }
 
 function contactHref(phone: string | null | undefined) {
-  const digits = String(phone || "").replace(/\D/g, "");
+  // A number saved without its code gets the business's own country code (none when its country isn't set).
+  const international = toInternationalPhone(phone, dialCodeFor(businessCountry()));
+  const digits = String(international || "").replace(/\D/g, "");
   if (!digits) return "";
-  const normalized = digits.startsWith("0") ? `66${digits.slice(1)}` : digits;
-  return `https://wa.me/${normalized}`;
+  return `https://wa.me/${digits}`;
 }
 
 function normalizedDeliveryMethod(value: unknown) {
@@ -562,6 +565,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             detail={{
               token,
               organizationName: businessName,
+              businessCountry: businessCountry(),
               vehicleWithCustomer: ["active", "due_soon", "overdue", "extended"].includes(String(rental?.status || "")),
               customer,
               completion: detail.completion,

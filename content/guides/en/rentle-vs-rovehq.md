@@ -41,7 +41,7 @@ Facts about TWICE come from its own website **as of November 2026**.
 | Vehicle types | Products such as bikes and e-bikes; no vehicle-specific features listed | Cars, vans, pickups, motorbikes, scooters, e-bikes, quads |
 | Free plan or trial | 14-day trial, no card | Free plan with no time limit (2 cars, 5 motorbikes); 30-day trial with everything on |
 | Payments | Online payments, checkout links, deposits, POS connection | Your own Stripe account: cards on the booking page, embedded checkout and payment links; Apple Pay, Google Pay; SEPA Direct Debit, iDEAL, Bancontact, Klarna, MB Way, BLIK; card deposit holds. Plus cash, bank transfer and QR with slip checking |
-| Languages | Multi-language storefront and translations | 28 languages for the app and customer pages |
+| Languages | Multi-language storefront and translations | 29 languages for the app and customer pages |
 | Mobile | Web platform; POS connection | Phone-first web app |
 | Contracts | Order documents, terms and policies | Vehicle rental agreement written for you in English and the local language (18 countries across Southeast Asia and Europe), e-signature on the customer's phone |
 | Onboarding | Self-service free; guided €999; premium €1,990 | Self-serve in minutes; free import of your existing data |

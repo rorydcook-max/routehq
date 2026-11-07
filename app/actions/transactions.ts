@@ -3,6 +3,7 @@
 import { earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
 import { applyLateStart } from "@/lib/late-start";
 import { tellRentalCustomer } from "@/lib/customer-messages";
+import { toInternationalPhone } from "@/lib/phone";
 import { getTransactionFormOptions } from "@/lib/transactions";
 import { chargeRenter } from "@/lib/charges";
 import { extrasIncomeTag } from "@/lib/extras";
@@ -1221,8 +1222,8 @@ export async function sendPaymentReminder(
   // Construct WhatsApp deep-link if customer has a WhatsApp number
   let whatsappUrl: string | undefined;
   if (customer?.whatsapp_number) {
-    const digits = String(customer.whatsapp_number).replace(/\D/g, "");
-    const normalized = digits.startsWith("66") ? digits : digits.startsWith("0") ? `66${digits.slice(1)}` : digits;
+    // A local number gets the business's own country code (lib/phone.ts), not a fixed one.
+    const normalized = String(toInternationalPhone(customer.whatsapp_number) || "").replace(/\D/g, "");
     const text = encodeURIComponent(
       `Hi ${customer.full_name ?? ""},\n\nPayment reminder for ${vLabel}:\nAmount due: ${currencySymbol(rental.currency)}${balanceDue.toLocaleString("en-US")}\nDue: ${dueDateLabel}${org.promptpay_id ? `\n\nPromptPay: ${org.promptpay_id}` : ""}\n\nThank you 🙏`
     );

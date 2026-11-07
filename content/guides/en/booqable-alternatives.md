@@ -54,7 +54,7 @@ RoveHQ is built for small fleets, from one vehicle to a few dozen cars, scooters
 - **Platform fee.** Payments taken through Stripe carry a RoveHQ fee of 5% on Free, 2.5% on Starter, 2% on Pro, 1.5% on Business and 1% on any yearly plan, on top of Stripe's own processing fee. Booqable charges no commission, so if you take a lot by card, add this to the comparison.
 - **Vehicle features.** Handover and return checks with odometer and fuel photos, a damage map and the customer's signature. Passport and license photos are read automatically.
 - **Agreements.** RoveHQ writes the rental agreement for each booking, in English and the local language in 18 countries across Southeast Asia and Europe, and the customer signs on their phone.
-- **Messaging and languages.** Connect a LINE Official Account or Telegram bot and reply from one inbox; payment reminders go out automatically, and RoveHQ opens WhatsApp with the message ready to send. The app and customer pages come in 28 languages.
+- **Messaging and languages.** Connect a LINE Official Account or Telegram bot and reply from one inbox; payment reminders go out automatically, and RoveHQ opens WhatsApp with the message ready to send. The app and customer pages come in 29 languages.
 - **Where it falls short.** Stripe is the only card provider, there's no connection to travel booking sites, and no telematics integration.
 
 ## RentSyst

@@ -310,7 +310,15 @@
 .masthead {
   font-size: clamp(54px, 12.5vw, 196px);
   line-height: 0.86;
-  overflow-wrap: anywhere;
+  /* Long names are made to fit (fitLongestWord); breaking inside a word is only the last resort. */
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+/* Headlines wrap between words: a word that still can't fit breaks rather than spill out of the picture. */
+h1.display {
+  hyphens: manual;
+  overflow-wrap: break-word;
 }
 
 /* Masonry fleet: columns of cards with different picture shapes. */

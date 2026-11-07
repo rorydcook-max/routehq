@@ -44,6 +44,8 @@ export function Catalog({
   initialStart,
   initialEnd,
   initialVehicleId,
+  initialLongTerm = null,
+  onStayChange,
   source,
   referrer = null,
   embedded = false,
@@ -82,6 +84,10 @@ export function Catalog({
   initialStart?: string | null;
   initialEnd?: string | null;
   initialVehicleId?: string | null;
+  /** A monthly stay (true) or set dates (false) already chosen; null: the business's default. */
+  initialLongTerm?: boolean | null;
+  /** Told the dates and kind of stay whenever the renter changes them. */
+  onStayChange?: (stay: { start: string; end: string; longTerm: boolean }) => void;
   source?: string | null;
   /** A partner business that sent this customer (?ref=): checked on the server when they book. */
   referrer?: string | null;
@@ -91,7 +97,19 @@ export function Catalog({
   const router = useRouter();
   const [startDate, setStartDate] = useState(initialStart && initialStart >= today ? initialStart : today);
   const [endDate, setEndDate] = useState(initialEnd || "");
-  const [longTerm, setLongTerm] = useState(initialEnd ? offer === "monthly" : offer === "monthly" || offer === "both_monthly");
+  const [longTerm, setLongTerm] = useState(
+    // A kind of stay already chosen counts only when the business offers both.
+    typeof initialLongTerm === "boolean" && (offer === "both_monthly" || offer === "both_dates")
+      ? initialLongTerm
+      : initialEnd
+        ? offer === "monthly"
+        : offer === "monthly" || offer === "both_monthly"
+  );
+  // The dates and kind of stay as the renter sets them, for a parent that remounts this (the website's fleet "Book").
+  useEffect(() => {
+    onStayChange?.({ start: startDate, end: endDate, longTerm });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startDate, endDate, longTerm]);
   const bothOffered = offer === "both_monthly" || offer === "both_dates";
   const [openId, setOpenId] = useState<string | null>(initialVehicleId || null);
   const [error, setError] = useState<string | null>(null);

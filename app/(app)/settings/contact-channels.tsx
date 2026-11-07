@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
+import { businessCountry } from "@/lib/business-units";
+import { lineFirst } from "@/lib/messaging-order";
+import { phonePlaceholderFor } from "@/lib/phone";
 
 /**
  * How customers reach the business (Rory, 1 Nov 2026): tap the apps you use and add your name or number on each.
@@ -10,8 +13,8 @@ import { Check } from "lucide-react";
  * business's settings for booking links and messages. Renters from different countries use different apps, so the
  * list covers the main ones by country.
  */
-const CHANNELS = [
-  { key: "whatsapp", label: "WhatsApp", field: "whatsapp", placeholder: "+66 81 234 5678" },
+const ALL_CHANNELS = [
+  { key: "whatsapp", label: "WhatsApp", field: "whatsapp", placeholder: "" },
   { key: "line", label: "LINE", field: "line_id", placeholder: "@yourbusiness" },
   { key: "messenger", label: "Messenger", field: "contact_messenger", placeholder: "facebook.com/yourpage" },
   { key: "instagram", label: "Instagram", field: "contact_instagram", placeholder: "@yourbusiness" },
@@ -19,11 +22,16 @@ const CHANNELS = [
   { key: "wechat", label: "WeChat", field: "contact_wechat", placeholder: "WeChat ID" },
   { key: "kakaotalk", label: "KakaoTalk", field: "contact_kakaotalk", placeholder: "KakaoTalk ID" },
   { key: "zalo", label: "Zalo", field: "contact_zalo", placeholder: "+84 …" },
-  { key: "viber", label: "Viber", field: "contact_viber", placeholder: "+66 …" }
+  { key: "viber", label: "Viber", field: "contact_viber", placeholder: "" }
 ] as const;
 
 export function ContactChannels({ values, inputClass, form }: { values: Record<string, string>; inputClass: string; form?: string }) {
   const say = useTranslations("settingsPage") as unknown as (key: string, vars?: Record<string, string>) => string;
+  // Phone numbers start with the business's own dialling code; LINE sits up front only where it is the everyday app.
+  const country = businessCountry();
+  const phonePlaceholder = phonePlaceholderFor(country);
+  const CHANNELS = lineFirst(country) ? ALL_CHANNELS : [...ALL_CHANNELS.filter((channel) => channel.key !== "line"), ...ALL_CHANNELS.filter((channel) => channel.key === "line")];
+  const placeholderOf = (channel: (typeof ALL_CHANNELS)[number]) => channel.placeholder || phonePlaceholder;
   const [on, setOn] = useState<Record<string, boolean>>(() => Object.fromEntries(CHANNELS.map((channel) => [channel.key, Boolean(values[channel.field])])));
   const [text, setText] = useState<Record<string, string>>(() => Object.fromEntries(CHANNELS.map((channel) => [channel.key, values[channel.field] || ""])));
 
@@ -57,7 +65,7 @@ export function ContactChannels({ values, inputClass, form }: { values: Record<s
                 form={form}
                 name={channel.field}
                 onChange={(event) => setText((current) => ({ ...current, [channel.key]: event.target.value }))}
-                placeholder={channel.placeholder}
+                placeholder={placeholderOf(channel)}
                 value={text[channel.key]}
               />
             </label>

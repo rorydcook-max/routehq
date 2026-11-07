@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { BadgeCheck, CalendarX, CreditCard, MapPin, ShieldCheck, Truck, Wallet } from "lucide-react";
 import { Catalog } from "@/app/(app)/rent/[slug]/catalog";
 import { headlineRate } from "@/lib/rental-estimate";
@@ -40,6 +40,12 @@ export function Booking() {
     return picks.filter((value, index) => value > 0 && picks.indexOf(value) === index && value < amounts[amounts.length - 1]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.vehicles, per]);
+
+  // The dates and kind of stay set in the booking section, so a fleet card's Book (which reopens the list with that
+  // vehicle) keeps them. Tied to the hero search they started from: a new search starts again from its own dates.
+  const stay = useRef<{ start: string; end: string; longTerm: boolean; searchN: number } | null>(null);
+  const searchN = search?.n ?? 0;
+  const kept = stay.current && stay.current.searchN === searchN ? stay.current : null;
 
   // A fleet card's Book shows every vehicle again, so the one picked is in the list.
   useEffect(() => {
@@ -124,9 +130,13 @@ export function Booking() {
           extras={data.catalog.extras}
           gapDays={data.catalog.gapDays}
           holdHours={data.catalog.holdHours}
-          initialEnd={search?.end || data.catalog.initialEnd}
-          initialStart={search?.start || data.catalog.initialStart}
+          initialEnd={kept ? kept.end || null : search?.end || data.catalog.initialEnd}
+          initialLongTerm={kept ? kept.longTerm : null}
+          initialStart={kept ? kept.start : search?.start || data.catalog.initialStart}
           initialVehicleId={picked?.id || data.catalog.initialVehicleId}
+          onStayChange={(value) => {
+            stay.current = { ...value, searchN };
+          }}
           key={`${picked ? `${picked.id}-${picked.n}` : "catalog"}${search ? `-s${search.n}` : ""}`}
           offer={data.catalog.offer}
           organizationName={data.business.name}

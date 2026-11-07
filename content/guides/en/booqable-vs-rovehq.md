@@ -38,7 +38,7 @@ This page compares the two using Booqable's own website **as of November 2026**.
 | Fleet size it suits | Any number of items | One vehicle to a few dozen; Business has no limit |
 | Free plan or trial | 14-day trial, no card; account inactive after until you pick a plan | Free plan with no time limit (2 cars, 5 motorbikes); 30-day trial with everything on |
 | Payments | Stripe, PayPal, Square, Adyen, Mercado Pago, Teya, Mollie; Tap to Pay; pre-authorisations | Your own Stripe account: cards on the booking page, embedded checkout and payment links; Apple Pay, Google Pay; SEPA Direct Debit, iDEAL, Bancontact, Klarna, MB Way, BLIK; card deposit holds. Plus cash, bank transfer and QR with slip checking |
-| Languages | 10+ admin languages; customer-facing text fully customizable | 28 languages for the app and customer pages |
+| Languages | 10+ admin languages; customer-facing text fully customizable | 29 languages for the app and customer pages |
 | Mobile | iOS and Android app, add-on at $9 to $12 per user a month | Phone-first web app, included in every plan |
 | Contracts | Quotes, contracts and invoices; e-signatures from Grow | Rental agreement written for you in English and the local language (18 countries across Southeast Asia and Europe), signed on the customer's phone, every plan |
 | Vehicle handover | Not listed | Odometer and fuel photos, walkaround, damage map, signature |
@@ -63,7 +63,7 @@ This page compares the two using Booqable's own website **as of November 2026**.
 - **Card deposits for vehicles.** Hold a deposit on the customer's card at pickup, then release it or capture what's owed when the vehicle comes back.
 - **Small-fleet pricing.** A free plan with no time limit, and plans priced by vehicles rather than users, with no add-on for the phone app.
 - **Every way customers pay.** Card and wallet payments online, plus cash, bank transfer and QR codes, with slips checked against what's owed (including PromptPay in Thailand and QRIS in Indonesia).
-- **Languages and chat.** 28 languages for staff and customers, from German, French, Spanish, Italian and Greek to Thai, Indonesian and Vietnamese. LINE and Telegram chats sit in one inbox, with reminders sent automatically.
+- **Languages and chat.** 29 languages for staff and customers, from German, French, Spanish, Italian and Greek to Thai, Indonesian and Vietnamese. LINE and Telegram chats sit in one inbox, with reminders sent automatically.
 
 ## Who should pick which
 

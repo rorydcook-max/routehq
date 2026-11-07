@@ -20,7 +20,9 @@ function fullPhone(formData: FormData, codeKey: string, localKey: string) {
   if (raw.startsWith("+")) {
     return raw;
   }
-  const code = String(formData.get(codeKey) || "+66").trim();
+  // No country code chosen: keep the number as typed rather than guess a country.
+  const code = String(formData.get(codeKey) || "").trim();
+  if (!/^\+\d{1,4}$/.test(code)) return raw;
   const normalized = raw.startsWith("0") ? raw.slice(1) : raw;
   return `${code}${normalized}`;
 }
@@ -233,7 +235,8 @@ export async function createCustomer(formData: FormData) {
 export async function customerWithPhone(organizationId: string, code: string, local: string) {
   const digits = String(local || "").replace(/[\s\-().]+/g, "");
   if (!organizationId || digits.replace(/\D/g, "").length < 6) return null;
-  const phone = digits.startsWith("+") ? digits : `${String(code || "+66").trim()}${digits.startsWith("0") ? digits.slice(1) : digits}`;
+  const cleanCode = String(code || "").trim();
+  const phone = digits.startsWith("+") || !cleanCode ? digits : `${cleanCode}${digits.startsWith("0") ? digits.slice(1) : digits}`;
   const supabase = (await createSupabaseServerClient()) as any;
   const { data } = await supabase
     .from("customers")

@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentMembership, OWNER_ONLY_MESSAGE } from "@/lib/auth/roles";
 import { said } from "@/lib/i18n/server-text";
-import { submitReview, type SubmitReviewResult } from "@/lib/reviews";
+import { tellRentalCustomer } from "@/lib/customer-messages";
+import { reviewRowFor, reviewUrl, submitReview, type SubmitReviewResult } from "@/lib/reviews";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type Result = { ok: true } | { ok: false; error: string };
@@ -18,6 +19,29 @@ export async function sendRenterReview(input: { token: string; rating: number; t
   );
   revalidatePath(`/book/review/${token}`);
   return result;
+}
+
+export type ReviewRequestResult = { ok: true; url: string; sent: boolean; submitted: boolean } | { ok: false; error: string };
+
+/**
+ * "Ask for a review" on a returned rental's booking: makes (or reuses) the rental's review link and sends it on the
+ * renter's usual channel when there is one. The link is returned either way, for "Copy link".
+ */
+export async function requestRentalReview(rentalId: string, send = true): Promise<ReviewRequestResult> {
+  const membership = await getCurrentMembership();
+  if (!membership) return { ok: false, error: await said("Please sign in again.") };
+  const admin = createSupabaseAdminClient() as any;
+  const row = await reviewRowFor(admin, membership.organizationId, String(rentalId || "")).catch(() => null);
+  if (!row) return { ok: false, error: await said("Review not found.") };
+  const url = reviewUrl(row.token);
+  if (row.submitted || !send) return { ok: true, url, sent: false, submitted: row.submitted };
+  const result = await tellRentalCustomer(admin, rentalId, ({ say, vehicle }) => say("reviewRequest", { vehicle, link: url }), {
+    withLink: false,
+    sentBy: membership.userId || null,
+    metadata: { reminder_key: "review" }
+  });
+  revalidatePath(`/bookings/${rentalId}`);
+  return { ok: true, url, sent: result.sent, submitted: false };
 }
 
 /** A review of the signed-in person's business, or null. */

@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { addDaysIso, bookingRules, EXTENSION_ASK_DAYS, EXTENSION_LAPSE_DAYS } from "@/lib/booking-rules";
 import { remindRentalCustomerOnce } from "@/lib/customer-messages";
 import { notifyOperator } from "@/lib/notify-operator";
+import { dialCodeFor, toInternationalPhone } from "@/lib/phone";
 import type { AlertText } from "@/lib/operator-alert-text";
 import { processCustomerPortalAction } from "@/lib/portal-notifications";
 import { BLOCKING_RENTAL_STATUSES, OUT_RENTAL_STATUSES } from "@/lib/rental-conflicts";
@@ -125,7 +126,7 @@ export async function loadExtensionCheck(admin: any, token: string): Promise<Ext
   const { data: rental } = await admin
     .from("rentals")
     .select(
-      "id, organization_id, status, end_date, extension_check_end, extension_answer, vehicles!rentals_vehicle_id_fkey(make, model), organizations!rentals_organization_id_fkey(name, trading_name, business_phone, whatsapp, contract_accent_colour)"
+      "id, organization_id, status, end_date, extension_check_end, extension_answer, vehicles!rentals_vehicle_id_fkey(make, model), organizations!rentals_organization_id_fkey(name, trading_name, business_phone, whatsapp, contract_accent_colour, country_code)"
     )
     .eq("extension_check_token", token)
     .is("deleted_at", null)
@@ -144,7 +145,8 @@ export async function loadExtensionCheck(admin: any, token: string): Promise<Ext
     organizationId: rental.organization_id,
     businessName: String(organization.trading_name || organization.name || ""),
     brandColour: organization.contract_accent_colour || null,
-    contactPhone: organization.whatsapp || organization.business_phone || null,
+    // In international form with the business's own country code, so the WhatsApp link works anywhere.
+    contactPhone: toInternationalPhone(organization.whatsapp || organization.business_phone, dialCodeFor(organization.country_code)) || null,
     vehicle: [rental.vehicles?.make, rental.vehicles?.model].filter(Boolean).join(" "),
     endDate: end || "",
     answer: answeredNow

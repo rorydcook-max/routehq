@@ -54,7 +54,8 @@ export const SLOT_MAX: Record<TextSlot, number> = {
 
 export type SiteSocial = { facebook: string; instagram: string; tiktok: string; line: string; whatsapp: string };
 export const SOCIAL_KEYS: Array<keyof SiteSocial> = ["facebook", "instagram", "line", "tiktok", "whatsapp"];
-export const EMPTY_SOCIAL: SiteSocial = { facebook: "", instagram: "", tiktok: "", line: "", whatsapp: "" };
+// Built from SOCIAL_KEYS so a default config and a stored one list the links in the same order.
+export const EMPTY_SOCIAL: SiteSocial = Object.fromEntries(SOCIAL_KEYS.map((key) => [key, ""])) as SiteSocial;
 /** Opening hours, Monday first; null is closed. The whole list is null when not set. */
 export type SiteHours = Array<{ open: string; close: string } | null>;
 export type SiteFaq = { q: string; a: string };
@@ -259,7 +260,14 @@ export function siteConfigFromLegacy(settings: unknown, kinds: string[]): SiteCo
 
 /** Two configs are the same site (for "Unpublished changes"). */
 export function sameSite(a: SiteConfig | null, b: SiteConfig | null) {
-  return JSON.stringify(a) === JSON.stringify(b);
+  return canonical(a) === canonical(b);
+}
+
+/** JSON with object keys sorted (arrays keep their order: section order matters), so key order never counts as a change. */
+function canonical(value: unknown): string {
+  return JSON.stringify(value, (_key, item) =>
+    item && typeof item === "object" && !Array.isArray(item) ? Object.fromEntries(Object.keys(item).sort().map((key) => [key, item[key]])) : item
+  );
 }
 
 export function isSectionOn(config: SiteConfig, id: SectionId) {

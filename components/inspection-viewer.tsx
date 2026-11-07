@@ -1,4 +1,4 @@
-import { BUSINESS_TIME_ZONE } from "@/lib/business-time";
+import { businessTimeZone } from "@/lib/business-time";
 import { Camera, FileVideo, Fuel, Gauge, PenLine, ShieldAlert } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
@@ -15,7 +15,8 @@ function formatDate(value: string | null | undefined, locale: string, notSet: st
   return dateFormat(locale, {
     dateStyle: "medium",
     timeStyle: "short",
-    timeZone: BUSINESS_TIME_ZONE
+    // The business's own clock (it was always Bangkok's), never the reader's device.
+    timeZone: businessTimeZone()
   }).format(new Date(value));
 }
 

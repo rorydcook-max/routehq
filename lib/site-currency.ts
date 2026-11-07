@@ -4,7 +4,7 @@
  * server), SITE_DEFAULT_COUNTRY. Never the browser's language. Only currencies lib/plan-currency.ts has a rate for.
  */
 
-import { localPrice, planCurrency } from "@/lib/plan-currency";
+import { localPrice, PLAN_CURRENCIES, planCurrency } from "@/lib/plan-currency";
 
 const EURO = ["AT", "BE", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK", "ME", "XK", "AD", "MC", "SM", "VA"];
 
@@ -39,8 +39,21 @@ export function isSiteCurrency(code: string | null | undefined) {
  * currency and country out (lib/site/internal-path.ts) and puts them in the page's internal address.
  */
 
-/** Currencies offered in the pricing page's switcher: US dollars and Thai baht first, then the region's and visitors' usual ones. All are in lib/plan-currency.ts. */
-export const PRICING_CURRENCIES = ["USD", "THB", "EUR", "GBP", "AUD", "SGD", "MYR", "IDR", "VND", "PHP", "LAK", "KHR", "MMK", "INR", "CNY", "JPY", "KRW"];
+/** The most used currencies worldwide, at the top of the pricing page's switcher. */
+const GLOBAL_FIRST = ["USD", "EUR", "GBP", "AUD", "CAD"];
+
+/**
+ * Currencies offered in the pricing page's switcher (global audience, 7 Nov 2026): US dollar, euro, pound, Australian
+ * and Canadian dollar, then every other currency a plan can be charged in, alphabetical by code. The pricing page
+ * puts the visitor's own currency first when it is known.
+ */
+export const PRICING_CURRENCIES = [...GLOBAL_FIRST, ...PLAN_CURRENCIES.filter((code) => !GLOBAL_FIRST.includes(code)).sort()];
+
+/** The switcher's list with the visitor's own currency first. */
+export function pricingCurrenciesFor(detected: string | null | undefined): string[] {
+  const own = String(detected || "").toUpperCase();
+  return isSiteCurrency(own) ? [own, ...PRICING_CURRENCIES.filter((code) => code !== own)] : PRICING_CURRENCIES;
+}
 
 /**
  * A made-up amount for the website's pictures, set in THB and shown as a plausible round number in the currency:

@@ -1,5 +1,6 @@
 import { tellRentalCustomer } from "@/lib/customer-messages";
 import { niceDate } from "@/lib/nice-date";
+import { niceMoney } from "@/lib/nice-money";
 import { bookingRules, clashes } from "@/lib/booking-rules";
 import { businessToday } from "@/lib/business-time";
 import { notifyOperator, type AlertText } from "@/lib/notify-operator";
@@ -73,7 +74,8 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
   const currency = String(rental.currency || "THB");
   const vehicle = [rental.vehicles?.make, rental.vehicles?.model].filter(Boolean).join(" ") || "vehicle";
   const who = rental.customers?.full_name || "The customer";
-  const baht = (value: number) => `${currency === "THB" ? "฿" : `${currency} `}${value.toLocaleString("en-US")}`;
+  // "€300", "฿8,400": the app's own money format (was "EUR 300").
+  const baht = (value: number) => niceMoney(value, currency);
 
   let outcome: ExtensionOutcome;
   let detail: string;

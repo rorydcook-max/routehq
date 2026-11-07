@@ -10,6 +10,7 @@ import { countriesSorted, customerLanguages } from "@/lib/customer-options";
 import { PhoneField } from "@/components/phone-field";
 import { DuplicatePhoneHint } from "@/components/duplicate-phone-hint";
 import { getDefaultOrganization } from "@/lib/organization";
+import { phonePlaceholderFor } from "@/lib/phone";
 
 // The wording for this page is in locales/<language>/common.json under "customerPage".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -59,7 +60,7 @@ export default async function NewCustomerPage() {
               </label>
               <label className="block">
                 <span className={labelClass}>{say("f_phone")}</span>
-                <PhoneField defaultCountry={(organization as any).country_code || "TH"} inputClass={inputClass} required />
+                <PhoneField defaultCountry={(organization as any).country_code || ""} inputClass={inputClass} required />
               </label>
               <DuplicatePhoneHint organizationId={organization.id} />
               <label className="block">
@@ -83,7 +84,7 @@ export default async function NewCustomerPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className={labelClass}>{say("ch_whatsapp")}</span>
-                <input className={inputClass} name="whatsappNumber" placeholder="+66812345678" type="tel" />
+                <input className={inputClass} name="whatsappNumber" placeholder={phonePlaceholderFor((organization as any).country_code)} type="tel" />
                 <span className="mt-1 block font-medium text-[var(--muted)]">{say("new_whatsappHint")}</span>
               </label>
               <label className="block">
@@ -164,7 +165,7 @@ export default async function NewCustomerPage() {
               </label>
               <label className="block">
                 <span className={labelClass}>{say("new_emPhone")}</span>
-                <PhoneField codeName="emergencyPhoneCountryCode" defaultCountry={(organization as any).country_code || "TH"} inputClass={inputClass} inputName="emergencyContactPhone" />
+                <PhoneField codeName="emergencyPhoneCountryCode" defaultCountry={(organization as any).country_code || ""} inputClass={inputClass} inputName="emergencyContactPhone" />
               </label>
             </div>
           </Fold>

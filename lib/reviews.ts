@@ -5,6 +5,7 @@ import { allCountries } from "@/lib/customer-options";
 import { remindersOff, remindRentalCustomerOnce } from "@/lib/customer-messages";
 import { notifyOperator } from "@/lib/notify-operator";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 
 /**
  * Renter reviews (Rory, 7 Nov 2026). supabase/migrations/0134_reviews.sql.
@@ -150,14 +151,43 @@ export async function sendReviewRequests(admin: any, organizationIds: string[], 
     if (error) continue;
     const link = reviewUrl(token);
     const ok = await remindRentalCustomerOnce(admin, rental.id, "review", ({ say, vehicle }) => say("reviewRequest", { vehicle, link }), { withLink: false }).catch(() => false);
-    if (ok) {
-      sent += 1;
-    } else {
-      // Not sent (messages off, reminders off for this renter): let a later day try again.
-      await admin.from("rental_reviews").delete().eq("rental_id", rental.id).is("submitted_at", null).then(() => null, () => null);
-    }
+    // Not sent (messages off, reminders off for this renter): the row stays, so the owner can copy the link from the
+    // booking ("Ask for a review").
+    if (ok) sent += 1;
   }
   return sent;
+}
+
+/**
+ * The owner's "Ask for a review" on a returned rental's booking: the rental's review row, made now if there isn't one.
+ * Returns its token and whether the renter has already sent it, or null when the rental can't have one.
+ */
+export async function reviewRowFor(admin: any, organizationId: string, rentalId: string): Promise<{ token: string; submitted: boolean } | null> {
+  const { data: rental } = await admin
+    .from("rentals")
+    .select("id, organization_id, customer_id, vehicle_id, status")
+    .eq("id", rentalId)
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (!rental?.customer_id || rental.status !== "completed") return null;
+  const existing = async () => {
+    const { data } = await admin.from("rental_reviews").select("token, submitted_at").eq("rental_id", rental.id).maybeSingle();
+    return data?.token ? { token: String(data.token), submitted: Boolean(data.submitted_at) } : null;
+  };
+  const found = await existing();
+  if (found) return found;
+  const token = randomBytes(18).toString("base64url");
+  const { error } = await admin.from("rental_reviews").insert({
+    organization_id: rental.organization_id,
+    rental_id: rental.id,
+    customer_id: rental.customer_id,
+    vehicle_id: rental.vehicle_id || null,
+    token
+  });
+  // A daily run made it at the same moment: use that one.
+  if (error) return existing();
+  return { token, submitted: false };
 }
 
 // ── The renter's form ────────────────────────────────────────────────────────
@@ -169,6 +199,8 @@ export type ReviewPage =
       id: string;
       organizationId: string;
       businessName: string;
+      /** The business's uploaded logo, when it has one. */
+      logoUrl: string | null;
       brandColour: string | null;
       vehicle: string;
       /** "Anna M.", as it will show. */
@@ -183,18 +215,23 @@ export async function loadReviewPage(admin: any, token: string): Promise<ReviewP
   const { data: review } = await admin
     .from("rental_reviews")
     .select(
-      "id, organization_id, rating, display_name, country_code, submitted_at, customers(full_name, nationality), vehicles(make, model), organizations(name, trading_name, contract_accent_colour, settings)"
+      "id, organization_id, rating, display_name, country_code, submitted_at, customers(full_name, nationality), vehicles(make, model), organizations(name, trading_name, contract_accent_colour, settings, logo_url, business_logo_storage_bucket, business_logo_storage_path)"
     )
     .eq("token", token)
     .maybeSingle();
   if (!review) return { state: "not_found" };
   const organization = review.organizations || {};
   const done = Boolean(review.submitted_at);
+  // The business's uploaded logo for the page header (as on its website: the logo when there is one).
+  const logoUrl = await resolveOrganizationBrandingDisplayUrls(admin, organization, { allowExternalUrl: true, expiresIn: 60 * 60 })
+    .then((urls) => urls.logoUrl || null)
+    .catch(() => null);
   return {
     state: done ? "done" : "open",
     id: review.id,
     organizationId: review.organization_id,
     businessName: String(organization.trading_name || organization.name || ""),
+    logoUrl,
     brandColour: organization.contract_accent_colour || null,
     vehicle: [review.vehicles?.make, review.vehicles?.model].filter(Boolean).join(" "),
     displayName: done ? String(review.display_name || "") : reviewName(review.customers?.full_name),

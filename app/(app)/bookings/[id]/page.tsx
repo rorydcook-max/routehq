@@ -43,7 +43,7 @@ import { getBookingDetail, getCustomersForSelector } from "@/lib/bookings";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
-import { toWallTime, wallTimeToIso, businessToday, BUSINESS_TIME_ZONE } from "@/lib/business-time";
+import { toWallTime, wallTimeToIso, businessToday, businessTimeZone } from "@/lib/business-time";
 import { signedReceiptUrls } from "@/lib/payment-receipts";
 import { GeneratePaymentScheduleButton } from "@/app/(app)/bookings/[id]/generate-payment-schedule-button";
 import { RentalDocumentsCard } from "@/app/(app)/bookings/[id]/rental-documents-card";
@@ -55,6 +55,8 @@ import { distanceKey } from "@/lib/business-units";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 import { KABIS_URL, isKabisBusiness, kabisFields } from "@/lib/kabis";
 import { KabisDetails } from "@/app/(app)/bookings/[id]/kabis-details";
+import { ReviewRequestButtons } from "@/app/(app)/bookings/[id]/review-request-buttons";
+import { reviewUrl } from "@/lib/reviews";
 
 function money(value: unknown, currency = "THB") {
   return currency === "THB" ? new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0)) : formatRegionalMoney(Number(value || 0), currency, "en-GB");
@@ -79,10 +81,11 @@ function formatDate(value: string | null | undefined, tx: Tx) {
 
 function formatDateTime(value: string | null | undefined, tx: Tx) {
   if (!value) return tx.say("notYet");
-  // A time without an offset is already Thai time; reading it as UTC showed 09:00 handovers as 16:00.
+  // A time without an offset is already business time; reading it as UTC showed 09:00 handovers as 16:00.
+  // Shown on the business's own clock (it was always Bangkok's, 7 hours out for a business in Lisbon).
   const instant = wallTimeToIso(value);
   if (!instant) return tx.say("notYet");
-  return dateFormat(tx.locale, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: BUSINESS_TIME_ZONE }).format(new Date(instant));
+  return dateFormat(tx.locale, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: businessTimeZone() }).format(new Date(instant));
 }
 
 function formatPaymentMethod(value: string | null | undefined, tx: Tx) {
@@ -359,6 +362,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const loosePayments = await loosePaymentsFor(supabaseForVehicles, { id: rental.id, vehicle_id: rental.vehicle_id, start_date: rental.start_date, end_date: rental.end_date, organization_id: organization.id }).catch(() => []);
   // Giving money away (refunds, free early days, unpaid rent taken off) is the owner's or a manager's call.
   const isOwner = canDecideMoney((await getCurrentMembership())?.role);
+  // "Ask for a review" on a returned rental: the review link already made (by the daily job or an earlier ask), if any.
+  const reviewRow =
+    rental.status === "completed" && rental.customer_id
+      ? ((await (createSupabaseAdminClient() as any)
+          .from("rental_reviews")
+          .select("token, submitted_at")
+          .eq("rental_id", rental.id)
+          .eq("organization_id", organization.id)
+          .maybeSingle()
+          .then((result: any) => result, () => ({ data: null }))) as any).data
+      : null;
   // Receipts customers sent stay with their payment; staff open them from the schedule.
   const receiptUrls = await signedReceiptUrls(payments.map((payment: any) => payment.metadata?.receipt?.path).filter(Boolean));
   for (const payment of payments as any[]) {
@@ -718,7 +732,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <ArrowRight aria-hidden="true" className="hidden text-[var(--muted)] sm:block" size={18} />
                     {/* Both leaves in the same dark teal: white on the light blue failed contrast. */}
                     <DateLeaf date={rental.end_date} locale={tx.locale} tone={isCancelled ? "var(--muted)" : undefined} />
-                    <span className="sr-only">{tx.say("dateTo", { date: formatDate(rental.start_date, tx) })}</span>
+                    <span className="sr-only">{tx.say("dateRange", { start: formatDate(rental.start_date, tx), end: formatDate(rental.end_date, tx) })}</span>
                     {isCancelled || rental.status === "completed" ? null : rental.status === "booked" && !bookingLink?.contract_signed_at && !renterSignatureOf(rentalDocuments) ? (
                       <BookingDatesButton billingPeriod={String(rental.billing_interval || rental.pricing_model || "")} currentEndDate={rental.end_date} currentRate={Number(rental.rental_rate || 0)} currentStartDate={rental.start_date} customerName={customer?.full_name || tx.list("awaitingCustomerShort")} rentalId={rental.id} vehicleLabel={vehicleTitle(vehicle)} />
                     ) : (
@@ -844,6 +858,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 {tx.say("editBooking")}
               </ActionButton>
               {!["completed", "cancelled", "draft"].includes(rental.status) ? <VehicleChangeButton rentalId={rental.id} /> : null}
+              {rental.status === "completed" && rental.customer_id && !reviewRow?.submitted_at ? (
+                <ReviewRequestButtons initialUrl={reviewRow?.token ? reviewUrl(String(reviewRow.token)) : null} rentalId={rental.id} />
+              ) : null}
               {/* Damage, a fine, fuel: a cost the renter is responsible for, taken from the deposit first and the rest billed. */}
               {rental.customer_id && !["cancelled", "draft"].includes(rental.status) ? (
                 <ActionButton href={`/transactions/new?cost=1&rentalId=${rental.id}&vehicleId=${rental.vehicle_id || vehicle?.id || ""}` as Route} tone="light">

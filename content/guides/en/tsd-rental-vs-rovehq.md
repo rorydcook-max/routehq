@@ -38,7 +38,7 @@ All facts about TSD come from its own website **as of November 2026**.
 | Vehicle types | Cars and loaner fleets | Cars, vans, pickups, motorbikes, scooters, e-bikes, quads |
 | Free plan or trial | Demo | Free plan with no time limit (2 cars, 5 motorbikes); 30-day trial with everything on |
 | Payments | Certified card processing; card authorization before a reservation is saved | Your own Stripe account: cards on the booking page, embedded checkout and payment links; Apple Pay, Google Pay; SEPA Direct Debit, iDEAL, Bancontact, Klarna, MB Way, BLIK; card deposit holds. Plus cash, bank transfer and QR with slip checking |
-| Languages | Lists English, Spanish, French, Dutch and Turkish | 28 languages for the app and customer pages |
+| Languages | Lists English, Spanish, French, Dutch and Turkish | 29 languages for the app and customer pages |
 | Mobile | iOS and Android app; mobile check-in and handoff | Phone-first web app |
 | Contracts | Agreements sent by text or email for contactless check-in | Agreement written for you in English and the local language (18 countries across Southeast Asia and Europe), e-signature on the customer's phone |
 | ID and license checks | Checks for underage drivers and expired licenses; insurance verification integration | Passport and license photos read automatically; warns when a document has expired |
@@ -64,7 +64,7 @@ The product covers flexible rate setups (hourly to monthly), card authorization 
 - **Small fleets and two-wheelers.** Plans priced by cars and motorbikes separately, so a scooter shop pays little.
 - **Payments a small shop needs.** Card, Apple Pay, Google Pay and European methods online, deposits held on the card, and cash, transfer or QR with slips checked against what's owed (including PromptPay and QRIS).
 - **Agreements in the customer's language.** A rental agreement in English and the local language in 18 countries across Southeast Asia and Europe (Greek, Spanish, Italian, Thai, Indonesian and more), signed on the customer's phone.
-- **Languages and chat.** 28 languages for staff and customers; LINE and Telegram in one inbox, and WhatsApp opens with the message ready.
+- **Languages and chat.** 29 languages for staff and customers; LINE and Telegram in one inbox, and WhatsApp opens with the message ready.
 
 ## Who should pick which
 

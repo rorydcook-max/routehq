@@ -13,6 +13,7 @@ import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { defaultCurrencyForCountry, locationOptions, townsFor } from "@/lib/onboarding-locations";
 import { PhoneField } from "@/components/phone-field";
 import { allCountries } from "@/lib/customer-options";
+import { placeLabel, toCountryCode } from "@/lib/regional";
 
 type Organization = { id: string; name: string; default_locale: string; settings?: Record<string, any> };
 
@@ -24,10 +25,11 @@ const labelClass = "font-semibold text-[var(--foreground-secondary)]";
  * 1. Language, phone, where you are. 2. Your vehicles: tell the assistant, a short form, a list, or later.
  * Setup counts as done once step 1 is saved, so nobody is ever sent back here; vehicles can be added any time.
  */
-/** The setup list's country (an English name) as the ISO code the phone field uses; Thailand when unknown. */
+/** The setup list's country (an English name) as the ISO code the phone field uses; none until a country is chosen. */
 function phoneCountryFor(name: string) {
   const wanted = name.trim().toLowerCase();
-  return allCountries.find((item) => item.name.toLowerCase() === wanted || item.country.toLowerCase() === wanted)?.code || "TH";
+  if (!wanted) return "";
+  return allCountries.find((item) => item.name.toLowerCase() === wanted || item.country.toLowerCase() === wanted)?.code || toCountryCode(name) || "";
 }
 
 export function OnboardingWizard({
@@ -53,7 +55,8 @@ export function OnboardingWizard({
   const [assistantOpen, setAssistantOpen] = useState(openAssistant);
   const saved = organization.settings?.main_location || {};
   const [phone, setPhone] = useState(String(organization.settings?.business_phone || ""));
-  const [country, setCountry] = useState(String(saved.country || defaultCountry || "Thailand"));
+  // Where they browse from when known; otherwise nothing is picked and they choose (never assumed to be Thailand).
+  const [country, setCountry] = useState(String(saved.country || defaultCountry || ""));
   const [town, setTown] = useState(String(saved.town || ""));
   const towns = useMemo(() => townsFor(country), [country]);
   const countries = useMemo(() => [...locationOptions.map((option) => option.country)].sort((a, b) => a.localeCompare(b)), []);
@@ -70,6 +73,10 @@ export function OnboardingWizard({
 
   function saveStepOne() {
     const place = town.trim();
+    if (!country) {
+      setError(t("needCountry"));
+      return;
+    }
     if (!place) {
       setError(t("needTown"));
       return;
@@ -86,7 +93,8 @@ export function OnboardingWizard({
         form.set("country", country);
         form.set("region", known?.region || "");
         form.set("town", known?.town || place);
-        form.set("location", [known?.town || place, known?.region, country].filter(Boolean).join(", "));
+        // "Lisbon, Portugal", not "Lisbon, Lisbon, Portugal" when the town and its region share a name.
+        form.set("location", placeLabel([known?.town || place, known?.region, country]));
         form.set("currency", defaultCurrencyForCountry(country));
         await saveBusinessProfile(form);
         setStep(2);
@@ -156,7 +164,12 @@ export function OnboardingWizard({
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className={labelClass}>{t("country")}</span>
-                  <select className={fieldClass} onChange={(event) => setCountry(event.target.value)} value={country}>
+                  <select className={fieldClass} onChange={(event) => setCountry(event.target.value)} required value={country}>
+                    {!country ? (
+                      <option disabled value="">
+                        {t("countryChoose")}
+                      </option>
+                    ) : null}
                     {countries.map((name) => (
                       <option key={name} value={name}>
                         {name}

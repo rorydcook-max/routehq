@@ -41,8 +41,13 @@ export default async function EditBookingPage({ params }: { params: Promise<{ id
     .limit(1);
   const agreementSigned = Boolean(signedAgreements?.length);
 
+  // Where the delivery map opens: the business's own area from setup, or nothing (never a fixed place).
+  const settings = (organization as any).settings || {};
+  const mainLocation = settings.main_location && typeof settings.main_location === "object" ? settings.main_location : {};
   const homeTerritory =
-    typeof (organization as any).settings?.home_territory === "string" ? (organization as any).settings.home_territory : "Koh Samui, Thailand";
+    typeof settings.home_territory === "string" && settings.home_territory.trim()
+      ? settings.home_territory
+      : [mainLocation.town || mainLocation.province, mainLocation.country].map((part: unknown) => String(part || "").trim()).filter(Boolean).join(", ");
 
   return (
     <AppShell userEmail={userEmail}>

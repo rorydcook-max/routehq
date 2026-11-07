@@ -12,6 +12,7 @@ import { applyPlanToFleet, chooseActive, loadFleet } from "@/lib/billing/parking
 import { getStripe, portalConfigurationId, priceIds, stripeConfigured } from "@/lib/billing/stripe";
 import { retrieveSubscription, syncSubscription } from "@/lib/billing/sync";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { toCountryCode } from "@/lib/regional";
 import { choosePlan } from "@/app/actions/plan";
 
 /**
@@ -22,7 +23,7 @@ import { choosePlan } from "@/app/actions/plan";
 type Result<T = {}> = ({ ok: true } & T) | { ok: false; error: string };
 
 const ORG_FIELDS =
-  "id, name, currency, subscription_status, subscription_tier, billing_interval, trial_ends_at, stripe_customer_id, stripe_subscription_id, stripe_subscription_status, scheduled_plan";
+  "id, name, trading_name, country_code, settings, currency, subscription_status, subscription_tier, billing_interval, trial_ends_at, stripe_customer_id, stripe_subscription_id, stripe_subscription_status, scheduled_plan";
 
 const LIVE_STATUSES = ["active", "trialing", "past_due", "unpaid"];
 
@@ -49,11 +50,36 @@ async function appOrigin() {
   return host ? `${proto}://${host}` : String(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
 }
 
-/** The business's Stripe customer, made on first use. */
+/**
+ * The business's billing address as far as RoveHQ knows it: its country (and town), so Checkout opens on the
+ * business's country rather than the one the visitor's connection seems to come from.
+ */
+function businessAddress(organization: any): Stripe.AddressParam | null {
+  const country = toCountryCode(organization.country_code) || toCountryCode(organization.settings?.main_location?.country);
+  if (!country) return null;
+  const city = String(organization.settings?.main_location?.town || "").trim();
+  return { country, ...(city ? { city } : {}) };
+}
+
+/** The business's Stripe customer, made on first use, with its name, email and country filled in. */
 async function ensureCustomer(admin: any, organization: any, email: string | null) {
-  if (organization.stripe_customer_id) return String(organization.stripe_customer_id);
+  const name = String(organization.trading_name || organization.name || "").trim() || undefined;
+  const address = businessAddress(organization);
+  if (organization.stripe_customer_id) {
+    const id = String(organization.stripe_customer_id);
+    // A customer made before the country was filled in: add it now, never over an address the owner typed at Checkout.
+    if (address) {
+      const existing = await getStripe().customers.retrieve(id).catch(() => null);
+      if (existing && !("deleted" in existing && existing.deleted) && !(existing as Stripe.Customer).address?.country) {
+        await getStripe()
+          .customers.update(id, { address, ...(!(existing as Stripe.Customer).name && name ? { name } : {}), ...(!(existing as Stripe.Customer).email && email ? { email } : {}) })
+          .catch(() => null);
+      }
+    }
+    return id;
+  }
   const customer = await getStripe().customers.create(
-    { name: organization.name || undefined, email: email || undefined, metadata: { organization_id: organization.id } },
+    { name, email: email || undefined, ...(address ? { address } : {}), metadata: { organization_id: organization.id } },
     { idempotencyKey: `rovehq-customer-${organization.id}` }
   );
   await admin.from("organizations").update({ stripe_customer_id: customer.id }).eq("id", organization.id);

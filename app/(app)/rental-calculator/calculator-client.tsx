@@ -191,6 +191,7 @@ function priceForReturn(a: Assumptions, targetPct: number) {
 
 export function CalculatorClient({
   checks: initialChecks,
+  country,
   currency,
   defaultStyle,
   defaultCategory,
@@ -198,6 +199,8 @@ export function CalculatorClient({
   initialSavedCalcs
 }: {
   checks: ChecksLeft;
+  /** The business's country: orders the make list by what is common there. */
+  country?: string | null;
   currency: string;
   defaultStyle: RentStyle;
   defaultCategory: string;
@@ -273,13 +276,13 @@ export function CalculatorClient({
     setMakes([]);
     setMakeId("");
     setModelId("");
-    fetchVehicleMakesForCategory(category)
+    fetchVehicleMakesForCategory(category, country)
       .then((rows) => live && setMakes(rows))
       .catch(() => live && setMakes([]));
     return () => {
       live = false;
     };
-  }, [category]);
+  }, [category, country]);
 
   useEffect(() => {
     let live = true;

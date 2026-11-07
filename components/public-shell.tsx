@@ -38,9 +38,18 @@ export function PublicShell({
 }
 
 /** The business in the header row: its logo, or its first letter on a brand tile, with its name beside it. */
-export function PublicBrand({ name, logoUrl, detail, href }: { name: string; logoUrl?: string | null; detail?: string | null; href?: string }) {
+export function PublicBrand({ name, logoUrl, detail, href, logoOnly = false }: { name: string; logoUrl?: string | null; detail?: string | null; href?: string; logoOnly?: boolean }) {
   const tile = <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)] text-[17px] font-semibold text-white">{name.slice(0, 1).toUpperCase()}</span>;
-  const body = (
+  const nameRow = (
+    <span className="flex min-w-0 items-center gap-3">
+      {tile}
+      <span className="block min-w-0 truncate text-[17px] font-semibold leading-tight text-[var(--foreground)]">{name}</span>
+    </span>
+  );
+  // A logo usually carries the name already (the website header's rule): the logo alone, the name only if it fails to load.
+  const body = logoOnly && logoUrl ? (
+    <BusinessLogoImage alt={name} className="max-h-12 max-w-[200px] shrink-0 object-contain" fallback={nameRow} src={logoUrl} />
+  ) : (
     <span className="flex min-w-0 items-center gap-3">
       {logoUrl ? <BusinessLogoImage alt={`${name} logo`} className="max-h-10 max-w-[120px] shrink-0 object-contain" fallback={tile} src={logoUrl} /> : tile}
       <span className="min-w-0">

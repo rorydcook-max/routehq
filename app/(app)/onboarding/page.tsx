@@ -8,6 +8,8 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
+import { locationOptions } from "@/lib/onboarding-locations";
+import { toCountryCode } from "@/lib/regional";
 
 export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ preview?: string; step?: string; added?: string; rentals?: string }> }) {
   // On a developer's machine only: /onboarding?preview=2 shows a step of the wizard for an account that has already finished it. Never on the live site.
@@ -62,9 +64,11 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   // skipped straight past the vehicles step.
   const profileDone = Boolean(organizationDetail.settings?.location);
 
-  // Where they are, guessed from where they are browsing, until they say.
+  // Where they are, guessed from where they are browsing, until they say. No guess (no IP country, or a country not
+  // on the setup list): nothing is picked, and they choose it themselves.
   const countryCode = ((await headers()).get("x-vercel-ip-country") || "").toUpperCase();
-  const defaultCountry = COUNTRY_NAMES[countryCode] || "Thailand";
+  const defaultCountry =
+    COUNTRY_NAMES[countryCode] || (countryCode ? locationOptions.find((option) => toCountryCode(option.country) === countryCode)?.country : "") || "";
   const names = (vehicles || []).map((row: any) => [row.make, row.model, row.registration_number].filter(Boolean).join(" "));
   const initialStep = previewStep === 1 || previewStep === 2 ? previewStep : profileDone ? 2 : 1;
   const openAssistant = (await searchParams).rentals === "1";

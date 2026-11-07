@@ -39,7 +39,7 @@ Facts about RENTALL come from its own website **as of November 2026**.
 | Fleet size it suits | Minimum 10 vehicles (exceptions possible); larger fleets and multiple locations | One vehicle to a few dozen; Business has no limit |
 | Free plan or trial | Free online demo | Free plan with no time limit (2 cars, 5 motorbikes); 30-day trial with everything on |
 | Payments | RENTALL Payments, integrated card processing | Your own Stripe account: cards on the booking page, embedded checkout and payment links; Apple Pay, Google Pay; SEPA Direct Debit, iDEAL, Bancontact, Klarna, MB Way, BLIK; card deposit holds. Plus cash, bank transfer and QR with slip checking |
-| Languages | Not listed on the pricing page | 28 languages for the app and customer pages |
+| Languages | Not listed on the pricing page | 29 languages for the app and customer pages |
 | Mobile | Mobile app for check-out and check-in, included | Phone-first web app |
 | Contracts | Not detailed on the pricing page; PDF configuration and two training sessions included | Agreement written for you in English and the local language (18 countries across Southeast Asia and Europe), e-signature on the customer's phone |
 | Online booking | Online reservation plugin (Business package and up) | Booking page and website booking box, every plan |

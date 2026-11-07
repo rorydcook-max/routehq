@@ -37,7 +37,7 @@ Facts about RCM come from its own website **as of November 2026**, unless we say
 | Fleet size it suits | "Scalable to fleets of any size"; startup package for new businesses | One vehicle to a few dozen; Business has no limit |
 | Free plan or trial | Fully functional free trial; keep your data if you stay | Free plan with no time limit (2 cars, 5 motorbikes); 30-day trial with everything on |
 | Payments | VostroPay card payments and payment links; other gateways | Your own Stripe account: cards on the booking page, embedded checkout and payment links; Apple Pay, Google Pay; SEPA Direct Debit, iDEAL, Bancontact, Klarna, MB Way, BLIK; card deposit holds. Plus cash, bank transfer and QR with slip checking |
-| Languages | "Ask us about our multilingual capability" | 28 languages for the app and customer pages |
+| Languages | "Ask us about our multilingual capability" | 29 languages for the app and customer pages |
 | Mobile | Cloud based, works on phone, tablet and desktop | Phone-first web app |
 | Contracts | Online pre-check-in, electronic signing, interactive inspection forms | Agreement written for you in English and the local language (18 countries across Southeast Asia and Europe), e-signature on the customer's phone |
 | Booking channels | Website integration plus agents such as Rentalcars.com and Motorhome Republic | Own booking page and website booking box; Rove directory with no commission |
@@ -64,7 +64,7 @@ It also says clients use it for "cars, campers, uber vehicle fleets, bikes/scoot
 - **Scooter and motorbike shops.** Cars and motorbikes are counted separately, so a scooter-heavy fleet stays on a small plan.
 - **Every way customers pay.** Card, Apple Pay, Google Pay and European methods online, deposits held on the card, and cash, transfer or QR with slips checked against what's owed (including PromptPay and QRIS).
 - **Agreements and ID.** An agreement for each booking in English and the local language in 18 countries across Southeast Asia and Europe, signed on the customer's phone, with passport and license photos read for you.
-- **Languages and chat.** 28 languages for staff and customers; LINE and Telegram in one inbox with automatic reminders.
+- **Languages and chat.** 29 languages for staff and customers; LINE and Telegram in one inbox with automatic reminders.
 
 ## Who should pick which
 

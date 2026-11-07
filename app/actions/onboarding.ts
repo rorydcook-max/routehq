@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { ensureOnboardingChecklist, markOnboardingStep } from "@/lib/onboarding";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { timeZoneForPlace, toCountryCode } from "@/lib/regional";
+import { placeLabel, timeZoneForPlace, toCountryCode } from "@/lib/regional";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -39,7 +39,8 @@ export async function saveBusinessProfile(formData: FormData) {
   const { supabase, user } = await requireUser();
   const organizationId = requiredString(formData, "organizationId");
   const name = requiredString(formData, "businessName");
-  const location = requiredString(formData, "location");
+  // "Lisbon, Portugal", never "Lisbon, Lisbon, Portugal" (a town and its region with one name).
+  const location = placeLabel(requiredString(formData, "location").split(","));
   const country = requiredString(formData, "country");
   // Setup asks only where they are (Rory, 2 Nov 2026): the province may be unknown, and fleet type and size are no longer asked.
   const region = optionalString(formData, "region") || "";
@@ -48,7 +49,8 @@ export async function saveBusinessProfile(formData: FormData) {
   const fleetSize = optionalString(formData, "fleetSize");
   const language = requiredString(formData, "language");
   const businessPhone = String(formData.get("businessPhone") || "").trim().slice(0, 80);
-  const currency = optionalString(formData, "currency") || "THB";
+  // The country's own currency (setup sends it); US dollars when none is known, never baht by default.
+  const currency = optionalString(formData, "currency") || "USD";
 
   const { data: organization, error: orgError } = await supabase
     .from("organizations")
@@ -73,7 +75,7 @@ export async function saveBusinessProfile(formData: FormData) {
       onboarding_completed: true,
       onboarding_completed_at: new Date().toISOString(),
       currency,
-      supported_currencies: Array.from(new Set([currency, "THB", "USD"])),
+      supported_currencies: Array.from(new Set([currency, "USD"])),
       // The country as a code and its clock (the Canaries, Madeira and the Azores keep their own): due dates,
       // "today", paperwork names, miles or km and VAT all follow it (lib/regional.ts).
       ...(toCountryCode(country) ? { country_code: toCountryCode(country), timezone: timeZoneForPlace(country, region, town) } : {}),

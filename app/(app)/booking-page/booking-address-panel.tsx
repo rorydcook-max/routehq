@@ -6,15 +6,15 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Copy, ExternalLink, RefreshCw } from "lucide-react";
-import { checkOwnDomain, saveBookingSubdomain, saveOwnDomain } from "@/app/actions/booking-address";
-import { cleanSubdomain, DNS_A_TARGET, DNS_CNAME_TARGET, isApexDomain, typingSubdomain } from "@/lib/booking-address";
+import { checkOwnDomain, saveOwnDomain } from "@/app/actions/booking-address";
+import { DNS_A_TARGET, DNS_CNAME_TARGET, isApexDomain } from "@/lib/booking-address";
 import { RoveNameField } from "@/app/(app)/booking-page/rove-name-field";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * Where customers book: the rove.rent address (always), then a subdomain (Pro and above) OR a custom domain
- * (Business plan). Labels and controls only (Rory, 7 Nov 2026).
+ * Where customers book: the rove.rent address, or a custom domain (Business plan). Labels and controls only.
+ * The *.rovehq.app subdomain option was removed from here (Rory, 7 Nov 2026); subdomains already taken keep working.
  */
 export function BookingAddressPanel({
   pathUrl,
@@ -42,7 +42,6 @@ export function BookingAddressPanel({
 }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const router = useRouter();
-  const [label, setLabel] = useState(subdomain || "");
   const [own, setOwn] = useState(domain || "");
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
@@ -99,49 +98,6 @@ export function BookingAddressPanel({
         <p className="font-semibold text-[var(--foreground)]">{say("rn_title")}</p>
         {/* The name after rove.rent/ is the business's to choose (Rory, 1 Nov 2026). */}
         <RoveNameField current={pathUrl.replace(/\/$/, "").split("/").pop() || ""} host={pathUrl.replace(/^https?:\/\//, "").replace(/\/[^/]*$/, "")} />
-      </div>
-
-      <div className="space-y-2">
-        <p className="font-semibold text-[var(--foreground)]">{say("ba_subLabel")}</p>
-        {canSubdomain ? (
-          <>
-            <div className="flex max-w-md items-stretch overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel)]">
-              <input
-                aria-label={say("ba_subLabel")}
-                autoCapitalize="none"
-                autoCorrect="off"
-                className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2.5 text-[16px] font-semibold"
-                disabled={pending}
-                onChange={(event) => setLabel(typingSubdomain(event.target.value))}
-                placeholder={suggestion}
-                spellCheck={false}
-                value={label}
-              />
-              <span className="flex items-center bg-[var(--panel-secondary)] px-3 font-semibold text-[var(--muted)]">.{rootDomain}</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button className="primary-action pressable" disabled={pending || !cleanSubdomain(label) || cleanSubdomain(label) === (subdomain || "")} onClick={() => run(() => saveBookingSubdomain({ value: label }))} type="button">
-                {subdomain ? say("ba_change") : say("ba_claim")}
-              </button>
-              {subdomain ? (
-                <button
-                  className="secondary-action pressable"
-                  disabled={pending}
-                  onClick={() => {
-                    setLabel("");
-                    run(() => saveBookingSubdomain({ value: "" }));
-                  }}
-                  type="button"
-                >
-                  {say("ba_remove")}
-                </button>
-              ) : null}
-            </div>
-            {subdomain && subdomainUrl ? liveRow(subdomainUrl) : null}
-          </>
-        ) : (
-          planLink(say("ba_subPlan", { example: `${suggestion}.${rootDomain}` }))
-        )}
       </div>
 
       <div className="flex items-center gap-3 text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]">

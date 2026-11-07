@@ -217,7 +217,7 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
         <main>
           <Hero />
           {ticker.length ? (
-            <div aria-hidden="true" className={`${s.ticker} border-y ${s.line} bg-[var(--s-accent)] py-3 text-[var(--s-accent-ink)]`}>
+            <div aria-hidden="true" className={`${s.ticker} border-y ${s.line} bg-[var(--s-second)] py-3 text-[var(--s-second-ink)]`}>
               <div className={s.tickerTrack}>
                 {[0, 1].map((copy) => (
                   <span className={`${s.display} flex shrink-0 items-center text-[22px] sm:text-[26px]`} key={copy}>
@@ -238,15 +238,15 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
           })}
         </main>
 
-        <footer className={`border-t ${s.line}`}>
+        <footer className={`${s.footer} border-t ${s.line}`}>
           <div className={`${s.wrap} flex flex-col gap-4 py-10 sm:flex-row sm:items-center sm:justify-between`}>
             <div>
               <p className="text-[17px] font-bold">{data.business.name}</p>
-              {data.business.address ? <p className={`${s.muted} mt-1 max-w-[52ch] whitespace-pre-line text-[15px]`}>{data.business.address}</p> : null}
+              {data.business.address ? <p className={`${s.footerSoft} mt-1 max-w-[52ch] whitespace-pre-line text-[15px]`}>{data.business.address}</p> : null}
             </div>
             <div className="flex items-center gap-4">
               {edit ? null : <CustomerLanguagePicker />}
-              <p className={`${s.muted} text-[14px]`}>{t("footer_copy", { year: new Date().getFullYear(), business: data.business.name })}</p>
+              <p className={`${s.footerSoft} text-[14px]`}>{t("footer_copy", { year: new Date().getFullYear(), business: data.business.name })}</p>
             </div>
           </div>
         </footer>

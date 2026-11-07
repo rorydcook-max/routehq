@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { numberLocale } from "@/lib/i18n/dates";
+import { siteTime } from "@/lib/sites/format";
 import { PLANS, fleetText } from "@/lib/plans";
 import { faqLd, softwareApplicationLd } from "@/lib/site/schema";
 import { hasOwnTranslation } from "@/lib/site/own-translation";
@@ -56,6 +57,10 @@ export default async function SiteHomePage({ params }: Props) {
   const say = settings as unknown as Say;
   const nl = numberLocale(locale);
   const price = (amount: number) => formatPlanPrice(amount, currency, nl);
+  // The summary's time the way the visitor writes it (sites-global): the page is drawn ahead per language and
+  // currency, so English uses the 12-hour clock where that currency's countries do (7:00 AM) and 07:00 elsewhere.
+  const TWELVE_HOUR = ["USD", "CAD", "AUD", "NZD", "PHP", "INR"];
+  const summaryTime = siteTime("07:00", locale === "en" ? (TWELVE_HOUR.includes(String(currency).toUpperCase()) ? "en-US" : "en-GB") : locale);
   // The free template and the latest guides, in this language when written, else English.
   const ownGuides = listGuides(locale);
   const guidesLocale = ownGuides.length ? undefined : "en";
@@ -256,7 +261,7 @@ export default async function SiteHomePage({ params }: Props) {
                       <p>{m("daySummaryTomorrow", { count: 2 })}</p>
                     </div>
                   </div>
-                  <p className={s.chatTime}>07:00</p>
+                  <p className={s.chatTime}>{summaryTime}</p>
                 </div>
               </div>
             </div>

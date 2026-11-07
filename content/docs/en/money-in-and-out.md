@@ -45,7 +45,7 @@ Choose the period, then tap **Spreadsheet** (the download icon on a phone). You 
 
 ## Yearly costs as monthly shares
 
-In **Month**, **Year** and **Custom**, a payment that covers a long stretch, like a year of insurance, is split into monthly shares, so one month doesn't look terrible and the rest too good. Each share says something like "Share 3 of 12 · ฿12,000 paid 15 Mar". **Day** and **Week** show the real payment.
+In **Month**, **Year** and **Custom**, a payment that covers a long stretch, like a year of insurance, is split into monthly shares, so one month doesn't look terrible and the rest too good. Each share says something like "Share 3 of 12 · $1,200 paid 15 Mar". **Day** and **Week** show the real payment.
 
 Opening a share edits or deletes the whole payment, not just that month.
 

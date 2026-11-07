@@ -1,5 +1,6 @@
 import { TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import { businessDistanceUnit } from "@/lib/business-units";
+import { methodsFor } from "@/lib/payment-methods";
 
 /**
  * Changes the assistant can make for the owner. It never makes them on its
@@ -239,7 +240,8 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
       { key: "paymentId", label: "For", type: "select", value: payment.id, options: theirs.map((entry) => ({ value: entry.id, label: entry.label })) },
       { key: "amount", label: "Amount", type: "number", value: String(value) },
       { key: "date", label: "Paid on", type: "date", value: date },
-      { key: "method", label: "How", type: "select", value: method, options: Object.entries(PAYMENT_METHODS).map(([code, label]) => ({ value: code, label })) },
+      // PromptPay only for businesses in Thailand (lib/payment-methods.ts), unless the assistant was told it was paid that way.
+      { key: "method", label: "How", type: "select", value: method, options: methodsFor(Object.keys(PAYMENT_METHODS) as Array<keyof typeof PAYMENT_METHODS>, undefined, method).map((code) => ({ value: code, label: PAYMENT_METHODS[code] })) },
       { key: "note", label: "Note", type: "text", value: args.note || "", optional: true }
     ];
     return { ok: true, action: { kind: "record_payment", title: "Record this payment", rows: [{ label: "Customer", value: payment.customer }], args, fields } };

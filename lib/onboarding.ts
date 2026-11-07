@@ -1,4 +1,5 @@
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
+import { organizationOffersPromptPay } from "@/lib/payment-methods";
 export const onboardingSteps = [
   // In the order that makes RoveHQ worth coming back to (Rory, 2 Nov 2026): the business in first (vehicles, then who is
   // renting them now, so money due and returns show at once), reminders that send themselves, the booking page out in
@@ -92,7 +93,8 @@ export async function getOnboardingStatus(supabase: any, organizationId: string,
     reminders: (channelResult?.count || 0) > 0,
     booking_page: false,
     signature: orgResult.data ? onlineSigningGaps(orgResult.data).length === 0 : false,
-    payment_methods: Boolean(organization.promptpay_id || organization.promptpay_qr_url || organization.bank_account_number || organization.wise_link || organization.revolut_link),
+    // PromptPay counts only for businesses in Thailand (lib/payment-methods.ts), where it is offered.
+    payment_methods: Boolean((organizationOffersPromptPay(organization) && (organization.promptpay_id || organization.promptpay_qr_url)) || organization.bank_account_number || organization.wise_link || organization.revolut_link),
     first_booking: rentalCount >= 1,
     contract_template: Boolean(checklistRows.get("contract_template")?.completed || settings.contract_template_reviewed_at),
     line_connected: Boolean(settings.line_id),

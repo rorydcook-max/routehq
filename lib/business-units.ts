@@ -73,3 +73,35 @@ export function businessCurrency(): string {
     return pageCurrency || "THB";
   }
 }
+
+/**
+ * The business's country (TH, GB, PT...), the same way, for choices that only exist in some countries, such as
+ * PromptPay (lib/payment-methods.ts). Null when it isn't known.
+ */
+const requestCountry = cache((): { code: string | null } => ({ code: null }));
+let pageCountry: string | null = null;
+const cleanCountry = (code: unknown) => (/^[A-Z]{2}$/.test(String(code || "").toUpperCase()) ? String(code).toUpperCase() : null);
+
+export function setBusinessCountry(code: unknown) {
+  const valid = cleanCountry(code);
+  if (!valid) return;
+  try {
+    requestCountry().code = valid;
+  } catch {
+    // Outside a request.
+  }
+}
+
+export function rememberPageCountry(code: unknown) {
+  const valid = cleanCountry(code);
+  if (valid) pageCountry = valid;
+}
+
+export function businessCountry(): string | null {
+  if (typeof window !== "undefined") return pageCountry;
+  try {
+    return requestCountry().code || pageCountry;
+  } catch {
+    return pageCountry;
+  }
+}

@@ -5,6 +5,7 @@ import { kindFromCategory } from "@/lib/vehicle-groups";
 import { includedOptions } from "@/lib/included-items";
 import { shownError } from "@/lib/error-text";
 import { businessToday, toWallTime } from "@/lib/business-time";
+import { businessOffersPromptPay } from "@/lib/payment-methods";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
@@ -1339,7 +1340,8 @@ export function BookingForm({
                     <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("paymentMethod")}</span>
                     <select className={inputClass} onChange={(event) => setWalkInPaymentMethod(event.target.value)} value={walkInPaymentMethod}>
                       <option value="cash">{say("pm_cash")}</option>
-                      <option value="promptpay">{say("pm_promptpay")}</option>
+                      {/* PromptPay only for businesses in Thailand (lib/payment-methods.ts). */}
+                      {businessOffersPromptPay() || walkInPaymentMethod === "promptpay" ? <option value="promptpay">{say("pm_promptpay")}</option> : null}
                       <option value="bank_transfer">{say("pm_bank_transfer")}</option>
                     </select>
                   </label>

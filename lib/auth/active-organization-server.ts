@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { ACTIVE_ORGANIZATION_COOKIE, loadActiveMembership } from "@/lib/auth/active-organization";
 import { setBusinessTimeZone } from "@/lib/business-time";
-import { setBusinessCurrency, setBusinessDistanceUnit } from "@/lib/business-units";
+import { setBusinessCountry, setBusinessCurrency, setBusinessDistanceUnit } from "@/lib/business-units";
 
 /**
  * Server-side: the active membership for this request, using the remembered
@@ -16,5 +16,6 @@ export async function getActiveMembership(supabase: any, userId: string) {
   setBusinessTimeZone(result.timezone);
   setBusinessDistanceUnit(result.distanceUnit);
   setBusinessCurrency(result.currency);
+  setBusinessCountry(result.country);
   return result;
 }

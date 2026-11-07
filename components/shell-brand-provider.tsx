@@ -2,7 +2,7 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 import { rememberPageTimeZone } from "@/lib/business-time";
-import { rememberPageCurrency, rememberPageDistanceUnit } from "@/lib/business-units";
+import { rememberPageCountry, rememberPageCurrency, rememberPageDistanceUnit } from "@/lib/business-units";
 import type { ShellBrand } from "@/lib/shell-brand";
 
 // The operator's logo and name, worked out on the server for the root layout, so the shell paints
@@ -18,14 +18,17 @@ export function ShellBrandProvider({
   timeZone,
   distanceUnit,
   currency,
+  country,
   children
 }: {
   brand: ShellBrand | null;
   timeZone?: string | null;
   distanceUnit?: string | null;
   currency?: string | null;
+  country?: string | null;
   children: ReactNode;
 }) {
+  rememberPageCountry(country);
   rememberPageTimeZone(timeZone);
   rememberPageDistanceUnit(distanceUnit);
   rememberPageCurrency(currency);

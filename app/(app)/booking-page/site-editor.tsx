@@ -8,8 +8,9 @@ import { SiteArt } from "@/components/site/site-art";
 import { LIMITS, SECTION_IDS, SOCIAL_KEYS, type SectionId, type SiteConfig, type SiteSocial } from "@/lib/sites/config";
 import { FONT_PAIRINGS, fontPairing, fontPreviewHref, fontStack } from "@/lib/sites/fonts";
 import { ART_IDS, type ImageRef } from "@/lib/sites/images";
-import { generatePalettes, sitePalette, siteVars, type Palette } from "@/lib/sites/palettes";
+import { sitePalette, siteVars, type Palette } from "@/lib/sites/palettes";
 import { TEMPLATE_IDS, TEMPLATE_TAGS, TEMPLATES, templateDef, type TemplateId, type TemplateTag } from "@/lib/sites/templates";
+import { PalettePicker } from "./palette-picker";
 import type { SiteDraft } from "./use-site-draft";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -37,10 +38,9 @@ export function SiteEditorParts({ site, brandColour, vehicles, renderPart }: { s
   const { draft, update } = site;
   const [gallery, setGallery] = useState(false);
   const template = templateDef(draft.template);
-  const palettes = generatePalettes(brandColour);
   const current = sitePalette(draft, template, brandColour);
   const font = fontPairing(draft.font, template.font);
-  const paletteName = draft.palette === "auto" ? say("pal_auto") : say(`pal_${draft.palette}`);
+  const paletteName = say(`pal_${draft.palette}`);
 
   const look = (
     <div className="space-y-6">
@@ -57,47 +57,7 @@ export function SiteEditorParts({ site, brandColour, vehicles, renderPart }: { s
         </div>
       </div>
 
-      <fieldset>
-        <legend className="font-semibold text-[var(--foreground)]">{say("colours")}</legend>
-        <div className="mt-2 grid grid-cols-4 gap-2" role="radiogroup">
-          {[{ id: "auto", palette: sitePalette({ ...draft, palette: "auto" }, template, brandColour) }, ...palettes.map((palette) => ({ id: palette.id, palette }))].map(({ id, palette }) => {
-            const on = draft.palette === id;
-            return (
-              <button aria-checked={on} aria-label={id === "auto" ? say("pal_auto") : say(`pal_${id}`)} className="flex flex-col items-center gap-1.5" key={id} onClick={() => update({ palette: id })} role="radio" title={id === "auto" ? say("pal_auto") : say(`pal_${id}`)} type="button">
-                <span
-                  className={`relative flex h-12 w-full items-end justify-end overflow-hidden rounded-xl p-1.5 ring-offset-2 ${on ? "ring-[3px] ring-[var(--primary)]" : "ring-1 ring-[var(--border)]"}`}
-                  style={{ background: palette.bg }}
-                >
-                  <span className="absolute left-1.5 top-1.5 h-2 w-6 rounded-full" style={{ background: palette.ink, opacity: 0.85 }} />
-                  <span className="h-5 w-5 rounded-full" style={{ background: palette.accent }} />
-                </span>
-                <span className="w-full truncate text-center text-[12px] font-semibold text-[var(--foreground-secondary)]">{id === "auto" ? say("pal_auto") : say(`pal_${id}`)}</span>
-              </button>
-            );
-          })}
-        </div>
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <label className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-3 font-semibold ${draft.palette === "custom" ? "bg-[var(--primary-light)] text-[var(--foreground)]" : "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"}`}>
-            <input
-              aria-label={say("pal_custom")}
-              className="h-7 w-7 cursor-pointer rounded-full border-0 bg-transparent p-0"
-              onChange={(event) => update({ palette: "custom", customAccent: event.target.value })}
-              type="color"
-              value={draft.customAccent || current.accent}
-            />
-            {say("pal_custom")}
-          </label>
-          {draft.palette === "custom" ? (
-            <div className="inline-flex rounded-full bg-[var(--panel-secondary)] p-1" role="radiogroup">
-              {[false, true].map((dark) => (
-                <button aria-checked={draft.customDark === dark} className={`min-h-9 rounded-full px-4 text-sm font-bold ${draft.customDark === dark ? "bg-[var(--panel)] text-[var(--foreground)] shadow-[var(--shadow-card)]" : "text-[var(--foreground-secondary)]"}`} key={String(dark)} onClick={() => update({ customDark: dark })} role="radio" type="button">
-                  {say(dark ? "dark" : "light")}
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      </fieldset>
+      <PalettePicker brandColour={brandColour} site={site} />
 
       <fieldset>
         <legend className="font-semibold text-[var(--foreground)]">{say("fonts")}</legend>

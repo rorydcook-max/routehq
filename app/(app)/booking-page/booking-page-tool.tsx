@@ -5,11 +5,9 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Copy, ExternalLink, Monitor, Smartphone } from "lucide-react";
 import { savePublicBookingSettings } from "@/app/actions/online-booking";
-import { saveBrandColour } from "@/app/actions/sites";
 import { BookingAddressPanel } from "@/app/(app)/booking-page/booking-address-panel";
 import { PublishBar, SiteEditorParts, type EditorVehicle } from "@/app/(app)/booking-page/site-editor";
 import { useSiteDraft } from "@/app/(app)/booking-page/use-site-draft";
-import { BrandColourField } from "@/app/(app)/settings/brand-colour-field";
 import { LogoUploadSection } from "@/app/(app)/settings/logo-upload-section";
 import { SwitchField } from "@/components/switch-field";
 import { Fold } from "@/components/ui";
@@ -20,8 +18,6 @@ type Say = ((key: string, values?: Record<string, string | number>) => string) &
 };
 
 type Device = "mobile" | "desktop";
-
-const BRAND_FORM = "booking-brand";
 
 /**
  * The Booking page tool (Rory, 7 Nov 2026): the website editor on the left and the real site on the right, shown as
@@ -170,7 +166,7 @@ export function BookingPageTool({
               <LogoUploadSection logoUrl={logoUrl} onDone={reload} orgName={businessName} />
               {/* Part of the website draft (published with it): a wordmark logo already says the name. */}
               <SwitchField checked={site.draft.showName} label={say("bt_showName")} onChange={(event) => site.update({ showName: event.target.checked })} />
-              <BrandColourPart colour={colour} onSaved={reload} />
+              {/* The app's brand colour stays in Settings › Business (app, agreements, receipts); the website has its own palette under Look. */}
             </div>
           </Fold>
           <Fold id="website" title={say("pb_embedTitle")}>
@@ -241,37 +237,6 @@ function PagePart({ booking, vehicles, onSaved }: { booking: { enabled: boolean;
       ) : null}
       {failed ? <p className="font-bold text-[var(--danger)]">{say("saveFailed")}</p> : null}
     </div>
-  );
-}
-
-/** The brand colour (the same one as Settings › Business › Your brand). */
-function BrandColourPart({ colour, onSaved }: { colour: string; onSaved: () => void }) {
-  const say = useTranslations("settingsPage") as unknown as Say;
-  const [status, setStatus] = useState<"idle" | "saved" | "failed">("idle");
-  const [pending, start] = useTransition();
-  return (
-    <form
-      id={BRAND_FORM}
-      onChange={() => setStatus("idle")}
-      onSubmit={(event) => {
-        event.preventDefault();
-        const value = String(new FormData(event.currentTarget).get("contract_accent_colour") || "");
-        start(async () => {
-          const result = await saveBrandColour(value).catch(() => ({ ok: false as const }));
-          setStatus(result.ok ? "saved" : "failed");
-          if (result.ok) onSaved();
-        });
-      }}
-    >
-      <BrandColourField customLabel={say("b_colourCustom")} form={BRAND_FORM} hint="" initial={colour} key={colour} label={say("b_colour")} />
-      <div className="mt-3 flex flex-wrap items-center gap-3">
-        <button className="secondary-action pressable" disabled={pending} type="submit">
-          {pending ? say("saving") : say("save")}
-        </button>
-        {status === "saved" ? <span className="font-bold text-[var(--success)]">{say("saved")}</span> : null}
-        {status === "failed" ? <span className="font-bold text-[var(--danger)]">{say("saveFailed")}</span> : null}
-      </div>
-    </form>
   );
 }
 

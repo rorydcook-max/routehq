@@ -33,7 +33,7 @@ function normaliseMethods(methods: unknown) {
   return Array.from(new Set(["cash", ...valid]));
 }
 
-export function PaymentMethodsForm({ businessName, settings }: { businessName: string; settings: PaymentSettings }) {
+export function PaymentMethodsForm({ businessName, settings, promptPay = true }: { businessName: string; settings: PaymentSettings; promptPay?: boolean }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const methodName = (method: string) => (method === "promptpay" ? say("pm_promptpayName") : method === "bank_transfer" ? say("pm_bankName") : say(`pay_${method}`));
   const initialMethods = useMemo(() => normaliseMethods(settings.accepted_payment_methods), [settings.accepted_payment_methods]);
@@ -86,6 +86,9 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
 
       <div className="grid gap-2.5 md:grid-cols-2">
         <MethodCard checked description={say("pm_cashBody")} disabled label={say("pay_cash")} name="cash" />
+        {/* PromptPay only for businesses in Thailand (lib/payment-methods.ts). Elsewhere its saved number is sent back unchanged. */}
+        {promptPay ? null : <input name="promptpay_id" type="hidden" value={settings.promptpay_id || ""} />}
+        {promptPay ? (
         <MethodCard checked={enabledMethods.includes("promptpay")} description={say("pm_promptpayBody")} label={say("pm_promptpayName")} name="promptpay" onToggle={toggleMethod}>
           <div className="mt-3 grid gap-3">
             <label className="block">
@@ -128,6 +131,7 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
             </div>
           </div>
         </MethodCard>
+        ) : null}
         <MethodCard checked={enabledMethods.includes("bank_transfer")} description={say("pm_bankBody")} label={say("pm_bankName")} name="bank_transfer" onToggle={toggleMethod}>
           <div className="mt-3 grid gap-3">
             <label className="block">
@@ -173,7 +177,7 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
           <label className="block">
             <span className={labelClass}>{say("pm_default")}</span>
             <select className="mt-1 w-full" name="default_payment_method" onChange={(event) => setDefaultMethod(event.target.value)} value={defaultMethod}>
-              {enabledMethods.map((method) => (
+              {enabledMethods.filter((method) => method !== "promptpay" || promptPay || defaultMethod === "promptpay").map((method) => (
                 <option key={method} value={method}>
                   {methodName(method)}
                 </option>

@@ -23,7 +23,7 @@ You paid for a repair, a fine or fuel, and the customer should cover it. You rec
 
 ## What happens to the money
 
-- If you still hold a deposit, the charge comes out of it first. RoveHQ shows how much, e.g. "฿2,000 comes out of the deposit held (฿5,000)".
+- If you still hold a deposit, the charge comes out of it first. RoveHQ shows how much, e.g. "€200 comes out of the deposit held (€500)".
 - If the charge is more than the deposit, tick **Bill the customer the other ...** to put the rest on their booking. Untick it if insurance or someone else is paying.
 - The customer is told, and can pay the bill from their booking page. When they pay, it's money in.
 - Your cost stays as money out either way.

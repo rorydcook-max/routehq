@@ -37,7 +37,7 @@ You rent to them as normal. Open it from **Customers partners sent you** with **
 
 ## Paying and getting paid
 
-You settle the fee directly with each other, by PromptPay or bank transfer. If you owe one, it shows at the top of **Partners**. Pay it, then tap **Mark paid**.
+You settle the fee directly with each other, by bank transfer (or PromptPay in Thailand). If you owe one, it shows at the top of **Partners**. Pay it, then tap **Mark paid**.
 
 That records a **Finder's fee paid** cost in your **Money in & out**, and a **Finder's fee received** in theirs. Fees you're owed show under **Customers you sent to partners** as paid or not paid yet.
 

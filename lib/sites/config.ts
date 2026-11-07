@@ -3,6 +3,7 @@ import type { ArtId, ImageRef } from "@/lib/sites/images";
 import { imageRefFrom } from "@/lib/sites/images";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/sites/templates";
 import { FONT_IDS } from "@/lib/sites/fonts";
+import { COLOR_ROLES, type PaletteColors } from "@/lib/sites/palettes";
 
 /**
  * A business's booking website (Rory, 7 Nov 2026): one page made of sections, drawn by a template, coloured by a
@@ -61,8 +62,15 @@ export type SiteFaq = { q: string; a: string };
 export type SiteConfig = {
   v: 1;
   template: TemplateId;
-  /** "auto" (the template's own), a generated palette id (lib/sites/palettes.ts) or "custom". */
+  /**
+   * The website's palette (lib/sites/palettes.ts), separate from the app's brand colour: "auto" (the template's own),
+   * "own" (from the business's brand colour), a curated id ("coastal"), "custom" (`colors`), or one of the ids from
+   * before palettes, which still draw as they did.
+   */
   palette: string;
+  /** Custom: the seven colours, by what they do on the page. */
+  colors: PaletteColors | null;
+  /** Before palettes, Custom was one colour and light or dark: still read so those sites look the same. */
   customAccent: string | null;
   customDark: boolean;
   /** A font pairing (lib/sites/fonts.ts); null uses the template's. */
@@ -136,6 +144,13 @@ function sectionsFrom(value: unknown): SiteConfig["sections"] {
   return sections;
 }
 
+/** Custom colours: all seven, each a #rrggbb, or none. */
+function colorsFrom(value: unknown): PaletteColors | null {
+  const raw = record(value);
+  if (!COLOR_ROLES.every((role) => isBrandColour(raw[role]))) return null;
+  return Object.fromEntries(COLOR_ROLES.map((role) => [role, String(raw[role]).toLowerCase()])) as PaletteColors;
+}
+
 function textFrom(value: unknown): SiteConfig["text"] {
   const raw = record(value);
   const out: SiteConfig["text"] = {};
@@ -152,6 +167,7 @@ export function defaultSiteConfig(template: TemplateId = "coast"): SiteConfig {
     v: 1,
     template,
     palette: "auto",
+    colors: null,
     customAccent: null,
     customDark: false,
     font: null,
@@ -180,6 +196,7 @@ export function siteConfigFrom(value: unknown, fallbackTemplate: TemplateId = "c
   return {
     ...base,
     palette: typeof raw.palette === "string" && /^[a-z0-9-]{1,24}$/.test(raw.palette) ? raw.palette : "auto",
+    colors: colorsFrom(raw.colors),
     customAccent: isBrandColour(raw.customAccent) ? String(raw.customAccent).toLowerCase() : null,
     customDark: raw.customDark === true,
     font: typeof raw.font === "string" && FONT_IDS.includes(raw.font) ? raw.font : null,

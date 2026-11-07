@@ -1,5 +1,6 @@
 import { resolveBrandingAssetUrl } from "@/lib/branding-assets";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { methodsFor, organizationOffersPromptPay } from "@/lib/payment-methods";
 import { getPublishedReviews, getReviewStats, googleReviewUrl } from "@/lib/reviews";
 import { serviceAreasFor, type BranchRow } from "@/lib/service-area";
 import { siteConfigFrom, siteConfigFromLegacy, templateForFleet, type SiteConfig } from "@/lib/sites/config";
@@ -49,7 +50,7 @@ export async function loadSiteData(input: { catalog: Catalog; slug: string; conf
   const [{ data: organization }, { data: branches }, reviews, reviewStats, uploads] = await Promise.all([
     admin
       .from("organizations")
-      .select("name, trading_name, settings, business_phone, business_email, business_address, whatsapp, line_id, accepted_payment_methods")
+      .select("name, trading_name, settings, country_code, business_phone, business_email, business_address, whatsapp, line_id, accepted_payment_methods")
       .eq("id", catalog.organizationId)
       .maybeSingle(),
     admin.from("branches").select("id, name, address, latitude, longitude, service_radius_km, is_active").eq("organization_id", catalog.organizationId),
@@ -62,7 +63,8 @@ export async function loadSiteData(input: { catalog: Catalog; slug: string; conf
     // Only a radius the owner set counts as delivery; otherwise the page says "pickup at".
     .map((area) => ({ name: area.name, radiusKm: area.radiusSet ? area.radiusKm : null }));
   const channels = settings.contact_channels && typeof settings.contact_channels === "object" ? settings.contact_channels : {};
-  const methods = Array.isArray(organization?.accepted_payment_methods) && organization.accepted_payment_methods.length ? organization.accepted_payment_methods.map(String) : ["cash"];
+  // PromptPay only for businesses in Thailand (lib/payment-methods.ts).
+  const methods = methodsFor(Array.isArray(organization?.accepted_payment_methods) && organization.accepted_payment_methods.length ? organization.accepted_payment_methods.map(String) : ["cash"], organizationOffersPromptPay(organization));
   const place = String(settings.main_location?.town || "").trim() || String(catalog.location || "").split(",")[0].trim();
 
   return {

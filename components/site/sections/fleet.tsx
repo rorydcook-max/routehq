@@ -73,7 +73,7 @@ export function Fleet() {
                 <p className={`${s.muted} mt-1 min-h-6 text-[15px]`}>{details(vehicle)}</p>
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <p className="text-[17px] font-semibold">{price(vehicle)}</p>
-                  {book(vehicle, `${s.focus} min-h-11 rounded-full px-4 text-[15px] font-semibold text-[var(--s-accent)] underline decoration-2 underline-offset-4`)}
+                  {book(vehicle, `${s.focus} min-h-11 rounded-full px-4 text-[15px] font-semibold text-[var(--s-accent-text)] underline decoration-2 underline-offset-4`)}
                 </div>
               </li>
             ))}
@@ -88,7 +88,7 @@ export function Fleet() {
                 </div>
                 <div className="flex flex-1 flex-col p-4">
                   <h3 className={`${s.display} text-[22px] sm:text-[26px]`}>{vehicle.name}</h3>
-                  <p className="mt-2 text-[16px] font-bold text-[var(--s-accent)]">{price(vehicle)}</p>
+                  <p className="mt-2 text-[16px] font-bold text-[var(--s-accent-text)]">{price(vehicle)}</p>
                   <div className="mt-auto pt-4">{book(vehicle, `${s.btn} !min-h-11 w-full !px-3 text-[15px]`)}</div>
                 </div>
               </li>
@@ -140,7 +140,7 @@ type LayoutProps = {
   details?: (vehicle: CatalogVehicle) => string;
 };
 
-const LINK_BOOK = `${s.focus} min-h-11 px-1 text-[15px] font-semibold text-[var(--s-accent)] underline decoration-2 underline-offset-4`;
+const LINK_BOOK = `${s.focus} min-h-11 px-1 text-[15px] font-semibold text-[var(--s-accent-text)] underline decoration-2 underline-offset-4`;
 
 /** Metro, Runway, Nomad, Washi, Fjord, Block: one row per vehicle with its specs, like a price list. */
 function FleetList({ vehicles, price, book }: LayoutProps) {

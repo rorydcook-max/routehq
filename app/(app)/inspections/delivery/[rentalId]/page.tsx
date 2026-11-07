@@ -11,6 +11,7 @@ import { getTranslations } from "next-intl/server";
 import { longDate } from "@/lib/i18n/dates";
 import { getLocale } from "next-intl/server";
 import { freshPromptPayQrUrl } from "@/lib/promptpay-qr";
+import { methodsFor, organizationOffersPromptPay } from "@/lib/payment-methods";
 import type { HandoverPayOptions } from "@/components/handover-payment-step";
 
 export default async function DeliveryInspectionPage({ params, searchParams }: { params: Promise<{ rentalId: string }>; searchParams: Promise<{ swap?: string; vehicle?: string }> }) {
@@ -49,11 +50,13 @@ export default async function DeliveryInspectionPage({ params, searchParams }: {
     const { data: link } = await supabase.from("booking_links").select("token, public_url").eq("rental_id", rentalId).is("deleted_at", null).order("created_at", { ascending: false }).limit(1).maybeSingle();
     const org = organization as any;
     const base = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
+    // PromptPay only for businesses in Thailand (lib/payment-methods.ts).
+    const promptPay = organizationOffersPromptPay(org);
     pay = {
-      accepted: Array.isArray(org.accepted_payment_methods) ? org.accepted_payment_methods : ["cash"],
-      defaultMethod: org.default_payment_method || null,
-      promptpayId: org.promptpay_id || null,
-      promptpayQrUrl: org.promptpay_qr_url ? await freshPromptPayQrUrl(supabase, org.promptpay_qr_url, 60 * 60).catch(() => null) : null,
+      accepted: methodsFor(Array.isArray(org.accepted_payment_methods) ? (org.accepted_payment_methods as string[]) : ["cash"], promptPay),
+      defaultMethod: org.default_payment_method === "promptpay" && !promptPay ? null : org.default_payment_method || null,
+      promptpayId: (promptPay && org.promptpay_id) || null,
+      promptpayQrUrl: promptPay && org.promptpay_qr_url ? await freshPromptPayQrUrl(supabase, org.promptpay_qr_url, 60 * 60).catch(() => null) : null,
       bankName: org.bank_name || null,
       bankAccountNumber: org.bank_account_number || null,
       bankAccountName: org.bank_account_name || null,

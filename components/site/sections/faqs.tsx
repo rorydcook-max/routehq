@@ -17,7 +17,7 @@ export function Faqs() {
             <details className="group" key={faq.q}>
               <summary className={`${s.focus} flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 py-4 text-[18px] font-semibold [&::-webkit-details-marker]:hidden`}>
                 {faq.q}
-                <Plus aria-hidden="true" className="shrink-0 text-[var(--s-accent)] transition-transform duration-200 group-open:rotate-45 motion-reduce:transition-none" size={22} />
+                <Plus aria-hidden="true" className="shrink-0 text-[var(--s-accent-text)] transition-transform duration-200 group-open:rotate-45 motion-reduce:transition-none" size={22} />
               </summary>
               <p className={`${s.soft} max-w-[62ch] whitespace-pre-line pb-6 text-[16.5px] leading-relaxed`}>{faq.a}</p>
             </details>

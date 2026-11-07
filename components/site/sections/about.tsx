@@ -60,7 +60,7 @@ export function About() {
                 <ul className="mt-8 grid gap-x-6 gap-y-4 sm:grid-cols-2">
                   {highlights.map((line) => (
                     <li className="flex items-start gap-3 text-[16px] font-semibold leading-snug" key={line}>
-                      <span aria-hidden="true" className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--s-accent-soft)] text-[var(--s-accent)]">
+                      <span aria-hidden="true" className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--s-accent-soft)] text-[var(--s-accent-text)]">
                         <Check size={15} strokeWidth={3} />
                       </span>
                       {line}
@@ -115,7 +115,7 @@ function Highlights({ className = "" }: { className?: string }) {
     <ul className={`grid gap-x-6 gap-y-3 sm:grid-cols-2 ${className}`}>
       {config.highlights.map((line) => (
         <li className="flex items-start gap-3 text-[16.5px] font-semibold leading-snug" key={line}>
-          <Check aria-hidden="true" className="mt-0.5 shrink-0 text-[var(--s-accent)]" size={19} strokeWidth={2.6} />
+          <Check aria-hidden="true" className="mt-0.5 shrink-0 text-[var(--s-accent-text)]" size={19} strokeWidth={2.6} />
           {line}
         </li>
       ))}
@@ -212,7 +212,7 @@ function QuoteAbout() {
           <ul className="mt-12 flex max-w-[900px] flex-wrap justify-center gap-2.5">
             {config.highlights.map((line) => (
               <li className={`${s.card} inline-flex min-h-11 items-center gap-2 px-4 text-[15.5px] font-semibold`} key={line}>
-                <Check aria-hidden="true" className="text-[var(--s-accent)]" size={17} strokeWidth={2.6} />
+                <Check aria-hidden="true" className="text-[var(--s-accent-text)]" size={17} strokeWidth={2.6} />
                 {line}
               </li>
             ))}

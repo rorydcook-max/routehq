@@ -104,7 +104,7 @@ export function Booking() {
     <p className={`${s.soft} flex flex-wrap items-center gap-x-4 gap-y-1 text-[15px]`}>
       {data.areas.map((area) => (
         <span className="inline-flex items-center gap-1.5" key={area.name}>
-          <MapPin aria-hidden="true" className="text-[var(--s-accent)]" size={16} />
+          <MapPin aria-hidden="true" className="text-[var(--s-accent-text)]" size={16} />
           {area.radiusKm && area.radiusKm > 0 ? t("pol_deliveryWithin", { km: area.radiusKm, place: area.name }) : t("pol_pickupAt", { place: area.name })}
         </span>
       ))}
@@ -154,7 +154,7 @@ export function Booking() {
           return (
             <li className={layout === "ticket" ? `${s.card} p-5` : ""} key={policy.id}>
               <p className="flex items-center gap-2.5 text-[17px] font-bold">
-                <Icon aria-hidden="true" className="shrink-0 text-[var(--s-accent)]" size={20} />
+                <Icon aria-hidden="true" className="shrink-0 text-[var(--s-accent-text)]" size={20} />
                 {policy.title}
               </p>
               <ul className={`${s.soft} mt-2 space-y-1.5 text-[15.5px] leading-relaxed`}>

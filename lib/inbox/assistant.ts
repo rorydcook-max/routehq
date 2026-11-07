@@ -3,6 +3,7 @@ import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import { BLOCKING_RENTAL_STATUSES, BOOKABLE_END_COLUMNS, bookableEnd } from "@/lib/rental-conflicts";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { organizationOffersPromptPay } from "@/lib/payment-methods";
 
 const MODEL = process.env.OPENAI_ASSISTANT_MODEL || "gpt-4o";
 
@@ -19,7 +20,7 @@ export async function draftReply(input: { organizationId: string; conversationId
   const supabase = createSupabaseAdminClient() as any;
   const today = businessToday();
   const [{ data: organization }, { data: messages }, { data: vehicles }, { data: rentals }, { data: liveRentals }] = await Promise.all([
-    supabase.from("organizations").select("name, trading_name, currency, promptpay_id, bank_name").eq("id", input.organizationId).maybeSingle(),
+    supabase.from("organizations").select("name, trading_name, currency, country_code, settings, promptpay_id, bank_name").eq("id", input.organizationId).maybeSingle(),
     supabase.from("conversation_messages").select("direction, body, created_at").eq("conversation_id", input.conversationId).order("created_at", { ascending: false }).limit(14),
     supabase.from("vehicles").select("id, make, model, year, status, daily_rate, weekly_rate, monthly_rate, vehicle_categories(name)").eq("organization_id", input.organizationId).is("deleted_at", null).limit(60),
     input.customerId
@@ -54,7 +55,8 @@ export async function draftReply(input: { organizationId: string; conversationId
     today,
     business: organization?.trading_name || organization?.name || "the rental business",
     currency: organization?.currency || "THB",
-    acceptsPromptPay: Boolean(organization?.promptpay_id),
+    // PromptPay only for businesses in Thailand (lib/payment-methods.ts).
+    acceptsPromptPay: Boolean(organization?.promptpay_id) && organizationOffersPromptPay(organization),
     acceptsBankTransfer: Boolean(organization?.bank_name),
     vehicles: (vehicles || []).map((vehicle: any) => ({
       name: [vehicle.make, vehicle.model, vehicle.year].filter(Boolean).join(" "),

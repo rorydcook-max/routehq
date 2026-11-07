@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { MapPin, MessageCircle, Star } from "lucide-react";
 import { kindsOffered, socialHref } from "@/lib/sites/format";
 import type { ResolvedImage } from "@/lib/sites/images";
-import { Txt, useSite } from "../site-context";
+import { Txt, useSite, useSiteTime } from "../site-context";
 import { SiteImage } from "../site-image";
 import { imageTreatment } from "./parts";
 import s from "../site.module.css";
@@ -30,9 +30,10 @@ export function useFromLine() {
 /** Today's opening hours, when set (on the business's week: Monday first). */
 function useToday() {
   const { config, t } = useSite();
+  const time = useSiteTime();
   if (!config.hours) return null;
   const day = config.hours[(new Date().getDay() + 6) % 7];
-  return day ? t("open_today", { from: day.open, until: day.close }) : t("closed_today");
+  return day ? t("open_today", { from: time(day.open), until: time(day.close) }) : t("closed_today");
 }
 
 export type Fact = { value: string; label: string; star?: boolean };
@@ -164,7 +165,7 @@ function SplitHero() {
         <div>
           {data.business.place ? (
             <p className="inline-flex items-center gap-1.5 rounded-full bg-[var(--s-accent-soft)] px-3.5 py-1.5 text-[14px] font-semibold text-[var(--s-ink)]">
-              <MapPin aria-hidden="true" className="text-[var(--s-accent)]" size={15} />
+              <MapPin aria-hidden="true" className="text-[var(--s-accent-text)]" size={15} />
               {data.business.place}
             </p>
           ) : null}
@@ -185,7 +186,7 @@ function SplitHero() {
                   <dt className="sr-only">{fact.label}</dt>
                   <dd className={`${s.display} flex items-center gap-1 text-[26px] sm:text-[30px]`}>
                     {fact.value}
-                    {fact.star ? <Star aria-hidden="true" className="fill-[var(--s-accent)] text-[var(--s-accent)]" size={20} /> : null}
+                    {fact.star ? <Star aria-hidden="true" className="fill-[var(--s-accent-text)] text-[var(--s-accent-text)]" size={20} /> : null}
                   </dd>
                   <dd className={`${s.muted} mt-1 text-[14px] leading-snug`}>{fact.label}</dd>
                 </div>

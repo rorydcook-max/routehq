@@ -2,7 +2,7 @@ import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
 import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
 import { setBusinessTimeZone } from "@/lib/business-time";
-import { setBusinessCurrency, setBusinessDistanceUnit } from "@/lib/business-units";
+import { setBusinessCountry, setBusinessCurrency, setBusinessDistanceUnit } from "@/lib/business-units";
 import { distanceUnitFor } from "@/lib/regional";
 export { getTravelPolicySettings, mergeTravelPolicySettings, jurisdictionByCountry, travelPolicyDefaults } from "@/lib/travel-policy";
 export type { HomeTerritoryType, IslandTravelPolicy, TravelPolicySettings } from "@/lib/travel-policy";
@@ -34,6 +34,7 @@ export async function getDefaultOrganization() {
       setBusinessTimeZone((data as any).timezone);
       setBusinessDistanceUnit(distanceUnitFor(data));
       setBusinessCurrency((data as any).currency);
+      setBusinessCountry((data as any).country_code);
 
       return data as {
         id: string;
@@ -108,6 +109,7 @@ export async function getDefaultOrganization() {
   setBusinessTimeZone((data as any).timezone);
   setBusinessDistanceUnit(distanceUnitFor(data));
   setBusinessCurrency((data as any).currency);
+  setBusinessCountry((data as any).country_code);
 
   return data as {
     id: string;

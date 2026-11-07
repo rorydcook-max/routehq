@@ -6,7 +6,7 @@ import { Clock, Mail, MapPin, MessageCircle, Phone, Send } from "lucide-react";
 import { sendSiteMessage, type SiteMessageState } from "@/app/actions/sites";
 import { mapLinks, socialHref, telHref } from "@/lib/sites/format";
 import type { SiteSocial } from "@/lib/sites/config";
-import { Txt, useSite } from "../site-context";
+import { Txt, useSite, useSiteTime } from "../site-context";
 import s from "../site.module.css";
 
 const FIELD = "!border-[var(--s-line)] !bg-[var(--s-surface)] !text-[var(--s-ink)]";
@@ -30,19 +30,20 @@ function useChannels() {
 function Hours() {
   const { config, t } = useSite();
   const locale = useLocale();
+  const time = useSiteTime();
   if (!config.hours) return null;
   const dayName = (index: number) => new Intl.DateTimeFormat(locale, { weekday: "long", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 1 + index)));
   return (
     <div>
       <p className="flex items-center gap-2 text-[17px] font-bold">
-        <Clock aria-hidden="true" className="text-[var(--s-accent)]" size={19} />
+        <Clock aria-hidden="true" className="text-[var(--s-accent-text)]" size={19} />
         {t("hours_title")}
       </p>
       <dl className="mt-3 space-y-1.5 text-[15.5px]">
         {config.hours.map((day, index) => (
           <div className="flex justify-between gap-6" key={index}>
             <dt className={s.soft}>{dayName(index)}</dt>
-            <dd className={day ? "tabular-nums font-medium" : s.muted}>{day ? `${day.open} – ${day.close}` : t("closed")}</dd>
+            <dd className={day ? "tabular-nums font-medium" : s.muted}>{day ? `${time(day.open)} – ${time(day.close)}` : t("closed")}</dd>
           </div>
         ))}
       </dl>
@@ -64,9 +65,9 @@ function MapBlock({ tall = false, big = false }: { tall?: boolean; big?: boolean
     <div className={`${s.image} border ${s.line} bg-[var(--s-raised)]`}>
       <iframe className={`block w-full border-0 ${big ? "h-[380px] sm:h-[460px] lg:h-[580px]" : tall ? "h-[360px] lg:h-full lg:min-h-[420px]" : "h-[300px]"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={links.embed} title={t("map_title")} />
       <a className={`${s.focus} flex items-center gap-2 bg-[var(--s-surface)] px-4 py-3 text-[15px] font-semibold`} href={links.open} rel="noopener noreferrer" target="_blank">
-        <MapPin aria-hidden="true" className="shrink-0 text-[var(--s-accent)]" size={17} />
+        <MapPin aria-hidden="true" className="shrink-0 text-[var(--s-accent-text)]" size={17} />
         <span className="min-w-0 flex-1 truncate">{query}</span>
-        <span className="text-[var(--s-accent)]">{t("map_open")}</span>
+        <span className="text-[var(--s-accent-text)]">{t("map_open")}</span>
       </a>
     </div>
   );
@@ -125,7 +126,7 @@ export function Contact() {
   // Map first needs somewhere to point; without one it falls back to the split layout.
   const layout = template.layout.contact === "mapfirst" && !mapQuery ? "split" : template.layout.contact;
   const row = "flex items-center gap-3 text-[17px] font-semibold";
-  const icon = "shrink-0 text-[var(--s-accent)]";
+  const icon = "shrink-0 text-[var(--s-accent-text)]";
   const details = (
     <ul className="space-y-4">
       {phone ? (
@@ -208,7 +209,7 @@ export function Contact() {
             {chats.length || email || others.length ? (
               <p className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-3 text-[18px] font-semibold">
                 {[...chats, ...(email ? [{ key: "email", label: email, href: `mailto:${email}` }] : []), ...others].map((link) => (
-                  <a className={`${s.focus} break-all text-[var(--s-accent)] underline decoration-2 underline-offset-[6px]`} href={link.href} key={link.key} rel="noopener noreferrer" target={link.key === "email" ? undefined : "_blank"}>
+                  <a className={`${s.focus} break-all text-[var(--s-accent-text)] underline decoration-2 underline-offset-[6px]`} href={link.href} key={link.key} rel="noopener noreferrer" target={link.key === "email" ? undefined : "_blank"}>
                     {link.label}
                   </a>
                 ))}

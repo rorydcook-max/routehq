@@ -1,5 +1,6 @@
 "use client";
 
+import { methodsFor } from "@/lib/payment-methods";
 import { businessToday, businessTimeZone } from "@/lib/business-time";
 import { shownError } from "@/lib/error-text";
 import { typedNote } from "@/lib/transaction-notes";
@@ -34,6 +35,7 @@ type BookingTransaction = {
 };
 
 const editablePaymentStatuses = ["pending", "scheduled", "overdue", "waived", "voided"];
+// PromptPay is offered only to businesses in Thailand (lib/payment-methods.ts); one already recorded that way keeps it.
 const paymentMethodOptions = ["cash", "promptpay", "bank_transfer", "wise", "revolut", "other"];
 
 const transactionTypeOptions = [
@@ -334,7 +336,7 @@ export function ExistingRentalPaymentSetupCard({
               <label className="sm:col-span-2">
                 {tx.say("pc_method")}
                 <select className="mt-1 w-full" value={firstPaymentMethod} onChange={(event) => setFirstPaymentMethod(event.target.value)}>
-                  {paymentMethodOptions.map((option) => (
+                  {methodsFor(paymentMethodOptions, undefined, firstPaymentMethod).map((option) => (
                     <option key={option} value={option}>{tx.optionName(option)}</option>
                   ))}
                 </select>
@@ -378,7 +380,7 @@ export function ExistingRentalPaymentSetupCard({
                 <label className="sm:col-span-2">
                   {tx.say("pc_method")}
                   <select className="mt-1 w-full" value={depositMethod} onChange={(event) => setDepositMethod(event.target.value)}>
-                    {paymentMethodOptions.map((option) => (
+                    {methodsFor(paymentMethodOptions, undefined, depositMethod).map((option) => (
                       <option key={option} value={option}>{tx.optionName(option)}</option>
                     ))}
                   </select>
@@ -695,7 +697,7 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
             <label>
               {tx.say("pc_method")}
               <select className="mt-1 w-full" value={recordMethod} onChange={(event) => setRecordMethod(event.target.value)}>
-                {paymentMethodOptions.map((option) => (
+                {methodsFor(paymentMethodOptions, undefined, recordMethod).map((option) => (
                   <option key={option} value={option}>{tx.optionName(option)}</option>
                 ))}
               </select>

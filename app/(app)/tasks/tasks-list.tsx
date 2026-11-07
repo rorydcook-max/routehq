@@ -14,6 +14,7 @@ import { PendingButton } from "@/components/pending-button";
 import { EmptyState } from "@/components/ui";
 import { dateFormat, longDate, shortDate } from "@/lib/i18n/dates";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
+import { methodsFor } from "@/lib/payment-methods";
 import type { TaskListItem } from "@/lib/tasks";
 import { BOARD_BUCKETS, BUCKET_LABEL_KEY, bucketOf, type Bucket } from "./buckets";
 import { businessTimeZone } from "@/lib/business-time";
@@ -304,7 +305,8 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
         <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
           {tx.say("method")}
           <select className={field} onChange={(event) => setMethod(event.target.value)} value={method}>
-            {METHODS.map((key) => (
+            {/* PromptPay only for businesses in Thailand (lib/payment-methods.ts), unless a slip already says PromptPay. */}
+            {methodsFor(METHODS, undefined, method).map((key) => (
               <option key={key} value={key}>{tx.say(`method_${key}`)}</option>
             ))}
           </select>

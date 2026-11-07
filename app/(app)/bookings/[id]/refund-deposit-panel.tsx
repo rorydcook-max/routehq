@@ -8,6 +8,7 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
 import { recordPaymentRefund } from "@/app/actions/bookings";
 import { MoneyInput } from "@/components/money-input";
+import { businessOffersPromptPay } from "@/lib/payment-methods";
 
 type Props = {
   rentalId: string;
@@ -49,6 +50,8 @@ export function RefundDepositPanel({
 }: Props & { canRefund?: boolean }) {
   const t = useTranslations("booking");
   const say = t as unknown as Say;
+  // PromptPay only for businesses in Thailand (lib/payment-methods.ts).
+  const promptPay = businessOffersPromptPay();
   const [activeForm, setActiveForm] = useState<ActiveForm>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -222,7 +225,7 @@ export function RefundDepositPanel({
                 <select className="mt-1 w-full" defaultValue="cash" name="paymentMethod">
                   <option value="cash">{say("ref_cash")}</option>
                   <option value="bank_transfer">{say("ref_bank")}</option>
-                  <option value="promptpay">{say("ref_promptpay")}</option>
+                  {promptPay ? <option value="promptpay">{say("ref_promptpay")}</option> : null}
                 </select>
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
@@ -282,7 +285,7 @@ export function RefundDepositPanel({
                 <select className="mt-1 w-full" defaultValue="cash" name="paymentMethod">
                   <option value="cash">{say("ref_cash")}</option>
                   <option value="bank_transfer">{say("ref_bank")}</option>
-                  <option value="promptpay">{say("ref_promptpay")}</option>
+                  {promptPay ? <option value="promptpay">{say("ref_promptpay")}</option> : null}
                 </select>
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">

@@ -52,6 +52,7 @@ import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, Fold } from "@/components/ui";
 import { OpenOnHash } from "@/components/open-on-hash";
 import { freshPromptPayQrUrl } from "@/lib/promptpay-qr";
+import { methodsFor, organizationOffersPromptPay } from "@/lib/payment-methods";
 import { PushToggle } from "@/components/push-toggle";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
@@ -201,7 +202,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const viewerIsOwner = (members || []).some((member: any) => member.user_id === user?.id && member.role === "owner");
   const promptPayQrDisplayUrl = tab === "rentals" ? await freshPromptPayQrUrl(await createSupabaseServerClient(), organization.promptpay_qr_url, 60 * 60) : organization.promptpay_qr_url;
   const paymentNames: Record<string, string> = { cash: say("pay_cash"), promptpay: say("pay_promptpay"), bank_transfer: say("pay_bank_transfer"), wise: say("pay_wise"), revolut: say("pay_revolut") };
-  const acceptedMethods = Array.from(new Set(["cash", ...((organization.accepted_payment_methods as unknown as string[] | null) || [])])).filter((method) => method in paymentNames);
+  // PromptPay only for businesses in Thailand (lib/payment-methods.ts): saved details elsewhere are kept, not shown.
+  const offersPromptPay = organizationOffersPromptPay(organization);
+  const acceptedMethods = methodsFor(Array.from(new Set(["cash", ...((organization.accepted_payment_methods as unknown as string[] | null) || [])])), offersPromptPay).filter((method) => method in paymentNames);
   const paymentSummary = acceptedMethods.map((method) => paymentNames[method]).join(", ");
   // Travel rules belong to each location (lib/travel-policy.ts); the summary names the main one's area, or the count.
   const travelCountry = travelCountryCode(organization);
@@ -384,6 +387,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("pay_body")}</p>
               <PaymentMethodsForm
               businessName={organization.name}
+              promptPay={offersPromptPay}
               settings={{
                 accepted_payment_methods: organization.accepted_payment_methods,
                 promptpay_id: organization.promptpay_id,

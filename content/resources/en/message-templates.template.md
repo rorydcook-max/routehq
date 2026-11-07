@@ -4,7 +4,7 @@ footer: "Message templates for rental businesses · rovehq.io"
 page: "Page"
 of: "of"
 ---
-# LINE and WhatsApp message templates for rental businesses
+# WhatsApp and LINE message templates for rental businesses
 
 Copy a message, replace everything in {braces}, check the numbers and send. Keep each one as a quick reply so you never type it twice.
 
@@ -13,15 +13,15 @@ Copy a message, replace everything in {braces}, check the numbers and send. Keep
 | Placeholder | Example |
 |---|---|
 | {renter_name} | Sarah |
-| {business_name} | Island Wheels |
-| {staff_name} | Nok |
-| {vehicle} | Honda Click 160, white |
-| {plate} | 1กข 1234 |
+| {business_name} | Harbor Rentals |
+| {staff_name} | Maria |
+| {vehicle} | Toyota Yaris, white |
+| {plate} | AB12 CDE |
 | {start_date} / {end_date} | 3 Nov / 10 Nov |
 | {pickup_time} / {return_time} | 10:00 / 10:00 |
-| {price_per_day} / {total_price} | ฿250 / ฿1,750 |
-| {deposit_amount} | ฿3,000 |
-| {payment_details} | Bank, account name and number, or PromptPay / QR |
+| {price_per_day} / {total_price} | €35 / €245 |
+| {deposit_amount} | €300 |
+| {payment_details} | Bank, account name and IBAN or account number, a payment link, or a QR code (such as PromptPay in Thailand) |
 | {location} | Shop address or Google Maps link |
 | {phone} | Your emergency number |
 | {booking_link} | Your online booking page |

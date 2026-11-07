@@ -40,7 +40,7 @@ The owner's **Dashboard** then shows **Get ready for your first booking**, three
 - **Turn on automatic reminders**: done once a chat app is connected in **Settings**, **Messaging**. See [Automatic customer messages](/docs/automatic-customer-messages).
 - **Share your booking page**: tap to copy or share the link. Put it on Facebook, Google Maps and LINE.
 - **Add your signature**: customers can't finish an online booking without it.
-- **Say how customers pay you**: add PromptPay, bank, Wise or Revolut. See [Payment reminders and methods](/docs/payment-reminders-and-methods).
+- **Say how customers pay you**: add bank details, Wise, Revolut or PromptPay (Thailand). See [Payment reminders and methods](/docs/payment-reminders-and-methods).
 - **Verify your email**: only if you haven't yet. Tap it for a new link.
 - **Take your first booking**. See [Create a booking](/docs/create-a-booking).
 - **Read the rental agreement**. See [Rental agreements](/docs/rental-agreements).

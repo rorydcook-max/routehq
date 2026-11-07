@@ -31,7 +31,7 @@ This guide is for the moment that stops being true. We'll go through the specifi
 
 Paper and chat apps are free, fast and familiar. Your customers already message you on LINE or WhatsApp. A spreadsheet can do almost anything if you're patient. With three to five vehicles and one person taking bookings, the whole business fits on one screen and in one memory.
 
-The trouble is that these tools have no idea what a rental is. A notebook doesn't know that the red Honda Click can't be in two places on Saturday. A chat thread doesn't know the customer still owes ฿1,500. That knowledge sits in you, and it stops scaling when you take a day off, hire a second person, or add the next five vehicles.
+The trouble is that these tools have no idea what a rental is. A notebook doesn't know that the red Honda Click can't be in two places on Saturday. A chat thread doesn't know the customer still owes $150. That knowledge sits in you, and it stops scaling when you take a day off, hire a second person, or add the next five vehicles.
 
 ## The seven places it breaks
 
@@ -39,11 +39,11 @@ The trouble is that these tools have no idea what a rental is. A notebook doesn'
 
 The most common failure. You confirm a car on WhatsApp at 11pm, and your partner confirms the same car on LINE the next morning, because the notebook is at the shop. Someone has to call a customer and cancel, often a tourist with a flight already booked.
 
-For example, a shop with 10 scooters at ฿250 a day loses more than the ฿250 when this happens. It loses the review, and possibly the customer's friends who were going to rent next week.
+For example, a shop with 10 scooters at $30 a day loses more than the $30 when this happens. It loses the review, and possibly the customer's friends who were going to rent next week.
 
 ### 2. Deposits nobody can find
 
-"Did she pay the ฿3,000 deposit in cash or by transfer? Who has it?" Cash deposits go into a drawer, transfers go into a personal account, and the record is a line in a notebook if anyone remembered to write it. At return time, nobody is sure how much to refund.
+"Did she pay the €300 deposit in cash or by transfer? Who has it?" Cash deposits go into a drawer, transfers go into a personal account, and the record is a line in a notebook if anyone remembered to write it. At return time, nobody is sure how much to refund.
 
 ### 3. Damage disputes without photos
 

@@ -14,6 +14,8 @@ const ACCENT = "var(--s-accent)";
 const BG = "var(--s-bg)";
 const INK = "var(--s-ink)";
 const SOFT = "var(--s-accent-soft)";
+/** Suns and moons: the palette's secondary (the accent itself for palettes from before 7 Nov 2026). */
+const SECOND = "var(--s-second)";
 
 /** A smooth wave across the whole width, closed down to the bottom. */
 function wave(y: number, amp: number, length: number, phase = 0) {
@@ -44,7 +46,7 @@ function Tide({ u }: { u: string }) {
         </linearGradient>
       </defs>
       <rect height={H} style={{ fill: `url(#${u}-tide-sky)` }} width={W} />
-      <circle cx="1220" cy="560" r="140" style={mix(ACCENT, BG, 30)} />
+      <circle cx="1220" cy="560" r="140" style={mix(SECOND, BG, 30)} />
       <path d={wave(690, 22, 520, 40)} style={mix(ACCENT, BG, 22)} />
       <path d={wave(760, 26, 600, 210)} style={mix(ACCENT, BG, 42)} />
       <path d={wave(840, 28, 680, 90)} style={mix(ACCENT, INK, 82)} />
@@ -57,7 +59,7 @@ function Dunes({ u }: { u: string }) {
   return (
     <>
       <rect height={H} style={mix(SOFT, BG, 60)} width={W} />
-      <circle cx="1240" cy="520" r="110" style={mix(ACCENT, BG, 45)} />
+      <circle cx="1240" cy="520" r="110" style={mix(SECOND, BG, 45)} />
       <path d="M0 720 C 300 600 620 640 900 700 S 1400 730 1600 640 L1600 1000 L0 1000 Z" style={mix(ACCENT, BG, 26)} />
       <path d="M0 800 C 360 700 700 730 1000 790 S 1420 820 1600 770 L1600 1000 L0 1000 Z" style={mix(ACCENT, BG, 48)} />
       <path d="M0 890 C 420 820 820 850 1120 900 S 1460 920 1600 890 L1600 1000 L0 1000 Z" style={mix(ACCENT, INK, 70)} />
@@ -104,7 +106,7 @@ function Road({ u }: { u: string }) {
         </linearGradient>
       </defs>
       <rect height="560" style={{ fill: `url(#${u}-road-sky)` }} width={W} />
-      <circle cx="1220" cy="400" r="120" style={mix(ACCENT, BG, 90)} />
+      <circle cx="1220" cy="400" r="120" style={mix(SECOND, BG, 90)} />
       <path d="M0 560 L 260 430 L 470 520 L 700 380 L 980 540 L 1240 450 L 1600 560 Z" style={mix(ACCENT, INK, 35)} />
       <rect height={H - 560} style={mix(INK, BG, 82)} width={W} y="560" />
       <path d="M 760 560 L 840 560 L 1500 1000 L 100 1000 Z" style={mix(INK, BG, 94)} />
@@ -193,7 +195,7 @@ function Palms({ u }: { u: string }) {
         </linearGradient>
       </defs>
       <rect height={H} style={{ fill: `url(#${u}-palms-sky)` }} width={W} />
-      <circle cx="1040" cy="610" r="190" style={mix(ACCENT, BG, 38)} />
+      <circle cx="1040" cy="610" r="190" style={mix(SECOND, BG, 38)} />
       <rect height="160" style={mix(ACCENT, BG, 55)} width={W} y="700" />
       <path d={wave(780, 10, 380, 60)} style={mix(ACCENT, INK, 70)} />
       <path d="M0 880 C 400 840 900 860 1600 830 L1600 1000 L0 1000 Z" style={mix(SOFT, BG, 90)} />
@@ -311,7 +313,7 @@ function Peaks({ u }: { u: string }) {
         </linearGradient>
       </defs>
       <rect height={H} style={{ fill: `url(#${u}-peaks-sky)` }} width={W} />
-      <circle cx="420" cy="330" r="110" style={mix(ACCENT, BG, 70)} />
+      <circle cx="420" cy="330" r="110" style={mix(SECOND, BG, 70)} />
       <path d="M0 620 L 180 470 L 330 560 L 560 330 L 760 520 L 980 300 L 1200 500 L 1400 380 L 1600 520 L1600 1000 L0 1000 Z" style={mix(ACCENT, BG, 28)} />
       <path d="M 560 330 L 610 380 L 580 375 L 545 400 L 520 370 Z M 980 300 L 1040 360 L 1000 352 L 960 380 L 930 345 Z" style={mix(SOFT, BG, 95)} />
       <path d="M0 720 L 240 560 L 420 680 L 700 500 L 960 690 L 1240 540 L 1600 700 L1600 1000 L0 1000 Z" style={mix(ACCENT, INK, 62)} />
@@ -336,7 +338,7 @@ function Ripple({ u }: { u: string }) {
         </pattern>
       </defs>
       <rect height={H} style={{ fill: BG }} width={W} />
-      <circle cx="1120" cy="330" r="170" style={{ fill: ACCENT }} />
+      <circle cx="1120" cy="330" r="170" style={{ fill: SECOND }} />
       <rect height="2" style={mix(INK, BG, 30)} width={W} y="578" />
       <rect height={H - 580} style={{ fill: `url(#${u}-ripple)` }} width={W} y="580" />
     </>
@@ -356,7 +358,7 @@ function Grid({ u }: { u: string }) {
         ))}
       </g>
       <rect height="600" style={mix(INK, BG, 88)} width="400" x="200" y="200" />
-      <circle cx="1000" cy="500" r="300" style={{ fill: ACCENT }} />
+      <circle cx="1000" cy="500" r="300" style={{ fill: SECOND }} />
       <path d="M 0 1000 L 0 600 A 400 400 0 0 1 400 1000 Z" style={mix(ACCENT, BG, 45)} />
       <circle cx="1400" cy="800" r="70" style={mix(INK, BG, 88)} />
       <rect height="40" style={mix(SOFT, BG, 95)} width="400" x="800" y="760" />

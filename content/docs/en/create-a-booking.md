@@ -38,7 +38,7 @@ Customer already has the vehicle? Use [Enter a rental that is already running](/
 - Under **What is included**, tick what comes with it (insurance, helmet, child seat). Tick any **Paid extras** the customer wants.
 - **More options** lets you take several months (or weeks, days) upfront at a lower rate, change the currency, or add **Special conditions** to the agreement.
 
-You'll see what the customer pays to start, e.g. "฿12,000 to start: first month's rent + deposit". Daily rentals are paid in one go; weekly and monthly start with the first period.
+You'll see what the customer pays to start, e.g. "£1,250 to start: first month's rent + deposit". Daily rentals are paid in one go; weekly and monthly start with the first period.
 
 If the dates clash with another booking, RoveHQ tells you who has it.
 

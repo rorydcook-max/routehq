@@ -4,7 +4,7 @@ import { getCustomerInspectionReports } from "@/lib/booking-rental-documents";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
 import { bookingRules } from "@/lib/booking-rules";
 import { businessToday, setBusinessTimeZone } from "@/lib/business-time";
-import { setBusinessCurrency, setBusinessDistanceUnit } from "@/lib/business-units";
+import { setBusinessCountry, setBusinessCurrency, setBusinessDistanceUnit } from "@/lib/business-units";
 import { distanceUnitFor, vatSettings } from "@/lib/regional";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
@@ -12,6 +12,7 @@ import { loadPublicRentalAgreementForPage } from "@/lib/rental-document-customer
 import { ensureRentalAgreementDraft } from "@/lib/rental-agreement-automation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { freshPromptPayQrUrl } from "@/lib/promptpay-qr";
+import { methodsFor, organizationOffersPromptPay } from "@/lib/payment-methods";
 
 export type PublicBookingState = "not_found" | "expired" | "cancelled" | "taken" | "dates_passed" | "ready" | "active" | "completed";
 
@@ -26,13 +27,15 @@ function normalizePaymentMethods(value: unknown) {
 }
 
 function organizationPaymentSettings(organization: any) {
-  const acceptedMethods = normalizePaymentMethods(organization?.accepted_payment_methods);
+  // PromptPay only for businesses in Thailand (lib/payment-methods.ts): elsewhere saved details stay, unseen.
+  const promptPay = organizationOffersPromptPay(organization);
+  const acceptedMethods = methodsFor(normalizePaymentMethods(organization?.accepted_payment_methods), promptPay);
   const defaultMethod = String(organization?.default_payment_method || "cash");
 
   return {
     accepted_payment_methods: acceptedMethods,
-    promptpay_id: organization?.promptpay_id || null,
-    promptpay_qr_url: organization?.promptpay_qr_url || null,
+    promptpay_id: (promptPay && organization?.promptpay_id) || null,
+    promptpay_qr_url: (promptPay && organization?.promptpay_qr_url) || null,
     bank_name: organization?.bank_name || null,
     bank_account_number: organization?.bank_account_number || null,
     bank_account_name: organization?.bank_account_name || null,
@@ -85,6 +88,7 @@ export async function getPublicBookingDetail(token: string) {
   setBusinessTimeZone(linkOrganization.timezone);
   setBusinessDistanceUnit(distanceUnitFor(linkOrganization));
   setBusinessCurrency(linkOrganization.currency);
+  setBusinessCountry(linkOrganization.country_code);
 
   if (bookingLink.status === "cancelled") {
     // Enough about the business to tell the customer who to contact and where to book again.
@@ -344,7 +348,7 @@ export async function getPublicBookingDetail(token: string) {
       documents: documentCategories.every((category) => uploadedCategories.has(category)),
       agreement: Boolean(rentalDocumentAgreement?.eligibility?.fullyExecuted)
     },
-    org_payment: { ...organizationPaymentSettings(organization), promptpay_qr_url: promptPayQrUrl },
+    org_payment: { ...organizationPaymentSettings(organization), promptpay_qr_url: organizationOffersPromptPay(organization) ? promptPayQrUrl : null },
     customerPortalActions: portalActionsResult.data || [],
     deliveryInspection,
     deliveryPhotoUrls: deliveryPhotoUrls.filter(Boolean),

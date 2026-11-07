@@ -18,6 +18,7 @@ import { earlyStartFor, type EarlyStartChoice } from "@/lib/early-start";
 import { lateStartFor, type LateStartChoice } from "@/lib/late-start";
 import { dateFormat } from "@/lib/i18n/dates";
 import { distanceKey } from "@/lib/business-units";
+import { methodsFor } from "@/lib/payment-methods";
 import { HandoverPaymentStep, type HandoverPayOptions } from "@/components/handover-payment-step";
 
 type DamageItem = {
@@ -537,6 +538,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   const [cleaningCharge, setCleaningCharge] = useState(0);
   const [refundOverride, setRefundOverride] = useState("");
   const [refundMethod, setRefundMethod] = useState("cash");
+  // PromptPay only for businesses in Thailand (lib/payment-methods.ts).
+  const refundMethods = methodsFor(["cash", "bank_transfer", "promptpay"] as const);
   // Charges the deposit cannot cover are billed to the customer unless the owner says not to.
   const [billUncovered, setBillUncovered] = useState(true);
   // Damage whose cost is not known until it has been looked at: the deposit stays held, nothing goes back yet.
@@ -1359,8 +1362,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               {depositRefundAmount > 0 ? (
                 <div className="mt-3">
                   <p className="text-sm font-semibold text-[var(--foreground)]">{t("refundHow")}</p>
-                  <div className="mt-2 grid grid-cols-3 gap-2">
-                    {(["cash", "bank_transfer", "promptpay"] as const).map((method) => (
+                  <div className={`mt-2 grid gap-2 ${refundMethods.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
+                    {refundMethods.map((method) => (
                       <button
                         aria-pressed={refundMethod === method}
                         className={`min-h-11 rounded-xl border px-2 text-sm font-semibold ${refundMethod === method ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}

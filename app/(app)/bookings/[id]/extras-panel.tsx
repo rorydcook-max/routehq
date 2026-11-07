@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { creditExtrasToRent, moveExtrasToRent, refundExtras, removeExtras } from "@/app/actions/extras";
 import { MoneyInput } from "@/components/money-input";
+import { businessOffersPromptPay } from "@/lib/payment-methods";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 type Line = { name: string; amount: number; index: number };
@@ -180,7 +181,8 @@ export function ExtrasPanel({ rentalId, organizationId, currency, lines, removed
                 <select className="mt-1 w-full" defaultValue="cash" name="paymentMethod">
                   <option value="cash">{say("ref_cash")}</option>
                   <option value="bank_transfer">{say("ref_bank")}</option>
-                  <option value="promptpay">{say("ref_promptpay")}</option>
+                  {/* PromptPay only for businesses in Thailand (lib/payment-methods.ts). */}
+                  {businessOffersPromptPay() ? <option value="promptpay">{say("ref_promptpay")}</option> : null}
                 </select>
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">

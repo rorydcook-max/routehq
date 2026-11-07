@@ -9,7 +9,7 @@ import { ImageShrinker } from "@/components/image-shrinker";
 import { FlagFont } from "@/components/flag-font";
 import { BrandStyle } from "@/components/brand-style";
 import { ShellBrandProvider } from "@/components/shell-brand-provider";
-import { businessCurrency, businessDistanceUnit } from "@/lib/business-units";
+import { businessCountry, businessCurrency, businessDistanceUnit } from "@/lib/business-units";
 import { cookies, headers } from "next/headers";
 import { THEME_COOKIE, themeScript, type ThemeChoice } from "@/lib/theme";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -99,7 +99,11 @@ export default async function RootLayout({
   // rove.rent's directory search is the exception: Rove's own page, with its own notice and analytics.
   const words = customerPage && !directoryPage ? null : await cookieWords().catch(() => null);
   // Read after getTimeZone(): loading the signed-in business recorded its unit for this request.
-  const page = <ShellBrandProvider brand={brand} currency={businessCurrency()} distanceUnit={businessDistanceUnit()} timeZone={timeZone}>{children}</ShellBrandProvider>;
+  const page = (
+    <ShellBrandProvider brand={brand} country={businessCountry()} currency={businessCurrency()} distanceUnit={businessDistanceUnit()} timeZone={timeZone}>
+      {children}
+    </ShellBrandProvider>
+  );
   return (
     // "System" is resolved in the browser before the first paint, so the attribute can differ from the server's: expected.
     <html data-theme={theme === "system" ? undefined : theme} dir={textDirection(locale)} lang={locale} suppressHydrationWarning>

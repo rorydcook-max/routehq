@@ -49,8 +49,8 @@ export default async function ContactPage({ params }: SiteParams) {
   const words = Object.fromEntries(FORM_KEYS.map((key) => [key, m(key)]));
   const contacts = supportContacts();
   const rows = [
-    contacts.line && contacts.lineUrl ? { label: m("contactLine"), value: contacts.line, href: contacts.lineUrl } : null,
     contacts.whatsapp && contacts.whatsappUrl ? { label: m("contactWhatsapp"), value: contacts.whatsapp, href: contacts.whatsappUrl } : null,
+    contacts.line && contacts.lineUrl ? { label: m("contactLine"), value: contacts.line, href: contacts.lineUrl } : null,
     contacts.email ? { label: m("contactEmailUs"), value: contacts.email, href: `mailto:${contacts.email}` } : null
   ].filter((row): row is { label: string; value: string; href: string } => Boolean(row));
 

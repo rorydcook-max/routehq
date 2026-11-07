@@ -12,7 +12,7 @@ faq:
   - q: "Why isn't one of my vehicles on the page?"
     a: "It needs a daily, weekly or monthly price. Add one on the vehicle and it shows up."
   - q: "Does the customer pay when they book?"
-    a: "No. On their booking link they choose to pay now (e.g. PromptPay, then send the slip) or when they get the vehicle. You confirm the payment when it arrives."
+    a: "No. On their booking link they choose to pay now (e.g. by bank transfer or a payment QR code, then send the slip) or when they get the vehicle. You confirm the payment when it arrives."
 ---
 
 Customers see your vehicles, prices and free dates and book at your listed price. You don't approve anything. The vehicle is held for them and the booking is confirmed when they sign.
@@ -68,4 +68,4 @@ To stop same-day bookings or keep a cleaning day between rentals, see [Booking a
 It needs a daily, weekly or monthly price. Add one on the vehicle and it shows up.
 
 **Does the customer pay when they book?**
-No. On their booking link they choose to pay now (e.g. PromptPay, then send the slip) or when they get the vehicle. You confirm the payment when it arrives.
+No. On their booking link they choose to pay now (e.g. by bank transfer or a payment QR code, then send the slip) or when they get the vehicle. You confirm the payment when it arrives.

@@ -31,7 +31,7 @@ Answers come with links to the vehicle, booking or report they're about. Ask a f
 It can make four kinds of change:
 
 - **Add a vehicle**: "Add a red Honda Click, plate 1กข 1234, 3,000 a month."
-- **Record a payment or cost**: "I paid 5,000 baht for a new windscreen on the Ford Ecosport."
+- **Record a payment or cost**: "I paid $450 for a new windscreen on the Ford Ecosport."
 - **Create a booking link**: "Create a booking link for the Mazda 2 from 14 Oct, 11,000 a month, 5,000 deposit."
 - **Mark paperwork as renewed**: "Renewed the Yaris's insurance until 3 May."
 

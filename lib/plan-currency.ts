@@ -51,9 +51,10 @@ const PLAN_CURRENCY_FOR: Record<string, string> = { TRY: "EUR" };
 export const PLAN_CURRENCIES = Object.keys(PER_THB);
 
 export function planCurrency(currency: string | null | undefined) {
-  const code = String(currency || "THB").toUpperCase();
+  // Unknown or unsupported currencies are billed in US dollars (global audience; Rory, 7 Nov 2026).
+  const code = String(currency || "USD").toUpperCase();
   const mapped = PLAN_CURRENCY_FOR[code] || code;
-  return PER_THB[mapped] ? mapped : "THB";
+  return PER_THB[mapped] ? mapped : "USD";
 }
 
 /** Decimal places the currency is normally written with (0 for JPY, IDR, VND...). */

@@ -58,5 +58,18 @@ export function kindsOffered(kinds: string[]) {
   return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([kind]) => kind);
 }
 
+/** An opening time ("17:30") the way the reader's locale writes it: "5:30 PM" in en-US, "17:30" in en-GB or de. */
+export function siteTime(hhmm: string, locale: string) {
+  const [hours, minutes] = hhmm.split(":").map(Number);
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return hhmm;
+  try {
+    // 24-hour locales write 07:00, 12-hour ones 7:00 AM.
+    const twelve = /h1[12]/.test(new Intl.DateTimeFormat(locale, { hour: "numeric" }).resolvedOptions().hourCycle || "");
+    return new Intl.DateTimeFormat(locale, { hour: twelve ? "numeric" : "2-digit", minute: "2-digit", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 1, hours, minutes)));
+  } catch {
+    return hhmm;
+  }
+}
+
 /** "+66 81 234 5678" as a tel: link. */
 export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;

@@ -10,10 +10,10 @@ video: "help-insurance-and-tax-costs.mp4"
 poster: "help-insurance-and-tax-costs.jpg"
 faq:
   - q: "How are the months counted?"
-    a: "The way you pay: 15 March to 14 March next year is 12 months, so a ฿12,000 policy counts ฿1,000 a month."
+    a: "The way you pay: 15 March to 14 March next year is 12 months, so a $1,200 policy counts $100 a month."
 ---
 
-Paid ฿12,000 for a year of insurance? If it all landed in one month, that month would look awful. So RoveHQ counts 1/12 of it each month it covers.
+Paid $1,200 for a year of insurance? If it all landed in one month, that month would look awful. So RoveHQ counts 1/12 of it each month it covers.
 
 You pay one of two ways:
 
@@ -31,7 +31,7 @@ This records the cost and moves the car's date in one go.
 5. Under **How is it paid?** pick **All at once** or **Every month**, and enter the **Cost** (or **Cost per month**).
 6. Tap **Save**.
 
-It tells you what it'll do, like "Counted as ฿1,000 a month over 12 months in your costs".
+It tells you what it'll do, like "Counted as $100 a month over 12 months in your costs".
 
 **Thailand, older vehicles:** cars over 7 years and bikes over 5 need an inspection (ตรอ.) before road tax. When you renew **Road tax**, put that in **Inspection cost (ตรอ.)**. It's saved as its own **Other** cost over the same months. Leave it empty if there wasn't one.
 
@@ -52,4 +52,4 @@ Thailand: **Road tax**, **Compulsory insurance (Por Ror Bor)**, **Insurance**. E
 ## Common questions
 
 **How are the months counted?**
-The way you pay: 15 March to 14 March next year is 12 months, so a ฿12,000 policy counts ฿1,000 a month.
+The way you pay: 15 March to 14 March next year is 12 months, so a $1,200 policy counts $100 a month.

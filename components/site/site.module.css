@@ -86,7 +86,7 @@
 }
 .btn:focus-visible,
 .focus:focus-visible {
-  outline: 3px solid var(--s-accent);
+  outline: 3px solid var(--s-accent-text);
   outline-offset: 3px;
 }
 
@@ -222,8 +222,17 @@
 }
 
 .stars {
-  color: var(--s-accent);
+  color: var(--s-second-text);
   letter-spacing: 2px;
+}
+
+/* The footer sits on the palette's dark colour (palettes before 7 Nov 2026 set it to the page's own colour). */
+.footer {
+  background: var(--s-deep);
+  color: var(--s-deep-ink);
+}
+.footerSoft {
+  color: var(--s-deep-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {

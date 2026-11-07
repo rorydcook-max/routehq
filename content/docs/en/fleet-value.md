@@ -24,7 +24,7 @@ Values checked in the last month aren't checked again. If some can't be valued, 
 ## Each vehicle shows
 
 - its value, or **Not valued yet**, and **Your figure** if you entered it yourself
-- the advert range it came from, like "Adverts: ฿380,000 to ฿420,000 (6 found, ...)". With fewer than 3 adverts it says **Rough estimate**.
+- the advert range it came from, like "Adverts: €14,500 to €16,000 (6 found, ...)". With fewer than 3 adverts it says **Rough estimate**.
 - its condition. If none is set, estimates assume good condition. Damage found at a return moves it down by itself.
 - what you paid and how much it's gone up or down
 - the sum insured, flagged when it's well below what the vehicle is worth

@@ -1,7 +1,9 @@
 "use client";
 
-import { createContext, useContext, type ClipboardEvent, type ElementType, type KeyboardEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ClipboardEvent, type ElementType, type KeyboardEvent, type ReactNode } from "react";
+import { useLocale } from "next-intl";
 import { LONG_SLOTS, SLOT_MAX, type SiteConfig, type TextSlot } from "@/lib/sites/config";
+import { siteTime } from "@/lib/sites/format";
 import type { ResolvedImage } from "@/lib/sites/images";
 import type { Palette } from "@/lib/sites/palettes";
 import type { TemplateDef } from "@/lib/sites/templates";
@@ -38,6 +40,21 @@ export function useSite() {
   const value = useContext(SiteContext);
   if (!value) throw new Error("useSite outside SitePage");
   return value;
+}
+
+/**
+ * Opening times in the reader's own style (sites-global): the page's language first ("en" writes 5:30 PM), then, once
+ * in the browser, the reader's own region for that language (en-GB, en-AU: 17:30) so the server and first paint agree.
+ */
+export function useSiteTime() {
+  const pageLocale = useLocale();
+  const [locale, setLocale] = useState(pageLocale);
+  useEffect(() => {
+    const base = pageLocale.split("-")[0];
+    const own = (navigator.languages || [navigator.language]).find((tag) => tag && tag.split("-")[0] === base);
+    setLocale(own || pageLocale);
+  }, [pageLocale]);
+  return (hhmm: string) => siteTime(hhmm, locale);
 }
 
 /**

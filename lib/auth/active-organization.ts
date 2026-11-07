@@ -66,7 +66,7 @@ export async function loadActiveMembership(supabase: any, userId: string, prefer
       .eq("is_active", true)
       .order("created_at", { ascending: true }));
   }
-  if (error) return { data: null as ActiveMembership | null, error, closed: false, timezone: null as string | null, distanceUnit: null as DistanceUnit | null, currency: null as string | null };
+  if (error) return { data: null as ActiveMembership | null, error, closed: false, timezone: null as string | null, distanceUnit: null as DistanceUnit | null, currency: null as string | null, country: null as string | null };
 
   const rows = (data || []) as MembershipRow[];
   const open = rows.filter((row) => !row.organizations?.deleted_at);
@@ -90,5 +90,5 @@ export async function loadActiveMembership(supabase: any, userId: string, prefer
   const timezone = org?.timezone || null;
   // Miles or km (lib/business-units.ts): the saved choice, else the country's usual unit.
   const distanceUnit = org ? distanceUnitFor({ country_code: org.country_code, settings: { distance_unit: org.distance_unit } }) : null;
-  return { data: picked, error: null, closed, timezone, distanceUnit, currency: org?.currency || null };
+  return { data: picked, error: null, closed, timezone, distanceUnit, currency: org?.currency || null, country: org?.country_code || null };
 }

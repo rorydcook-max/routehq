@@ -103,7 +103,7 @@ const VEHICLES = {
   yaris: { name: "Toyota Yaris", file: "toyota-yaris" },
   corolla: { name: "Toyota Corolla", file: "toyota-corolla" },
   pajero: { name: "Mitsubishi Pajero Sport", file: "mitsubishi-pajero-sport" },
-  vespa: { name: "Vespa VXL 125", file: "vespa-vxl" }
+  vespa: { name: "Vespa Primavera 125", file: "vespa-vxl" }
 } as const;
 type VehicleId = keyof typeof VEHICLES;
 const vehicleName = (id: VehicleId) => VEHICLES[id].name;
@@ -199,7 +199,7 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
     { icon: BarChart3, label: t("mockNavReports") }
   ];
   const rows = [
-    { title: t("mockRowHandover", { vehicle: vehicleName("yaris") }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, vehicle: "yaris" as VehicleId },
+    { title: t("mockRowHandover", { vehicle: vehicleName("pajero") }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, vehicle: "pajero" as VehicleId },
     { title: t("mockRowCollect", { amount: money(2400) }), sub: `Kenji Watanabe · ${vehicleName("vespa")}`, action: t("mockRecordPayment"), vehicle: "vespa" as VehicleId },
     { title: t("mockRowReturn", { vehicle: vehicleName("corolla") }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), vehicle: "corolla" as VehicleId }
   ];
@@ -209,16 +209,16 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
   const going = { bg: "#d9f4f3", fg: "#0b6e6c" };
   const back = { bg: "#e4eef8", fg: "#1f4f7a" };
   const calendar = [
-    { vehicle: vehicleName("yaris"), bars: [{ who: "Anna Becker", from: 4, to: 8, ...going }] },
+    { vehicle: vehicleName("pajero"), bars: [{ who: "Anna Becker", from: 4, to: 8, ...going }] },
     { vehicle: vehicleName("corolla"), bars: [{ who: "Lucas Martin", from: 1, to: 5, ...back }, { who: "Mei Lin", from: 6, to: 8, ...out }] },
     { vehicle: vehicleName("vespa"), bars: [{ who: "Kenji Watanabe", from: 2, to: 7, ...out }] },
-    { vehicle: vehicleName("pajero"), bars: [{ who: "Sofia Rossi", from: 1, to: 8, ...out }] }
+    { vehicle: vehicleName("yaris"), bars: [{ who: "Sofia Rossi", from: 1, to: 8, ...out }] }
   ];
   return (
-    <WindowFrame address="palm.rovehq.app" className={className} label={t("mockDashboardLabel")}>
+    <WindowFrame address="harbor.rovehq.app" className={className} label={t("mockDashboardLabel")}>
       <div className="grid aspect-[16/9.2] grid-cols-[15em_1fr] bg-[#f3f6f8]">
         <aside className="flex flex-col gap-[0.3em] bg-[#0b2140] px-[1em] py-[1.4em] text-white">
-          <p className="px-[0.6em] text-[1.15em] font-bold leading-tight">Palm Car Rental</p>
+          <p className="px-[0.6em] text-[1.15em] font-bold leading-tight">Harbor Rentals</p>
           <p className="px-[0.7em] text-[0.85em] text-white/60">Powered by RoveHQ</p>
           <div className="mt-[1em] flex flex-col gap-[0.2em]">
             {nav.map(({ icon: Icon, label, active }) => (
@@ -333,7 +333,7 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
 export async function TodayPhoneMock({ className = "" }: { className?: string }) {
   const { t, money, date } = await kit();
   const rows = [
-    { title: t("mockRowHandover", { vehicle: vehicleName("yaris") }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, bar: "#0b8f8c" },
+    { title: t("mockRowHandover", { vehicle: vehicleName("pajero") }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, bar: "#0b8f8c" },
     { title: t("mockRowCollect", { amount: money(2400) }), sub: "Kenji Watanabe", action: t("mockRecordPayment"), bar: "#12bcb8" },
     { title: t("mockRowReturn", { vehicle: vehicleName("corolla") }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), bar: "#4a9ad8" }
   ];
@@ -342,7 +342,7 @@ export async function TodayPhoneMock({ className = "" }: { className?: string })
       <div className="flex h-full flex-col bg-[linear-gradient(180deg,#e6eaef_0%,#f3f6f8_40%)]">
         <StatusBar />
         <div className="px-[1.3em] pt-[1.6em]">
-          <p className="font-bold">Palm Car Rental</p>
+          <p className="font-bold">Harbor Rentals</p>
           <p className="mt-[1.1em] font-semibold text-[#5f6b7a]">{date("2026-11-12", { weekday: "long", day: "numeric", month: "long" })}</p>
           <p className="text-[2.2em] font-semibold leading-[1.05] tracking-[-0.02em]" style={{ fontFamily: "var(--font-site)" }}>
             {t("mockGoodMorning")}
@@ -405,17 +405,17 @@ export async function BookingPhoneMock({ className = "" }: { className?: string 
       <div className="flex h-full flex-col bg-[#f3f6f8]">
         <StatusBar />
         <div className="flex items-center gap-[0.6em] px-[1.2em] pt-[1.4em]">
-          <span className="flex h-[2.2em] w-[2.2em] items-center justify-center rounded-[0.6em] bg-[#0b8f8c] font-bold text-white">P</span>
-          <span className="font-bold">Palm Car Rental</span>
+          <span className="flex h-[2.2em] w-[2.2em] items-center justify-center rounded-[0.6em] bg-[#0b8f8c] font-bold text-white">H</span>
+          <span className="font-bold">Harbor Rentals</span>
         </div>
         <div className="mx-[0.9em] mt-[1em] rounded-[1.3em] bg-white p-[1em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
           <p className="font-semibold text-[#5f6b7a]">{t("mockYourBooking")}</p>
           <div className="mt-[0.5em] flex items-center gap-[0.8em]">
             <span className="block h-[3.4em] w-[4.6em] shrink-0 overflow-hidden rounded-[0.8em] bg-[#e6eaef]">
-              <VehiclePhoto id="yaris" thumb />
+              <VehiclePhoto id="pajero" thumb />
             </span>
             <span className="min-w-0">
-              <span className="block text-[1.15em] font-bold leading-tight">{vehicleName("yaris")}</span>
+              <span className="block text-[1.15em] font-bold leading-tight">{vehicleName("pajero")}</span>
               <span className="block text-[#5f6b7a]">
                 {range} · {t("mockDays", { count: 7 })}
               </span>
@@ -724,11 +724,11 @@ export async function LedgerCard({ className = "" }: { className?: string }) {
   const rows = [
     { label: t("mockRental"), sub: t("mockDays", { count: 7 }), amount: money(5600), done: true },
     { label: t("mockDepositHeld"), sub: qrName, amount: money(3000), done: true },
-    { label: t("mockReceiptSent"), sub: "LINE", amount: "", done: true }
+    { label: t("mockReceiptSent"), sub: "Email", amount: "", done: true }
   ];
   return (
     <div aria-hidden="true" className={`${s.card} ${className}`}>
-      <CardHead icon={<FileText className="h-[1.2em] w-[1.2em]" />} sub={<Sub detail="Anna Becker" main={vehicleName("yaris")} />} title={t("mockLedgerTitle")} />
+      <CardHead icon={<FileText className="h-[1.2em] w-[1.2em]" />} sub={<Sub detail="Anna Becker" main={vehicleName("pajero")} />} title={t("mockLedgerTitle")} />
       <div className="px-[1.3em] py-[0.3em]">
         {rows.map((row) => (
           <div className="flex items-center justify-between gap-[1em] border-b border-[var(--line)] py-[0.75em] last:border-0" key={row.label}>
@@ -758,19 +758,19 @@ export async function LedgerCard({ className = "" }: { className?: string }) {
 export async function ShopPageMock({ className = "" }: { className?: string }) {
   const { t, money } = await kit();
   const vehicles = [
-    { id: "vespa" as VehicleId, price: money(450) },
-    { id: "yaris" as VehicleId, price: money(1100) },
     { id: "corolla" as VehicleId, price: money(1300) },
-    { id: "pajero" as VehicleId, price: money(2200) }
+    { id: "vespa" as VehicleId, price: money(450) },
+    { id: "pajero" as VehicleId, price: money(2200) },
+    { id: "yaris" as VehicleId, price: money(1100) }
   ];
   return (
-    <WindowFrame address="palm.rovehq.app/book" className={className} label={t("mockShopLabel")} light>
+    <WindowFrame address="harbor.rovehq.app/book" className={className} label={t("mockShopLabel")} light>
       <div className="bg-[#f3f6f8] px-[2.4em] pb-[2.4em] pt-[2em] text-[1.3em]">
         <div className="flex items-center justify-between gap-[1em]">
           <span className="flex items-center gap-[0.8em]">
-            <span className="flex h-[3em] w-[3em] items-center justify-center rounded-[0.8em] bg-[#0b8f8c] text-[1.2em] font-bold text-white">P</span>
+            <span className="flex h-[3em] w-[3em] items-center justify-center rounded-[0.8em] bg-[#0b8f8c] text-[1.2em] font-bold text-white">H</span>
             <span>
-              <span className="block text-[1.5em] font-bold leading-tight">Palm Car Rental</span>
+              <span className="block text-[1.5em] font-bold leading-tight">Harbor Rentals</span>
               <span className="block text-[#5f6b7a]">{t("mockShopTagline")}</span>
             </span>
           </span>

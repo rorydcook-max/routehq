@@ -57,12 +57,17 @@ export function earlyReturnSuggestion(input: { payments: any[]; returnDate: stri
   let periodDays = 0;
   let paid = 0;
   let amount = 0;
+  // A period paid in parts (a part payment at handover, then the rest) is still one period: its days count once.
+  const periods = new Set<string>();
   rent.forEach((payment, index) => {
     if (!["paid", "reconciled"].includes(String(payment.status))) return;
     const share = unusedShare(rent, index, usedUntil, previousEnd, interval);
     if (!share) return;
-    unusedDays += share.unused;
-    periodDays += share.length;
+    if (!periods.has(share.period)) {
+      periods.add(share.period);
+      unusedDays += share.unused;
+      periodDays += share.length;
+    }
     paid += Number(payment.amount || 0);
     amount += share.amount;
   });
@@ -130,6 +135,6 @@ function unusedShare(rent: any[], index: number, usedUntil: string, previousEnd:
     const length = daysBetween(periodStart, periodEnd);
     const unused = daysBetween(usedUntil > periodStart ? usedUntil : periodStart, periodEnd);
     if (length <= 0 || unused <= 0) return null;
-    return { length, unused: Math.min(unused, length), amount: (Number(payment.amount || 0) * Math.min(unused, length)) / length };
+    return { length, unused: Math.min(unused, length), amount: (Number(payment.amount || 0) * Math.min(unused, length)) / length, period: `${periodStart}/${periodEnd}` };
   }
 }

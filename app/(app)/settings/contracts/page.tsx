@@ -46,7 +46,7 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
   await markOnboardingStep(supabase, organization.id, "contract_template");
   const usingUploaded = template?.template_key === UPLOADED_TEMPLATE_KEY;
 
-  const policy = getTravelPolicySettings(organization.settings);
+  const policy = getTravelPolicySettings(organization.settings, organization.currency);
   const mainTravel = defaultLocationRules(organization.settings, travelCountryCode(organization));
   const money = currencySymbol(organization.currency);
   const amount = (value: number) => `${money}${Math.round(Number(value) || 0).toLocaleString("en-US")}`;

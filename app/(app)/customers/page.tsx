@@ -40,7 +40,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
         <PageBand action={{ href: "/customers/new", label: say("add"), icon: <Plus size={16} /> }} title={say("title")}>
           <BandPills
             items={[
-              { count: customers.length, label: say("pillAll"), href: show ? "/customers" : null },
+              { count: customers.length, label: say("pillAll", { count: customers.length }), href: show ? "/customers" : null },
               { count: renting, label: say("pillRenting"), dot: "var(--on-rent)", href: link("renting"), active: show === "renting" },
               ...(rented.length > 0
                 ? [

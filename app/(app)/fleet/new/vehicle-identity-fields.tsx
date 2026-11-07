@@ -276,6 +276,9 @@ export function VehicleIdentityFields({
   }
 
   function handleCategoryChange(value: string) {
+    // The same type again: nothing changes (clearing the makes here left the picker empty, as the list is only
+    // fetched again when the type changes).
+    if (value === categoryId) return;
     setCategoryId(value);
     setSelectedMakeId("");
     setSelectedModelId("");

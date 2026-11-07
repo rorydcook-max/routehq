@@ -172,7 +172,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const signatureDisplayUrl = organization.authorised_signature_storage_bucket && organization.authorised_signature_storage_path
     ? "/api/branding-assets/signature"
     : brandingDisplayUrls.signatureUrl || browserSafeAssetFallback(ownerSignatureUrl);
-  const travelPolicySettings = getTravelPolicySettings(organization.settings);
+  const travelPolicySettings = getTravelPolicySettings(organization.settings, organization.currency);
 
   const lineUserId = organization.line_user_id ?? null;
   const lineOaId = process.env.LINE_OA_ID ?? "";

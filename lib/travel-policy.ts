@@ -1,3 +1,4 @@
+import { localPrice } from "@/lib/plan-currency";
 import { COUNTRY_NAMES, countryCodeOf, detectIsland, islandById, placeKind, placeName, placesFor } from "@/lib/travel-places";
 
 export type HomeTerritoryType = "island" | "mainland";
@@ -136,12 +137,19 @@ export const travelPolicyDefaults: TravelPolicySettings = {
   promptpay_id: ""
 };
 
-function numberSetting(settings: Record<string, any>, key: keyof TravelPolicySettings) {
+/** Defaults that are amounts of money: set in THB above, converted for a business in another currency. */
+const MONEY_DEFAULTS = new Set<keyof TravelPolicySettings>(["secondary_deposit_amount", "fuel_charge_per_increment", "cleaning_fee_minimum", "smoking_fee_maximum", "emergency_repair_limit"]);
+
+function numberSetting(settings: Record<string, any>, currency: string | null | undefined, key: keyof TravelPolicySettings) {
   const value = Number(settings[key]);
-  return Number.isFinite(value) ? value : Number(travelPolicyDefaults[key]);
+  if (Number.isFinite(value)) return value;
+  const fallback = Number(travelPolicyDefaults[key]);
+  // A business outside Thailand starts from the same amounts in its own currency (€4 fuel, not €150).
+  return MONEY_DEFAULTS.has(key) && currency && currency.toUpperCase() !== "THB" ? localPrice(fallback, currency) : fallback;
 }
 
-export function getTravelPolicySettings(settings: Record<string, any> | null | undefined): TravelPolicySettings {
+/** The travel rules and fees a business saved, else the defaults (money defaults in `currency`, the business's). */
+export function getTravelPolicySettings(settings: Record<string, any> | null | undefined, currency?: string | null): TravelPolicySettings {
   const source = settings || {};
   const country = String(source.country || source.main_location?.country || travelPolicyDefaults.country);
   const territory = String(source.home_territory || source.main_location?.town || source.location || travelPolicyDefaults.home_territory);
@@ -154,17 +162,17 @@ export function getTravelPolicySettings(settings: Record<string, any> | null | u
     home_territory: territory,
     home_territory_type: homeTerritoryType,
     island_travel_policy: islandTravelPolicy,
-    secondary_deposit_amount: numberSetting(source, "secondary_deposit_amount"),
+    secondary_deposit_amount: numberSetting(source, currency, "secondary_deposit_amount"),
     geofence_monitoring_enabled: Boolean(source.geofence_monitoring_enabled),
     country,
     jurisdiction: String(source.jurisdiction || jurisdictionByCountry[country] || travelPolicyDefaults.jurisdiction),
-    mileage_limit: numberSetting(source, "mileage_limit"),
-    fuel_charge_per_increment: numberSetting(source, "fuel_charge_per_increment"),
-    late_fee_percentage: numberSetting(source, "late_fee_percentage"),
-    cleaning_fee_minimum: numberSetting(source, "cleaning_fee_minimum"),
-    smoking_fee_maximum: numberSetting(source, "smoking_fee_maximum"),
-    emergency_repair_limit: numberSetting(source, "emergency_repair_limit"),
-    deposit_return_days: numberSetting(source, "deposit_return_days"),
+    mileage_limit: numberSetting(source, currency, "mileage_limit"),
+    fuel_charge_per_increment: numberSetting(source, currency, "fuel_charge_per_increment"),
+    late_fee_percentage: numberSetting(source, currency, "late_fee_percentage"),
+    cleaning_fee_minimum: numberSetting(source, currency, "cleaning_fee_minimum"),
+    smoking_fee_maximum: numberSetting(source, currency, "smoking_fee_maximum"),
+    emergency_repair_limit: numberSetting(source, currency, "emergency_repair_limit"),
+    deposit_return_days: numberSetting(source, currency, "deposit_return_days"),
     fees_off: Array.isArray(source.fees_off) ? (source.fees_off as string[]).filter((key): key is FeeKey => (FEE_KEYS as readonly string[]).includes(key)) : [],
     owner_line_id: String(source.owner_line_id || source.line_id || ""),
     owner_whatsapp: String(source.owner_whatsapp || source.whatsapp || ""),

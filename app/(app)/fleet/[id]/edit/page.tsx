@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { orgCountry } from "@/lib/regional";
 import { notFound } from "next/navigation";
 import { niceMoney } from "@/lib/nice-money";
 import { getTranslations } from "next-intl/server";
@@ -41,6 +42,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
   const { id } = await params;
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
+  const thai = orgCountry(organization) === "TH";
   const t = await getTranslations("vehicleForm");
   const say = t as unknown as Say;
   const supabase = (await createSupabaseServerClient()) as any;
@@ -192,13 +194,14 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
           <Fold summary={datesSummary} title={say("datesTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               {dateField("tax", "taxExpiryDate", compliance.tax_expiry_date)}
-              {dateField("porbor", "porborExpiryDate", compliance.porbor_expiry_date)}
+              {/* Por Ror Bor is Thailand's; elsewhere only when one was saved. */}
+              {thai || compliance.porbor_expiry_date ? dateField("porbor", "porborExpiryDate", compliance.porbor_expiry_date) : null}
               {dateField("insurance", "insuranceExpiryDate", compliance.insurance_expiry_date)}
               <label className="block">
                 <span className={labelClass}>{say("cover")}</span>
                 <select className={inputClass} defaultValue={valueOrEmpty(compliance.voluntary_insurance_type)} name="voluntaryInsuranceType">
                   <option value="">{say("choose")}</option>
-                  {coverTypes.map((type) => (
+                  {coverTypes.filter((type) => thai || !type.startsWith("class_") || type === compliance.voluntary_insurance_type).map((type) => (
                     <option key={type} value={type}>
                       {say(`cover_${type}`)}
                     </option>

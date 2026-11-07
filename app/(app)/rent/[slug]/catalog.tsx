@@ -424,7 +424,7 @@ export function Catalog({
                     </label>
                     <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
                       {t("phoneOrWhatsApp")}
-                      <input autoComplete="tel" className={inputClass} inputMode="tel" name="phone" placeholder="+66 ..." required />
+                      <input autoComplete="tel" className={inputClass} inputMode="tel" name="phone" placeholder="+ ..." required />
                     </label>
                   </div>
                   {offered.length ? (

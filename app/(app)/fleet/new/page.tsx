@@ -17,6 +17,7 @@ import { defaultCalendarForLocale } from "@/lib/i18n/calendars";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { distanceKey } from "@/lib/business-units";
+import { orgCountry } from "@/lib/regional";
 
 // The wording for this page is in locales/<language>/common.json under "vehicleForm".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -107,7 +108,7 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
           {/* Everything below can wait: one tap away, filled in any time. The short form leaves it out altogether. */}
           {quick ? null : (<>
           <Fold summary={say("datesSummary")} title={say("datesTitle")}>
-            <ComplianceFields calendar={preferredCalendar} inputClass={inputClass} preferredLocale={preferredLocale} />
+            <ComplianceFields calendar={preferredCalendar} inputClass={inputClass} preferredLocale={preferredLocale} thai={orgCountry(organization) === "TH"} />
           </Fold>
           <Fold summary={say(distanceKey("valueSummary"))} title={say("valueTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">

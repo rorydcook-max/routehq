@@ -439,7 +439,7 @@ export function buildContractVariables({
   rental: any;
   bookingLink: any;
 }): ContractVariables {
-  const settings = getTravelPolicySettings(organization?.settings);
+  const settings = getTravelPolicySettings(organization?.settings, rental?.currency || organization?.currency);
   const bookingData = (bookingLink?.booking_data || {}) as Record<string, any>;
   // English plus the business location's language (lib/agreement-language.ts). Thailand reads exactly as before.
   const country = agreementCountry(organization);

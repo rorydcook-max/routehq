@@ -101,7 +101,7 @@ function missingSiteContent(path: string, locale: string) {
 
 /** The app's and website's own top-level pages: on rove.rent these still go to RoveHQ, never read as a business's name. */
 const APP_TOP_LEVEL = new Set(
-  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,docs,faq,guides,home,legal,pricing,resources,switch,car-rental-software,scooter-rental-software,motorcycle-rental-software,booking-pages,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko,el,it,nl,pl,hr,tr".split(",")
+  "accept-invite,account,actions,amend,api,auth,book,booking-page,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,docs,faq,guides,home,legal,pricing,resources,switch,car-rental-software,scooter-rental-software,motorcycle-rental-software,booking-pages,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko,el,it,nl,pl,hr,tr".split(",")
 );
 
 /** Search engines and link previews: never sent to a language by their Accept-Language (they index each address as it is). */
@@ -496,9 +496,10 @@ export async function proxy(request: NextRequest) {
 const GATE_COOKIE = "rhq_gate";
 const GATE_SECONDS = 300;
 
-/** Settings, the team, reports and bringing in a fleet from a file are the owner's. */
+/** Settings (and the Booking page tool that came out of it), the team, reports and bringing in a fleet from a file are the owner's. */
 function isOwnerOnlyPath(pathname: string) {
   return (
+    pathname === "/booking-page" ||
     pathname === "/settings" ||
     pathname.startsWith("/settings/") ||
     pathname === "/invite" ||

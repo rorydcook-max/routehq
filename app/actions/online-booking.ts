@@ -266,6 +266,7 @@ export async function savePublicBookingSettings(input: { enabled: boolean; holdH
     .eq("id", membership.organizationId);
   if (error) return { ok: false, error: await said("Couldn't save. Please try again.") };
   revalidatePath("/settings");
+  revalidatePath("/booking-page");
   revalidatePath(`/rent/${organization.slug}`);
   return { ok: true };
 }

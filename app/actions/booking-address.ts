@@ -29,6 +29,7 @@ async function ownerOrg() {
 
 function refresh(slug: string) {
   revalidatePath("/settings");
+  revalidatePath("/booking-page");
   revalidatePath(`/rent/${slug}`);
 }
 

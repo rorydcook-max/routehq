@@ -8,7 +8,7 @@ export const onboardingSteps = [
   // Told to the chat (the fleet assistant is part of it): ?chat=1 opens it on Fleet.
   { step: "current_rentals", label: "Add who's renting now", href: "/fleet?chat=1" },
   { step: "reminders", label: "Turn on automatic reminders", href: "/settings?tab=messaging" },
-  { step: "booking_page", label: "Share your booking page", href: "#booking-page" },
+  { step: "booking_page", label: "Share your booking page", href: "/booking-page" },
   // Without these the customer is stopped at the last step of their booking link.
   { step: "signature", label: "Add your signature", href: "/settings/signature" },
   { step: "payment_methods", label: "Say how customers pay you", href: "/settings?tab=rentals#payment-methods" },

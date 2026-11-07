@@ -6,6 +6,7 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { OWNER_ONLY_MESSAGE } from "@/lib/auth/role-types";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { bookingSiteFrom, bookingSiteToStored } from "@/lib/booking-site";
+import { isBrandColour } from "@/lib/brand";
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -37,6 +38,24 @@ async function store(admin: any, organization: { id: string; slug: string }, set
   const { error } = await admin.from("organizations").update({ settings: { ...settings, booking_site: clean } }).eq("id", organization.id);
   if (error) return { ok: false, error: await said("Couldn't save. Please try again.") };
   revalidatePath("/settings");
+  revalidatePath("/booking-page");
+  revalidatePath(`/rent/${organization.slug}`);
+  return { ok: true };
+}
+
+/**
+ * The brand colour from the Booking page tool (owner only). The same colour as Settings › Business › Your brand:
+ * it also colours agreements, receipts and booking links.
+ */
+export async function saveBrandColour(colour: string): Promise<Result> {
+  const found = await ownerOrganization();
+  if ("error" in found) return { ok: false, error: found.error as string };
+  const value = String(colour || "").trim().toLowerCase();
+  if (!isBrandColour(value)) return { ok: false, error: await said("Couldn't save. Please try again.") };
+  const { admin, organization } = found;
+  const { error } = await admin.from("organizations").update({ contract_accent_colour: value }).eq("id", organization.id);
+  if (error) return { ok: false, error: await said("Couldn't save. Please try again.") };
+  revalidatePath("/", "layout");
   revalidatePath(`/rent/${organization.slug}`);
   return { ok: true };
 }

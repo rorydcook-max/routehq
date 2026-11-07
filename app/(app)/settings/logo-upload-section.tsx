@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { updateBusinessLogo } from "@/app/actions/settings";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 
-export function LogoUploadSection({ logoUrl, orgName }: { logoUrl: string | null | undefined; orgName: string }) {
+export function LogoUploadSection({ logoUrl, orgName, onDone }: { logoUrl: string | null | undefined; orgName: string; /** After the logo is saved (the Booking page tool reloads its preview). */ onDone?: () => void }) {
   const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ key: string; type: "error" | "success" } | null>(null);
@@ -18,6 +18,7 @@ export function LogoUploadSection({ logoUrl, orgName }: { logoUrl: string | null
         await updateBusinessLogo(formData);
         setMessage({ key: "lg_done", type: "success" });
         if (fileRef.current) fileRef.current.value = "";
+        onDone?.();
       } catch {
         setMessage({ key: "lg_failed", type: "error" });
       }

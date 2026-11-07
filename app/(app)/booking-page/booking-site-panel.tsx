@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowDown, ArrowUp, ExternalLink, ImagePlus, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ImagePlus, Plus, Trash2 } from "lucide-react";
 import { saveBookingHero, saveBookingSite } from "@/app/actions/booking-site";
 import { TemplateThumb } from "@/components/booking-site/template-thumb";
 import { bookingSiteToStored, LIMITS, SOCIAL_KEYS, type BookingSite, type BookingTemplate, type SiteSection, type SiteSocial, type Switchable } from "@/lib/booking-site";
@@ -17,24 +17,34 @@ const DEFAULT_HOURS = Array.from({ length: 7 }, (_, index) => (index < 6 ? { ope
 
 const field = "mt-1 w-full";
 
+export type SitePart = { id: "design" | "sections"; title: string; summary?: string; body: ReactNode };
+
 /**
- * Settings > Booking page > Page design (Rory, 7 Nov 2026): the template, the big photo and headline, and the
- * sections around the vehicles (on or off, in order, with what each says). Saved in settings.booking_site.
+ * Booking page tool › Design and Sections (Rory, 7 Nov 2026; moved out of Settings the same day): the template,
+ * the big photo and headline, and the sections around the vehicles (on or off, in order, with what each says).
+ * Saved in settings.booking_site. `renderPart` draws each of the two parts (the tool folds them); one save bar
+ * shows while there are unsaved changes.
  */
 export function BookingSitePanel({
   initial,
   heroUrl,
   fallbackPhotoUrl,
-  slug,
   colour,
   businessName,
-  contacts
+  contacts,
+  renderPart,
+  onSaved,
+  onTemplateChange
 }: {
+  renderPart: (part: SitePart) => ReactNode;
+  /** After a save or a photo change (the tool reloads its preview). */
+  onSaved?: () => void;
+  /** The template being looked at, saved or not (the preview shows it with ?template=). */
+  onTemplateChange?: (template: BookingTemplate) => void;
   initial: BookingSite;
   heroUrl: string | null;
   /** The first vehicle photo, used when no big photo has been uploaded. */
   fallbackPhotoUrl: string | null;
-  slug: string;
   colour: string;
   businessName: string;
   /** The Business tab's contact details: what the social links fall back to. */
@@ -42,6 +52,7 @@ export function BookingSitePanel({
 }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const [site, setSite] = useState<BookingSite>(initial);
+  const [savedSite, setSavedSite] = useState<BookingSite>(initial);
   const [photo, setPhoto] = useState<string | null>(heroUrl);
   const [editing, setEditing] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "saved" | "failed">("idle");
@@ -53,6 +64,7 @@ export function BookingSitePanel({
   const update = (patch: Partial<BookingSite>) => {
     setStatus("idle");
     setSite((current) => ({ ...current, ...patch }));
+    if (patch.template) onTemplateChange?.(patch.template);
   };
   const isOn = (id: Switchable) => !site.off.includes(id);
   const toggle = (id: Switchable) => update({ off: isOn(id) ? [...site.off, id] : site.off.filter((item) => item !== id) });
@@ -64,9 +76,14 @@ export function BookingSitePanel({
   };
 
   function save() {
+    const saving = site;
     startTransition(async () => {
-      const result = await saveBookingSite(bookingSiteToStored(site)).catch(() => ({ ok: false as const, error: "" }));
+      const result = await saveBookingSite(bookingSiteToStored(saving)).catch(() => ({ ok: false as const, error: "" }));
       setStatus(result.ok ? "saved" : "failed");
+      if (result.ok) {
+        setSavedSite(saving);
+        onSaved?.();
+      }
     });
   }
 
@@ -91,6 +108,7 @@ export function BookingSitePanel({
         if (file) setPhoto(URL.createObjectURL(file));
       }
       if (fileRef.current) fileRef.current.value = "";
+      onSaved?.();
     });
   }
 
@@ -121,7 +139,6 @@ export function BookingSitePanel({
                 ) : null}
               </div>
             </div>
-            <p className="text-sm text-[var(--muted)]">{say("bs_photoHint")}</p>
             {photoError ? <p className="font-bold text-[var(--danger)]">{photoError}</p> : null}
             <label className="block">
               <span className="font-semibold text-[var(--foreground-secondary)]">{say("bs_headline")}</span>
@@ -288,55 +305,56 @@ export function BookingSitePanel({
     );
   };
 
-  return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="font-bold text-[var(--foreground)]">{say("bs_title")}</h3>
-        <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("bs_body")}</p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3" role="radiogroup" aria-label={say("bs_title")}>
-        {TEMPLATE_ORDER.map((template) => {
-          const chosen = site.template === template;
-          return (
-            <div className={`flex flex-col rounded-2xl border-2 p-2 ${chosen ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--border)] bg-white"}`} key={template}>
-              <button aria-checked={chosen} className="text-start" onClick={() => update({ template })} role="radio" type="button">
-                <TemplateThumb colour={colour} template={template} />
-                <span className="mt-2 block font-bold leading-tight text-[var(--foreground)]">{say(`bs_t_${template}`)}</span>
-                <span className="mt-0.5 block text-sm leading-5 text-[var(--foreground-secondary)]">{say(`bs_td_${template}`)}</span>
-              </button>
-              <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-                {initial.template === template ? <span className="whitespace-nowrap text-sm font-bold text-[var(--primary)]">{say("bs_current")}</span> : <span />}
-                <a className="inline-flex min-h-10 items-center gap-1 rounded-full px-2 text-sm font-bold text-[var(--primary)]" href={`/rent/${slug}?template=${template}`} rel="noreferrer" target="_blank">
-                  <ExternalLink size={15} />
-                  {say("bs_preview")}
-                </a>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {site.template === "standard" ? (
-        <p className="text-sm font-medium text-[var(--muted)]">{say("bs_standardNote")}</p>
-      ) : (
-        <div>
-          <h3 className="font-bold text-[var(--foreground)]">{say("bs_sections")}</h3>
-          <p className="mt-0.5 text-sm font-medium text-[var(--muted)]">{say("bs_sectionsHint")}</p>
-          <ul className="mt-2 space-y-2">
-            {row("hero", null)}
-            {site.order.map((id, index) => row(id, index))}
-          </ul>
-        </div>
-      )}
-
-      <div className="flex flex-wrap items-center gap-3">
-        <button className="primary-action pressable" disabled={isPending} onClick={save} type="button">
-          {isPending ? say("saving") : say("bs_save")}
-        </button>
-        {status === "saved" ? <span className="font-bold text-[var(--success)]">{say("saved")}</span> : null}
-        {status === "failed" ? <span className="font-bold text-[var(--danger)]">{say("saveFailed")}</span> : null}
-      </div>
+  const design = (
+    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3" role="radiogroup" aria-label={say("bt_design")}>
+      {TEMPLATE_ORDER.map((template) => {
+        const chosen = site.template === template;
+        return (
+          <button
+            aria-checked={chosen}
+            className={`flex flex-col rounded-2xl border-2 p-2 text-start ${chosen ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--border)] bg-white"}`}
+            key={template}
+            onClick={() => update({ template })}
+            role="radio"
+            type="button"
+          >
+            <TemplateThumb colour={colour} template={template} />
+            <span className="mt-2 block font-bold leading-tight text-[var(--foreground)]">{say(`bs_t_${template}`)}</span>
+            {savedSite.template === template ? <span className="mt-0.5 block text-sm font-bold text-[var(--primary)]">{say("bs_current")}</span> : null}
+          </button>
+        );
+      })}
     </div>
+  );
+
+  // The Standard template has no sections around the vehicles: the Sections part only shows for the others.
+  const sections =
+    site.template === "standard" ? null : (
+      <ul className="space-y-2">
+        {row("hero", null)}
+        {site.order.map((id, index) => row(id, index))}
+      </ul>
+    );
+
+  const shownSections = (isOn("hero" as Switchable) ? 1 : 0) + site.order.filter((id) => id === "vehicles" || isOn(id as Switchable)).length;
+  const dirty = JSON.stringify(bookingSiteToStored(site)) !== JSON.stringify(bookingSiteToStored(savedSite));
+
+  return (
+    <>
+      {renderPart({ id: "design", title: say("bt_design"), summary: say(`bs_t_${site.template}`), body: design })}
+      {sections ? renderPart({ id: "sections", title: say("bs_sections"), summary: say("bt_sectionsOn", { count: shownSections }), body: sections }) : null}
+      {dirty || status !== "idle" ? (
+        <div className="sticky bottom-24 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-3 shadow-[var(--shadow-card)] lg:bottom-4">
+          {dirty ? (
+            <button className="primary-action pressable" disabled={isPending} onClick={save} type="button">
+              {isPending ? say("saving") : say("bt_saveChanges")}
+            </button>
+          ) : null}
+          {dirty && status !== "failed" ? <span className="font-semibold text-[var(--foreground-secondary)]">{say("bt_unsaved")}</span> : null}
+          {!dirty && status === "saved" ? <span className="font-bold text-[var(--success)]">{say("saved")}</span> : null}
+          {status === "failed" ? <span className="font-bold text-[var(--danger)]">{say("saveFailed")}</span> : null}
+        </div>
+      ) : null}
+    </>
   );
 }

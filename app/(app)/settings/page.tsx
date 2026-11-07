@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Smartphone, Zap } from "lucide-react";
+import { ChevronRight, Smartphone, Zap } from "lucide-react";
 import { alertSettings } from "@/lib/alerts";
 import { CalendarFeedCard, EmailAlertsCard, IntegrationCard } from "@/app/(app)/settings/integrations-panel";
 import { NotificationGrid } from "@/app/(app)/settings/notification-grid";
@@ -27,13 +27,10 @@ import { PaymentMethodsForm } from "@/app/(app)/settings/payment-methods-form";
 import { ExtrasPanel, SeasonsPanel } from "@/app/(app)/settings/price-rules-panel";
 import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { vehicleName } from "@/components/vehicle-identity";
-import { PublicBookingPanel } from "@/app/(app)/settings/public-booking-panel";
 import { UsualDepositPanel } from "@/app/(app)/settings/usual-deposit-panel";
 import { MoneyInput } from "@/components/money-input";
 import { PartnerNetworkPanel } from "@/app/(app)/settings/partner-network-panel";
 import { DirectoryPanel } from "@/app/(app)/settings/directory-panel";
-import { BookingAddressPanel } from "@/app/(app)/settings/booking-address-panel";
-import { bookingAddress, canUseOwnDomain, canUseSubdomain, cleanSubdomain, renterUrl, rootDomain, subdomainUrl } from "@/lib/booking-address";
 import { canBeListed, directorySettings } from "@/lib/directory";
 import { partnerNetworkSettings } from "@/lib/partner-network";
 import { FINDERS_FEE_PCT } from "@/lib/plans";
@@ -56,10 +53,7 @@ import { OpenOnHash } from "@/components/open-on-hash";
 import { freshPromptPayQrUrl } from "@/lib/promptpay-qr";
 import { PushToggle } from "@/components/push-toggle";
 import { getCurrentUserEmail } from "@/lib/auth/session";
-import { resolveBrandingAssetUrl, resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
-import { bookingSiteFrom } from "@/lib/booking-site";
-import { vehiclePhotoUrls } from "@/lib/vehicle-photos";
-import { BookingSitePanel } from "@/app/(app)/settings/booking-site-panel";
+import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { getDefaultOrganization, getTravelPolicySettings, getVehicleCategories } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -107,10 +101,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     .select("id, make, model, trim, registration_number, daily_rate, weekly_rate, monthly_rate, category_id")
     .eq("organization_id", organization.id)
     .is("deleted_at", null);
-  const publicVehicleCounts = {
-    total: (vehicleRates || []).length,
-    priced: (vehicleRates || []).filter((v: any) => Number(v.daily_rate) > 0 || Number(v.weekly_rate) > 0 || Number(v.monthly_rate) > 0).length
-  };
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -179,14 +169,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     ? "/api/branding-assets/signature"
     : brandingDisplayUrls.signatureUrl || browserSafeAssetFallback(ownerSignatureUrl);
   const travelPolicySettings = getTravelPolicySettings(organization.settings);
-  // The booking page's template and sections, its big photo, and the first vehicle photo it falls back to.
-  const bookingSite = bookingSiteFrom(organization.settings);
-  const siteAdmin = teamAdminClient() as any;
-  const [bookingHeroUrl, firstVehiclePhotos] = await Promise.all([
-    bookingSite.heroPath ? resolveBrandingAssetUrl(siteAdmin, { bucket: "branding", path: bookingSite.heroPath }, { expiresIn: 60 * 60 }).catch(() => null) : Promise.resolve(null),
-    vehiclePhotoUrls(siteAdmin, organization.id, 1).catch(() => new Map<string, string[]>())
-  ]);
-  const firstVehiclePhoto = [...firstVehiclePhotos.values()].find((list) => list.length)?.[0] || null;
 
   const lineUserId = organization.line_user_id ?? null;
   const lineOaId = process.env.LINE_OA_ID ?? "";
@@ -521,53 +503,16 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </div>
           <div className="space-y-3">
             <h2 className={groupHeading}>{say("grp_online")}</h2>
-          <Fold id="booking-page" summary={publicBookingSettings(organization.settings).enabled ? stateLine("st_bookOn", true) : stateLine("st_bookOff", false)} title={say("book_title")}>
-            <PublicBookingPanel
-              currency={money}
-              enabled={publicBookingSettings(organization.settings).enabled}
-              deposit={publicBookingSettings(organization.settings).deposit}
-                  offer={publicBookingSettings(organization.settings).offer}
-              holdHours={bookingRules(organization.settings).holdHours}
-              link={bookingAddress(addressOrg).url}
-              pricedVehicles={publicVehicleCounts.priced}
-              slug={organization.slug}
-              totalVehicles={publicVehicleCounts.total}
-            />
-            {/* How the page looks: a template and the sections around the vehicles (Rory, 7 Nov 2026). */}
-            <div className="mt-4 border-t border-[var(--border)] pt-4" id="page-design">
-              <BookingSitePanel
-                businessName={String(organization.trading_name || organization.name || "")}
-                colour={String((organization as any).contract_accent_colour || "#0e5e6f")}
-                contacts={{
-                  whatsapp: String((organization as any).whatsapp || ""),
-                  line: String((organization as any).line_id || ""),
-                  instagram: String((organizationSettings.contact_channels as any)?.instagram || ""),
-                  facebook: String((organizationSettings.contact_channels as any)?.messenger || "")
-                }}
-                fallbackPhotoUrl={firstVehiclePhoto}
-                heroUrl={bookingHeroUrl}
-                initial={bookingSite}
-                slug={organization.slug}
-              />
-            </div>
-            {/* The page and its address in one place (Rory, 1 Nov 2026): no separate "booking address" card. */}
-            <div className="mt-4 border-t border-[var(--border)] pt-4" id="booking-address">
-              <h3 className="font-bold text-[var(--foreground)]">{say("ba_title")}</h3>
-              <div className="mt-2">
-                <BookingAddressPanel
-                  canDomain={canUseOwnDomain(addressOrg)}
-                  canSubdomain={canUseSubdomain(addressOrg)}
-                  domain={addressOrg.custom_domain || null}
-                  domainStatus={addressOrg.custom_domain_status || null}
-                  pathUrl={`${renterUrl()}/${organization.slug}`}
-                  rootDomain={rootDomain()}
-                  subdomain={addressOrg.booking_subdomain || null}
-                  subdomainUrl={addressOrg.booking_subdomain ? subdomainUrl(addressOrg.booking_subdomain) : null}
-                  suggestion={cleanSubdomain(String(organization.name || organization.slug).replace(/\b(car|cars|rent|rental|rentals|test\d*)\b/gi, "")) || cleanSubdomain(organization.slug).slice(0, 20)}
-                />
-              </div>
-            </div>
-          </Fold>
+          {/* The booking page has its own tool now (side menu › Tools › Booking page; Rory, 7 Nov 2026): one row here. */}
+          <Link className="card pressable flex min-h-14 items-center justify-between gap-3 px-4 py-3.5" href={"/booking-page" as Route} id="booking-page">
+            <span className="min-w-0">
+              <span className="card-title block !text-[17px]">{say("book_title")}</span>
+              <span className="mt-0.5 line-clamp-2 block font-medium text-[var(--foreground-secondary)]">
+                {publicBookingSettings(organization.settings).enabled ? stateLine("st_bookOn", true) : stateLine("st_bookOff", false)}
+              </span>
+            </span>
+            <ChevronRight className="shrink-0 text-[var(--foreground-secondary)] rtl:rotate-180" size={22} strokeWidth={2.2} />
+          </Link>
           <Fold id="directory" summary={directorySettings(organization.settings).enabled && canBeListed(organization as any) && publicBookingSettings(organization.settings).enabled ? stateLine("st_dirOn", true) : stateLine("st_dirOff", false)} title={say("dir_title")}>
             <DirectoryPanel
               allowed={canBeListed(organization as any)}

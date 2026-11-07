@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 import { Copy, ExternalLink, RefreshCw } from "lucide-react";
 import { checkOwnDomain, saveBookingSubdomain, saveOwnDomain } from "@/app/actions/booking-address";
 import { cleanSubdomain, DNS_A_TARGET, DNS_CNAME_TARGET, isApexDomain, typingSubdomain } from "@/lib/booking-address";
-import { RoveNameField } from "@/app/(app)/settings/rove-name-field";
+import { RoveNameField } from "@/app/(app)/booking-page/rove-name-field";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -25,8 +25,11 @@ export function BookingAddressPanel({
   domainStatus,
   canSubdomain,
   canDomain,
-  suggestion
+  suggestion,
+  onSaved
 }: {
+  /** After an address is saved (the Booking page tool reloads its preview). */
+  onSaved?: () => void;
   pathUrl: string;
   rootDomain: string;
   subdomain: string | null;
@@ -60,7 +63,10 @@ export function BookingAddressPanel({
     start(async () => {
       const result = await work().catch(() => ({ ok: false, error: say("saveFailed") }));
       if (!result.ok) setError(result.error || say("saveFailed"));
-      else router.refresh();
+      else {
+        router.refresh();
+        onSaved?.();
+      }
     });
   }
 

@@ -6,6 +6,7 @@ import {
   Car,
   Calculator,
   CircleUserRound,
+  Globe,
   Handshake,
   LifeBuoy,
   LogOut,
@@ -55,6 +56,7 @@ type NavKey =
   | "documents"
   | "rentalCalculator"
   | "partners"
+  | "bookingPage"
   | "help";
 
 type NavItem = {
@@ -95,6 +97,8 @@ const navGroups: NavGroup[] = [
     heading: "g_tools",
     items: [
       // Documents moved to Settings › Business › Files (Rory, 7 Nov 2026).
+      // Booking page: its own tool with a live preview, moved out of Settings (Rory, 7 Nov 2026).
+      { key: "bookingPage", href: "/booking-page" as Route, icon: Globe },
       { key: "partners", href: "/partners" as Route, icon: Handshake },
       { key: "rentalCalculator", href: "/rental-calculator", icon: Calculator }
     ]
@@ -195,7 +199,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   const isTeammate = shell.role === "teammate" || shell.role === "manager";
   const hasSeveralBusinesses = shell.organizations.length > 1;
   const activeBusiness = shell.organizations.find((organization) => organization.active);
-  const ownerOnly = ["/settings", "/reports", "/rental-calculator"];
+  const ownerOnly = ["/settings", "/reports", "/rental-calculator", "/booking-page"];
   const allowed = (item: NavItem) => !isTeammate || !ownerOnly.includes(item.href);
   const groups = navGroups.map((group) => ({ ...group, items: group.items.filter(allowed) })).filter((group) => group.items.length > 0);
   const visibleFootItems = footItems.filter(allowed);

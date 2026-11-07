@@ -163,7 +163,8 @@
     "helpLoading": "Loading…",
     "helpNoArticle": "Help center",
     "helpNoArticleBody": "There's no article about this page yet. The Help center has guides for every part of RoveHQ.",
-    "helpOpenCentre": "Open in Help center"
+    "helpOpenCentre": "Open in Help center",
+    "bookingPage": "Booking page"
   },
   "vehicles": {
     "addVehicle": "Add vehicle"
@@ -262,7 +263,8 @@
       "GPS": "GPS",
       "Signature": "Signature",
       "Deposit": "Deposit",
-      "Review": "Review"
+      "Review": "Review",
+      "Payment": "Payment"
     },
     "signatureCaptured": "Signature captured",
     "signInBox": "Sign in the box above",
@@ -1244,7 +1246,8 @@
     "group_next30": "Next 30 days",
     "nothingHere": "Nothing here",
     "showAllJobs": "Show all jobs",
-    "laterLink": "{count, plural, one {# job} other {# jobs}} later or with no date"
+    "laterLink": "{count, plural, one {# job} other {# jobs}} later or with no date",
+    "job_collectFrom": "Collect {amount}"
   },
   "bookings": {
     "eyebrow": "Bookings",
@@ -4683,7 +4686,20 @@
     "br_pickupOnly": "Customers come to the branch",
     "br_deliversWithin": "Delivers and collects within {distance}",
     "br_setArea": "Service area not set",
-    "reg_zoneHint": "Dates, your morning summary (8:00) and customer reminders (9:00) follow this time zone."
+    "reg_zoneHint": "Dates, your morning summary (8:00) and customer reminders (9:00) follow this time zone.",
+    "bt_title": "Booking page",
+    "bt_edit": "Edit",
+    "bt_preview": "Preview",
+    "bt_mobile": "Mobile",
+    "bt_desktop": "Desktop",
+    "bt_open": "Open page",
+    "bt_page": "Page",
+    "bt_address": "Address",
+    "bt_design": "Design",
+    "bt_brand": "Brand",
+    "bt_saveChanges": "Save changes",
+    "bt_unsaved": "Unsaved changes",
+    "bt_sectionsOn": "{count, plural, one {# section shown} other {# sections shown}}"
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -7204,5 +7220,38 @@
     "nudgeSignature": "Add your signature once, and customers can sign the rental agreement on their phone.",
     "nudgePaymentMethods": "Add your PromptPay or bank details so customers can pay straight from their booking page.",
     "extensionHoldReturning": "{customer} isn't extending: the {vehicle} is due back on {date}. The days after it are open for booking again."
+  },
+  "handoverPay": {
+    "title": "Payment",
+    "rent": "Rent",
+    "deposit": "Deposit",
+    "total": "Total due",
+    "paid": "Paid",
+    "left": "Left to pay",
+    "paidInFull": "Paid in full",
+    "howPay": "How is the customer paying?",
+    "m_cash": "Cash",
+    "m_promptpay": "PromptPay",
+    "m_bank_transfer": "Bank transfer",
+    "m_wise": "Wise",
+    "m_revolut": "Revolut",
+    "cashAsk": "Has the customer paid {amount} in cash?",
+    "yes": "Yes",
+    "part": "Part",
+    "no": "No",
+    "amountPaid": "Amount paid",
+    "record": "Record",
+    "saving": "Saving...",
+    "showCustomer": "Show to customer",
+    "markPaid": "Paid",
+    "notYet": "Not yet",
+    "close": "Close",
+    "promptpayId": "PromptPay ID",
+    "bank": "Bank",
+    "account": "Account",
+    "accountName": "Name",
+    "receipt": "Receipt {number}",
+    "failed": "Payment couldn't be recorded. Try again.",
+    "later": "Later"
   }
 }

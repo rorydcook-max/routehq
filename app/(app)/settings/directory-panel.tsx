@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import type { Route } from "next";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { saveDirectoryListing } from "@/app/actions/partners";
@@ -40,7 +42,11 @@ export function DirectoryPanel({ enabled, allowed, bookingPageOn }: { enabled: b
         label={say("dir_switch")}
         onChange={(event) => change(event.target.checked)}
       />
-      {!bookingPageOn ? <p className="mt-2 text-sm font-semibold text-[var(--warning)]">{say("dir_needsBookingPage")}</p> : null}
+      {!bookingPageOn ? (
+        <Link className="mt-2 inline-flex text-sm font-semibold text-[var(--warning)] underline" href={"/booking-page" as Route}>
+          {say("dir_needsBookingPage")}
+        </Link>
+      ) : null}
       {on && usable ? (
         <a className="mt-2 inline-flex text-sm font-bold text-[var(--primary)]" href="/rent" rel="noreferrer" target="_blank">
           {say("dir_open")}

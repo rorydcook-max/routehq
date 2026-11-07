@@ -14,7 +14,40 @@ import {
 } from "@/lib/agreement-language";
 import { toWallTime } from "@/lib/business-time";
 import { extrasAgreementVariables, waiverExcess } from "@/lib/extras";
-import { feeOn, getTravelPolicySettings, type IslandTravelPolicy } from "@/lib/travel-policy";
+import { feeOn, getTravelPolicySettings, rulesForLocation, territoryText, travelCountryCode, travelPlaceAnswers, type IslandTravelPolicy } from "@/lib/travel-policy";
+import { placeKind } from "@/lib/travel-places";
+
+/**
+ * The travel rules of the booking's pickup location as agreement lines (Settings › Travel area, per location):
+ * where the Renter may take the vehicle, with any extra deposit or notice, and where not. English, with the Thai
+ * line under it for a Thai agreement. Empty when the location has nothing to ask about.
+ */
+function travelPlacesHtml(answers: ReturnType<typeof travelPlaceAnswers>, money: string, thai: boolean) {
+  const line = (en: string, th: string) =>
+    `<div class="bilingual-section">\n        <div class="lang-en">${en}</div>${thai ? `\n        <div class="lang-th">${th}</div>` : ""}\n      </div>`;
+  const amountText = (value: number) => `${money}${new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(value)}`;
+  const parts: string[] = [];
+  if (answers.allowed.length) {
+    const en = answers.allowed
+      .map((place) => {
+        const extras = [place.deposit > 0 ? `an extra deposit of ${amountText(place.deposit)}` : "", place.notice ? "the Owner must be told before travel" : ""].filter(Boolean);
+        return `${escapeHtml(place.name)}${extras.length ? ` (${extras.join("; ")})` : ""}`;
+      })
+      .join(", ");
+    const th = answers.allowed
+      .map((place) => {
+        const extras = [place.deposit > 0 ? `เงินประกันเพิ่ม ${amountText(place.deposit)}` : "", place.notice ? "ต้องแจ้งผู้ให้เช่าก่อนเดินทาง" : ""].filter(Boolean);
+        return `${escapeHtml(place.name)}${extras.length ? ` (${extras.join("; ")})` : ""}`;
+      })
+      .join(", ");
+    parts.push(line(`The Renter may take the vehicle to: ${en}.`, `ผู้เช่าสามารถนำยานพาหนะไปยัง: ${th}`));
+  }
+  if (answers.notAllowed.length) {
+    const names = answers.notAllowed.map((place) => escapeHtml(place.name)).join(", ");
+    parts.push(line(`The Renter may not take the vehicle to: ${names}.`, `ผู้เช่าไม่ได้รับอนุญาตให้นำยานพาหนะไปยัง: ${names}`));
+  }
+  return parts.join("\n      ");
+}
 
 function escapeHtml(value: unknown) {
   return String(value ?? "")
@@ -261,7 +294,7 @@ export const contractVariableKeys = [
 
 export function renderContractTemplate(template: string, variables: Record<string, unknown>) {
   // These arrive already made safe (built by this file, or escaped by textToHtml); everything else is escaped below.
-  const rawHtmlKeys = new Set(["included_items", "special_conditions", "owner_extra_terms", "delivery_damage_report"]);
+  const rawHtmlKeys = new Set(["included_items", "special_conditions", "owner_extra_terms", "delivery_damage_report", "travel_places_html"]);
 
   let rendered = template.replace(/<!--\s*CONDITIONAL:\s*([a-zA-Z0-9_]+)\s*-->([\s\S]*?)<!--\s*END CONDITIONAL\s*-->/g, (_match, key, content) => {
     return variables[key] ? content : "";
@@ -420,10 +453,17 @@ export function buildContractVariables({
   const europe = isEuropeanAgreementCountry(country.code);
   // Türkiye (4 Nov 2026) has its own clauses and governing law the same way, without the EU/UK ones.
   const ownClauses = hasOwnCountryClauses(country.code);
+  // Travel rules and governing law of the booking's pickup location: the vehicle's home location (or one saved on
+  // the booking), else the main location's (lib/travel-policy.ts rulesForLocation).
+  const travelCountry = travelCountryCode(organization);
+  const pickupBranchId = String(bookingData.pickup_branch_id || rental?.pickup_branch_id || rental?.branch_id || vehicle?.home_branch_id || "") || null;
+  const travelRules = rulesForLocation(organization?.settings, travelCountry, pickupBranchId);
+  const travelAnswers = travelPlaceAnswers(travelRules, travelCountry, [organization?.settings?.main_location?.region, organization?.settings?.main_location?.town].filter(Boolean));
+  const locationLaw = travelRules.law || settings.jurisdiction;
   const jurisdiction =
-    (europe || ownClauses) && (!settings.jurisdiction || /thailand/i.test(settings.jurisdiction))
+    (europe || ownClauses) && (!locationLaw || /thailand/i.test(locationLaw))
       ? EUROPEAN_JURISDICTION[country.code] || OWN_CLAUSE_JURISDICTION[country.code] || country.name
-      : settings.jurisdiction;
+      : locationLaw;
   const paidExtras = (Array.isArray(rental?.extras) ? rental.extras : []).map((line: any) => {
     const price = `${Math.round(Number(line?.price || 0)).toLocaleString("en-US")} ${rental?.currency || "THB"}`;
     return `${line?.name} - ${line?.per === "day" ? `${price} ${second("per day", "ต่อวัน", words?.perDay)}` : `${price}`} (${second("paid extra", "บริการเสริม", words?.paidExtra)})`;
@@ -439,8 +479,12 @@ export function buildContractVariables({
     bookingData.delivery_date ||
     null;
   const isRollingMonthly = Boolean(rental?.is_indefinite || rental?.pricing_model === "subscription" || bookingData.open_ended);
-  const islandClauseEnabled = settings.home_territory_type === "island" || settings.island_travel_policy !== "notice_only";
-  const secondaryDepositEnabled = settings.island_travel_policy === "deposit_required";
+  // The ferry clause: the location is on an island, or customers may take the vehicle to one.
+  const islandClauseEnabled = Boolean(travelRules.area) || travelAnswers.allowed.some((place) => placeKind(place.id) !== "country");
+  // Extra deposits are now per place, in the travel lines; these two remain for owners' own uploaded agreements.
+  const travelDeposits = travelAnswers.allowed.map((place) => place.deposit).filter((deposit) => deposit > 0);
+  const secondaryDepositEnabled = travelDeposits.length > 0;
+  const moneySymbol = currencySymbol(rental?.currency || organization?.currency || "THB");
   const vehicleSpecs = typeof vehicle?.specifications === "object" && vehicle.specifications ? vehicle.specifications : {};
   const fuelType = vehicle?.fuel_type || vehicleSpecs.fuel_type || vehicleSpecs.fuelType || "";
   const deliveryLocation = bookingData.delivery_location || rental?.delivery_location || bookingData.collection_address || "To be confirmed";
@@ -503,8 +547,8 @@ export function buildContractVariables({
     owner_line_id: optionalText(settings.owner_line_id, "Not provided"),
     owner_whatsapp: optionalText(settings.owner_whatsapp, "Not provided"),
     business_address: optionalText(organization?.settings?.business_address || organization?.settings?.address || organization?.address),
-    home_territory: settings.home_territory,
-    home_territory_type: settings.home_territory_type,
+    home_territory: territoryText(travelRules, travelCountry, miles ? "mi" : "km"),
+    home_territory_type: travelRules.area ? "island" : "mainland",
     island_travel_policy: settings.island_travel_policy,
     jurisdiction,
     renter_first_name: name.firstName,
@@ -604,7 +648,8 @@ export function buildContractVariables({
       return "ตามที่ตกลงกัน";
     })(),
     deposit_amount: formatAmount(rental?.deposit_amount),
-    secondary_deposit_amount: formatAmount(settings.secondary_deposit_amount),
+    secondary_deposit_amount: formatAmount(travelDeposits.length ? Math.max(...travelDeposits) : settings.secondary_deposit_amount),
+    travel_places_html: travelPlacesHtml(travelAnswers, moneySymbol, thai),
     // Distance switched off in Settings = unlimited. The setting is per month, so the agreement says so.
     mileage_limit: feeOn(settings, "mileage_limit")
       ? second(

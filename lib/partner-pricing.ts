@@ -1,48 +1,61 @@
-/** The partner network's shapes and price maths, with no server code behind them, so the browser can use them. */
+/** The partner network's shapes, with no server code behind them, so the browser can use them. */
 
+/** A partner's vehicle that is free for the dates searched. */
 export type PartnerVehicle = {
   vehicleId: string;
   organizationId: string;
   business: string;
   town: string;
-  phone: string;
-  make: string;
-  model: string;
+  region: string;
+  photoUrl: string | null;
+  name: string;
   year: number | null;
-  plate: string;
   kind: string;
-  dailyRate: number;
-  weeklyRate: number;
-  monthlyRate: number;
-  deposit: number;
+  /** All prices below are in the vehicle operator's currency. */
   currency: string;
+  pricingModel: "daily" | "weekly" | "monthly";
+  rate: number;
+  /** Days in the stay; null for a monthly rental with no end date. */
+  days: number | null;
+  /** The price for the dates (for no end date: one month). */
+  total: number;
+  /** The same, per day: what the budget slider compares. */
+  perDay: number;
+  /** perDay and total in the searching business's currency (same as above when the currencies match; null when no rate). */
+  perDayMine: number | null;
+  totalMine: number | null;
+  /** The operator's booking page for this vehicle and these dates, tagged with the referring business. */
+  bookingUrl: string;
 };
 
+/** One rental payment on a referred booking, and the commission it earned. */
+export type CommissionRow = {
+  id: string;
+  paymentAmount: number;
+  feeAmount: number;
+  createdAt: string;
+  settledAt: string | null;
+};
+
+/** A referred booking, seen from one side: "sent" (we referred, they owe us) or "received" (we owe them). */
 export type ReferralRow = {
   id: string;
   direction: "sent" | "received";
   partner: string;
   customerName: string;
-  customerPhone: string;
   vehicle: string;
   startDate: string | null;
   endDate: string | null;
   rentalId: string | null;
   rentalStatus: string | null;
   status: string;
+  channel: string;
   feePct: number;
-  feeAmount: number | null;
-  feeDueAt: string | null;
-  feePaidAt: string | null;
+  currency: string;
+  /** All commission so far, how much of it is settled, and what is still open. */
+  feeTotal: number;
+  feeSettled: number;
+  feeOpen: number;
+  commissions: CommissionRow[];
   createdAt: string;
 };
-
-/** The rate the partner would charge for these dates, by the longest period that fits. */
-export function priceFor(vehicle: Pick<PartnerVehicle, "dailyRate" | "weeklyRate" | "monthlyRate">, startDate: string, endDate: string | null) {
-  const days = endDate ? Math.max(1, Math.round((new Date(`${endDate}T00:00:00Z`).getTime() - new Date(`${startDate}T00:00:00Z`).getTime()) / 86_400_000)) : null;
-  if ((days === null || days >= 28) && vehicle.monthlyRate > 0) return { model: "monthly" as const, rate: vehicle.monthlyRate, days, total: days ? Math.round((vehicle.monthlyRate * days) / 30) : vehicle.monthlyRate };
-  if (days !== null && days >= 7 && vehicle.weeklyRate > 0 && !vehicle.dailyRate) return { model: "weekly" as const, rate: vehicle.weeklyRate, days, total: Math.round((vehicle.weeklyRate * days) / 7) };
-  if (vehicle.dailyRate > 0) return { model: "daily" as const, rate: vehicle.dailyRate, days, total: days ? vehicle.dailyRate * days : vehicle.dailyRate * 30 };
-  if (vehicle.weeklyRate > 0) return { model: "weekly" as const, rate: vehicle.weeklyRate, days, total: days ? Math.round((vehicle.weeklyRate * days) / 7) : vehicle.weeklyRate * 4 };
-  return { model: "monthly" as const, rate: vehicle.monthlyRate, days, total: vehicle.monthlyRate };
-}

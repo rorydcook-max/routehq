@@ -393,7 +393,9 @@ export function ChatPanel({
     if (busy) return;
     setBusy(true);
     setError(null);
-    const result = await chatHandoff({ threadId: threadId || null, pathname }).catch(() => null);
+    // The remembered chat too: tapped straight after opening, the panel may not have loaded it yet, and handing over an
+    // empty new chat left the team without the business's questions (Rory, 7 Nov 2026).
+    const result = await chatHandoff({ threadId: threadId || storedThread() || null, pathname }).catch(() => null);
     setBusy(false);
     if (!result || !result.ok) {
       setError(result && !result.ok ? result.error : t("sendFailed"));

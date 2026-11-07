@@ -159,7 +159,11 @@
     "home": "Početna",
     "supportAccess": "Podrška RoveHQ-a ima pristup Vašoj tvrtki do {time}.",
     "language": "Jezik",
-    "helpForPage": "Pomoć za ovu stranicu"
+    "helpForPage": "Pomoć za ovu stranicu",
+    "helpLoading": "Učitavanje…",
+    "helpNoArticle": "Centar za pomoć",
+    "helpNoArticleBody": "Za ovu stranicu još nema članka. U Centru za pomoć nalaze se vodiči za svaki dio RoveHQ-a.",
+    "helpOpenCentre": "Otvori u Centru za pomoć"
   },
   "vehicles": {
     "addVehicle": "Dodaj vozilo"
@@ -903,7 +907,8 @@
     "noneFree": "Ništa nije dostupno od {start}.",
     "noneFreeEarliest": "Ništa nije dostupno od {start}. Najranije: {date} ({vehicle}).",
     "bookedUntil": "Rezervirano do {date}",
-    "vatIncluded": "Cijene uključuju {name} od {rate} %"
+    "vatIncluded": "Cijene uključuju {name} od {rate} %",
+    "extraFree": "Besplatno"
   },
   "customerMessages": {
     "hi": "Pozdrav {name},",
@@ -2681,7 +2686,8 @@
     "noPriceYet": "Još nema cijene",
     "saveRate_daily": "Spremi {amount} dnevno kao cijenu ovog vozila",
     "saveRate_weekly": "Spremi {amount} tjedno kao cijenu ovog vozila",
-    "saveRate_monthly": "Spremi {amount} mjesečno kao cijenu ovog vozila"
+    "saveRate_monthly": "Spremi {amount} mjesečno kao cijenu ovog vozila",
+    "extraFree": "Besplatno"
   },
   "fleet": {
     "title": "Vozni park",
@@ -4366,7 +4372,23 @@
     "ag_lang_it": "talijanski",
     "ag_lang_hr": "hrvatski",
     "ag_lang_fr": "francuski",
-    "ag_lang_de": "njemački"
+    "ag_lang_de": "njemački",
+    "plan_trialEnds": "Probno razdoblje završava",
+    "extra_summary": "{count, plural, one {# dodatak} few {# dodatka} other {# dodataka}}: {names}",
+    "extra_free": "Besplatno",
+    "extra_pillDay": "{price} dnevno",
+    "extra_pillRental": "{price} po rezervaciji",
+    "extra_sheetNew": "Novi dodatak",
+    "extra_sheetEdit": "Uredi dodatak",
+    "extra_priceShort": "Cijena",
+    "extra_priceHint": "Ostavite 0 da bude besplatno.",
+    "extra_forChosen": "Odabrana vozila",
+    "extra_noVehicles": "Još nema vozila. Najprije dodajte jedno u Floti.",
+    "extra_nameNeeded": "Upišite naziv dodatka.",
+    "extra_pickVehicle": "Odaberite barem jedno vozilo.",
+    "extra_delete": "Izbriši",
+    "extra_deleteSure": "Izbriši ovaj dodatak",
+    "extra_saveFailed": "Spremanje nije uspjelo. Pokušajte ponovno."
   },
   "accountPage": {
     "roleOwner": "Vlasnik",

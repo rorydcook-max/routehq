@@ -436,7 +436,11 @@
     "home": "ໜ້າຫຼັກ",
     "supportAccess": "ທີມຊ່ວຍເຫຼືອ RoveHQ ເຂົ້າເຖິງທຸລະກິດຂອງທ່ານໄດ້ຈົນຮອດ {time}",
     "language": "ພາສາ",
-    "helpForPage": "ຊ່ວຍເຫຼືອສຳລັບໜ້ານີ້"
+    "helpForPage": "ຊ່ວຍເຫຼືອສຳລັບໜ້ານີ້",
+    "helpLoading": "ກຳລັງໂຫຼດ…",
+    "helpNoArticle": "ສູນຊ່ວຍເຫຼືອ",
+    "helpNoArticleBody": "ຍັງບໍ່ມີບົດຄວາມກ່ຽວກັບໜ້ານີ້. ສູນຊ່ວຍເຫຼືອມີຄູ່ມືສຳລັບທຸກສ່ວນຂອງ RoveHQ.",
+    "helpOpenCentre": "ເປີດໃນສູນຊ່ວຍເຫຼືອ"
   },
   "customer": {
     "cur_also": "ສະແດງລາຄາເປັນສະກຸນເງິນ",
@@ -903,7 +907,8 @@
     "noneFree": "ບໍ່ມີລົດຫວ່າງຕັ້ງແຕ່ {start}.",
     "noneFreeEarliest": "ບໍ່ມີລົດຫວ່າງຕັ້ງແຕ່ {start}. ໄວທີ່ສຸດແມ່ນ {date} ({vehicle}).",
     "privacyLink": "{business} ແລະ RoveHQ ໃຊ້ຂໍ້ມູນຂອງທ່ານແນວໃດ",
-    "vatIncluded": "ລາຄາລວມ {name} {rate}% ແລ້ວ"
+    "vatIncluded": "ລາຄາລວມ {name} {rate}% ແລ້ວ",
+    "extraFree": "ຟຣີ"
   },
   "customerMessages": {
     "hi": "ສະບາຍດີ {name},",
@@ -2707,7 +2712,8 @@
     "noPriceYet": "ຍັງບໍ່ມີລາຄາ",
     "saveRate_daily": "ບັນທຶກ {amount} ຕໍ່ມື້ ເປັນລາຄາຂອງລົດຄັນນີ້",
     "saveRate_weekly": "ບັນທຶກ {amount} ຕໍ່ອາທິດ ເປັນລາຄາຂອງລົດຄັນນີ້",
-    "saveRate_monthly": "ບັນທຶກ {amount} ຕໍ່ເດືອນ ເປັນລາຄາຂອງລົດຄັນນີ້"
+    "saveRate_monthly": "ບັນທຶກ {amount} ຕໍ່ເດືອນ ເປັນລາຄາຂອງລົດຄັນນີ້",
+    "extraFree": "ຟຣີ"
   },
   "fleet": {
     "title": "ລົດທັງໝົດ",
@@ -4393,7 +4399,23 @@
     "ag_lang_it": "ອີຕາລີ",
     "ag_lang_hr": "ໂຄຣເອເຊຍ",
     "ag_lang_fr": "ຝຣັ່ງ",
-    "ag_lang_de": "ເຢຍລະມັນ"
+    "ag_lang_de": "ເຢຍລະມັນ",
+    "plan_trialEnds": "ການທົດລອງສິ້ນສຸດ",
+    "extra_summary": "{count, plural, other {ບໍລິການເສີມ # ລາຍການ}}: {names}",
+    "extra_free": "ຟຣີ",
+    "extra_pillDay": "{price} ຕໍ່ມື້",
+    "extra_pillRental": "{price} ຕໍ່ການຈອງ",
+    "extra_sheetNew": "ບໍລິການເສີມໃໝ່",
+    "extra_sheetEdit": "ແກ້ໄຂບໍລິການເສີມ",
+    "extra_priceShort": "ລາຄາ",
+    "extra_priceHint": "ປ່ອຍເປັນ 0 ເພື່ອໃຫ້ຟຣີ.",
+    "extra_forChosen": "ລົດທີ່ເລືອກ",
+    "extra_noVehicles": "ຍັງບໍ່ມີລົດ. ເພີ່ມລົດໃນກອງລົດກ່ອນ.",
+    "extra_nameNeeded": "ໃສ່ຊື່ບໍລິການເສີມ.",
+    "extra_pickVehicle": "ເລືອກລົດຢ່າງໜ້ອຍໜຶ່ງຄັນ.",
+    "extra_delete": "ລຶບ",
+    "extra_deleteSure": "ລຶບບໍລິການເສີມນີ້",
+    "extra_saveFailed": "ບັນທຶກບໍ່ໄດ້. ກະລຸນາລອງໃໝ່."
   },
   "accountPage": {
     "roleOwner": "ເຈົ້າຂອງ",

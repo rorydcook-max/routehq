@@ -23,7 +23,12 @@ export type ExtraKind = "all" | "car" | "bike";
  */
 export type ExtraPreset = "damage_waiver" | "young_driver" | "additional_driver" | "cross_border" | "out_of_hours" | "one_way";
 export const EXTRA_PRESETS: ExtraPreset[] = ["additional_driver", "cross_border", "damage_waiver", "one_way", "out_of_hours", "young_driver"];
-export type Extra = { id: string; name: string; price: number; per: "day" | "rental"; kind: ExtraKind; preset?: ExtraPreset; excess?: number; minAge?: number; countries?: string };
+/**
+ * One paid extra. `kind` is who it is offered to ("all", or the older "car"/"bike" choice); `vehicleIds`, when set,
+ * narrows it to those vehicles only (Rory, 7 Nov 2026: "offered with chosen vehicles"). A price of 0 is a free extra
+ * (a phone holder, say), listed on the booking like the paid ones.
+ */
+export type Extra = { id: string; name: string; price: number; per: "day" | "rental"; kind: ExtraKind; vehicleIds?: string[]; preset?: ExtraPreset; excess?: number; minAge?: number; countries?: string };
 export type ChosenExtra = { id: string; name: string; price: number; per: "day" | "rental"; amount: number; preset?: ExtraPreset; excess?: number; minAge?: number; countries?: string };
 
 /** The preset's own details, kept on the booking's extras lines so the agreement can use them. */
@@ -60,15 +65,21 @@ export function extrasFrom(settings: unknown): Extra[] {
   const list = asObject(settings).extras;
   if (!Array.isArray(list)) return [];
   return list
-    .map((raw: any, index: number) => ({
-      id: String(raw?.id || `e${index}`),
-      name: String(raw?.name || "").trim().slice(0, 60),
-      price: Math.max(0, Math.round(Number(raw?.price) || 0)),
-      per: raw?.per === "rental" ? ("rental" as const) : ("day" as const),
-      kind: (["car", "bike"].includes(raw?.kind) ? raw.kind : "all") as ExtraKind,
-      ...presetDetails(raw)
-    }))
-    .filter((extra) => extra.name && extra.price > 0)
+    .map((raw: any, index: number) => {
+      const vehicleIds = Array.isArray(raw?.vehicleIds) ? Array.from(new Set(raw.vehicleIds.map((id: unknown) => String(id)).filter((id: string) => /^[0-9a-f-]{36}$/i.test(id)))).slice(0, 500) as string[] : [];
+      return {
+        id: String(raw?.id || `e${index}`),
+        name: String(raw?.name || "").trim().slice(0, 60),
+        // Cents and satang kept (the price field takes them); 0 is a free extra.
+        price: Math.max(0, Math.round((Number(raw?.price) || 0) * 100) / 100),
+        per: raw?.per === "rental" ? ("rental" as const) : ("day" as const),
+        kind: (["car", "bike"].includes(raw?.kind) ? raw.kind : "all") as ExtraKind,
+        ...(vehicleIds.length ? { vehicleIds } : {}),
+        ...presetDetails(raw)
+      };
+    })
+    // Before 7 Nov 2026 an extra needed a price above 0; free ones are allowed now, so only a name is required.
+    .filter((extra) => extra.name)
     .slice(0, 30);
 }
 
@@ -124,9 +135,12 @@ export function seasonalRate(
   return { rate: Math.max(0, Math.round((rate * (1 + pct / 100)) / 10) * 10), pct: Math.round(pct), names: [...names], seasonDays, days: counted };
 }
 
-/** Extras offered for a kind of vehicle. */
-export function extrasFor(extras: Extra[], twoWheels: boolean) {
-  return extras.filter((extra) => extra.kind === "all" || (twoWheels ? extra.kind === "bike" : extra.kind === "car"));
+/** Extras offered with a vehicle: its kind, and (when the extra names vehicles) only those vehicles. */
+export function extrasFor(extras: Extra[], twoWheels: boolean, vehicleId?: string | null) {
+  return extras.filter((extra) => {
+    if (extra.vehicleIds?.length) return Boolean(vehicleId) && extra.vehicleIds.includes(String(vehicleId));
+    return extra.kind === "all" || (twoWheels ? extra.kind === "bike" : extra.kind === "car");
+  });
 }
 
 /**

@@ -436,7 +436,11 @@
     "home": "Trang chủ",
     "supportAccess": "Bộ phận hỗ trợ RoveHQ có quyền truy cập doanh nghiệp của bạn đến {time}.",
     "language": "Ngôn ngữ",
-    "helpForPage": "Trợ giúp cho trang này"
+    "helpForPage": "Trợ giúp cho trang này",
+    "helpLoading": "Đang tải…",
+    "helpNoArticle": "Trung tâm trợ giúp",
+    "helpNoArticleBody": "Chưa có bài viết về trang này. Trung tâm trợ giúp có hướng dẫn cho mọi phần của RoveHQ.",
+    "helpOpenCentre": "Mở trong Trung tâm trợ giúp"
   },
   "customer": {
     "cur_also": "Hiển thị thêm giá bằng",
@@ -903,7 +907,8 @@
     "noneFree": "Không còn xe trống từ {start}.",
     "noneFreeEarliest": "Không còn xe trống từ {start}. Sớm nhất là {date} ({vehicle}).",
     "privacyLink": "{business} và RoveHQ sử dụng thông tin của bạn như thế nào",
-    "vatIncluded": "Giá đã bao gồm {name} {rate}%"
+    "vatIncluded": "Giá đã bao gồm {name} {rate}%",
+    "extraFree": "Miễn phí"
   },
   "customerMessages": {
     "hi": "Chào {name},",
@@ -2747,7 +2752,8 @@
     "noPriceYet": "Chưa có giá",
     "saveRate_daily": "Lưu {amount} một ngày làm giá của phương tiện này",
     "saveRate_weekly": "Lưu {amount} một tuần làm giá của phương tiện này",
-    "saveRate_monthly": "Lưu {amount} một tháng làm giá của phương tiện này"
+    "saveRate_monthly": "Lưu {amount} một tháng làm giá của phương tiện này",
+    "extraFree": "Miễn phí"
   },
   "fleet": {
     "title": "Đội xe",
@@ -4433,7 +4439,23 @@
     "ag_lang_it": "Tiếng Ý",
     "ag_lang_hr": "Tiếng Croatia",
     "ag_lang_fr": "Tiếng Pháp",
-    "ag_lang_de": "Tiếng Đức"
+    "ag_lang_de": "Tiếng Đức",
+    "plan_trialEnds": "Hết dùng thử",
+    "extra_summary": "{count, plural, other {# dịch vụ thêm}}: {names}",
+    "extra_free": "Miễn phí",
+    "extra_pillDay": "{price} một ngày",
+    "extra_pillRental": "{price} mỗi đơn",
+    "extra_sheetNew": "Dịch vụ thêm mới",
+    "extra_sheetEdit": "Sửa dịch vụ thêm",
+    "extra_priceShort": "Giá",
+    "extra_priceHint": "Để 0 nếu miễn phí.",
+    "extra_forChosen": "Xe đã chọn",
+    "extra_noVehicles": "Chưa có xe. Hãy thêm xe trong Đội xe trước.",
+    "extra_nameNeeded": "Đặt tên cho dịch vụ thêm.",
+    "extra_pickVehicle": "Chọn ít nhất một xe.",
+    "extra_delete": "Xóa",
+    "extra_deleteSure": "Xóa dịch vụ thêm này",
+    "extra_saveFailed": "Không lưu được. Vui lòng thử lại."
   },
   "accountPage": {
     "roleOwner": "Chủ sở hữu",

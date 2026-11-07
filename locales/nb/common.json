@@ -436,7 +436,11 @@
     "home": "Hjem",
     "supportAccess": "RoveHQ-kundestøtte har tilgang til firmaet ditt til {time}.",
     "language": "Språk",
-    "helpForPage": "Hjelp med denne siden"
+    "helpForPage": "Hjelp med denne siden",
+    "helpLoading": "Laster…",
+    "helpNoArticle": "Hjelpesenter",
+    "helpNoArticleBody": "Det finnes ingen artikkel om denne siden ennå. Hjelpesenteret har veiledninger for alle deler av RoveHQ.",
+    "helpOpenCentre": "Åpne i hjelpesenteret"
   },
   "customer": {
     "cur_also": "Vis også priser i",
@@ -903,7 +907,8 @@
     "noneFree": "Ingenting er ledig fra {start}.",
     "noneFreeEarliest": "Ingenting er ledig fra {start}. Tidligst er {date} ({vehicle}).",
     "privacyLink": "Hvordan {business} og RoveHQ bruker opplysningene dine",
-    "vatIncluded": "Prisene inkluderer {name} på {rate} %"
+    "vatIncluded": "Prisene inkluderer {name} på {rate} %",
+    "extraFree": "Gratis"
   },
   "customerMessages": {
     "hi": "Hei {name},",
@@ -2707,7 +2712,8 @@
     "noPriceYet": "Ingen pris ennå",
     "saveRate_daily": "Lagre {amount} per dag som dette kjøretøyets pris",
     "saveRate_weekly": "Lagre {amount} per uke som dette kjøretøyets pris",
-    "saveRate_monthly": "Lagre {amount} per måned som dette kjøretøyets pris"
+    "saveRate_monthly": "Lagre {amount} per måned som dette kjøretøyets pris",
+    "extraFree": "Gratis"
   },
   "fleet": {
     "title": "Flåte",
@@ -4393,7 +4399,23 @@
     "ag_lang_it": "Italiensk",
     "ag_lang_hr": "Kroatisk",
     "ag_lang_fr": "Fransk",
-    "ag_lang_de": "Tysk"
+    "ag_lang_de": "Tysk",
+    "plan_trialEnds": "Prøveperioden slutter",
+    "extra_summary": "{count, plural, one {# tillegg} other {# tillegg}}: {names}",
+    "extra_free": "Gratis",
+    "extra_pillDay": "{price} per dag",
+    "extra_pillRental": "{price} per booking",
+    "extra_sheetNew": "Nytt tillegg",
+    "extra_sheetEdit": "Rediger tillegg",
+    "extra_priceShort": "Pris",
+    "extra_priceHint": "La stå på 0 for å tilby det gratis.",
+    "extra_forChosen": "Valgte kjøretøy",
+    "extra_noVehicles": "Ingen kjøretøy ennå. Legg til ett i Flåte først.",
+    "extra_nameNeeded": "Gi tillegget et navn.",
+    "extra_pickVehicle": "Velg minst ett kjøretøy.",
+    "extra_delete": "Slett",
+    "extra_deleteSure": "Slett dette tillegget",
+    "extra_saveFailed": "Kunne ikke lagre. Prøv igjen."
   },
   "accountPage": {
     "roleOwner": "Eier",

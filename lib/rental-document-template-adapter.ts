@@ -135,7 +135,7 @@ export async function renderRentalAgreementDraftTemplate({
   variables.insurance_excess_amount = waived !== null ? clean(waived) : rental?.insurance_excess == null ? "" : clean(rental.insurance_excess);
   variables.mileage_allowance_amount = rental?.mileage_allowance == null ? "" : clean(rental.mileage_allowance);
   variables.excess_mileage_rate_amount = rental?.excess_mileage_rate == null ? "" : clean(rental.excess_mileage_rate);
-  variables.permitted_territory = clean(bookingLink?.booking_data?.permitted_territory || organization?.settings?.permitted_territory || organization?.settings?.home_territory);
+  variables.permitted_territory = clean(bookingLink?.booking_data?.permitted_territory || organization?.settings?.permitted_territory || variables.home_territory || organization?.settings?.home_territory);
   variables.fuel_policy = clean(bookingLink?.booking_data?.fuel_policy || organization?.settings?.fuel_policy);
   variables.cleaning_fee = clean(bookingLink?.booking_data?.cleaning_fee || organization?.settings?.cleaning_fee_minimum);
   variables.included_services = Array.isArray(bookingLink?.included_items) ? bookingLink.included_items.join(", ") : "";

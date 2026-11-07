@@ -13,7 +13,8 @@ import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { FEE_KEYS, jurisdictionByCountry, mergeTravelPolicySettings, type HomeTerritoryType, type IslandTravelPolicy } from "@/lib/travel-policy";
+import { cleanLocationRules, FEE_KEYS, mergeTravelPolicySettings, territoryText, travelCountryCode, travelLocationsFor, type LocationTravelRules } from "@/lib/travel-policy";
+import { distanceUnitFor } from "@/lib/regional";
 import { requireOwner } from "@/lib/auth/roles";
 import { sendDailySummary } from "@/lib/line/daily-summary";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
@@ -683,25 +684,13 @@ export async function updateTravelPolicySettings(formData: FormData) {
   }
 
   const organizationId = String(formData.get("organizationId") || "");
-  const country = String(formData.get("country") || "Thailand");
-  const homeTerritoryType = String(formData.get("homeTerritoryType") || "island") as HomeTerritoryType;
-  const islandTravelPolicy = String(formData.get("islandTravelPolicy") || "deposit_required") as IslandTravelPolicy;
-  const homeTerritory = String(formData.get("homeTerritory") || "").trim();
-  const jurisdiction = String(formData.get("jurisdiction") || jurisdictionByCountry[country] || "").trim();
-
-  if (!organizationId || !homeTerritory || !jurisdiction) {
-    throw new Error("Home territory and jurisdiction are required.");
-  }
-  if (!["island", "mainland"].includes(homeTerritoryType)) {
-    throw new Error("Unsupported home territory type.");
-  }
-  if (!["deposit_required", "notice_only", "not_permitted"].includes(islandTravelPolicy)) {
-    throw new Error("Unsupported island travel policy.");
+  if (!organizationId) {
+    throw new Error("Organization is required.");
   }
 
   const { data: organization, error: organizationError } = await supabase
     .from("organizations")
-    .select("settings, line_id, whatsapp, promptpay_id")
+    .select("id, name, country_code, settings, line_id, whatsapp, promptpay_id")
     .eq("id", organizationId)
     .maybeSingle();
 
@@ -709,14 +698,33 @@ export async function updateTravelPolicySettings(formData: FormData) {
     throw new Error(organizationError?.message || "Organization was not found.");
   }
 
+  // Travel rules per location (lib/travel-policy.ts): one JSON field with every location's rules, so switching
+  // between locations in the form never loses what was typed. Only this business's locations are kept.
+  const { data: branchRows } = await supabase
+    .from("branches")
+    .select("id, name, address, is_active, created_at")
+    .eq("organization_id", organizationId)
+    .order("created_at", { ascending: true });
+  const locations = travelLocationsFor(organization, (branchRows || []) as any[]);
+  let submitted: Record<string, unknown> = {};
+  try {
+    submitted = JSON.parse(String(formData.get("travelRules") || "{}")) || {};
+  } catch {
+    submitted = {};
+  }
+  const existingStore = (organization.settings?.travel_rules || {}) as { locations?: Record<string, LocationTravelRules> };
+  const savedLocations: Record<string, LocationTravelRules> = { ...(existingStore.locations || {}) };
+  for (const location of locations) {
+    if (submitted[location.id] !== undefined) savedLocations[location.id] = cleanLocationRules(submitted[location.id], location.rules);
+  }
+  const main = locations[0] ? savedLocations[locations[0].id] || locations[0].rules : null;
+  const country = travelCountryCode(organization);
+  const mainTerritory = main ? territoryText(main, country, distanceUnitFor(organization)) : String(organization.settings?.home_territory || "");
+
   const settings = mergeTravelPolicySettings(organization.settings, {
-    home_territory: homeTerritory,
-    home_territory_type: homeTerritoryType,
-    island_travel_policy: islandTravelPolicy,
-    secondary_deposit_amount: requiredNumberFromForm(formData, "secondaryDepositAmount", 5000),
+    // The old business-wide fields follow the main location, for anything that still reads them.
+    ...(main ? { home_territory: mainTerritory, home_territory_type: main.area ? "island" : "mainland", jurisdiction: main.law } : {}),
     geofence_monitoring_enabled: formData.get("geofenceMonitoringEnabled") === "on",
-    country,
-    jurisdiction,
     mileage_limit: requiredNumberFromForm(formData, "mileageLimit", 1500),
     fuel_charge_per_increment: requiredNumberFromForm(formData, "fuelChargePerIncrement", 150),
     late_fee_percentage: requiredNumberFromForm(formData, "lateFeePercentage", 5),
@@ -731,10 +739,13 @@ export async function updateTravelPolicySettings(formData: FormData) {
     owner_whatsapp: String(organization.whatsapp || ""),
     promptpay_id: String(organization.promptpay_id || "")
   });
+  const settingsWithRules = main
+    ? { ...settings, travel_rules: { default: main, locations: savedLocations, updated_at: new Date().toISOString() } }
+    : settings;
 
   const { error } = await supabase
     .from("organizations")
-    .update({ settings })
+    .update({ settings: settingsWithRules })
     .eq("id", organizationId);
 
   if (error) {

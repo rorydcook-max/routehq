@@ -4,7 +4,8 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { InfoTip } from "@/components/info-tip";
 import { saveBookingRules } from "@/app/actions/online-booking";
-import { END_NOTICE_OPTIONS, EXTEND_NOTICE_OPTIONS, GAP_DAY_OPTIONS, HOLD_HOUR_OPTIONS, LEAD_HOUR_OPTIONS, type BookingRules } from "@/lib/booking-rules";
+import { SwitchField } from "@/components/switch-field";
+import { END_NOTICE_OPTIONS, EXTEND_NOTICE_OPTIONS, EXTENSION_HOLD_DAY_OPTIONS, GAP_DAY_OPTIONS, HOLD_HOUR_OPTIONS, LEAD_HOUR_OPTIONS, type BookingRules } from "@/lib/booking-rules";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -18,7 +19,7 @@ export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
   const days = (value: number, none: string) => (value === 0 ? none : say("ru_days", { count: value }));
   const hours = (value: number, none: string) => (value === 0 ? none : value % 24 === 0 && value >= 24 ? days(value / 24, none) : say("ru_hours", { count: value }));
 
-  function change(key: keyof BookingRules, value: number) {
+  function change(key: keyof BookingRules, value: number | boolean) {
     const next = { ...values, [key]: value };
     setValues(next);
     setFailed(false);
@@ -32,7 +33,7 @@ export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
     });
   }
 
-  const rows: Array<{ key: keyof BookingRules; label: string; help: string; options: number[]; text: (value: number) => string }> = [
+  const rows: Array<{ key: "holdHours" | "leadHours" | "gapDays" | "endNoticeDays" | "extendNoticeDays"; label: string; help: string; options: number[]; text: (value: number) => string }> = [
     { key: "holdHours", label: say("ru_hold"), help: say("ru_holdHelp"), options: HOLD_HOUR_OPTIONS, text: (value) => say("ru_hours", { count: value }) },
     { key: "leadHours", label: say("ru_lead"), help: say("ru_leadHelp"), options: LEAD_HOUR_OPTIONS, text: (value) => hours(value, say("ru_leadNone")) },
     { key: "gapDays", label: say("ru_gap"), help: say("ru_gapHelp"), options: GAP_DAY_OPTIONS, text: (value) => days(value, say("ru_gapNone")) },
@@ -56,6 +57,30 @@ export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
           </select>
         </label>
       ))}
+      {/* Hold for extension: monthly renters often extend at the last minute (lib/extension-hold.ts). */}
+      <div className="border-t border-[var(--border)] pt-4 sm:col-span-2">
+        <SwitchField
+          checked={values.extensionHold}
+          description={say("ru_extHoldBody", { days: values.extensionHoldDays })}
+          disabled={isPending}
+          label={say("ru_extHold")}
+          onChange={(event) => change("extensionHold", event.target.checked)}
+        />
+        {values.extensionHold ? (
+          <label className="mt-3 block sm:max-w-[calc(50%-0.5rem)]">
+            <span className="font-semibold text-[var(--foreground)]">
+              {say("ru_extHoldDays")} <InfoTip label={say("ru_extHold")} text={say("ru_extHoldHelp")} />
+            </span>
+            <select className="mt-1 block w-full" disabled={isPending} onChange={(event) => change("extensionHoldDays", Number(event.target.value))} value={values.extensionHoldDays}>
+              {EXTENSION_HOLD_DAY_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {say("ru_days", { count: option })}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+      </div>
       {failed ? <p className="font-bold text-[var(--danger)] sm:col-span-2">{say("saveFailed")}</p> : null}
     </div>
   );

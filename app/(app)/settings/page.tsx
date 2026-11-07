@@ -25,6 +25,7 @@ import { InviteForm } from "@/app/(app)/invite/invite-form";
 import { PaymentMethodsForm } from "@/app/(app)/settings/payment-methods-form";
 import { ExtrasPanel, SeasonsPanel } from "@/app/(app)/settings/price-rules-panel";
 import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
+import { vehicleName } from "@/components/vehicle-identity";
 import { PublicBookingPanel } from "@/app/(app)/settings/public-booking-panel";
 import { UsualDepositPanel } from "@/app/(app)/settings/usual-deposit-panel";
 import { PartnerNetworkPanel } from "@/app/(app)/settings/partner-network-panel";
@@ -42,6 +43,7 @@ import { customerMessagesOn, remindersOff } from "@/lib/customer-messages";
 import { bookingRules } from "@/lib/booking-rules";
 import { publicBookingSettings } from "@/lib/public-catalog";
 import { TravelPolicyForm } from "@/app/(app)/settings/travel-policy-form";
+import { territoryText, travelCountryCode, travelLocationsFor } from "@/lib/travel-policy";
 import { RegionalPanel } from "@/app/(app)/settings/regional-panel";
 import { defaultTimeZone, distanceUnitFor, orgCountry, vatSettings } from "@/lib/regional";
 import { AppShell } from "@/components/app-shell";
@@ -96,7 +98,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const groupHeading = "px-1 pt-1 text-[13px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]";
   const { data: vehicleRates } = await ((await createSupabaseServerClient()) as any)
     .from("vehicles")
-    .select("daily_rate, weekly_rate, monthly_rate, category_id")
+    .select("id, make, model, trim, registration_number, daily_rate, weekly_rate, monthly_rate, category_id")
     .eq("organization_id", organization.id)
     .is("deleted_at", null);
   const publicVehicleCounts = {
@@ -202,9 +204,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const paymentNames: Record<string, string> = { cash: say("pay_cash"), promptpay: say("pay_promptpay"), bank_transfer: say("pay_bank_transfer"), wise: say("pay_wise"), revolut: say("pay_revolut") };
   const acceptedMethods = Array.from(new Set(["cash", ...((organization.accepted_payment_methods as unknown as string[] | null) || [])])).filter((method) => method in paymentNames);
   const paymentSummary = acceptedMethods.map((method) => paymentNames[method]).join(", ");
-  const travelSummary = `${travelPolicySettings.home_territory || say("travel_noHome")} · ${
-    travelPolicySettings.island_travel_policy === "not_permitted" ? say("travel_not_permitted") : travelPolicySettings.island_travel_policy === "notice_only" ? say("travel_notice_only") : say("travel_deposit")
-  }`;
+  // Travel rules belong to each location (lib/travel-policy.ts); the summary names the main one's area, or the count.
+  const travelCountry = travelCountryCode(organization);
+  const travelLocations = travelLocationsFor(organization, branches || []);
+  const travelSummary =
+    travelLocations.length > 1
+      ? say("tr_sumMany", { count: travelLocations.length })
+      : travelLocations[0]
+        ? territoryText(travelLocations[0].rules, travelCountry, distanceUnitFor(organization)).replace(/^[a-z]/, (letter) => letter.toUpperCase())
+        : travelPolicySettings.home_territory || say("travel_noHome");
   // Plan and tools tab: the plan at a glance (the full page is Settings › Plan and subscription).
   const currentPlan = effectiveLimits({ subscription_tier: organization.subscription_tier, custom_limits: customPlan.custom_limits });
   const planStatus = String(organization.subscription_status || "trial");
@@ -451,14 +459,32 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </Fold>
             <Fold
               id="extras"
-              summary={extrasFrom(organization.settings).length ? extrasFrom(organization.settings).map((extra) => extra.name).join(", ") : say("extra_none")}
+              // "3 extras: Child seat, Airport delivery…" (Rory, 7 Nov 2026): how many, then the first two names.
+              summary={(() => {
+                const saved = extrasFrom(organization.settings);
+                if (!saved.length) return say("extra_none");
+                const names = saved.slice(0, 2).map((extra) => extra.name).join(", ") + (saved.length > 2 ? "…" : "");
+                return say("extra_summary", { count: saved.length, names });
+              })()}
               title={say("extra_title")}
             >
-              <ExtrasPanel currencySymbol={money} initial={extrasFrom(organization.settings)} />
+              <ExtrasPanel
+                currencySymbol={money}
+                initial={extrasFrom(organization.settings)}
+                vehicles={((vehicleRates || []) as any[]).map((vehicle) => ({ id: String(vehicle.id), name: vehicleName(vehicle) || String(vehicle.registration_number || ""), plate: vehicle.registration_number || null }))}
+              />
             </Fold>
             <Fold id="travel" summary={travelSummary} title={say("travel_title")}>
               <p className="font-medium text-[var(--foreground-secondary)]">{say("travel_body")}</p>
-              <TravelPolicyForm currency={money} organizationId={organization.id} settings={travelPolicySettings} />
+              <TravelPolicyForm
+                country={travelCountry}
+                currency={money}
+                currencyCode={organization.currency || "THB"}
+                locations={travelLocations.map(({ id, name, regionTexts, rules, own }) => ({ id, name, regionTexts, rules, own }))}
+                organizationId={organization.id}
+                settings={travelPolicySettings}
+                unit={distanceUnitFor(organization)}
+              />
             </Fold>
             {/* Booking rules (holds and notice) sit with the other rules, not under "Booking online". */}
             <Fold id="holds" summary={say("hold_summary", { hours: bookingRules(organization.settings).holdHours })} title={say("hold_title")}>
@@ -505,7 +531,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               enabled={directorySettings(organization.settings).enabled}
             />
           </Fold>
-          <Fold id="partner-network" summary={partnerNetworkSettings(organization.settings).enabled ? stateLine("st_pnOn", true) : stateLine("st_pnOff", false)} title={say("pn_title")}>
+          <Fold id="partner-network" summary={partnerNetworkSettings(organization.settings).enabled ? stateLine("st_pnShareOn", true) : stateLine("st_pnShareOff", false)} title={say("pn_title")}>
             <PartnerNetworkPanel initial={partnerNetworkSettings(organization.settings)} pct={FINDERS_FEE_PCT} />
           </Fold>
           </div>
@@ -688,11 +714,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         </div>
       ) : null}
       {tab === "more" ? (
-        <div className="page-form">
+        // space-y: the plan card and the data card sat edge to edge (Rory, 7 Nov 2026).
+        <div className="page-form space-y-4">
           {/* Your plan and how much of it you use, at a glance (importing lives on Fleet, the vehicle catalogue in the admin console). */}
           <Card className="p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
+              <div className="min-w-0">
                 <h2 className="card-title">{say("plan_title")}</h2>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <p className="text-[26px] font-semibold leading-tight text-[var(--foreground)]">{say(`bl_${currentPlan.id}`)}</p>
@@ -706,6 +733,26 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 {say("plan_btn")}
               </Link>
             </div>
+            {/*
+              The plan's facts, one row each. Price and interval, renewal date and payment method join this list once
+              plans are billed through Stripe (feedback plan F); until then only what is known is shown.
+            */}
+            {(() => {
+              const facts: Array<{ label: string; value: string }> = [];
+              if (planStatus === "trial" && trialEndsAt) {
+                facts.push({ label: say("plan_trialEnds"), value: dateFormat(locale, { day: "numeric", month: "long", year: "numeric", timeZone: businessTimeZone() }).format(new Date(trialEndsAt)) });
+              }
+              return facts.length ? (
+                <dl className="mt-4 grid gap-x-6 gap-y-2 border-t border-[var(--border)] pt-4 sm:grid-cols-2">
+                  {facts.map((fact) => (
+                    <div className="flex items-baseline justify-between gap-3 sm:block" key={fact.label}>
+                      <dt className="text-[14px] font-semibold text-[var(--muted)]">{fact.label}</dt>
+                      <dd className="font-semibold text-[var(--foreground)]">{fact.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null;
+            })()}
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
               {[
                 { label: say("use_cars"), used: fleetNow.cars, limit: currentPlan.cars },

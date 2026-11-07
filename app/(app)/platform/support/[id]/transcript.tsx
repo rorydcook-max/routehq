@@ -15,9 +15,19 @@ function when(iso: string) {
  */
 export function HelpdeskTranscript({ messages }: { messages: HelpdeskMessage[] }) {
   if (!messages.length) return <p className="font-medium text-[var(--muted)]">No messages yet.</p>;
+  const earlierFrom = messages.find((message) => message.fromThread)?.fromThread || null;
   return (
     <ol className="space-y-3">
-      {messages.map((message) => {
+      {/* Pulled in from the chat just before an empty handover (lib/helpdesk.ts), so the team sees what was asked. */}
+      {earlierFrom ? (
+        <li className="text-center text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--muted)]">
+          From their chat just before ·{" "}
+          <a className="normal-case tracking-normal text-[var(--primary)] hover:underline" href={`/platform/support/${earlierFrom}`}>
+            open it
+          </a>
+        </li>
+      ) : null}
+      {messages.map((message, index) => {
         const handoff = Boolean(message.meta?.handoff);
         const articles: Array<{ slug: string; title: string }> = Array.isArray(message.meta?.articles) ? message.meta.articles : [];
         const action = message.meta?.action && typeof message.meta.action === "object" ? message.meta.action : null;
@@ -31,8 +41,10 @@ export function HelpdeskTranscript({ messages }: { messages: HelpdeskMessage[] }
                 : "border border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)]";
         const onRight = message.kind === "team" || message.kind === "note";
         const light = message.kind === "team";
+        const firstOfThisChat = earlierFrom && !message.fromThread && messages[index - 1]?.fromThread;
         return (
-          <li key={message.id}>
+          <li key={`${message.fromThread || ""}${message.id}`}>
+            {firstOfThisChat ? <p className="mb-3 text-center text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--muted)]">This conversation</p> : null}
             <div className={`flex ${onRight ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[92%] rounded-2xl px-4 py-3 sm:max-w-[78%] ${bubble}`}>
                 <p className={`flex items-center gap-1.5 text-[13px] font-semibold ${light ? "text-white/80" : "text-[var(--muted)]"}`}>

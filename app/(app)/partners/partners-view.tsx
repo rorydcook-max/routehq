@@ -1,263 +1,411 @@
 "use client";
 
-import { Check, Copy, Loader2, Search, Send } from "lucide-react";
+import { Car, Check, Copy, Handshake, Loader2, Search, Share2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { longDate, shortDate } from "@/lib/i18n/dates";
-import { markFeePaid, searchPartnerVehicles, sendReferral } from "@/app/actions/partners";
-import { priceFor, type PartnerVehicle, type ReferralRow } from "@/lib/partner-pricing";
+import { formatMoney } from "@/lib/regional";
+import { markReferralSettled, savePartnerNetwork, searchPartnerVehicles } from "@/app/actions/partners";
+import { SwitchField } from "@/components/switch-field";
+import type { PartnerVehicle, ReferralRow } from "@/lib/partner-pricing";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
+export type RegionOption = { name: string; towns: string[] };
 
 // The global field style (44px, regular weight), so these line up with the Search button beside them.
 const inputClass = "mt-1 w-full";
+const labelClass = "block text-sm font-semibold text-[var(--foreground-secondary)]";
+const KINDS = ["car", "scooter", "motorbike", "van", "atv", "ebike"];
+const PERIODS: Array<{ key: string; days: number | null }> = [
+  { key: "p_day", days: 1 },
+  { key: "p_week", days: 7 },
+  { key: "p_2weeks", days: 14 },
+  { key: "p_month", days: 30 },
+  { key: "p_open", days: null }
+];
 
-const KINDS = ["any", "car", "scooter", "motorbike", "van", "atv", "ebike"];
+const money = (amount: number, currency: string) => formatMoney(amount, currency, "en-US");
 
-function baht(value: number, currency = "THB") {
-  return `${currency === "THB" ? "฿" : `${currency} `}${Math.round(value).toLocaleString("en-US")}`;
+function addDays(iso: string, days: number) {
+  const date = new Date(`${iso}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
 }
 
-export function PartnersView({ referrals, today }: { referrals: ReferralRow[]; today: string }) {
+/** Amounts per currency, e.g. "฿1,200 + €40". */
+function totals(rows: ReferralRow[]) {
+  const sums = new Map<string, number>();
+  for (const row of rows) if (row.feeOpen > 0) sums.set(row.currency, (sums.get(row.currency) || 0) + row.feeOpen);
+  return [...sums.entries()].map(([currency, amount]) => money(amount, currency));
+}
+
+export function PartnersView({
+  sharing: initialSharing,
+  blocked,
+  canEdit,
+  canSettle,
+  referrals,
+  regions,
+  country,
+  defaultTown,
+  currency,
+  pct,
+  today
+}: {
+  sharing: boolean;
+  blocked: string[];
+  canEdit: boolean;
+  canSettle: boolean;
+  referrals: ReferralRow[];
+  regions: RegionOption[];
+  country: string;
+  defaultTown: string;
+  currency: string;
+  pct: number;
+  today: string;
+}) {
   const t = useTranslations("partners") as unknown as Say;
   const c = useTranslations("common") as unknown as Say;
+  const router = useRouter();
+  const [sharing, setSharing] = useState(initialSharing);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const [saving, startSaving] = useTransition();
+
+  const [place, setPlace] = useState(defaultTown ? `t:${defaultTown}` : "");
   const [startDate, setStartDate] = useState(today);
-  const [endDate, setEndDate] = useState("");
+  const [endDate, setEndDate] = useState(addDays(today, 7));
   const [kind, setKind] = useState("any");
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<PartnerVehicle[] | null>(null);
+  const [resultCurrency, setResultCurrency] = useState(currency);
+  const [searched, setSearched] = useState<{ startDate: string; endDate: string | null } | null>(null);
+  const [budget, setBudget] = useState<number | null>(null);
   const [error, setError] = useState("");
-  const [picked, setPicked] = useState<PartnerVehicle | null>(null);
-  const [customerName, setCustomerName] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState<{ bookingUrl: string; partner: string } | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [paying, setPaying] = useState<string | null>(null);
-  const [paid, setPaid] = useState<Set<string>>(new Set());
+  const [copied, setCopied] = useState<string | null>(null);
+  const [fallbackLink, setFallbackLink] = useState<{ id: string; url: string } | null>(null);
+
+  const kinds = useMemo(() => [...KINDS].sort((a, b) => c(`kinds_${a}`).localeCompare(c(`kinds_${b}`))), [c]);
+
+  function toggleSharing(next: boolean) {
+    setSharing(next);
+    setSaveFailed(false);
+    startSaving(async () => {
+      const result = await savePartnerNetwork({ enabled: next, blocked }).catch(() => ({ ok: false as const }));
+      if (!result.ok) {
+        setSharing(!next);
+        setSaveFailed(true);
+        return;
+      }
+      if (!next) setResults(null);
+      router.refresh();
+    });
+  }
 
   async function search() {
     setSearching(true);
     setError("");
-    setPicked(null);
-    setSent(null);
-    const result = await searchPartnerVehicles({ startDate, endDate: endDate || null, kind });
-    if (result.ok) setResults(result.vehicles);
-    else setError(result.error);
+    setFallbackLink(null);
+    const town = place.startsWith("t:") ? place.slice(2) : null;
+    const region = place.startsWith("r:") ? place.slice(2) : null;
+    const result = await searchPartnerVehicles({ startDate, endDate: endDate || null, kind, town, region }).catch(() => null);
+    if (result?.ok) {
+      setResults(result.vehicles);
+      setResultCurrency(result.currency);
+      setSearched({ startDate, endDate: endDate || null });
+      setBudget(null);
+    } else setError(result && !result.ok ? result.error : t("searchFailed"));
     setSearching(false);
   }
 
-  async function send() {
-    if (!picked) return;
-    setSending(true);
-    setError("");
-    const result = await sendReferral({ vehicleId: picked.vehicleId, startDate, endDate: endDate || null, customerName, customerPhone, baseUrl: window.location.origin });
-    if (result.ok) setSent({ bookingUrl: result.bookingUrl, partner: result.partner });
-    else setError(result.error);
-    setSending(false);
-  }
-
-  async function copy(text: string) {
+  async function copy(vehicle: PartnerVehicle) {
     try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(vehicle.bookingUrl);
+      setCopied(vehicle.vehicleId);
+      setFallbackLink(null);
+      setTimeout(() => setCopied((current) => (current === vehicle.vehicleId ? null : current)), 2500);
     } catch {
-      // The link is on screen to select by hand.
+      // No clipboard (an old browser or a blocked permission): show the link to copy by hand.
+      setFallbackLink({ id: vehicle.vehicleId, url: vehicle.bookingUrl });
     }
   }
 
-  async function payFee(id: string) {
-    setPaying(id);
-    const result = await markFeePaid({ referralId: id, method: "bank_transfer" });
-    if (result.ok) setPaid((current) => new Set([...current, id]));
-    else setError(result.error);
-    setPaying(null);
-  }
+  // Budget slider: price per day in this business's currency, from nothing up to the dearest result.
+  const priced = (results || []).filter((vehicle) => vehicle.perDayMine !== null);
+  const maxPerDay = priced.length ? Math.max(...priced.map((vehicle) => vehicle.perDayMine as number)) : 0;
+  const step = maxPerDay > 2000 ? 100 : maxPerDay > 200 ? 10 : 1;
+  const sliderMax = Math.max(step, Math.ceil(maxPerDay / step) * step);
+  const limit = budget ?? sliderMax;
+  const shown = (results || []).filter((vehicle) => vehicle.perDayMine === null || vehicle.perDayMine <= limit);
+  const overBudget = (results?.length || 0) - shown.length;
 
-  const whatsapp = (phone: string, text: string) => {
-    const digits = phone.replace(/\D/g, "");
-    const to = digits.startsWith("0") ? `66${digits.slice(1)}` : digits;
-    return `https://wa.me/${to}?text=${encodeURIComponent(text)}`;
-  };
-
-  const sentRows = referrals.filter((row) => row.direction === "sent");
-  const receivedRows = referrals.filter((row) => row.direction === "received");
-  const owed = receivedRows.filter((row) => row.feeAmount && !row.feePaidAt && !paid.has(row.id));
+  const sent = referrals.filter((row) => row.direction === "sent");
+  const received = referrals.filter((row) => row.direction === "received");
+  const owedToMe = totals(sent);
+  const iOwe = totals(received);
 
   return (
     <div className="space-y-4">
-      {/* 1. What the customer wants */}
+      {/* 1. Share the fleet: the switch everything else depends on. */}
       <section className="card p-4">
-        <h2 className="card-title">{t("findTitle")}</h2>
-        <p className="mt-1 text-sm text-[var(--muted)]">{t("findBody")}</p>
-        <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
-          <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-            {t("from")}
-            <input className={inputClass} min={today} onChange={(event) => setStartDate(event.target.value)} type="date" value={startDate} />
-          </label>
-          <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-            {t("to")} <span className="font-medium text-[var(--muted)]">· {t("toOptional")}</span>
-            <input className={inputClass} min={startDate} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
-          </label>
-          <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-            {t("kind")}
-            <select className={inputClass} onChange={(event) => setKind(event.target.value)} value={kind}>
-              {KINDS.map((value) => (
-                <option key={value} value={value}>
-                  {value === "any" ? t("anyKind") : c(`kinds_${value}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button className="primary-action pressable self-end" disabled={searching || !startDate} onClick={search} type="button">
-            {searching ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}
-            {t("search")}
-          </button>
-        </div>
-        {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
+        <SwitchField
+          checked={sharing}
+          description={t("shareBody")}
+          disabled={saving || !canEdit}
+          label={t("shareTitle")}
+          onChange={(event) => toggleSharing(event.target.checked)}
+        />
+        {!canEdit ? <p className="mt-2 text-sm text-[var(--muted)]">{t("shareOwnerOnly")}</p> : null}
+        {saveFailed ? <p className="mt-2 text-sm font-bold text-[var(--danger)]">{t("shareSaveFailed")}</p> : null}
       </section>
 
-      {/* 2. What partners have free */}
-      {results ? (
-        <section className="card p-4">
-          <h2 className="card-title">{results.length ? t("freeTitle", { count: results.length }) : t("noneTitle")}</h2>
-          {!results.length ? <p className="mt-1 text-sm text-[var(--muted)]">{t("noneBody")}</p> : null}
-          <div className="mt-3 grid gap-3 md:grid-cols-2">
-            {results.map((vehicle) => {
-              const price = priceFor(vehicle, startDate, endDate || null);
-              const chosen = picked?.vehicleId === vehicle.vehicleId;
-              return (
-                <div className={`rounded-xl border p-3 ${chosen ? "border-[var(--primary)] ring-2 ring-[var(--focus-ring)]" : "border-[var(--border)]"}`} key={vehicle.vehicleId}>
-                  <p className="text-[16px] font-bold text-[var(--foreground)]">
-                    {vehicle.make} {vehicle.model} {vehicle.year ? <span className="font-medium text-[var(--muted)]">{vehicle.year}</span> : null}
-                  </p>
-                  <p className="text-sm font-semibold text-[var(--foreground-secondary)]">
-                    {vehicle.business}
-                    {vehicle.town ? ` · ${vehicle.town}` : ""}
-                  </p>
-                  <p className="mt-2 text-[15px] font-bold text-[var(--foreground)]">
-                    {baht(price.rate, vehicle.currency)} {t(`per_${price.model}`)}
-                    {price.days ? <span className="font-medium text-[var(--muted)]"> · {t("forDays", { total: baht(price.total, vehicle.currency), days: price.days })}</span> : null}
-                  </p>
-                  <p className="text-sm text-[var(--muted)]">{t("deposit", { amount: baht(vehicle.deposit, vehicle.currency) })}</p>
-                  <button
-                    className={`${chosen ? "primary-action" : "secondary-action"} pressable mt-3 min-h-11 px-4`}
-                    onClick={() => {
-                      setPicked(vehicle);
-                      setSent(null);
-                    }}
-                    type="button"
-                  >
-                    {chosen ? <Check size={15} /> : null}
-                    {chosen ? t("chosen") : t("choose")}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      ) : null}
-
-      {/* 3. Send the customer */}
-      {picked && !sent ? (
-        <section className="card p-4">
-          <h2 className="card-title">{t("sendTitle", { vehicle: `${picked.make} ${picked.model}`, partner: picked.business })}</h2>
-          <p className="mt-1 text-sm text-[var(--muted)]">{t("sendBody")}</p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-              {t("customerName")}
-              <input className={inputClass} onChange={(event) => setCustomerName(event.target.value)} value={customerName} />
-            </label>
-            <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-              {t("customerPhone")}
-              <input className={inputClass} inputMode="tel" onChange={(event) => setCustomerPhone(event.target.value)} value={customerPhone} />
-            </label>
-          </div>
-          <button className="primary-action pressable mt-4" disabled={sending || !customerName.trim()} onClick={send} type="button">
-            {sending ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}
-            {t("sendButton")}
-          </button>
-        </section>
-      ) : null}
-
-      {sent ? (
-        <section className="card !bg-[var(--success-light)] p-4">
-          <h2 className="card-title">{t("sentTitle", { partner: sent.partner })}</h2>
-          <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{t("sentBody")}</p>
-          <p className="mt-3 break-all rounded-lg bg-white px-3 py-2 font-mono text-sm text-[var(--foreground)]">{sent.bookingUrl}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button className="secondary-action pressable" onClick={() => copy(sent.bookingUrl)} type="button">
-              <Copy size={15} /> {copied ? t("copied") : t("copyLink")}
-            </button>
-            {customerPhone ? (
-              <a className="primary-action pressable" href={whatsapp(customerPhone, t("whatsappText", { partner: sent.partner, url: sent.bookingUrl }))} rel="noreferrer" target="_blank">
-                {t("sendWhatsapp")}
-              </a>
-            ) : null}
-          </div>
-        </section>
-      ) : null}
-
-      {/* 4. Fees */}
-      {owed.length ? (
-        <section className="card !bg-[var(--warning-light)] p-4">
-          <h2 className="card-title">{t("owedTitle", { count: owed.length })}</h2>
-          <ul className="mt-2 space-y-2">
-            {owed.map((row) => (
-              <li className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white px-3 py-2" key={row.id}>
-                <span className="font-medium text-[var(--foreground)]">
-                  {baht(row.feeAmount || 0)} {t("toPartner", { partner: row.partner })} · {row.customerName || t("aCustomer")}
-                  {row.feeDueAt ? <span className="text-[var(--muted)]"> · {t("by", { date: row.feeDueAt })}</span> : null}
-                </span>
-                <button className="secondary-action pressable min-h-11 px-4" disabled={paying === row.id} onClick={() => payFee(row.id)} type="button">
-                  {paying === row.id ? <Loader2 className="animate-spin" size={15} /> : <Check size={15} />} {t("markPaid")}
-                </button>
+      {!sharing ? (
+        // Only businesses that share can search: a friendly nudge, and how it works in three steps.
+        <section className="card p-5 lg:p-7">
+          <h2 className="card-title">{t("joinTitle")}</h2>
+          <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{t("joinBody")}</p>
+          <ol className="mt-5 grid gap-3 md:grid-cols-3">
+            {[
+              { icon: <Search size={22} />, text: t("step1") },
+              { icon: <Share2 size={22} />, text: t("step2") },
+              { icon: <Handshake size={22} />, text: t("step3", { pct }) }
+            ].map((step, index) => (
+              <li className="rounded-2xl bg-[var(--panel-secondary)] p-4" key={index}>
+                <span aria-hidden="true" className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">{step.icon}</span>
+                <p className="mt-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--muted)]">{t("how_step", { n: index + 1 })}</p>
+                <p className="mt-0.5 font-semibold text-[var(--foreground)]">{step.text}</p>
               </li>
             ))}
-          </ul>
+          </ol>
+        </section>
+      ) : (
+        <>
+          {/* 2. What the customer wants. */}
+          <section className="card p-4">
+            <h2 className="card-title">{t("searchTitle")}</h2>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_auto]">
+              <label className={labelClass}>
+                {t("location")}
+                <select className={inputClass} onChange={(event) => setPlace(event.target.value)} value={place}>
+                  <option value="">{country ? t("anywhereIn", { country }) : t("anywhere")}</option>
+                  {regions.map((region) => (
+                    <optgroup key={region.name} label={region.name}>
+                      <option value={`r:${region.name}`}>{t("allOf", { region: region.name })}</option>
+                      {region.towns.map((town) => (
+                        <option key={town} value={`t:${town}`}>
+                          {town}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </label>
+              <label className={labelClass}>
+                {t("startDate")}
+                <input
+                  className={inputClass}
+                  min={today}
+                  onChange={(event) => {
+                    const next = event.target.value;
+                    setStartDate(next);
+                    if (endDate && endDate <= next) setEndDate(addDays(next, 1));
+                  }}
+                  type="date"
+                  value={startDate}
+                />
+              </label>
+              <label className={labelClass}>
+                {t("endDate")}
+                <input className={inputClass} min={addDays(startDate || today, 1)} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
+              </label>
+              <label className={labelClass}>
+                {t("vehicleType")}
+                <select className={inputClass} onChange={(event) => setKind(event.target.value)} value={kind}>
+                  <option value="any">{t("anyType")}</option>
+                  {kinds.map((value) => (
+                    <option key={value} value={value}>
+                      {c(`kinds_${value}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button className="primary-action pressable self-end" disabled={searching || !startDate} onClick={search} type="button">
+                {searching ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}
+                {t("searchButton")}
+              </button>
+            </div>
+            {/* Or pick a rental period: it sets the end date from the start date. */}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("period")}</span>
+              {PERIODS.map((period) => {
+                const end = period.days === null ? "" : addDays(startDate || today, period.days);
+                const active = endDate === end;
+                return (
+                  <button
+                    aria-pressed={active}
+                    className={`rounded-full border px-3 py-1.5 text-sm font-semibold ${active ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] text-[var(--foreground-secondary)]"}`}
+                    key={period.key}
+                    onClick={() => setEndDate(end)}
+                    type="button"
+                  >
+                    {t(period.key)}
+                  </button>
+                );
+              })}
+            </div>
+            {!endDate ? <p className="mt-2 text-sm text-[var(--muted)]">{t("endDateHint")}</p> : null}
+            {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
+          </section>
+
+          {/* 3. What partners have free. */}
+          {results && searched ? (
+            <section className="card p-4">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <h2 className="card-title">{results.length ? t("resultsTitle", { count: shown.length }) : t("noResultsTitle")}</h2>
+                {priced.length > 1 ? (
+                  <label className="block w-full text-sm font-semibold text-[var(--foreground-secondary)] sm:w-72">
+                    {t("budget")}: <span className="text-[var(--foreground)]">{t("budgetUpTo", { amount: money(limit, resultCurrency) })}</span>
+                    <input
+                      aria-valuetext={money(limit, resultCurrency)}
+                      className="mt-2 w-full accent-[var(--primary)]"
+                      max={sliderMax}
+                      min={0}
+                      onChange={(event) => setBudget(Number(event.target.value))}
+                      step={step}
+                      type="range"
+                      value={limit}
+                    />
+                  </label>
+                ) : null}
+              </div>
+              {!results.length ? <p className="mt-1 text-sm text-[var(--muted)]">{t("noResultsBody")}</p> : null}
+              {overBudget > 0 ? <p className="mt-1 text-sm text-[var(--muted)]">{t("budgetHidden", { count: overBudget })}</p> : null}
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {shown.map((vehicle) => {
+                  const foreign = vehicle.currency !== resultCurrency;
+                  return (
+                    <article className="overflow-hidden rounded-xl border border-[var(--border)]" key={vehicle.vehicleId}>
+                      {vehicle.photoUrl ? (
+                        // Signed storage links: a plain img, like the booking page.
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img alt={vehicle.name} className="aspect-[16/10] w-full bg-[var(--panel-secondary)] object-cover" loading="lazy" src={vehicle.photoUrl} />
+                      ) : (
+                        <div aria-label={t("noPhoto")} className="flex aspect-[16/10] w-full items-center justify-center bg-[var(--panel-secondary)] text-[var(--muted)]" role="img">
+                          <Car size={36} />
+                        </div>
+                      )}
+                      <div className="p-3">
+                        <p className="text-[16px] font-bold text-[var(--foreground)]">
+                          {vehicle.name} {vehicle.year ? <span className="font-medium text-[var(--muted)]">{vehicle.year}</span> : null}
+                        </p>
+                        <p className="text-sm font-semibold text-[var(--foreground-secondary)]">
+                          {vehicle.business}
+                          {vehicle.town ? ` · ${vehicle.town}` : ""}
+                        </p>
+                        <p className="mt-2 text-[15px] font-bold text-[var(--foreground)]">
+                          {vehicle.days ? t("forDates", { total: money(vehicle.total, vehicle.currency), days: vehicle.days }) : t("perMonthOpen", { total: money(vehicle.total, vehicle.currency) })}
+                        </p>
+                        <p className="text-sm text-[var(--muted)]">
+                          {t("perDay", { amount: money(vehicle.perDay, vehicle.currency) })}
+                          {foreign ? (vehicle.perDayMine !== null ? ` · ${t("approx", { amount: money(vehicle.perDayMine, resultCurrency) })}` : ` · ${t("ownCurrency", { currency: vehicle.currency })}`) : null}
+                        </p>
+                        <button className="secondary-action pressable mt-3 min-h-11 w-full px-4" onClick={() => copy(vehicle)} type="button">
+                          {copied === vehicle.vehicleId ? <Check size={15} /> : <Copy size={15} />}
+                          {copied === vehicle.vehicleId ? t("linkCopied") : t("copyLink")}
+                        </button>
+                        {fallbackLink?.id === vehicle.vehicleId ? (
+                          <label className="mt-2 block text-sm font-semibold text-[var(--foreground-secondary)]">
+                            {t("copyFallback")}
+                            <input className="mt-1 w-full font-mono text-xs" onFocus={(event) => event.target.select()} readOnly value={fallbackLink.url} />
+                          </label>
+                        ) : null}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
+        </>
+      )}
+
+      {/* 4. Commissions: what partners owe this business, and what it owes them. */}
+      {referrals.length || sharing ? (
+        <section className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="card p-4">
+              <p className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--muted)]">{t("owedToYou")}</p>
+              <p className="mt-1 text-[22px] font-bold text-[var(--success)]">{owedToMe.length ? owedToMe.join(" + ") : t("nothingOwed")}</p>
+            </div>
+            <div className="card p-4">
+              <p className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--muted)]">{t("youOwe")}</p>
+              <p className={`mt-1 text-[22px] font-bold ${iOwe.length ? "text-[var(--warning)]" : "text-[var(--foreground)]"}`}>{iOwe.length ? iOwe.join(" + ") : t("nothingOwed")}</p>
+            </div>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <ReferralList canSettle={canSettle} rows={sent} t={t} title={t("referredByYou")} />
+            <ReferralList canSettle={canSettle} rows={received} t={t} title={t("referredToYou")} />
+          </div>
         </section>
       ) : null}
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <ReferralList emptyKey="sentEmpty" rows={sentRows} paid={paid} t={t} titleKey="sentListTitle" />
-        <ReferralList emptyKey="receivedEmpty" rows={receivedRows} paid={paid} t={t} titleKey="receivedListTitle" />
-      </div>
     </div>
   );
 }
 
-function ReferralList({ rows, paid, t, titleKey, emptyKey }: { rows: ReferralRow[]; paid: Set<string>; t: Say; titleKey: string; emptyKey: string }) {
+function ReferralList({ rows, t, title, canSettle }: { rows: ReferralRow[]; t: Say; title: string; canSettle: boolean }) {
   const locale = useLocale();
+  const router = useRouter();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [failed, setFailed] = useState<{ id: string; message: string } | null>(null);
   const stage = (row: ReferralRow) => {
     if (row.status === "cancelled" || row.rentalStatus === "cancelled") return t("st_cancelled");
+    if (!row.rentalId) return row.channel === "link" ? t("st_notBooked") : t("st_sent");
     if (row.rentalStatus && ["active", "due_soon", "overdue", "extended", "completed"].includes(row.rentalStatus)) return t("st_rented");
-    if (row.rentalStatus === "booked") return t("st_booked");
-    return t("st_sent");
+    return t("st_booked");
   };
+
+  async function settle(id: string) {
+    setBusy(id);
+    setFailed(null);
+    const result = await markReferralSettled({ referralId: id }).catch(() => null);
+    if (result?.ok) router.refresh();
+    else setFailed({ id, message: result && !result.ok ? result.error : t("settleFailed") });
+    setBusy(null);
+  }
+
   return (
     <section className="card p-4">
-      <h2 className="card-title">{t(titleKey)}</h2>
+      <h2 className="card-title">{title}</h2>
       {rows.length ? (
         <ul className="mt-2 divide-y divide-[var(--border)]">
-          {rows.map((row) => {
-            const feePaid = Boolean(row.feePaidAt) || paid.has(row.id);
-            return (
-              <li className="py-2.5" key={row.id}>
-                <p className="font-semibold text-[var(--foreground)]">
-                  {row.customerName || t("aCustomer")} <span className="font-medium text-[var(--muted)]">· {row.vehicle}</span>
-                </p>
-                <p className="text-sm text-[var(--foreground-secondary)]">
-                  {row.direction === "sent" ? t("toPartner", { partner: row.partner }) : t("fromPartner", { partner: row.partner })} · {row.endDate ? `${shortDate(row.startDate, locale)} – ${longDate(row.endDate, locale)}` : longDate(row.startDate, locale)} · {stage(row)}
-                </p>
+          {rows.map((row) => (
+            <li className="py-3" key={row.id}>
+              <p className="font-semibold text-[var(--foreground)]">
+                {row.customerName || t("aCustomer")} {row.vehicle ? <span className="font-medium text-[var(--muted)]">· {row.vehicle}</span> : null}
+              </p>
+              <p className="text-sm text-[var(--foreground-secondary)]">
+                {row.direction === "sent" ? t("rowSent", { partner: row.partner, pct: row.feePct }) : t("rowReceived", { partner: row.partner, pct: row.feePct })}
+              </p>
+              <p className="text-sm text-[var(--muted)]">
+                {row.startDate ? (row.endDate ? `${shortDate(row.startDate, locale)} – ${longDate(row.endDate, locale)}` : longDate(row.startDate, locale)) : null}
+                {row.startDate ? " · " : ""}
+                {stage(row)}
+              </p>
+              <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">
-                  {row.feeAmount ? (
-                    <span className={feePaid ? "text-[var(--success)]" : "text-[var(--warning)]"}>
-                      {t("fee", { amount: `฿${Math.round(row.feeAmount).toLocaleString("en-US")}`, pct: row.feePct })} · {feePaid ? t("feePaid") : t("feeUnpaid")}
-                    </span>
+                  {row.feeTotal > 0 ? (
+                    <>
+                      <span className="text-[var(--foreground)]">{t("commissionSoFar", { total: money(row.feeTotal, row.currency) })}</span>
+                      {" · "}
+                      {row.feeOpen > 0 ? (
+                        <span className="text-[var(--warning)]">{t("openAmount", { amount: money(row.feeOpen, row.currency) })}</span>
+                      ) : (
+                        <span className="text-[var(--success)]">{t("allSettled")}</span>
+                      )}
+                    </>
                   ) : (
-                    <span className="text-[var(--muted)]">{t("feePending", { pct: row.feePct })}</span>
+                    <span className="text-[var(--muted)]">{t("noPaymentsYet")}</span>
                   )}
                   {row.direction === "received" && row.rentalId ? (
                     <Link className="ml-2 font-bold text-[var(--primary)]" href={`/bookings/${row.rentalId}`}>
@@ -265,13 +413,33 @@ function ReferralList({ rows, paid, t, titleKey, emptyKey }: { rows: ReferralRow
                     </Link>
                   ) : null}
                 </p>
-              </li>
-            );
-          })}
+                {row.feeOpen > 0 && canSettle ? (
+                  <button className="secondary-action pressable min-h-11 px-4" disabled={busy === row.id} onClick={() => settle(row.id)} type="button">
+                    {busy === row.id ? <Loader2 className="animate-spin" size={15} /> : <Check size={15} />} {t("markSettled")}
+                  </button>
+                ) : null}
+              </div>
+              {row.commissions.length ? (
+                <details className="mt-1 text-sm">
+                  <summary className="cursor-pointer font-semibold text-[var(--primary)]">{t("paymentsShow", { count: row.commissions.length })}</summary>
+                  <ul className="mt-1 space-y-0.5 text-[var(--foreground-secondary)]">
+                    {row.commissions.map((item) => (
+                      <li key={item.id}>
+                        {shortDate(item.createdAt.slice(0, 10), locale)} · {t("paymentLine", { payment: money(item.paymentAmount, row.currency), fee: money(item.feeAmount, row.currency) })}
+                        {item.settledAt ? <span className="text-[var(--success)]"> · {t("settledTag")}</span> : null}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ) : null}
+              {failed?.id === row.id ? <p className="mt-1 text-sm font-bold text-[var(--danger)]">{failed.message}</p> : null}
+            </li>
+          ))}
         </ul>
       ) : (
-        <p className="mt-1 text-sm text-[var(--muted)]">{t(emptyKey)}</p>
+        <p className="mt-1 text-sm text-[var(--muted)]">{t("noneYet")}</p>
       )}
+      {/* Paid between the two businesses for now. Automatic settlement with Stripe Connect plugs in at noteReferralFee (lib/partner-network.ts). */}
     </section>
   );
 }

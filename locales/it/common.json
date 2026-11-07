@@ -159,7 +159,11 @@
     "home": "Home",
     "supportAccess": "L'assistenza RoveHQ ha accesso alla tua attività fino alle {time}.",
     "language": "Lingua",
-    "helpForPage": "Aiuto per questa pagina"
+    "helpForPage": "Aiuto per questa pagina",
+    "helpLoading": "Caricamento…",
+    "helpNoArticle": "Centro assistenza",
+    "helpNoArticleBody": "Non c’è ancora un articolo su questa pagina. Il Centro assistenza ha guide per ogni parte di RoveHQ.",
+    "helpOpenCentre": "Apri nel Centro assistenza"
   },
   "vehicles": {
     "addVehicle": "Aggiungi veicolo"
@@ -903,7 +907,8 @@
     "noneFree": "Nulla disponibile dal {start}.",
     "noneFreeEarliest": "Nulla disponibile dal {start}. Il primo disponibile è il {date} ({vehicle}).",
     "bookedUntil": "Prenotato fino al {date}",
-    "vatIncluded": "Prezzi comprensivi di {name} al {rate}%"
+    "vatIncluded": "Prezzi comprensivi di {name} al {rate}%",
+    "extraFree": "Gratis"
   },
   "customerMessages": {
     "hi": "Ciao {name},",
@@ -2681,7 +2686,8 @@
     "noPriceYet": "Ancora nessun prezzo",
     "saveRate_daily": "Salva {amount} al giorno come prezzo di questo veicolo",
     "saveRate_weekly": "Salva {amount} a settimana come prezzo di questo veicolo",
-    "saveRate_monthly": "Salva {amount} al mese come prezzo di questo veicolo"
+    "saveRate_monthly": "Salva {amount} al mese come prezzo di questo veicolo",
+    "extraFree": "Gratis"
   },
   "fleet": {
     "title": "Flotta",
@@ -4366,7 +4372,23 @@
     "ag_lang_it": "italiano",
     "ag_lang_hr": "croato",
     "ag_lang_fr": "francese",
-    "ag_lang_de": "tedesco"
+    "ag_lang_de": "tedesco",
+    "plan_trialEnds": "Fine della prova",
+    "extra_summary": "{count, plural, one {# extra} other {# extra}}: {names}",
+    "extra_free": "Gratis",
+    "extra_pillDay": "{price} al giorno",
+    "extra_pillRental": "{price} a prenotazione",
+    "extra_sheetNew": "Nuovo extra",
+    "extra_sheetEdit": "Modifica extra",
+    "extra_priceShort": "Prezzo",
+    "extra_priceHint": "Lascia 0 per offrirlo gratis.",
+    "extra_forChosen": "Veicoli scelti",
+    "extra_noVehicles": "Ancora nessun veicolo. Aggiungine uno prima in Flotta.",
+    "extra_nameNeeded": "Dai un nome all’extra.",
+    "extra_pickVehicle": "Scegli almeno un veicolo.",
+    "extra_delete": "Elimina",
+    "extra_deleteSure": "Elimina questo extra",
+    "extra_saveFailed": "Salvataggio non riuscito. Riprova."
   },
   "accountPage": {
     "roleOwner": "Titolare",

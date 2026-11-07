@@ -471,7 +471,11 @@
     "home": "หน้าแรก",
     "supportAccess": "ทีมซัพพอร์ต RoveHQ เข้าถึงธุรกิจของคุณได้จนถึง {time}",
     "language": "ภาษา",
-    "helpForPage": "ช่วยเหลือสำหรับหน้านี้"
+    "helpForPage": "ช่วยเหลือสำหรับหน้านี้",
+    "helpLoading": "กำลังโหลด…",
+    "helpNoArticle": "ศูนย์ช่วยเหลือ",
+    "helpNoArticleBody": "ยังไม่มีบทความเกี่ยวกับหน้านี้ ศูนย์ช่วยเหลือมีคู่มือสำหรับทุกส่วนของ RoveHQ",
+    "helpOpenCentre": "เปิดในศูนย์ช่วยเหลือ"
   },
   "customer": {
     "cur_also": "แสดงราคาเป็นสกุลเงิน",
@@ -938,7 +942,8 @@
     "noneFree": "ไม่มีรถว่างตั้งแต่ {start}",
     "noneFreeEarliest": "ไม่มีรถว่างตั้งแต่ {start} เร็วที่สุดคือ {date} ({vehicle})",
     "privacyLink": "{business} และ RoveHQ ใช้ข้อมูลของคุณอย่างไร",
-    "vatIncluded": "ราคารวม {name} {rate}% แล้ว"
+    "vatIncluded": "ราคารวม {name} {rate}% แล้ว",
+    "extraFree": "ฟรี"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",
@@ -2742,7 +2747,8 @@
     "noPriceYet": "ยังไม่ได้ตั้งราคา",
     "saveRate_daily": "บันทึก {amount} ต่อวัน เป็นราคาของรถคันนี้",
     "saveRate_weekly": "บันทึก {amount} ต่อสัปดาห์ เป็นราคาของรถคันนี้",
-    "saveRate_monthly": "บันทึก {amount} ต่อเดือน เป็นราคาของรถคันนี้"
+    "saveRate_monthly": "บันทึก {amount} ต่อเดือน เป็นราคาของรถคันนี้",
+    "extraFree": "ฟรี"
   },
   "fleet": {
     "title": "รถ",
@@ -4428,7 +4434,23 @@
     "ag_lang_it": "อิตาลี",
     "ag_lang_hr": "โครเอเชีย",
     "ag_lang_fr": "ฝรั่งเศส",
-    "ag_lang_de": "เยอรมัน"
+    "ag_lang_de": "เยอรมัน",
+    "plan_trialEnds": "สิ้นสุดการทดลองใช้",
+    "extra_summary": "{count, plural, other {บริการเสริม # รายการ}}: {names}",
+    "extra_free": "ฟรี",
+    "extra_pillDay": "{price} ต่อวัน",
+    "extra_pillRental": "{price} ต่อการจอง",
+    "extra_sheetNew": "บริการเสริมใหม่",
+    "extra_sheetEdit": "แก้ไขบริการเสริม",
+    "extra_priceShort": "ราคา",
+    "extra_priceHint": "ใส่ 0 ไว้หากให้ฟรี",
+    "extra_forChosen": "รถที่เลือก",
+    "extra_noVehicles": "ยังไม่มีรถ เพิ่มรถในหน้ากองรถก่อน",
+    "extra_nameNeeded": "ใส่ชื่อบริการเสริม",
+    "extra_pickVehicle": "เลือกรถอย่างน้อยหนึ่งคัน",
+    "extra_delete": "ลบ",
+    "extra_deleteSure": "ลบบริการเสริมนี้",
+    "extra_saveFailed": "บันทึกไม่สำเร็จ โปรดลองอีกครั้ง"
   },
   "accountPage": {
     "roleOwner": "เจ้าของ",

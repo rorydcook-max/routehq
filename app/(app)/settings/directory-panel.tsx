@@ -8,8 +8,8 @@ import { SwitchField } from "@/components/switch-field";
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * Listing on the RoveHQ booking site (rovehq.app/rent): on by default, in every plan.
- * Needs the online booking page on.
+ * "List my vehicles on rove.rent": the business's vehicles show on rove.rent for the dates they're free, and renters
+ * book on the business's own booking page. On by default, in every plan. Needs the online booking page on.
  */
 export function DirectoryPanel({ enabled, allowed, bookingPageOn }: { enabled: boolean; allowed: boolean; bookingPageOn: boolean }) {
   const say = useTranslations("settingsPage") as unknown as Say;

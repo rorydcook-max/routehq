@@ -436,7 +436,11 @@
     "home": "முகப்பு",
     "supportAccess": "RoveHQ ஆதரவுக் குழுவுக்கு {time} வரை உங்கள் தொழிலை அணுகும் அனுமதி உள்ளது.",
     "language": "மொழி",
-    "helpForPage": "இந்தப் பக்கத்திற்கான உதவி"
+    "helpForPage": "இந்தப் பக்கத்திற்கான உதவி",
+    "helpLoading": "ஏற்றுகிறது…",
+    "helpNoArticle": "உதவி மையம்",
+    "helpNoArticleBody": "இந்தப் பக்கத்தைப் பற்றி இன்னும் கட்டுரை இல்லை. உதவி மையத்தில் RoveHQ-இன் ஒவ்வொரு பகுதிக்கும் வழிகாட்டிகள் உள்ளன.",
+    "helpOpenCentre": "உதவி மையத்தில் திற"
   },
   "customer": {
     "cur_also": "விலைகளை இதிலும் காட்டு",
@@ -903,7 +907,8 @@
     "noneFree": "{start} முதல் எதுவும் கிடைக்கவில்லை.",
     "noneFreeEarliest": "{start} முதல் எதுவும் கிடைக்கவில்லை. விரைவானது {date} ({vehicle}).",
     "privacyLink": "{business} மற்றும் RoveHQ உங்கள் தகவலை எப்படிப் பயன்படுத்துகின்றன",
-    "vatIncluded": "விலைகளில் {name} {rate}% சேர்க்கப்பட்டுள்ளது"
+    "vatIncluded": "விலைகளில் {name} {rate}% சேர்க்கப்பட்டுள்ளது",
+    "extraFree": "இலவசம்"
   },
   "customerMessages": {
     "hi": "வணக்கம் {name},",
@@ -2707,7 +2712,8 @@
     "noPriceYet": "இன்னும் விலை இல்லை",
     "saveRate_daily": "நாளுக்கு {amount} என்பதை இந்த வாகனத்தின் விலையாகச் சேமி",
     "saveRate_weekly": "வாரத்துக்கு {amount} என்பதை இந்த வாகனத்தின் விலையாகச் சேமி",
-    "saveRate_monthly": "மாதத்துக்கு {amount} என்பதை இந்த வாகனத்தின் விலையாகச் சேமி"
+    "saveRate_monthly": "மாதத்துக்கு {amount} என்பதை இந்த வாகனத்தின் விலையாகச் சேமி",
+    "extraFree": "இலவசம்"
   },
   "fleet": {
     "title": "வாகனங்கள்",
@@ -4393,7 +4399,23 @@
     "ag_lang_it": "இத்தாலியன்",
     "ag_lang_hr": "குரோஷியன்",
     "ag_lang_fr": "பிரெஞ்சு",
-    "ag_lang_de": "ஜெர்மன்"
+    "ag_lang_de": "ஜெர்மன்",
+    "plan_trialEnds": "சோதனை முடியும் நாள்",
+    "extra_summary": "{count, plural, one {# கூடுதல்} other {# கூடுதல்கள்}}: {names}",
+    "extra_free": "இலவசம்",
+    "extra_pillDay": "நாளுக்கு {price}",
+    "extra_pillRental": "முன்பதிவுக்கு {price}",
+    "extra_sheetNew": "புதிய கூடுதல்",
+    "extra_sheetEdit": "கூடுதலைத் திருத்து",
+    "extra_priceShort": "விலை",
+    "extra_priceHint": "இலவசமாக வழங்க 0 என விடவும்.",
+    "extra_forChosen": "தேர்ந்தெடுத்த வாகனங்கள்",
+    "extra_noVehicles": "இன்னும் வாகனங்கள் இல்லை. முதலில் வாகனக் குழுவில் ஒன்றைச் சேர்க்கவும்.",
+    "extra_nameNeeded": "கூடுதலுக்கு ஒரு பெயர் இடவும்.",
+    "extra_pickVehicle": "குறைந்தது ஒரு வாகனத்தைத் தேர்ந்தெடுக்கவும்.",
+    "extra_delete": "நீக்கு",
+    "extra_deleteSure": "இந்தக் கூடுதலை நீக்கு",
+    "extra_saveFailed": "சேமிக்க முடியவில்லை. மீண்டும் முயலவும்."
   },
   "accountPage": {
     "roleOwner": "உரிமையாளர்",

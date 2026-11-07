@@ -436,7 +436,11 @@
     "home": "בית",
     "supportAccess": "לתמיכה של RoveHQ יש גישה לעסק שלכם עד {time}.",
     "language": "שפה",
-    "helpForPage": "עזרה לדף הזה"
+    "helpForPage": "עזרה לדף הזה",
+    "helpLoading": "טוען…",
+    "helpNoArticle": "מרכז העזרה",
+    "helpNoArticleBody": "עדיין אין מאמר על הדף הזה. במרכז העזרה יש מדריכים לכל חלק ב-RoveHQ.",
+    "helpOpenCentre": "פתיחה במרכז העזרה"
   },
   "customer": {
     "cur_also": "להציג מחירים גם ב-",
@@ -903,7 +907,8 @@
     "noneFree": "אין רכב זמין מ־{start}.",
     "noneFreeEarliest": "אין רכב זמין מ־{start}. המוקדם ביותר הוא {date} ({vehicle}).",
     "privacyLink": "איך {business} ו-RoveHQ משתמשים במידע שלך",
-    "vatIncluded": "המחירים כוללים {name} בשיעור {rate}%"
+    "vatIncluded": "המחירים כוללים {name} בשיעור {rate}%",
+    "extraFree": "חינם"
   },
   "customerMessages": {
     "hi": "שלום {name},",
@@ -2747,7 +2752,8 @@
     "noPriceYet": "אין מחיר עדיין",
     "saveRate_daily": "שמירת {amount} ליום כמחיר של רכב זה",
     "saveRate_weekly": "שמירת {amount} לשבוע כמחיר של רכב זה",
-    "saveRate_monthly": "שמירת {amount} לחודש כמחיר של רכב זה"
+    "saveRate_monthly": "שמירת {amount} לחודש כמחיר של רכב זה",
+    "extraFree": "חינם"
   },
   "fleet": {
     "title": "צי הרכבים",
@@ -4433,7 +4439,23 @@
     "ag_lang_it": "איטלקית",
     "ag_lang_hr": "קרואטית",
     "ag_lang_fr": "צרפתית",
-    "ag_lang_de": "גרמנית"
+    "ag_lang_de": "גרמנית",
+    "plan_trialEnds": "תקופת הניסיון מסתיימת",
+    "extra_summary": "{count, plural, one {תוספת אחת} other {# תוספות}}: {names}",
+    "extra_free": "חינם",
+    "extra_pillDay": "{price} ליום",
+    "extra_pillRental": "{price} להזמנה",
+    "extra_sheetNew": "תוספת חדשה",
+    "extra_sheetEdit": "עריכת תוספת",
+    "extra_priceShort": "מחיר",
+    "extra_priceHint": "השאירו 0 כדי להציע אותה בחינם.",
+    "extra_forChosen": "רכבים נבחרים",
+    "extra_noVehicles": "אין רכבים עדיין. הוסיפו רכב בצי קודם.",
+    "extra_nameNeeded": "תנו שם לתוספת.",
+    "extra_pickVehicle": "בחרו לפחות רכב אחד.",
+    "extra_delete": "מחיקה",
+    "extra_deleteSure": "מחיקת התוספת",
+    "extra_saveFailed": "השמירה נכשלה. נסו שוב."
   },
   "accountPage": {
     "roleOwner": "בעלים",

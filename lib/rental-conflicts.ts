@@ -33,6 +33,28 @@ function holdEnd(startDate: string, endDate: string | null) {
   return endDate > startDate ? endDate : addDay(startDate);
 }
 
+/** Columns of a rental needed by bookableEnd. */
+export const BOOKABLE_END_COLUMNS = "end_date, extension_hold_until";
+
+/**
+ * Up to when a rental keeps its vehicle off new bookings, as an end date: the rental's end, or later while the vehicle
+ * is held for the renter to extend (rentals.extension_hold_until, worked out by supabase/migrations/0125_extension_hold.sql).
+ * Null for no end date. Used wherever customers see availability (booking page and embedded checkout, rove.rent,
+ * partner search, booking-link re-holds, inbox reply drafts). The owner's own booking form doesn't block on the hold:
+ * the owner sees it on the calendar and the booking, and can release it.
+ */
+export function bookableEnd(row: { end_date?: unknown; extension_hold_until?: unknown }): string | null {
+  const end = row.end_date ? String(row.end_date).slice(0, 10) : null;
+  if (!end) return null;
+  const held = row.extension_hold_until ? String(row.extension_hold_until).slice(0, 10) : null;
+  return held && held > end ? held : end;
+}
+
+/** PostgREST `or` filter: rentals still keeping their vehicle on or after `startDate` (no end, end date, or extension hold). */
+export function busyOnOrAfter(startDate: string) {
+  return `end_date.is.null,end_date.gte.${startDate},extension_hold_until.gt.${startDate}`;
+}
+
 export function overlaps(startDate: string, endDate: string | null, period: Pick<BusyPeriod, "startDate" | "endDate">) {
   return startDate < holdEnd(period.startDate, period.endDate) && period.startDate < holdEnd(startDate, endDate);
 }

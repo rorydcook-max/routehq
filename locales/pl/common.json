@@ -159,7 +159,11 @@
     "home": "Start",
     "supportAccess": "Wsparcie RoveHQ ma dostęp do Twojej firmy do {time}.",
     "language": "Język",
-    "helpForPage": "Pomoc do tej strony"
+    "helpForPage": "Pomoc do tej strony",
+    "helpLoading": "Ładowanie…",
+    "helpNoArticle": "Centrum pomocy",
+    "helpNoArticleBody": "Nie ma jeszcze artykułu o tej stronie. W Centrum pomocy znajdziesz poradniki do każdej części RoveHQ.",
+    "helpOpenCentre": "Otwórz w Centrum pomocy"
   },
   "vehicles": {
     "addVehicle": "Dodaj pojazd"
@@ -903,7 +907,8 @@
     "noneFree": "Brak dostępnych pojazdów od {start}.",
     "noneFreeEarliest": "Brak dostępnych pojazdów od {start}. Najwcześniej: {date} ({vehicle}).",
     "bookedUntil": "Zarezerwowany do {date}",
-    "vatIncluded": "Ceny zawierają {name} w wysokości {rate}%"
+    "vatIncluded": "Ceny zawierają {name} w wysokości {rate}%",
+    "extraFree": "Bezpłatnie"
   },
   "customerMessages": {
     "hi": "Dzień dobry, {name},",
@@ -2681,7 +2686,8 @@
     "noPriceYet": "Jeszcze brak ceny",
     "saveRate_daily": "Zapisz {amount} za dzień jako cenę tego pojazdu",
     "saveRate_weekly": "Zapisz {amount} za tydzień jako cenę tego pojazdu",
-    "saveRate_monthly": "Zapisz {amount} za miesiąc jako cenę tego pojazdu"
+    "saveRate_monthly": "Zapisz {amount} za miesiąc jako cenę tego pojazdu",
+    "extraFree": "Bezpłatnie"
   },
   "fleet": {
     "title": "Flota",
@@ -4366,7 +4372,23 @@
     "ag_lang_it": "włoski",
     "ag_lang_hr": "chorwacki",
     "ag_lang_fr": "francuski",
-    "ag_lang_de": "niemiecki"
+    "ag_lang_de": "niemiecki",
+    "plan_trialEnds": "Koniec okresu próbnego",
+    "extra_summary": "{count, plural, one {# dodatek} few {# dodatki} many {# dodatków} other {# dodatku}}: {names}",
+    "extra_free": "Bezpłatnie",
+    "extra_pillDay": "{price} za dzień",
+    "extra_pillRental": "{price} za rezerwację",
+    "extra_sheetNew": "Nowy dodatek",
+    "extra_sheetEdit": "Edytuj dodatek",
+    "extra_priceShort": "Cena",
+    "extra_priceHint": "Zostaw 0, aby był bezpłatny.",
+    "extra_forChosen": "Wybranymi pojazdami",
+    "extra_noVehicles": "Brak pojazdów. Najpierw dodaj pojazd we Flocie.",
+    "extra_nameNeeded": "Podaj nazwę dodatku.",
+    "extra_pickVehicle": "Wybierz co najmniej jeden pojazd.",
+    "extra_delete": "Usuń",
+    "extra_deleteSure": "Usuń ten dodatek",
+    "extra_saveFailed": "Nie udało się zapisać. Spróbuj ponownie."
   },
   "accountPage": {
     "roleOwner": "Właściciel",

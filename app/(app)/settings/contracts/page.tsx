@@ -11,7 +11,8 @@ import { buildSampleContractVariables, embedLogoInContractVariables, ensureDefau
 import { markOnboardingStep } from "@/lib/onboarding";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { feeOn, getTravelPolicySettings } from "@/lib/travel-policy";
+import { defaultLocationRules, feeOn, getTravelPolicySettings, territoryText, travelCountryCode } from "@/lib/travel-policy";
+import { distanceUnitFor } from "@/lib/regional";
 import { AgreementTerms } from "./agreement-terms";
 import { ContractImportCard } from "./import-card";
 import { currencySymbol } from "@/components/currency-symbol";
@@ -46,6 +47,7 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
   const usingUploaded = template?.template_key === UPLOADED_TEMPLATE_KEY;
 
   const policy = getTravelPolicySettings(organization.settings);
+  const mainTravel = defaultLocationRules(organization.settings, travelCountryCode(organization));
   const money = currencySymbol(organization.currency);
   const amount = (value: number) => `${money}${Math.round(Number(value) || 0).toLocaleString("en-US")}`;
   // A fee switched off in Settings shows as such, the way the agreement leaves it out.
@@ -58,8 +60,9 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
     { label: say("ag_n_cleaning"), value: feeOn(policy, "cleaning_fee_minimum") ? amount(policy.cleaning_fee_minimum) : off },
     { label: say("ag_n_smoking"), value: feeOn(policy, "smoking_fee_maximum") ? amount(policy.smoking_fee_maximum) : off },
     { label: say("ag_n_repair"), value: feeOn(policy, "emergency_repair_limit") ? amount(policy.emergency_repair_limit) : say("tp_off_emergency_repair_limit") },
-    { label: say("ag_n_area"), value: policy.home_territory },
-    { label: say("ag_n_law"), value: policy.jurisdiction }
+    // The main location's travel area and law (each location has its own: Settings › Travel area and limits).
+    { label: say("ag_n_area"), value: territoryText(mainTravel, travelCountryCode(organization), distanceUnitFor(organization)) },
+    { label: say("ag_n_law"), value: mainTravel.law || policy.jurisdiction }
   ].map((row) => ({ ...row, value: String(row.value || "").replace(/^[a-z]/, (letter) => letter.toUpperCase()) })); // "the Kingdom of Thailand" reads as a value, not mid-sentence
 
   // A file handed over from the chat widget ("Upload my own contract"): only a path inside this business's folder.

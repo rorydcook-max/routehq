@@ -436,7 +436,11 @@
     "home": "මුල් පිටුව",
     "supportAccess": "{time} දක්වා RoveHQ සහාය කණ්ඩායමට ඔබේ ව්‍යාපාරයට ප්‍රවේශය ඇත.",
     "language": "භාෂාව",
-    "helpForPage": "මෙම පිටුව සඳහා උදව්"
+    "helpForPage": "මෙම පිටුව සඳහා උදව්",
+    "helpLoading": "පූරණය වෙමින්…",
+    "helpNoArticle": "උදව් මධ්‍යස්ථානය",
+    "helpNoArticleBody": "මෙම පිටුව ගැන තවම ලිපියක් නැත. උදව් මධ්‍යස්ථානයේ RoveHQ හි සෑම කොටසක් සඳහාම මාර්ගෝපදේශ ඇත.",
+    "helpOpenCentre": "උදව් මධ්‍යස්ථානයේ විවෘත කරන්න"
   },
   "customer": {
     "cur_also": "මිල ගණන් මෙම මුදලින්ද පෙන්වන්න",
@@ -903,7 +907,8 @@
     "noneFree": "{start} සිට කිසිවක් ලබා ගත නොහැක.",
     "noneFreeEarliest": "{start} සිට කිසිවක් ලබා ගත නොහැක. ඉක්මනින්ම ලැබෙන්නේ {date} ({vehicle}).",
     "privacyLink": "{business} සහ RoveHQ ඔබේ තොරතුරු භාවිත කරන ආකාරය",
-    "vatIncluded": "මිල ගණන්වලට {name} {rate}% ඇතුළත්"
+    "vatIncluded": "මිල ගණන්වලට {name} {rate}% ඇතුළත්",
+    "extraFree": "නොමිලේ"
   },
   "customerMessages": {
     "hi": "ආයුබෝවන් {name},",
@@ -2707,7 +2712,8 @@
     "noPriceYet": "තවම මිලක් නැත",
     "saveRate_daily": "දිනකට {amount} මෙම වාහනයේ මිල ලෙස සුරකින්න",
     "saveRate_weekly": "සතියකට {amount} මෙම වාහනයේ මිල ලෙස සුරකින්න",
-    "saveRate_monthly": "මාසයකට {amount} මෙම වාහනයේ මිල ලෙස සුරකින්න"
+    "saveRate_monthly": "මාසයකට {amount} මෙම වාහනයේ මිල ලෙස සුරකින්න",
+    "extraFree": "නොමිලේ"
   },
   "fleet": {
     "title": "වාහන සමූහය",
@@ -4393,7 +4399,23 @@
     "ag_lang_it": "ඉතාලි",
     "ag_lang_hr": "ක්‍රොඒෂියානු",
     "ag_lang_fr": "ප්‍රංශ",
-    "ag_lang_de": "ජර්මන්"
+    "ag_lang_de": "ජර්මන්",
+    "plan_trialEnds": "අත්හදා බැලීම අවසන් වේ",
+    "extra_summary": "{count, plural, one {අමතර දේ #} other {අමතර දේ #}}: {names}",
+    "extra_free": "නොමිලේ",
+    "extra_pillDay": "දිනකට {price}",
+    "extra_pillRental": "බුකින් එකකට {price}",
+    "extra_sheetNew": "නව අමතර දේ",
+    "extra_sheetEdit": "අමතර දේ සංස්කරණය",
+    "extra_priceShort": "මිල",
+    "extra_priceHint": "නොමිලේ දීමට 0 ලෙස තබන්න.",
+    "extra_forChosen": "තෝරාගත් වාහන",
+    "extra_noVehicles": "තවම වාහන නැත. පළමුව වාහන සමූහයට එකක් එක් කරන්න.",
+    "extra_nameNeeded": "අමතර දෙයට නමක් දෙන්න.",
+    "extra_pickVehicle": "අවම වශයෙන් එක් වාහනයක් තෝරන්න.",
+    "extra_delete": "මකන්න",
+    "extra_deleteSure": "මෙම අමතර දේ මකන්න",
+    "extra_saveFailed": "සුරැකිය නොහැකි විය. නැවත උත්සාහ කරන්න."
   },
   "accountPage": {
     "roleOwner": "හිමිකරු",

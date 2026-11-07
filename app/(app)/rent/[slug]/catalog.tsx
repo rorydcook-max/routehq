@@ -45,6 +45,7 @@ export function Catalog({
   initialEnd,
   initialVehicleId,
   source,
+  referrer = null,
   embedded = false,
   rates = {},
   visitorCurrency = null
@@ -73,6 +74,8 @@ export function Catalog({
   initialEnd?: string | null;
   initialVehicleId?: string | null;
   source?: string | null;
+  /** A partner business that sent this customer (?ref=): checked on the server when they book. */
+  referrer?: string | null;
 }) {
   const t = useTranslations("customer");
   const locale = useLocale();
@@ -152,6 +155,7 @@ export function Catalog({
         formData.set("endDate", end || "");
         formData.set("extraIds", JSON.stringify(chosen));
         if (source) formData.set("source", source);
+        if (referrer) formData.set("ref", referrer);
         const result = await bookOnline(formData);
         if (!result.ok) {
           setError(result.error);
@@ -265,7 +269,7 @@ export function Catalog({
           // High season: the price for these dates, not the usual one.
           const season = basePlan ? seasonalRate(basePlan.rate, basePlan.pricingModel, seasons, startDate, end) : null;
           const plan = basePlan && season ? { ...basePlan, rate: season.rate } : basePlan;
-          const offered = extrasFor(extras, isTwoWheeler(vehicle.kind));
+          const offered = extrasFor(extras, isTwoWheeler(vehicle.kind), vehicle.id);
           const pricedExtras = priceExtras(offered.filter((extra) => chosen.includes(extra.id)), days);
           const bookable = !!plan;
           // Exactly what this booking will be charged, worked out the way the payments are: a day price for each day,
@@ -408,7 +412,7 @@ export function Catalog({
                           <label className="flex min-h-11 items-center gap-3 rounded-xl border border-[var(--border)] px-3 py-2 text-sm font-semibold text-[var(--foreground)]" key={extra.id}>
                             <input checked={chosen.includes(extra.id)} onChange={(event) => setChosen((list) => (event.target.checked ? [...list, extra.id] : list.filter((id) => id !== extra.id)))} type="checkbox" />
                             <span className="min-w-0 flex-1">{extra.name}</span>
-                            <span className="shrink-0 text-xs text-[var(--muted)]">{t(extra.per === "day" ? "extraPerDay" : "extraOnce", { amount: money(extra.price) })}</span>
+                            <span className="shrink-0 text-xs text-[var(--muted)]">{extra.price > 0 ? t(extra.per === "day" ? "extraPerDay" : "extraOnce", { amount: money(extra.price) }) : t("extraFree")}</span>
                           </label>
                         ))}
                       </div>

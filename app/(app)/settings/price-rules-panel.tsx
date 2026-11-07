@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { saveExtras, saveSeasons } from "@/app/actions/price-rules";
 import { EXTRA_PRESETS, type Extra, type ExtraPreset, type Season } from "@/lib/price-rules";
 import { dateFormat } from "@/lib/i18n/dates";
@@ -118,97 +120,319 @@ export function SeasonsPanel({ initial }: { initial: Season[] }) {
   );
 }
 
-export function ExtrasPanel({ initial, currencySymbol }: { initial: Extra[]; currencySymbol: string }) {
+/** A vehicle an extra can be limited to: its name as the fleet shows it, and its plate. */
+export type ExtraVehicle = { id: string; name: string; plate: string | null };
+
+/** The price as shown on a pill and in the sheet: the business's own currency, no decimals when there are none. */
+function priceText(symbol: string, price: number) {
+  return `${symbol}${price.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+}
+
+/**
+ * Paid extras (Rory, 7 Nov 2026): the saved ones are pills, like the ready-made options. Tapping a pill opens a small
+ * sheet to change it (name, price with the business's currency in the field, per day or per booking, which vehicles,
+ * delete); "Add an extra" and the ready-made pills open the same sheet. Saving stores the list at once, closes the
+ * sheet and shows the pill. A price of 0 is a free extra. Before, a new extra with no price was dropped on save
+ * without a word, so adding one seemed to do nothing.
+ */
+export function ExtrasPanel({ initial, currencySymbol, vehicles = [] }: { initial: Extra[]; currencySymbol: string; vehicles?: ExtraVehicle[] }) {
   const say = useTranslations("settingsPage") as unknown as Say;
+  const router = useRouter();
   const [rows, setRows] = useState<Extra[]>(initial);
-  const save = useSave(() => saveExtras(rows));
-  const change = (id: string, patch: Partial<Extra>) => {
-    save.clear();
-    setRows((list) => list.map((row) => (row.id === id ? { ...row, ...patch } : row)));
-  };
+  const [editing, setEditing] = useState<{ extra: Extra; isNew: boolean } | null>(null);
+
+  const pillPrice = (extra: Extra) =>
+    extra.price > 0 ? say(extra.per === "day" ? "extra_pillDay" : "extra_pillRental", { price: priceText(currencySymbol, extra.price) }) : say("extra_free");
+
+  async function store(next: Extra[]): Promise<string | null> {
+    const result = await saveExtras(next);
+    if (!result.ok) return result.error || say("extra_saveFailed");
+    setRows(next);
+    router.refresh();
+    return null;
+  }
+
+  const presetsLeft = EXTRA_PRESETS.filter((preset) => !rows.some((row) => row.preset === preset))
+    .map((preset) => ({ preset, label: say(`xp_${preset}`) }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <p className="font-medium text-[var(--foreground-secondary)]">
         {say("extra_body")} <InfoTip label={say("extra_title")} text={say("extra_bodyTip")} />
       </p>
-      {rows.map((row) => (
-        <div className="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:grid-cols-[1.4fr_0.8fr_1fr_1fr_auto] sm:items-end" key={row.id}>
-          <label className="block">
-            <span className={small}>{say("extra_name")}</span>
-            <input className={field} maxLength={60} onChange={(event) => change(row.id, { name: event.target.value })} placeholder={say("extra_namePh")} value={row.name} />
-          </label>
-          <label className="block">
-            <span className={small}>{say("extra_price", { symbol: currencySymbol })}</span>
-            <input className={field} inputMode="numeric" onChange={(event) => change(row.id, { price: Number(event.target.value.replace(/[^\d]/g, "")) || 0 })} value={row.price ? String(row.price) : ""} />
-          </label>
-          <label className="block">
-            <span className={small}>{say("extra_per")}</span>
-            <select className={field} onChange={(event) => change(row.id, { per: event.target.value as Extra["per"] })} value={row.per}>
-              <option value="day">{say("extra_perDay")}</option>
-              <option value="rental">{say("extra_perRental")}</option>
-            </select>
-          </label>
-          <label className="block">
-            <span className={small}>{say("extra_for")}</span>
-            <select className={field} onChange={(event) => change(row.id, { kind: event.target.value as Extra["kind"] })} value={row.kind}>
-              <option value="all">{say("extra_forAll")}</option>
-              <option value="car">{say("extra_forCars")}</option>
-              <option value="bike">{say("extra_forBikes")}</option>
-            </select>
-          </label>
-          <button aria-label={say("remove")} className="flex min-h-10 items-center justify-center text-[var(--muted)] hover:text-[var(--danger)]" onClick={() => { save.clear(); setRows((list) => list.filter((item) => item.id !== row.id)); }} type="button">
-            <Trash2 size={18} />
-          </button>
-          {/* A ready-made extra's own detail: the lower excess, the age, the countries allowed. */}
-          {row.preset === "damage_waiver" ? (
-            <label className="block sm:col-span-2">
-              <span className={small}>
-                {say("xp_excess", { symbol: currencySymbol })} <InfoTip label={say("xp_excess", { symbol: currencySymbol })} text={say("xp_excessTip")} />
-              </span>
-              <input className={field} inputMode="numeric" onChange={(event) => change(row.id, { excess: Number(event.target.value.replace(/[^\d]/g, "")) || 0 })} value={row.excess ? String(row.excess) : ""} />
-            </label>
-          ) : null}
-          {row.preset === "young_driver" ? (
-            <label className="block sm:col-span-2">
-              <span className={small}>{say("xp_minAge")}</span>
-              <input className={field} inputMode="numeric" onChange={(event) => change(row.id, { minAge: Number(event.target.value.replace(/[^\d]/g, "")) || 0 })} value={row.minAge ? String(row.minAge) : ""} />
-            </label>
-          ) : null}
-          {row.preset === "cross_border" ? (
-            <label className="block sm:col-span-3">
-              <span className={small}>{say("xp_countries")}</span>
-              <input className={field} maxLength={200} onChange={(event) => change(row.id, { countries: event.target.value })} placeholder={say("xp_countriesPh")} value={row.countries || ""} />
-            </label>
-          ) : null}
-        </div>
-      ))}
-      {/* Ready-made extras common in Europe: one tap adds it with a sensible start; the owner sets the price. */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className={small}>{say("xp_ready")}</span>
-        {EXTRA_PRESETS.filter((preset) => !rows.some((row) => row.preset === preset))
-          .map((preset) => ({ preset, label: say(`xp_${preset}`) }))
-          .sort((a, b) => a.label.localeCompare(b.label))
-          .map(({ preset, label }) => (
+      {rows.length ? (
+        <ul className="flex flex-wrap gap-2">
+          {rows.map((row) => (
+            <li key={row.id}>
+              <button
+                className="pressable inline-flex min-h-10 max-w-full items-center gap-2 rounded-full border border-[var(--primary)] bg-[var(--primary-light)] px-3.5 py-1.5 text-start text-[14px] font-semibold text-[var(--foreground)]"
+                onClick={() => setEditing({ extra: row, isNew: false })}
+                type="button"
+              >
+                <span className="min-w-0 truncate">{row.name}</span>
+                <span className="shrink-0 font-medium text-[var(--foreground-secondary)]">· {pillPrice(row)}</span>
+                <Pencil aria-hidden="true" className="shrink-0 text-[var(--primary)]" size={14} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {/* Ready-made extras common in Europe: one tap opens the sheet with a sensible start; the owner sets the price. */}
+      {presetsLeft.length ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={small}>{say("xp_ready")}</span>
+          {presetsLeft.map(({ preset, label }) => (
             <button
               className="rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-[14px] font-semibold text-[var(--foreground)] hover:border-[var(--primary)]"
               key={preset}
-              onClick={() => { save.clear(); setRows((list) => [...list, readyMade(preset, label)]); }}
+              onClick={() => setEditing({ extra: readyMade(preset, label), isNew: true })}
               type="button"
             >
               + {label}
             </button>
           ))}
-      </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <button className="secondary-action pressable" onClick={() => { save.clear(); setRows((list) => [...list, { id: newId(), name: "", price: 0, per: "day", kind: "all" }]); }} type="button">
-          <Plus size={16} />
-          {say("extra_add")}
-        </button>
-        <button className="primary-action pressable" disabled={save.pending} onClick={save.run} type="button">
-          {save.pending ? say("saving") : say("save")}
-        </button>
-        {save.note ? <span className={`text-sm font-semibold ${save.note === "saved" ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{save.note === "saved" ? say("saved") : save.note}</span> : null}
-      </div>
+        </div>
+      ) : null}
+      <button className="secondary-action pressable" onClick={() => setEditing({ extra: { id: newId(), name: "", price: 0, per: "day", kind: "all" }, isNew: true })} type="button">
+        <Plus size={16} />
+        {say("extra_add")}
+      </button>
+      {editing ? (
+        <ExtraSheet
+          currencySymbol={currencySymbol}
+          extra={editing.extra}
+          isNew={editing.isNew}
+          onClose={() => setEditing(null)}
+          onDelete={async () => {
+            const error = await store(rows.filter((row) => row.id !== editing.extra.id));
+            if (!error) setEditing(null);
+            return error;
+          }}
+          onSave={async (extra) => {
+            const next = editing.isNew ? [...rows, extra] : rows.map((row) => (row.id === extra.id ? extra : row));
+            const error = await store(next);
+            if (!error) setEditing(null);
+            return error;
+          }}
+          vehicles={vehicles}
+        />
+      ) : null}
     </div>
+  );
+}
+
+/** The sheet for one extra: a bottom sheet on a phone, a box in the middle on a computer. */
+function ExtraSheet({
+  extra,
+  isNew,
+  currencySymbol,
+  vehicles,
+  onClose,
+  onSave,
+  onDelete
+}: {
+  extra: Extra;
+  isNew: boolean;
+  currencySymbol: string;
+  vehicles: ExtraVehicle[];
+  onClose: () => void;
+  onSave: (extra: Extra) => Promise<string | null>;
+  onDelete: () => Promise<string | null>;
+}) {
+  const say = useTranslations("settingsPage") as unknown as Say;
+  const [draft, setDraft] = useState<Extra>(extra);
+  const [priceTyped, setPriceTyped] = useState(extra.price ? String(extra.price) : "");
+  // "Chosen vehicles" when the extra names some; the older cars-only or motorbikes-only choice stays as it was.
+  const [scope, setScope] = useState<"all" | "chosen" | "kind">(extra.vehicleIds?.length ? "chosen" : extra.kind === "all" ? "all" : "kind");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, start] = useTransition();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const change = (patch: Partial<Extra>) => {
+    setError(null);
+    setDraft((current) => ({ ...current, ...patch }));
+  };
+  const chosen = new Set(draft.vehicleIds || []);
+  const sortedVehicles = [...vehicles].sort((a, b) => a.name.localeCompare(b.name) || String(a.plate || "").localeCompare(String(b.plate || "")));
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  function save() {
+    const name = draft.name.trim();
+    if (!name) return setError(say("extra_nameNeeded"));
+    if (scope === "chosen" && !chosen.size) return setError(say("extra_pickVehicle"));
+    const price = Math.max(0, Math.round((Number(priceTyped.replace(/,/g, "")) || 0) * 100) / 100);
+    const clean: Extra = { ...draft, name, price, kind: scope === "kind" ? draft.kind : "all" };
+    if (scope === "chosen") clean.vehicleIds = [...chosen];
+    else delete clean.vehicleIds;
+    start(async () => {
+      const failed = await onSave(clean);
+      if (failed) setError(failed);
+    });
+  }
+
+  const segment = (on: boolean) =>
+    `flex min-h-11 flex-1 items-center justify-center rounded-xl px-3 text-[15px] font-semibold transition ${on ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--foreground-secondary)]"}`;
+
+  // On the page itself, not inside the folded card: a transformed parent would pin a fixed sheet to the card.
+  return createPortal(
+    <div className="sheet-scrim fixed inset-0 z-[60] flex items-end bg-[var(--foreground)]/40 lg:items-center lg:justify-center" onClick={onClose}>
+      <div
+        aria-label={isNew ? say("extra_sheetNew") : say("extra_sheetEdit")}
+        aria-modal="true"
+        className="surface-panel phone-sheet flex max-h-[90vh] w-full flex-col rounded-t-3xl shadow-xl lg:w-[480px] lg:rounded-2xl"
+        onClick={(event) => event.stopPropagation()}
+        role="dialog"
+      >
+        <span aria-hidden="true" className="lg:hidden">
+          <span className="sheet-grabber" />
+        </span>
+        <div className="flex items-center justify-between gap-3 px-5 pb-2 pt-4">
+          <h2 className="sheet-title">{isNew ? say("extra_sheetNew") : say("extra_sheetEdit")}</h2>
+          <button aria-label={say("cancel")} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]" onClick={onClose} type="button">
+            <X size={18} strokeWidth={2.4} />
+          </button>
+        </div>
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 pb-4">
+          <label className="block">
+            <span className={small}>{say("extra_name")}</span>
+            <input autoFocus={isNew && !draft.name} className={field} maxLength={60} onChange={(event) => change({ name: event.target.value })} placeholder={say("extra_namePh")} value={draft.name} />
+          </label>
+          <label className="block">
+            <span className={small}>{say("extra_priceShort")}</span>
+            {/* The business's own currency inside the field (never a fixed baht sign). */}
+            <span className="relative mt-1 block">
+              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-3 flex items-center font-semibold text-[var(--foreground-secondary)]">
+                {currencySymbol}
+              </span>
+              <input
+                className="w-full"
+                inputMode="decimal"
+                onChange={(event) => {
+                  setError(null);
+                  setPriceTyped(event.target.value.replace(/[^\d.,]/g, ""));
+                }}
+                placeholder="0"
+                style={{ paddingInlineStart: `calc(1.25rem + ${Math.max(1, currencySymbol.length)}ch)` }}
+                value={priceTyped}
+              />
+            </span>
+            <span className="mt-1 block text-[13px] font-medium text-[var(--muted)]">{say("extra_priceHint")}</span>
+          </label>
+          <div>
+            <span className={small}>{say("extra_per")}</span>
+            <div className="mt-1 flex gap-1 rounded-2xl bg-[var(--panel-secondary)] p-1" role="radiogroup">
+              {(["day", "rental"] as const).map((per) => (
+                <button aria-checked={draft.per === per} className={segment(draft.per === per)} key={per} onClick={() => change({ per })} role="radio" type="button">
+                  {say(per === "day" ? "extra_perDay" : "extra_perRental")}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <span className={small}>{say("extra_for")}</span>
+            <div className="mt-1 flex flex-wrap gap-1 rounded-2xl bg-[var(--panel-secondary)] p-1" role="radiogroup">
+              <button aria-checked={scope === "all"} className={segment(scope === "all")} onClick={() => { setError(null); setScope("all"); }} role="radio" type="button">
+                {say("extra_forAll")}
+              </button>
+              {scope === "kind" ? (
+                <button aria-checked className={segment(true)} role="radio" type="button">
+                  {say(draft.kind === "bike" ? "extra_forBikes" : "extra_forCars")}
+                </button>
+              ) : null}
+              <button aria-checked={scope === "chosen"} className={segment(scope === "chosen")} onClick={() => { setError(null); setScope("chosen"); }} role="radio" type="button">
+                {say("extra_forChosen")}
+              </button>
+            </div>
+            {scope === "chosen" ? (
+              sortedVehicles.length ? (
+                <ul className="mt-2 max-h-56 divide-y divide-[var(--border)] overflow-y-auto rounded-xl border border-[var(--border)]">
+                  {sortedVehicles.map((vehicle) => (
+                    <li key={vehicle.id}>
+                      <label className="flex min-h-11 items-center gap-3 px-3 py-2">
+                        <input
+                          checked={chosen.has(vehicle.id)}
+                          onChange={(event) => {
+                            const next = new Set(chosen);
+                            if (event.target.checked) next.add(vehicle.id);
+                            else next.delete(vehicle.id);
+                            change({ vehicleIds: [...next] });
+                          }}
+                          type="checkbox"
+                        />
+                        <span className="min-w-0 flex-1 truncate font-semibold text-[var(--foreground)]">{vehicle.name}</span>
+                        {vehicle.plate ? <span className="shrink-0 text-[13px] font-medium text-[var(--muted)]">{vehicle.plate}</span> : null}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-[14px] font-medium text-[var(--muted)]">{say("extra_noVehicles")}</p>
+              )
+            ) : null}
+          </div>
+          {/* A ready-made extra's own detail: the lower excess, the age, the countries allowed. */}
+          {draft.preset === "damage_waiver" ? (
+            <label className="block">
+              <span className={small}>
+                {say("xp_excess", { symbol: currencySymbol })} <InfoTip label={say("xp_excess", { symbol: currencySymbol })} text={say("xp_excessTip")} />
+              </span>
+              <input className={field} inputMode="numeric" onChange={(event) => change({ excess: Number(event.target.value.replace(/[^\d]/g, "")) || 0 })} value={draft.excess ? String(draft.excess) : ""} />
+            </label>
+          ) : null}
+          {draft.preset === "young_driver" ? (
+            <label className="block">
+              <span className={small}>{say("xp_minAge")}</span>
+              <input className={field} inputMode="numeric" onChange={(event) => change({ minAge: Number(event.target.value.replace(/[^\d]/g, "")) || 0 })} value={draft.minAge ? String(draft.minAge) : ""} />
+            </label>
+          ) : null}
+          {draft.preset === "cross_border" ? (
+            <label className="block">
+              <span className={small}>{say("xp_countries")}</span>
+              <input className={field} maxLength={200} onChange={(event) => change({ countries: event.target.value })} placeholder={say("xp_countriesPh")} value={draft.countries || ""} />
+            </label>
+          ) : null}
+          {error ? <p className="text-[14px] font-semibold text-[var(--danger)]" role="alert">{error}</p> : null}
+        </div>
+        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+          <button className="primary-action pressable" disabled={pending} onClick={save} type="button">
+            {pending ? say("saving") : say("save")}
+          </button>
+          <button className="secondary-action pressable" disabled={pending} onClick={onClose} type="button">
+            {say("cancel")}
+          </button>
+          {!isNew ? (
+            confirmDelete ? (
+              <button
+                className="ms-auto inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-[var(--danger)] px-3 font-semibold text-white"
+                disabled={pending}
+                onClick={() =>
+                  start(async () => {
+                    const failed = await onDelete();
+                    if (failed) setError(failed);
+                  })
+                }
+                type="button"
+              >
+                <Trash2 size={16} />
+                {say("extra_deleteSure")}
+              </button>
+            ) : (
+              <button className="ms-auto inline-flex min-h-11 items-center gap-1.5 px-2 font-semibold text-[var(--danger)]" disabled={pending} onClick={() => setConfirmDelete(true)} type="button">
+                <Trash2 size={16} />
+                {say("extra_delete")}
+              </button>
+            )
+          ) : null}
+        </div>
+      </div>
+    </div>,
+    document.body
   );
 }

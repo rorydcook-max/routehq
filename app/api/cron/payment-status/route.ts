@@ -1,4 +1,5 @@
 import { sendDailyCustomerReminders } from "@/lib/customer-reminders";
+import { runExtensionHolds } from "@/lib/extension-hold";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { wallTimeToIso } from "@/lib/business-time";
@@ -39,6 +40,8 @@ type Totals = {
   customerReminders: Record<string, number>;
   trialNudges: number;
   complianceInstalments: number;
+  extensionChecks: number;
+  extensionHoldsLapsed: number;
 };
 
 export async function GET(req: NextRequest) {
@@ -81,7 +84,9 @@ export async function GET(req: NextRequest) {
     lateReturnAlerts: 0,
     customerReminders: {},
     trialNudges: 0,
-    complianceInstalments: 0
+    complianceInstalments: 0,
+    extensionChecks: 0,
+    extensionHoldsLapsed: 0
   };
   const errors: string[] = [];
 
@@ -104,6 +109,10 @@ export async function GET(req: NextRequest) {
       // Handover tomorrow, return coming up, rent due or late, service due: each sent once.
       const reminders = await sendDailyCustomerReminders(supabase, { organizationIds: ids }).catch(() => null);
       for (const [kind, count] of Object.entries(reminders || {})) totals.customerReminders[kind] = (totals.customerReminders[kind] || 0) + Number(count || 0);
+      // Hold for extension: unanswered holds lift 2 days before the end; monthly renters ending in a week are asked if they're extending.
+      const holds = await runExtensionHolds(supabase, ids, today).catch(() => null);
+      totals.extensionChecks += holds?.asked || 0;
+      totals.extensionHoldsLapsed += holds?.lapsed || 0;
       // New businesses that stalled in their first week: one nudge towards their next step on day 1, 3 and 7.
       totals.trialNudges += await sendTrialNudges(supabase, ids).catch(() => 0);
       // Insurance or tax paid every month: this month's instalment is added as a cost on its day, until the cover runs out.

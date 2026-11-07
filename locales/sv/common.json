@@ -436,7 +436,11 @@
     "home": "Hem",
     "supportAccess": "RoveHQ-supporten har åtkomst till ditt företag till {time}.",
     "language": "Språk",
-    "helpForPage": "Hjälp med den här sidan"
+    "helpForPage": "Hjälp med den här sidan",
+    "helpLoading": "Laddar…",
+    "helpNoArticle": "Hjälpcenter",
+    "helpNoArticleBody": "Det finns ingen artikel om den här sidan än. Hjälpcentret har guider för alla delar av RoveHQ.",
+    "helpOpenCentre": "Öppna i hjälpcentret"
   },
   "customer": {
     "cur_also": "Visa även priser i",
@@ -903,7 +907,8 @@
     "noneFree": "Inget är ledigt från {start}.",
     "noneFreeEarliest": "Inget är ledigt från {start}. Tidigast är {date} ({vehicle}).",
     "privacyLink": "Hur {business} och RoveHQ använder dina uppgifter",
-    "vatIncluded": "Priserna inkluderar {name} på {rate} %"
+    "vatIncluded": "Priserna inkluderar {name} på {rate} %",
+    "extraFree": "Gratis"
   },
   "customerMessages": {
     "hi": "Hej {name},",
@@ -2707,7 +2712,8 @@
     "noPriceYet": "Inget pris än",
     "saveRate_daily": "Spara {amount} per dag som fordonets pris",
     "saveRate_weekly": "Spara {amount} per vecka som fordonets pris",
-    "saveRate_monthly": "Spara {amount} per månad som fordonets pris"
+    "saveRate_monthly": "Spara {amount} per månad som fordonets pris",
+    "extraFree": "Gratis"
   },
   "fleet": {
     "title": "Fordonsflotta",
@@ -4393,7 +4399,23 @@
     "ag_lang_it": "Italienska",
     "ag_lang_hr": "Kroatiska",
     "ag_lang_fr": "Franska",
-    "ag_lang_de": "Tyska"
+    "ag_lang_de": "Tyska",
+    "plan_trialEnds": "Provperioden slutar",
+    "extra_summary": "{count, plural, one {# tillägg} other {# tillägg}}: {names}",
+    "extra_free": "Gratis",
+    "extra_pillDay": "{price} per dag",
+    "extra_pillRental": "{price} per bokning",
+    "extra_sheetNew": "Nytt tillägg",
+    "extra_sheetEdit": "Redigera tillägg",
+    "extra_priceShort": "Pris",
+    "extra_priceHint": "Låt stå på 0 för att erbjuda det gratis.",
+    "extra_forChosen": "Valda fordon",
+    "extra_noVehicles": "Inga fordon än. Lägg till ett under Flotta först.",
+    "extra_nameNeeded": "Ge tillägget ett namn.",
+    "extra_pickVehicle": "Välj minst ett fordon.",
+    "extra_delete": "Radera",
+    "extra_deleteSure": "Radera tillägget",
+    "extra_saveFailed": "Det gick inte att spara. Försök igen."
   },
   "accountPage": {
     "roleOwner": "Ägare",

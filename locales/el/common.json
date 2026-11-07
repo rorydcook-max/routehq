@@ -159,7 +159,11 @@
     "home": "Αρχική",
     "supportAccess": "Η υποστήριξη του RoveHQ έχει πρόσβαση στην επιχείρησή σας έως {time}.",
     "language": "Γλώσσα",
-    "helpForPage": "Βοήθεια για αυτή τη σελίδα"
+    "helpForPage": "Βοήθεια για αυτή τη σελίδα",
+    "helpLoading": "Φόρτωση…",
+    "helpNoArticle": "Κέντρο βοήθειας",
+    "helpNoArticleBody": "Δεν υπάρχει ακόμη άρθρο για αυτή τη σελίδα. Στο Κέντρο βοήθειας θα βρείτε οδηγούς για κάθε μέρος του RoveHQ.",
+    "helpOpenCentre": "Άνοιγμα στο Κέντρο βοήθειας"
   },
   "vehicles": {
     "addVehicle": "Προσθήκη οχήματος"
@@ -903,7 +907,8 @@
     "noneFree": "Τίποτα διαθέσιμο από {start}.",
     "noneFreeEarliest": "Τίποτα διαθέσιμο από {start}. Το νωρίτερο είναι {date} ({vehicle}).",
     "bookedUntil": "Κρατημένο έως {date}",
-    "vatIncluded": "Οι τιμές περιλαμβάνουν {name} {rate}%"
+    "vatIncluded": "Οι τιμές περιλαμβάνουν {name} {rate}%",
+    "extraFree": "Δωρεάν"
   },
   "customerMessages": {
     "hi": "Γεια σας {name},",
@@ -2681,7 +2686,8 @@
     "noPriceYet": "Χωρίς τιμή ακόμη",
     "saveRate_daily": "Αποθήκευση {amount} την ημέρα ως τιμή του οχήματος",
     "saveRate_weekly": "Αποθήκευση {amount} την εβδομάδα ως τιμή του οχήματος",
-    "saveRate_monthly": "Αποθήκευση {amount} τον μήνα ως τιμή του οχήματος"
+    "saveRate_monthly": "Αποθήκευση {amount} τον μήνα ως τιμή του οχήματος",
+    "extraFree": "Δωρεάν"
   },
   "fleet": {
     "title": "Στόλος",
@@ -4366,7 +4372,23 @@
     "ag_lang_it": "ιταλικά",
     "ag_lang_hr": "κροατικά",
     "ag_lang_fr": "γαλλικά",
-    "ag_lang_de": "γερμανικά"
+    "ag_lang_de": "γερμανικά",
+    "plan_trialEnds": "Λήξη δοκιμής",
+    "extra_summary": "{count, plural, one {# πρόσθετο} other {# πρόσθετα}}: {names}",
+    "extra_free": "Δωρεάν",
+    "extra_pillDay": "{price} την ημέρα",
+    "extra_pillRental": "{price} ανά κράτηση",
+    "extra_sheetNew": "Νέο πρόσθετο",
+    "extra_sheetEdit": "Επεξεργασία πρόσθετου",
+    "extra_priceShort": "Τιμή",
+    "extra_priceHint": "Αφήστε 0 για να το προσφέρετε δωρεάν.",
+    "extra_forChosen": "Επιλεγμένα οχήματα",
+    "extra_noVehicles": "Δεν υπάρχουν οχήματα ακόμη. Προσθέστε ένα πρώτα στον Στόλο.",
+    "extra_nameNeeded": "Δώστε όνομα στο πρόσθετο.",
+    "extra_pickVehicle": "Επιλέξτε τουλάχιστον ένα όχημα.",
+    "extra_delete": "Διαγραφή",
+    "extra_deleteSure": "Διαγραφή αυτού του πρόσθετου",
+    "extra_saveFailed": "Η αποθήκευση απέτυχε. Δοκιμάστε ξανά."
   },
   "accountPage": {
     "roleOwner": "Ιδιοκτήτης",

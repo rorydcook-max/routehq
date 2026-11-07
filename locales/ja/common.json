@@ -436,7 +436,11 @@
     "home": "ホーム",
     "supportAccess": "RoveHQサポートは{time}まであなたの事業者アカウントにアクセスできます。",
     "language": "言語",
-    "helpForPage": "このページのヘルプ"
+    "helpForPage": "このページのヘルプ",
+    "helpLoading": "読み込み中…",
+    "helpNoArticle": "ヘルプセンター",
+    "helpNoArticleBody": "このページの記事はまだありません。ヘルプセンターにはRoveHQの各機能のガイドがあります。",
+    "helpOpenCentre": "ヘルプセンターで開く"
   },
   "customer": {
     "cur_also": "価格をこの通貨でも表示",
@@ -903,7 +907,8 @@
     "noneFree": "{start} からの空きはありません。",
     "noneFreeEarliest": "{start} からの空きはありません。最短は {date}（{vehicle}）です。",
     "privacyLink": "{business} と RoveHQ によるお客様の情報の利用について",
-    "vatIncluded": "価格には {name}（{rate}%）が含まれています"
+    "vatIncluded": "価格には {name}（{rate}%）が含まれています",
+    "extraFree": "無料"
   },
   "customerMessages": {
     "hi": "{name} 様",
@@ -2707,7 +2712,8 @@
     "noPriceYet": "料金未設定",
     "saveRate_daily": "1日{amount}をこの車両の料金として保存",
     "saveRate_weekly": "1週間{amount}をこの車両の料金として保存",
-    "saveRate_monthly": "1か月{amount}をこの車両の料金として保存"
+    "saveRate_monthly": "1か月{amount}をこの車両の料金として保存",
+    "extraFree": "無料"
   },
   "fleet": {
     "title": "車両一覧",
@@ -4393,7 +4399,23 @@
     "ag_lang_it": "イタリア語",
     "ag_lang_hr": "クロアチア語",
     "ag_lang_fr": "フランス語",
-    "ag_lang_de": "ドイツ語"
+    "ag_lang_de": "ドイツ語",
+    "plan_trialEnds": "トライアル終了日",
+    "extra_summary": "{count, plural, other {#件のオプション}}：{names}",
+    "extra_free": "無料",
+    "extra_pillDay": "1日{price}",
+    "extra_pillRental": "予約ごとに{price}",
+    "extra_sheetNew": "新しいオプション",
+    "extra_sheetEdit": "オプションを編集",
+    "extra_priceShort": "料金",
+    "extra_priceHint": "無料にするには0のままにします。",
+    "extra_forChosen": "選んだ車両",
+    "extra_noVehicles": "まだ車両がありません。先にフリートで追加してください。",
+    "extra_nameNeeded": "オプション名を入力してください。",
+    "extra_pickVehicle": "車両を1台以上選んでください。",
+    "extra_delete": "削除",
+    "extra_deleteSure": "このオプションを削除",
+    "extra_saveFailed": "保存できませんでした。もう一度お試しください。"
   },
   "accountPage": {
     "roleOwner": "オーナー",

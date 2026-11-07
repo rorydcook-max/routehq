@@ -150,6 +150,8 @@ export type HelpdeskMessage = {
   createdAt: string;
   meta: Record<string, any>;
   attachments: (SupportAttachment & { url: string | null })[];
+  /** Set on messages pulled in from the chat they had just before this one (see loadConversationData). */
+  fromThread?: string;
 };
 
 /**
@@ -165,12 +167,46 @@ export async function loadConversationData(threadId: string) {
     admin.from("support_messages").select("id, author_id, from_team, from_assistant, internal, body, attachments, meta, created_at").eq("thread_id", thread.id).order("created_at", { ascending: true }),
     teamNames()
   ]);
-  const authorIds = Array.from(new Set(((messages || []) as any[]).map((message) => message.author_id).filter(Boolean)));
+  /*
+   * A chat handed over with nothing from the business in it (Rory, 7 Nov 2026: the team saw only the assistant's
+   * "I've passed this to the RoveHQ team"). That happened when "Talk to a person" was tapped before the panel had
+   * loaded the chat they were in, so the handover started a new, empty chat. The questions are in the chat they had
+   * just before: show those messages first, so the team sees what was asked.
+   */
+  let earlierMessages: any[] = [];
+  let earlierThreadId: string | null = null;
+  const customerWrote = ((messages || []) as any[]).some((message) => !message.from_team && !message.from_assistant && !message.internal);
+  if (!customerWrote && thread.channel === "chat" && (thread.organization_id || thread.visitor_id)) {
+    const from = new Date(new Date(thread.created_at).getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: before } = await admin
+      .from("support_threads")
+      .select("id")
+      .eq(thread.organization_id ? "organization_id" : "visitor_id", thread.organization_id || thread.visitor_id)
+      .eq("channel", "chat")
+      .neq("id", thread.id)
+      .lte("created_at", thread.created_at)
+      .gte("last_message_at", from)
+      .order("last_message_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (before?.id) {
+      const { data: rowsBefore } = await admin
+        .from("support_messages")
+        .select("id, author_id, from_team, from_assistant, internal, body, attachments, meta, created_at")
+        .eq("thread_id", before.id)
+        .order("created_at", { ascending: true })
+        .limit(200);
+      earlierMessages = ((rowsBefore || []) as any[]).filter((message) => !message.internal);
+      earlierThreadId = before.id;
+    }
+  }
+  const allMessages = [...earlierMessages.map((message) => ({ ...message, fromThread: earlierThreadId })), ...((messages || []) as any[])];
+  const authorIds = Array.from(new Set(allMessages.map((message) => message.author_id).filter(Boolean)));
   const { data: profiles } = authorIds.length ? await admin.from("users").select("id, full_name").in("id", authorIds) : { data: [] };
   const authors = new Map(((profiles || []) as any[]).map((profile) => [profile.id, String(profile.full_name || "")]));
   const customerName = thread.organizations?.name || thread.visitor_name || thread.visitor_email || "Website visitor";
   const rows: HelpdeskMessage[] = await Promise.all(
-    ((messages || []) as any[]).map(async (message) => {
+    allMessages.map(async (message) => {
       const kind: HelpdeskMessage["kind"] = message.internal ? "note" : message.from_assistant ? "assistant" : message.from_team ? "team" : "customer";
       const authorName =
         kind === "assistant" ? "Assistant" : kind === "customer" ? authors.get(message.author_id) || customerName : names.get(message.author_id) || authors.get(message.author_id) || "RoveHQ team";
@@ -181,7 +217,8 @@ export async function loadConversationData(threadId: string) {
         body: String(message.body || ""),
         createdAt: message.created_at,
         meta: message.meta && typeof message.meta === "object" ? message.meta : {},
-        attachments: await signAttachments(admin, Array.isArray(message.attachments) ? message.attachments : [])
+        attachments: await signAttachments(admin, Array.isArray(message.attachments) ? message.attachments : []),
+        ...(message.fromThread ? { fromThread: String(message.fromThread) } : {})
       };
     })
   );

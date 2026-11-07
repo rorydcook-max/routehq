@@ -1,6 +1,6 @@
 import { businessToday } from "@/lib/business-time";
 import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
-import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
+import { BLOCKING_RENTAL_STATUSES, BOOKABLE_END_COLUMNS, bookableEnd } from "@/lib/rental-conflicts";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -32,13 +32,15 @@ export async function draftReply(input: { organizationId: string; conversationId
           .limit(5)
       : Promise.resolve({ data: [] }),
     // Every rental that holds a vehicle now or later, so the draft can speak about future dates.
-    supabase.from("rentals").select("vehicle_id, start_date, end_date").eq("organization_id", input.organizationId).in("status", BLOCKING_RENTAL_STATUSES as unknown as string[])
+    supabase.from("rentals").select(`vehicle_id, start_date, ${BOOKABLE_END_COLUMNS}`).eq("organization_id", input.organizationId).in("status", BLOCKING_RENTAL_STATUSES as unknown as string[])
   ]);
 
   const bookedByVehicle = new Map<string, string[]>();
   for (const rental of liveRentals || []) {
-    if (!rental.vehicle_id || (rental.end_date && rental.end_date < today)) continue;
-    const period = `${rental.start_date} to ${rental.end_date || "open-ended"}`;
+    // Held for a monthly renter to extend: not free until the hold ends.
+    const until = bookableEnd(rental);
+    if (!rental.vehicle_id || (until && until < today)) continue;
+    const period = `${rental.start_date} to ${until || "open-ended"}`;
     bookedByVehicle.set(rental.vehicle_id, [...(bookedByVehicle.get(rental.vehicle_id) || []), period]);
   }
 

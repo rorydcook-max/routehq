@@ -19,6 +19,7 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { remindersOff } from "@/lib/customer-messages";
+import { partnerReferrer, recordLinkReferral } from "@/lib/partner-network";
 
 type Result<T = {}> = ({ ok: true } & T) | { ok: false; error: string };
 
@@ -74,7 +75,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     extraIds = [];
   }
   const extrasPriced = priceExtras(
-    extrasFor(catalog.extras, isTwoWheeler(vehicle.kind)).filter((extra) => extraIds.includes(extra.id)),
+    extrasFor(catalog.extras, isTwoWheeler(vehicle.kind), vehicle.id).filter((extra) => extraIds.includes(extra.id)),
     endDate ? daysBetween(startDate, endDate) : null
   );
   if (!plan) return { ok: false, error: await said(`${minimumStay(vehicle) || "This vehicle can't be booked online for those dates"}. Please choose a longer stay or another vehicle.`) };
@@ -154,7 +155,17 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
   // Where the customer came from: the business's page here, the RoveHQ directory, or the booking box on their own website.
   const asked = String(formData.get("source") || "");
   const source = asked === "directory" || asked === "website" ? asked : "public_page";
-  const bookingData = { delivery_method: "tbd", delivery_location: null, delivery_datetime: null, special_conditions: null, share_channel: source, source };
+  // Booked through a partner's link (?ref=): the referring business earns 10% of each rental payment (lib/partner-network.ts).
+  const referrer = await partnerReferrer(admin, formData.get("ref"), organizationId).catch(() => null);
+  const bookingData = {
+    delivery_method: "tbd",
+    delivery_location: null,
+    delivery_datetime: null,
+    special_conditions: null,
+    share_channel: source,
+    source,
+    ...(referrer ? { referral: { from_organization_id: referrer.id, from: referrer.name } } : {})
+  };
   const { data: link, error: linkError } = await admin
     .from("booking_links")
     .insert({
@@ -186,6 +197,21 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     admin.from("contracts").update({ booking_link_id: link.id }).eq("id", contract.id),
     admin.from("rentals").update({ contract_id: contract.id }).eq("id", rental.id)
   ]);
+  if (referrer) {
+    await recordLinkReferral(admin, {
+      referrer,
+      organizationId,
+      rentalId: rental.id,
+      bookingLinkId: link.id,
+      vehicleId: vehicle.id,
+      vehicleName: vehicle.name,
+      customerName: name,
+      customerPhone: phone,
+      startDate,
+      endDate,
+      currency: catalog.currency
+    });
+  }
   await syncVehicleStatusFromBookings(admin, organizationId, vehicle.id).catch(() => null);
 
   const when = endDate ? `${shortDate(startDate)} to ${shortDate(endDate)}` : `from ${shortDate(startDate)}, no end date`;
@@ -287,14 +313,31 @@ export async function saveBookingRules(input: BookingRules): Promise<Result> {
   const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
   // Run the values through the same reader the rest of the app uses, so only allowed options are stored.
   const clean = bookingRules({
-    booking_rules: { hold_hours: input.holdHours, lead_hours: input.leadHours, end_notice_days: input.endNoticeDays, extend_notice_days: input.extendNoticeDays, gap_days: input.gapDays }
+    booking_rules: {
+      hold_hours: input.holdHours,
+      lead_hours: input.leadHours,
+      end_notice_days: input.endNoticeDays,
+      extend_notice_days: input.extendNoticeDays,
+      gap_days: input.gapDays,
+      extension_hold: input.extensionHold === true,
+      extension_hold_days: input.extensionHoldDays
+    }
   });
   const { error } = await admin
     .from("organizations")
     .update({
       settings: {
         ...settings,
-        booking_rules: { hold_hours: clean.holdHours, lead_hours: clean.leadHours, end_notice_days: clean.endNoticeDays, extend_notice_days: clean.extendNoticeDays, gap_days: clean.gapDays }
+        // Changing the extension hold re-works every booking's hold in the database (0125_extension_hold.sql).
+        booking_rules: {
+          hold_hours: clean.holdHours,
+          lead_hours: clean.leadHours,
+          end_notice_days: clean.endNoticeDays,
+          extend_notice_days: clean.extendNoticeDays,
+          gap_days: clean.gapDays,
+          extension_hold: clean.extensionHold,
+          extension_hold_days: clean.extensionHoldDays
+        }
       }
     })
     .eq("id", membership.organizationId);

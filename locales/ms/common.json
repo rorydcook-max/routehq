@@ -436,7 +436,11 @@
     "home": "Utama",
     "supportAccess": "Sokongan RoveHQ mempunyai akses kepada perniagaan anda sehingga {time}.",
     "language": "Bahasa",
-    "helpForPage": "Bantuan untuk halaman ini"
+    "helpForPage": "Bantuan untuk halaman ini",
+    "helpLoading": "Memuatkan…",
+    "helpNoArticle": "Pusat bantuan",
+    "helpNoArticleBody": "Belum ada artikel tentang halaman ini. Pusat bantuan ada panduan untuk setiap bahagian RoveHQ.",
+    "helpOpenCentre": "Buka dalam Pusat bantuan"
   },
   "customer": {
     "cur_also": "Tunjukkan juga harga dalam",
@@ -903,7 +907,8 @@
     "noneFree": "Tiada yang tersedia dari {start}.",
     "noneFreeEarliest": "Tiada yang tersedia dari {start}. Yang paling awal ialah {date} ({vehicle}).",
     "privacyLink": "Cara {business} dan RoveHQ menggunakan maklumat anda",
-    "vatIncluded": "Harga termasuk {name} {rate}%"
+    "vatIncluded": "Harga termasuk {name} {rate}%",
+    "extraFree": "Percuma"
   },
   "customerMessages": {
     "hi": "Hai {name},",
@@ -2747,7 +2752,8 @@
     "noPriceYet": "Belum ada harga",
     "saveRate_daily": "Simpan {amount} sehari sebagai harga kenderaan ini",
     "saveRate_weekly": "Simpan {amount} seminggu sebagai harga kenderaan ini",
-    "saveRate_monthly": "Simpan {amount} sebulan sebagai harga kenderaan ini"
+    "saveRate_monthly": "Simpan {amount} sebulan sebagai harga kenderaan ini",
+    "extraFree": "Percuma"
   },
   "fleet": {
     "title": "Armada",
@@ -4433,7 +4439,23 @@
     "ag_lang_it": "Itali",
     "ag_lang_hr": "Croatia",
     "ag_lang_fr": "Perancis",
-    "ag_lang_de": "Jerman"
+    "ag_lang_de": "Jerman",
+    "plan_trialEnds": "Percubaan tamat",
+    "extra_summary": "{count, plural, other {# tambahan}}: {names}",
+    "extra_free": "Percuma",
+    "extra_pillDay": "{price} sehari",
+    "extra_pillRental": "{price} setiap tempahan",
+    "extra_sheetNew": "Tambahan baharu",
+    "extra_sheetEdit": "Edit tambahan",
+    "extra_priceShort": "Harga",
+    "extra_priceHint": "Biarkan 0 untuk menawarkannya percuma.",
+    "extra_forChosen": "Kenderaan pilihan",
+    "extra_noVehicles": "Belum ada kenderaan. Tambah satu dalam Armada dahulu.",
+    "extra_nameNeeded": "Beri nama tambahan ini.",
+    "extra_pickVehicle": "Pilih sekurang-kurangnya satu kenderaan.",
+    "extra_delete": "Padam",
+    "extra_deleteSure": "Padam tambahan ini",
+    "extra_saveFailed": "Tidak dapat disimpan. Sila cuba lagi."
   },
   "accountPage": {
     "roleOwner": "Pemilik",

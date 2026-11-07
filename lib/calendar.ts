@@ -209,6 +209,19 @@ export type AvailabilityVehicle = {
   category: { code: string; name: string } | null;
   inShop: boolean;
   bookings: AvailabilityBooking[];
+  /** Days after a monthly rental kept off new bookings in case the renter extends (lib/extension-hold.ts). */
+  holds?: AvailabilityHold[];
+};
+
+export type AvailabilityHold = {
+  rentalId: string;
+  /** First and last held day shown in this month. */
+  from: string;
+  to: string;
+  /** The last held day (the vehicle can be booked from the day after). */
+  lastDay: string;
+  startsBefore: boolean;
+  runsOn: boolean;
 };
 
 /**
@@ -231,7 +244,7 @@ export async function getAvailability(organizationId: string, year: number, mont
       .order("make", { ascending: true }),
     supabase
       .from("rentals")
-      .select("id, vehicle_id, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name)")
+      .select("id, vehicle_id, start_date, end_date, status, extension_hold_until, customers!rentals_customer_id_fkey(full_name)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .not("status", "in", "(cancelled,draft)")
@@ -241,6 +254,7 @@ export async function getAvailability(organizationId: string, year: number, mont
   if (vehiclesResult.error) throw new Error(vehiclesResult.error.message);
 
   const byVehicle = new Map<string, AvailabilityBooking[]>();
+  const holdsByVehicle = new Map<string, AvailabilityHold[]>();
   for (const rental of rentalsResult.data || []) {
     const start = String(rental.start_date || "").slice(0, 10);
     const plannedEnd = String(rental.end_date || "").slice(0, 10);
@@ -249,9 +263,11 @@ export async function getAvailability(organizationId: string, year: number, mont
     // A vehicle that hasn't come back is still out today, whatever the end date said.
     const late = stillOut && !!plannedEnd && plannedEnd < today;
     const end = !plannedEnd ? "9999-12-31" : late ? (today > plannedEnd ? today : plannedEnd) : plannedEnd;
-    if (!start || end < startDate) continue;
+    // A rental that ended last month can still be held into this one (hold for extension, below).
+    const heldInto = String(rental.extension_hold_until || "").slice(0, 10) > startDate;
+    if (!start || (end < startDate && !heldInto)) continue;
     const list = byVehicle.get(rental.vehicle_id) || [];
-    list.push({
+    if (end >= startDate) list.push({
       id: rental.id,
       from: start < startDate ? startDate : start,
       to: end > endDate ? endDate : end,
@@ -263,6 +279,25 @@ export async function getAvailability(organizationId: string, year: number, mont
       runsOn: end > endDate
     });
     byVehicle.set(rental.vehicle_id, list);
+
+    // Held for extension: from the day after the end date up to the last held day (extension_hold_until is the first free day).
+    const holdUntil = String(rental.extension_hold_until || "").slice(0, 10);
+    if (holdUntil && plannedEnd && !returned) {
+      const firstHeld = shiftDay(end > plannedEnd ? end : plannedEnd, 1);
+      const lastHeld = shiftDay(holdUntil, -1);
+      if (firstHeld <= lastHeld && lastHeld >= startDate && firstHeld <= endDate) {
+        const holds = holdsByVehicle.get(rental.vehicle_id) || [];
+        holds.push({
+          rentalId: rental.id,
+          from: firstHeld < startDate ? startDate : firstHeld,
+          to: lastHeld > endDate ? endDate : lastHeld,
+          lastDay: lastHeld,
+          startsBefore: firstHeld < startDate,
+          runsOn: lastHeld > endDate
+        });
+        holdsByVehicle.set(rental.vehicle_id, holds);
+      }
+    }
   }
 
   return ((vehiclesResult.data || []) as any[]).map((vehicle) => ({
@@ -271,6 +306,13 @@ export async function getAvailability(organizationId: string, year: number, mont
     plate: vehicle.registration_number || "",
     category: vehicle.vehicle_categories || null,
     inShop: /maint|repair|shop|service/i.test(`${vehicle.status || ""} ${vehicle.availability_status || ""}`),
-    bookings: byVehicle.get(vehicle.id) || []
+    bookings: byVehicle.get(vehicle.id) || [],
+    holds: holdsByVehicle.get(vehicle.id) || []
   }));
+}
+
+function shiftDay(iso: string, days: number) {
+  const date = new Date(`${iso}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
 }

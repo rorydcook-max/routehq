@@ -436,7 +436,11 @@
     "home": "Start",
     "supportAccess": "Der RoveHQ-Support hat bis {time} Zugriff auf Ihren Betrieb.",
     "language": "Sprache",
-    "helpForPage": "Hilfe zu dieser Seite"
+    "helpForPage": "Hilfe zu dieser Seite",
+    "helpLoading": "Wird geladen…",
+    "helpNoArticle": "Hilfecenter",
+    "helpNoArticleBody": "Zu dieser Seite gibt es noch keinen Artikel. Im Hilfecenter findest du Anleitungen zu allen Bereichen von RoveHQ.",
+    "helpOpenCentre": "Im Hilfecenter öffnen"
   },
   "customer": {
     "cur_also": "Preise auch anzeigen in",
@@ -903,7 +907,8 @@
     "noneFree": "Ab {start} ist nichts verfügbar.",
     "noneFreeEarliest": "Ab {start} ist nichts verfügbar. Frühestens ab {date} ({vehicle}).",
     "privacyLink": "Wie {business} und RoveHQ Ihre Daten verwenden",
-    "vatIncluded": "Preise inkl. {name} von {rate} %"
+    "vatIncluded": "Preise inkl. {name} von {rate} %",
+    "extraFree": "Kostenlos"
   },
   "customerMessages": {
     "hi": "Hallo {name},",
@@ -2721,7 +2726,8 @@
     "noPriceYet": "Noch kein Preis",
     "saveRate_daily": "{amount} pro Tag als Preis dieses Fahrzeugs speichern",
     "saveRate_weekly": "{amount} pro Woche als Preis dieses Fahrzeugs speichern",
-    "saveRate_monthly": "{amount} pro Monat als Preis dieses Fahrzeugs speichern"
+    "saveRate_monthly": "{amount} pro Monat als Preis dieses Fahrzeugs speichern",
+    "extraFree": "Kostenlos"
   },
   "fleet": {
     "title": "Fuhrpark",
@@ -4406,7 +4412,23 @@
     "ag_lang_it": "Italienisch",
     "ag_lang_hr": "Kroatisch",
     "ag_lang_fr": "Französisch",
-    "ag_lang_de": "Deutsch"
+    "ag_lang_de": "Deutsch",
+    "plan_trialEnds": "Testphase endet",
+    "extra_summary": "{count, plural, one {# Extra} other {# Extras}}: {names}",
+    "extra_free": "Kostenlos",
+    "extra_pillDay": "{price} pro Tag",
+    "extra_pillRental": "{price} pro Buchung",
+    "extra_sheetNew": "Neues Extra",
+    "extra_sheetEdit": "Extra bearbeiten",
+    "extra_priceShort": "Preis",
+    "extra_priceHint": "Bei 0 ist es kostenlos.",
+    "extra_forChosen": "Ausgewählten Fahrzeugen",
+    "extra_noVehicles": "Noch keine Fahrzeuge. Füge zuerst eines unter Flotte hinzu.",
+    "extra_nameNeeded": "Gib dem Extra einen Namen.",
+    "extra_pickVehicle": "Wähle mindestens ein Fahrzeug.",
+    "extra_delete": "Löschen",
+    "extra_deleteSure": "Dieses Extra löschen",
+    "extra_saveFailed": "Speichern fehlgeschlagen. Bitte versuche es noch einmal."
   },
   "accountPage": {
     "roleOwner": "Inhaber",

@@ -14,7 +14,7 @@ import { after } from "next/server";
 import { markOnboardingStep } from "@/lib/onboarding";
 import { activateRental } from "@/lib/rental-activation";
 import { settleExistingRental } from "@/lib/existing-rental";
-import { noteReferralFee } from "@/lib/partner-network";
+import { dropReferralFee, noteReferralFee } from "@/lib/partner-network";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { niceDate } from "@/lib/nice-date";
 import { niceMoney } from "@/lib/nice-money";
@@ -2878,8 +2878,8 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
         detail,
         metadata: { content: detail, payment_method: method, note }
       }),
-      // A referred customer's first rent sets the partner's finder's fee.
-      !isDepositPayment && !isChargePayment ? noteReferralFee(supabase, payment.rental_id, amount, payment.metadata) : Promise.resolve()
+      // A customer a partner referred: 10% of each rental payment is owed to that partner (lib/partner-network.ts).
+      !isDepositPayment && !isChargePayment ? noteReferralFee(supabase, payment.rental_id, amount, payment.metadata, payment.id, payment.currency) : Promise.resolve()
     ]);
   });
 
@@ -2935,6 +2935,9 @@ export async function deleteRentalPayment(paymentId: string) {
       .eq("id", payment.id)
       .eq("organization_id", orgId);
   }
+
+  // A partner's commission on this payment goes with it (unless already settled).
+  await dropReferralFee(payment.id).catch(() => null);
 
   const { error: deleteError } = await supabase
     .from("rental_payments")

@@ -436,7 +436,11 @@
     "home": "होम",
     "supportAccess": "RoveHQ सपोर्ट के पास {time} तक आपके बिज़नेस का एक्सेस है।",
     "language": "भाषा",
-    "helpForPage": "इस पेज के लिए मदद"
+    "helpForPage": "इस पेज के लिए मदद",
+    "helpLoading": "लोड हो रहा है…",
+    "helpNoArticle": "हेल्प सेंटर",
+    "helpNoArticleBody": "इस पेज के बारे में अभी कोई लेख नहीं है। हेल्प सेंटर में RoveHQ के हर हिस्से के लिए गाइड हैं।",
+    "helpOpenCentre": "हेल्प सेंटर में खोलें"
   },
   "customer": {
     "cur_also": "कीमतें इसमें भी दिखाएं",
@@ -903,7 +907,8 @@
     "noneFree": "{start} से कुछ भी उपलब्ध नहीं है।",
     "noneFreeEarliest": "{start} से कुछ भी उपलब्ध नहीं है। सबसे जल्दी {date} ({vehicle}) है।",
     "privacyLink": "{business} और RoveHQ आपकी जानकारी का उपयोग कैसे करते हैं",
-    "vatIncluded": "कीमतों में {rate}% {name} शामिल है"
+    "vatIncluded": "कीमतों में {rate}% {name} शामिल है",
+    "extraFree": "मुफ़्त"
   },
   "customerMessages": {
     "hi": "नमस्ते {name},",
@@ -2707,7 +2712,8 @@
     "noPriceYet": "अभी कोई कीमत नहीं",
     "saveRate_daily": "{amount} प्रति दिन को इस वाहन की कीमत के रूप में सेव करें",
     "saveRate_weekly": "{amount} प्रति सप्ताह को इस वाहन की कीमत के रूप में सेव करें",
-    "saveRate_monthly": "{amount} प्रति माह को इस वाहन की कीमत के रूप में सेव करें"
+    "saveRate_monthly": "{amount} प्रति माह को इस वाहन की कीमत के रूप में सेव करें",
+    "extraFree": "मुफ़्त"
   },
   "fleet": {
     "title": "फ़्लीट",
@@ -4393,7 +4399,23 @@
     "ag_lang_it": "इतालवी",
     "ag_lang_hr": "क्रोएशियाई",
     "ag_lang_fr": "फ़्रेंच",
-    "ag_lang_de": "जर्मन"
+    "ag_lang_de": "जर्मन",
+    "plan_trialEnds": "ट्रायल खत्म होगा",
+    "extra_summary": "{count, plural, one {# एक्स्ट्रा} other {# एक्स्ट्रा}}: {names}",
+    "extra_free": "मुफ़्त",
+    "extra_pillDay": "{price} प्रति दिन",
+    "extra_pillRental": "{price} प्रति बुकिंग",
+    "extra_sheetNew": "नया एक्स्ट्रा",
+    "extra_sheetEdit": "एक्स्ट्रा बदलें",
+    "extra_priceShort": "कीमत",
+    "extra_priceHint": "मुफ़्त देने के लिए 0 रहने दें।",
+    "extra_forChosen": "चुने हुए वाहन",
+    "extra_noVehicles": "अभी कोई वाहन नहीं। पहले फ़्लीट में एक जोड़ें।",
+    "extra_nameNeeded": "एक्स्ट्रा का नाम लिखें।",
+    "extra_pickVehicle": "कम से कम एक वाहन चुनें।",
+    "extra_delete": "मिटाएँ",
+    "extra_deleteSure": "यह एक्स्ट्रा मिटाएँ",
+    "extra_saveFailed": "सेव नहीं हो सका। फिर से कोशिश करें।"
   },
   "accountPage": {
     "roleOwner": "मालिक",

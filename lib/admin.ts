@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isPlatformAdmin } from "@/lib/support";
+import { tagsFrom } from "@/lib/admin-segments";
 
 /**
  * RoveHQ admin console: helpers for platform admins only (table platform_admins).
@@ -83,6 +84,8 @@ export type AdminBusiness = {
   owners: Array<{ userId: string; email: string | null }>;
   members: number;
   lastActive: string | null;
+  /** Manual tags from the admin console (organizations.admin_tags; none until migration 0124 has run). */
+  tags: string[];
 };
 
 /** All businesses with what the admin list needs: plan, status, size, owner, last sign-in of anyone in it. */
@@ -117,7 +120,8 @@ export async function listBusinesses(): Promise<AdminBusiness[]> {
       vehicles: vehicleCount.get(org.id) || 0,
       owners: people.filter((m) => m.role === "owner").map((m) => ({ userId: m.user_id, email: authUsers.get(m.user_id)?.email ?? null })),
       members: people.length,
-      lastActive
+      lastActive,
+      tags: tagsFrom(org.admin_tags)
     };
   });
 }
@@ -144,7 +148,9 @@ export const ACTION_LABEL: Record<string, string> = {
   view_expired: "RoveHQ support access ran out",
   business_deleted: "Business closed",
   business_restored: "Business restored",
-  business_purged: "Business deleted permanently"
+  business_purged: "Business deleted permanently",
+  tag_added: "Tag added",
+  tag_removed: "Tag removed"
 };
 
 /** Days a closed (soft-deleted) business waits before it can be deleted for good. */

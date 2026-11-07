@@ -34,9 +34,11 @@ function Notice({ title, message }: { title: string; message: string }) {
   );
 }
 
-export default async function PublicCatalogPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ from?: string; to?: string; vehicle?: string; via?: string; embed?: string }> }) {
+export default async function PublicCatalogPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ from?: string; to?: string; vehicle?: string; via?: string; embed?: string; ref?: string }> }) {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
   const isoDay = (value: unknown) => (/^\d{4}-\d{2}-\d{2}$/.test(String(value || "")) ? String(value) : null);
+  // A partner's referral link (Partner network): the referring business, checked when the customer books.
+  const referrer = /^[0-9a-f-]{36}$/i.test(String(query.ref || "")) ? String(query.ref) : null;
   const catalog = await getPublicCatalog(slug);
   const t = await getTranslations("customer");
 
@@ -91,6 +93,7 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
             initialEnd={isoDay(query.to)}
             initialVehicleId={query.vehicle ? String(query.vehicle).slice(0, 60) : null}
             source={embedded ? "website" : query.via === "directory" ? "directory" : null}
+            referrer={referrer}
             embedded={embedded}
           />
         </div>
@@ -122,6 +125,7 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
           initialEnd={isoDay(query.to)}
           initialVehicleId={query.vehicle ? String(query.vehicle).slice(0, 60) : null}
           source={query.via === "directory" ? "directory" : null}
+          referrer={referrer}
         />
       </div>
     </PublicShell>

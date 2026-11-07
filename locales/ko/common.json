@@ -436,7 +436,11 @@
     "home": "홈",
     "supportAccess": "RoveHQ 지원팀이 {time}까지 업체에 접근할 수 있어요.",
     "language": "언어",
-    "helpForPage": "이 페이지 도움말"
+    "helpForPage": "이 페이지 도움말",
+    "helpLoading": "불러오는 중…",
+    "helpNoArticle": "도움말 센터",
+    "helpNoArticleBody": "이 페이지에 대한 글이 아직 없습니다. 도움말 센터에서 RoveHQ의 모든 기능 안내를 볼 수 있습니다.",
+    "helpOpenCentre": "도움말 센터에서 열기"
   },
   "customer": {
     "cur_also": "가격을 이 통화로도 표시",
@@ -903,7 +907,8 @@
     "noneFree": "{start}부터 이용 가능한 차량이 없어요.",
     "noneFreeEarliest": "{start}부터 이용 가능한 차량이 없어요. 가장 빠른 날짜는 {date}({vehicle})예요.",
     "privacyLink": "{business} 및 RoveHQ의 개인정보 이용 방법",
-    "vatIncluded": "가격에 {name} {rate}% 포함"
+    "vatIncluded": "가격에 {name} {rate}% 포함",
+    "extraFree": "무료"
   },
   "customerMessages": {
     "hi": "{name}님, 안녕하세요.",
@@ -2707,7 +2712,8 @@
     "noPriceYet": "요금 미설정",
     "saveRate_daily": "하루 {amount}을 이 차량 요금으로 저장",
     "saveRate_weekly": "주 {amount}을 이 차량 요금으로 저장",
-    "saveRate_monthly": "월 {amount}을 이 차량 요금으로 저장"
+    "saveRate_monthly": "월 {amount}을 이 차량 요금으로 저장",
+    "extraFree": "무료"
   },
   "fleet": {
     "title": "차량",
@@ -4393,7 +4399,23 @@
     "ag_lang_it": "이탈리아어",
     "ag_lang_hr": "크로아티아어",
     "ag_lang_fr": "프랑스어",
-    "ag_lang_de": "독일어"
+    "ag_lang_de": "독일어",
+    "plan_trialEnds": "체험 종료일",
+    "extra_summary": "{count, plural, other {추가 옵션 #개}}: {names}",
+    "extra_free": "무료",
+    "extra_pillDay": "하루 {price}",
+    "extra_pillRental": "예약당 {price}",
+    "extra_sheetNew": "새 추가 옵션",
+    "extra_sheetEdit": "추가 옵션 수정",
+    "extra_priceShort": "가격",
+    "extra_priceHint": "무료로 제공하려면 0으로 두세요.",
+    "extra_forChosen": "선택한 차량",
+    "extra_noVehicles": "아직 차량이 없습니다. 먼저 차량 관리에서 추가하세요.",
+    "extra_nameNeeded": "추가 옵션 이름을 입력하세요.",
+    "extra_pickVehicle": "차량을 하나 이상 선택하세요.",
+    "extra_delete": "삭제",
+    "extra_deleteSure": "이 추가 옵션 삭제",
+    "extra_saveFailed": "저장하지 못했습니다. 다시 시도하세요."
   },
   "accountPage": {
     "roleOwner": "대표",

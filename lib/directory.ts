@@ -8,6 +8,7 @@ import { publicBookingSettings } from "@/lib/public-catalog";
 import { billingPeriodAmounts } from "@/lib/payment-schedule";
 import { seasonsFrom, seasonalRate } from "@/lib/price-rules";
 import { planFor } from "@/lib/rental-estimate";
+import { busyOnOrAfter } from "@/lib/rental-conflicts";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export type DirectorySettings = { enabled: boolean };
@@ -136,7 +137,8 @@ export async function searchDirectory(input: DirectorySearch): Promise<Directory
     .in("status", BUSY)
     .is("deleted_at", null)
     .lte("start_date", end)
-    .or(`end_date.is.null,end_date.gte.${startDate}`);
+    // A vehicle held for its monthly renter to extend counts as busy until the hold ends.
+    .or(busyOnOrAfter(startDate));
   const taken = new Set(((busy || []) as any[]).map((rental) => rental.vehicle_id));
 
   // Each vehicle's lead photo (the first in the order set on the vehicle page), as on the business's own page.

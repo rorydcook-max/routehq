@@ -152,6 +152,18 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
                         </Link>
                       );
                     })}
+                    {(vehicle.holds || []).map((hold) => (
+                      // Held for extension: dashed outline, so it reads as "not free" without looking like a booking.
+                      <Link
+                        className={`z-10 mx-0.5 flex h-7 items-center overflow-clip border border-dashed border-[var(--warning)] bg-[var(--warning-light)] px-1.5 text-[11px] font-semibold text-[var(--warning)] ${hold.startsBefore ? "rounded-l-none" : "rounded-l-md"} ${hold.runsOn ? "rounded-r-none" : "rounded-r-md"}`}
+                        href={`/bookings/${hold.rentalId}#extension-hold` as Route}
+                        key={`hold-${hold.rentalId}`}
+                        style={{ gridColumn: `${dayOf(hold.from)} / ${dayOf(hold.to) + 1}`, gridRow: 1 }}
+                        title={t("heldBar", { date: shortDay(hold.lastDay, locale) })}
+                      >
+                        <span className="sticky left-[116px] min-w-0 flex-1 truncate sm:left-[172px]">{t("heldBar", { date: shortDay(hold.lastDay, locale) })}</span>
+                      </Link>
+                    ))}
                   </div>
                 </div>
               ))}

@@ -13,6 +13,7 @@ import { confirmCustomerPayment } from "@/app/actions/deposits";
 import { PaymentReminderButton } from "@/app/(app)/bookings/[id]/payment-reminder-button";
 import { acknowledgePortalAction, declinePortalAction, replyToPortalQuestion, resolvePortalAction } from "@/app/actions/portal-actions";
 import { ExtensionRequestAnswer } from "@/app/(app)/bookings/[id]/extension-request-answer";
+import { ExtensionHoldNote } from "@/app/(app)/bookings/[id]/extension-hold-note";
 import { extensionPicture } from "@/lib/extension-picture";
 import { getLocale, getTranslations } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
@@ -342,12 +343,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
 
   const { rental, bookingLink, payments, transactions, inspections, documents, activityEvents, customerPortalActions, communicationTimeline } = detail;
-  // A customer a partner sent: who, and the finder's fee owed to them.
+  // A customer a partner referred (Partner network): who, and the commission owed to them (10% of each rental payment).
   const { data: referral } = await supabaseForVehicles
     .from("referrals")
-    .select("id, fee_pct, fee_amount, fee_paid_at, from_org:organizations!referrals_from_organization_id_fkey(name, trading_name)")
+    .select("id, fee_pct, fee_amount, fee_settled_amount, fee_paid_at, from_org:organizations!referrals_from_organization_id_fkey(name, trading_name)")
     .eq("rental_id", id)
     .eq("to_organization_id", organization.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
   const vehicle = rental.vehicles;
   const customer = rental.customers;
@@ -636,10 +639,16 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
         {referral ? (
           <div className="rounded-lg border border-[var(--info-line)] bg-[var(--info-light)] px-3 py-2 text-sm font-semibold text-[var(--foreground)]">
-            {tx.say("referredBy", { partner: String(referral.from_org?.trading_name || referral.from_org?.name || "") })}{" "}
-            {referral.fee_amount
-              ? tx.say(referral.fee_paid_at ? "referralFeePaid" : "referralFeeOwed", { amount: money(Number(referral.fee_amount), rental.currency) })
-              : tx.say("referralFeeLater", { pct: Number(referral.fee_pct || 10) })}{" "}
+            {tx.say("referralCame", { partner: String(referral.from_org?.trading_name || referral.from_org?.name || "") })}{" "}
+            {Number(referral.fee_amount || 0) > 0
+              ? Number(referral.fee_amount) - Number(referral.fee_settled_amount || 0) > 0.004
+                ? tx.say("referralCommissionOpen", {
+                    pct: Number(referral.fee_pct || 10),
+                    total: money(Number(referral.fee_amount), rental.currency),
+                    open: money(Number(referral.fee_amount) - Number(referral.fee_settled_amount || 0), rental.currency)
+                  })
+                : tx.say("referralCommissionSettled", { pct: Number(referral.fee_pct || 10), total: money(Number(referral.fee_amount), rental.currency) })
+              : tx.say("referralCommissionLater", { pct: Number(referral.fee_pct || 10) })}{" "}
             <Link className="font-bold text-[var(--primary)]" href="/partners">
               {tx.say("referralOpen")}
             </Link>
@@ -907,6 +916,22 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           <div className="rounded-xl border border-[var(--border)] bg-white p-3 text-sm text-[var(--foreground-secondary)]">
             {tx.say("exchangeSigned", { name: customer?.full_name || tx.say("theCustomerCap"), vehicle: waitingExchange.changes?.new_vehicle_label || tx.say("otherVehicle") })}
           </div>
+        ) : null}
+        {/* Hold for extension (lib/extension-hold.ts): the days after this monthly rental are kept off new bookings. */}
+        {rental.extension_hold_until && !isCancelled ? (
+          <ExtensionHoldNote
+            holdUntil={String(rental.extension_hold_until).slice(0, 10)}
+            rentalId={rental.id}
+            stage={
+              String(rental.extension_check_end || "").slice(0, 10) === String(rental.end_date || "").slice(0, 10)
+                ? rental.extension_answer === "extend"
+                  ? "extend"
+                  : rental.extension_check_sent_at
+                    ? "asked"
+                    : "waiting"
+                : "waiting"
+            }
+          />
         ) : null}
 
         {pendingPortalActions.length > 0 ? (

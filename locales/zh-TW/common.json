@@ -436,7 +436,11 @@
     "home": "首頁",
     "supportAccess": "RoveHQ 客服可存取您的店家，直到 {time}。",
     "language": "語言",
-    "helpForPage": "本頁說明"
+    "helpForPage": "本頁說明",
+    "helpLoading": "載入中…",
+    "helpNoArticle": "說明中心",
+    "helpNoArticleBody": "本頁還沒有相關文章。說明中心有 RoveHQ 各部分的使用指南。",
+    "helpOpenCentre": "在說明中心開啟"
   },
   "customer": {
     "cur_also": "同時顯示價格為",
@@ -903,7 +907,8 @@
     "noneFree": "自 {start} 起暫無可租車輛。",
     "noneFreeEarliest": "自 {start} 起暫無可租車輛。最早可租日期為 {date}（{vehicle}）。",
     "privacyLink": "{business} 與 RoveHQ 如何使用您的資料",
-    "vatIncluded": "價格已含 {name}（{rate}%）"
+    "vatIncluded": "價格已含 {name}（{rate}%）",
+    "extraFree": "免費"
   },
   "customerMessages": {
     "hi": "{name} 您好，",
@@ -2707,7 +2712,8 @@
     "noPriceYet": "尚無價格",
     "saveRate_daily": "將每天 {amount} 儲存為此車價格",
     "saveRate_weekly": "將每週 {amount} 儲存為此車價格",
-    "saveRate_monthly": "將每月 {amount} 儲存為此車價格"
+    "saveRate_monthly": "將每月 {amount} 儲存為此車價格",
+    "extraFree": "免費"
   },
   "fleet": {
     "title": "車隊",
@@ -4393,7 +4399,23 @@
     "ag_lang_it": "義大利文",
     "ag_lang_hr": "克羅埃西亞文",
     "ag_lang_fr": "法文",
-    "ag_lang_de": "德文"
+    "ag_lang_de": "德文",
+    "plan_trialEnds": "試用結束",
+    "extra_summary": "{count, plural, other {# 個加購項目}}：{names}",
+    "extra_free": "免費",
+    "extra_pillDay": "每天 {price}",
+    "extra_pillRental": "每筆預約 {price}",
+    "extra_sheetNew": "新加購項目",
+    "extra_sheetEdit": "編輯加購項目",
+    "extra_priceShort": "價格",
+    "extra_priceHint": "填 0 即免費提供。",
+    "extra_forChosen": "所選車輛",
+    "extra_noVehicles": "還沒有車輛。請先在車隊中新增。",
+    "extra_nameNeeded": "請填寫加購項目名稱。",
+    "extra_pickVehicle": "請至少選擇一輛車。",
+    "extra_delete": "刪除",
+    "extra_deleteSure": "刪除此加購項目",
+    "extra_saveFailed": "儲存失敗，請再試一次。"
   },
   "accountPage": {
     "roleOwner": "負責人",

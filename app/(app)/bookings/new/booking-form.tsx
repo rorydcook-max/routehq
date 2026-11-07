@@ -1082,7 +1082,7 @@ export function BookingForm({
             </div>
           </div>
           {(() => {
-            const offered = extrasFor(extras, isTwoWheeler(selectedVehicle?.category_code));
+            const offered = extrasFor(extras, isTwoWheeler(selectedVehicle?.category_code), selectedVehicle?.id);
             if (!offered.length) return null;
             return (
               <div className="mt-3">
@@ -1097,7 +1097,7 @@ export function BookingForm({
                         type="checkbox"
                       />
                       <span className="min-w-0 flex-1">{extra.name}</span>
-                      <span className="shrink-0 text-[13px] font-semibold text-[var(--muted)]">{say(extra.per === "day" ? "extraPerDay" : "extraOnce", { amount: money(extra.price, currency) })}</span>
+                      <span className="shrink-0 text-[13px] font-semibold text-[var(--muted)]">{extra.price > 0 ? say(extra.per === "day" ? "extraPerDay" : "extraOnce", { amount: money(extra.price, currency) }) : say("extraFree")}</span>
                     </label>
                   ))}
                 </div>

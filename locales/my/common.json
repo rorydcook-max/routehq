@@ -436,7 +436,11 @@
     "home": "ပင်မစာမျက်နှာ",
     "supportAccess": "RoveHQ အကူအညီအဖွဲ့သည် {time} အထိ သင့်လုပ်ငန်းကို ဝင်ရောက်ကြည့်ရှုခွင့် ရှိသည်။",
     "language": "ဘာသာစကား",
-    "helpForPage": "ဤစာမျက်နှာအတွက် အကူအညီ"
+    "helpForPage": "ဤစာမျက်နှာအတွက် အကူအညီ",
+    "helpLoading": "ဖွင့်နေသည်…",
+    "helpNoArticle": "အကူအညီစင်တာ",
+    "helpNoArticleBody": "ဤစာမျက်နှာအကြောင်း ဆောင်းပါး မရှိသေးပါ။ အကူအညီစင်တာတွင် RoveHQ ၏ အပိုင်းတိုင်းအတွက် လမ်းညွှန်များ ရှိသည်။",
+    "helpOpenCentre": "အကူအညီစင်တာတွင် ဖွင့်ရန်"
   },
   "customer": {
     "cur_also": "ဈေးနှုန်းကို ဤငွေကြေးဖြင့်လည်း ပြပါ",
@@ -903,7 +907,8 @@
     "noneFree": "{start} မှစ၍ ဘာမှ မရနိုင်ပါ။",
     "noneFreeEarliest": "{start} မှစ၍ ဘာမှ မရနိုင်ပါ။ အစောဆုံးမှာ {date} ({vehicle}) ဖြစ်သည်။",
     "privacyLink": "{business} နှင့် RoveHQ က သင့်အချက်အလက်ကို မည်သို့ အသုံးပြုသနည်း",
-    "vatIncluded": "စျေးနှုန်းတွင် {name} {rate}% ပါဝင်ပြီး"
+    "vatIncluded": "စျေးနှုန်းတွင် {name} {rate}% ပါဝင်ပြီး",
+    "extraFree": "အခမဲ့"
   },
   "customerMessages": {
     "hi": "မင်္ဂလာပါ {name}၊",
@@ -2747,7 +2752,8 @@
     "noPriceYet": "စျေးနှုန်း မရှိသေးပါ",
     "saveRate_daily": "ဤယာဉ်၏စျေးနှုန်းအဖြစ် တစ်ရက်လျှင် {amount} ကို သိမ်းဆည်းရန်",
     "saveRate_weekly": "ဤယာဉ်၏စျေးနှုန်းအဖြစ် တစ်ပတ်လျှင် {amount} ကို သိမ်းဆည်းရန်",
-    "saveRate_monthly": "ဤယာဉ်၏စျေးနှုန်းအဖြစ် တစ်လလျှင် {amount} ကို သိမ်းဆည်းရန်"
+    "saveRate_monthly": "ဤယာဉ်၏စျေးနှုန်းအဖြစ် တစ်လလျှင် {amount} ကို သိမ်းဆည်းရန်",
+    "extraFree": "အခမဲ့"
   },
   "fleet": {
     "title": "ယာဉ်အုပ်စု",
@@ -4433,7 +4439,23 @@
     "ag_lang_it": "အီတလီ",
     "ag_lang_hr": "ခရိုအေးရှား",
     "ag_lang_fr": "ပြင်သစ်",
-    "ag_lang_de": "ဂျာမန်"
+    "ag_lang_de": "ဂျာမန်",
+    "plan_trialEnds": "စမ်းသုံးကာလ ပြီးဆုံးမည်",
+    "extra_summary": "{count, plural, other {အပို # ခု}}: {names}",
+    "extra_free": "အခမဲ့",
+    "extra_pillDay": "တစ်ရက်လျှင် {price}",
+    "extra_pillRental": "ဘိုကင်တစ်ခုလျှင် {price}",
+    "extra_sheetNew": "အပို အသစ်",
+    "extra_sheetEdit": "အပို ပြင်ရန်",
+    "extra_priceShort": "ဈေးနှုန်း",
+    "extra_priceHint": "အခမဲ့ပေးရန် 0 ထားပါ။",
+    "extra_forChosen": "ရွေးထားသော ယာဉ်များ",
+    "extra_noVehicles": "ယာဉ် မရှိသေးပါ။ ယာဉ်အုပ်စုတွင် အရင်ထည့်ပါ။",
+    "extra_nameNeeded": "အပိုအတွက် အမည်ထည့်ပါ။",
+    "extra_pickVehicle": "ယာဉ် အနည်းဆုံး တစ်စီး ရွေးပါ။",
+    "extra_delete": "ဖျက်ရန်",
+    "extra_deleteSure": "ဤအပိုကို ဖျက်ရန်",
+    "extra_saveFailed": "သိမ်း၍ မရပါ။ ထပ်ကြိုးစားပါ။"
   },
   "accountPage": {
     "roleOwner": "ပိုင်ရှင်",

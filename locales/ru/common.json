@@ -436,7 +436,11 @@
     "home": "Главная",
     "supportAccess": "Поддержка RoveHQ имеет доступ к вашей компании до {time}.",
     "language": "Язык",
-    "helpForPage": "Помощь по этой странице"
+    "helpForPage": "Помощь по этой странице",
+    "helpLoading": "Загрузка…",
+    "helpNoArticle": "Центр помощи",
+    "helpNoArticleBody": "Статьи об этой странице пока нет. В Центре помощи есть руководства по каждому разделу RoveHQ.",
+    "helpOpenCentre": "Открыть в Центре помощи"
   },
   "customer": {
     "cur_also": "Также показывать цены в",
@@ -903,7 +907,8 @@
     "noneFree": "С {start} ничего не доступно.",
     "noneFreeEarliest": "С {start} ничего не доступно. Ближайшая дата — {date} ({vehicle}).",
     "privacyLink": "Как {business} и RoveHQ используют ваши данные",
-    "vatIncluded": "Цены включают {name} по ставке {rate}%"
+    "vatIncluded": "Цены включают {name} по ставке {rate}%",
+    "extraFree": "Бесплатно"
   },
   "customerMessages": {
     "hi": "Здравствуйте, {name}!",
@@ -2747,7 +2752,8 @@
     "noPriceYet": "Цены пока нет",
     "saveRate_daily": "Сохранить {amount} в день как цену этого автомобиля",
     "saveRate_weekly": "Сохранить {amount} в неделю как цену этого автомобиля",
-    "saveRate_monthly": "Сохранить {amount} в месяц как цену этого автомобиля"
+    "saveRate_monthly": "Сохранить {amount} в месяц как цену этого автомобиля",
+    "extraFree": "Бесплатно"
   },
   "fleet": {
     "title": "Автопарк",
@@ -4433,7 +4439,23 @@
     "ag_lang_it": "Итальянский",
     "ag_lang_hr": "Хорватский",
     "ag_lang_fr": "Французский",
-    "ag_lang_de": "Немецкий"
+    "ag_lang_de": "Немецкий",
+    "plan_trialEnds": "Пробный период до",
+    "extra_summary": "{count, plural, one {# дополнение} few {# дополнения} many {# дополнений} other {# дополнения}}: {names}",
+    "extra_free": "Бесплатно",
+    "extra_pillDay": "{price} в день",
+    "extra_pillRental": "{price} за бронирование",
+    "extra_sheetNew": "Новое дополнение",
+    "extra_sheetEdit": "Изменить дополнение",
+    "extra_priceShort": "Цена",
+    "extra_priceHint": "Оставьте 0, чтобы предлагать бесплатно.",
+    "extra_forChosen": "Выбранным транспортом",
+    "extra_noVehicles": "Транспорта пока нет. Сначала добавьте его в разделе «Автопарк».",
+    "extra_nameNeeded": "Укажите название дополнения.",
+    "extra_pickVehicle": "Выберите хотя бы одно транспортное средство.",
+    "extra_delete": "Удалить",
+    "extra_deleteSure": "Удалить это дополнение",
+    "extra_saveFailed": "Не удалось сохранить. Попробуйте ещё раз."
   },
   "accountPage": {
     "roleOwner": "Владелец",

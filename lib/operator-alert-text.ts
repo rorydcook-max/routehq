@@ -22,6 +22,7 @@ export type AlertKey =
   | "receiptSent"
   | "extensionRequested"
   | "extensionRequestedReason"
+  | "extensionHoldReturning"
   | "returnConfirmed"
   | "problemReported"
   | "questionAsked"

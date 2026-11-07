@@ -5,7 +5,7 @@ import { inBusinessTimeZone } from "@/lib/business-time-scope";
 
 export { clashes };
 import { notifyOperator } from "@/lib/notify-operator";
-import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
+import { BLOCKING_RENTAL_STATUSES, BOOKABLE_END_COLUMNS, bookableEnd } from "@/lib/rental-conflicts";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 
@@ -109,15 +109,14 @@ export async function retakeHold(admin: any, bookingLink: any): Promise<boolean>
 
   const { data: others } = await admin
     .from("rentals")
-    .select("start_date, end_date")
+    .select(`start_date, ${BOOKABLE_END_COLUMNS}`)
     .eq("organization_id", rental.organization_id)
     .eq("vehicle_id", rental.vehicle_id)
     .neq("id", rental.id)
     .is("deleted_at", null)
     .in("status", BLOCKING_RENTAL_STATUSES as unknown as string[]);
-  const taken = (others || []).some((row: any) =>
-    clashes(start, end, { startDate: String(row.start_date).slice(0, 10), endDate: row.end_date ? String(row.end_date).slice(0, 10) : null }, rules.gapDays)
-  );
+  // A vehicle held for its monthly renter to extend is busy until the hold ends.
+  const taken = (others || []).some((row: any) => clashes(start, end, { startDate: String(row.start_date).slice(0, 10), endDate: bookableEnd(row) }, rules.gapDays));
   if (taken) return false;
 
   const { error } = await admin.from("rentals").update({ status: "booked" }).eq("id", rental.id).eq("status", "draft");

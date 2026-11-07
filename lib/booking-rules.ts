@@ -17,6 +17,12 @@ export type BookingRules = {
   extendNoticeDays: number;
   /** Days kept free after each rental for cleaning and checks. */
   gapDays: number;
+  /**
+   * Hold for extension: a monthly rental keeps its vehicle off new bookings for extensionHoldDays after it ends, until
+   * the renter says they're returning (supabase/migrations/0125_extension_hold.sql works the hold out). Off by default.
+   */
+  extensionHold: boolean;
+  extensionHoldDays: number;
 };
 
 export const HOLD_HOUR_OPTIONS = [6, 12, 24, 48, 72];
@@ -24,8 +30,13 @@ export const LEAD_HOUR_OPTIONS = [0, 12, 24, 48, 72];
 export const END_NOTICE_OPTIONS = [0, 1, 3, 7, 14, 30];
 export const EXTEND_NOTICE_OPTIONS = [0, 1, 2, 3, 7];
 export const GAP_DAY_OPTIONS = [0, 1, 2, 3];
+export const EXTENSION_HOLD_DAY_OPTIONS = [3, 5, 7, 10, 14];
 
-export const DEFAULT_BOOKING_RULES: BookingRules = { holdHours: 24, leadHours: 0, endNoticeDays: 0, extendNoticeDays: 0, gapDays: 0 };
+export const DEFAULT_BOOKING_RULES: BookingRules = { holdHours: 24, leadHours: 0, endNoticeDays: 0, extendNoticeDays: 0, gapDays: 0, extensionHold: false, extensionHoldDays: 7 };
+
+/** The renter is asked "Are you extending?" this many days before a held rental ends; no answer lifts the hold this many days before. */
+export const EXTENSION_ASK_DAYS = 7;
+export const EXTENSION_LAPSE_DAYS = 2;
 
 function pick(value: unknown, options: number[], fallback: number) {
   const number = Number(value);
@@ -41,7 +52,9 @@ export function bookingRules(settings: unknown): BookingRules {
     leadHours: pick(raw.lead_hours, LEAD_HOUR_OPTIONS, DEFAULT_BOOKING_RULES.leadHours),
     endNoticeDays: pick(raw.end_notice_days, END_NOTICE_OPTIONS, DEFAULT_BOOKING_RULES.endNoticeDays),
     extendNoticeDays: pick(raw.extend_notice_days, EXTEND_NOTICE_OPTIONS, DEFAULT_BOOKING_RULES.extendNoticeDays),
-    gapDays: pick(raw.gap_days, GAP_DAY_OPTIONS, DEFAULT_BOOKING_RULES.gapDays)
+    gapDays: pick(raw.gap_days, GAP_DAY_OPTIONS, DEFAULT_BOOKING_RULES.gapDays),
+    extensionHold: raw.extension_hold === true,
+    extensionHoldDays: pick(raw.extension_hold_days, EXTENSION_HOLD_DAY_OPTIONS, DEFAULT_BOOKING_RULES.extensionHoldDays)
   };
 }
 

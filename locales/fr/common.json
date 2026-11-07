@@ -436,7 +436,11 @@
     "home": "Accueil",
     "supportAccess": "Le support RoveHQ a accès à votre entreprise jusqu'à {time}.",
     "language": "Langue",
-    "helpForPage": "Aide pour cette page"
+    "helpForPage": "Aide pour cette page",
+    "helpLoading": "Chargement…",
+    "helpNoArticle": "Centre d’aide",
+    "helpNoArticleBody": "Il n’y a pas encore d’article sur cette page. Le Centre d’aide propose des guides pour chaque partie de RoveHQ.",
+    "helpOpenCentre": "Ouvrir dans le Centre d’aide"
   },
   "customer": {
     "cur_also": "Afficher aussi les prix en",
@@ -903,7 +907,8 @@
     "noneFree": "Rien n'est disponible à partir du {start}.",
     "noneFreeEarliest": "Rien n'est disponible à partir du {start}. Le plus tôt est le {date} ({vehicle}).",
     "privacyLink": "Comment {business} et RoveHQ utilisent vos informations",
-    "vatIncluded": "Prix incluant {name} à {rate} %"
+    "vatIncluded": "Prix incluant {name} à {rate} %",
+    "extraFree": "Gratuit"
   },
   "customerMessages": {
     "hi": "Bonjour {name},",
@@ -2747,7 +2752,8 @@
     "noPriceYet": "Aucun prix pour l'instant",
     "saveRate_daily": "Enregistrer {amount} par jour comme tarif de ce véhicule",
     "saveRate_weekly": "Enregistrer {amount} par semaine comme tarif de ce véhicule",
-    "saveRate_monthly": "Enregistrer {amount} par mois comme tarif de ce véhicule"
+    "saveRate_monthly": "Enregistrer {amount} par mois comme tarif de ce véhicule",
+    "extraFree": "Gratuit"
   },
   "fleet": {
     "title": "Flotte",
@@ -4433,7 +4439,23 @@
     "ag_lang_it": "Italien",
     "ag_lang_hr": "Croate",
     "ag_lang_fr": "Français",
-    "ag_lang_de": "Allemand"
+    "ag_lang_de": "Allemand",
+    "plan_trialEnds": "Fin de l’essai",
+    "extra_summary": "{count, plural, one {# option} other {# options}} : {names}",
+    "extra_free": "Gratuit",
+    "extra_pillDay": "{price} par jour",
+    "extra_pillRental": "{price} par réservation",
+    "extra_sheetNew": "Nouvelle option",
+    "extra_sheetEdit": "Modifier l’option",
+    "extra_priceShort": "Prix",
+    "extra_priceHint": "Laissez 0 pour l’offrir gratuitement.",
+    "extra_forChosen": "Véhicules choisis",
+    "extra_noVehicles": "Aucun véhicule pour l’instant. Ajoutez-en un dans Flotte d’abord.",
+    "extra_nameNeeded": "Donnez un nom à l’option.",
+    "extra_pickVehicle": "Choisissez au moins un véhicule.",
+    "extra_delete": "Supprimer",
+    "extra_deleteSure": "Supprimer cette option",
+    "extra_saveFailed": "Échec de l’enregistrement. Veuillez réessayer."
   },
   "accountPage": {
     "roleOwner": "Propriétaire",

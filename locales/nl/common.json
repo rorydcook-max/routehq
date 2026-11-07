@@ -159,7 +159,11 @@
     "home": "Home",
     "supportAccess": "RoveHQ-support heeft tot {time} toegang tot je bedrijf.",
     "language": "Taal",
-    "helpForPage": "Hulp bij deze pagina"
+    "helpForPage": "Hulp bij deze pagina",
+    "helpLoading": "Laden…",
+    "helpNoArticle": "Helpcentrum",
+    "helpNoArticleBody": "Er is nog geen artikel over deze pagina. Het Helpcentrum heeft handleidingen voor elk onderdeel van RoveHQ.",
+    "helpOpenCentre": "Openen in het Helpcentrum"
   },
   "vehicles": {
     "addVehicle": "Voertuig toevoegen"
@@ -903,7 +907,8 @@
     "noneFree": "Niets beschikbaar vanaf {start}.",
     "noneFreeEarliest": "Niets beschikbaar vanaf {start}. Het vroegst is {date} ({vehicle}).",
     "bookedUntil": "Geboekt tot {date}",
-    "vatIncluded": "Prijzen inclusief {name} van {rate}%"
+    "vatIncluded": "Prijzen inclusief {name} van {rate}%",
+    "extraFree": "Gratis"
   },
   "customerMessages": {
     "hi": "Hoi {name},",
@@ -2681,7 +2686,8 @@
     "noPriceYet": "Nog geen prijs",
     "saveRate_daily": "{amount} per dag opslaan als prijs van dit voertuig",
     "saveRate_weekly": "{amount} per week opslaan als prijs van dit voertuig",
-    "saveRate_monthly": "{amount} per maand opslaan als prijs van dit voertuig"
+    "saveRate_monthly": "{amount} per maand opslaan als prijs van dit voertuig",
+    "extraFree": "Gratis"
   },
   "fleet": {
     "title": "Wagenpark",
@@ -4366,7 +4372,23 @@
     "ag_lang_it": "Italiaans",
     "ag_lang_hr": "Kroatisch",
     "ag_lang_fr": "Frans",
-    "ag_lang_de": "Duits"
+    "ag_lang_de": "Duits",
+    "plan_trialEnds": "Proefperiode eindigt",
+    "extra_summary": "{count, plural, one {# extra} other {# extra's}}: {names}",
+    "extra_free": "Gratis",
+    "extra_pillDay": "{price} per dag",
+    "extra_pillRental": "{price} per boeking",
+    "extra_sheetNew": "Nieuwe extra",
+    "extra_sheetEdit": "Extra bewerken",
+    "extra_priceShort": "Prijs",
+    "extra_priceHint": "Laat op 0 staan om het gratis aan te bieden.",
+    "extra_forChosen": "Gekozen voertuigen",
+    "extra_noVehicles": "Nog geen voertuigen. Voeg er eerst een toe bij Vloot.",
+    "extra_nameNeeded": "Geef de extra een naam.",
+    "extra_pickVehicle": "Kies minstens één voertuig.",
+    "extra_delete": "Verwijderen",
+    "extra_deleteSure": "Deze extra verwijderen",
+    "extra_saveFailed": "Opslaan mislukt. Probeer het opnieuw."
   },
   "accountPage": {
     "roleOwner": "Eigenaar",

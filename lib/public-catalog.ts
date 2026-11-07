@@ -1,5 +1,5 @@
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
-import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
+import { BLOCKING_RENTAL_STATUSES, BOOKABLE_END_COLUMNS, bookableEnd } from "@/lib/rental-conflicts";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { bookingRules, earliestStart } from "@/lib/booking-rules";
@@ -84,7 +84,7 @@ export async function getPublicCatalog(slug: string) {
       .order("monthly_rate", { ascending: true }),
     admin
       .from("rentals")
-      .select("vehicle_id, start_date, end_date")
+      .select(`vehicle_id, start_date, ${BOOKABLE_END_COLUMNS}`)
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
       .in("status", BLOCKING_RENTAL_STATUSES as unknown as string[]),
@@ -95,7 +95,8 @@ export async function getPublicCatalog(slug: string) {
   for (const row of rentalsResult.data || []) {
     if (!row.vehicle_id || !row.start_date) continue;
     const list = busy.get(row.vehicle_id) || [];
-    list.push({ startDate: String(row.start_date).slice(0, 10), endDate: row.end_date ? String(row.end_date).slice(0, 10) : null });
+    // Held for a monthly renter to extend: busy until the hold ends.
+    list.push({ startDate: String(row.start_date).slice(0, 10), endDate: bookableEnd(row) });
     busy.set(row.vehicle_id, list);
   }
 

@@ -436,7 +436,11 @@
     "home": "Tahanan",
     "supportAccess": "May access ang RoveHQ support sa iyong negosyo hanggang {time}.",
     "language": "Wika",
-    "helpForPage": "Tulong sa page na ito"
+    "helpForPage": "Tulong sa page na ito",
+    "helpLoading": "Naglo-load…",
+    "helpNoArticle": "Help centre",
+    "helpNoArticleBody": "Wala pang artikulo tungkol sa page na ito. May mga gabay ang Help centre para sa bawat bahagi ng RoveHQ.",
+    "helpOpenCentre": "Buksan sa Help centre"
   },
   "customer": {
     "cur_also": "Ipakita rin ang presyo sa",
@@ -903,7 +907,8 @@
     "noneFree": "Walang available mula {start}.",
     "noneFreeEarliest": "Walang available mula {start}. Ang pinakamaaga ay {date} ({vehicle}).",
     "privacyLink": "Paano ginagamit ng {business} at RoveHQ ang iyong impormasyon",
-    "vatIncluded": "Kasama na sa presyo ang {name} na {rate}%"
+    "vatIncluded": "Kasama na sa presyo ang {name} na {rate}%",
+    "extraFree": "Libre"
   },
   "customerMessages": {
     "hi": "Kumusta {name},",
@@ -2681,7 +2686,8 @@
     "noPriceYet": "Wala pang presyo",
     "saveRate_daily": "I-save ang {amount} kada araw bilang presyo ng sasakyang ito",
     "saveRate_weekly": "I-save ang {amount} kada linggo bilang presyo ng sasakyang ito",
-    "saveRate_monthly": "I-save ang {amount} kada buwan bilang presyo ng sasakyang ito"
+    "saveRate_monthly": "I-save ang {amount} kada buwan bilang presyo ng sasakyang ito",
+    "extraFree": "Libre"
   },
   "fleet": {
     "title": "Fleet",
@@ -4367,7 +4373,23 @@
     "ag_lang_it": "Italian",
     "ag_lang_hr": "Croatian",
     "ag_lang_fr": "French",
-    "ag_lang_de": "German"
+    "ag_lang_de": "German",
+    "plan_trialEnds": "Matatapos ang trial",
+    "extra_summary": "{count, plural, one {# extra} other {# extra}}: {names}",
+    "extra_free": "Libre",
+    "extra_pillDay": "{price} kada araw",
+    "extra_pillRental": "{price} bawat booking",
+    "extra_sheetNew": "Bagong extra",
+    "extra_sheetEdit": "I-edit ang extra",
+    "extra_priceShort": "Presyo",
+    "extra_priceHint": "Iwan sa 0 para libre ito.",
+    "extra_forChosen": "Mga piniling sasakyan",
+    "extra_noVehicles": "Wala pang sasakyan. Magdagdag muna sa Fleet.",
+    "extra_nameNeeded": "Lagyan ng pangalan ang extra.",
+    "extra_pickVehicle": "Pumili ng kahit isang sasakyan.",
+    "extra_delete": "Burahin",
+    "extra_deleteSure": "Burahin ang extra na ito",
+    "extra_saveFailed": "Hindi na-save. Pakisubukan ulit."
   },
   "accountPage": {
     "roleOwner": "May-ari",

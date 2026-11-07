@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
+import { useEffect, useRef, useState, useTransition, type ReactNode, type RefObject } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Copy, ExternalLink, Monitor, Smartphone } from "lucide-react";
 import { savePublicBookingSettings } from "@/app/actions/online-booking";
-import { saveBrandColour } from "@/app/actions/booking-site";
+import { saveBrandColour } from "@/app/actions/sites";
 import { BookingAddressPanel } from "@/app/(app)/booking-page/booking-address-panel";
-import { BookingSitePanel } from "@/app/(app)/booking-page/booking-site-panel";
+import { PublishBar, SiteEditorParts, type EditorVehicle } from "@/app/(app)/booking-page/site-editor";
+import { useSiteDraft } from "@/app/(app)/booking-page/use-site-draft";
 import { BrandColourField } from "@/app/(app)/settings/brand-colour-field";
 import { LogoUploadSection } from "@/app/(app)/settings/logo-upload-section";
 import { SwitchField } from "@/components/switch-field";
 import { Fold } from "@/components/ui";
-import type { BookingSite, BookingTemplate, SiteSocial } from "@/lib/booking-site";
+import type { SiteConfig } from "@/lib/sites/config";
 
 type Say = ((key: string, values?: Record<string, string | number>) => string) & {
   rich: (key: string, values: Record<string, unknown>) => ReactNode;
@@ -22,21 +24,21 @@ type Device = "mobile" | "desktop";
 const BRAND_FORM = "booking-brand";
 
 /**
- * The Booking page tool (Rory, 7 Nov 2026): the editor on the left and the real page on the right, shown as a
- * phone or a computer. On phones the two are tabs. The preview reloads after each save; a template that isn't
- * saved yet is previewed with ?template=.
+ * The Booking page tool (Rory, 7 Nov 2026): the website editor on the left and the real site on the right, shown as
+ * a phone or a computer. On phones the two are tabs. The preview is the owner's draft (?draft=1&edit=1): every change
+ * reaches it at once, text is edited by clicking it there, and Publish makes the draft live.
  */
 export function BookingPageTool({
   slug,
   link: shareLink,
   booking,
   vehicles,
-  site,
-  heroUrl,
-  fallbackPhotoUrl,
+  draft,
+  published,
+  uploads,
+  editorVehicles,
   colour,
   businessName,
-  contacts,
   logoUrl,
   address
 }: {
@@ -44,12 +46,12 @@ export function BookingPageTool({
   link: string;
   booking: { enabled: boolean; offer: string; deposit: number; holdHours: number };
   vehicles: { priced: number; total: number };
-  site: BookingSite;
-  heroUrl: string | null;
-  fallbackPhotoUrl: string | null;
+  draft: SiteConfig;
+  published: SiteConfig;
+  uploads: Record<string, string>;
+  editorVehicles: EditorVehicle[];
   colour: string;
   businessName: string;
-  contacts: Partial<SiteSocial>;
   logoUrl: string | null;
   address: React.ComponentProps<typeof BookingAddressPanel>;
 }) {
@@ -57,19 +59,21 @@ export function BookingPageTool({
   const [tab, setTab] = useState<"edit" | "preview">("edit");
   const [device, setDevice] = useState<Device>("mobile");
   const [version, setVersion] = useState(0);
-  const [template, setTemplate] = useState<BookingTemplate>(site.template);
-  const [savedTemplate, setSavedTemplate] = useState<BookingTemplate>(site.template);
+  const frame = useRef<HTMLIFrameElement>(null);
+  const site = useSiteDraft({ draft, published, uploads, frame });
+  const router = useRouter();
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState<"link" | "code" | null>(null);
   useEffect(() => setOrigin(window.location.origin), []);
-  const reload = () => setVersion((value) => value + 1);
+  // Page on/off, address, logo and brand colour change what the server draws: reload the preview (it asks for the draft again).
+  const reload = () => {
+    setVersion((value) => value + 1);
+    router.refresh();
+  };
 
   // Their own address (subdomain or domain) when they have one; otherwise this app's /rent page.
   const link = shareLink && !shareLink.includes("/rent/") ? shareLink : `${origin}/rent/${slug}`;
-  const query = new URLSearchParams();
-  if (template !== savedTemplate) query.set("template", template);
-  if (version) query.set("v", String(version));
-  const src = `/rent/${slug}${query.toString() ? `?${query}` : ""}`;
+  const src = `/rent/${slug}?draft=1&edit=1${version ? `&v=${version}` : ""}`;
   const snippet = `<div data-routehq-booking="${slug}"></div>\n<script src="${origin}/embed.js" async></script>`;
 
   function copy(text: string, what: "link" | "code") {
@@ -150,24 +154,17 @@ export function BookingPageTool({
           <Fold id="address" summary={link.replace(/^https?:\/\//, "")} title={say("bt_address")}>
             <BookingAddressPanel {...address} onSaved={reload} />
           </Fold>
-          <BookingSitePanel
-            businessName={businessName}
-            colour={colour}
-            contacts={contacts}
-            fallbackPhotoUrl={fallbackPhotoUrl}
-            heroUrl={heroUrl}
-            initial={site}
-            onSaved={() => {
-              setSavedTemplate(template);
-              reload();
-            }}
-            onTemplateChange={setTemplate}
+          <SiteEditorParts
+            brandColour={colour}
             renderPart={(part) => (
-              <Fold id={part.id} key={part.id} summary={part.summary} title={part.title}>
+              <Fold id={part.id} key={part.id} open={part.id === "look"} summary={part.summary} title={part.title}>
                 {part.body}
               </Fold>
             )}
+            site={site}
+            vehicles={editorVehicles}
           />
+          <PublishBar site={site} />
           <Fold id="brand" title={say("bt_brand")}>
             <div className="space-y-4">
               <LogoUploadSection logoUrl={logoUrl} onDone={reload} orgName={businessName} />
@@ -189,7 +186,7 @@ export function BookingPageTool({
         >
           {toolbar}
           <div className="h-[calc(100dvh-260px)] min-h-[460px] lg:h-auto lg:min-h-0 lg:flex-1">
-            <Preview device={device} src={src} title={say("bt_preview")} />
+            <Preview device={device} frameRef={frame} src={src} title={say("bt_preview")} />
           </div>
         </section>
       </div>
@@ -280,7 +277,7 @@ function BrandColourPart({ colour, onSaved }: { colour: string; onSaved: () => v
  * The real booking page in a frame. Mobile: 390px wide in a phone outline, made smaller if the panel is narrower.
  * Desktop: 1280px wide, scaled down to fit the panel.
  */
-function Preview({ src, device, title }: { src: string; device: Device; title: string }) {
+function Preview({ src, device, title, frameRef }: { src: string; device: Device; title: string; frameRef: RefObject<HTMLIFrameElement | null> }) {
   const box = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [loading, setLoading] = useState(true);
@@ -310,6 +307,7 @@ function Preview({ src, device, title }: { src: string; device: Device; title: s
           <iframe
             className="block border-0"
             onLoad={() => setLoading(false)}
+            ref={frameRef}
             src={src}
             style={{ width: deviceWidth, height: innerHeight / scale, transform: `scale(${scale})`, transformOrigin: "0 0" }}
             title={title}

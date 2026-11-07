@@ -137,6 +137,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     .select("id, provider, display_name, status, last_error, webhook_key, updated_at")
     .eq("organization_id", organization.id)
     .neq("status", "disconnected")
+    // The website's contact form isn't an account to connect or disconnect.
+    .neq("provider", "website")
     .order("created_at", { ascending: true });
   // An account can be connected and still not be delivering (a token that was revoked, say).
   // The last message sent on each account says which: if it failed, the account says so here.

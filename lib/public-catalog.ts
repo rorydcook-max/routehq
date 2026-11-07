@@ -1,5 +1,4 @@
-import { resolveBrandingAssetUrl, resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
-import { bookingSiteFrom } from "@/lib/booking-site";
+import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { BLOCKING_RENTAL_STATUSES, BOOKABLE_END_COLUMNS, bookableEnd } from "@/lib/rental-conflicts";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { releaseExpiredHolds } from "@/lib/booking-holds";
@@ -57,7 +56,8 @@ export function publicBookingSettings(settings: any): PublicBookingSettings {
 
 const HIDDEN_STATUS = /sold|retired|inactive|archived|written|maintenance/i;
 
-export async function getPublicCatalog(slug: string) {
+/** `includeOff`: the whole catalog even when the page is switched off (the owner's preview in the Booking page tool); `pageOff` says so. */
+export async function getPublicCatalog(slug: string, options: { includeOff?: boolean } = {}) {
   const admin = createSupabaseAdminClient() as any;
   const { data: organization } = await admin
     .from("organizations")
@@ -72,7 +72,7 @@ export async function getPublicCatalog(slug: string) {
   setBusinessTimeZone(organization.timezone);
   const vat = vatSettings(organization);
   const gross = (value: unknown) => Math.round(withVat(Number(value || 0), vat) * 100) / 100;
-  if (!settings.enabled) return { enabled: false as const, name: String(organization.name || "") };
+  if (!settings.enabled && !options.includeOff) return { enabled: false as const, name: String(organization.name || "") };
   await releaseExpiredHolds(admin, organization.id).catch(() => null);
   const rules = bookingRules(organization.settings);
 
@@ -131,24 +131,13 @@ export async function getPublicCatalog(slug: string) {
     .filter((vehicle) => vehicle.dailyRate > 0 || vehicle.weeklyRate > 0 || vehicle.monthlyRate > 0);
 
   const orgSettings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
-  // The page's template and sections (lib/booking-site.ts); its own big photo, when one was uploaded.
-  const site = bookingSiteFrom(orgSettings);
-  const heroUrl = site.heroPath
-    ? await resolveBrandingAssetUrl(admin, { bucket: "branding", path: site.heroPath }, { expiresIn: 60 * 60 }).catch(() => null)
-    : null;
-  const channels = orgSettings.contact_channels && typeof orgSettings.contact_channels === "object" ? orgSettings.contact_channels : {};
+  // The page's look (template, sections, text) is the website's own: booking_sites, lib/sites/data.ts.
   return {
-    site,
-    heroUrl: heroUrl || null,
     address: String(organization.business_address || ""),
-    /** How customers reach the business (Settings > Business): the social section starts from these. */
-    contacts: {
-      whatsapp: String(organization.whatsapp || ""),
-      line: String(organization.line_id || ""),
-      instagram: String(channels.instagram || ""),
-      facebook: String(channels.messenger || "")
-    },
     enabled: true as const,
+    pageOff: !settings.enabled,
+    /** Settings, for the website (its old booking_site choices carry over until the owner publishes a site). */
+    settings: orgSettings,
     organizationId: String(organization.id),
     name: String(organization.name || "Vehicle rental"),
     /** The business's own booking address (its domain, subdomain or rove.rent/<slug>): the one search engines are told. */

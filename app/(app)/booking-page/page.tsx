@@ -6,8 +6,9 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { bookingAddress, canUseOwnDomain, canUseSubdomain, cleanSubdomain, renterUrl, rootDomain, subdomainUrl } from "@/lib/booking-address";
 import { bookingRules } from "@/lib/booking-rules";
-import { bookingSiteFrom } from "@/lib/booking-site";
-import { resolveBrandingAssetUrl, resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
+import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
+import { loadSiteRow, uploadUrls } from "@/lib/sites/data";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 import { getCustomPlan } from "@/lib/custom-plan";
 import { getDefaultOrganization } from "@/lib/organization";
 import { publicBookingSettings } from "@/lib/public-catalog";
@@ -36,19 +37,20 @@ export default async function BookingPagePage() {
   const [{ data: addressRow }, customPlan, { data: vehicleRates }, brandingDisplayUrls] = await Promise.all([
     supabase.from("organizations").select("booking_subdomain, custom_domain, custom_domain_status").eq("id", organization.id).maybeSingle(),
     getCustomPlan(organization.id),
-    supabase.from("vehicles").select("id, daily_rate, weekly_rate, monthly_rate").eq("organization_id", organization.id).is("deleted_at", null),
+    supabase.from("vehicles").select("id, make, model, trim, daily_rate, weekly_rate, monthly_rate, vehicle_categories(code, name)").eq("organization_id", organization.id).is("deleted_at", null).order("monthly_rate", { ascending: true }),
     resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true })
   ]);
   const addressOrg = { ...(organization as any), ...(addressRow || {}), custom_limits: customPlan.custom_limits };
-  const vehicles = (vehicleRates || []) as Array<{ daily_rate: unknown; weekly_rate: unknown; monthly_rate: unknown }>;
+  const vehicles = (vehicleRates || []) as Array<{ id: string; make: string | null; model: string | null; trim: string | null; daily_rate: unknown; weekly_rate: unknown; monthly_rate: unknown; vehicle_categories: any }>;
   const priced = vehicles.filter((v) => Number(v.daily_rate) > 0 || Number(v.weekly_rate) > 0 || Number(v.monthly_rate) > 0).length;
 
-  const bookingSite = bookingSiteFrom(organization.settings);
-  const [heroUrl, firstVehiclePhotos] = await Promise.all([
-    bookingSite.heroPath ? resolveBrandingAssetUrl(admin, { bucket: "branding", path: bookingSite.heroPath }, { expiresIn: 60 * 60 }).catch(() => null) : Promise.resolve(null),
+  // The website: the draft being edited and what is published (booking_sites), and each vehicle's main photo for the image picker.
+  const [siteRow, photos] = await Promise.all([
+    loadSiteRow(organization.id, organization.settings, vehicles.map((vehicle) => kindFromCategory(vehicle.vehicle_categories))),
     vehiclePhotoUrls(admin, organization.id, 1).catch(() => new Map<string, string[]>())
   ]);
-  const firstVehiclePhoto = [...firstVehiclePhotos.values()].find((list) => list.length)?.[0] || null;
+  const uploads = { ...(await uploadUrls(siteRow.published)), ...(await uploadUrls(siteRow.draft)) };
+  const editorVehicles = vehicles.map((vehicle) => ({ id: vehicle.id, name: [vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" ") || "—", photoUrl: photos.get(vehicle.id)?.[0] || null }));
 
   const settings = organization.settings && typeof organization.settings === "object" && !Array.isArray(organization.settings) ? (organization.settings as Record<string, any>) : {};
   const logoUrl =
@@ -74,17 +76,12 @@ export default async function BookingPagePage() {
         booking={{ enabled: booking.enabled, offer: booking.offer, deposit: booking.deposit, holdHours: bookingRules(organization.settings).holdHours }}
         businessName={businessName}
         colour={String((organization as any).contract_accent_colour || "#0e5e6f")}
-        contacts={{
-          whatsapp: String((organization as any).whatsapp || ""),
-          line: String((organization as any).line_id || ""),
-          instagram: String(settings.contact_channels?.instagram || ""),
-          facebook: String(settings.contact_channels?.messenger || "")
-        }}
-        fallbackPhotoUrl={firstVehiclePhoto}
-        heroUrl={heroUrl}
+        draft={siteRow.draft}
+        editorVehicles={editorVehicles}
+        published={siteRow.published}
+        uploads={uploads}
         link={bookingAddress(addressOrg).url}
         logoUrl={logoUrl}
-        site={bookingSite}
         slug={organization.slug}
         vehicles={{ priced, total: vehicles.length }}
       />

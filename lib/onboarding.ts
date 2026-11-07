@@ -67,7 +67,7 @@ export async function getOnboardingStatus(supabase: any, organizationId: string,
     supabase.from("customers").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).is("deleted_at", null),
     supabase.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).is("deleted_at", null),
     supabase.from("organization_members").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).eq("is_active", true),
-    supabase.from("messaging_channels").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).neq("status", "disconnected")
+    supabase.from("messaging_channels").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).neq("status", "disconnected").neq("provider", "website")
   ]);
 
   const error = [orgResult, checklistResult, vehicleResult, customerResult, rentalResult, memberResult].find((result: any) => result.error)?.error;

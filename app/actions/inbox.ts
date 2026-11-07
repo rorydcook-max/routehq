@@ -9,6 +9,8 @@ import { draftReply } from "@/lib/inbox/assistant";
 import { lineBotInfo, linePush, lineReply, lineSetWebhook, telegramDeleteWebhook, telegramGetMe, telegramSend, telegramSetWebhook } from "@/lib/inbox/providers";
 import { webhookReachable, webhookUrl } from "@/lib/inbox/store";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { sendEmail } from "@/lib/email";
+import { EMAIL_PATTERN } from "@/lib/site/request-hash";
 
 type ActionResult<T = {}> = ({ ok: true } & T) | { ok: false; error: string };
 
@@ -135,15 +137,30 @@ export async function sendInboxMessage(conversationId: string, text: string): Pr
   if ("error" in found) return { ok: false, error: found.error as string };
   const { membership, supabase, conversation } = found;
 
-  const { data: channel } = await supabase.from("messaging_channels").select("id, status").eq("id", conversation.channel_id).maybeSingle();
-  const { data: secrets } = await supabase.from("messaging_channel_secrets").select("access_token").eq("channel_id", conversation.channel_id).maybeSingle();
-  if (!channel || channel.status === "disconnected" || !secrets?.access_token) {
-    return { ok: false, error: await said("This account is no longer connected. Reconnect it in Settings → Messaging to reply.") };
-  }
-  const token = String(secrets.access_token);
-
   let result: { ok: boolean; error?: string };
-  if (conversation.provider === "line") {
+  let token = "";
+  if (conversation.provider === "website") {
+    // From the business's website contact form (app/actions/sites.ts): no platform to reply on, so the reply goes by
+    // email when the sender left an address. A sender who left a phone number is called or messaged directly.
+    const to = String(conversation.external_user_id || "");
+    if (!EMAIL_PATTERN.test(to)) return { ok: false, error: await said("This person left a phone number, not an email. Call or message them directly.") };
+    const { data: organization } = await supabase.from("organizations").select("name, trading_name, business_email").eq("id", conversation.organization_id).maybeSingle();
+    const business = String(organization?.trading_name || organization?.name || "");
+    const sent = await sendEmail({ to, subject: business ? `${business}: reply to your message` : "Reply to your message", text: body, ...(organization?.business_email ? { replyTo: String(organization.business_email) } : {}) });
+    result = sent.status === "sent" ? { ok: true } : { ok: false, error: sent.status === "failed" ? sent.error : "Email isn't set up" };
+  } else {
+    const { data: channel } = await supabase.from("messaging_channels").select("id, status").eq("id", conversation.channel_id).maybeSingle();
+    const { data: secrets } = await supabase.from("messaging_channel_secrets").select("access_token").eq("channel_id", conversation.channel_id).maybeSingle();
+    if (!channel || channel.status === "disconnected" || !secrets?.access_token) {
+      return { ok: false, error: await said("This account is no longer connected. Reconnect it in Settings → Messaging to reply.") };
+    }
+    token = String(secrets.access_token);
+    result = { ok: false };
+  }
+
+  if (conversation.provider === "website") {
+    // Sent above.
+  } else if (conversation.provider === "line") {
     // LINE's reply token is single-use and short-lived; within that window the reply is free.
     const fresh = conversation.reply_token && conversation.reply_token_at && Date.now() - new Date(conversation.reply_token_at).getTime() < 45_000;
     result = fresh ? await lineReply(token, conversation.reply_token, body) : { ok: false };

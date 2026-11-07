@@ -1,0 +1,237 @@
+/* The website's shared styles (components/site). Colours, fonts, radii and spacing come from the CSS variables
+   lib/sites/palettes.ts sets on .root, so every template and palette uses these same rules. */
+
+.root {
+  background: var(--s-bg);
+  color: var(--s-ink);
+  font-family: var(--s-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+.root ::selection {
+  background: var(--s-accent);
+  color: var(--s-accent-ink);
+}
+
+.display {
+  font-family: var(--s-display);
+  font-weight: var(--s-display-weight);
+  letter-spacing: var(--s-track);
+  line-height: var(--s-leading);
+  text-wrap: balance;
+}
+
+.wrap {
+  margin-inline: auto;
+  max-width: 1200px;
+  padding-inline: 20px;
+}
+@media (min-width: 640px) {
+  .wrap {
+    padding-inline: 32px;
+  }
+}
+
+.section {
+  padding-block: var(--s-pad);
+  scroll-margin-top: 64px;
+}
+@media (min-width: 1024px) {
+  .section {
+    padding-block: var(--s-pad-lg);
+  }
+}
+
+.raised {
+  background: var(--s-raised);
+}
+
+.soft {
+  color: var(--s-soft);
+}
+.muted {
+  color: var(--s-muted);
+}
+
+.btn {
+  align-items: center;
+  background: var(--s-accent);
+  border-radius: var(--s-r-button);
+  color: var(--s-accent-ink);
+  display: inline-flex;
+  font-size: 16px;
+  font-weight: 650;
+  gap: 8px;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 26px;
+  transition: transform 160ms ease, filter 160ms ease;
+  white-space: nowrap;
+}
+.btn:hover {
+  filter: brightness(1.06);
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btnGhost {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+  color: inherit;
+}
+.btn:focus-visible,
+.focus:focus-visible {
+  outline: 3px solid var(--s-accent);
+  outline-offset: 3px;
+}
+
+.card {
+  background: var(--s-surface);
+  border-radius: var(--s-r-card);
+}
+
+.line {
+  border-color: var(--s-line);
+}
+
+.image {
+  border-radius: var(--s-r-image);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Moto's photos are cut on a slant. */
+.slant {
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+}
+@media (max-width: 1023px) {
+  .slant {
+    clip-path: polygon(0 4%, 100% 0, 100% 96%, 0 100%);
+  }
+}
+
+/* The hero's one entrance: the picture settles in as the page opens. */
+.settle {
+  animation: settle 1400ms cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Moto's fleet strip. */
+.ticker {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.tickerTrack {
+  animation: ticker 48s linear infinite;
+  display: inline-flex;
+}
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.rail {
+  display: grid;
+  gap: 16px;
+  grid-auto-columns: 80%;
+  grid-auto-flow: column;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-bottom: 8px;
+  scroll-padding-inline: 20px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+.rail > * {
+  scroll-snap-align: start;
+}
+@media (min-width: 640px) {
+  .rail {
+    grid-auto-columns: calc((100% - 16px) / 2);
+  }
+}
+@media (min-width: 1024px) {
+  .rail {
+    gap: 24px;
+    grid-auto-columns: calc((100% - 48px) / 3);
+  }
+}
+
+/* Click-to-edit text in the editor's preview. */
+.editable {
+  border-radius: 6px;
+  cursor: text;
+  outline: 1.5px dashed transparent;
+  outline-offset: 4px;
+  transition: outline-color 120ms ease;
+}
+.editable:hover {
+  outline-color: color-mix(in oklab, var(--s-accent) 70%, transparent);
+}
+.editable:focus {
+  outline: 2px solid var(--s-accent);
+}
+
+.header {
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  background: color-mix(in oklab, var(--s-bg) 84%, transparent);
+}
+
+.root .field {
+  background: var(--s-surface);
+  border: 1.5px solid var(--s-line);
+  border-radius: calc(var(--s-r-card) * 0.6);
+  color: var(--s-ink);
+  font-size: 16px;
+  min-height: 52px;
+  padding: 12px 14px;
+  width: 100%;
+}
+.root .field::placeholder {
+  color: var(--s-muted);
+}
+.root .field:focus {
+  border-color: var(--s-accent);
+  outline: none;
+}
+
+.form label {
+  color: var(--s-ink);
+}
+
+.stars {
+  color: var(--s-accent);
+  letter-spacing: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settle,
+  .tickerTrack {
+    animation: none;
+  }
+  .btn {
+    transition: none;
+  }
+}

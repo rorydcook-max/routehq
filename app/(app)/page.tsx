@@ -168,7 +168,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     // Messages and bookings at a glance (Rory, 31 Oct 2026): the latest chats with what's new, and the three booking
     // counts the Bookings page leads with (same rules, same links).
     Promise.all([
-      db.from("messaging_channels").select("id", { count: "exact", head: true }).eq("organization_id", homeOrg.id).neq("status", "disconnected"),
+      db.from("messaging_channels").select("id", { count: "exact", head: true }).eq("organization_id", homeOrg.id).neq("status", "disconnected").neq("provider", "website"),
       db
         .from("conversations")
         .select("id, display_name, unread_count, last_message_at, last_message_preview, last_message_direction")

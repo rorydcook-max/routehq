@@ -60,7 +60,7 @@ export async function chatInvites(admin: any, input: { organizationId: string; c
   if (!input.customerId || !input.token) return [];
   const [{ data: linked }, { data: channels }, { data: customer }] = await Promise.all([
     admin.from("conversations").select("id").eq("organization_id", input.organizationId).eq("customer_id", input.customerId).limit(1),
-    admin.from("messaging_channels").select("id, provider, public_handle, status").eq("organization_id", input.organizationId).neq("status", "disconnected"),
+    admin.from("messaging_channels").select("id, provider, public_handle, status").eq("organization_id", input.organizationId).neq("status", "disconnected").neq("provider", "website"),
     admin.from("customers").select("preferred_contact_method").eq("id", input.customerId).maybeSingle()
   ]);
   if (linked?.length) return [];

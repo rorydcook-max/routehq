@@ -109,7 +109,8 @@ async function loadMessages(locale: string): Promise<Messages> {
 
 // The words the customer pages (booking link, change to sign, online booking, directory) and their error and
 // not-found screens use. The staff app's other ~200 KB of text never reaches a customer's phone.
-const CUSTOMER_NAMESPACES = ["customer", "directory", "errorPages", "gallery", "renterReview"];
+// "bsite": the business's own website (components/site).
+const CUSTOMER_NAMESPACES = ["customer", "directory", "errorPages", "gallery", "renterReview", "bsite"];
 
 async function isDirectoryPage(): Promise<boolean> {
   try {

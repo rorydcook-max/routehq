@@ -21,7 +21,9 @@ const PROVIDER: Record<string, { label: string; className: string }> = {
   telegram: { label: "Telegram", className: "bg-[var(--info-light)] text-[var(--info)]" },
   whatsapp: { label: "WhatsApp", className: "bg-[var(--success-light)] text-[var(--success)]" },
   messenger: { label: "Messenger", className: "bg-[var(--info-light)] text-[#4252d6]" },
-  instagram: { label: "Instagram", className: "bg-[#fbeaf3] text-[#b02a73]" }
+  instagram: { label: "Instagram", className: "bg-[#fbeaf3] text-[#b02a73]" },
+  // The contact form on the business's own website (replies go by email).
+  website: { label: "Website", className: "bg-[var(--primary-light)] text-[var(--primary)]" }
 };
 
 function ProviderTag({ provider }: { provider: string }) {

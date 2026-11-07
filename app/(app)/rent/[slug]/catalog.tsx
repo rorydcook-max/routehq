@@ -53,7 +53,7 @@ export function Catalog({
   monthlyFocus = false,
   demo = false
 }: {
-  /** How the booking page's template lays the vehicles out (lib/booking-site.ts): cards, a dense list, or small tiles two to a row on phones. */
+  /** How the vehicles are laid out: cards (the default), a dense list, or small tiles two to a row on phones. */
   layout?: "grid" | "list" | "tiles";
   /** The monthly-rentals template: a rough price per day under each monthly price. */
   monthlyFocus?: boolean;

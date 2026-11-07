@@ -1,62 +1,36 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { getLocale } from "next-intl/server";
+import type { Metadata, Route } from "next";
+import { notFound, permanentRedirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { BrandStyle } from "@/components/brand-style";
-import { BookingSiteView } from "@/components/booking-site/booking-site-view";
-import { catalogLayoutFor, lowestPrices } from "@/lib/booking-site";
-import { bookingDemo } from "@/lib/booking-site-demos";
+import { SitePage } from "@/components/site/site-page";
+import { demoSiteData, siteDemo } from "@/lib/sites/demos";
 import { ratesFrom, visitorCurrency } from "@/lib/visitor-currency";
-import { Catalog } from "../../[slug]/catalog";
+
+/** The examples from before the website builder, sent to the nearest new one. */
+const RETIRED: Record<string, string> = { "coastal-scooters": "redline", "harbor-car-hire": "saltwater", "long-stay-wheels": "northpoint", "island-fleet": "northpoint" };
 
 /**
- * An example booking page (rovehq.io/booking-pages links here): a made-up business from lib/booking-site-demos.ts,
- * drawn with the same template and booking parts as a real one. Labelled as a demo, never indexed, and booking is
- * turned off. Nothing is read from or written to the database.
+ * An example website (rovehq.io/booking-pages links here): a made-up business from lib/sites/demos.ts, drawn with the
+ * same components as a real one. Labelled as a demo, never indexed; booking and the contact form are off. Nothing is
+ * read from or written to the database.
  */
 
 export async function generateMetadata({ params }: { params: Promise<{ demo: string }> }): Promise<Metadata> {
-  const demo = bookingDemo((await params).demo);
+  const demo = siteDemo((await params).demo);
   return { title: demo ? `${demo.name} (example)` : "Example", robots: { index: false, follow: false } };
 }
 
 export default async function BookingDemoPage({ params }: { params: Promise<{ demo: string }> }) {
-  const demo = bookingDemo((await params).demo);
+  const id = (await params).demo;
+  if (RETIRED[id]) permanentRedirect(`/rent/demo/${RETIRED[id]}` as Route);
+  const demo = siteDemo(id);
   if (!demo) notFound();
-  const [rates, visitor] = await Promise.all([ratesFrom(demo.currency), visitorCurrency(await getLocale())]);
-  const { fromMonthly, fromDaily } = lowestPrices(demo.vehicles);
-  const today = new Date().toISOString().slice(0, 10);
+  const [rates, visitor, t] = await Promise.all([ratesFrom(demo.currency), visitorCurrency(await getLocale()), getTranslations("bsite")]);
+  const data = demoSiteData(demo, { t: t as any, rates, visitorCurrency: visitor, today: new Date().toISOString().slice(0, 10) });
   return (
     <>
       <BrandStyle colour={demo.brandColour} />
-      <BookingSiteView
-        business={{ name: demo.name, logoUrl: null, location: demo.location, address: "", currency: demo.currency, contacts: { whatsapp: "", line: "", instagram: "", facebook: "" } }}
-        demo
-        fromDaily={fromDaily}
-        fromMonthly={fromMonthly}
-        heroUrl={demo.heroUrl}
-        site={demo.site}
-        vehicleCount={demo.vehicles.length}
-      >
-        <Catalog
-          currency={demo.currency}
-          deposit={0}
-          demo
-          extras={[]}
-          gapDays={0}
-          holdHours={24}
-          layout={catalogLayoutFor(demo.site.template)}
-          monthlyFocus={demo.site.template === "monthly"}
-          offer={demo.site.template === "monthly" ? "monthly" : "both_dates"}
-          organizationName={demo.name}
-          rates={rates}
-          seasons={[]}
-          slug={`demo-${demo.id}`}
-          source={null}
-          today={today}
-          vehicles={demo.vehicles}
-          visitorCurrency={visitor}
-        />
-      </BookingSiteView>
+      <SitePage config={demo.config} data={data} />
     </>
   );
 }

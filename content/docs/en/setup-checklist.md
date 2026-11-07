@@ -44,7 +44,7 @@ The owner's **Dashboard** then shows **Get ready for your first booking**, three
 - **Verify your email**: only if you haven't yet. Tap it for a new link.
 - **Take your first booking**. See [Create a booking](/docs/create-a-booking).
 - **Read the rental agreement**. See [Rental agreements](/docs/rental-agreements).
-- **Get alerts on LINE**. See [Notifications](/docs/notifications).
+- **Get the morning summary on LINE**: connects it in **Settings**, **Notifications** (businesses in Thailand). See [Alerts and the morning summary](/docs/notifications).
 - **Invite a team member**. See [Invite your team](/docs/invite-your-team).
 
 To hide it, tap the **X** on the card.

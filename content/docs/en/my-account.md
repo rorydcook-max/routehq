@@ -30,7 +30,7 @@ Pick **Same as device**, **Light** or **Dark**. It applies to this device only a
 
 ## Alerts on this device
 
-Tap **Enable alerts on this device** and allow it, then **Send a test**. Do it on each phone or computer you use. On an iPhone, add RoveHQ to your home screen first. What you're alerted about is set in **Settings**, **Integrations**. See [Alerts](/docs/notifications).
+Tap **Enable alerts on this device** and allow it, then **Send a test**. Do it on each phone or computer you use. On an iPhone, add RoveHQ to your home screen first. What you're alerted about is set in **Settings**, **Notifications**. See [Alerts](/docs/notifications).
 
 ## Common questions
 

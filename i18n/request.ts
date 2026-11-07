@@ -111,6 +111,14 @@ async function loadMessages(locale: string): Promise<Messages> {
 // not-found screens use. The staff app's other ~200 KB of text never reaches a customer's phone.
 const CUSTOMER_NAMESPACES = ["customer", "directory", "errorPages", "gallery"];
 
+async function isDirectoryPage(): Promise<boolean> {
+  try {
+    return Boolean((await headers()).get("x-routehq-directory"));
+  } catch {
+    return false;
+  }
+}
+
 async function isCustomerPage(): Promise<boolean> {
   try {
     return Boolean((await headers()).get("x-routehq-customer-page"));
@@ -143,6 +151,10 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const [locale, customerPage, timeZone] = await Promise.all([resolveLocale(), isCustomerPage(), staffTimeZone()]);
   const english = await loadMessages("en");
   const all = locale === "en" ? english : merge(english, await loadMessages(locale));
-  const messages = customerPage ? Object.fromEntries(CUSTOMER_NAMESPACES.filter((key) => key in all).map((key) => [key, all[key]])) : all;
+  const messages: Record<string, any> = customerPage ? Object.fromEntries(CUSTOMER_NAMESPACES.filter((key) => key in all).map((key) => [key, all[key]])) : all;
+  // rove.rent's directory search shows the cookie notice (its own analytics): only those few words come along.
+  if (customerPage && (await isDirectoryPage()) && all.site && typeof all.site === "object") {
+    messages.site = Object.fromEntries(Object.entries(all.site as Record<string, unknown>).filter(([key]) => key.startsWith("cookie")));
+  }
   return { locale, messages, timeZone };
 });

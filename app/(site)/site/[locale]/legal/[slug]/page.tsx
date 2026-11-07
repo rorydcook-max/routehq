@@ -6,6 +6,7 @@ import { getLegalDoc, LEGAL_LOCALE } from "@/lib/site/legal";
 import { LEGAL_SLUGS } from "@/lib/site/legal-slugs";
 import { siteLocale } from "@/lib/site/static-page";
 import { siteMetadata, siteUrl } from "@/lib/site/seo";
+import { breadcrumbLd, schemaDateTime } from "@/lib/site/schema";
 import { contentDate, JsonLd } from "../../_components/content-ui";
 import { Container, SiteLink } from "../../_components/site-ui";
 import s from "../../site.module.css";
@@ -40,15 +41,25 @@ export default async function LegalPage({ params }: Props) {
   return (
     <>
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "WebPage",
-          name: doc.title,
-          description: doc.description,
-          inLanguage: doc.locale,
-          dateModified: doc.updated || undefined,
-          url
-        }}
+        data={[
+          {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: doc.title,
+            description: doc.description,
+            inLanguage: doc.locale,
+            dateModified: schemaDateTime(doc.updated),
+            url
+          },
+          breadcrumbLd(
+            [
+              { name: m("breadcrumbHome"), path: "/" },
+              { name: m("footerLegal"), path: "/legal" },
+              { name: doc.title, path: `/legal/${slug}` }
+            ],
+            doc.locale
+          )
+        ]}
       />
 
       <section className={`${s.dark} ${s.hero} ${s.heroPlain} ${c.articleHero}`}>

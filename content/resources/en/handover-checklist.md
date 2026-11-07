@@ -12,6 +12,8 @@ inside:
   - "Scooter damage grid: front fairing, side panels, seat, exhaust, mirrors, wheels and more"
   - "The 12 photos to take at every handover, as a tick list"
   - "Notes box and signature rows for you and the renter, at handover and at return"
+cover: "/site/covers/handover.svg"
+coverAlt: "Illustration: a handover checklist and a vehicle key"
 ---
 
 Most deposit arguments come down to one question: was that scratch there before? This checklist gives you a written answer, signed by the renter, before they drive away and again when they bring the vehicle back.

@@ -29,7 +29,7 @@ If money is still owed, you'll see **Still owed on this booking**. Tap **Collect
 
 On a phone, **Share receipt** opens your share menu (LINE, WhatsApp, email…). On a computer it copies the link.
 
-The customer can also open it any time from their booking page. You'll find all your receipts in **Documents** under the **Receipts** filter.
+The customer can also open it any time from their booking page. You'll find all your receipts in **Settings › Business › Files**: pick **Receipts** as the type.
 
 ## Receipt number and footer
 

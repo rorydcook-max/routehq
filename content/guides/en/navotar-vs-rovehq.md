@@ -17,6 +17,8 @@ faq:
     a: "Look for a self-serve tool with published prices. RoveHQ has a free plan for up to 2 cars and 5 motorbikes and paid plans from US$15, €13 or £11 a month, plus a platform fee of 1% to 5% on payments taken through Stripe, depending on your plan. HQ Rental Software starts at $120 a month for 10 vehicles."
   - q: "Can I move from Navotar or RENTALL to RoveHQ?"
     a: "Yes. Export reservations and agreements to Excel where your account allows, or ask support for a copy of your data, then upload it to RoveHQ. The import is free."
+cover: "/site/covers/compare.svg"
+coverAlt: "Illustration: a balance weighing two software options"
 ---
 
 Navotar was a well-known name in car rental software, but you won't find it under that name any more. [Auto Rental News reported](https://www.autorentalnews.com/news/navotar-announces-branding-switch-to-rentall) in May 2022 that Navotar had switched its operations and products to Rentall, and navotar.com now redirects to [rentallsoftware.com](https://www.rentallsoftware.com/). So this page compares RENTALL with RoveHQ.

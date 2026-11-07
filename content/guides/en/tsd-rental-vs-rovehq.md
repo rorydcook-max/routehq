@@ -17,6 +17,8 @@ faq:
     a: "Not all of it. RoveHQ doesn't connect to booking sites such as Booking.com or Kayak, doesn't have an insurance verification integration, and isn't built for dealership loaner programs. It covers bookings, card payments and deposit holds, handovers, agreements, ID checks and customer chat for small fleets."
   - q: "Can I move from TSD Rental to RoveHQ?"
     a: "Yes. TSD reports can be exported to Excel. Upload them to RoveHQ, which links contracts to vehicles by stock number and converts miles to your unit. The import is free."
+cover: "/site/covers/compare.svg"
+coverAlt: "Illustration: a balance weighing two software options"
 ---
 
 TSD Rental and RoveHQ are both car rental software, but they sit at opposite ends of the market. TSD serves dealerships and some of the largest rental companies in the world. RoveHQ is for small fleets, from one vehicle to a few dozen cars, scooters, motorbikes, quads or vans. If you're weighing them up, the main question is simply which kind of business you are.

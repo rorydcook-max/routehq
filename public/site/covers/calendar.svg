@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="calendar-t"><title id="calendar-t">Illustration: a booking calendar with rentals as bars</title>
+<rect width="1200" height="630" fill="#e6f2f2"/>
+<circle cx="930" cy="190" r="150" fill="#f3dcae"/>
+<path d="M0 520 C 200 500 360 540 600 520 S 1000 500 1200 520 V630 H0Z" fill="#cfe9e8"/>
+<path d="M90 560 h90 M980 575 h120 M520 590 h60" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+<rect x="300" y="130" width="600" height="400" rx="26" fill="#ffffff" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><rect x="300" y="130" width="600" height="80" rx="26" fill="#06162b"/>
+<path d="M380 108 v50 M820 108 v50" stroke="#06162b" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M300 210 V 530" stroke="#e6f2f2" stroke-width="4"/><path d="M386 210 V 530" stroke="#e6f2f2" stroke-width="4"/><path d="M472 210 V 530" stroke="#e6f2f2" stroke-width="4"/><path d="M558 210 V 530" stroke="#e6f2f2" stroke-width="4"/><path d="M644 210 V 530" stroke="#e6f2f2" stroke-width="4"/><path d="M730 210 V 530" stroke="#e6f2f2" stroke-width="4"/><path d="M816 210 V 530" stroke="#e6f2f2" stroke-width="4"/>
+<rect x="320" y="240" width="300" height="40" rx="20" fill="#12bcb8"/><rect x="500" y="306" width="360" height="40" rx="20" fill="#0b8f8c"/><rect x="340" y="372" width="200" height="40" rx="20" fill="#f3dcae"/><rect x="600" y="438" width="250" height="40" rx="20" fill="#12bcb8"/>
+</svg>

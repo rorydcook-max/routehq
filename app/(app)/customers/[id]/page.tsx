@@ -24,7 +24,7 @@ import { DateLeaf, ElapsedBar, initialsOf } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
 import { countriesSorted, customerLanguages, flagForNationality } from "@/lib/customer-options";
-import { getCustomerDetail, getCustomerDocumentCompleteness, type CustomerDetail, refundsOf } from "@/lib/customer-detail";
+import { customerStatsByCustomer, getCustomerDetail, getCustomerDocumentCompleteness, type CustomerDetail, refundsOf } from "@/lib/customer-detail";
 import { longDate } from "@/lib/i18n/dates";
 import { getDefaultOrganization } from "@/lib/organization";
 import { licenceCategoriesFor, licenceCategoriesOf } from "@/lib/licence";
@@ -32,6 +32,12 @@ import { orgCountry } from "@/lib/regional";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+import { businessCurrency } from "@/lib/business-units";
+import { formatMoney } from "@/lib/regional";
+import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
+import { CustomerTimeline, type TimelineRow } from "@/app/(app)/customers/[id]/customer-timeline";
+import { eventDay, getCustomerTimeline } from "@/lib/customer-timeline";
+import { activityTitle } from "@/lib/activity-display";
 
 // The wording for this page is in locales/<language>/common.json under "customerPage".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -55,8 +61,9 @@ const STATUS_TONE: Record<string, "neutral" | "green" | "amber" | "red" | "blue"
   cancelled: "neutral"
 };
 
+// In the business's own currency (was always baht).
 function money(value: unknown) {
-  return `฿${Math.round(Number(value || 0)).toLocaleString("en-US")}`;
+  return formatMoney(Math.round(Number(value || 0)), businessCurrency(), "en-US");
 }
 
 function formatDate(value: string | null | undefined, cx: Cx) {
@@ -131,10 +138,13 @@ function preferredContactMethod(customer: any) {
   return "whatsapp";
 }
 
-function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; customerId: string; dueNow: number }) {
+function ActiveRentalCard({ rental, customerId, customerName, dueNow }: { rental: any; customerId: string; customerName: string; dueNow: number }) {
   const cx = useCx();
   const locale = useLocale();
   const days = daysUntil(rental.end_date);
+  // Out on the road with a return date: offer more days. Loud when it is due back within a week (or late).
+  const canOffer = ["active", "due_soon", "overdue", "extended"].includes(String(rental.status)) && Boolean(rental.end_date);
+  const soon = canOffer && days !== null && days <= 7;
   // A booking that hasn't gone out is about its start: "10 days late" on a car never handed over read as an overdue return.
   const booked = rental.status === "booked";
   const startsIn = booked ? daysUntil(rental.start_date) : null;
@@ -191,6 +201,19 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
         <Link className="secondary-action pressable" href={`/transactions/new?customerId=${customerId}` as Route}>
           {cx.say("r_recordPayment")}
         </Link>
+        {/* Upsell, lightly: someone out on a vehicle with a return date can be offered more days (the usual extend flow). */}
+        {canOffer ? (
+          <RentalAdjustmentButton
+            className={`${soon ? "primary-action" : "secondary-action"} pressable`}
+            currentEndDate={rental.end_date}
+            currentRate={Number(rental.rental_rate || 0)}
+            currentStartDate={rental.start_date}
+            customerName={customerName}
+            label={cx.say("r_offerExtension")}
+            rentalId={rental.id}
+            vehicleLabel={vehicleName(rental.vehicles)}
+          />
+        ) : null}
       </div>
     </section>
   );
@@ -562,6 +585,52 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
     disputed: Boolean(report.disputed_at)
   }));
 
+  // The lifecycle: one timeline from the records the app already keeps, and the same lifetime figures as the list.
+  const [timeline, statsMap, bookingWords] = await Promise.all([
+    getCustomerTimeline(supabase, organization.id, customer, detail.rentals, detail.transactions, detail.documentsWithUrls),
+    customerStatsByCustomer(supabase, organization.id),
+    getTranslations("booking")
+  ]);
+  const stats = statsMap.get(customer.id);
+  const lifeRentals = stats?.rentals ?? detail.rentals.filter((rental: any) => isHandedOver(rental.status)).length;
+  const lifeDays = stats?.rentalDays ?? detail.totalRentalDays;
+  const customerSince = [String(customer.created_at || "").slice(0, 10), stats?.firstStart || ""].filter(Boolean).sort()[0] || null;
+  const messageCount = timeline.messages.fromThem + timeline.messages.toThem;
+  const sortKey = (date: string) => Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T12:00:00Z` : date) || 0;
+  const timelineRows: TimelineRow[] = [
+    ...timeline.events.map((event) => {
+      const values = { ...(event.values || {}) } as Record<string, string | number>;
+      if (typeof values.amount === "number") values.amount = money(values.amount);
+      if (values.date) values.date = formatDate(String(values.date), cx);
+      if (values.channel) values.channel = ["email", "line", "messenger", "phone", "sms", "telegram", "whatsapp"].includes(String(values.channel)) ? cx.say(`m_${values.channel}`) : String(values.channel);
+      const booking = String(event.key).startsWith("booked");
+      return {
+        id: event.id,
+        sort: sortKey(event.date),
+        day: eventDay(event.date),
+        kind: event.kind,
+        title: cx.say(`tl_${event.key}`, values),
+        detail: booking && values.from ? (values.to ? cx.say("r_range", { from: formatDate(String(values.from), cx), to: formatDate(String(values.to), cx) }) : cx.say("h_from", { date: formatDate(String(values.from), cx) })) : null,
+        amount: event.amount ? `${event.amount < 0 ? "−" : ""}${money(Math.abs(event.amount))}` : null,
+        out: Number(event.amount || 0) < 0,
+        href: event.rentalId ? `/bookings/${event.rentalId}` : null
+      };
+    }),
+    ...timeline.activities.map((event: any) => ({
+      id: `act-${event.id}`,
+      sort: sortKey(event.occurred_at || event.created_at),
+      day: eventDay(event.occurred_at || event.created_at),
+      kind: "change" as const,
+      title: activityTitle(event, bookingWords as any),
+      detail: null,
+      amount: null,
+      out: false,
+      href: event.rental_id ? `/bookings/${event.rental_id}` : null
+    }))
+  ]
+    .sort((left, right) => right.sort - left.sort)
+    .map(({ sort: _sort, ...row }) => row);
+
   return (
     <AppShell userEmail={userEmail}>
       <div className="space-y-3">
@@ -627,7 +696,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         {detail.rentals.length > 0 ? (
         // Four tiles, one template: a label, a 28px value, a caption, all from the top. Colour only in the caption.
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatTile caption={cx.say("g_days", { count: detail.totalRentalDays })} label={cx.say("h_title")} value={String(detail.rentals.length)} />
+          {/* Rentals that went out and their days so far: the same figures as the list and the timeline (not cancellations). */}
+          <StatTile caption={cx.say("g_days", { count: lifeDays })} label={cx.say("h_title")} value={String(lifeRentals)} />
           <StatTile caption={cx.say("g_notDeposits")} label={cx.say("h_paid")} value={money(totalIncome)} />
           <StatTile
             caption={owedNow > 0 ? cx.say("g_owesDetail") : cx.say("g_owesNothingDetail")}
@@ -647,14 +717,43 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         ) : null}
 
         {currentRentals.map((rental) => (
-          <ActiveRentalCard customerId={customer.id} dueNow={dueByRental.get(rental.id) || 0} key={rental.id} rental={rental} />
+          <ActiveRentalCard customerId={customer.id} customerName={customer.full_name || ""} dueNow={dueByRental.get(rental.id) || 0} key={rental.id} rental={rental} />
         ))}
 
         <PageTabs
           aliases={{ notes: "details" }}
-          initial={completeness.status !== "complete" ? "documents" : detail.rentals.length > 0 ? "rentals" : "details"}
+          initial={completeness.status !== "complete" ? "documents" : detail.rentals.length > 0 ? "timeline" : "details"}
           label={cx.say("tab_label")}
           tabs={[
+            {
+              id: "timeline",
+              label: cx.say("tab_timeline"),
+              content: (
+                <Pane title={cx.say("lc_title")}>
+                  {/* The customer's life with you in one strip, then everything that happened, newest first. */}
+                  <dl className="mb-4 grid grid-cols-2 gap-x-4 gap-y-2.5 rounded-2xl bg-[var(--panel-secondary)] p-3.5 sm:grid-cols-4">
+                    {(
+                      [
+                        [cx.say("lc_since"), customerSince ? formatDate(customerSince, cx) : cx.say("notSet"), false],
+                        [cx.say("lc_rentals"), cx.say("lc_rentalsDays", { count: lifeRentals, days: lifeDays }), false],
+                        [cx.say("lc_spent"), money(totalIncome), false],
+                        [cx.say("lc_rate"), lifeDays > 0 && totalIncome > 0 ? cx.say("lc_perDay", { amount: money(totalIncome / lifeDays) }) : "—", false],
+                        [cx.say("lc_owes"), money(owedNow), owedNow > 0],
+                        [cx.say("lc_messages"), messageCount > 0 ? cx.say("lc_messageCount", { count: messageCount, theirs: timeline.messages.fromThem }) : cx.say("lc_noMessages"), false],
+                        [cx.say("lc_damage"), stats?.damageCount ? cx.say("lc_damageCount", { count: stats.damageCount }) : cx.say("lc_noDamage"), Boolean(stats?.damageCount)],
+                        [cx.say("lc_source"), cx.say(`src_${stats?.source || "direct"}`), false]
+                      ] as Array<[string, string, boolean]>
+                    ).map(([label, value, alert]) => (
+                      <div className="min-w-0" key={label}>
+                        <dt className="text-sm font-semibold text-[var(--muted)]">{label}</dt>
+                        <dd className={`mt-0.5 text-[16px] font-bold leading-tight ${alert ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <CustomerTimeline rows={timelineRows} />
+                </Pane>
+              )
+            },
             {
               id: "documents",
               label: cx.say("tab_documents"),

@@ -26,10 +26,9 @@ On a computer the menu is down the left. On a phone the bottom bar has **Home**,
 - **Customers**: their documents, what they have now and what they've spent. See [Customers](/docs/customers).
 - **Money in & out**: every payment and every cost. See [Money in and out](/docs/money-in-and-out).
 - **Reports**: how the business is doing. See [Reports](/docs/reports).
-- **Documents**: signed agreements, customer ID and photos. See [Documents](/docs/documents).
 - **Partners**: fully booked? Send the customer to a partner and earn a share of the first rent. See [Partners](/docs/partners).
 - **Buying a vehicle**: what a vehicle would earn before you buy it. See [Buying a vehicle calculator](/docs/buying-a-vehicle-calculator).
-- **Settings**: business details, payments, messaging, alerts, team and plan. See [Business settings](/docs/business-settings).
+- **Settings**: business details, payments, messaging, alerts, team and plan. See [Business settings](/docs/business-settings). Signed agreements, customer ID and photos are in **Settings › Business › Files**. See [Documents and files](/docs/documents).
 - **Help**: guides, and a place to write to us. See [Get help](/docs/get-help).
 
 A number next to **To do**, **Inbox** or **Help** means something is waiting.

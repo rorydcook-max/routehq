@@ -19,6 +19,8 @@ faq:
     a: "Of the tools here, RoveHQ is the one we found with chat apps built in: it connects a LINE Official Account or Telegram bot to one inbox and sends automatic reminders, and it opens WhatsApp with the message ready to send."
   - q: "What happened to Rentle and Navotar?"
     a: "Rentle is now TWICE Commerce, and Navotar's products now carry the RENTALL name. Both are covered in this guide under their new names."
+cover: "/site/covers/scooter.svg"
+coverAlt: "Illustration: a scooter by the sea"
 ---
 
 There's no single best rental software. There's the one that fits how many vehicles you have, what you rent, how your customers pay and how you like to work. This roundup covers the tools small car, scooter, quad and van rental shops most often compare, with prices and facts from each company's own website **as of November 2026**.

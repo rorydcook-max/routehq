@@ -15,6 +15,8 @@ faq:
 
 Most changes start from **Change terms** on the booking.
 
+![A booking in RoveHQ: dates, billing, next payment, and buttons to start the return or change terms](/site/docs/screens/booking-page.webp)
+
 ## Extend a rental
 
 1. Open the booking, tap **Change terms** > **Extend rental**.

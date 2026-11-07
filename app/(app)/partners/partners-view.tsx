@@ -1,18 +1,21 @@
 "use client";
 
-import { Car, Check, Copy, Handshake, Loader2, Search, Share2 } from "lucide-react";
+import { Car, Check, Copy, Handshake, Loader2, MapPin, Search, Share2, Truck } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { longDate, shortDate } from "@/lib/i18n/dates";
-import { formatMoney } from "@/lib/regional";
+import { formatDistance, formatMoney, fromKm, type DistanceUnit } from "@/lib/regional";
 import { markReferralSettled, savePartnerNetwork, searchPartnerVehicles } from "@/app/actions/partners";
+import { MoneyInput } from "@/components/money-input";
+import { PlaceField, type PickedPlace } from "@/components/place-field";
 import { SwitchField } from "@/components/switch-field";
 import type { PartnerVehicle, ReferralRow } from "@/lib/partner-pricing";
+import { searchPlaces } from "@/lib/place-coords";
+import { CAR_SIZES, ENGINE_BANDS, ENGINE_KINDS } from "@/lib/vehicle-filters";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
-export type RegionOption = { name: string; towns: string[] };
 
 // The global field style (44px, regular weight), so these line up with the Search button beside them.
 const inputClass = "mt-1 w-full";
@@ -47,9 +50,8 @@ export function PartnersView({
   canEdit,
   canSettle,
   referrals,
-  regions,
   country,
-  defaultTown,
+  defaultPlace,
   currency,
   pct,
   today
@@ -59,9 +61,8 @@ export function PartnersView({
   canEdit: boolean;
   canSettle: boolean;
   referrals: ReferralRow[];
-  regions: RegionOption[];
   country: string;
-  defaultTown: string;
+  defaultPlace: PickedPlace | null;
   currency: string;
   pct: number;
   today: string;
@@ -73,13 +74,19 @@ export function PartnersView({
   const [saveFailed, setSaveFailed] = useState(false);
   const [saving, startSaving] = useTransition();
 
-  const [place, setPlace] = useState(defaultTown ? `t:${defaultTown}` : "");
+  const [place, setPlace] = useState<PickedPlace | null>(defaultPlace);
+  const [placeText, setPlaceText] = useState(defaultPlace?.name || "");
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(addDays(today, 7));
   const [kind, setKind] = useState("any");
+  const [size, setSize] = useState("");
+  const [engine, setEngine] = useState("");
+  const [gearbox, setGearbox] = useState("");
+  const [budgetInput, setBudgetInput] = useState("");
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<PartnerVehicle[] | null>(null);
   const [resultCurrency, setResultCurrency] = useState(currency);
+  const [unit, setUnit] = useState<DistanceUnit>("km");
   const [searched, setSearched] = useState<{ startDate: string; endDate: string | null } | null>(null);
   const [budget, setBudget] = useState<number | null>(null);
   const [error, setError] = useState("");
@@ -87,6 +94,20 @@ export function PartnersView({
   const [fallbackLink, setFallbackLink] = useState<{ id: string; url: string } | null>(null);
 
   const kinds = useMemo(() => [...KINDS].sort((a, b) => c(`kinds_${a}`).localeCompare(c(`kinds_${b}`))), [c]);
+  const sizes = useMemo(() => [...CAR_SIZES].sort((a, b) => t(`size_${a}`).localeCompare(t(`size_${b}`))), [t]);
+  const gearboxes = useMemo(() => ["auto", "manual"].sort((a, b) => t(`gear_${a}`).localeCompare(t(`gear_${b}`))), [t]);
+  const showSize = kind === "car";
+  const showEngine = ENGINE_KINDS.includes(kind);
+  const distance = (km: number) => formatDistance(Math.round(fromKm(km, unit) * 10) / 10, unit, "en-US");
+  /** "Automatic · 5 seats · 125 cc", from what the operator recorded. */
+  const details = (vehicle: PartnerVehicle) =>
+    [
+      vehicle.gearbox ? t(`gear_${vehicle.gearbox}`) : null,
+      vehicle.seats && vehicle.kind !== "scooter" && vehicle.kind !== "motorbike" ? t("seatsN", { count: vehicle.seats }) : null,
+      vehicle.engineCc && ENGINE_KINDS.includes(vehicle.kind) ? t("ccN", { cc: vehicle.engineCc.toLocaleString("en-US") }) : null
+    ]
+      .filter(Boolean)
+      .join(" · ");
 
   function toggleSharing(next: boolean) {
     setSharing(next);
@@ -107,12 +128,34 @@ export function PartnersView({
     setSearching(true);
     setError("");
     setFallbackLink(null);
-    const town = place.startsWith("t:") ? place.slice(2) : null;
-    const region = place.startsWith("r:") ? place.slice(2) : null;
-    const result = await searchPartnerVehicles({ startDate, endDate: endDate || null, kind, town, region }).catch(() => null);
+    // Typed but not picked: the best suggestion, so "lamai" + Search just works. Nothing typed: anywhere.
+    let point = place;
+    if (!point && placeText.trim()) {
+      const best = searchPlaces(placeText, { country, limit: 1 })[0];
+      if (!best) {
+        setError(t("placeUnknown"));
+        setSearching(false);
+        return;
+      }
+      point = { name: best.name, region: best.region, lat: best.lat, lng: best.lng };
+      setPlace(point);
+    }
+    const budgetValue = Number(budgetInput);
+    const result = await searchPartnerVehicles({
+      startDate,
+      endDate: endDate || null,
+      kind,
+      size: showSize ? size || null : null,
+      engine: showEngine ? engine || null : null,
+      gearbox: gearbox || null,
+      lat: point?.lat ?? null,
+      lng: point?.lng ?? null,
+      maxPerDay: budgetValue > 0 ? budgetValue : null
+    }).catch(() => null);
     if (result?.ok) {
       setResults(result.vehicles);
       setResultCurrency(result.currency);
+      setUnit(result.unit);
       setSearched({ startDate, endDate: endDate || null });
       setBudget(null);
     } else setError(result && !result.ok ? result.error : t("searchFailed"));
@@ -184,23 +227,22 @@ export function PartnersView({
           {/* 2. What the customer wants. */}
           <section className="card p-4">
             <h2 className="card-title">{t("searchTitle")}</h2>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_auto]">
-              <label className={labelClass}>
-                {t("location")}
-                <select className={inputClass} onChange={(event) => setPlace(event.target.value)} value={place}>
-                  <option value="">{country ? t("anywhereIn", { country }) : t("anywhere")}</option>
-                  {regions.map((region) => (
-                    <optgroup key={region.name} label={region.name}>
-                      <option value={`r:${region.name}`}>{t("allOf", { region: region.name })}</option>
-                      {region.towns.map((town) => (
-                        <option key={town} value={`t:${town}`}>
-                          {town}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
-              </label>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr]">
+              <div className="sm:col-span-2 lg:col-span-1">
+                <label className={labelClass} htmlFor="partner-place">
+                  {t("where")}
+                </label>
+                <PlaceField
+                  country={country}
+                  initial={defaultPlace}
+                  inputId="partner-place"
+                  onPick={(picked, typed) => {
+                    setPlace(picked);
+                    setPlaceText(typed);
+                  }}
+                  placeholder={t("wherePh")}
+                />
+              </div>
               <label className={labelClass}>
                 {t("startDate")}
                 <input
@@ -219,9 +261,20 @@ export function PartnersView({
                 {t("endDate")}
                 <input className={inputClass} min={addDays(startDate || today, 1)} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
               </label>
+            </div>
+            {/* What kind of vehicle, and the budget: all applied by the search itself. */}
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]">
               <label className={labelClass}>
                 {t("vehicleType")}
-                <select className={inputClass} onChange={(event) => setKind(event.target.value)} value={kind}>
+                <select
+                  className={inputClass}
+                  onChange={(event) => {
+                    setKind(event.target.value);
+                    setSize("");
+                    setEngine("");
+                  }}
+                  value={kind}
+                >
                   <option value="any">{t("anyType")}</option>
                   {kinds.map((value) => (
                     <option key={value} value={value}>
@@ -230,7 +283,48 @@ export function PartnersView({
                   ))}
                 </select>
               </label>
-              <button className="primary-action pressable self-end" disabled={searching || !startDate} onClick={search} type="button">
+              {showSize ? (
+                <label className={labelClass}>
+                  {t("size")}
+                  <select className={inputClass} onChange={(event) => setSize(event.target.value)} value={size}>
+                    <option value="">{t("anySize")}</option>
+                    {sizes.map((value) => (
+                      <option key={value} value={value}>
+                        {t(`size_${value}`)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : showEngine ? (
+                <label className={labelClass}>
+                  {t("engine")}
+                  {/* Smallest to biggest engine reads better than A to Z here. */}
+                  <select className={inputClass} onChange={(event) => setEngine(event.target.value)} value={engine}>
+                    <option value="">{t("anyEngine")}</option>
+                    {ENGINE_BANDS.map((value) => (
+                      <option key={value} value={value}>
+                        {t(`engine_${value}`)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+              <label className={labelClass}>
+                {t("gearbox")}
+                <select className={inputClass} onChange={(event) => setGearbox(event.target.value)} value={gearbox}>
+                  <option value="">{t("anyGearbox")}</option>
+                  {gearboxes.map((value) => (
+                    <option key={value} value={value}>
+                      {t(`gear_${value}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className={`${labelClass} ${showSize || showEngine ? "" : "lg:col-span-2"}`}>
+                {t("budgetField")}
+                <MoneyInput className="mt-1" currency={currency} name="maxPerDay" onValueChange={setBudgetInput} />
+              </label>
+              <button className="primary-action pressable self-end sm:col-span-2 lg:col-span-1" disabled={searching || !startDate} onClick={search} type="button">
                 {searching ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}
                 {t("searchButton")}
               </button>
@@ -303,6 +397,18 @@ export function PartnersView({
                           {vehicle.business}
                           {vehicle.town ? ` · ${vehicle.town}` : ""}
                         </p>
+                        {details(vehicle) ? <p className="text-sm text-[var(--muted)]">{details(vehicle)}</p> : null}
+                        {vehicle.delivers === true ? (
+                          <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--success)]">
+                            <Truck aria-hidden="true" size={15} />
+                            {t("deliversToYou")}
+                          </p>
+                        ) : vehicle.delivers === false && vehicle.distanceKm !== null ? (
+                          <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground-secondary)]">
+                            <MapPin aria-hidden="true" size={15} />
+                            {vehicle.distanceKm < 1 ? t("pickupNear") : t("pickupAway", { distance: distance(vehicle.distanceKm) })}
+                          </p>
+                        ) : null}
                         <p className="mt-2 text-[15px] font-bold text-[var(--foreground)]">
                           {vehicle.days ? t("forDates", { total: money(vehicle.total, vehicle.currency), days: vehicle.days }) : t("perMonthOpen", { total: money(vehicle.total, vehicle.currency) })}
                         </p>

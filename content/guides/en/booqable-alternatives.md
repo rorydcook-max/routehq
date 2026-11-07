@@ -17,6 +17,8 @@ faq:
     a: "All of the alternatives here do. RoveHQ takes cards, Apple Pay, Google Pay and European methods such as SEPA Direct Debit, iDEAL and Klarna through your own Stripe account, with card deposit holds. HQ Rental Software, RentSyst and Rental Car Manager connect to their own choice of payment providers."
   - q: "Can I move my data from Booqable?"
     a: "Yes. Booqable exports orders, customers and inventory as CSV. RoveHQ recognizes those files and imports them for free; see our guide to switching from Booqable."
+cover: "/site/covers/compare.svg"
+coverAlt: "Illustration: a balance weighing two software options"
 ---
 
 Booqable is a popular, well-made rental tool. Its homepage says it's used by "8,500+ business owners in 12+ industries", from party and AV hire to tools, boats and bikes. If you rent out vehicles, though, you may be looking for something built around cars and motorbikes rather than stock items.

@@ -7,11 +7,15 @@ import { createBranch, deleteBranch, updateBranch } from "@/app/actions/settings
 import { PendingButton } from "@/components/pending-button";
 import { Badge } from "@/components/ui";
 import type { Branch } from "@/lib/branches";
+import { validPoint } from "@/lib/place-coords";
+import { fromKm, type DistanceUnit } from "@/lib/regional";
+import type { ServiceArea } from "@/lib/service-area";
+import { BranchServiceArea } from "./branch-service-area";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
-function BranchFields({ branch, say }: { branch?: Branch; say: Say }) {
+function BranchFields({ branch, say, place }: { branch?: Branch; say: Say; place: { country: string; unit: DistanceUnit; fallback?: ServiceArea | null } }) {
   return (
     <>
       <label className="block">
@@ -30,20 +34,32 @@ function BranchFields({ branch, say }: { branch?: Branch; say: Say }) {
         <span className={labelClass}>{say("br_email")}</span>
         <input className="mt-1 w-full" defaultValue={branch?.email || ""} name="email" type="email" />
       </label>
-      <label className="block">
-        <span className={labelClass}>{say("br_lat")}</span>
-        <input className="mt-1 w-full" defaultValue={branch?.latitude ?? ""} name="latitude" step="any" type="number" />
-      </label>
-      <label className="block">
-        <span className={labelClass}>{say("br_lng")}</span>
-        <input className="mt-1 w-full" defaultValue={branch?.longitude ?? ""} name="longitude" step="any" type="number" />
-      </label>
+      {/* Map pin and delivery radius (replaces the old latitude/longitude boxes). */}
+      <BranchServiceArea country={place.country} fallback={place.fallback} initial={branch} say={say} unit={place.unit} />
     </>
   );
 }
 
-export function BranchList({ branches, organizationId }: { branches: Branch[]; organizationId: string }) {
+type PlaceContext = { country: string; unit: DistanceUnit; fallback?: ServiceArea | null };
+
+export function BranchList({
+  branches,
+  organizationId,
+  country = "",
+  unit = "km",
+  fallbackAreas = []
+}: {
+  branches: Branch[];
+  organizationId: string;
+  country?: string;
+  unit?: DistanceUnit;
+  /** Where search places each location today (lib/service-area.ts), main location first. */
+  fallbackAreas?: ServiceArea[];
+}) {
   const say = useTranslations("settingsPage") as unknown as Say;
+  const areaFor = (branchId: string | null) => fallbackAreas.find((area) => area.branchId === branchId) || fallbackAreas[0] || null;
+  const placeFor = (branchId: string | null): PlaceContext => ({ country, unit, fallback: areaFor(branchId) });
+  const distance = (km: number) => `${Math.round(fromKm(km, unit) * 10) / 10} ${unit}`;
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
   const [isAddingBranch, setIsAddingBranch] = useState(false);
 
@@ -60,6 +76,18 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
                 <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{branch.address || say("br_noAddress")}</p>
                 {/* Contact details on their own line, muted when there are none. */}
                 <p className={`mt-0.5 text-sm font-medium ${contact ? "text-[var(--foreground-secondary)]" : "text-[var(--muted)]"}`}>{contact || say("br_noContact")}</p>
+                {/* Service area at a glance, with a nudge while it isn't set (partners search by it). */}
+                {(() => {
+                  const radiusKm = branch.service_radius_km === null || branch.service_radius_km === undefined ? null : Number(branch.service_radius_km);
+                  if (!validPoint(branch.latitude, branch.longitude) || radiusKm === null) {
+                    return <p className="mt-0.5 text-sm font-semibold text-[var(--warning)]">{say("br_setArea")}</p>;
+                  }
+                  return (
+                    <p className="mt-0.5 text-sm font-medium text-[var(--foreground-secondary)]">
+                      {radiusKm > 0 ? say("br_deliversWithin", { distance: distance(radiusKm) }) : say("br_pickupOnly")}
+                    </p>
+                  );
+                })()}
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 {branch.is_active ? null : <Badge tone="amber">{say("br_inactive")}</Badge>}
@@ -96,7 +124,7 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
               <form action={updateBranch} className="mt-3 grid gap-3 sm:grid-cols-2">
                 <input name="organizationId" type="hidden" value={organizationId} />
                 <input name="branchId" type="hidden" value={branch.id} />
-                <BranchFields branch={branch} say={say} />
+                <BranchFields branch={branch} place={placeFor(branch.id)} say={say} />
                 <label className="checkbox-label sm:col-span-2">
                   <input className="flex-shrink-0" defaultChecked={branch.is_active} name="isActive" type="checkbox" />
                   <span className="font-semibold text-[var(--foreground)]">{say("br_active")}</span>
@@ -118,7 +146,7 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
       {isAddingBranch ? (
         <form action={createBranch} className="grid gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5 sm:grid-cols-2">
           <input name="organizationId" type="hidden" value={organizationId} />
-          <BranchFields say={say} />
+          <BranchFields place={placeFor(null)} say={say} />
           <div className="flex flex-wrap gap-2 sm:col-span-2">
             <PendingButton className="primary-action" pendingLabel={say("br_adding")} type="submit">
               {say("br_add")}

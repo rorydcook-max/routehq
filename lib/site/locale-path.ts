@@ -32,7 +32,13 @@ export function isSitePath(path: string) {
     path.startsWith("/switch/") ||
     // Privacy policy, terms, DPA, sub-processors, cookies (lib/site/legal.ts).
     path === "/legal" ||
-    path.startsWith("/legal/")
+    path.startsWith("/legal/") ||
+    // RoveHQ for each kind of rental business (lib/site/segments.ts).
+    path === "/car-rental-software" ||
+    path === "/scooter-rental-software" ||
+    path === "/motorcycle-rental-software" ||
+    // Booking page templates, with example pages (app/(site)/site/[locale]/booking-pages).
+    path === "/booking-pages"
   );
 }
 

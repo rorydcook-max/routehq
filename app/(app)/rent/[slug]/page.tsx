@@ -10,17 +10,20 @@ import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 import { renterUrl } from "@/lib/booking-address";
 import { permanentRedirect } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { BookingSiteView } from "@/components/booking-site/booking-site-view";
+import { BOOKING_TEMPLATES, catalogLayoutFor, lowestPrices, type BookingTemplate } from "@/lib/booking-site";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ template?: string }> }): Promise<Metadata> {
+  const [{ slug }, query] = await Promise.all([params, searchParams]);
   const catalog = await getPublicCatalog(slug);
   const t = await getTranslations("customer");
   // One address for search engines (Rory, 1 Nov 2026): the business's own domain or subdomain when it has one,
   // else rove.rent/<slug>, however the page was reached.
   const canonical = catalog && catalog.enabled ? catalog.canonicalUrl : `${renterUrl()}/${slug}`;
-  return { title: catalog ? `${catalog.name} · ${t("bookAVehicle")}` : t("bookAVehicle"), alternates: { canonical } };
+  // A template preview (?template=, from Settings) is never indexed.
+  return { title: catalog ? `${catalog.name} · ${t("bookAVehicle")}` : t("bookAVehicle"), alternates: { canonical }, ...(query.template ? { robots: { index: false, follow: false } } : {}) };
 }
 
 function Notice({ title, message }: { title: string; message: string }) {
@@ -34,7 +37,7 @@ function Notice({ title, message }: { title: string; message: string }) {
   );
 }
 
-export default async function PublicCatalogPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ from?: string; to?: string; vehicle?: string; via?: string; embed?: string; ref?: string }> }) {
+export default async function PublicCatalogPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ from?: string; to?: string; vehicle?: string; via?: string; embed?: string; ref?: string; template?: string }> }) {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
   const isoDay = (value: unknown) => (/^\d{4}-\d{2}-\d{2}$/.test(String(value || "")) ? String(value) : null);
   // A partner's referral link (Partner network): the referring business, checked when the customer books.
@@ -98,6 +101,49 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
           />
         </div>
       </main>
+    );
+  }
+
+  // The page's template (Settings > Booking page). ?template= shows another one before choosing it (the Preview link).
+  const previewTemplate = BOOKING_TEMPLATES.includes(query.template as BookingTemplate) ? (query.template as BookingTemplate) : null;
+  const site = previewTemplate ? { ...catalog.site, template: previewTemplate } : catalog.site;
+  if (site.template !== "standard") {
+    const { fromMonthly, fromDaily } = lowestPrices(catalog.vehicles);
+    return (
+      <>
+        <BrandStyle colour={catalog.brandColour} />
+        <BookingSiteView
+          business={{ name: catalog.name, logoUrl: catalog.logoUrl, location: catalog.location, address: catalog.address, currency: catalog.currency, contacts: catalog.contacts }}
+          fromDaily={fromDaily}
+          fromMonthly={fromMonthly}
+          heroUrl={catalog.heroUrl || catalog.vehicles.find((vehicle) => vehicle.photoUrl)?.photoUrl || null}
+          site={site}
+          vehicleCount={catalog.vehicles.length}
+        >
+          <Catalog
+            currency={catalog.currency}
+            rates={rates}
+            visitorCurrency={visitor}
+            offer={catalog.offer}
+            deposit={catalog.deposit}
+            holdHours={catalog.holdHours}
+            organizationName={catalog.name}
+            slug={slug}
+            gapDays={catalog.gapDays}
+            today={catalog.minStart}
+            vehicles={catalog.vehicles}
+            seasons={catalog.seasons}
+            extras={catalog.extras}
+            initialStart={isoDay(query.from)}
+            initialEnd={isoDay(query.to)}
+            initialVehicleId={query.vehicle ? String(query.vehicle).slice(0, 60) : null}
+            source={query.via === "directory" ? "directory" : null}
+            referrer={referrer}
+            layout={catalogLayoutFor(site.template)}
+            monthlyFocus={site.template === "monthly"}
+          />
+        </BookingSiteView>
+      </>
     );
   }
 

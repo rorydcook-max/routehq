@@ -36,9 +36,28 @@ export function visitorCountryFrom(headers: Headers) {
   return String(headers.get("x-vercel-ip-country") || process.env.SITE_DEFAULT_COUNTRY || "").trim().toUpperCase();
 }
 
-/** The visitor's currency: their country's, US dollars when we can't tell (same rule as before, lib/site-currency.ts). */
+/**
+ * Search engines and AI crawlers (SEO, 7 Nov 2026). They see prices in US dollars, whatever country they crawl from:
+ * Googlebot crawling from Jakarta used to be shown rupiah, and that is what ended up in search results and AI answers.
+ */
+const CRAWLER =
+  /googlebot|google-inspectiontool|googleother|google-extended|storebot-google|adsbot-google|mediapartners-google|apis-google|feedfetcher-google|bingbot|bingpreview|msnbot|adidxbot|duckduckbot|duckassistbot|yandexbot|yandeximages|baiduspider|applebot|slurp|petalbot|seznambot|naverbot|yeti\/|sogou|qwantbot|mojeekbot|gptbot|chatgpt-user|oai-searchbot|claudebot|claude-user|claude-searchbot|anthropic-ai|perplexitybot|perplexity-user|ccbot|bytespider|amazonbot|meta-externalagent|meta-externalfetcher|facebookexternalhit|facebookbot|linkedinbot|twitterbot|slackbot|discordbot|telegrambot|whatsapp|cohere-ai|youbot|diffbot|mistralai-user|ai2bot|timpibot|semrushbot|ahrefsbot|mj12bot|dotbot|\bbot\b|crawler|spider/i;
+
+export function isCrawler(userAgent: string | null | undefined) {
+  return CRAWLER.test(String(userAgent || ""));
+}
+
+/**
+ * The visitor's currency: their country's, US dollars when we can't tell (lib/site-currency.ts). Crawlers always get
+ * US dollars, and so does a request with no country (on Vercel every visitor has one). SITE_DEFAULT_COUNTRY stands in
+ * for the missing country only in development (a local server has no x-vercel-ip-country).
+ */
 export function visitorCurrencyFrom(headers: Headers) {
-  return currencyForCountry(headers.get("x-vercel-ip-country")) || currencyForCountry(process.env.SITE_DEFAULT_COUNTRY) || "USD";
+  if (isCrawler(headers.get("user-agent"))) return "USD";
+  const country = String(headers.get("x-vercel-ip-country") || "").trim();
+  if (country) return currencyForCountry(country) || "USD";
+  if (process.env.NODE_ENV === "development") return currencyForCountry(process.env.SITE_DEFAULT_COUNTRY) || "USD";
+  return "USD";
 }
 
 /**

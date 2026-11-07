@@ -12,6 +12,8 @@ inside:
   - "Late return chasers in two steps: polite first, then firm"
   - "Calm wording for damage found at return and fines that arrive after the rental"
   - "Mid-rental check-in for long rentals and a review request"
+cover: "/site/covers/messages.svg"
+coverAlt: "Illustration: a phone with chat messages to a renter"
 ---
 
 Most of a rental shop's day is spent typing the same messages. What's the price? Where do I pay? What time do I bring it back? This pack gives you a tested wording for each of those moments, so you or your staff can answer in seconds and sound the same every time.

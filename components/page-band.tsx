@@ -54,7 +54,7 @@ export function bandTab(active: boolean) {
  * Counts on the band, as pills (Look G): a number in the display face, a few words, and a dot when
  * the count has a colour meaning. One that needs doing something about turns white with a brick number.
  */
-export function BandPills({ items }: { items: Array<{ count: number; label: string; dot?: string | null; alert?: boolean; href?: string | null; active?: boolean }> }) {
+export function BandPills({ items }: { items: Array<{ count: number; label: string; dot?: string | null; alert?: boolean; href?: string | null; active?: boolean; /** Shown instead of the count, e.g. "38%" or "฿4,200". */ value?: string }> }) {
   return (
     <div className="chip-row -my-1 flex flex-wrap gap-2 py-1">
       {items.map((item) => {
@@ -62,7 +62,7 @@ export function BandPills({ items }: { items: Array<{ count: number; label: stri
         const inner = (
           <>
             {item.dot ? <span aria-hidden="true" className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: item.dot }} /> : null}
-            <span className={`num text-[22px] leading-none ${loud && !item.active ? "text-[var(--danger)]" : ""}`}>{item.count}</span>
+            <span className={`num text-[22px] leading-none ${loud && !item.active ? "text-[var(--danger)]" : ""}`}>{item.value ?? item.count}</span>
             <span className="font-semibold">{item.label}</span>
           </>
         );

@@ -756,6 +756,12 @@ export async function updateTravelPolicySettings(formData: FormData) {
   revalidatePath("/settings/contracts");
 }
 
+/** The branch's delivery radius in km from its form (the form converts miles); empty = not set. */
+function serviceRadiusFromForm(formData: FormData) {
+  const value = optionalNumberFromForm(formData, "serviceRadiusKm");
+  return value === null || value === undefined || !Number.isFinite(Number(value)) ? null : Math.min(500, Math.max(0, Math.round(Number(value) * 10) / 10));
+}
+
 export async function createBranch(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
@@ -781,6 +787,7 @@ export async function createBranch(formData: FormData) {
     address,
     latitude: optionalNumberFromForm(formData, "latitude"),
     longitude: optionalNumberFromForm(formData, "longitude"),
+    service_radius_km: serviceRadiusFromForm(formData),
     phone: optionalStringFromForm(formData, "phone"),
     email: optionalStringFromForm(formData, "email"),
     is_active: true
@@ -820,6 +827,7 @@ export async function updateBranch(formData: FormData) {
       address: optionalStringFromForm(formData, "address"),
       latitude: optionalNumberFromForm(formData, "latitude"),
       longitude: optionalNumberFromForm(formData, "longitude"),
+      service_radius_km: serviceRadiusFromForm(formData),
       phone: optionalStringFromForm(formData, "phone"),
       email: optionalStringFromForm(formData, "email"),
       is_active: formData.get("isActive") === "on"

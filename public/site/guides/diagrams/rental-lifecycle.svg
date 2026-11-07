@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 686" width="720" height="686" role="img" aria-labelledby="lc-t"><title id="lc-t">Diagram: a rental from start to finish. Booking, signed agreement, handover check, return check, deposit back.</title>
+<rect width="720" height="686" rx="28" fill="#e6f2f2"/>
+<text x="46" y="62" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="#0b8f8c">A rental, start to finish</text>
+<path d="M76 130 V 224" stroke="#12bcb8" stroke-width="6"/>
+<circle cx="76" cy="122" r="30" fill="#06162b"/><text x="76" y="133" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="30" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+<text x="132" y="120" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="32" font-weight="700" fill="#06162b">Booking</text>
+<text x="132" y="160" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="26" fill="#4b5a6a">Dates, vehicle, price and deposit agreed</text><path d="M76 248 V 342" stroke="#12bcb8" stroke-width="6"/>
+<circle cx="76" cy="240" r="30" fill="#06162b"/><text x="76" y="251" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="30" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+<text x="132" y="238" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="32" font-weight="700" fill="#06162b">Agreement signed</text>
+<text x="132" y="278" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="26" fill="#4b5a6a">Before the keys change hands</text><path d="M76 366 V 460" stroke="#12bcb8" stroke-width="6"/>
+<circle cx="76" cy="358" r="30" fill="#06162b"/><text x="76" y="369" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="30" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+<text x="132" y="356" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="32" font-weight="700" fill="#06162b">Handover check</text>
+<text x="132" y="396" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="26" fill="#4b5a6a">Photos, fuel, km and signature</text><path d="M76 484 V 578" stroke="#12bcb8" stroke-width="6"/>
+<circle cx="76" cy="476" r="30" fill="#06162b"/><text x="76" y="487" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="30" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+<text x="132" y="474" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="32" font-weight="700" fill="#06162b">Return check</text>
+<text x="132" y="514" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="26" fill="#4b5a6a">Same photos, compared with handover</text>
+<circle cx="76" cy="594" r="30" fill="#12bcb8"/><text x="76" y="605" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="30" font-weight="700" fill="#ffffff" text-anchor="middle">5</text>
+<text x="132" y="592" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="32" font-weight="700" fill="#06162b">Deposit back</text>
+<text x="132" y="632" font-family="Geist, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="26" fill="#4b5a6a">Minus agreed, evidenced costs</text>
+</svg>

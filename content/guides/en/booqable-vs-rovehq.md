@@ -17,6 +17,8 @@ faq:
     a: "Booqable has iOS and Android apps, sold as a Mobile Point of Sale add-on at $9 to $12 per user a month. RoveHQ is a phone-first web app included in every plan, which you can add to your home screen."
   - q: "Can I switch from Booqable to RoveHQ?"
     a: "Yes. Export your orders, customers and inventory from Booqable as CSV and upload them to RoveHQ. The import is free, and you can undo it within 30 days."
+cover: "/site/covers/compare.svg"
+coverAlt: "Illustration: a balance weighing two software options"
 ---
 
 Booqable and RoveHQ both help you take bookings, track what's out and get paid. They were built for different businesses, though. Booqable serves "8,500+ business owners in 12+ industries", according to its [homepage](https://booqable.com/), most of them renting equipment. RoveHQ is only for vehicle rental.

@@ -21,7 +21,8 @@ const nextConfig: NextConfig = {
     // The "For owners" page was dropped (28 Oct 2026): the website speaks only to rental businesses for now.
     // Rentle is now TWICE Commerce (Nov 2026): its switching page stays at /switch/rentle.
     return [
-      { source: "/owners", destination: "/home", permanent: true },
+      // Straight to "/": /home itself now redirects there (proxy.ts), so pointing here at /home would be a chain.
+      { source: "/owners", destination: "/", permanent: true },
       { source: "/switch/twice-commerce", destination: "/switch/rentle", permanent: true },
       { source: "/:locale/switch/twice-commerce", destination: "/:locale/switch/rentle", permanent: true }
     ];

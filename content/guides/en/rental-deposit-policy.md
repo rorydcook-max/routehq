@@ -15,6 +15,8 @@ faq:
     a: "Refund it at the return inspection if there is no damage, or within a short, stated period if you hold part of it for fines or repairs. Write the timing into your agreement."
   - q: "What can I deduct from a rental deposit?"
     a: "Only what your signed agreement allows: new damage shown by comparing handover and return photos, missing accessories, fuel shortfall, late return, cleaning beyond normal use and traffic fines from the rental period. Always give the renter an itemized list."
+cover: "/site/covers/deposit.svg"
+coverAlt: "Illustration: a stack of coins and a lock for a held deposit"
 ---
 
 *By Anan · Updated 28 October 2026*
@@ -56,6 +58,8 @@ If you offer this, keep it simple and honest:
 - **Exclude what you must:** riding without a license, drink-riding, and taking the vehicle off the permitted area.
 
 Track how much you collect against how much you pay out in repairs. If repairs regularly exceed the fees, raise the fee or narrow the cover.
+
+![Diagram: what happens to a deposit. Taken before handover and written on the agreement, kept separate as the customer's money, checked at return, deductions backed by evidence, the rest refunded promptly.](/site/guides/diagrams/deposit-flow.svg)
 
 ## How to take the deposit
 

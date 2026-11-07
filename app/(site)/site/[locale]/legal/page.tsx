@@ -3,7 +3,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { listLegalDocs } from "@/lib/site/legal";
 import { siteLocale, type SiteParams } from "@/lib/site/static-page";
 import { siteMetadata } from "@/lib/site/seo";
-import { contentDate } from "../_components/content-ui";
+import { breadcrumbLd } from "@/lib/site/schema";
+import { contentDate, JsonLd } from "../_components/content-ui";
 import { Container, Eyebrow, SiteLink } from "../_components/site-ui";
 import s from "../site.module.css";
 import l from "./legal.module.css";
@@ -21,6 +22,15 @@ export default async function LegalIndexPage({ params }: SiteParams) {
   const docs = listLegalDocs(locale);
   return (
     <>
+      <JsonLd
+        data={breadcrumbLd(
+          [
+            { name: m("breadcrumbHome"), path: "/" },
+            { name: m("footerLegal"), path: "/legal" }
+          ],
+          locale
+        )}
+      />
       <section className={`${s.dark} ${s.hero} ${s.heroPlain}`}>
         <Container>
           <div className={s.rise}>

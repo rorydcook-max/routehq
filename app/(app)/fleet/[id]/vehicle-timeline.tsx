@@ -9,7 +9,7 @@ export type VehicleTimelineEvent = {
   title: string;
   detail?: string | null;
   date: string;
-  kind: "activity" | "compliance" | "reminder" | "rental";
+  kind: "activity" | "compliance" | "reminder" | "rental" | "service" | "damage";
 };
 
 type RangePreset = "year" | "quarter" | "all" | "custom";
@@ -35,7 +35,9 @@ const KIND_COLOUR: Record<VehicleTimelineEvent["kind"], string> = {
   activity: "var(--primary)",
   compliance: "var(--warning)",
   reminder: "var(--going-out)",
-  rental: "var(--coming-back)"
+  rental: "var(--coming-back)",
+  service: "var(--success)",
+  damage: "var(--danger)"
 };
 
 /** What has happened with this vehicle, newest first. */

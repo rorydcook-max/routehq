@@ -7,6 +7,8 @@ export type Branch = {
   address: string | null;
   latitude: number | null;
   longitude: number | null;
+  /** Delivers and collects within this many km (0 = pickup at the branch only; null = not set). */
+  service_radius_km: number | null;
   phone: string | null;
   email: string | null;
   is_active: boolean;
@@ -17,7 +19,7 @@ export async function getBranches(organizationId: string) {
   const supabase = (await createSupabaseServerClient()) as any;
   const { data, error } = await supabase
     .from("branches")
-    .select("id, organization_id, name, address, latitude, longitude, phone, email, is_active, created_at")
+    .select("id, organization_id, name, address, latitude, longitude, service_radius_km, phone, email, is_active, created_at")
     .eq("organization_id", organizationId)
     .order("created_at", { ascending: true });
 
@@ -43,7 +45,7 @@ export async function ensureDefaultBranch(organisation: { id: string; name: stri
       name: organisation.name,
       is_active: true
     })
-    .select("id, organization_id, name, address, latitude, longitude, phone, email, is_active, created_at")
+    .select("id, organization_id, name, address, latitude, longitude, service_radius_km, phone, email, is_active, created_at")
     .single();
 
   if (error || !data) {

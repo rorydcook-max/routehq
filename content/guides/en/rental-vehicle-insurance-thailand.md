@@ -15,6 +15,8 @@ faq:
     a: "You can agree in the contract that the renter pays up to the excess when they cause damage, but under the 2025 rental contract rules you can only claim actual, evidenced damage and cannot keep a deposit if the renter has not breached the contract."
   - q: "Can I insure rental scooters against theft?"
     a: "Some insurers sell voluntary motorbike policies that include theft, usually class 1 or 2+ style cover. Ask specifically whether rental use is accepted, as many personal motorbike policies exclude it."
+cover: "/site/covers/insurance.svg"
+coverAlt: "Illustration: a shield protecting a rental car"
 ---
 
 > Updated 28 October 2026. This is general information, not legal advice. Policy wording varies between insurers, so read your schedule and ask your broker to confirm in writing.

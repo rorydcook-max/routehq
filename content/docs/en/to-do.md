@@ -15,6 +15,8 @@ faq:
 
 **To do** lists payments to collect and jobs, grouped by **Overdue**, **Next 3 days**, **Next 7 days** and **Next 30 days**. Jobs further off or with no date are under **Later**. The counts at the top are filters: tap one to see just those.
 
+![RoveHQ To do list with a refund to decide and next month's rent to collect](/site/docs/screens/to-do.webp)
+
 ## What shows up
 
 Most of it is added for you:

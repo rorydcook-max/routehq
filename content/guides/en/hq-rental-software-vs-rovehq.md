@@ -17,6 +17,8 @@ faq:
     a: "Both. HQ connects to many gateways, including Stripe, PayPal, Braintree and Mollie. RoveHQ takes cards, Apple Pay, Google Pay, European methods such as SEPA Direct Debit and iDEAL, and card deposit holds through your own Stripe account, with a platform fee of 1% to 5% per payment depending on your plan, on top of Stripe's fee."
   - q: "Can I move from HQ Rental Software to RoveHQ?"
     a: "Yes. Export reservations, vehicles and customers to Excel from HQ and upload them to RoveHQ. The import is free and you can undo it within 30 days."
+cover: "/site/covers/compare.svg"
+coverAlt: "Illustration: a balance weighing two software options"
 ---
 
 HQ Rental Software is one of the best-known car rental systems for independent operators. Its [homepage](https://hqrentalsoftware.com/) says it's trusted by 1,250+ operators in 85+ countries. RoveHQ is a newer, phone-first tool for small fleets of cars, scooters, motorbikes, quads and vans. Both publish their prices, which makes a fair comparison easier.

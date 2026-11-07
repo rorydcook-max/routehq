@@ -5,6 +5,7 @@ import { parse as parseYaml } from "yaml";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { localizeSitePath } from "@/lib/site/locale-path";
 import { isLaunched } from "@/lib/site/launch";
+import { imageSize } from "@/lib/site/covers";
 
 /**
  * The website's written content: guides (content/guides/<locale>/<slug>.md) and free resources
@@ -39,7 +40,9 @@ export type GuideMeta = {
   readingMinutes: number;
   leadMagnet: string | null;
   faq: FaqItem[];
+  /** `cover: /site/covers/contract.svg` and `coverAlt`: the card and page image (lib/site/covers.ts picks one when unset). */
   cover: string | null;
+  coverAlt: string | null;
   /** `launch: payments`: written for a launch and hidden until it is live (lib/site/launch.ts). */
   launch: string | null;
 };
@@ -56,6 +59,9 @@ export type ResourceMeta = {
   date: string;
   /** False for pages that exist for search (the country and city versions of the agreement): not in the list, but in the sitemap. */
   listed: boolean;
+  /** As on guides: the card and page image, chosen by lib/site/covers.ts when unset. */
+  cover: string | null;
+  coverAlt: string | null;
 };
 export type Resource = ResourceMeta & { html: string };
 export type ResourceFile = { locale: string; format: DownloadFormat; bytes: number };
@@ -210,7 +216,10 @@ export function renderMarkdown(body: string, locale: string): { html: string; he
       image({ href, title, text }) {
         const safe = /^(https?:\/\/|\/)/i.test(href) ? href : "";
         if (!safe) return escapeHtml(text);
-        return `<img src="${escapeHtml(safe)}" alt="${escapeHtml(text)}"${title ? ` title="${escapeHtml(title)}"` : ""} loading="lazy" decoding="async">`;
+        // A file in public/ gets its width and height, so the page doesn't jump as it loads.
+        const size = imageSize(safe);
+        const dims = size ? ` width="${size.width}" height="${size.height}"` : "";
+        return `<img src="${escapeHtml(safe)}" alt="${escapeHtml(text)}"${title ? ` title="${escapeHtml(title)}"` : ""}${dims} loading="lazy" decoding="async">`;
       }
     }
   });
@@ -246,6 +255,7 @@ function readGuide(locale: string, slug: string): Guide | null {
       leadMagnet: SLUG.test(str(data.leadMagnet)) ? str(data.leadMagnet) : null,
       faq,
       cover: str(data.cover) || null,
+      coverAlt: str(data.coverAlt) || null,
       launch: str(data.launch) || null,
       html,
       headings,
@@ -304,6 +314,8 @@ function readResource(locale: string, slug: string): Resource | null {
       formats: formats.length ? formats : ["pdf"],
       date: isoDate(data.date),
       listed: data.listed !== false,
+      cover: str(data.cover) || null,
+      coverAlt: str(data.coverAlt) || null,
       html: renderMarkdown(body, locale).html,
       draft: data.draft === true
     } as Resource & { draft: boolean };

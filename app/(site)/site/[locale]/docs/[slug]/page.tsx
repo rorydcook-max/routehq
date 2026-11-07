@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { DOC_CATEGORY_KEY, DOCS_LOCALE, getDoc, listDocs, loadPublishedArticles } from "@/lib/site/docs";
 import { siteLocale } from "@/lib/site/static-page";
-import { siteMetadata, siteOrigin, siteUrl } from "@/lib/site/seo";
+import { siteMetadata, siteUrl } from "@/lib/site/seo";
+import { breadcrumbLd, faqLd, organizationLd, schemaDateTime } from "@/lib/site/schema";
 import { contentDate, JsonLd } from "../../_components/content-ui";
 import { Arrow, Container, Plus, SITE_LINKS, SiteLink } from "../../_components/site-ui";
 import s from "../../site.module.css";
@@ -65,29 +66,25 @@ export default async function DocPage({ params }: Props) {
       headline: doc.title,
       description: doc.description,
       inLanguage: doc.locale,
-      dateModified: doc.updated || undefined,
+      dateModified: schemaDateTime(doc.updated),
       mainEntityOfPage: { "@type": "WebPage", "@id": url },
       about: { "@type": "SoftwareApplication", name: "RoveHQ", applicationCategory: "BusinessApplication", operatingSystem: "Web" },
-      publisher: { "@type": "Organization", name: "RoveHQ", url: siteOrigin(), logo: { "@type": "ImageObject", url: `${siteOrigin()}/routehq-logo.svg` } }
+      publisher: organizationLd()
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: m("breadcrumbHome"), item: siteUrl("/", "en") },
-        { "@type": "ListItem", position: 2, name: m("docsEyebrow"), item: siteUrl("/docs", "en") },
-        { "@type": "ListItem", position: 3, name: doc.title, item: url }
-      ]
-    }
+    breadcrumbLd(
+      [
+        { name: m("breadcrumbHome"), path: "/" },
+        { name: m("docsEyebrow"), path: "/docs" },
+        { name: doc.title, path: `/docs/${slug}` }
+      ],
+      doc.locale
+    )
   ];
-  if (doc.faq.length) {
-    jsonLd.push({
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: doc.faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } }))
-    });
-  }
-  if (doc.video) {
+  if (doc.faq.length) jsonLd.push(faqLd(doc.faq));
+  // Google wants uploadDate as a full date-time with a time zone (Search Console, Nov 2026): "2026-11-02T09:00:00+07:00".
+  // Without a date the video block is left out rather than sent invalid.
+  const uploadDate = schemaDateTime(doc.updated);
+  if (doc.video && uploadDate) {
     jsonLd.push({
       "@context": "https://schema.org",
       "@type": "VideoObject",
@@ -95,7 +92,8 @@ export default async function DocPage({ params }: Props) {
       description: doc.description,
       contentUrl: doc.video,
       ...(doc.poster ? { thumbnailUrl: doc.poster } : {}),
-      uploadDate: doc.updated || undefined
+      uploadDate,
+      inLanguage: doc.locale
     });
   }
 

@@ -11,6 +11,8 @@ inside:
   - "Depreciation, so you see real profit, not just cash in"
   - "Payback in months and the break-even days you need each month"
   - "A fleet sheet to add up the whole business"
+cover: "/site/covers/calculator.svg"
+coverAlt: "Illustration: a calculator working out rental prices and profit"
 ---
 
 Most small rental businesses know their daily price but not what a vehicle really earns once the slow months, insurance, servicing and the drop in its value are counted. This spreadsheet does that sum for you.

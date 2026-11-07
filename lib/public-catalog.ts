@@ -1,4 +1,5 @@
-import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
+import { resolveBrandingAssetUrl, resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
+import { bookingSiteFrom } from "@/lib/booking-site";
 import { BLOCKING_RENTAL_STATUSES, BOOKABLE_END_COLUMNS, bookableEnd } from "@/lib/rental-conflicts";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { releaseExpiredHolds } from "@/lib/booking-holds";
@@ -128,7 +129,23 @@ export async function getPublicCatalog(slug: string) {
     .filter((vehicle) => vehicle.dailyRate > 0 || vehicle.weeklyRate > 0 || vehicle.monthlyRate > 0);
 
   const orgSettings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
+  // The page's template and sections (lib/booking-site.ts); its own big photo, when one was uploaded.
+  const site = bookingSiteFrom(orgSettings);
+  const heroUrl = site.heroPath
+    ? await resolveBrandingAssetUrl(admin, { bucket: "branding", path: site.heroPath }, { expiresIn: 60 * 60 }).catch(() => null)
+    : null;
+  const channels = orgSettings.contact_channels && typeof orgSettings.contact_channels === "object" ? orgSettings.contact_channels : {};
   return {
+    site,
+    heroUrl: heroUrl || null,
+    address: String(organization.business_address || ""),
+    /** How customers reach the business (Settings > Business): the social section starts from these. */
+    contacts: {
+      whatsapp: String(organization.whatsapp || ""),
+      line: String(organization.line_id || ""),
+      instagram: String(channels.instagram || ""),
+      facebook: String(channels.messenger || "")
+    },
     enabled: true as const,
     organizationId: String(organization.id),
     name: String(organization.name || "Vehicle rental"),

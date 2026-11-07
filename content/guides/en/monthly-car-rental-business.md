@@ -15,6 +15,8 @@ faq:
     a: "Normally the operator pays for scheduled servicing, wear parts and anything that fails through normal use. The renter pays for fuel, damage they cause, fines and anything caused by misuse. Spell this out in the agreement."
   - q: "Can a monthly renter end the rental early in Thailand?"
     a: "Yes. The standard car rental form under the 2025 rules lets a monthly or yearly renter return the car early with advance notice, and the operator refunds the unused rent pro rata and returns the deposit. Build this into your pricing instead of fighting it."
+cover: "/site/covers/car.svg"
+coverAlt: "Illustration: a rental car by the sea"
 ---
 
 > Updated 28 October 2026. This is general information, not legal advice.
@@ -92,6 +94,8 @@ Most long-stay customers prefer to pay month by month. That's fine, as long as t
 - **Receipts for every payment**, showing the period covered.
 
 RoveHQ reads payment slips, matches them to the right booking and sends reminders over LINE, WhatsApp or Telegram, which removes most of the monthly chasing. If you prefer to do it by hand, our [message templates](/resources/message-templates) include payment reminders in several languages.
+
+![RoveHQ To do list with a refund to decide and next month's rent to collect](/site/docs/screens/to-do.webp)
 
 ## Maintenance during a rental: who pays what
 

@@ -282,6 +282,8 @@ const SCREEN_ARTICLES: Record<string, string> = {
   "/settings/billing": "plans-and-billing",
   "/settings/notifications": "notifications",
   "/settings/contracts": "rental-agreements",
+  // Settings › Business › Files, the old Documents page (7 Nov 2026).
+  "/settings/files": "documents",
   "/bookings/new": "create-a-booking",
   "/transactions/new": "record-a-payment",
   "/transactions/new?cost=1": "add-a-cost",

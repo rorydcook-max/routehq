@@ -17,6 +17,8 @@ faq:
 
 Money in is on the left, money out on the right. On a phone, tap **Money in** or **Money out** to switch sides.
 
+![RoveHQ Money in & out: the month's money in, money out and profit, with each entry listed](/site/docs/screens/money-in-and-out.webp)
+
 ## Pick the period
 
 Tap **Day**, **Week**, **Month**, **Year** or **Custom**. Use the arrows to go back or forward, and **Today** / **This month** etc. to jump back to now.

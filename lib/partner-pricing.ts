@@ -11,6 +11,13 @@ export type PartnerVehicle = {
   name: string;
   year: number | null;
   kind: string;
+  /** From the vehicle's specifications, when recorded. */
+  seats: number | null;
+  engineCc: number | null;
+  gearbox: "auto" | "manual" | null;
+  /** Searched by place: km from the vehicle's branch, and whether the branch delivers there (else pickup). Null for "anywhere". */
+  distanceKm: number | null;
+  delivers: boolean | null;
   /** All prices below are in the vehicle operator's currency. */
   currency: string;
   pricingModel: "daily" | "weekly" | "monthly";

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="contract-t"><title id="contract-t">Illustration: a rental agreement with a signature</title>
+<rect width="1200" height="630" fill="#e6f2f2"/>
+<circle cx="930" cy="190" r="150" fill="#f3dcae"/>
+<path d="M0 520 C 200 500 360 540 600 520 S 1000 500 1200 520 V630 H0Z" fill="#cfe9e8"/>
+<path d="M90 560 h90 M980 575 h120 M520 590 h60" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+<rect x="410" y="96" width="380" height="460" rx="22" fill="#ffffff" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><rect x="450" y="196" width="245.99999999999997" height="14" rx="7" fill="#9fb3bf" opacity=".55"/><rect x="450" y="240" width="245.99999999999997" height="14" rx="7" fill="#9fb3bf" opacity=".55"/><rect x="450" y="284" width="165" height="14" rx="7" fill="#9fb3bf" opacity=".55"/><rect x="450" y="328" width="245.99999999999997" height="14" rx="7" fill="#9fb3bf" opacity=".55"/><rect x="450" y="372" width="245.99999999999997" height="14" rx="7" fill="#9fb3bf" opacity=".55"/>
+<rect x="450" y="132" width="200" height="26" rx="13" fill="#06162b"/>
+<path d="M452 470 C 480 420 500 500 530 450 S 580 430 600 470 S 640 450 660 462" fill="none" stroke="#0b8f8c" stroke-width="9" stroke-linecap="round"/>
+<path d="M450 500 h220" stroke="#06162b" stroke-width="4" stroke-dasharray="10 10"/>
+<g transform="rotate(38 820 380)"><rect x="800" y="250" width="40" height="220" rx="12" fill="#12bcb8" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><path d="M800 470 L 820 515 L 840 470Z" fill="#f3dcae" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/></g>
+<circle cx="760" cy="200" r="54" fill="#12bcb8" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><path d="M735 200 l18 18 l32 -36" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

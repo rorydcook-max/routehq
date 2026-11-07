@@ -15,6 +15,8 @@ faq:
 
 Almost everything on the dashboard can be tapped to open the details.
 
+![RoveHQ dashboard: vehicles on rent, money this month, unpaid rent and deposits held](/site/docs/screens/dashboard.webp)
+
 ## The counts at the top
 
 **overdue** and **for today** are jobs on [To do](/docs/to-do). **going out** and **coming back** are today's handovers and returns, and open the [Calendar](/docs/calendar). On a computer, **New booking** is on the right.

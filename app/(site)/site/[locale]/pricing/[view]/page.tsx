@@ -12,6 +12,8 @@ import { parsePricingView, pricingView } from "@/lib/site/internal-path";
 import { siteLocale } from "@/lib/site/static-page";
 import { localizeSitePath } from "@/lib/site/locale-path";
 import { siteMetadata } from "@/lib/site/seo";
+import { breadcrumbLd, faqLd, softwareApplicationLd } from "@/lib/site/schema";
+import { JsonLd } from "../../_components/content-ui";
 import { FinalCta } from "../../_components/final-cta";
 import { Check, Container, Eyebrow, Plus, RICH, SITE_LINKS, SiteLink, r } from "../../_components/site-ui";
 import s from "../../site.module.css";
@@ -108,8 +110,24 @@ export default async function PricingPage({ params }: Props) {
     Trial: { days: TRIAL_DAYS }
   };
 
+  // Structured data: the product with its plans in US dollars whatever the visitor's currency (search engines index
+  // one page), the questions below, and where the page sits.
+  const cheapestPaid = PLANS.filter((plan) => plan.monthly > 0).sort((a, b) => a.monthly - b.monthly)[0];
+  const jsonLd = [
+    softwareApplicationLd({ description: t("metaPricingDescription", { price: formatPlanPrice(planPrices(cheapestPaid, "USD").monthly, "USD", nl), days: TRIAL_DAYS }), locale }),
+    faqLd(faqs.map((key) => ({ q: t(`pfaq${key}Q`), a: t(`pfaq${key}A`, faqValues[key] || {}) }))),
+    breadcrumbLd(
+      [
+        { name: m("breadcrumbHome"), path: "/" },
+        { name: m("navPricing"), path: "/pricing" }
+      ],
+      locale
+    )
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <section className={`${s.dark} ${s.hero} ${s.heroCards}`}>
         <Container>
           {/* Above the plan cards: both rise in with an animation (each its own layer), and the cards, coming later,

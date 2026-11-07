@@ -15,6 +15,8 @@ faq:
 
 Do this every time. If there's ever an argument about a scratch or the fuel, the photos and signature settle it.
 
+![Diagram: a rental from start to finish. Booking, signed agreement, handover check, return check, deposit back.](/site/guides/diagrams/rental-lifecycle.svg)
+
 ## Hand a vehicle over
 
 1. Open the booking and tap **Start handover**. Or open the quick menu, tap **Hand over a vehicle** and pick the booking.

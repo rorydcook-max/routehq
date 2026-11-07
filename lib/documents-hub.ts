@@ -16,6 +16,8 @@ export type DocumentListItem = {
   mimeType: string | null;
   createdAt: string;
   signedUrl: string | null;
+  /** Opens the file through /api/files/[id], which signs a fresh link when asked (no signing on page load). */
+  fileUrl: string;
   href: string | null;
 };
 
@@ -57,8 +59,11 @@ function rentalLabel(rental: any) {
  * inspection photos) and the signed rental documents (agreements, delivery
  * and return reports, amendments), newest first.
  */
-export async function getDocumentList(organizationId: string, limit = 150): Promise<DocumentListItem[]> {
+export async function getDocumentList(organizationId: string, limit = 150, options: { signLinks?: boolean } = {}): Promise<DocumentListItem[]> {
   const supabase = (await createSupabaseServerClient()) as any;
+  // Settings › Files (7 Nov 2026) asks for no links: signing hundreds of files made the page slow to open.
+  const signLinks = options.signLinks !== false;
+  const fileUrl = (id: string) => `/api/files/${encodeURIComponent(id)}`;
   const [uploadsResult, signedResult, receiptsResult] = await Promise.all([
     supabase
       .from("documents")
@@ -96,15 +101,27 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
   const inspectionIds = idsOf("inspection");
   const versionIds = signed.map((row: any) => row.current_version_id).filter(Boolean);
 
-  const [vehiclesResult, customersResult, inspectionsResult, versionsResult] = await Promise.all([
+  const transactionIds = idsOf("transaction");
+  const [vehiclesResult, customersResult, inspectionsResult, versionsResult, transactionsResult] = await Promise.all([
     vehicleIds.length ? supabase.from("vehicles").select("id, registration_number, make, model").in("id", vehicleIds) : Promise.resolve({ data: [] }),
     customerIds.length ? supabase.from("customers").select("id, full_name").in("id", customerIds) : Promise.resolve({ data: [] }),
     inspectionIds.length ? supabase.from("inspections").select("id, rental_id, vehicle_id, type, vehicles(registration_number, make, model)").in("id", inspectionIds) : Promise.resolve({ data: [] }),
     versionIds.length
       ? supabase.from("rental_document_versions").select("id, final_pdf_storage_bucket, final_pdf_storage_path, pdf_storage_bucket, pdf_storage_path, swap:rendered_data_snapshot->swap").in("id", versionIds)
+      : Promise.resolve({ data: [] }),
+    // Receipt photos added with a cost or payment: shown with the vehicle the money was for.
+    transactionIds.length
+      ? supabase.from("transactions").select("id, vehicle_id").in("id", transactionIds)
       : Promise.resolve({ data: [] })
   ]);
 
+  const transactionById = new Map((transactionsResult.data || []).map((row: any) => [row.id, row]));
+  // Their vehicles' names (plain lookup: transactions has more than one link to vehicles, so an embed is ambiguous).
+  const transactionVehicleIds = [...new Set((transactionsResult.data || []).map((row: any) => row.vehicle_id).filter(Boolean))];
+  const { data: transactionVehicles } = transactionVehicleIds.length
+    ? await supabase.from("vehicles").select("id, registration_number, make, model").in("id", transactionVehicleIds)
+    : { data: [] };
+  const transactionVehicleById = new Map((transactionVehicles || []).map((row: any) => [row.id, row]));
   const inspectionById = new Map((inspectionsResult.data || []).map((row: any) => [row.id, row]));
   const rentalIds = [
     ...new Set([
@@ -131,6 +148,12 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
       if (row.owner_type === "vehicle" && row.owner_id) ownerLabel = String(vehicleLabels.get(row.owner_id) || "");
       if (row.owner_type === "customer" && row.owner_id) ownerLabel = String(customerLabels.get(row.owner_id) || "");
       if (row.owner_type === "rental" && row.owner_id) ownerLabel = rentalLabel(rentalById.get(row.owner_id));
+      if (row.owner_type === "transaction" && row.owner_id) {
+        const transaction: any = transactionById.get(row.owner_id);
+        const vehicle: any = transactionVehicleById.get(transaction?.vehicle_id) || {};
+        ownerLabel = [vehicle.registration_number, vehicle.make, vehicle.model].filter(Boolean).join(" ");
+        href = transaction?.vehicle_id ? `/fleet/${transaction.vehicle_id}` : null;
+      }
       if (row.owner_type === "inspection" && row.owner_id) {
         // Inspection photos belong to a booking: link there.
         const inspection: any = inspectionById.get(row.owner_id);
@@ -156,7 +179,8 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
         inspectionType,
         mimeType: row.mime_type,
         createdAt: row.created_at,
-        signedUrl: await signedPath(supabase, row.storage_path),
+        signedUrl: signLinks ? await signedPath(supabase, row.storage_path) : null,
+        fileUrl: fileUrl(row.id),
         href
       };
     })
@@ -177,7 +201,8 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
         createdAt: row.finalised_at || row.created_at,
         // Row read with the member's own access; the link is signed by the
         // document service like on the booking page.
-        signedUrl: version
+        fileUrl: fileUrl(`rental-document-${row.id}`),
+        signedUrl: version && signLinks
           ? await createRentalDocumentSignedUrl(
               version.final_pdf_storage_bucket || version.pdf_storage_bucket || "documents",
               version.final_pdf_storage_path || version.pdf_storage_path,
@@ -201,7 +226,8 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
       ownerLabel: rentalLabel(rentalById.get(row.rental_id)),
       mimeType: "application/pdf",
       createdAt: row.created_at,
-      signedUrl: await signedPath(supabase, `${organizationId}/receipts/${row.id}.pdf`),
+      signedUrl: signLinks ? await signedPath(supabase, `${organizationId}/receipts/${row.id}.pdf`) : null,
+      fileUrl: fileUrl(`receipt-${row.id}`),
       href: row.rental_id ? `/bookings/${row.rental_id}` : null
     }))
   );
@@ -214,4 +240,68 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
   return [...signedItems, ...receiptItems, ...uploads]
     .filter((item) => !fromDeleted(item))
     .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * A fresh link to one file from the list, signed only when someone opens it or its thumbnail scrolls into view
+ * (Settings › Files). Ids as getDocumentList gives them: an upload's id, "rental-document-<id>" or "receipt-<id>".
+ * Rows are read with the member's own access and checked against their business, so another business's id finds nothing.
+ */
+export async function signDocumentFile(organizationId: string, id: string, expiresIn = 60 * 60): Promise<string | null> {
+  const supabase = (await createSupabaseServerClient()) as any;
+  if (id.startsWith("rental-document-")) {
+    const documentId = id.slice("rental-document-".length);
+    if (!UUID.test(documentId)) return null;
+    const { data: row } = await supabase
+      .from("rental_documents")
+      .select("current_version_id")
+      .eq("id", documentId)
+      .eq("organization_id", organizationId)
+      .in("status", ["signed", "finalised"])
+      .maybeSingle();
+    if (!row?.current_version_id) return null;
+    const { data: version } = await supabase
+      .from("rental_document_versions")
+      .select("final_pdf_storage_bucket, final_pdf_storage_path, pdf_storage_bucket, pdf_storage_path")
+      .eq("id", row.current_version_id)
+      .maybeSingle();
+    const path = version?.final_pdf_storage_path || version?.pdf_storage_path;
+    if (!path) return null;
+    return createRentalDocumentSignedUrl(version.final_pdf_storage_bucket || version.pdf_storage_bucket || "documents", path, expiresIn).catch(() => null);
+  }
+  if (id.startsWith("receipt-")) {
+    const receiptId = id.slice("receipt-".length);
+    if (!UUID.test(receiptId)) return null;
+    const { data: row } = await supabase.from("receipts").select("id").eq("id", receiptId).eq("organisation_id", organizationId).maybeSingle();
+    if (!row) return null;
+    const { data } = await supabase.storage.from("documents").createSignedUrl(`${organizationId}/receipts/${row.id}.pdf`, expiresIn);
+    return data?.signedUrl || null;
+  }
+  if (!UUID.test(id)) return null;
+  const { data: row } = await supabase
+    .from("documents")
+    .select("storage_bucket, storage_path")
+    .eq("id", id)
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (!row?.storage_path) return null;
+  const { data } = await supabase.storage.from(row.storage_bucket || "documents").createSignedUrl(row.storage_path, expiresIn);
+  return data?.signedUrl || null;
+}
+
+/** Bytes taken by the business's uploaded photos and files (signed PDFs and receipts aren't sized in the database). */
+export async function getUploadedBytes(organizationId: string): Promise<number> {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data, error } = await supabase
+    .from("documents")
+    .select("size_bytes")
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .not("size_bytes", "is", null)
+    .limit(20000);
+  if (error) return 0;
+  return (data || []).reduce((sum: number, row: any) => sum + (Number(row.size_bytes) || 0), 0);
 }

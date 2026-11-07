@@ -21,6 +21,8 @@ RoveHQ writes the agreement for every booking, in English and the language of yo
 
 Already have your own contract? Tap **Upload your contract** beside it. See [Use your own agreement](/docs/use-your-own-agreement).
 
+![RoveHQ rental agreement settings with a preview of the English-Thai agreement](/site/docs/screens/rental-agreement.webp)
+
 ## Add your signature
 
 Customers can't finish a booking until you do this.

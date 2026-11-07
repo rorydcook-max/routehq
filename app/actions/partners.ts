@@ -6,7 +6,10 @@ import { canDecideMoney } from "@/lib/auth/role-types";
 import { said } from "@/lib/i18n/server-text";
 import { getDefaultOrganization } from "@/lib/organization";
 import { findPartnerVehicles, partnerNetworkSettings, settleReferral, type PartnerVehicle } from "@/lib/partner-network";
+import { validPoint } from "@/lib/place-coords";
+import type { DistanceUnit } from "@/lib/regional";
 import { recordActivityEvent } from "@/lib/supabase/activity";
+import { cleanVehicleFilter } from "@/lib/vehicle-filters";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -57,14 +60,21 @@ export async function saveDirectoryListing(input: { enabled: boolean }): Promise
   return { ok: true };
 }
 
-/** Partners' vehicles free for the dates, in the place and kind asked for. Only for businesses that share their fleet. */
+/**
+ * Partners' vehicles free for the dates, near the place asked for (a picked suggestion's coordinates), with the vehicle
+ * filters and budget applied here. Only for businesses that share their fleet.
+ */
 export async function searchPartnerVehicles(input: {
   startDate: string;
   endDate: string | null;
-  kind: string | null;
-  town?: string | null;
-  region?: string | null;
-}): Promise<Result<{ vehicles: PartnerVehicle[]; currency: string }>> {
+  kind?: string | null;
+  size?: string | null;
+  engine?: string | null;
+  gearbox?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  maxPerDay?: number | null;
+}): Promise<Result<{ vehicles: PartnerVehicle[]; currency: string; unit: DistanceUnit }>> {
   const who = await member();
   if ("error" in who) return { ok: false, error: who.error };
   if (!partnerNetworkSettings(who.organization.settings).enabled) return { ok: false, error: await said("Share your fleet with the partner network first, then you can search.") };
@@ -72,14 +82,14 @@ export async function searchPartnerVehicles(input: {
   const endDate = input.endDate ? String(input.endDate).slice(0, 10) : null;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) return { ok: false, error: await said("Choose a start date first.") };
   if (endDate && (!/^\d{4}-\d{2}-\d{2}$/.test(endDate) || endDate <= startDate)) return { ok: false, error: await said("The end date must be after the start date.") };
-  const clean = (value: unknown) => String(value || "").trim().slice(0, 80) || null;
+  const budget = Number(input.maxPerDay);
   const result = await findPartnerVehicles(createSupabaseAdminClient() as any, {
     organizationId: who.organization.id,
     startDate,
     endDate,
-    kind: clean(input.kind),
-    town: clean(input.town),
-    region: clean(input.region)
+    filter: cleanVehicleFilter(input),
+    point: validPoint(input.lat, input.lng),
+    maxPerDay: input.maxPerDay !== null && input.maxPerDay !== undefined && Number.isFinite(budget) && budget > 0 ? budget : null
   });
   return { ok: true, ...result };
 }

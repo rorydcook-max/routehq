@@ -9,7 +9,7 @@ import s from "../site.module.css";
 export const r = (path: string) => path as Route;
 
 /** Website pages that open each other in place. */
-const IN_SITE = new Set(["/pricing", "/faq", "/contact", "/guides", "/resources", "/legal", "/switch"]);
+const IN_SITE = new Set(["/pricing", "/faq", "/contact", "/guides", "/resources", "/legal", "/switch", "/car-rental-software", "/scooter-rental-software", "/motorcycle-rental-software", "/booking-pages"]);
 const inSite = (path: string) => IN_SITE.has(path) || path.startsWith("/guides/") || path.startsWith("/resources/") || path.startsWith("/legal/") || path.startsWith("/switch/");
 
 /**
@@ -55,7 +55,8 @@ function SiteAnchor({
 
 export const SITE_LINKS = {
   home: "/",
-  features: "/home#how",
+  // "/" with the section, not /home: /home redirects to "/" (proxy.ts).
+  features: "/#how",
   pricing: "/pricing",
   faq: "/faq",
   contact: "/contact",
@@ -63,6 +64,10 @@ export const SITE_LINKS = {
   resources: "/resources",
   docs: "/docs",
   switch: "/switch",
+  // RoveHQ for each kind of rental business (lib/site/segments.ts).
+  carRental: "/car-rental-software",
+  scooterRental: "/scooter-rental-software",
+  motorcycleRental: "/motorcycle-rental-software",
   // No link to the renters' booking site (/rent): it is moving to its own consumer brand, and this site speaks to rental businesses.
   signIn: "/login",
   signUp: "/signup"

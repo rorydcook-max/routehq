@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="scooter-t"><title id="scooter-t">Illustration: a scooter by the sea</title>
+<rect width="1200" height="630" fill="#e6f2f2"/>
+<circle cx="930" cy="190" r="150" fill="#f3dcae"/>
+<path d="M0 520 C 200 500 360 540 600 520 S 1000 500 1200 520 V630 H0Z" fill="#cfe9e8"/>
+<path d="M90 560 h90 M980 575 h120 M520 590 h60" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+<g transform="translate(0 0) scale(1)">
+<circle cx="420" cy="450" r="62" fill="#ffffff" stroke="#06162b" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/><circle cx="420" cy="450" r="19" fill="#06162b"/><circle cx="800" cy="450" r="62" fill="#ffffff" stroke="#06162b" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/><circle cx="800" cy="450" r="19" fill="#06162b"/>
+<path d="M360 395 Q 372 318 470 312 L 650 312 Q 690 314 700 352 L 712 418 L 470 418 Q 400 418 360 395Z" fill="#12bcb8" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="455" y="268" width="180" height="40" rx="20" fill="#06162b"/>
+<path d="M700 418 L 760 236 L 792 244 L 812 430" fill="#0b8f8c" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M760 236 L 778 176 M742 172 L 820 166" stroke="#06162b" stroke-width="12" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+<circle cx="800" cy="262" r="16" fill="#f3dcae" stroke="#06162b" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M740 452 Q 800 360 860 452" fill="none" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+</g>
+</svg>

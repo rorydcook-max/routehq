@@ -12,6 +12,15 @@ const small = "text-[13px] font-semibold text-[var(--foreground-secondary)]";
 // Places a time zone name doesn't say plainly.
 const ZONE_NAMES: Record<string, string> = { "Atlantic/Canary": "Canary Islands", "Atlantic/Madeira": "Madeira", "Atlantic/Azores": "Azores", "Asia/Nicosia": "Cyprus" };
 const zoneName = (zone: string) => ZONE_NAMES[zone] || (zone.split("/").pop() || zone).replace(/_/g, " ");
+// "(UTC+7)", so the owner can see the zone is right at a glance.
+const zoneOffset = (zone: string) => {
+  try {
+    const part = new Intl.DateTimeFormat("en-US", { timeZone: zone, timeZoneName: "shortOffset" }).formatToParts(new Date()).find((p) => p.type === "timeZoneName");
+    return part ? `(${part.value.replace("GMT", "UTC")})` : "";
+  } catch {
+    return "";
+  }
+};
 
 /**
  * Country and units (Settings › Rentals): the country sets sensible defaults for time zone, currency, miles or km and the
@@ -67,13 +76,20 @@ export function RegionalPanel({ initial }: { initial: RegionalInput }) {
         </label>
         <label className="block">
           <span className={small}>{say("reg_zone")}</span>
-          <select className="mt-1 w-full" disabled={zones.length < 2} onChange={(event) => update({ timezone: event.target.value })} value={form.timezone}>
-            {zones.map((zone) => (
-              <option key={zone} value={zone}>
-                {zoneName(zone)}
-              </option>
-            ))}
-          </select>
+          {/* A country with one time zone (Thailand) shows it as a fact, not a dropdown with one choice. */}
+          {zones.length < 2 ? (
+            <span className="mt-1 flex min-h-10 w-full items-center rounded-[var(--radius-md,10px)] bg-[var(--surface-muted,#f3f6f6)] px-3 text-sm font-semibold">
+              {zoneName(form.timezone)} {zoneOffset(form.timezone)}
+            </span>
+          ) : (
+            <select className="mt-1 w-full" onChange={(event) => update({ timezone: event.target.value })} value={form.timezone}>
+              {zones.map((zone) => (
+                <option key={zone} value={zone}>
+                  {zoneName(zone)} {zoneOffset(zone)}
+                </option>
+              ))}
+            </select>
+          )}
         </label>
         <label className="block">
           <span className={small}>{say("reg_currency")}</span>

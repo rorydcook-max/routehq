@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="plates-t"><title id="plates-t">Illustration: a vehicle registration plate</title>
+<rect width="1200" height="630" fill="#e6f2f2"/>
+<circle cx="930" cy="190" r="150" fill="#f3dcae"/>
+<path d="M0 520 C 200 500 360 540 600 520 S 1000 500 1200 520 V630 H0Z" fill="#cfe9e8"/>
+<path d="M90 560 h90 M980 575 h120 M520 590 h60" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+<rect x="300" y="190" width="600" height="260" rx="30" fill="#ffffff" stroke="#06162b" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="330" y="220" width="540" height="200" rx="18" fill="none" stroke="#06162b" stroke-width="4"/>
+<rect x="380" y="250" width="66" height="104" rx="14" fill="#06162b"/><rect x="468" y="250" width="66" height="104" rx="14" fill="#06162b"/><rect x="556" y="250" width="66" height="104" rx="14" fill="#06162b"/>
+<rect x="660" y="250" width="34" height="104" rx="10" fill="#0b8f8c"/><rect x="708" y="250" width="34" height="104" rx="10" fill="#0b8f8c"/><rect x="756" y="250" width="34" height="104" rx="10" fill="#0b8f8c"/><rect x="804" y="250" width="34" height="104" rx="10" fill="#0b8f8c"/>
+<rect x="480" y="378" width="240" height="18" rx="9" fill="#9fb3bf"/>
+<circle cx="345" cy="235" r="7" fill="#06162b"/><circle cx="855" cy="235" r="7" fill="#06162b"/>
+</svg>

@@ -13,6 +13,8 @@ faq:
     a: "Because it's the customer's money until you keep it. Deposits are listed separately in Money in & out. Anything you keep or deduct does count as income."
 ---
 
+![Diagram: what happens to a deposit. Taken before handover and written on the agreement, kept separate as the customer's money, checked at return, deductions backed by evidence, the rest refunded promptly.](/site/guides/diagrams/deposit-flow.svg)
+
 ## Set the amount
 
 Each booking takes the vehicle's own deposit, or your **Usual deposit** from Settings if the vehicle has none. You can change it on the booking form. See [Booking and price rules](/docs/booking-and-price-rules).

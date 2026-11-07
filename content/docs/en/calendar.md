@@ -13,6 +13,8 @@ faq: []
 
 Open **Calendar**. There are two views at the top.
 
+![RoveHQ Calendar in month view, with handovers, returns and payments by day](/site/docs/screens/calendar.webp)
+
 ## Agenda
 
 What's happening each day:

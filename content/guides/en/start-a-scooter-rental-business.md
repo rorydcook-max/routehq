@@ -17,6 +17,8 @@ faq:
     a: "Start from what similar bikes rent for in your area, then set weekly and monthly prices that give a clear discount for longer rentals. Our free pricing calculator helps you check that each rate still covers your costs."
   - q: "Is it OK to keep a renter's passport as a deposit?"
     a: "It is common but risky, and it is restricted by law in several countries. A cash, transfer or card deposit backed by a signed agreement and handover photos protects you better."
+cover: "/site/covers/scooter.svg"
+coverAlt: "Illustration: a scooter by the sea"
 ---
 
 *By Anan · Updated 28 October 2026*
@@ -135,6 +137,8 @@ Every rental needs a written agreement, even for one day. It should state:
 Use our free [rental agreement](/resources/rental-agreement), which is bilingual and filled in with your details.
 
 Then photograph the bike at every handover and return, in front of the renter, from the same angles every time. Our [vehicle handover checklist guide](/guides/vehicle-handover-checklist) gives the 12-photo protocol, and RoveHQ saves those photos with a timestamp against each booking so you can find them later in a dispute.
+
+![Diagram: the 12 handover photos. Eight around the vehicle (front, four corners, both sides, rear), then dashboard, wheels, seat and interior, and accessories.](/site/guides/diagrams/handover-photos.svg)
 
 ## Helmets and safety kit
 

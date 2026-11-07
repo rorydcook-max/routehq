@@ -17,6 +17,8 @@ faq:
     a: "Yes, on payments taken through Stripe: 5% on the Free plan, 2.5% on Starter, 2% on Pro, 1.5% on Business and 1% on any yearly plan, on top of Stripe's own processing fee. That's more than TWICE's 1.5% on Free, Starter and Pro paid monthly, the same on Business and less on a yearly plan. Cash, bank transfer and QR payments that customers pay you directly carry no RoveHQ fee."
   - q: "Can I move from Rentle to RoveHQ?"
     a: "Yes. Export your orders and customers where your account allows, or ask TWICE support for a copy of your data, then upload it to RoveHQ. The import is free."
+cover: "/site/covers/compare.svg"
+coverAlt: "Illustration: a balance weighing two software options"
 ---
 
 If you're searching for Rentle, you'll land on a different name. Rentle's [own news page](https://www.twicecommerce.com/blog/news/rentle-raises-3-8-million-euro-seed-round-to-power-circular-commerce) says "Rentle is now Twice Commerce", and rentle.io now redirects to twicecommerce.com. The product has grown into what its [homepage](https://www.twicecommerce.com/) calls a "circular commerce platform for rental and resale operators".

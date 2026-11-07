@@ -11,6 +11,8 @@ import { siteLocale, siteLocaleParams } from "@/lib/site/static-page";
 import { themeScript } from "@/lib/theme";
 import { rootMetadata, rootViewport } from "../../../root-metadata";
 import { localizeSitePath } from "@/lib/site/locale-path";
+import { siteWideLd } from "@/lib/site/schema";
+import { JsonLd } from "./_components/content-ui";
 import { CookieBanner } from "@/components/cookie-banner";
 import { GoogleTagManager } from "@/components/google-tag-manager";
 import { SiteFooter } from "./_components/site-footer";
@@ -52,6 +54,8 @@ export default async function SiteLayout({ children, params }: { children: React
     <html dir={textDirection(locale)} lang={locale} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {/* Organization and WebSite structured data, on every website page (lib/site/schema.ts). */}
+        <JsonLd data={siteWideLd(locale)} />
       </head>
       <body>
         {/* The website is drawn on the server: its few client parts need the language, not the words. */}

@@ -17,6 +17,8 @@ faq:
     a: "On the subscription, RoveHQ for 1 to 7 vehicles: free for up to 2 cars and 5 motorbikes, then €13 a month for up to 5 cars and 10 motorbikes, against RentSyst's €55 a month for up to 15 vehicles. RoveHQ also charges a platform fee on payments taken through Stripe (2.5% on Starter paid monthly, 1% on any yearly plan), on top of Stripe's fee. On Starter paid monthly, that fee closes the €42 gap once you take about €1,680 a month by card; on Starter yearly, at about €51,700 a year. RentSyst's €55 is good value if you're near 15 vehicles."
   - q: "Can I move from RentSyst to RoveHQ?"
     a: "Yes. Download your vehicles, orders and clients from RentSyst as XLS or CSV and upload them to RoveHQ. The import is free and you can undo it within 30 days."
+cover: "/site/covers/compare.svg"
+coverAlt: "Illustration: a balance weighing two software options"
 ---
 
 RentSyst and RoveHQ are both built for vehicle rental, which makes this a closer comparison than most. RentSyst is a cloud system that also covers car sharing and taxi fleets, with GPS and telematics at its core. RoveHQ is a phone-first tool for small fleets, from one vehicle to a few dozen cars, scooters, motorbikes, quads or vans.

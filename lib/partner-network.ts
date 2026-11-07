@@ -19,6 +19,10 @@ import { daysBetween, planFor } from "@/lib/rental-estimate";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { ratesFrom } from "@/lib/visitor-currency";
 import type { CommissionRow, PartnerVehicle, ReferralRow } from "@/lib/partner-pricing";
+import { distanceKm } from "@/lib/place-coords";
+import { distanceUnitFor, type DistanceUnit } from "@/lib/regional";
+import { PICKUP_REACH_KM, serviceAreasFor, type ServiceArea } from "@/lib/service-area";
+import { engineCcOf, gearboxOf, passesVehicleFilter, seatsOf, type VehicleFilter } from "@/lib/vehicle-filters";
 
 export type { CommissionRow, PartnerVehicle, ReferralRow };
 
@@ -51,23 +55,31 @@ export type PartnerSearch = {
   organizationId: string;
   startDate: string;
   endDate: string | null;
-  kind: string | null;
-  /** A town, or a whole province/region; empty for anywhere in the searcher's country. */
-  town: string | null;
-  region: string | null;
+  /** Type, car size, engine size and gearbox (lib/vehicle-filters.ts). */
+  filter: VehicleFilter;
+  /** Where the customer is (a place picked from the suggestions); null for anywhere in the searcher's country. */
+  point: { lat: number; lng: number } | null;
+  /** Most per day, in the searcher's currency; null for no limit. */
+  maxPerDay: number | null;
 };
+
+/** Where a vehicle is based: its own branch, else the business's main location. */
+function homeArea(areas: ServiceArea[], branchId: string | null | undefined) {
+  return (branchId ? areas.find((area) => area.branchId === branchId) : null) || areas[0] || null;
+}
 
 /**
  * Other sharing businesses' vehicles that are free for these dates, priced for them. Availability and price come from
  * the same code as each operator's public booking page (getPublicCatalog: holds released, booked and held dates, gap
  * days, lead time, high seasons, VAT), so what is shown here is exactly what the customer can book through the link.
  */
-export async function findPartnerVehicles(admin: any, input: PartnerSearch): Promise<{ vehicles: PartnerVehicle[]; currency: string }> {
-  const { data: mine } = await admin.from("organizations").select("id, settings, currency, timezone").eq("id", input.organizationId).maybeSingle();
+export async function findPartnerVehicles(admin: any, input: PartnerSearch): Promise<{ vehicles: PartnerVehicle[]; currency: string; unit: DistanceUnit }> {
+  const { data: mine } = await admin.from("organizations").select("id, settings, currency, timezone, country_code").eq("id", input.organizationId).maybeSingle();
   const myCurrency = String(mine?.currency || "THB");
+  const unit = distanceUnitFor(mine);
   const mySettings = partnerNetworkSettings(mine?.settings);
   // Only businesses that share can search.
-  if (!mySettings.enabled) return { vehicles: [], currency: myCurrency };
+  if (!mySettings.enabled) return { vehicles: [], currency: myCurrency, unit };
   const myPlace = placeOf(mine?.settings);
 
   const { data: candidates } = await admin
@@ -80,24 +92,52 @@ export async function findPartnerVehicles(admin: any, input: PartnerSearch): Pro
     const theirs = partnerNetworkSettings(candidate.settings);
     if (!theirs.enabled || !candidate.slug) return false;
     if (theirs.blocked.includes(input.organizationId) || mySettings.blocked.includes(candidate.id)) return false;
+    // Searched by place: distance decides, below. Anywhere: the searcher's own country only.
+    if (input.point) return true;
     const place = placeOf(candidate.settings);
-    // The searcher's own country only; then the town or region asked for.
-    if (myPlace.country && place.country && !same(myPlace.country, place.country)) return false;
-    if (input.town) return same(place.town, input.town);
-    if (input.region) return same(place.region, input.region);
-    return true;
+    return !(myPlace.country && place.country && !same(myPlace.country, place.country));
   });
+
+  // Each partner's service areas (branch pins and delivery radius) and where each vehicle is based.
+  const partnerIds = partners.map((partner) => partner.id);
+  const [{ data: branchRows }, { data: vehicleRows }] = partnerIds.length
+    ? await Promise.all([
+        admin.from("branches").select("id, organization_id, name, address, latitude, longitude, service_radius_km, is_active, created_at").in("organization_id", partnerIds).order("created_at", { ascending: true }),
+        admin.from("vehicles").select("id, home_branch_id, specifications").in("organization_id", partnerIds).is("deleted_at", null)
+      ])
+    : [{ data: [] }, { data: [] }];
+  const areasByOrg = new Map<string, ServiceArea[]>();
+  for (const partner of partners) {
+    areasByOrg.set(partner.id, serviceAreasFor(partner, ((branchRows || []) as any[]).filter((row) => row.organization_id === partner.id)));
+  }
+  const vehicleInfo = new Map<string, { branchId: string | null; specs: unknown }>();
+  for (const row of (vehicleRows || []) as any[]) vehicleInfo.set(row.id, { branchId: row.home_branch_id || null, specs: row.specifications || {} });
+  /** Distance from the searched point to an area, and whether it delivers there; null when it's out of reach. */
+  const reach = (area: ServiceArea | null) => {
+    if (!input.point) return { distanceKm: null, delivers: null };
+    if (!area) return null;
+    const km = distanceKm(input.point, area);
+    if (km > area.radiusKm + PICKUP_REACH_KM) return null;
+    return { distanceKm: Math.round(km * 10) / 10, delivers: area.radiusKm > 0 && km <= area.radiusKm };
+  };
 
   const found: Array<Omit<PartnerVehicle, "perDayMine" | "totalMine">> = [];
   const days = input.endDate ? daysBetween(input.startDate, input.endDate) : null;
   // One business at a time: getPublicCatalog sets the business clock for the request.
   for (const partner of partners) {
+    const areas = areasByOrg.get(partner.id) || [];
+    // Nothing of theirs reaches the place: skip loading their catalog.
+    if (input.point && !areas.some((area) => reach(area))) continue;
     const catalog = await getPublicCatalog(String(partner.slug)).catch(() => null);
     if (!catalog || !catalog.enabled) continue;
     if (input.startDate < catalog.minStart) continue;
     const place = placeOf(partner.settings);
     for (const vehicle of catalog.vehicles) {
-      if (input.kind && input.kind !== "any" && vehicle.kind !== input.kind) continue;
+      const info = vehicleInfo.get(vehicle.id);
+      const specs = info?.specs || {};
+      if (!passesVehicleFilter(input.filter, vehicle.kind, specs)) continue;
+      const where = reach(homeArea(areas, info?.branchId));
+      if (!where) continue;
       if (vehicle.busy.some((period) => clashes(input.startDate, input.endDate, period, catalog.gapDays))) continue;
       const base = planFor(vehicle, days);
       if (!base) continue;
@@ -121,6 +161,11 @@ export async function findPartnerVehicles(admin: any, input: PartnerSearch): Pro
         name: vehicle.name,
         year: vehicle.year,
         kind: vehicle.kind,
+        seats: seatsOf(specs),
+        engineCc: engineCcOf(specs),
+        gearbox: gearboxOf(specs, vehicle.kind),
+        distanceKm: where.distanceKm,
+        delivers: where.delivers,
         currency: catalog.currency,
         pricingModel: base.pricingModel,
         rate,
@@ -143,12 +188,21 @@ export async function findPartnerVehicles(admin: any, input: PartnerSearch): Pro
       rateTo.set(code, Number(rates[myCurrency]) > 0 ? Number(rates[myCurrency]) : null);
     })
   );
-  const vehicles: PartnerVehicle[] = found.map((item) => {
-    const factor = item.currency === myCurrency ? 1 : rateTo.get(item.currency) ?? null;
-    return { ...item, perDayMine: factor ? round2(item.perDay * factor) : null, totalMine: factor ? round2(item.total * factor) : null };
-  });
-  vehicles.sort((a, b) => (a.perDayMine ?? a.perDay) - (b.perDayMine ?? b.perDay) || a.business.localeCompare(b.business));
-  return { vehicles, currency: myCurrency };
+  const vehicles: PartnerVehicle[] = found
+    .map((item) => {
+      const factor = item.currency === myCurrency ? 1 : rateTo.get(item.currency) ?? null;
+      return { ...item, perDayMine: factor ? round2(item.perDay * factor) : null, totalMine: factor ? round2(item.total * factor) : null };
+    })
+    // The budget, in the searcher's currency. A price with no exchange rate can't be compared, so it stays in.
+    .filter((item) => input.maxPerDay === null || item.perDayMine === null || item.perDayMine <= input.maxPerDay);
+  // Nearest first (to the whole km, so price still decides between neighbours), then cheapest.
+  vehicles.sort(
+    (a, b) =>
+      Math.round(a.distanceKm ?? 0) - Math.round(b.distanceKm ?? 0) ||
+      (a.perDayMine ?? a.perDay) - (b.perDayMine ?? b.perDay) ||
+      a.business.localeCompare(b.business)
+  );
+  return { vehicles, currency: myCurrency, unit };
 }
 
 /**

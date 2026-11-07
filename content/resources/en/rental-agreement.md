@@ -13,6 +13,8 @@ inside:
   - "Insurance and excess, damage, theft, accidents and breakdowns"
   - "Handover and return check (Annex A) and a damage price list (Annex B)"
   - "Signature blocks for you, the renter and an additional driver"
+cover: "/site/covers/contract.svg"
+coverAlt: "Illustration: a rental agreement with a signature"
 ---
 
 Most rental shops start with an agreement copied from somewhere else, in one language, that says nothing about the things that actually go wrong: the fine that arrives a month later, the scooter returned with a cracked panel, the monthly renter who leaves two weeks early.

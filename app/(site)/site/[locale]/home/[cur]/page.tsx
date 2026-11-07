@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { numberLocale } from "@/lib/i18n/dates";
-import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { PLANS, fleetText } from "@/lib/plans";
+import { faqLd, softwareApplicationLd } from "@/lib/site/schema";
+import { hasOwnTranslation } from "@/lib/site/own-translation";
 import { formatPlanPrice, planPrices } from "@/lib/plan-currency";
 import { notFound } from "next/navigation";
 import { isSiteCurrency } from "@/lib/site-currency";
@@ -12,7 +13,7 @@ import { BookingPhoneMock, DashboardWindowMock, HandoverPhoneMock, ImportMock, L
 import { Arrow, Check, Container, Eyebrow, Plus, RICH, RICH_SERIF, SITE_LINKS, SiteLink } from "../../_components/site-ui";
 import { siteMetadata } from "@/lib/site/seo";
 import { getResource, listGuides } from "@/lib/site/content";
-import { CATEGORY_KEY } from "../../_components/content-ui";
+import { CATEGORY_KEY, JsonLd } from "../../_components/content-ui";
 import { FinalCta } from "../../_components/final-cta";
 import s from "../../site.module.css";
 import c from "../../content.module.css";
@@ -33,7 +34,16 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   await siteLocale(params);
   const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
-  return siteMetadata({ path: "/", locale, title: m("metaTitle"), description: m("metaDescription"), absoluteTitle: true });
+  // The title and description lead with what RoveHQ is (SEO, 7 Nov 2026). A language whose file doesn't have the new
+  // ones yet keeps its translated older ones rather than showing English.
+  const [ownTitle, ownDescription] = await Promise.all([hasOwnTranslation(locale, "marketing.homeMetaTitle"), hasOwnTranslation(locale, "marketing.homeMetaDescription")]);
+  return siteMetadata({
+    path: "/",
+    locale,
+    title: ownTitle ? m("homeMetaTitle") : m("metaTitle"),
+    description: ownDescription ? m("homeMetaDescription") : m("metaDescription"),
+    absoluteTitle: true
+  });
 }
 
 export default async function SiteHomePage({ params }: Props) {
@@ -64,36 +74,24 @@ export default async function SiteHomePage({ params }: Props) {
     { label: t("mockGoingOut", { count: 2 }), colour: "#4a9ad8" }
   ];
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "RoveHQ",
-    url: "https://rovehq.io",
-    applicationCategory: "BusinessApplication",
-    applicationSubCategory: "Vehicle rental management",
-    operatingSystem: "Web, Android, iOS",
-    description: m("metaDescription"),
-    inLanguage: [...supportedLocaleCodes],
-    offers: {
-      "@type": "AggregateOffer",
-      priceCurrency: "THB",
-      lowPrice: Math.min(...PLANS.map((plan) => plan.monthly)),
-      highPrice: Math.max(...PLANS.map((plan) => plan.monthly)),
-      offerCount: PLANS.length
-    },
-    publisher: { "@type": "Organization", name: "RoveHQ", url: "https://rovehq.io", logo: "https://rovehq.io/rovehq-logo.svg" }
-  };
+  // Structured data: the product with its plans in US dollars (lib/site/schema.ts), and the questions below.
+  // Organization and WebSite come from the layout.
+  const homeFaq = [1, 2, 3, 4, 5].map((n) => ({ q: m(`faq${n}Q`), a: m(`faq${n}A`) }));
+  const jsonLd = [softwareApplicationLd({ description: m("metaDescription"), locale }), faqLd(homeFaq)];
+  // The page's one H1 says what RoveHQ is (SEO, 7 Nov 2026), set small above the headline, which stays the brand line.
+  // Until a language has the new words, it uses its translated "For car, scooter and bike rental businesses".
+  const heading = (await hasOwnTranslation(locale, "marketing.heroH1")) ? m("heroH1") : m("heroEyebrow");
 
   return (
     <>
-      <script dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} type="application/ld+json" />
+      <JsonLd data={jsonLd} />
 
       {/* 1. Hero: the promise, then the product, running onto the white below */}
       <section className={`${s.dark} ${s.hero}`}>
         <Container>
           <div className={s.rise}>
-            <Eyebrow>{m("heroEyebrow")}</Eyebrow>
-            <h1 className={`${s.h1} mt-6`}>{m.rich("heroTitle", RICH_SERIF)}</h1>
+            <h1 className={s.eyebrow}>{heading}</h1>
+            <p className={`${s.h1} mt-6`}>{m.rich("heroTitle", RICH_SERIF)}</p>
             <p className={`${s.lede} ${s.heroBody}`}>{m("heroBody")}</p>
             <div className={s.heroActions}>
               <SiteLink className={`${s.btn} ${s.btnLight}`} href={SITE_LINKS.signUp}>

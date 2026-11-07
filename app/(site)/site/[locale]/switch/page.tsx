@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { siteLocale, type SiteParams } from "@/lib/site/static-page";
 import { siteMetadata } from "@/lib/site/seo";
+import { breadcrumbLd, faqLd } from "@/lib/site/schema";
 import { listSwitchPages } from "@/lib/site/switch";
 import { JsonLd } from "../_components/content-ui";
 import { FinalCta } from "../_components/final-cta";
@@ -26,11 +27,16 @@ export default async function SwitchPage({ params }: SiteParams) {
   await siteLocale(params);
   const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
   const pages = listSwitchPages(locale);
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: QUESTIONS.map((n) => ({ "@type": "Question", name: m(`switchQ${n}`), acceptedAnswer: { "@type": "Answer", text: m(`switchA${n}`) } }))
-  };
+  const jsonLd = [
+    faqLd(QUESTIONS.map((n) => ({ q: m(`switchQ${n}`), a: m(`switchA${n}`) }))),
+    breadcrumbLd(
+      [
+        { name: m("breadcrumbHome"), path: "/" },
+        { name: m("switchEyebrow"), path: "/switch" }
+      ],
+      locale
+    )
+  ];
 
   return (
     <>

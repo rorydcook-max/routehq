@@ -2,7 +2,7 @@ import { rentalHappeningNow } from "@/lib/vehicle-detail";
 import { toWallTime, businessToday } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRevenueTransaction } from "@/lib/transaction-options";
-import { amountDueNowByRental } from "@/lib/rental-balances";
+import { HANDED_OVER_STATUSES } from "@/lib/rental-balances";
 
 const activeRentalStatuses = ["booked", "active", "due_soon", "overdue", "extended"];
 
@@ -31,6 +31,8 @@ export type CustomerListItem = {
   totalRentals: number;
   /** Unpaid rent due today or earlier, across their rentals (the list only). */
   owesNow?: number;
+  /** Lifetime figures from customer_stats (the list and the customer page). */
+  stats?: CustomerStats;
 };
 
 export type CustomerDetail = CustomerListItem & {
@@ -140,48 +142,143 @@ async function addDocumentUrls(supabase: any, documents: any[]): Promise<Custome
   );
 }
 
+/** Where a customer first came from, worked out from their first booking (customer_stats, migration 0130). */
+export type CustomerSource = "booking_page" | "direct" | "imported" | "partner" | "rove_rent";
+
+/** Lifetime figures per customer, computed in the database in one pass (customer_stats, migration 0130). */
+export type CustomerStats = {
+  /** Rentals that went out (not drafts, unsent links, future bookings or cancellations). */
+  rentals: number;
+  /** Days on rent so far across those rentals. */
+  rentalDays: number;
+  firstStart: string | null;
+  lastEnd: string | null;
+  /** The next booking that hasn't started yet. */
+  nextStart: string | null;
+  /** Money brought in (not deposits), less refunds. */
+  revenue: number;
+  source: CustomerSource;
+  /** Rentals that came back with new damage or a kept deposit, plus own damage reports. */
+  damageCount: number;
+};
+
+const EMPTY_STATS: CustomerStats = { rentals: 0, rentalDays: 0, firstStart: null, lastEnd: null, nextStart: null, revenue: 0, source: "direct", damageCount: 0 };
+
+/** customer_stats for a whole business, keyed by customer. An empty map if the function isn't there yet. */
+export async function customerStatsByCustomer(supabase: any, organizationId: string) {
+  const stats = new Map<string, CustomerStats>();
+  const { data, error } = await supabase.rpc("customer_stats", { p_org: organizationId });
+  if (error) {
+    console.error("[customers] customer_stats failed:", error.message);
+    return stats;
+  }
+  for (const row of (data || []) as any[]) {
+    stats.set(String(row.customer_id), {
+      rentals: Number(row.rentals || 0),
+      rentalDays: Number(row.rental_days || 0),
+      firstStart: row.first_start || null,
+      lastEnd: row.last_end || null,
+      nextStart: row.next_start || null,
+      revenue: Number(row.revenue || 0),
+      source: (["booking_page", "direct", "imported", "partner", "rove_rent"].includes(row.source) ? row.source : "direct") as CustomerSource,
+      damageCount: Number(row.damage_count || 0)
+    });
+  }
+  return stats;
+}
+
+/** What each customer owes right now across their rentals: unpaid rent due today or earlier on a handed-over rental. */
+async function amountDueNowByCustomer(supabase: any, organizationId: string) {
+  const due = new Map<string, number>();
+  const { data, error } = await supabase
+    .from("rental_payments")
+    .select("amount, voided, metadata, rentals!inner(customer_id, status, organization_id, deleted_at)")
+    .eq("rentals.organization_id", organizationId)
+    .is("rentals.deleted_at", null)
+    .is("deleted_at", null)
+    .in("status", ["scheduled", "pending", "overdue"])
+    .in("rentals.status", HANDED_OVER_STATUSES)
+    .lte("due_date", businessToday());
+  if (error) console.error("[customers] amount due now failed:", error.message);
+  for (const row of (data || []) as any[]) {
+    if (row.voided || row.metadata?.voided || !row.rentals?.customer_id) continue;
+    due.set(row.rentals.customer_id, (due.get(row.rentals.customer_id) || 0) + Number(row.amount || 0));
+  }
+  return due;
+}
+
+/**
+ * The customer list: one fixed set of queries for the whole business, never one per customer.
+ * Lifetime figures come from customer_stats; only rentals on the go are read in full (for "renting the Yaris").
+ */
 export async function getCustomerList(organizationId: string): Promise<CustomerListItem[]> {
   const supabase = (await createSupabaseServerClient()) as any;
-  const [customersResult, documentsResult, rentalsResult, transactionsResult, returnsResult] = await Promise.all([
+  const [customersResult, documentsResult, rentalsResult, stats, dueByCustomer] = await Promise.all([
     supabase.from("customers").select("*").eq("organization_id", organizationId).is("deleted_at", null).order("created_at", { ascending: false }),
-    supabase.from("documents").select("*").eq("organization_id", organizationId).eq("owner_type", "customer").is("deleted_at", null),
+    supabase.from("documents").select("owner_id, category").eq("organization_id", organizationId).eq("owner_type", "customer").is("deleted_at", null),
     supabase
       .from("rentals")
-      .select("*, vehicles!rentals_vehicle_id_fkey(make, model, registration_number)")
+      .select("id, customer_id, status, start_date, end_date, vehicle_id, vehicles!rentals_vehicle_id_fkey(make, model, registration_number)")
       .eq("organization_id", organizationId)
+      .in("status", activeRentalStatuses)
       .is("deleted_at", null)
       .order("start_date", { ascending: false }),
-    supabase.from("transactions").select("*").eq("organization_id", organizationId).is("deleted_at", null),
-    supabase.from("inspections").select("rental_id, submitted_at, created_at").eq("organization_id", organizationId).eq("type", "return").not("rental_id", "is", null)
+    customerStatsByCustomer(supabase, organizationId),
+    amountDueNowByCustomer(supabase, organizationId)
   ]);
 
-  const queryError = [customersResult, documentsResult, rentalsResult, transactionsResult].find((result) => result.error)?.error;
+  const queryError = [customersResult, documentsResult, rentalsResult].find((result) => result.error)?.error;
   if (queryError) {
     throw new Error(queryError.message);
   }
 
-  // The day each vehicle came back, in the business's time zone.
-  const returnedOn = new Map<string, string>();
-  for (const row of (returnsResult.data || []) as any[]) {
-    const day = toWallTime(row.submitted_at || row.created_at).slice(0, 10);
-    if (day && (!returnedOn.has(row.rental_id) || day > String(returnedOn.get(row.rental_id)))) returnedOn.set(row.rental_id, day);
-  }
-  const rentals = (rentalsResult.data || []).map((rental: any) => ({ ...rental, returned_on: returnedOn.get(rental.id) || null }));
-  // What each person owes right now, the same figure their page and To do use.
-  const dueByRental = await amountDueNowByRental(supabase, rentals.filter((rental: any) => rental.status !== "cancelled").map((rental: any) => rental.id));
+  const documentsBy = new Map<string, any[]>();
+  for (const document of (documentsResult.data || []) as any[]) documentsBy.set(document.owner_id, [...(documentsBy.get(document.owner_id) || []), document]);
+  const rentalsBy = new Map<string, any[]>();
+  for (const rental of (rentalsResult.data || []) as any[]) rentalsBy.set(rental.customer_id, [...(rentalsBy.get(rental.customer_id) || []), rental]);
 
   return (customersResult.data || []).map((customer: any) => {
-    const theirRentals = rentals.filter((rental: any) => rental.customer_id === customer.id);
+    const documents = documentsBy.get(customer.id) || [];
+    const completeness = getCustomerDocumentCompleteness(documents);
+    // What is out on the road first, then what is booked.
+    const activeRentals = (rentalsBy.get(customer.id) || []).sort(
+      (left, right) => Number(left.status === "booked") - Number(right.status === "booked") || String(left.start_date).localeCompare(String(right.start_date))
+    );
+    const own = stats.get(customer.id) || EMPTY_STATS;
     return {
-      ...summarizeCustomer(
-        customer,
-        (documentsResult.data || []).filter((document: any) => document.owner_id === customer.id),
-        theirRentals,
-        (transactionsResult.data || []).filter((transaction: any) => transaction.customer_id === customer.id)
-      ),
-      owesNow: theirRentals.reduce((sum: number, rental: any) => sum + (dueByRental.get(rental.id) || 0), 0)
+      customer,
+      documents,
+      documentStatus: completeness.status,
+      documentCompleteness: completeness.percentage,
+      activeRentals,
+      activeRental: rentalHappeningNow(activeRentals),
+      lifetimeRevenue: own.revenue,
+      lastRentalDate: own.lastEnd,
+      totalRentals: own.rentals,
+      owesNow: dueByCustomer.get(customer.id) || 0,
+      stats: own
     };
   });
+}
+
+/** One month of the insights panel (customer_month_stats, migration 0130). */
+export type CustomerMonth = { month: string; newCustomers: number; rentals: number; rentalDays: number; revenue: number };
+
+/** The last 12 months: new customers, rentals started, their days and the money they brought in. */
+export async function getCustomerMonths(organizationId: string): Promise<CustomerMonth[]> {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data, error } = await supabase.rpc("customer_month_stats", { p_org: organizationId });
+  if (error) {
+    console.error("[customers] customer_month_stats failed:", error.message);
+    return [];
+  }
+  return ((data || []) as any[]).map((row) => ({
+    month: String(row.month).slice(0, 7),
+    newCustomers: Number(row.new_customers || 0),
+    rentals: Number(row.rentals || 0),
+    rentalDays: Number(row.rental_days || 0),
+    revenue: Number(row.revenue || 0)
+  }));
 }
 
 export async function getCustomerDetail(customerId: string, organizationId: string): Promise<CustomerDetail | null> {

@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { siteLocale, type SiteParams } from "@/lib/site/static-page";
 import { siteMetadata } from "@/lib/site/seo";
+import { breadcrumbLd } from "@/lib/site/schema";
 import { supportContacts } from "@/lib/support";
+import { JsonLd } from "../_components/content-ui";
 import { FinalCta } from "../_components/final-cta";
 import { Arrow, Container, Eyebrow, SITE_LINKS, SiteLink } from "../_components/site-ui";
 import { ContactForm } from "./contact-form";
@@ -43,7 +45,7 @@ export async function generateMetadata({ params }: SiteParams): Promise<Metadata
 
 export default async function ContactPage({ params }: SiteParams) {
   await siteLocale(params);
-  const m = await getTranslations("marketing");
+  const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
   const words = Object.fromEntries(FORM_KEYS.map((key) => [key, m(key)]));
   const contacts = supportContacts();
   const rows = [
@@ -54,6 +56,15 @@ export default async function ContactPage({ params }: SiteParams) {
 
   return (
     <>
+      <JsonLd
+        data={breadcrumbLd(
+          [
+            { name: m("breadcrumbHome"), path: "/" },
+            { name: m("navContact"), path: "/contact" }
+          ],
+          locale
+        )}
+      />
       <section className={`${s.dark} ${s.hero} ${s.heroPlain}`}>
         <Container>
           <div className={s.rise}>

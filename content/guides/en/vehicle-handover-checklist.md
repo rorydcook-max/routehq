@@ -15,9 +15,9 @@ faq:
     a: "Yes. Walk round the vehicle together, point out existing damage and let the renter see each photo. It stops most disputes before they start."
   - q: "What do I do if I find new damage when the vehicle comes back?"
     a: "Stay calm, photograph the damage from the same angle as the handover photo, show both to the renter, then use your damage price list or a repair quote to agree the cost in writing."
+cover: "/site/covers/handover.svg"
+coverAlt: "Illustration: a handover checklist and a vehicle key"
 ---
-
-*By Anan · Updated 28 October 2026*
 
 Most damage disputes are not really about the damage. They are about whether it was there before. If you can show a clear, dated photo of the same panel at handover and at return, the conversation usually ends in a minute. If you cannot, it becomes your word against the renter's, and the renter writes the review.
 
@@ -28,6 +28,8 @@ This guide gives you a handover routine you can do in five minutes, for scooters
 ## The 12-photo protocol
 
 Take the same 12 photos, in the same order, at every handover and every return. Consistency matters: it makes comparison quick, and it shows you treat every renter the same.
+
+![Diagram: the 12 handover photos. Eight around the vehicle (front, four corners, both sides, rear), then dashboard, wheels, seat and interior, and accessories.](/site/guides/diagrams/handover-photos.svg)
 
 1. **Front, straight on,** with the number plate readable.
 2. **Front left corner,** at about 45 degrees.

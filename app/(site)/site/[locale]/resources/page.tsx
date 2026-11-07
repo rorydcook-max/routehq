@@ -3,6 +3,9 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { siteLocale, type SiteParams } from "@/lib/site/static-page";
 import { listResources } from "@/lib/site/content";
 import { siteMetadata } from "@/lib/site/seo";
+import { breadcrumbLd } from "@/lib/site/schema";
+import { coverFor } from "@/lib/site/covers";
+import { CoverImage, JsonLd } from "../_components/content-ui";
 import { FinalCta } from "../_components/final-cta";
 import { Arrow, Container, Eyebrow, SiteLink } from "../_components/site-ui";
 import s from "../site.module.css";
@@ -24,6 +27,15 @@ export default async function ResourcesPage({ params }: SiteParams) {
 
   return (
     <>
+      <JsonLd
+        data={breadcrumbLd(
+          [
+            { name: m("breadcrumbHome"), path: "/" },
+            { name: m("navResources"), path: "/resources" }
+          ],
+          locale
+        )}
+      />
       <section className={`${s.dark} ${s.hero} ${s.heroPlain}`}>
         <Container>
           <div className={s.rise}>
@@ -41,6 +53,7 @@ export default async function ResourcesPage({ params }: SiteParams) {
             <div className={c.grid}>
               {resources.map((resource) => (
                 <article className={c.card} key={resource.slug}>
+                  <CoverImage cover={coverFor({ slug: resource.slug, cover: resource.cover })} variant="card" />
                   {resource.fileLabel ? <p className={c.tag}>{resource.fileLabel}</p> : null}
                   <h2 className={c.cardTitle}>
                     <SiteLink href={`/resources/${resource.slug}`} locale={fallback ? "en" : undefined}>

@@ -101,7 +101,7 @@ function missingSiteContent(path: string, locale: string) {
 
 /** The app's and website's own top-level pages: on rove.rent these still go to RoveHQ, never read as a business's name. */
 const APP_TOP_LEVEL = new Set(
-  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,docs,faq,guides,home,legal,pricing,resources,switch,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko,el,it,nl,pl,hr,tr".split(",")
+  "accept-invite,account,actions,amend,api,auth,book,bookings,business-closed,calendar,customers,documents,fleet,forgot-password,help,import,inbox,inspections,invite,login,onboarding,partners,platform,receipts,rent,rental-calculator,reports,reset-password,settings,signup,subscription-required,tasks,transactions,trial-expired,contact,docs,faq,guides,home,legal,pricing,resources,switch,car-rental-software,scooter-rental-software,motorcycle-rental-software,booking-pages,manifest,icon,robots,sitemap,favicon,en,th,de,es,fr,ru,zh,ja,ko,el,it,nl,pl,hr,tr".split(",")
 );
 
 /** Search engines and link previews: never sent to a language by their Accept-Language (they index each address as it is). */
@@ -155,6 +155,13 @@ export async function proxy(request: NextRequest) {
   // pages, the visitor's currency): app/(site)/site/[locale], via lib/site/internal-path.ts. Nothing about the
   // visitor is passed in headers, so Vercel serves those pages from its cache.
   const { locale: prefixLocale, rest: unprefixed } = splitSiteLocale(pathname);
+  // /home (and /th/home) is the home page's internal name, not an address: one home page per language, at "/" or
+  // "/<language>" (SEO, 7 Nov 2026: /home was a duplicate of "/").
+  if (unprefixed === "/home" && !isRenterHost(requestHost)) {
+    const url = request.nextUrl.clone();
+    url.pathname = localizeSitePath("/", prefixLocale || DEFAULT_SITE_LOCALE);
+    return NextResponse.redirect(url, 308);
+  }
   const prefixedSite = Boolean(prefixLocale) && isSitePath(unprefixed);
   if (prefixedSite && prefixLocale === DEFAULT_SITE_LOCALE) {
     // English has no prefix: /en/pricing → /pricing, so each page has exactly one English address.

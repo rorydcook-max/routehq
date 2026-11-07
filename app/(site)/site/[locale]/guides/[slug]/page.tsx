@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { allGuideSlugs, getGuide, guideLocales, listGuides } from "@/lib/site/content";
 import { siteLocale } from "@/lib/site/static-page";
-import { siteMetadata, siteOrigin, siteUrl } from "@/lib/site/seo";
-import { Avatar, CATEGORY_KEY, contentDate, GuideCard, JsonLd, LeadCard } from "../../_components/content-ui";
+import { siteMetadata, siteUrl } from "@/lib/site/seo";
+import { organizationLd, schemaDateTime } from "@/lib/site/schema";
+import { coverFor, coverOgImage } from "@/lib/site/covers";
+import { Avatar, CATEGORY_KEY, contentDate, CoverImage, GuideCard, JsonLd, LeadCard } from "../../_components/content-ui";
 import { FinalCta } from "../../_components/final-cta";
 import { Arrow, Container, Plus, SITE_LINKS, SiteLink } from "../../_components/site-ui";
 import s from "../../site.module.css";
@@ -26,6 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Here as well as in the page, so a missing guide (or translation) answers 404 before anything is streamed.
   if (!guide) notFound();
   const meta = siteMetadata({ path: `/guides/${slug}`, locale, title: guide.title, description: guide.description, available: guideLocales(slug), type: "article" });
+  const image = coverOgImage(coverFor(guide), guide.title);
   return {
     ...meta,
     openGraph: {
@@ -34,8 +37,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       publishedTime: guide.date || undefined,
       modifiedTime: guide.updated || undefined,
       section: guide.category,
-      ...(guide.cover ? { images: [{ url: guide.cover }] } : {})
-    }
+      ...(image ? { images: [image] } : {})
+    },
+    ...(image ? { twitter: { ...meta.twitter, images: [image.url] } } : {})
   };
 }
 
@@ -65,6 +69,8 @@ export default async function GuidePage({ params }: Props) {
     .filter((item) => item.slug !== slug && item.category === guide.category)
     .slice(0, 3);
   const url = siteUrl(`/guides/${slug}`, locale);
+  const cover = coverFor(guide);
+  const ogImage = coverOgImage(cover, guide.title);
 
   const jsonLd: unknown[] = [
     {
@@ -73,12 +79,12 @@ export default async function GuidePage({ params }: Props) {
       headline: guide.title,
       description: guide.description,
       inLanguage: locale,
-      datePublished: guide.date || undefined,
-      dateModified: guide.updated || undefined,
+      datePublished: schemaDateTime(guide.date),
+      dateModified: schemaDateTime(guide.updated),
       mainEntityOfPage: { "@type": "WebPage", "@id": url },
-      ...(guide.cover ? { image: guide.cover.startsWith("http") ? guide.cover : `${siteOrigin()}${guide.cover}` } : {}),
+      ...(ogImage ? { image: ogImage.url } : {}),
       author: { "@type": "Person", name: author, jobTitle: m("authorRole"), description: m("authorBio") },
-      publisher: { "@type": "Organization", name: "RoveHQ", url: siteOrigin(), logo: { "@type": "ImageObject", url: `${siteOrigin()}/routehq-logo.svg` } }
+      publisher: organizationLd()
     },
     {
       "@context": "https://schema.org",
@@ -146,6 +152,7 @@ export default async function GuidePage({ params }: Props) {
             <div aria-hidden="true" className={c.toc} />
           )}
           <article className={c.articleMain}>
+            <CoverImage cover={cover} variant="article" />
             <div className={c.prose} dangerouslySetInnerHTML={{ __html: first }} />
             {second ? (
               <>

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { GUIDE_CATEGORIES, listGuides, type GuideCategory } from "@/lib/site/content";
 import { siteMetadata } from "@/lib/site/seo";
-import { CATEGORY_KEY, GuideCard } from "../_components/content-ui";
+import { breadcrumbLd } from "@/lib/site/schema";
+import { CATEGORY_KEY, GuideCard, JsonLd } from "../_components/content-ui";
 import { FinalCta } from "../_components/final-cta";
 import { Container, Eyebrow, SITE_LINKS, SiteLink } from "../_components/site-ui";
 import s from "../site.module.css";
@@ -28,9 +29,15 @@ export async function GuidesIndex({ category }: { category: GuideCategory | null
   const shown = category ? guides.filter((guide) => guide.category === category) : guides;
   const say = m as unknown as (key: string, values?: Record<string, string | number>) => string;
   const filters: Array<{ key: GuideCategory | null; label: string }> = [{ key: null, label: m("guidesAll") }, ...GUIDE_CATEGORIES.map((key) => ({ key, label: m(CATEGORY_KEY[key]) }))];
+  const crumbs = [
+    { name: m("breadcrumbHome"), path: "/" },
+    { name: m("navGuides"), path: "/guides" },
+    ...(category ? [{ name: m(CATEGORY_KEY[category]), path: categoryPath(category) }] : [])
+  ];
 
   return (
     <>
+      <JsonLd data={breadcrumbLd(crumbs, locale)} />
       <section className={`${s.dark} ${s.hero} ${s.heroPlain}`}>
         <Container>
           <div className={s.rise}>

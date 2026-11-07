@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getResource, type GuideCategory, type GuideMeta } from "@/lib/site/content";
+import { coverFor, type Cover } from "@/lib/site/covers";
 import { Arrow, SiteLink } from "./site-ui";
 import s from "../site.module.css";
 import c from "../content.module.css";
@@ -35,10 +37,32 @@ export function Avatar({ name, large = false }: { name: string; large?: boolean 
   );
 }
 
-/** A guide in a list: topic, title (the whole card is the link), description, reading time and date. */
+/**
+ * An article's cover (lib/site/covers.ts): the topic illustration or its own image, sized so nothing jumps. On a card it
+ * is decorative (the title says the same); on the article page it is the first thing under the hero, so it loads first.
+ */
+export function CoverImage({ cover, variant }: { cover: Cover; variant: "card" | "article" }) {
+  const article = variant === "article";
+  return (
+    <div aria-hidden={cover.alt ? undefined : true} className={article ? c.articleCover : c.cardCover}>
+      <Image
+        alt={cover.alt}
+        height={cover.height}
+        priority={article}
+        sizes={article ? "(min-width: 1024px) 720px, 100vw" : "(min-width: 1100px) 360px, (min-width: 768px) 50vw, 100vw"}
+        src={cover.src}
+        unoptimized={cover.src.endsWith(".svg")}
+        width={cover.width}
+      />
+    </div>
+  );
+}
+
+/** A guide in a list: cover, topic, title (the whole card is the link), description, reading time and date. */
 export function GuideCard({ guide, m, locale, linkLocale }: { guide: GuideMeta; m: Say; locale: string; linkLocale?: string }) {
   return (
     <article className={c.card}>
+      <CoverImage cover={coverFor({ slug: guide.slug, category: guide.category, cover: guide.cover, coverAlt: null })} variant="card" />
       <p className={c.tag}>{m(CATEGORY_KEY[guide.category])}</p>
       <h3 className={c.cardTitle}>
         <SiteLink href={`/guides/${guide.slug}`} locale={linkLocale}>

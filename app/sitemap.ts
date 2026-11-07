@@ -8,6 +8,8 @@ import { listDocs, loadPublishedArticles } from "@/lib/site/docs";
 import { listLegalDocs } from "@/lib/site/legal";
 import { listSwitchPages } from "@/lib/site/switch";
 import { siteUrl } from "@/lib/site/seo";
+import { SEGMENT_IDS, SEGMENTS } from "@/lib/site/segments";
+import { translatedLocales } from "@/lib/site/own-translation";
 
 /**
  * Every page of RoveHQ's website in every language it exists in, each with its hreflang alternates. Pages written
@@ -31,6 +33,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   add("/pricing", supportedLocaleCodes, built, 0.9);
   add("/guides", supportedLocaleCodes, built, 0.8);
   add("/resources", supportedLocaleCodes, built, 0.8);
+  // RoveHQ for each kind of rental business: written in English first, listed in each language once translated.
+  for (const id of SEGMENT_IDS) add(SEGMENTS[id].path, await translatedLocales(`marketing.seg${SEGMENTS[id].key}Title`), built, 0.9);
+  // Booking page templates (the example pages they link to are never listed): English first, like the pages above.
+  add("/booking-pages", await translatedLocales("marketing.bxTitle"), built, 0.7);
   add("/faq", supportedLocaleCodes, built, 0.6);
   add("/contact", supportedLocaleCodes, built, 0.5);
   // A topic page in each language that has a guide on it (or, falling back, any English guide on it).

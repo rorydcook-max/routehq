@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { siteLocale, type SiteParams } from "@/lib/site/static-page";
 import { siteMetadata } from "@/lib/site/seo";
+import { breadcrumbLd, faqLd } from "@/lib/site/schema";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { TRIAL_DAYS } from "@/lib/plans";
 import { FinalCta } from "../_components/final-cta";
@@ -31,19 +32,20 @@ export async function generateMetadata({ params }: SiteParams): Promise<Metadata
 
 export default async function FaqPage({ params }: SiteParams) {
   await siteLocale(params);
-  const m = await getTranslations("marketing");
+  const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
   const q = (n: number) => m(`faqQ${n}`);
   const a = (n: number) => m(`faqA${n}`, VALUES[n] || {});
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: GROUPS.flatMap((group) => group.questions).map((n) => ({
-      "@type": "Question",
-      name: q(n),
-      acceptedAnswer: { "@type": "Answer", text: a(n) }
-    }))
-  };
+  const jsonLd = [
+    faqLd(GROUPS.flatMap((group) => group.questions).map((n) => ({ q: q(n), a: a(n) }))),
+    breadcrumbLd(
+      [
+        { name: m("breadcrumbHome"), path: "/" },
+        { name: m("navFaq"), path: "/faq" }
+      ],
+      locale
+    )
+  ];
 
   return (
     <>

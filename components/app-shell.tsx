@@ -6,7 +6,6 @@ import {
   Car,
   Calculator,
   CircleUserRound,
-  FileText,
   Handshake,
   LifeBuoy,
   LogOut,
@@ -95,7 +94,7 @@ const navGroups: NavGroup[] = [
   {
     heading: "g_tools",
     items: [
-      { key: "documents", href: "/documents", icon: FileText },
+      // Documents moved to Settings › Business › Files (Rory, 7 Nov 2026).
       { key: "partners", href: "/partners" as Route, icon: Handshake },
       { key: "rentalCalculator", href: "/rental-calculator", icon: Calculator }
     ]

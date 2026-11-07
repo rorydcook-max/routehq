@@ -16,6 +16,8 @@ faq:
     a: "HQ says it powers car and van rental out of the box and adapts to motorbikes, boats and equipment 'with a few simple configurations'. Try it during their 7-day free trial to check it fits your workflow."
   - q: "Which is best for a small fleet in Thailand or Indonesia?"
     a: "It depends on size and needs. If you have 1 to 30 cars or motorbikes, take payments by bank transfer or QR, and talk to customers on LINE or WhatsApp, look for a phone-first tool with local payment support and a free plan, such as RoveHQ."
+cover: "/site/covers/compare.svg"
+coverAlt: "Illustration: a balance weighing two software options"
 ---
 
 RentWorks Plus and HQ Rental Software are two of the better-known names in car rental software. Both are established, each says it has more than 1,000 operators as customers, and both are good at what they were built for. The question for a small operator is whether what they were built for matches your business.

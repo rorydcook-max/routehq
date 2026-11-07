@@ -7,8 +7,10 @@ import { allResourceSlugs, getResource, resourceLocales, resourcePreview } from 
 import { NO_COUNTRY } from "@/lib/site/internal-path";
 import { siteLocale } from "@/lib/site/static-page";
 import { localizeSitePath } from "@/lib/site/locale-path";
-import { siteMetadata, siteOrigin, siteUrl } from "@/lib/site/seo";
-import { JsonLd } from "../../../_components/content-ui";
+import { siteMetadata, siteUrl } from "@/lib/site/seo";
+import { breadcrumbLd, organizationLd, schemaDateTime } from "@/lib/site/schema";
+import { coverFor, coverOgImage } from "@/lib/site/covers";
+import { CoverImage, JsonLd } from "../../../_components/content-ui";
 import { FinalCta } from "../../../_components/final-cta";
 import { Check, Container, Eyebrow, SITE_LINKS, SiteLink } from "../../../_components/site-ui";
 import { LeadForm } from "../lead-form";
@@ -58,7 +60,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resource = getResource(locale, slug);
   // Here as well as in the page, so a missing resource (or translation) answers 404 before anything is streamed.
   if (!resource) notFound();
-  return siteMetadata({ path: `/resources/${slug}`, locale, title: resource.title, description: resource.description, available: resourceLocales(slug) });
+  const meta = siteMetadata({ path: `/resources/${slug}`, locale, title: resource.title, description: resource.description, available: resourceLocales(slug) });
+  const image = coverOgImage(coverFor(resource), resource.title);
+  return image ? { ...meta, openGraph: { ...meta.openGraph, images: [image] }, twitter: { ...meta.twitter, images: [image.url] } } : meta;
 }
 
 /**
@@ -81,17 +85,28 @@ export default async function ResourcePage({ params }: Props) {
     resourcePreview("en", slug) ||
     (builder ? resourcePreview(locale, CONTRACT_BUILDER_SLUG) || resourcePreview("en", CONTRACT_BUILDER_SLUG) : null);
   const url = siteUrl(`/resources/${slug}`, locale);
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "DigitalDocument",
-    name: resource.title,
-    description: resource.description,
-    inLanguage: locale,
-    url,
-    encodingFormat: resource.formats.map((format) => (format === "pdf" ? "application/pdf" : format === "xlsx" ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document")),
-    isAccessibleForFree: true,
-    publisher: { "@type": "Organization", name: "RoveHQ", url: siteOrigin() }
-  };
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "DigitalDocument",
+      name: resource.title,
+      description: resource.description,
+      inLanguage: locale,
+      url,
+      encodingFormat: resource.formats.map((format) => (format === "pdf" ? "application/pdf" : format === "xlsx" ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document")),
+      isAccessibleForFree: true,
+      ...(resource.date ? { datePublished: schemaDateTime(resource.date) } : {}),
+      publisher: organizationLd()
+    },
+    breadcrumbLd(
+      [
+        { name: m("breadcrumbHome"), path: "/" },
+        { name: m("navResources"), path: "/resources" },
+        { name: resource.title, path: `/resources/${slug}` }
+      ],
+      locale
+    )
+  ];
 
   return (
     <>
@@ -112,6 +127,7 @@ export default async function ResourcePage({ params }: Props) {
       <section className={s.section}>
         <Container className={c.resourceLayout}>
           <div className={c.resourceMain}>
+            <CoverImage cover={coverFor(resource)} variant="article" />
             {resource.html.trim() ? <div className={c.prose} dangerouslySetInnerHTML={{ __html: resource.html }} /> : null}
             {resource.inside.length ? (
               <div className={resource.html.trim() ? "mt-12" : ""}>

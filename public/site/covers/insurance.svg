@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="insurance-t"><title id="insurance-t">Illustration: a shield protecting a rental car</title>
+<rect width="1200" height="630" fill="#e6f2f2"/>
+<circle cx="930" cy="190" r="150" fill="#f3dcae"/>
+<path d="M0 520 C 200 500 360 540 600 520 S 1000 500 1200 520 V630 H0Z" fill="#cfe9e8"/>
+<path d="M90 560 h90 M980 575 h120 M520 590 h60" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+<path d="M600 92 L 800 150 L 792 330 Q 776 470 600 540 Q 424 470 408 330 L 400 150Z" fill="#12bcb8" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M600 140 L 750 184 L 744 326 Q 732 430 600 486Z" fill="#0b8f8c" opacity=".45"/>
+<g transform="translate(170 190) scale(0.55)">
+<path d="M410 330 L 490 238 Q 500 228 515 228 L 720 228 Q 736 228 746 240 L 820 330Z" fill="#ffffff" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M610 232 V 330" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="320" y="326" width="590" height="120" rx="44" fill="#12bcb8" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="882" cy="370" r="14" fill="#f3dcae" stroke="#06162b" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M560 370 h40" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="450" cy="450" r="56" fill="#ffffff" stroke="#06162b" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/><circle cx="450" cy="450" r="17" fill="#06162b"/><circle cx="780" cy="450" r="56" fill="#ffffff" stroke="#06162b" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/><circle cx="780" cy="450" r="17" fill="#06162b"/>
+</g>
+</svg>

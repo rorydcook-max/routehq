@@ -48,8 +48,17 @@ export function Catalog({
   referrer = null,
   embedded = false,
   rates = {},
-  visitorCurrency = null
+  visitorCurrency = null,
+  layout = "grid",
+  monthlyFocus = false,
+  demo = false
 }: {
+  /** How the booking page's template lays the vehicles out (lib/booking-site.ts): cards, a dense list, or small tiles two to a row on phones. */
+  layout?: "grid" | "list" | "tiles";
+  /** The monthly-rentals template: a rough price per day under each monthly price. */
+  monthlyFocus?: boolean;
+  /** An example page (rovehq.io/booking-pages): everything works except making the booking. */
+  demo?: boolean;
   /** One unit of the business's currency in other currencies, for the "about" price beside each one. */
   rates?: Record<string, number>;
   /** The renter's likely currency (from their country or language); they can change it. */
@@ -145,8 +154,16 @@ export function Catalog({
   // The first vehicle to come free when none are (rows are sorted by that date).
   const earliest = rows.find((row) => row.freeFrom) || null;
 
+  const list = layout === "list";
+  const tiles = layout === "tiles";
+
   function send(formData: FormData, vehicle: CatalogVehicle) {
     setError(null);
+    if (demo) {
+      // An example business: say so instead of booking anything.
+      setError(t("bs_demoNoBooking"));
+      return;
+    }
     startTransition(async () => {
       try {
         formData.set("slug", slug);
@@ -261,7 +278,7 @@ export function Catalog({
         </p>
       )}
 
-      <section className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <section className={list ? "grid gap-2.5" : tiles ? "grid grid-cols-2 items-stretch gap-3 lg:grid-cols-4" : "grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3"}>
         {rows.map(({ vehicle, free, freeFrom, openEndedClash }) => {
           const headline = headlineRate(vehicle);
           // A monthly-only vehicle can't be booked for a weekend.
@@ -290,8 +307,8 @@ export function Catalog({
           const unit = headlineKey ? t(headlineKey, { rate: "" }).trim() : "";
           const canBook = free && datesReady && bookable;
           return (
-            <article className={`flex flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-sm ${isOpen ? "sm:col-span-2 lg:col-span-3" : ""}`} key={vehicle.id}>
-              <div className={`relative ${isOpen ? "sm:flex sm:items-start sm:gap-5 sm:p-5" : "flex flex-1 flex-col"}`}>
+            <article className={`flex flex-col overflow-hidden border border-[var(--border)] bg-white shadow-sm ${list ? "rounded-xl" : "rounded-2xl"} ${isOpen ? (tiles ? "col-span-2 lg:col-span-4" : list ? "" : "sm:col-span-2 lg:col-span-3") : ""}`} key={vehicle.id}>
+              <div className={`relative ${isOpen ? "sm:flex sm:items-start sm:gap-5 sm:p-5" : list ? "flex flex-1 flex-row" : "flex flex-1 flex-col"}`}>
                 {/* Opened: the main photo large with the others as thumbnails, any of them full screen with a tap.
                     Closed: the main photo in the 4:3 shape phone cameras take, so cars aren't cropped to a strip (Rory, 1 Nov 2026). */}
                 {isOpen && vehicle.photoUrls.length > 0 ? (
@@ -310,12 +327,12 @@ export function Catalog({
                     />
                   </div>
                 ) : (
-                <div className={`relative aspect-[4/3] w-full bg-[var(--panel-secondary)] ${isOpen ? "sm:w-80 sm:shrink-0 sm:overflow-hidden sm:rounded-xl" : ""} ${!free ? "[&>div]:opacity-60 [&>img]:opacity-60" : ""}`}>
+                <div className={`relative bg-[var(--panel-secondary)] ${list && !isOpen ? "w-28 shrink-0 self-stretch sm:w-44" : "aspect-[4/3] w-full"} ${isOpen ? "sm:w-80 sm:shrink-0 sm:overflow-hidden sm:rounded-xl" : ""} ${!free ? "[&>div]:opacity-60 [&>img]:opacity-60" : ""}`}>
                   {vehicle.photoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img alt={vehicle.name} className="h-full w-full object-cover" src={vehicle.photoUrl} />
+                    <img alt={vehicle.name} className={`h-full w-full object-cover ${list && !isOpen ? "absolute inset-0" : ""}`} src={vehicle.photoUrl} />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center">
+                    <div className={`flex h-full w-full items-center justify-center ${list && !isOpen ? "absolute inset-0" : ""}`}>
                       <VehicleArt className="!h-full !w-full !rounded-none" colour={vehicle.color} kind={vehicle.kind} model={vehicle.name} size="xl" />
                     </div>
                   )}
@@ -327,19 +344,25 @@ export function Catalog({
                   ) : null}
                 </div>
                 )}
-                <div className={`flex min-w-0 flex-1 flex-col ${isOpen ? "p-4 sm:p-0" : "p-4"}`}>
-                  <h3 className="text-[17px] font-bold leading-tight text-[var(--foreground)]">{vehicle.name}</h3>
+                <div className={`flex min-w-0 flex-1 flex-col ${isOpen ? "p-4 sm:p-0" : list || tiles ? "p-3" : "p-4"}`}>
+                  <h3 className={`font-bold leading-tight text-[var(--foreground)] ${tiles && !isOpen ? "text-[15px]" : list && !isOpen ? "text-base" : "text-[17px]"}`}>{vehicle.name}</h3>
                   {/* Every card has the same lines in the same places (a dash where something is missing), so prices and buttons line up across a row. */}
-                  <p className="mt-1 min-h-5 text-sm text-[var(--muted)]">{[vehicle.year, vehicle.color, ...vehicle.details].filter(Boolean).join(" · ") || "—"}</p>
+                  <p className={`mt-1 min-h-5 text-[var(--muted)] ${(list || tiles) && !isOpen ? "truncate text-xs leading-5" : "text-sm"}`}>{[vehicle.year, vehicle.color, ...vehicle.details].filter(Boolean).join(" · ") || "—"}</p>
                   {headline ? (
-                    <p className="mt-3 flex flex-wrap items-baseline gap-x-1.5">
-                      <span className="text-[22px] font-bold leading-none text-[var(--foreground)]">{money(headline.amount)}</span>
+                    <p className={`flex flex-wrap items-baseline gap-x-1.5 ${(list || tiles) && !isOpen ? "mt-2" : "mt-3"}`}>
+                      <span className={`font-bold leading-none text-[var(--foreground)] ${tiles && !isOpen ? "text-[19px]" : "text-[22px]"}`}>{money(headline.amount)}</span>
                       {unit ? <span className="text-sm font-semibold text-[var(--muted)]">{unit}</span> : null}
-                      {approx(headline.amount) ? <span className="text-sm font-semibold text-[var(--foreground-secondary)]">· {approx(headline.amount)}</span> : null}
+                      {/* Small tiles have no room for the "about" price; it shows once the vehicle is opened. */}
+                      {approx(headline.amount) && !(tiles && !isOpen) ? <span className="text-sm font-semibold text-[var(--foreground-secondary)]">· {approx(headline.amount)}</span> : null}
                     </p>
                   ) : null}
-                  <p className="mt-1 min-h-5 text-sm text-[var(--muted)]">{otherRates.length ? otherRates.join(" · ") : " "}</p>
-                  <p className="mt-1 text-sm text-[var(--muted)]">{vehicle.deposit > 0 ? t("depositReturnedAtEnd", { amount: money(vehicle.deposit) }) : t("noDeposit")}</p>
+                  {/* Monthly rentals: roughly what a month comes to each day, worked out from the monthly price (30 days). */}
+                  {monthlyFocus && headline?.per === "month" ? (
+                    <p className="mt-1 text-sm font-semibold text-[var(--primary)]">{t("bs_aboutPerDay", { amount: money(headline.amount / 30) })}</p>
+                  ) : null}
+                  <p className={`mt-1 min-h-5 text-sm text-[var(--muted)] ${(list || tiles) && !isOpen && !otherRates.length ? "hidden" : ""}`}>{otherRates.length ? otherRates.join(" · ") : " "}</p>
+                  {/* The dense list leaves the deposit to the booking form, where it is spelled out before booking. */}
+                  <p className={`mt-1 text-[var(--muted)] ${tiles && !isOpen ? "text-xs" : "text-sm"} ${list && !isOpen ? "hidden" : ""}`}>{vehicle.deposit > 0 ? t("depositReturnedAtEnd", { amount: money(vehicle.deposit) }) : t("noDeposit")}</p>
                   {/* No price for a stay the vehicle can't be booked for: a slice of the monthly rate is not on offer. */}
                   {free && plan && stayTotal && !tooShort ? (
                     <p className="mt-1 text-sm font-semibold text-[var(--primary)]">
@@ -375,9 +398,9 @@ export function Catalog({
                     </div>
                   ) : null}
                   {canBook ? (
-                    <div className="mt-auto pt-4">
+                    <div className={`mt-auto ${(list || tiles) && !isOpen ? "pt-3" : "pt-4"}`}>
                       <button
-                        className={`pressable inline-flex min-h-12 w-full items-center justify-center rounded-full px-4 text-[15px] font-bold ${isOpen ? "border-2 border-[var(--border)] bg-white text-[var(--foreground)] sm:w-auto sm:px-8" : "bg-[var(--primary)] text-white"}`}
+                        className={`pressable inline-flex ${(list || tiles) && !isOpen ? "min-h-11" : "min-h-12"} ${list && !isOpen ? "w-auto self-start px-7" : "w-full px-4"} items-center justify-center rounded-full text-[15px] font-bold ${isOpen ? "border-2 border-[var(--border)] bg-white text-[var(--foreground)] sm:w-auto sm:px-8" : "bg-[var(--primary)] text-white"}`}
                         onClick={() => {
                           setError(null);
                           setChosen([]);

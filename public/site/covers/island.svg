@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="island-t"><title id="island-t">Illustration: an island with a palm tree and a ferry</title>
+<rect width="1200" height="630" fill="#e6f2f2"/>
+<circle cx="930" cy="190" r="150" fill="#f3dcae"/>
+<path d="M0 520 C 200 500 360 540 600 520 S 1000 500 1200 520 V630 H0Z" fill="#cfe9e8"/>
+<path d="M90 560 h90 M980 575 h120 M520 590 h60" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+<path d="M200 520 Q 360 400 540 520Z" fill="#f3dcae" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M380 470 Q 392 360 360 260" fill="none" stroke="#06162b" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M360 262 q -70 -40 -140 0 q 70 -10 140 0 q -40 -70 -10 -120 q 20 60 10 120 q 60 -60 130 -40 q -70 20 -130 40 q 80 0 120 50 q -70 -20 -120 -50z" fill="#12bcb8" stroke="#06162b" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M660 470 h360 l-40 60 h-290z" fill="#ffffff" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><rect x="720" y="410" width="200" height="60" rx="12" fill="#12bcb8" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><rect x="780" y="370" width="80" height="40" rx="8" fill="#06162b"/>
+<circle cx="760" cy="440" r="8" fill="#ffffff"/><circle cx="800" cy="440" r="8" fill="#ffffff"/><circle cx="840" cy="440" r="8" fill="#ffffff"/><circle cx="880" cy="440" r="8" fill="#ffffff"/>
+</svg>

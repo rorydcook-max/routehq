@@ -17,7 +17,7 @@ import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/(app)/fleet/[i
 import { VehicleYear, type YearMark, type YearRental } from "@/app/(app)/fleet/[id]/vehicle-year";
 import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
-import { Dot, ElapsedBar, InOutBars, Ring } from "@/components/glance";
+import { Dot, ElapsedBar, InOutBars, PartBar, Ring } from "@/components/glance";
 import { PageTabs, type PageTab } from "@/components/page-tabs";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
 import { RenewalForm, RenewalHelp } from "./renewal";
@@ -41,7 +41,8 @@ import { activityTitle, tidyDetail, visibleActivity } from "@/lib/activity-displ
 import { businessToday, businessNow, toWallTime } from "@/lib/business-time";
 import { longDate, dateFormat } from "@/lib/i18n/dates";
 import { hasLoan, loanFigures } from "@/lib/vehicle-loan";
-import { distanceKey } from "@/lib/business-units";
+import { businessCurrency, distanceKey } from "@/lib/business-units";
+import { formatMoney } from "@/lib/regional";
 
 // The wording for this page is in locales/<language>/common.json under "vehiclePage".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -58,8 +59,9 @@ const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
 const expenseTypes = new Set(["repair", "servicing", "maintenance", "fuel", "insurance", "tax", "finance", "fine", "accessories", "refund"]);
 
+// In the business's own currency (was always baht).
 function money(value: unknown) {
-  return `฿${Math.round(Number(value || 0)).toLocaleString("en-US")}`;
+  return formatMoney(Math.round(Number(value || 0)), businessCurrency(), "en-US");
 }
 
 function percent(value: unknown) {
@@ -550,12 +552,45 @@ function TimelineSection({ detail }: { detail: VehicleDetail }) {
   // in the reader's language (the stored titles and details are English sentences).
   const histNames = useTranslations("booking");
   const activityEvents = visibleActivity(detail.activityEvents as any[])
-    .filter((event: any) => !isQuietActivityEvent(event.event_type))
+    // Services and repairs come from their own records below (with the cost), not from the activity line.
+    .filter((event: any) => !isQuietActivityEvent(event.event_type) && event.event_type !== "maintenance_completed")
     .map((event) => ({ id: event.id, title: activityTitle(event, histNames as any), detail: tx.locale === "en" ? tidyDetail(event.detail, event.title) : null, date: event.occurred_at || event.created_at, kind: "activity" as const }));
   const rentalReturns = detail.rentals
-    .filter((rental) => rental.end_date)
+    .filter((rental) => rental.end_date && rental.status !== "cancelled" && rental.status !== "draft")
     .map((rental) => ({ id: `return-${rental.id}`, title: tx.say("tl_return", { name: rental.customers?.full_name || tx.say("customer") }), detail: null, date: rental.end_date!, kind: "rental" as const }));
-  const events: VehicleTimelineEvent[] = [...complianceEvents, ...reminderEvents, ...rentalReturns, ...activityEvents]
+  // The vehicle's lifecycle: each rental going out, each service or repair with its cost, and damage found on return.
+  // A handover already has its own line ("Vehicle handed over"); this fills in rentals that went out without one (imports, old data).
+  const handedOver = new Set((detail.activityEvents as any[]).filter((event) => ["delivery_inspection_completed", "handed_over_without_form"].includes(String(event.event_type))).map((event) => event.rental_id));
+  const rentalStarts = detail.rentals
+    .filter((rental) => rental.start_date && !handedOver.has(rental.id) && ["active", "due_soon", "overdue", "extended", "completed"].includes(String(rental.status)))
+    .map((rental) => ({
+      id: `out-${rental.id}`,
+      title: tx.say("tl_out", { name: rental.customers?.full_name || tx.say("customer") }),
+      detail: rental.end_date ? tx.say("h_range", { from: formatDate(rental.start_date, tx), to: formatDate(rental.end_date, tx) }) : null,
+      date: String(rental.start_date),
+      kind: "rental" as const
+    }));
+  const serviceEvents = detail.maintenanceEvents
+    .filter((event: any) => event.service_date)
+    .map((event: any) => ({
+      id: `svc-${event.id}`,
+      title: tx.say(event.event_type === "repair" ? "tl_repair" : "tl_service"),
+      detail: [Number(event.cost) > 0 ? money(event.cost) : "", event.supplier || "", event.notes || ""].filter(Boolean).join(" · ") || null,
+      date: String(event.service_date).slice(0, 10),
+      kind: "service" as const
+    }));
+  const damageEvents = detail.inspections
+    .filter((inspection: any) => (inspection.type || inspection.inspection_type) === "return")
+    .map((inspection: any) => ({ inspection, fresh: (Array.isArray(inspection.damage_items) ? inspection.damage_items : []).filter((item: any) => item?.is_pre_existing !== true).length }))
+    .filter(({ fresh }) => fresh > 0)
+    .map(({ inspection, fresh }) => ({
+      id: `dmg-${inspection.id}`,
+      title: tx.say("tl_damage", { count: fresh }),
+      detail: inspection.customers?.full_name || null,
+      date: String(inspection.submitted_at || inspection.created_at),
+      kind: "damage" as const
+    }));
+  const events: VehicleTimelineEvent[] = [...complianceEvents, ...reminderEvents, ...rentalStarts, ...rentalReturns, ...serviceEvents, ...damageEvents, ...activityEvents]
     .filter((event) => Boolean(event.date))
     .map((event) => ({ id: String(event.id), title: String(event.title), detail: event.detail ? String(event.detail) : null, date: String(event.date), kind: event.kind }));
   // Thai calendar dates: the server clock is UTC.
@@ -667,11 +702,62 @@ function MetricBar({ label, value, note, tone = "green" }: { label: string; valu
   );
 }
 
-function UtilizationSection({ detail }: { detail: VehicleDetail }) {
+/**
+ * The vehicle's life so far, in one compact block (Rory, 7 Nov 2026: understand the lifecycle of each vehicle).
+ * Money figures are the owner's, as elsewhere on this page; a teammate sees the rental side only.
+ */
+function LifecycleSummary({ detail, isOwner }: { detail: VehicleDetail; isOwner: boolean }) {
+  const tx = useVx();
+  const u = detail.utilization;
+  const f = detail.financials;
+  const lastService = detail.maintenanceEvents.find((event: any) => event.service_date && event.event_type !== "repair") || detail.maintenanceEvents.find((event: any) => event.service_date);
+  const facts: Array<[string, string]> = [
+    [tx.say("lc_since"), longDate(u.ownedSince, tx.locale)],
+    [tx.say("lc_rentals"), String(u.rentalsCount)],
+    [tx.say("lc_daysRented"), tx.say("lc_daysOf", { days: u.daysRentedAll, owned: u.daysOwned })],
+    [tx.say("lc_lastService"), lastService ? longDate(String(lastService.service_date).slice(0, 10), tx.locale) : tx.say("lc_none")]
+  ];
+  if (isOwner) {
+    facts.push(
+      [tx.say("lc_revenue"), money(f.lifetimeRevenue)],
+      [tx.say("lc_costs"), money(f.lifetimeExpenses)],
+      [tx.say("lc_net"), money(f.lifetimeProfit)],
+      [tx.say("lc_perDay"), money(u.daysOwned > 0 ? f.lifetimeRevenue / u.daysOwned : 0)]
+    );
+  }
+  return (
+    <div className="mb-4 rounded-2xl bg-[var(--panel-secondary)] p-3.5">
+      <p className="font-bold text-[var(--foreground)]">{tx.say("lc_title")}</p>
+      <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2.5 sm:grid-cols-4">
+        {facts.map(([label, value]) => (
+          <div className="min-w-0" key={label}>
+            <dt className="text-sm font-semibold text-[var(--muted)]">{label}</dt>
+            <dd className={`num mt-0.5 truncate text-[17px] ${label === tx.say("lc_net") && f.lifetimeProfit < 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      {/* Rented share of the last 30, 90 and 365 days: three small bars rather than three more numbers. */}
+      <div className="mt-3 grid grid-cols-3 gap-3">
+        {([["lc_30", u.last30], ["lc_90", u.last90], ["lc_365", u.last365]] as Array<[string, number]>).map(([key, value]) => (
+          <div key={key}>
+            <p className="flex items-baseline justify-between gap-1 text-sm font-semibold text-[var(--muted)]">
+              <span className="truncate">{tx.say(key)}</span>
+              <span className="num text-[15px] text-[var(--foreground)]">{percent(value)}</span>
+            </p>
+            <PartBar part={value} whole={100} color="var(--on-rent)" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function UtilizationSection({ detail, isOwner }: { detail: VehicleDetail; isOwner: boolean }) {
   const tx = useVx();
   const u = detail.utilization;
   return (
     <Pane summary={tx.say("u_summary", { percent: percent(u.twelveMonth) })} title={tx.say("u_title")}>
+      <LifecycleSummary detail={detail} isOwner={isOwner} />
       <div className="space-y-3">
         <MetricBar label={tx.say("u_12")} note={tx.say("u_fleetAvg", { percent: percent(u.fleetAverage) })} value={u.twelveMonth} />
         <MetricBar label={tx.say("u_life")} tone="blue" value={u.lifecycle} />
@@ -971,7 +1057,8 @@ function RentalHistorySection({ detail }: { detail: VehicleDetail }) {
 function DocumentsSection({ detail }: { detail: VehicleDetail }) {
   const tx = useVx();
   return (
-    <Fold summary={tx.say("d_summary", { count: detail.documents.length })} title={tx.say("d_title")}>
+    // id="files": Settings › Files links here (opens Paperwork & service and scrolls to this).
+    <Fold id="files" summary={tx.say("d_summary", { count: detail.documents.length })} title={tx.say("d_title")}>
       {detail.documents.length === 0 ? (
         <EmptyState>{tx.say("d_none")}</EmptyState>
       ) : (
@@ -1169,7 +1256,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
         </div>
       )
     },
-    { id: "rentals", label: tx.say("tab_rentals"), content: <UtilizationSection detail={detail} /> },
+    { id: "rentals", label: tx.say("tab_rentals"), content: <UtilizationSection detail={detail} isOwner={isOwner} /> },
     { id: "checks", label: tx.say("tab_checks"), content: <InspectionsSection detail={detail} /> },
     {
       id: "details",

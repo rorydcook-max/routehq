@@ -17,6 +17,8 @@ faq:
 
 Customer already has the vehicle? Use [Enter a rental that is already running](/docs/rentals-already-running) instead.
 
+![RoveHQ New booking screen: choose a vehicle, with each vehicle's rate and whether it's free](/site/docs/screens/new-booking.webp)
+
 ## Make the booking
 
 1. **Bookings** > **New booking**. Keep **Create booking link** selected.

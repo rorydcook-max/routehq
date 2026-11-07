@@ -16,6 +16,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { dateFormat, displayNamesLocale } from "@/lib/i18n/dates";
 import { disconnectLine, updateLineSettings, updateUpfrontDiscountSettings } from "@/app/actions/settings";
 import { BranchList } from "@/app/(app)/settings/branch-list";
+import { serviceAreasFor } from "@/lib/service-area";
 import { ContractsBrandingSection } from "@/app/(app)/settings/contracts-branding-section";
 import { MessagingPanel } from "@/app/(app)/settings/messaging-panel";
 import { webhookReachable, webhookUrl } from "@/lib/inbox/store";
@@ -55,7 +56,10 @@ import { OpenOnHash } from "@/components/open-on-hash";
 import { freshPromptPayQrUrl } from "@/lib/promptpay-qr";
 import { PushToggle } from "@/components/push-toggle";
 import { getCurrentUserEmail } from "@/lib/auth/session";
-import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
+import { resolveBrandingAssetUrl, resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
+import { bookingSiteFrom } from "@/lib/booking-site";
+import { vehiclePhotoUrls } from "@/lib/vehicle-photos";
+import { BookingSitePanel } from "@/app/(app)/settings/booking-site-panel";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { getDefaultOrganization, getTravelPolicySettings, getVehicleCategories } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -175,6 +179,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     ? "/api/branding-assets/signature"
     : brandingDisplayUrls.signatureUrl || browserSafeAssetFallback(ownerSignatureUrl);
   const travelPolicySettings = getTravelPolicySettings(organization.settings);
+  // The booking page's template and sections, its big photo, and the first vehicle photo it falls back to.
+  const bookingSite = bookingSiteFrom(organization.settings);
+  const siteAdmin = teamAdminClient() as any;
+  const [bookingHeroUrl, firstVehiclePhotos] = await Promise.all([
+    bookingSite.heroPath ? resolveBrandingAssetUrl(siteAdmin, { bucket: "branding", path: bookingSite.heroPath }, { expiresIn: 60 * 60 }).catch(() => null) : Promise.resolve(null),
+    vehiclePhotoUrls(siteAdmin, organization.id, 1).catch(() => new Map<string, string[]>())
+  ]);
+  const firstVehiclePhoto = [...firstVehiclePhotos.values()].find((list) => list.length)?.[0] || null;
 
   const lineUserId = organization.line_user_id ?? null;
   const lineOaId = process.env.LINE_OA_ID ?? "";
@@ -281,10 +293,16 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </section>
           }
           locations={
-            <section className="card p-4">
+            <section className="card scroll-mt-24 p-4" id="branches">
               <h2 className="card-title">{say("loc_title")}</h2>
               <div className="mt-3">
-                <BranchList branches={branches} organizationId={organization.id} />
+                <BranchList
+                  branches={branches}
+                  country={String((organization.settings as any)?.main_location?.country || "")}
+                  fallbackAreas={serviceAreasFor(organization, branches)}
+                  organizationId={organization.id}
+                  unit={distanceUnitFor(organization)}
+                />
               </div>
             </section>
           }
@@ -307,6 +325,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           whiteLabel={String(organization.subscription_status || "trial") === "trial" || planById(organization.subscription_tier).whiteLabel}
         />
       </div>
+      {/* Files (Rory, 7 Nov 2026): the old Documents page, moved here from the side menu. */}
+      <section className="card mt-4 flex items-center justify-between gap-3 p-4" id="files">
+        <div className="min-w-0">
+          <h2 className="card-title">{say("files_title")}</h2>
+        </div>
+        <Link className="secondary-action pressable shrink-0" href={"/settings/files" as Route}>
+          {say("files_btn")}
+        </Link>
+      </section>
         </>
       ) : null}
       {tab === "messaging" ? (
@@ -506,6 +533,23 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               slug={organization.slug}
               totalVehicles={publicVehicleCounts.total}
             />
+            {/* How the page looks: a template and the sections around the vehicles (Rory, 7 Nov 2026). */}
+            <div className="mt-4 border-t border-[var(--border)] pt-4" id="page-design">
+              <BookingSitePanel
+                businessName={String(organization.trading_name || organization.name || "")}
+                colour={String((organization as any).contract_accent_colour || "#0e5e6f")}
+                contacts={{
+                  whatsapp: String((organization as any).whatsapp || ""),
+                  line: String((organization as any).line_id || ""),
+                  instagram: String((organizationSettings.contact_channels as any)?.instagram || ""),
+                  facebook: String((organizationSettings.contact_channels as any)?.messenger || "")
+                }}
+                fallbackPhotoUrl={firstVehiclePhoto}
+                heroUrl={bookingHeroUrl}
+                initial={bookingSite}
+                slug={organization.slug}
+              />
+            </div>
             {/* The page and its address in one place (Rory, 1 Nov 2026): no separate "booking address" card. */}
             <div className="mt-4 border-t border-[var(--border)] pt-4" id="booking-address">
               <h3 className="font-bold text-[var(--foreground)]">{say("ba_title")}</h3>

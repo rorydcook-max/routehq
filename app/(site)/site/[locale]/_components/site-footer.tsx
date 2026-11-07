@@ -14,6 +14,12 @@ export async function SiteFooter() {
       title: m("footerProduct"),
       links: [
         { href: SITE_LINKS.features, label: m("navFeatures") },
+        // RoveHQ for each kind of rental business (lib/site/segments.ts).
+        { href: SITE_LINKS.carRental, label: m("navCarRental") },
+        { href: SITE_LINKS.scooterRental, label: m("navScooterRental") },
+        { href: SITE_LINKS.motorcycleRental, label: m("navMotorcycleRental") },
+        // Booking page templates and example pages.
+        { href: "/booking-pages", label: m("navBookingPages") },
         { href: SITE_LINKS.pricing, label: m("navPricing") },
         { href: SITE_LINKS.switch, label: m("navSwitch") },
         { href: SITE_LINKS.contact, label: m("navContact") }

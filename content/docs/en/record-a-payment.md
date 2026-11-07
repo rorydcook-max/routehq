@@ -13,6 +13,8 @@ faq:
     a: "No. It shows under Deposits, not in money in. It only becomes income if you keep it."
 ---
 
+![RoveHQ Record money screen: money in or out, what it was for, vehicle, booking and amount](/site/docs/screens/record-money.webp)
+
 ## Record a payment you were expecting
 
 1. Go to **Money in & out** and tap **Record money** (on a phone: the + button, then **Record money in or out**).

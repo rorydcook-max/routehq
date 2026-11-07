@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="compare-t"><title id="compare-t">Illustration: a balance weighing two software options</title>
+<rect width="1200" height="630" fill="#e6f2f2"/>
+<circle cx="930" cy="190" r="150" fill="#f3dcae"/>
+<path d="M0 520 C 200 500 360 540 600 520 S 1000 500 1200 520 V630 H0Z" fill="#cfe9e8"/>
+<path d="M90 560 h90 M980 575 h120 M520 590 h60" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+<path d="M600 140 V 500 M520 510 H 680" stroke="#06162b" stroke-width="14" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+<path d="M330 200 H 870" stroke="#06162b" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/><circle cx="600" cy="140" r="20" fill="#f3dcae" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M330 200 L 260 360 H 400Z M870 200 L 800 360 H 940Z" fill="none" stroke="#06162b" stroke-width="5"/>
+<rect x="240" y="300" width="180" height="120" rx="20" fill="#ffffff" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><rect x="262" y="330" width="110" height="14" rx="7" fill="#9fb3bf"/><rect x="262" y="362" width="80" height="14" rx="7" fill="#9fb3bf"/>
+<rect x="780" y="300" width="180" height="120" rx="20" fill="#12bcb8" stroke="#06162b" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><rect x="802" y="330" width="110" height="14" rx="7" fill="#ffffff"/><rect x="802" y="362" width="80" height="14" rx="7" fill="#ffffff"/>
+</svg>

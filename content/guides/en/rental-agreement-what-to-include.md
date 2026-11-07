@@ -15,6 +15,8 @@ faq:
     a: "Ideally both. A bilingual agreement means the renter understands what they sign and the document still works if it ever has to be shown to local police, an insurer or a court. If you use only one language, ask a local adviser which version would be relied on in a dispute."
   - q: "Is a template enough, or do I need a lawyer?"
     a: "A template is a good starting point that covers the usual clauses, but rental, consumer and insurance rules differ by country and sometimes by province. Have a local lawyer review your version once before you start using it, and again if the law or your insurance changes."
+cover: "/site/covers/contract.svg"
+coverAlt: "Illustration: a rental agreement with a signature"
 ---
 
 A rental agreement is the one document that protects you when something goes wrong: a scratch nobody remembers, a speeding ticket that arrives a month later, a scooter returned two days late. Most disputes in small rental businesses are not about bad faith. They happen because the owner and the renter remember the deal differently.
@@ -86,6 +88,8 @@ Say which country's law applies to the agreement and where any dispute would be 
 ## Signatures and ID copies
 
 Finish with the date, the names and signatures of both parties, and a note of the ID documents you have seen or copied (passport, license, International Driving Permit). Keep a copy of the signed agreement, the condition photos and the ID copies together for each rental, for as long as fines or claims could still arrive.
+
+![RoveHQ rental agreement settings with a preview of the English-Thai agreement](/site/docs/screens/rental-agreement.webp)
 
 ## Make it easy to sign
 

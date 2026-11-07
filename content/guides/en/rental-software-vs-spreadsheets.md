@@ -17,6 +17,8 @@ faq:
     a: "Yes. Good rental software works alongside the chat apps your customers already use. It sends reminders and links over LINE, WhatsApp or Telegram, while the booking, agreement and payment record live in one place."
   - q: "What is the most important feature to look for?"
     a: "A single calendar that everyone on your team sees on their phone, updated the moment a booking is made. Almost every other problem in this guide starts with two people looking at two different versions of the truth."
+cover: "/site/covers/spreadsheet.svg"
+coverAlt: "Illustration: a spreadsheet next to a phone showing a booking calendar"
 ---
 
 Almost every rental business starts the same way. A notebook by the till, a spreadsheet on the laptop, and a phone full of LINE or WhatsApp chats. It works. You know every vehicle, every customer, every deposit, because it all lives in your head.
@@ -132,6 +134,8 @@ Your spreadsheet, customer list and photos are years of work. Ask whether the co
 5. Will you import my existing data, and what does it cost?
 6. Can I export my data if I leave?
 7. Can I add staff with their own logins and limited access?
+
+![RoveHQ dashboard: vehicles on rent, money this month, unpaid rent and deposits held](/site/docs/screens/dashboard.webp)
 
 ## Making the switch without chaos
 

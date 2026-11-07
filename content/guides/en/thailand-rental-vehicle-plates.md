@@ -15,6 +15,8 @@ faq:
     a: "Many small operators do, but it carries real risks: the car is being used outside its registered category, the insurer may treat undeclared rental use as non-disclosure, and the standard rental contract assumes the insurance required for registered rental cars. Talk to your provincial land transport office and your insurer before you rely on it."
   - q: "Is a Grab car the same as a rental car?"
     a: "No. Ride-hailing cars are registered separately as app-based hire cars, keep their existing plate and display a DLT sticker. A rental car is driven by the renter. A ride-hailing car is driven by a licensed driver for paying passengers."
+cover: "/site/covers/plates.svg"
+coverAlt: "Illustration: a vehicle registration plate"
 ---
 
 > Updated 28 October 2026. This is general information, not legal advice. Rules are applied by your provincial land transport office (สำนักงานขนส่งจังหวัด), so confirm details with them before you register or buy vehicles.

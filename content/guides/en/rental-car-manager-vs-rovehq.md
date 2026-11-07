@@ -17,6 +17,8 @@ faq:
     a: "Rental Car Manager. It integrates with large rental agents including Rentalcars.com. RoveHQ doesn't connect to booking sites; it has its own booking page, where customers can pay by card, and the Rove directory."
   - q: "Can I move from Rental Car Manager to RoveHQ?"
     a: "Yes. Run RCM's Bookings Export with payments included, export it as Excel or CSV and upload it to RoveHQ. The import is free and you can undo it within 30 days."
+cover: "/site/covers/compare.svg"
+coverAlt: "Illustration: a balance weighing two software options"
 ---
 
 Rental Car Manager (RCM) is a cloud system for car, campervan and other vehicle rental, with a long list of integrations with booking agents. RoveHQ is a phone-first tool for small fleets of cars, scooters, motorbikes, quads and vans. They overlap for small car rental businesses, and differ most in how you sell and how you get started.

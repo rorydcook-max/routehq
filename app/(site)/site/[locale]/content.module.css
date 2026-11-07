@@ -77,6 +77,31 @@
   border-color: rgba(6, 22, 43, 0.24);
   box-shadow: var(--frame-shadow-light);
 }
+/* The cover sits flush with the card's top edge; the card's padding starts under it. */
+.cardCover {
+  margin: -24px -24px 20px;
+  aspect-ratio: 1200 / 630;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  border-radius: 19px 19px 0 0;
+  background: #e6f2f2;
+}
+.cardCover img,
+.articleCover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Under the hero, at the top of the reading column. */
+.articleCover {
+  margin-bottom: 40px;
+  aspect-ratio: 1200 / 630;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #e6f2f2;
+}
 .cardTitle {
   margin-top: 12px;
   font-size: 20px;
@@ -354,8 +379,27 @@
   border-top: 1px solid var(--line);
 }
 .prose img {
+  display: block;
+  width: 100%;
+  height: auto;
   border-radius: 16px;
   border: 1px solid var(--line);
+  background: var(--mist);
+}
+/* Diagrams are drawn narrow so their labels stay readable on phones; on wide screens they needn't fill the column. */
+.prose img[src$=".svg"] {
+  max-width: 560px;
+  margin-inline: auto;
+  border: 0;
+}
+/* A screenshot or diagram followed by an italic line: the line reads as its caption. */
+.prose p:has(> img:only-child) + p > em:only-child {
+  display: block;
+  margin-top: -0.4em;
+  font-size: 15px;
+  font-style: normal;
+  line-height: 1.5;
+  color: var(--muted);
 }
 .prose code {
   padding: 0.1em 0.35em;

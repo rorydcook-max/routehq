@@ -4,6 +4,7 @@ import { siteLocale, type SiteParams } from "@/lib/site/static-page";
 import { DOC_CATEGORIES, DOC_CATEGORY_KEY, docSearchIndex, listDocs, loadPublishedArticles } from "@/lib/site/docs";
 import { localizeSitePath } from "@/lib/site/locale-path";
 import { siteMetadata, siteUrl } from "@/lib/site/seo";
+import { breadcrumbLd } from "@/lib/site/schema";
 import { JsonLd } from "../_components/content-ui";
 import { FinalCta } from "../_components/final-cta";
 import { Container, Eyebrow, SiteLink } from "../_components/site-ui";
@@ -39,14 +40,23 @@ export default async function DocsPage({ params }: SiteParams) {
   return (
     <>
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          name: m("metaDocsTitle"),
-          description: m("metaDocsDescription"),
-          url: siteUrl("/docs", "en"),
-          hasPart: docs.map((doc) => ({ "@type": "TechArticle", headline: doc.title, url: siteUrl(`/docs/${doc.slug}`, "en") }))
-        }}
+        data={[
+          {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: m("metaDocsTitle"),
+            description: m("metaDocsDescription"),
+            url: siteUrl("/docs", "en"),
+            hasPart: docs.map((doc) => ({ "@type": "TechArticle", headline: doc.title, url: siteUrl(`/docs/${doc.slug}`, "en") }))
+          },
+          breadcrumbLd(
+            [
+              { name: m("breadcrumbHome"), path: "/" },
+              { name: m("docsEyebrow"), path: "/docs" }
+            ],
+            "en"
+          )
+        ]}
       />
       <section className={`${s.dark} ${s.hero} ${s.heroPlain}`}>
         <Container>

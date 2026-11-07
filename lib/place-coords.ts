@@ -1,0 +1,886 @@
+/**
+ * Towns and areas with coordinates (partner search, 7 Nov 2026), for the "Where is the customer?" suggestions and for
+ * placing a branch that has no map pin yet. It covers every town offered at setup (lib/onboarding-locations.ts), plus
+ * the beaches, areas and airports people actually type ("Lamai", "Chaweng", "Phuket airport"). Coordinates are the
+ * centre of the town or area, good to a kilometre or two: enough for "within 10 km", not for street addresses.
+ * No server code: the browser uses this too.
+ */
+
+export type PlacePoint = { name: string; region: string; country: string; lat: number; lng: number; aliases: string[] };
+
+type Row = [region: string, name: string, lat: number, lng: number, aliases?: string];
+
+const DATA: Record<string, Row[]> = {
+  Thailand: [
+    ["Bangkok", "Bangkok", 13.7563, 100.5018, "Krung Thep"],
+    ["Bangkok", "Sukhumvit", 13.738, 100.56],
+    ["Bangkok", "Silom / Sathorn", 13.724, 100.529, "Silom, Sathorn"],
+    ["Bangkok", "Ari", 13.7797, 100.5446],
+    ["Bangkok", "Ratchada", 13.77, 100.573],
+    ["Bangkok", "Ladprao", 13.816, 100.561, "Lat Phrao"],
+    ["Bangkok", "Siam", 13.746, 100.534],
+    ["Bangkok", "Khao San", 13.759, 100.4974],
+    ["Bangkok", "Don Mueang", 13.9126, 100.6068, "Don Mueang airport, DMK"],
+    ["Bangkok", "Suvarnabhumi", 13.69, 100.7501, "Bangkok airport, BKK airport, Suvarnabhumi airport"],
+    ["Chonburi", "Pattaya City", 12.9276, 100.8771, "Pattaya"],
+    ["Chonburi", "Naklua", 12.965, 100.889],
+    ["Chonburi", "Jomtien", 12.888, 100.871],
+    ["Chonburi", "Na Jomtien", 12.8, 100.91],
+    ["Chonburi", "Bang Lamung", 13.047, 100.928],
+    ["Chonburi", "Sattahip", 12.664, 100.901],
+    ["Chonburi", "U-Tapao Airport", 12.6799, 101.005, "Utapao, Pattaya airport"],
+    ["Chonburi", "Si Racha", 13.168, 100.931, "Sriracha"],
+    ["Chonburi", "Chonburi City", 13.3611, 100.9847, "Chonburi"],
+    ["Surat Thani", "Koh Samui", 9.512, 100.0136, "Samui"],
+    ["Surat Thani", "Lamai", 9.472, 100.044, "Lamai Beach"],
+    ["Surat Thani", "Chaweng", 9.533, 100.061, "Chaweng Beach"],
+    ["Surat Thani", "Chaweng Noi", 9.505, 100.06],
+    ["Surat Thani", "Bophut", 9.556, 100.027, "Bo Phut"],
+    ["Surat Thani", "Fisherman's Village", 9.559, 100.027, "Fishermans Village"],
+    ["Surat Thani", "Maenam", 9.57, 99.995, "Mae Nam"],
+    ["Surat Thani", "Bang Rak", 9.564, 100.057, "Big Buddha"],
+    ["Surat Thani", "Choeng Mon", 9.573, 100.078],
+    ["Surat Thani", "Plai Laem", 9.577, 100.07],
+    ["Surat Thani", "Bang Por", 9.569, 99.966],
+    ["Surat Thani", "Nathon", 9.535, 99.936, "Na Thon"],
+    ["Surat Thani", "Lipa Noi", 9.495, 99.935],
+    ["Surat Thani", "Taling Ngam", 9.43, 99.945],
+    ["Surat Thani", "Hua Thanon", 9.43, 100.028],
+    ["Surat Thani", "Samui Airport", 9.5478, 100.0623, "USM"],
+    ["Surat Thani", "Koh Phangan", 9.738, 100.028, "Phangan, Ko Pha Ngan"],
+    ["Surat Thani", "Thong Sala", 9.7128, 99.9956],
+    ["Surat Thani", "Haad Rin", 9.678, 100.062, "Hat Rin"],
+    ["Surat Thani", "Ban Tai (Koh Phangan)", 9.7, 100.02, "Baan Tai"],
+    ["Surat Thani", "Chaloklum", 9.788, 100.001, "Chaloklum Bay"],
+    ["Surat Thani", "Haad Yao", 9.77, 99.973, "Hat Yao"],
+    ["Surat Thani", "Sri Thanu", 9.755, 99.969, "Srithanu"],
+    ["Surat Thani", "Koh Tao", 10.0956, 99.8404, "Tao"],
+    ["Surat Thani", "Mae Haad (Koh Tao)", 10.096, 99.827],
+    ["Surat Thani", "Sairee", 10.1, 99.825, "Sairee Beach"],
+    ["Surat Thani", "Donsak", 9.317, 99.693, "Don Sak"],
+    ["Surat Thani", "Surat Thani City", 9.1382, 99.3215, "Surat Thani"],
+    ["Surat Thani", "Surat Thani Airport", 9.1326, 99.1356, "URT"],
+    ["Surat Thani", "Khanom", 9.234, 99.861],
+    ["Phuket", "Phuket Town", 7.8804, 98.3923, "Phuket"],
+    ["Phuket", "Phuket Airport", 8.1132, 98.3169, "HKT"],
+    ["Phuket", "Patong", 7.8961, 98.2966],
+    ["Phuket", "Kathu", 7.91, 98.333],
+    ["Phuket", "Rawai", 7.779, 98.325],
+    ["Phuket", "Nai Harn", 7.776, 98.306],
+    ["Phuket", "Chalong", 7.83, 98.34],
+    ["Phuket", "Kata / Karon", 7.83, 98.299],
+    ["Phuket", "Kata", 7.82, 98.299],
+    ["Phuket", "Karon", 7.847, 98.295],
+    ["Phuket", "Kamala", 7.956, 98.283],
+    ["Phuket", "Surin Beach", 7.975, 98.278],
+    ["Phuket", "Bang Tao", 7.993, 98.295, "Laguna"],
+    ["Phuket", "Cherng Talay", 8.0, 98.308, "Choeng Thale"],
+    ["Phuket", "Thalang", 8.03, 98.335],
+    ["Phuket", "Nai Yang", 8.09, 98.3],
+    ["Phuket", "Mai Khao", 8.15, 98.3],
+    ["Chiang Mai", "Old City", 18.7883, 98.9853, "Chiang Mai, Chiang Mai City"],
+    ["Chiang Mai", "Nimman", 18.798, 98.968, "Nimmanhaemin"],
+    ["Chiang Mai", "Mae Rim", 18.915, 98.944],
+    ["Chiang Mai", "Hang Dong", 18.686, 98.92],
+    ["Chiang Mai", "San Sai", 18.858, 99.04],
+    ["Chiang Mai", "Doi Saket", 18.87, 99.16],
+    ["Chiang Mai", "Chiang Mai Airport", 18.7668, 98.9626, "CNX"],
+    ["Krabi", "Ao Nang", 8.032, 98.822],
+    ["Krabi", "Krabi Town", 8.0863, 98.9063, "Krabi"],
+    ["Krabi", "Krabi Airport", 8.099, 98.986, "KBV"],
+    ["Krabi", "Koh Lanta", 7.625, 99.079, "Lanta"],
+    ["Krabi", "Saladan", 7.65, 99.04],
+    ["Krabi", "Railay", 8.011, 98.838],
+    ["Krabi", "Klong Muang", 8.056, 98.752],
+    ["Krabi", "Nong Thale", 8.07, 98.81],
+    ["Prachuap Khiri Khan", "Hua Hin", 12.5684, 99.9577],
+    ["Prachuap Khiri Khan", "Cha-am", 12.799, 99.967, "Cha am"],
+    ["Prachuap Khiri Khan", "Pranburi", 12.39, 99.91],
+    ["Prachuap Khiri Khan", "Sam Roi Yot", 12.27, 99.95],
+    ["Prachuap Khiri Khan", "Prachuap Town", 11.812, 99.797, "Prachuap"],
+    ["Rayong", "Rayong City", 12.6814, 101.2816, "Rayong"],
+    ["Rayong", "Ban Phe", 12.629, 101.44],
+    ["Rayong", "Koh Samet", 12.565, 101.456, "Samet"],
+    ["Rayong", "Mae Phim", 12.66, 101.66],
+    ["Trat", "Koh Chang", 12.05, 102.33],
+    ["Trat", "Trat Town", 12.243, 102.515, "Trat"],
+    ["Trat", "Koh Mak", 11.818, 102.48],
+    ["Trat", "Koh Kood", 11.66, 102.56, "Koh Kut"],
+    ["Satun", "Koh Lipe", 6.489, 99.304, "Lipe"],
+    ["Satun", "Pak Bara", 6.854, 99.74],
+    ["Satun", "Satun Town", 6.6238, 100.0674, "Satun"],
+    ["Mae Hong Son", "Pai", 19.358, 98.44],
+    ["Mae Hong Son", "Mae Hong Son Town", 19.302, 97.965, "Mae Hong Son"],
+    ["Mae Hong Son", "Mae Sariang", 18.16, 97.933],
+    ["Ayutthaya", "Ayutthaya City", 14.3532, 100.5689, "Ayutthaya"],
+    ["Ayutthaya", "Bang Pa-in", 14.229, 100.578],
+    ["Nakhon Ratchasima", "Korat", 14.9799, 102.0978, "Nakhon Ratchasima"],
+    ["Nakhon Ratchasima", "Pak Chong", 14.707, 101.416],
+    ["Nakhon Ratchasima", "Khao Yai", 14.439, 101.372],
+    ["Udon Thani", "Udon Thani City", 17.4138, 102.787, "Udon"],
+    ["Udon Thani", "Nong Prajak", 17.417, 102.779],
+    ["Khon Kaen", "Khon Kaen City", 16.4419, 102.836, "Khon Kaen"],
+    ["Khon Kaen", "Central Khon Kaen", 16.43, 102.83],
+    ["Songkhla", "Hat Yai", 7.0086, 100.4747],
+    ["Songkhla", "Songkhla City", 7.1898, 100.5951, "Songkhla"],
+    ["Songkhla", "Sadao", 6.639, 100.424],
+    ["Chiang Rai", "Chiang Rai City", 19.9105, 99.8406, "Chiang Rai"],
+    ["Chiang Rai", "Mae Sai", 20.428, 99.876],
+    ["Chiang Rai", "Chiang Khong", 20.263, 100.404]
+  ],
+  Indonesia: [
+    ["Bali", "Canggu", -8.6478, 115.1385],
+    ["Bali", "Seminyak", -8.6913, 115.1682],
+    ["Bali", "Ubud", -8.5069, 115.2625],
+    ["Bali", "Denpasar", -8.6705, 115.2126],
+    ["Bali", "Kuta", -8.718, 115.1686],
+    ["Bali", "Bali Airport", -8.7482, 115.167, "Ngurah Rai, DPS"],
+    ["Bali", "Sanur", -8.693, 115.262],
+    ["Bali", "Nusa Dua", -8.8, 115.231],
+    ["Bali", "Uluwatu", -8.829, 115.085],
+    ["Jakarta", "Central Jakarta", -6.1865, 106.8343, "Jakarta"],
+    ["Jakarta", "South Jakarta", -6.2615, 106.8106],
+    ["Jakarta", "North Jakarta", -6.1381, 106.8636],
+    ["Jakarta", "West Jakarta", -6.1683, 106.7589],
+    ["Jakarta", "East Jakarta", -6.225, 106.9004],
+    ["Jakarta", "Soekarno-Hatta Airport", -6.1256, 106.6559, "CGK"],
+    ["West Java", "Bandung", -6.9175, 107.6191],
+    ["West Java", "Bogor", -6.5971, 106.806],
+    ["West Java", "Bekasi", -6.2383, 106.9756],
+    ["West Java", "Depok", -6.4025, 106.7942],
+    ["West Java", "Cirebon", -6.732, 108.5523],
+    ["Central Java", "Semarang", -6.9667, 110.4167],
+    ["Central Java", "Surakarta", -7.5755, 110.8243, "Solo"],
+    ["Central Java", "Magelang", -7.4797, 110.2177],
+    ["East Java", "Surabaya", -7.2575, 112.7521],
+    ["East Java", "Malang", -7.9666, 112.6326],
+    ["East Java", "Banyuwangi", -8.2192, 114.3691],
+    ["East Java", "Sidoarjo", -7.4478, 112.7183],
+    ["Yogyakarta", "Yogyakarta City", -7.7956, 110.3695, "Jogja"],
+    ["Yogyakarta", "Sleman", -7.716, 110.355],
+    ["Yogyakarta", "Bantul", -7.888, 110.329],
+    ["West Nusa Tenggara", "Mataram", -8.5833, 116.1167, "Lombok"],
+    ["West Nusa Tenggara", "Senggigi", -8.491, 116.042],
+    ["West Nusa Tenggara", "Kuta Lombok", -8.895, 116.277],
+    ["West Nusa Tenggara", "Gili Trawangan", -8.35, 116.04],
+    ["Riau Islands", "Batam", 1.0456, 104.0305],
+    ["Riau Islands", "Bintan", 1.08, 104.49],
+    ["Riau Islands", "Tanjung Pinang", 0.9179, 104.4665],
+    ["North Sumatra", "Medan", 3.5952, 98.6722],
+    ["North Sumatra", "Lake Toba", 2.6, 98.83],
+    ["North Sumatra", "Kualanamu Airport", 3.6422, 98.8853],
+    ["South Sulawesi", "Makassar", -5.1477, 119.4327],
+    ["South Sulawesi", "Maros", -5.006, 119.573],
+    ["South Sulawesi", "Tana Toraja", -3.075, 119.742]
+  ],
+  Philippines: [
+    ["Metro Manila", "Makati", 14.5547, 121.0244],
+    ["Metro Manila", "BGC / Taguig", 14.5507, 121.0509, "BGC, Taguig"],
+    ["Metro Manila", "Pasay", 14.5378, 121.0014],
+    ["Metro Manila", "Manila Airport", 14.5086, 121.0198, "NAIA"],
+    ["Metro Manila", "Quezon City", 14.676, 121.0437],
+    ["Metro Manila", "Manila", 14.5995, 120.9842],
+    ["Metro Manila", "Paranaque", 14.4793, 121.0198],
+    ["Metro Manila", "Alabang", 14.4195, 121.039],
+    ["Cebu", "Cebu City", 10.3157, 123.8854, "Cebu"],
+    ["Cebu", "Mactan", 10.3075, 123.979, "Cebu airport"],
+    ["Cebu", "Lapu-Lapu", 10.3103, 123.9494],
+    ["Cebu", "Mandaue", 10.3236, 123.9223],
+    ["Cebu", "Moalboal", 9.948, 123.396],
+    ["Cebu", "Oslob", 9.465, 123.38],
+    ["Cebu", "Bantayan", 11.169, 123.723],
+    ["Palawan", "Puerto Princesa", 9.7392, 118.7353],
+    ["Palawan", "El Nido", 11.1956, 119.4075],
+    ["Palawan", "Coron", 11.9986, 120.2043],
+    ["Palawan", "Port Barton", 10.406, 119.159],
+    ["Palawan", "San Vicente", 10.528, 119.255],
+    ["Aklan", "Boracay", 11.9674, 121.9248],
+    ["Aklan", "Kalibo", 11.707, 122.364],
+    ["Aklan", "Caticlan", 11.926, 121.953],
+    ["Bohol", "Tagbilaran", 9.65, 123.85],
+    ["Bohol", "Panglao", 9.58, 123.75],
+    ["Bohol", "Anda", 9.745, 124.576],
+    ["Davao", "Davao City", 7.1907, 125.4553],
+    ["Davao", "Samal", 7.073, 125.708],
+    ["Davao", "Davao Airport", 7.1255, 125.6458],
+    ["Iloilo", "Iloilo City", 10.7202, 122.5621],
+    ["Iloilo", "Mandurriao", 10.719, 122.541],
+    ["Negros Oriental", "Dumaguete", 9.3068, 123.3054],
+    ["Negros Oriental", "Dauin", 9.19, 123.267],
+    ["Negros Oriental", "Siquijor Ferry", 9.214, 123.515],
+    ["La Union", "San Juan", 16.67, 120.34],
+    ["La Union", "San Fernando", 16.6159, 120.3166],
+    ["Benguet", "Baguio", 16.4023, 120.596],
+    ["Benguet", "La Trinidad", 16.455, 120.587]
+  ],
+  Vietnam: [
+    ["Ho Chi Minh City", "District 1", 10.7756, 106.7019, "Saigon, Ho Chi Minh City"],
+    ["Ho Chi Minh City", "Thao Dien", 10.803, 106.735],
+    ["Ho Chi Minh City", "District 7", 10.734, 106.722],
+    ["Ho Chi Minh City", "Tan Binh", 10.8015, 106.6527, "Tan Son Nhat"],
+    ["Ho Chi Minh City", "Binh Thanh", 10.8106, 106.7091],
+    ["Ho Chi Minh City", "Phu Nhuan", 10.799, 106.68],
+    ["Hanoi", "Hoan Kiem", 21.0288, 105.8525, "Hanoi"],
+    ["Hanoi", "Tay Ho", 21.068, 105.824],
+    ["Hanoi", "Ba Dinh", 21.034, 105.814],
+    ["Hanoi", "Cau Giay", 21.033, 105.793],
+    ["Hanoi", "Noi Bai Airport", 21.2187, 105.8042],
+    ["Da Nang", "My Khe", 16.06, 108.247, "Da Nang"],
+    ["Da Nang", "Hai Chau", 16.047, 108.22],
+    ["Da Nang", "Son Tra", 16.1, 108.26],
+    ["Da Nang", "Ngu Hanh Son", 16.0, 108.256],
+    ["Da Nang", "Da Nang Airport", 16.0439, 108.1992],
+    ["Khanh Hoa", "Nha Trang", 12.2388, 109.1967],
+    ["Khanh Hoa", "Cam Ranh", 11.9214, 109.1591],
+    ["Khanh Hoa", "Ninh Hoa", 12.493, 109.128],
+    ["Quang Nam", "Hoi An", 15.8801, 108.338],
+    ["Quang Nam", "An Bang", 15.913, 108.34],
+    ["Quang Nam", "Tam Ky", 15.573, 108.474],
+    ["Kien Giang", "Phu Quoc", 10.2899, 103.984],
+    ["Kien Giang", "Duong Dong", 10.217, 103.96],
+    ["Kien Giang", "An Thoi", 10.02, 104.01],
+    ["Lam Dong", "Da Lat", 11.9404, 108.4583, "Dalat"],
+    ["Lam Dong", "Lien Khuong Airport", 11.75, 108.367],
+    ["Thua Thien Hue", "Hue City", 16.4637, 107.5909, "Hue"],
+    ["Thua Thien Hue", "Lang Co", 16.23, 108.07],
+    ["Binh Thuan", "Mui Ne", 10.933, 108.287],
+    ["Binh Thuan", "Phan Thiet", 10.928, 108.102],
+    ["Quang Ninh", "Ha Long", 20.9517, 107.08, "Halong"],
+    ["Quang Ninh", "Van Don", 21.07, 107.42]
+  ],
+  Malaysia: [
+    ["Kuala Lumpur", "KLCC", 3.1579, 101.7123, "Kuala Lumpur, KL"],
+    ["Kuala Lumpur", "Bukit Bintang", 3.1466, 101.711],
+    ["Kuala Lumpur", "Mont Kiara", 3.17, 101.651],
+    ["Kuala Lumpur", "Bangsar", 3.13, 101.67],
+    ["Kuala Lumpur", "Cheras", 3.1, 101.74],
+    ["Selangor", "Petaling Jaya", 3.1073, 101.6067, "PJ"],
+    ["Selangor", "Subang Jaya", 3.0565, 101.5851],
+    ["Selangor", "Shah Alam", 3.0733, 101.5185],
+    ["Selangor", "Klang", 3.0449, 101.4456],
+    ["Selangor", "Sepang", 2.69, 101.75],
+    ["Selangor", "KLIA", 2.7456, 101.7072, "KL airport"],
+    ["Selangor", "Cyberjaya", 2.9213, 101.6559],
+    ["Penang", "George Town", 5.4141, 100.3288, "Penang"],
+    ["Penang", "Batu Ferringhi", 5.471, 100.246],
+    ["Penang", "Bayan Lepas", 5.295, 100.26, "Penang airport"],
+    ["Penang", "Tanjung Tokong", 5.46, 100.306],
+    ["Penang", "Butterworth", 5.3991, 100.3638],
+    ["Johor", "Johor Bahru", 1.4927, 103.7414, "JB"],
+    ["Johor", "Iskandar Puteri", 1.425, 103.635],
+    ["Johor", "Desaru", 1.545, 104.262],
+    ["Johor", "Mersing", 2.431, 103.837],
+    ["Kedah", "Langkawi", 6.35, 99.8],
+    ["Kedah", "Kuah", 6.317, 99.85],
+    ["Kedah", "Pantai Cenang", 6.295, 99.728],
+    ["Kedah", "Alor Setar", 6.121, 100.36],
+    ["Sabah", "Kota Kinabalu", 5.9804, 116.0735, "KK"],
+    ["Sabah", "Semporna", 4.48, 118.611],
+    ["Sabah", "Sandakan", 5.8394, 118.1172],
+    ["Sabah", "Tawau", 4.2448, 117.8912],
+    ["Sarawak", "Kuching", 1.5535, 110.3593],
+    ["Sarawak", "Miri", 4.3995, 113.9914],
+    ["Sarawak", "Sibu", 2.287, 111.83],
+    ["Melaka", "Melaka City", 2.1896, 102.2501, "Malacca"],
+    ["Melaka", "Ayer Keroh", 2.27, 102.29],
+    ["Perak", "Ipoh", 4.5975, 101.0901],
+    ["Perak", "Taiping", 4.85, 100.74],
+    ["Perak", "Pangkor", 4.22, 100.55],
+    ["Pahang", "Kuantan", 3.8077, 103.326],
+    ["Pahang", "Genting Highlands", 3.4236, 101.7932],
+    ["Pahang", "Cameron Highlands", 4.4718, 101.3767]
+  ],
+  Singapore: [
+    ["Central Region", "Marina Bay", 1.2834, 103.8607],
+    ["Central Region", "Orchard", 1.3048, 103.8318],
+    ["Central Region", "Bugis", 1.3009, 103.8559],
+    ["Central Region", "Novena", 1.3204, 103.8438],
+    ["Central Region", "River Valley", 1.295, 103.835],
+    ["Central Region", "Tanjong Pagar", 1.2764, 103.8458],
+    ["East Region", "Changi", 1.3644, 103.9915, "Changi airport"],
+    ["East Region", "Tampines", 1.3496, 103.9568],
+    ["East Region", "Paya Lebar", 1.318, 103.893],
+    ["East Region", "Bedok", 1.3236, 103.9273],
+    ["East Region", "Katong", 1.305, 103.905],
+    ["West Region", "Jurong", 1.3329, 103.7436],
+    ["West Region", "Clementi", 1.3162, 103.7649],
+    ["West Region", "Tuas", 1.32, 103.65],
+    ["West Region", "Bukit Batok", 1.359, 103.7637],
+    ["North Region", "Woodlands", 1.4382, 103.789],
+    ["North Region", "Yishun", 1.4304, 103.8354],
+    ["North Region", "Sembawang", 1.4491, 103.8185],
+    ["North-East Region", "Serangoon", 1.3554, 103.8679],
+    ["North-East Region", "Punggol", 1.3984, 103.9072],
+    ["North-East Region", "Hougang", 1.3612, 103.8863],
+    ["North-East Region", "Sengkang", 1.3868, 103.8914]
+  ],
+  Laos: [
+    ["Vientiane Capital", "Vientiane Center", 17.9757, 102.6331, "Vientiane"],
+    ["Vientiane Capital", "Wattay", 17.9883, 102.5633, "Vientiane airport"],
+    ["Vientiane Capital", "Sikhottabong", 17.99, 102.59],
+    ["Vientiane Capital", "Sisattanak", 17.95, 102.62],
+    ["Vientiane Capital", "Xaysetha", 17.98, 102.66],
+    ["Luang Prabang", "Luang Prabang Town", 19.8856, 102.1347, "Luang Prabang"],
+    ["Luang Prabang", "Ban Xiengkeo", 19.86, 102.15],
+    ["Luang Prabang", "Pak Ou", 20.05, 102.22],
+    ["Champasak", "Pakse", 15.1202, 105.799],
+    ["Champasak", "Don Det", 13.98, 105.92],
+    ["Champasak", "Don Khon", 13.97, 105.92],
+    ["Champasak", "Champasak Town", 14.89, 105.87],
+    ["Vientiane Province", "Vang Vieng", 18.9235, 102.4478],
+    ["Vientiane Province", "Vang Vieng Town", 18.9235, 102.4478],
+    ["Vientiane Province", "Phonhong", 18.49, 102.41],
+    ["Savannakhet", "Savannakhet City", 16.55, 104.75, "Savannakhet"],
+    ["Savannakhet", "Kaysone Phomvihane", 16.56, 104.76],
+    ["Khammouane", "Thakhek", 17.4, 104.8],
+    ["Khammouane", "Kong Lor", 17.98, 104.81],
+    ["Oudomxay", "Muang Xay", 20.69, 101.99],
+    ["Xieng Khouang", "Phonsavan", 19.45, 103.19]
+  ],
+  Cambodia: [
+    ["Phnom Penh", "BKK1", 11.552, 104.925, "Phnom Penh"],
+    ["Phnom Penh", "Daun Penh", 11.57, 104.92],
+    ["Phnom Penh", "Toul Kork", 11.58, 104.9],
+    ["Phnom Penh", "Chamkar Mon", 11.54, 104.93],
+    ["Phnom Penh", "Sen Sok", 11.6, 104.88],
+    ["Siem Reap", "Siem Reap City", 13.3633, 103.8564, "Siem Reap"],
+    ["Siem Reap", "Old Market", 13.354, 103.855],
+    ["Siem Reap", "Sivutha Boulevard", 13.356, 103.859],
+    ["Siem Reap", "Angkor Area", 13.4125, 103.867, "Angkor Wat"],
+    ["Sihanoukville", "Sihanoukville City", 10.6093, 103.5296, "Sihanoukville"],
+    ["Sihanoukville", "Otres", 10.57, 103.55],
+    ["Sihanoukville", "Serendipity Beach", 10.599, 103.53],
+    ["Kampot", "Kampot Town", 10.6104, 104.1815, "Kampot"],
+    ["Kampot", "Kep", 10.483, 104.317],
+    ["Kampot", "Bokor", 10.63, 104.03],
+    ["Battambang", "Battambang City", 13.0957, 103.2022, "Battambang"],
+    ["Koh Kong", "Koh Kong City", 11.615, 102.984],
+    ["Koh Kong", "Koh Rong", 10.72, 103.24],
+    ["Koh Kong", "Koh Rong Sanloem", 10.59, 103.3],
+    ["Kandal", "Ta Khmau", 11.483, 104.95],
+    ["Kandal", "Akreiy Ksatr", 11.62, 104.95]
+  ],
+  China: [
+    ["Beijing", "Chaoyang", 39.9219, 116.4436, "Beijing"],
+    ["Beijing", "Dongcheng", 39.9288, 116.416],
+    ["Beijing", "Haidian", 39.959, 116.2981],
+    ["Beijing", "Shunyi", 40.13, 116.654],
+    ["Beijing", "Daxing", 39.727, 116.341],
+    ["Shanghai", "Pudong", 31.221, 121.544, "Shanghai"],
+    ["Shanghai", "Huangpu", 31.2317, 121.4846],
+    ["Shanghai", "Jing'an", 31.229, 121.448],
+    ["Shanghai", "Xuhui", 31.188, 121.437],
+    ["Shanghai", "Hongqiao", 31.1979, 121.3363],
+    ["Guangdong", "Guangzhou", 23.1291, 113.2644],
+    ["Guangdong", "Shenzhen", 22.5431, 114.0579],
+    ["Guangdong", "Zhuhai", 22.271, 113.5767],
+    ["Guangdong", "Foshan", 23.0215, 113.1214],
+    ["Guangdong", "Dongguan", 23.0207, 113.7518],
+    ["Hainan", "Sanya", 18.2528, 109.5119],
+    ["Hainan", "Haikou", 20.044, 110.1999],
+    ["Hainan", "Wanning", 18.796, 110.389],
+    ["Hainan", "Qionghai", 19.246, 110.464],
+    ["Yunnan", "Kunming", 25.0389, 102.7183],
+    ["Yunnan", "Dali", 25.6065, 100.2676],
+    ["Yunnan", "Lijiang", 26.8721, 100.2299],
+    ["Yunnan", "Xishuangbanna", 22.0017, 100.7975],
+    ["Zhejiang", "Hangzhou", 30.2741, 120.1551],
+    ["Zhejiang", "Ningbo", 29.8683, 121.544],
+    ["Zhejiang", "Wenzhou", 27.9938, 120.6994],
+    ["Sichuan", "Chengdu", 30.5728, 104.0668],
+    ["Sichuan", "Leshan", 29.5521, 103.7657],
+    ["Sichuan", "Mianyang", 31.4675, 104.6796],
+    ["Fujian", "Xiamen", 24.4798, 118.0894],
+    ["Fujian", "Fuzhou", 26.0745, 119.2965],
+    ["Fujian", "Quanzhou", 24.8741, 118.6758]
+  ],
+  Japan: [
+    ["Tokyo", "Shinjuku", 35.6938, 139.7034, "Tokyo"],
+    ["Tokyo", "Shibuya", 35.658, 139.7016],
+    ["Tokyo", "Haneda", 35.5494, 139.7798],
+    ["Tokyo", "Narita", 35.772, 140.3929],
+    ["Tokyo", "Ueno", 35.7138, 139.7773],
+    ["Tokyo", "Roppongi", 35.6628, 139.7314],
+    ["Osaka", "Namba", 34.666, 135.501, "Osaka"],
+    ["Osaka", "Umeda", 34.7025, 135.4959],
+    ["Osaka", "Kansai Airport", 34.432, 135.2304, "KIX"],
+    ["Osaka", "Shin-Osaka", 34.7335, 135.5003],
+    ["Kyoto", "Kyoto Station", 34.9858, 135.7588, "Kyoto"],
+    ["Kyoto", "Gion", 35.0037, 135.7788],
+    ["Kyoto", "Arashiyama", 35.0094, 135.6668],
+    ["Hokkaido", "Sapporo", 43.0618, 141.3545],
+    ["Hokkaido", "New Chitose", 42.7752, 141.6923, "Chitose airport"],
+    ["Hokkaido", "Niseko", 42.8048, 140.6874],
+    ["Hokkaido", "Furano", 43.342, 142.383],
+    ["Hokkaido", "Hakodate", 41.7687, 140.7288],
+    ["Okinawa", "Naha", 26.2124, 127.6809, "Okinawa"],
+    ["Okinawa", "Chatan", 26.31, 127.76],
+    ["Okinawa", "Ishigaki", 24.3448, 124.1572],
+    ["Okinawa", "Miyakojima", 24.8055, 125.2811],
+    ["Fukuoka", "Hakata", 33.5902, 130.4207, "Fukuoka"],
+    ["Fukuoka", "Tenjin", 33.5911, 130.399],
+    ["Fukuoka", "Fukuoka Airport", 33.5859, 130.451],
+    ["Aichi", "Nagoya", 35.1815, 136.9066],
+    ["Aichi", "Chubu Centrair", 34.8584, 136.8054],
+    ["Kanagawa", "Yokohama", 35.4437, 139.638],
+    ["Kanagawa", "Kamakura", 35.3192, 139.5467],
+    ["Kanagawa", "Hakone", 35.2324, 139.1069]
+  ],
+  Taiwan: [
+    ["Taipei", "Xinyi", 25.033, 121.5654, "Taipei"],
+    ["Taipei", "Zhongshan", 25.064, 121.533],
+    ["Taipei", "Songshan", 25.05, 121.577],
+    ["Taipei", "Da'an", 25.026, 121.543],
+    ["Taipei", "Taipei Main Station", 25.0478, 121.517],
+    ["New Taipei", "Banqiao", 25.0143, 121.4672],
+    ["New Taipei", "Tamsui", 25.1676, 121.445],
+    ["New Taipei", "Xindian", 24.9676, 121.542],
+    ["New Taipei", "Ruifang", 25.109, 121.81],
+    ["Taichung", "Xitun", 24.181, 120.644, "Taichung"],
+    ["Taichung", "Central District", 24.143, 120.68],
+    ["Taichung", "Fengjia", 24.179, 120.646],
+    ["Kaohsiung", "Zuoying", 22.687, 120.308, "Kaohsiung"],
+    ["Kaohsiung", "Lingya", 22.625, 120.333],
+    ["Kaohsiung", "Cianjin", 22.625, 120.295],
+    ["Kaohsiung", "Kaohsiung Airport", 22.5771, 120.35],
+    ["Hualien", "Hualien City", 23.991, 121.611, "Hualien"],
+    ["Hualien", "Taroko", 24.158, 121.621],
+    ["Tainan", "Anping", 23.001, 120.165, "Tainan"],
+    ["Tainan", "West Central District", 22.992, 120.197],
+    ["Taoyuan", "Taoyuan Airport", 25.0797, 121.2342],
+    ["Taoyuan", "Zhongli", 24.9537, 121.2257],
+    ["Yilan", "Yilan City", 24.757, 121.753, "Yilan"],
+    ["Yilan", "Luodong", 24.677, 121.766]
+  ],
+  "South Korea": [
+    ["Seoul", "Gangnam", 37.4979, 127.0276, "Seoul"],
+    ["Seoul", "Hongdae", 37.5563, 126.922],
+    ["Seoul", "Myeongdong", 37.5636, 126.985],
+    ["Seoul", "Itaewon", 37.5345, 126.9946],
+    ["Seoul", "Jongno", 37.573, 126.9794],
+    ["Busan", "Haeundae", 35.1631, 129.1636, "Busan"],
+    ["Busan", "Seomyeon", 35.1578, 129.06],
+    ["Busan", "Nampo", 35.098, 129.03],
+    ["Busan", "Gimhae Airport", 35.1795, 128.9382],
+    ["Jeju", "Jeju City", 33.4996, 126.5312, "Jeju"],
+    ["Jeju", "Seogwipo", 33.2541, 126.56],
+    ["Jeju", "Aewol", 33.463, 126.331],
+    ["Jeju", "Jungmun", 33.245, 126.412],
+    ["Incheon", "Incheon Airport", 37.4602, 126.4407, "ICN"],
+    ["Incheon", "Songdo", 37.38, 126.656],
+    ["Incheon", "Bupyeong", 37.507, 126.722],
+    ["Gyeonggi", "Suwon", 37.2636, 127.0286],
+    ["Gyeonggi", "Seongnam", 37.42, 127.1265],
+    ["Gyeonggi", "Goyang", 37.6584, 126.832],
+    ["Gyeonggi", "Yongin", 37.2411, 127.1776],
+    ["Gangwon", "Sokcho", 38.207, 128.5918],
+    ["Gangwon", "Gangneung", 37.7519, 128.8761],
+    ["Gangwon", "Pyeongchang", 37.3705, 128.39],
+    ["Daegu", "Daegu City", 35.8714, 128.6014, "Daegu"],
+    ["Daegu", "Dongseongno", 35.869, 128.596],
+    ["Daejeon", "Daejeon City", 36.3504, 127.3845, "Daejeon"],
+    ["Daejeon", "Yuseong", 36.362, 127.356]
+  ],
+  Brunei: [
+    ["Brunei-Muara", "Bandar Seri Begawan", 4.9031, 114.9398, "BSB"],
+    ["Brunei-Muara", "Gadong", 4.905, 114.917],
+    ["Brunei-Muara", "Jerudong", 4.945, 114.835],
+    ["Brunei-Muara", "Muara", 5.027, 115.066],
+    ["Brunei-Muara", "Berakas", 4.97, 114.93],
+    ["Belait", "Kuala Belait", 4.5836, 114.2312],
+    ["Belait", "Seria", 4.6064, 114.3248],
+    ["Belait", "Lumut", 4.67, 114.44],
+    ["Tutong", "Tutong Town", 4.803, 114.649],
+    ["Tutong", "Pekan Tutong", 4.803, 114.649],
+    ["Temburong", "Bangar", 4.709, 115.072],
+    ["Temburong", "Batang Duri", 4.59, 115.12]
+  ],
+  India: [
+    ["Delhi NCR", "New Delhi", 28.6139, 77.209, "Delhi"],
+    ["Delhi NCR", "Gurugram", 28.4595, 77.0266, "Gurgaon"],
+    ["Delhi NCR", "Noida", 28.5355, 77.391],
+    ["Delhi NCR", "Faridabad", 28.4089, 77.3178],
+    ["Delhi NCR", "Ghaziabad", 28.6692, 77.4538],
+    ["Maharashtra", "Mumbai", 19.076, 72.8777],
+    ["Maharashtra", "Pune", 18.5204, 73.8567],
+    ["Maharashtra", "Navi Mumbai", 19.033, 73.0297],
+    ["Maharashtra", "Nagpur", 21.1458, 79.0882],
+    ["Karnataka", "Bengaluru", 12.9716, 77.5946, "Bangalore"],
+    ["Karnataka", "Mysuru", 12.2958, 76.6394, "Mysore"],
+    ["Karnataka", "Mangalore", 12.9141, 74.856],
+    ["Goa", "Panaji", 15.4909, 73.8278, "Panjim"],
+    ["Goa", "North Goa", 15.59, 73.76, "Calangute, Anjuna"],
+    ["Goa", "South Goa", 15.2, 73.95],
+    ["Goa", "Dabolim Airport", 15.3808, 73.8314, "Goa airport"],
+    ["Tamil Nadu", "Chennai", 13.0827, 80.2707],
+    ["Tamil Nadu", "Coimbatore", 11.0168, 76.9558],
+    ["Tamil Nadu", "Madurai", 9.9252, 78.1198],
+    ["Kerala", "Kochi", 9.9312, 76.2673, "Cochin"],
+    ["Kerala", "Thiruvananthapuram", 8.5241, 76.9366, "Trivandrum"],
+    ["Kerala", "Munnar", 10.0889, 77.0595],
+    ["Kerala", "Kozhikode", 11.2588, 75.7804, "Calicut"],
+    ["Rajasthan", "Jaipur", 26.9124, 75.7873],
+    ["Rajasthan", "Udaipur", 24.5854, 73.7125],
+    ["Rajasthan", "Jodhpur", 26.2389, 73.0243],
+    ["Gujarat", "Ahmedabad", 23.0225, 72.5714],
+    ["Gujarat", "Surat", 21.1702, 72.8311],
+    ["Gujarat", "Vadodara", 22.3072, 73.1812],
+    ["Uttar Pradesh", "Lucknow", 26.8467, 80.9462],
+    ["Uttar Pradesh", "Agra", 27.1767, 78.0081],
+    ["Uttar Pradesh", "Varanasi", 25.3176, 82.9739],
+    ["West Bengal", "Kolkata", 22.5726, 88.3639],
+    ["West Bengal", "Siliguri", 26.7271, 88.3953]
+  ],
+  Bangladesh: [
+    ["Dhaka", "Gulshan", 23.7925, 90.4078, "Dhaka"],
+    ["Dhaka", "Banani", 23.794, 90.4043],
+    ["Dhaka", "Uttara", 23.8759, 90.3795],
+    ["Dhaka", "Dhanmondi", 23.7461, 90.3742],
+    ["Dhaka", "Mirpur", 23.8223, 90.3654],
+    ["Dhaka", "Motijheel", 23.733, 90.4172],
+    ["Chattogram", "Chattogram City", 22.3569, 91.7832, "Chittagong"],
+    ["Chattogram", "Cox's Bazar", 21.4272, 92.0058],
+    ["Chattogram", "Patenga", 22.235, 91.79],
+    ["Sylhet", "Sylhet City", 24.8949, 91.8687],
+    ["Sylhet", "Sreemangal", 24.3065, 91.7296],
+    ["Khulna", "Khulna City", 22.8456, 89.5403],
+    ["Khulna", "Mongla", 22.49, 89.6],
+    ["Rajshahi", "Rajshahi City", 24.3745, 88.6042],
+    ["Barisal", "Barisal City", 22.701, 90.3535],
+    ["Barisal", "Kuakata", 21.817, 90.12],
+    ["Rangpur", "Rangpur City", 25.7439, 89.2752]
+  ],
+  "Sri Lanka": [
+    ["Western Province", "Colombo", 6.9271, 79.8612],
+    ["Western Province", "Negombo", 7.2008, 79.8737],
+    ["Western Province", "Mount Lavinia", 6.839, 79.865],
+    ["Western Province", "Bandaranaike Airport", 7.1808, 79.8841, "Colombo airport, CMB"],
+    ["Central Province", "Kandy", 7.2906, 80.6337],
+    ["Central Province", "Nuwara Eliya", 6.9497, 80.7891],
+    ["Central Province", "Ella", 6.8667, 81.0466],
+    ["Southern Province", "Galle", 6.0535, 80.221],
+    ["Southern Province", "Mirissa", 5.9483, 80.4716],
+    ["Southern Province", "Matara", 5.9549, 80.555],
+    ["Southern Province", "Unawatuna", 6.01, 80.249],
+    ["Southern Province", "Tangalle", 6.024, 80.794],
+    ["Eastern Province", "Trincomalee", 8.5874, 81.2152],
+    ["Eastern Province", "Arugam Bay", 6.84, 81.836],
+    ["Eastern Province", "Batticaloa", 7.731, 81.6747],
+    ["Northern Province", "Jaffna", 9.6615, 80.0255],
+    ["Northern Province", "Mannar", 8.977, 79.91],
+    ["North Central Province", "Anuradhapura", 8.3114, 80.4037],
+    ["North Central Province", "Polonnaruwa", 7.9403, 81.0188],
+    ["Uva Province", "Badulla", 6.9934, 81.055],
+    ["Uva Province", "Haputale", 6.768, 80.958]
+  ],
+  "United Kingdom": [
+    ["England", "London", 51.5074, -0.1278],
+    ["England", "Manchester", 53.4808, -2.2426],
+    ["England", "Birmingham", 52.4862, -1.8904],
+    ["England", "Bristol", 51.4545, -2.5879],
+    ["England", "Brighton", 50.8225, -0.1372],
+    ["England", "Cornwall", 50.266, -5.0527],
+    ["England", "Lake District", 54.4609, -3.0886],
+    ["Scotland", "Edinburgh", 55.9533, -3.1883],
+    ["Scotland", "Glasgow", 55.8642, -4.2518],
+    ["Scotland", "Inverness", 57.4778, -4.2247],
+    ["Scotland", "Aberdeen", 57.1497, -2.0943],
+    ["Wales", "Cardiff", 51.4816, -3.1791],
+    ["Wales", "Swansea", 51.6214, -3.9436],
+    ["Wales", "Snowdonia", 52.9, -3.9],
+    ["Northern Ireland", "Belfast", 54.5973, -5.9301],
+    ["Northern Ireland", "Derry", 54.9966, -7.3086]
+  ],
+  Ireland: [
+    ["Leinster", "Dublin", 53.3498, -6.2603],
+    ["Leinster", "Dublin Airport", 53.4264, -6.2499],
+    ["Leinster", "Kilkenny", 52.6541, -7.2448],
+    ["Munster", "Cork", 51.8985, -8.4756],
+    ["Munster", "Shannon", 52.7019, -8.9248],
+    ["Munster", "Killarney", 52.0599, -9.5044],
+    ["Munster", "Limerick", 52.6638, -8.6267],
+    ["Connacht", "Galway", 53.2707, -9.0568],
+    ["Connacht", "Knock", 53.91, -8.818]
+  ],
+  Spain: [
+    ["Canary Islands", "Tenerife", 28.2916, -16.6291],
+    ["Canary Islands", "Gran Canaria", 27.9202, -15.5474],
+    ["Canary Islands", "Lanzarote", 29.0469, -13.5899],
+    ["Canary Islands", "Fuerteventura", 28.3587, -14.0537],
+    ["Canary Islands", "La Palma", 28.6835, -17.7642],
+    ["Balearic Islands", "Mallorca", 39.6953, 3.0176, "Majorca, Palma"],
+    ["Balearic Islands", "Ibiza", 38.9067, 1.4206],
+    ["Balearic Islands", "Menorca", 39.9496, 4.1104],
+    ["Balearic Islands", "Formentera", 38.705, 1.45],
+    ["Andalusia", "Málaga", 36.7213, -4.4214, "Malaga"],
+    ["Andalusia", "Marbella", 36.5101, -4.8825],
+    ["Andalusia", "Seville", 37.3891, -5.9845],
+    ["Andalusia", "Granada", 37.1773, -3.5986],
+    ["Catalonia", "Barcelona", 41.3874, 2.1686],
+    ["Catalonia", "Girona", 41.9794, 2.8214],
+    ["Catalonia", "Costa Brava", 41.85, 3.1],
+    ["Valencia", "Valencia", 39.4699, -0.3763],
+    ["Valencia", "Alicante", 38.3452, -0.481],
+    ["Valencia", "Benidorm", 38.5411, -0.1225],
+    ["Madrid", "Madrid", 40.4168, -3.7038],
+    ["Madrid", "Madrid Airport", 40.4983, -3.5676]
+  ],
+  Portugal: [
+    ["Algarve", "Faro", 37.0194, -7.9304],
+    ["Algarve", "Albufeira", 37.0891, -8.2479],
+    ["Algarve", "Lagos", 37.1028, -8.673],
+    ["Algarve", "Portimão", 37.1386, -8.537, "Portimao"],
+    ["Lisbon", "Lisbon", 38.7223, -9.1393],
+    ["Lisbon", "Cascais", 38.6979, -9.4215],
+    ["Lisbon", "Sintra", 38.8029, -9.3817],
+    ["Porto", "Porto", 41.1579, -8.6291],
+    ["Madeira", "Funchal", 32.6669, -16.9241],
+    ["Azores", "Ponta Delgada", 37.7412, -25.6756]
+  ],
+  Italy: [
+    ["Sicily", "Catania", 37.5079, 15.083],
+    ["Sicily", "Palermo", 38.1157, 13.3615],
+    ["Sicily", "Taormina", 37.8516, 15.2853],
+    ["Sardinia", "Cagliari", 39.2238, 9.1217],
+    ["Sardinia", "Olbia", 40.9234, 9.4964],
+    ["Sardinia", "Alghero", 40.558, 8.319],
+    ["Campania", "Naples", 40.8518, 14.2681],
+    ["Campania", "Sorrento", 40.6263, 14.3758],
+    ["Campania", "Amalfi Coast", 40.634, 14.6027],
+    ["Lazio", "Rome", 41.9028, 12.4964],
+    ["Tuscany", "Florence", 43.7696, 11.2558],
+    ["Tuscany", "Pisa", 43.7228, 10.4017],
+    ["Lombardy", "Milan", 45.4642, 9.19],
+    ["Lombardy", "Lake Como", 45.987, 9.2572]
+  ],
+  Greece: [
+    ["Crete", "Heraklion", 35.3387, 25.1442],
+    ["Crete", "Chania", 35.5138, 24.018],
+    ["Crete", "Rethymno", 35.3644, 24.4822],
+    ["South Aegean", "Rhodes", 36.4341, 28.2176],
+    ["South Aegean", "Santorini", 36.3932, 25.4615],
+    ["South Aegean", "Mykonos", 37.4467, 25.3289],
+    ["South Aegean", "Kos", 36.8915, 27.2877],
+    ["South Aegean", "Naxos", 37.1036, 25.3763],
+    ["South Aegean", "Paros", 37.0853, 25.15],
+    ["Ionian Islands", "Corfu", 39.6243, 19.9217],
+    ["Ionian Islands", "Zakynthos", 37.787, 20.8999, "Zante"],
+    ["Ionian Islands", "Kefalonia", 38.1754, 20.5692],
+    ["Ionian Islands", "Lefkada", 38.8336, 20.7069],
+    ["Attica", "Athens", 37.9838, 23.7275],
+    ["Attica", "Athens Airport", 37.9364, 23.9445],
+    ["Central Macedonia", "Thessaloniki", 40.6401, 22.9444],
+    ["Central Macedonia", "Halkidiki", 40.25, 23.5]
+  ],
+  Croatia: [
+    ["Split-Dalmatia", "Split", 43.5081, 16.4402],
+    ["Split-Dalmatia", "Hvar", 43.1729, 16.4411],
+    ["Split-Dalmatia", "Makarska", 43.2969, 17.0178],
+    ["Dubrovnik-Neretva", "Dubrovnik", 42.6507, 18.0944],
+    ["Dubrovnik-Neretva", "Korčula", 42.9597, 17.1359],
+    ["Istria", "Pula", 44.8666, 13.8496],
+    ["Istria", "Rovinj", 45.0812, 13.6387],
+    ["Istria", "Poreč", 45.2271, 13.5947],
+    ["Zagreb", "Zagreb", 45.815, 15.9819],
+    ["Zadar", "Zadar", 44.1194, 15.2314]
+  ],
+  Cyprus: [
+    ["Paphos", "Paphos", 34.772, 32.4297],
+    ["Paphos", "Coral Bay", 34.854, 32.369],
+    ["Larnaca", "Larnaca", 34.9003, 33.6232],
+    ["Larnaca", "Ayia Napa", 34.9823, 34.001],
+    ["Larnaca", "Protaras", 35.0125, 34.0583],
+    ["Limassol", "Limassol", 34.7071, 33.0226],
+    ["Nicosia", "Nicosia", 35.1856, 33.3823]
+  ],
+  Malta: [
+    ["Malta", "Valletta", 35.8989, 14.5146],
+    ["Malta", "Sliema", 35.9122, 14.5042],
+    ["Malta", "St Julian's", 35.9184, 14.4893],
+    ["Malta", "Mellieħa", 35.9564, 14.3622, "Mellieha"],
+    ["Malta", "Malta Airport", 35.8575, 14.4775],
+    ["Gozo", "Victoria", 36.0444, 14.2397, "Rabat Gozo"],
+    ["Gozo", "Mġarr", 36.025, 14.299, "Mgarr"]
+  ],
+  France: [
+    ["Provence-Alpes-Côte d'Azur", "Nice", 43.7102, 7.262],
+    ["Provence-Alpes-Côte d'Azur", "Cannes", 43.5528, 7.0174],
+    ["Provence-Alpes-Côte d'Azur", "Marseille", 43.2965, 5.3698],
+    ["Corsica", "Ajaccio", 41.9192, 8.7386],
+    ["Corsica", "Bastia", 42.6973, 9.4509],
+    ["Corsica", "Porto-Vecchio", 41.5911, 9.2795],
+    ["Île-de-France", "Paris", 48.8566, 2.3522],
+    ["Occitanie", "Montpellier", 43.6108, 3.8767],
+    ["Occitanie", "Toulouse", 43.6047, 1.4442]
+  ],
+  Germany: [
+    ["Bavaria", "Munich", 48.1351, 11.582],
+    ["Bavaria", "Nuremberg", 49.4521, 11.0767],
+    ["Berlin", "Berlin", 52.52, 13.405],
+    ["Hamburg", "Hamburg", 53.5511, 9.9937],
+    ["Hesse", "Frankfurt", 50.1109, 8.6821]
+  ],
+  "Türkiye": [
+    ["Antalya", "Antalya", 36.8969, 30.7133],
+    ["Antalya", "Antalya Airport", 36.8987, 30.8005],
+    ["Antalya", "Alanya", 36.5444, 31.9954],
+    ["Antalya", "Side", 36.7675, 31.389],
+    ["Antalya", "Manavgat", 36.7867, 31.4433],
+    ["Antalya", "Kemer", 36.6, 30.56],
+    ["Antalya", "Belek", 36.8625, 31.0556],
+    ["Antalya", "Kaş", 36.2018, 29.6377],
+    ["Antalya", "Kalkan", 36.265, 29.414],
+    ["Antalya", "Demre", 36.245, 29.985],
+    ["Antalya", "Finike", 36.296, 30.145],
+    ["Muğla", "Bodrum", 37.0344, 27.4305],
+    ["Muğla", "Marmaris", 36.855, 28.2742],
+    ["Muğla", "Fethiye", 36.6214, 29.1164],
+    ["Muğla", "Ölüdeniz", 36.55, 29.115],
+    ["Muğla", "Göcek", 36.754, 28.94],
+    ["Muğla", "Dalaman", 36.766, 28.8],
+    ["Muğla", "Dalaman Airport", 36.7131, 28.7925],
+    ["Muğla", "Datça", 36.727, 27.687],
+    ["Muğla", "Dalyan", 36.835, 28.642],
+    ["Muğla", "Milas-Bodrum Airport", 37.2506, 27.6643, "Bodrum airport"],
+    ["İzmir", "İzmir", 38.4237, 27.1428],
+    ["İzmir", "İzmir Airport", 38.2924, 27.157],
+    ["İzmir", "Çeşme", 38.3236, 26.3029],
+    ["İzmir", "Alaçatı", 38.282, 26.374],
+    ["İzmir", "Urla", 38.323, 26.765],
+    ["İzmir", "Foça", 38.67, 26.757],
+    ["İzmir", "Seferihisar", 38.197, 26.838],
+    ["Aydın", "Kuşadası", 37.8579, 27.261],
+    ["Aydın", "Didim", 37.375, 27.268],
+    ["Aydın", "Aydın", 37.856, 27.8416],
+    ["İstanbul", "İstanbul Airport", 41.2753, 28.7519],
+    ["İstanbul", "Sabiha Gökçen Airport", 40.8986, 29.3092],
+    ["İstanbul", "Beyoğlu", 41.037, 28.977, "Istanbul, Taksim"],
+    ["İstanbul", "Kadıköy", 40.99, 29.029],
+    ["İstanbul", "Şişli", 41.06, 28.987],
+    ["İstanbul", "Fatih", 41.019, 28.94],
+    ["İstanbul", "Beşiktaş", 41.043, 29.007],
+    ["Çanakkale", "Çanakkale", 40.1553, 26.4142],
+    ["Çanakkale", "Bozcaada", 39.835, 26.07],
+    ["Çanakkale", "Gökçeada", 40.194, 25.907],
+    ["Balıkesir", "Ayvalık", 39.319, 26.695],
+    ["Balıkesir", "Edremit", 39.596, 27.024],
+    ["Balıkesir", "Akçay", 39.583, 26.925],
+    ["Nevşehir", "Göreme", 38.6431, 34.8289, "Cappadocia"],
+    ["Nevşehir", "Ürgüp", 38.631, 34.911],
+    ["Nevşehir", "Nevşehir", 38.6244, 34.7239],
+    ["Ankara", "Ankara", 39.9334, 32.8597],
+    ["Ankara", "Esenboğa Airport", 40.1281, 32.9951],
+    ["Trabzon", "Trabzon", 41.0027, 39.7168],
+    ["Trabzon", "Trabzon Airport", 40.9951, 39.7897]
+  ]
+};
+
+export const PLACES: PlacePoint[] = Object.entries(DATA).flatMap(([country, rows]) =>
+  rows.map(([region, name, lat, lng, aliases]) => ({
+    name,
+    region,
+    country,
+    lat,
+    lng,
+    aliases: aliases ? aliases.split(",").map((alias) => alias.trim()).filter(Boolean) : []
+  }))
+);
+
+/** Lower case, no accents or punctuation, and "Ko Samui" read as "Koh Samui". */
+export function normalizePlace(text: string) {
+  return String(text || "")
+    .toLocaleLowerCase("en-US")
+    .replace(/ı/g, "i")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/ħ/g, "h")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\bko\b/g, "koh")
+    .trim();
+}
+
+type Indexed = { place: PlacePoint; name: string; names: string[]; words: string[]; regionWords: string[] };
+let index: Indexed[] | null = null;
+function indexed(): Indexed[] {
+  if (!index) {
+    index = PLACES.map((place) => {
+      const names = [place.name, ...place.aliases].map(normalizePlace);
+      return { place, name: names[0], names, words: names.join(" ").split(" "), regionWords: normalizePlace(place.region).split(" ") };
+    });
+  }
+  return index;
+}
+
+/** Suggestions for what was typed so far: best matches first, the searcher's own country before others. */
+export function searchPlaces(query: string, options: { country?: string; limit?: number; countryOnly?: boolean } = {}): PlacePoint[] {
+  const q = normalizePlace(query);
+  if (q.length < 2) return [];
+  const tokens = q.split(" ");
+  const scored: Array<{ place: PlacePoint; score: number }> = [];
+  for (const item of indexed()) {
+    if (options.countryOnly && options.country && item.place.country !== options.country) continue;
+    let score = 0;
+    if (item.names.includes(q)) score = 100;
+    else if (item.name.startsWith(q)) score = 80;
+    else if (item.names.some((name) => name.startsWith(q))) score = 70;
+    else if (tokens.every((token) => item.words.some((word) => word.startsWith(token)))) score = 50;
+    else if (tokens.every((token) => item.words.some((word) => word.startsWith(token)) || item.regionWords.some((word) => word.startsWith(token)))) score = 20;
+    if (!score) continue;
+    if (options.country && item.place.country === options.country) score += 30;
+    scored.push({ place: item.place, score });
+  }
+  scored.sort((a, b) => b.score - a.score || a.place.name.length - b.place.name.length || a.place.name.localeCompare(b.place.name));
+  return scored.slice(0, options.limit ?? 8).map((item) => item.place);
+}
+
+/** A place by its exact name (or alias), in this country when given. */
+export function findPlace(name: string, country?: string, region?: string): PlacePoint | null {
+  const q = normalizePlace(name);
+  if (!q) return null;
+  const matches = indexed().filter((item) => item.names.includes(q)).map((item) => item.place);
+  return (
+    matches.find((place) => (!country || place.country === country) && (!region || normalizePlace(place.region) === normalizePlace(region))) ||
+    matches.find((place) => !country || place.country === country) ||
+    null
+  );
+}
+
+/**
+ * The known place named first in these texts (a branch's name or address): addresses go from small to big, so
+ * "Lamai, Koh Samui, Surat Thani" gives Lamai, and "Koh Samui, Surat Thani" gives Koh Samui (not Surat Thani City).
+ */
+export function placeInText(texts: Array<string | null | undefined>, country?: string): PlacePoint | null {
+  for (const text of texts) {
+    const hay = ` ${normalizePlace(String(text || ""))} `;
+    if (hay.trim().length < 2) continue;
+    let best: { place: PlacePoint; at: number; length: number } | null = null;
+    for (const item of indexed()) {
+      if (country && item.place.country !== country) continue;
+      for (const name of item.names) {
+        if (name.length < 3) continue;
+        const at = hay.indexOf(` ${name} `);
+        if (at === -1) continue;
+        if (!best || at < best.at || (at === best.at && name.length > best.length)) best = { place: item.place, at, length: name.length };
+      }
+    }
+    if (best) return best.place;
+  }
+  return null;
+}
+
+/** Straight-line distance in km. */
+export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+  const rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad;
+  const dLng = (b.lng - a.lng) * rad;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+export function validPoint(lat: unknown, lng: unknown): { lat: number; lng: number } | null {
+  const la = Number(lat);
+  const ln = Number(lng);
+  if (lat === null || lat === undefined || lat === "" || lng === null || lng === undefined || lng === "") return null;
+  if (!Number.isFinite(la) || !Number.isFinite(ln) || Math.abs(la) > 90 || Math.abs(ln) > 180 || (la === 0 && ln === 0)) return null;
+  return { lat: la, lng: ln };
+}

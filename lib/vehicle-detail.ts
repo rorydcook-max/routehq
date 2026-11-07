@@ -62,6 +62,15 @@ export type VehicleDetail = {
     daysMaintenanceThisYear: number;
     averageDailyRate: number;
     desiredDailyRate: number;
+    /** The vehicle's life so far (lifecycle summary on the Rentals tab). */
+    ownedSince: string;
+    daysOwned: number;
+    rentalsCount: number;
+    daysRentedAll: number;
+    /** Share of days on rent in the last 30 / 90 / 365 days (or since it joined the fleet, if later). */
+    last30: number;
+    last90: number;
+    last365: number;
   };
 };
 
@@ -85,7 +94,8 @@ function dateFromIso(value: string | null | undefined) {
 function overlapDays(start: Date, end: Date, windowStart: Date, windowEnd: Date) {
   const effectiveStart = start > windowStart ? start : windowStart;
   const effectiveEnd = end < windowEnd ? end : windowEnd;
-  return effectiveEnd > effectiveStart ? daysBetween(effectiveStart, effectiveEnd) + 1 : 0;
+  // Inclusive: a rental out and back on the same day is one day on rent (">" counted it as none).
+  return effectiveEnd >= effectiveStart ? daysBetween(effectiveStart, effectiveEnd) + 1 : 0;
 }
 
 function isExpense(transaction: { type: string; is_deposit?: boolean | null; isDeposit?: boolean | null }) {
@@ -212,8 +222,24 @@ function calculateUtilization(vehicle: any, rentals: any[], transactions: any[],
   // days on rent out of the days you have had the vehicle (at most the last
   // 12 months). Dividing by 365 made a car added last week look idle.
   const own = fleetVehicles.find((item) => item.id === vehicle.id);
+  // Days on rent in a recent window, out of the days it was in the fleet during that window.
+  const recent = (days: number) => {
+    const start = new Date(today);
+    start.setDate(today.getDate() - (days - 1));
+    const from = ownedSince > start ? ownedSince : start;
+    const windowDays = Math.max(1, daysBetween(from, today) + 1);
+    const rented = rentalWindows.reduce((total, item) => total + overlapDays(item.start, item.end, from, today), 0);
+    return Math.min(100, (rented / windowDays) * 100);
+  };
 
   return {
+    ownedSince: `${ownedSince.getFullYear()}-${String(ownedSince.getMonth() + 1).padStart(2, "0")}-${String(ownedSince.getDate()).padStart(2, "0")}`,
+    daysOwned: lifecycleDays,
+    rentalsCount: rentalWindows.length,
+    daysRentedAll: daysRentedLifecycle,
+    last30: recent(30),
+    last90: recent(90),
+    last365: recent(365),
     twelveMonth: own ? toNumber(own.utilization_12_month) : Math.min(100, (daysRentedLast365 / 365) * 100),
     lifecycle: own ? toNumber(own.utilization_lifecycle) : Math.min(100, (daysRentedLifecycle / lifecycleDays) * 100),
     fleetAverage,

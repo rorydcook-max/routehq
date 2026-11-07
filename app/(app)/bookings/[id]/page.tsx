@@ -52,6 +52,8 @@ import { loosePaymentsFor } from "@/lib/loose-payments";
 import { businessSignatureOf, getBookingRentalDocuments, renterSignatureOf, type BookingRentalDocument } from "@/lib/booking-rental-documents";
 import { distanceKey } from "@/lib/business-units";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
+import { KABIS_URL, isKabisBusiness, kabisFields } from "@/lib/kabis";
+import { KabisDetails } from "@/app/(app)/bookings/[id]/kabis-details";
 
 function money(value: unknown, currency = "THB") {
   return currency === "THB" ? new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0)) : formatRegionalMoney(Number(value || 0), currency, "en-GB");
@@ -865,6 +867,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </div>
         ) : null}
         {historySignals.length ? <SharedHistory reports={historySignals} /> : null}
+        {/* Türkiye: the KABİS entry for this rental, ready to copy into the police portal (lib/kabis.ts). */}
+        {isKabisBusiness(organization) && !isCancelled ? (
+          <KabisDetails customerId={customer?.id || null} fields={kabisFields({ customer, vehicle, rental, bookingLink })} portalUrl={KABIS_URL} />
+        ) : null}
 
         <UnsentMessages
           customerName={customer?.full_name || tx.say("theCustomer")}

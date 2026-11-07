@@ -27,7 +27,7 @@ import { countriesSorted, customerLanguages, flagForNationality } from "@/lib/cu
 import { getCustomerDetail, getCustomerDocumentCompleteness, type CustomerDetail, refundsOf } from "@/lib/customer-detail";
 import { longDate } from "@/lib/i18n/dates";
 import { getDefaultOrganization } from "@/lib/organization";
-import { LICENCE_CATEGORIES, licenceCategoriesOf } from "@/lib/licence";
+import { licenceCategoriesFor, licenceCategoriesOf } from "@/lib/licence";
 import { orgCountry } from "@/lib/regional";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -196,10 +196,13 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
   );
 }
 
-function DetailsForm({ customer, organizationId, uk = false }: { customer: any; organizationId: string; uk?: boolean }) {
+function DetailsForm({ customer, organizationId, country = "" }: { customer: any; organizationId: string; country?: string }) {
   const cx = useCx();
   const locale = useLocale();
   const day = (value: unknown) => String(value || "").slice(0, 10);
+  const uk = country === "GB";
+  // Türkiye: what a KABİS entry asks for beyond the usual (lib/kabis.ts), so the booking's KABİS block is complete.
+  const turkey = country === "TR";
   return (
     <form action={updateCustomer} className="grid gap-3 sm:grid-cols-2">
       <input name="customerId" type="hidden" value={customer.id} />
@@ -254,16 +257,38 @@ function DetailsForm({ customer, organizationId, uk = false }: { customer: any; 
         <span className={labelClass}>{cx.say("f_licenceExpiry")}</span>
         <input className={inputClass} defaultValue={day(customer.driver_license_expiry)} name="driverLicenseExpiry" type="date" />
       </label>
-      <label className="block sm:col-span-2">
+      <label className={turkey ? "block" : "block sm:col-span-2"}>
         <span className={labelClass}>{cx.say("f_licenceCountry")}</span>
         <input className={inputClass} defaultValue={customer.driver_license_country || ""} list="customer-country-options" name="driverLicenseCountry" />
       </label>
-      {/* EU licence categories (field 9 on the card): what they may drive, saved in customers.license_type. */}
+      {turkey ? (
+        <>
+          <label className="block">
+            <span className={labelClass}>{cx.say("f_licenceIssued")}</span>
+            <input className={inputClass} defaultValue={day(customer.driver_license_issued)} name="driverLicenseIssued" type="date" />
+          </label>
+          <label className="block">
+            <span className={labelClass}>{cx.say("f_tcKimlik")}</span>
+            <input autoComplete="off" className={inputClass} defaultValue={customer.national_id_number || ""} inputMode="numeric" maxLength={11} name="nationalIdNumber" />
+            <span className="mt-1 block font-medium text-[var(--muted)]">{cx.say("f_tcKimlikHint")}</span>
+          </label>
+          <label className="block">
+            <span className={labelClass}>{cx.say("f_dob")}</span>
+            <input className={inputClass} defaultValue={day(customer.date_of_birth)} name="dateOfBirth" type="date" />
+          </label>
+          <label className="block sm:col-span-2">
+            <span className={labelClass}>{cx.say("f_address")}</span>
+            <input className={inputClass} defaultValue={customer.address || ""} name="address" />
+            <span className="mt-1 block font-medium text-[var(--muted)]">{cx.say("f_kabisNote")}</span>
+          </label>
+        </>
+      ) : null}
+      {/* EU licence categories (field 9 on the card), or Türkiye's (M, B1...): what they may drive, saved in customers.license_type. */}
       <fieldset className="block sm:col-span-2">
         <legend className={labelClass}>{cx.say("f_licenceCategories")}</legend>
         <input name="licenceCategoriesShown" type="hidden" value="1" />
         <div className="mt-1 flex flex-wrap gap-2">
-          {LICENCE_CATEGORIES.map((category) => (
+          {licenceCategoriesFor(country).map((category) => (
             <label className="flex min-h-10 items-center gap-1.5 rounded-lg border border-[var(--border)] bg-white px-2.5 font-semibold text-[var(--foreground)]" key={category}>
               <input defaultChecked={licenceCategoriesOf(customer.license_type).includes(category)} name="licenceCategories" type="checkbox" value={category} />
               {category}
@@ -705,7 +730,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               content: (
                 <div className="grid items-start gap-3 lg:grid-cols-2">
             <Pane id="details" summary={missingDetails > 0 ? cx.say("d_missing", { count: missingDetails }) : cx.say("d_ok")} title={cx.say("d_title")}>
-              <DetailsForm customer={customer} organizationId={organization.id} uk={orgCountry(organization) === "GB"} />
+              <DetailsForm customer={customer} organizationId={organization.id} country={orgCountry(organization)} />
             </Pane>
                   <div className="grid gap-3">
             <Pane summary={cx.say("ch_summary")} title={cx.say("ch_title")}>

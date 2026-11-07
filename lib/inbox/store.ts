@@ -1,5 +1,16 @@
 import { sendPushToOrganization } from "@/lib/push";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { operatorAlertText, operatorLocale } from "@/lib/operator-alert-text";
+
+/** "New message" in the operator's language, for a chat whose sender has no name. */
+async function newMessageTitle(supabase: any, organizationId: string): Promise<string> {
+  try {
+    const { data: org } = await supabase.from("organizations").select("default_locale").eq("id", organizationId).maybeSingle();
+    return (await operatorAlertText(await operatorLocale(supabase, organizationId, org?.default_locale))).title("new_message");
+  } catch {
+    return "New message";
+  }
+}
 
 export type InboxConversation = {
   id: string;
@@ -143,8 +154,11 @@ export async function recordInbound(input: {
     .eq("id", conversationId);
 
   // Tapping the alert opens the Inbox. One alert per chat at a time: a burst of messages replaces itself.
+  // Titled with the sender's name; without one, "New message" in the operator's language (lib/operator-alert-text.ts).
+  const sender = input.displayName || existing?.display_name || "";
+  const title = sender || (await newMessageTitle(supabase, input.channel.organization_id));
   await sendPushToOrganization(supabase, input.channel.organization_id, {
-    title: input.displayName || existing?.display_name || "New message",
+    title,
     body: input.body.slice(0, 140),
     url: "/inbox",
     tag: `chat-${conversationId}`

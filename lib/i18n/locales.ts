@@ -1,7 +1,7 @@
 export const supportedLocaleCodes = [
   "en", "th", "my", "vi", "id", "ms", "zh", "zh-TW", "fil", "hi", "ta", "si",
   "fr", "ru", "es", "pt", "he", "de", "sv", "nb", "lo", "ko", "ja",
-  "el", "it", "nl", "pl", "hr"
+  "el", "it", "nl", "pl", "hr", "tr"
 ] as const;
 
 export type SupportedLocale = (typeof supportedLocaleCodes)[number];
@@ -42,6 +42,8 @@ export const supportedLocaleOptions: Array<{ code: SupportedLocale; label: strin
   { code: "sv", label: "Svenska (Swedish)", english: "Swedish" },
   { code: "fil", label: "Tagalog (Filipino)", english: "Filipino (Tagalog)" },
   { code: "vi", label: "Tiếng Việt (Vietnamese)", english: "Vietnamese" },
+  // Turkish (4 Nov 2026): Latin script with ç ğ ı İ ö ş ü; the app's fonts carry them (app/globals.css latin-ext).
+  { code: "tr", label: "Türkçe (Turkish)", english: "Turkish" },
   { code: "el", label: "Ελληνικά (Greek)", english: "Greek" },
   { code: "ru", label: "Русский (Russian)", english: "Russian" },
   { code: "he", label: "עברית (Hebrew)", english: "Hebrew" },

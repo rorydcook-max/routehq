@@ -8,21 +8,21 @@ import { headers } from "next/headers";
 /** The currencies a renter can pick, in the order of the list (alphabetical by code). */
 export const VISITOR_CURRENCIES = [
   "AED", "AUD", "BRL", "CAD", "CHF", "CNY", "CZK", "DKK", "EUR", "GBP", "HKD", "IDR", "ILS", "INR", "JPY", "KRW", "KZT",
-  "MYR", "NOK", "NZD", "PHP", "PLN", "RUB", "SAR", "SEK", "SGD", "THB", "TWD", "UAH", "USD", "VND", "ZAR"
+  "MYR", "NOK", "NZD", "PHP", "PLN", "RUB", "SAR", "SEK", "SGD", "THB", "TRY", "TWD", "UAH", "USD", "VND", "ZAR"
 ] as const;
 
 const EURO = ["AT", "BE", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK"];
 const BY_COUNTRY: Record<string, string> = {
   AE: "AED", AU: "AUD", BR: "BRL", CA: "CAD", CH: "CHF", CN: "CNY", CZ: "CZK", DK: "DKK", GB: "GBP", HK: "HKD", ID: "IDR", IL: "ILS",
   IN: "INR", JP: "JPY", KR: "KRW", KZ: "KZT", MY: "MYR", NO: "NOK", NZ: "NZD", PH: "PHP", PL: "PLN", RU: "RUB", SA: "SAR", SE: "SEK",
-  SG: "SGD", TH: "THB", TW: "TWD", UA: "UAH", US: "USD", VN: "VND", ZA: "ZAR",
+  SG: "SGD", TH: "THB", TR: "TRY", TW: "TWD", UA: "UAH", US: "USD", VN: "VND", ZA: "ZAR",
   ...Object.fromEntries(EURO.map((country) => [country, "EUR"]))
 };
 
 /** Without a country (or one not listed), the language is the next best guess. */
 const BY_LANGUAGE: Record<string, string> = {
   de: "EUR", fr: "EUR", es: "EUR", it: "EUR", nl: "EUR", el: "EUR", hr: "EUR", pl: "PLN", fi: "EUR", pt: "EUR", sv: "SEK", nb: "NOK", da: "DKK", ru: "RUB", uk: "UAH",
-  he: "ILS", hi: "INR", ja: "JPY", ko: "KRW", zh: "CNY", "zh-TW": "TWD", id: "IDR", ms: "MYR", vi: "VND", fil: "PHP", th: "THB"
+  he: "ILS", hi: "INR", ja: "JPY", ko: "KRW", zh: "CNY", "zh-TW": "TWD", id: "IDR", ms: "MYR", vi: "VND", fil: "PHP", th: "THB", tr: "TRY"
 };
 
 /** The renter's likely currency, from where they are browsing (Vercel says the country) or else their language. */

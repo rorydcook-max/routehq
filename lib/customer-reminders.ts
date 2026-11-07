@@ -17,24 +17,34 @@ import { complianceItems } from "@/lib/fleet-metrics";
 
 const ON_RENT = ["active", "due_soon", "overdue", "extended"];
 
-export async function sendDailyCustomerReminders(admin: any): Promise<Record<string, number>> {
+/**
+ * `organizationIds`: only these businesses (the hourly job passes those at their local reminder hour, and runs this
+ * inside their time zone, so "today" and "tomorrow" are theirs). Left out: every business, on the current clock.
+ */
+export async function sendDailyCustomerReminders(admin: any, options: { organizationIds?: string[] } = {}): Promise<Record<string, number>> {
   const today = businessToday();
   const tomorrow = businessToday(1);
   const inThreeDays = businessToday(3);
   const threeDaysAgo = businessToday(-3);
   const sent = { handover: 0, returnSoon: 0, rentDue: 0, rentOverdue: 0, vehicleDue: 0, signature: 0 };
+  const only = options.organizationIds;
+  if (only && !only.length) return sent;
+  // Narrows a query to the businesses being run.
+  const scoped = (query: any) => (only ? query.in("organization_id", only) : query);
   // Reminders each business has turned off in Settings.
-  const { data: organizations } = await admin.from("organizations").select("id, settings");
+  const { data: organizations } = await (only ? admin.from("organizations").select("id, settings").in("id", only) : admin.from("organizations").select("id, settings"));
   const offBy = new Map<string, ReminderKind[]>((organizations || []).map((organization: any) => [String(organization.id), remindersOff(organization.settings)]));
   const allowed = (organizationId: unknown, kind: ReminderKind) => !(offBy.get(String(organizationId)) || []).includes(kind);
 
   // ── Handover tomorrow ────────────────────────────────────────────────────
-  const { data: starting } = await admin
-    .from("rentals")
-    .select("id, organization_id, start_date, delivery_datetime, delivery_location")
-    .is("deleted_at", null)
-    .eq("status", "booked")
-    .eq("start_date", tomorrow);
+  const { data: starting } = await scoped(
+    admin
+      .from("rentals")
+      .select("id, organization_id, start_date, delivery_datetime, delivery_location")
+      .is("deleted_at", null)
+      .eq("status", "booked")
+      .eq("start_date", tomorrow)
+  );
   for (const rental of starting || []) {
     if (!allowed(rental.organization_id, "handover")) continue;
     const ok = await remindRentalCustomerOnce(admin, rental.id, `handover:${tomorrow}`, ({ say, t, vehicle, date }) =>
@@ -44,12 +54,14 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
   }
 
   // ── Return coming up ─────────────────────────────────────────────────────
-  const { data: ending } = await admin
-    .from("rentals")
-    .select("id, organization_id, end_date")
-    .is("deleted_at", null)
-    .in("status", ON_RENT)
-    .in("end_date", [tomorrow, inThreeDays]);
+  const { data: ending } = await scoped(
+    admin
+      .from("rentals")
+      .select("id, organization_id, end_date")
+      .is("deleted_at", null)
+      .in("status", ON_RENT)
+      .in("end_date", [tomorrow, inThreeDays])
+  );
   for (const rental of ending || []) {
     if (!allowed(rental.organization_id, "return")) continue;
     const end = String(rental.end_date).slice(0, 10);
@@ -60,13 +72,15 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
   }
 
   // ── Rent due tomorrow, and rent three days late ──────────────────────────
-  const { data: payments } = await admin
-    .from("rental_payments")
-    .select("id, rental_id, organization_id, amount, due_date, voided, metadata, rentals!inner(status)")
-    .is("deleted_at", null)
-    .in("status", ["scheduled", "pending", "overdue"])
-    .in("due_date", [tomorrow, threeDaysAgo])
-    .in("rentals.status", ON_RENT);
+  const { data: payments } = await scoped(
+    admin
+      .from("rental_payments")
+      .select("id, rental_id, organization_id, amount, due_date, voided, metadata, rentals!inner(status)")
+      .is("deleted_at", null)
+      .in("status", ["scheduled", "pending", "overdue"])
+      .in("due_date", [tomorrow, threeDaysAgo])
+      .in("rentals.status", ON_RENT)
+  );
   for (const payment of payments || []) {
     if (payment.voided || payment.metadata?.voided) continue;
     // A receipt is already with the business: nothing to chase.
@@ -81,11 +95,13 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
   }
 
   // ── The vehicle they have needs a service or a renewal this week ─────────
-  const { data: out } = await admin
-    .from("rentals")
-    .select("id, organization_id, vehicles!rentals_vehicle_id_fkey(metadata)")
-    .is("deleted_at", null)
-    .in("status", ON_RENT);
+  const { data: out } = await scoped(
+    admin
+      .from("rentals")
+      .select("id, organization_id, vehicles!rentals_vehicle_id_fkey(metadata)")
+      .is("deleted_at", null)
+      .in("status", ON_RENT)
+  );
   for (const rental of out || []) {
     if (!allowed(rental.organization_id, "vehicle_due")) continue;
     for (const item of complianceItems(rental.vehicles?.metadata, today)) {
@@ -104,10 +120,12 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
 
   // ── A change is waiting for their signature ──────────────────────────────
   // The day after it was sent, then every three days, until it is signed or cancelled.
-  const { data: unsigned } = await admin
-    .from("rental_amendments")
-    .select("id, rental_id, organization_id, token, changes, created_at, expires_at")
-    .eq("status", "awaiting_signature");
+  const { data: unsigned } = await scoped(
+    admin
+      .from("rental_amendments")
+      .select("id, rental_id, organization_id, token, changes, created_at, expires_at")
+      .eq("status", "awaiting_signature")
+  );
   const base = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
   for (const amendment of unsigned || []) {
     if (amendment.expires_at && new Date(amendment.expires_at).getTime() < Date.now()) continue;

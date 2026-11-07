@@ -53,3 +53,15 @@ See `content/legal/en/subprocessors.md` (public page `/legal/subprocessors`, Ann
 11. **Migration 0119**: `id_photo_retention_candidates` is applied; `erase_customer` and `purge_organization_data` need Rory's approval to apply (the database tool asks for confirmation on functions that delete rows). Until then the delete buttons say "isn't available yet".
 12. **Marketplace fee wording**: terms say "a service fee applies"; make sure the app shows it before a business turns the marketplace on.
 13. **privacy@rovehq.io / hello@rovehq.io**: make sure these mailboxes exist.
+
+## Türkiye (KVKK), added 7 Nov 2026: owner's to-dos
+
+Public text: KVKK section of `content/legal/en/privacy.md`, Annex 4 of `content/legal/en/dpa.md`. Sources: KVKK No. 6698 as amended by Law No. 7499 (Resmî Gazete 12 Mar 2024, in force 1 Jun 2024); Regulation on the Transfer of Personal Data Abroad (Resmî Gazete 10 Jul 2024, No. 32598); KVKK standard-contract notification module (kvkk.gov.tr, Oct 2024); VERBIS exemption decisions (2023/1154: under 50 employees and balance sheet under 100 million TL; 2025/1572: tighter limits for controllers whose main activity is special-category data). Not reviewed by a lawyer.
+
+1. **Standard contracts for transfers abroad (KVKK art. 9).** Sign the Board's standard contracts (unchanged text) for each transfer of Turkish personal data out of Türkiye: RoveHQ → Supabase/AWS Singapore, Vercel, Anthropic/OpenAI/Google, email and messaging providers (as processor-to-sub-processor), and offer the controller-to-processor module to Turkish businesses. **Each must be notified to the Authority within 5 business days of signing** (KEP, in person, or the online module). Fines for not notifying: 90,308–1,806,377 TRY (2026). Decide who notifies each one (exporter).
+2. **VERBIS.** Controllers established abroad that process data of people in Türkiye are expected to register regardless of size: confirm and register RoveHQ (as controller for business accounts, website and renter list) before taking Turkish customers. Turkish rental businesses register themselves unless exempt.
+3. **Representative in Türkiye.** A foreign controller registering on VERBIS names a data controller representative (a Turkish legal entity or resident Turkish citizen). Appoint one and fill the placeholder in the privacy policy.
+4. **Explicit consent (açık rıza)** for the renter list and analytics from people in Türkiye: the current opt-in tick and cookie banner are consent mechanisms; check the Turkish wording of the tick box once the `tr` translation lands.
+5. **Breach notification**: 72 hours to the Board; DPA promises 48 hours to businesses (no change needed).
+6. **Data-subject applications**: 30 days (KVKK art. 13), shorter than GDPR's one month + two: privacy@ mailbox owner must know.
+7. **Transfer cut-off**: consent-only transfers abroad stopped being valid on 1 Sep 2024; standard contracts must be in place before the first Turkish business signs up.

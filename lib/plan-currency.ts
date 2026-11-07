@@ -40,9 +40,17 @@ const PER_THB: Record<string, number> = {
   ZAR: 0.491682
 };
 
+/**
+ * Business currencies whose plans are priced in another currency. Türkiye (4 Nov 2026): the lira loses value too
+ * fast for a quarterly fixed rate, so a business that charges its renters in TRY sees and pays its plan in euros,
+ * the currency Turkish tourism businesses already price in. (Without this, TRY had no rate and fell back to baht.)
+ */
+const PLAN_CURRENCY_FOR: Record<string, string> = { TRY: "EUR" };
+
 export function planCurrency(currency: string | null | undefined) {
   const code = String(currency || "THB").toUpperCase();
-  return PER_THB[code] ? code : "THB";
+  const mapped = PLAN_CURRENCY_FOR[code] || code;
+  return PER_THB[mapped] ? mapped : "THB";
 }
 
 /** Decimal places the currency is normally written with (0 for JPY, IDR, VND...). */

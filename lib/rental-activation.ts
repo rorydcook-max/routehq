@@ -1,5 +1,6 @@
 import { businessToday } from "@/lib/business-time";
 import { addMonths, addWeeks, billingPeriodAmounts, countBillingPeriods, openEndedMonthCount } from "@/lib/payment-schedule";
+import { KABIS_TASK_ACTION, isKabisBusiness } from "@/lib/kabis";
 
 type SupabaseClient = { from: (table: string) => any };
 
@@ -100,6 +101,45 @@ export async function activateRental(rentalId: string, supabase: SupabaseClient,
   // Create tasks for all current unpaid non-voided rent payments
   const allPayments = [...existingRentPayments, ...newPayments];
   await createPaymentTasks(rental, allPayments, supabase);
+  await addKabisTask(rental, supabase);
+}
+
+/**
+ * Türkiye: the vehicle has gone out, so the rental must be on KABİS (lib/kabis.ts). A to-do for today, once per
+ * rental, linking to the booking's KABİS block; ticking it off is the business's own record that it was entered.
+ * Never blocks a handover: any failure here is only logged.
+ */
+async function addKabisTask(rental: any, supabase: SupabaseClient): Promise<void> {
+  try {
+    const { data: organization } = await (supabase as any)
+      .from("organizations")
+      .select("id, country_code, settings")
+      .eq("id", rental.organization_id)
+      .maybeSingle();
+    if (!organization || !isKabisBusiness(organization)) return;
+    const { data: existing } = await (supabase as any)
+      .from("tasks")
+      .select("id")
+      .eq("organization_id", rental.organization_id)
+      .eq("rental_id", rental.id)
+      .eq("action", KABIS_TASK_ACTION)
+      .is("deleted_at", null)
+      .limit(1);
+    if (existing?.length) return;
+    const { error } = await (supabase as any).from("tasks").insert({
+      organization_id: rental.organization_id,
+      vehicle_id: rental.vehicle_id || null,
+      rental_id: rental.id,
+      title: "Enter this rental on KABİS",
+      task_type: "compliance",
+      action: KABIS_TASK_ACTION,
+      due_at: new Date().toISOString(),
+      created_by: null
+    });
+    if (error) console.error("activateRental: failed to add the KABİS to-do:", error.message);
+  } catch (error) {
+    console.error("activateRental: KABİS to-do skipped:", error instanceof Error ? error.message : error);
+  }
 }
 
 async function generatePaymentScheduleInternal(

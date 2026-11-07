@@ -16,12 +16,18 @@ export type LateReturnRisk = {
   nextRentalId: string;
   nextCustomer: string;
   nextStart: string;
+  /** The names as saved (null when missing), for alerts that word the gap in the reader's language. */
+  lateCustomerName?: string | null;
+  nextCustomerName?: string | null;
 };
 
 const label = (row: any) => [row?.vehicles?.make, row?.vehicles?.model].filter(Boolean).join(" ") || "vehicle";
-const shortDate = (iso: string) => new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
 
-export async function findLateReturnRisks(admin: any, organizationId?: string): Promise<LateReturnRisk[]> {
+/**
+ * Bookings at risk, for one business, a list of businesses (the hourly job: those at their reminder hour), or all.
+ * "Today" is the business's (lib/business-time.ts): the caller runs this inside the business's time zone.
+ */
+export async function findLateReturnRisks(admin: any, organizationId?: string | string[]): Promise<LateReturnRisk[]> {
   const today = businessToday();
   const weekAhead = businessToday(7);
   let lateQuery = admin
@@ -31,7 +37,10 @@ export async function findLateReturnRisks(admin: any, organizationId?: string): 
     .in("status", ["active", "due_soon", "overdue", "extended"])
     .not("end_date", "is", null)
     .lt("end_date", today);
-  if (organizationId) lateQuery = lateQuery.eq("organization_id", organizationId);
+  if (Array.isArray(organizationId)) {
+    if (!organizationId.length) return [];
+    lateQuery = lateQuery.in("organization_id", organizationId);
+  } else if (organizationId) lateQuery = lateQuery.eq("organization_id", organizationId);
   const { data: late } = await lateQuery;
   if (!late?.length) return [];
 
@@ -56,21 +65,38 @@ export async function findLateReturnRisks(admin: any, organizationId?: string): 
       dueBack: String(row.end_date).slice(0, 10),
       nextRentalId: next.id,
       nextCustomer: next.customers?.full_name || "the next customer",
-      nextStart: String(next.start_date).slice(0, 10)
+      nextStart: String(next.start_date).slice(0, 10),
+      lateCustomerName: row.customers?.full_name || null,
+      nextCustomerName: next.customers?.full_name || null
     });
   }
   return risks;
 }
 
-/** Sends one alert per booking at risk. Returns how many were sent. */
-export async function alertLateReturns(admin: any): Promise<number> {
-  const risks = await findLateReturnRisks(admin);
+/**
+ * Sends one alert per booking at risk, in the operator's language. Returns how many were sent.
+ * Called once per business per local day (lib/scheduled-runs.ts), inside its time zone.
+ */
+export async function alertLateReturns(admin: any, organizationIds?: string[]): Promise<number> {
+  const risks = await findLateReturnRisks(admin, organizationIds);
   const today = businessToday();
   for (const risk of risks) {
-    const handover = risk.nextStart < today ? `was due on ${shortDate(risk.nextStart)}` : risk.nextStart === today ? "is today" : `is on ${shortDate(risk.nextStart)}`;
+    const next = { next: risk.nextCustomerName ?? null };
+    const handover =
+      risk.nextStart < today
+        ? { key: "lateHandoverPast" as const, values: next, dates: { start: risk.nextStart } }
+        : risk.nextStart === today
+          ? { key: "lateHandoverToday" as const, values: next }
+          : { key: "lateHandoverSoon" as const, values: next, dates: { start: risk.nextStart } };
     await notifyOperator(
       risk.organizationId,
-      `⚠️ Late return: the ${risk.vehicle} was due back from ${risk.lateCustomer} on ${shortDate(risk.dueBack)} and is still out. ${risk.nextCustomer}'s handover ${handover}.`,
+      {
+        emoji: "⚠️",
+        key: "lateReturn",
+        values: { vehicle: risk.vehicle, customer: risk.lateCustomerName ?? null },
+        dates: { due: risk.dueBack },
+        then: [handover]
+      },
       "operator_notification"
     ).catch(() => null);
   }

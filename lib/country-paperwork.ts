@@ -124,6 +124,18 @@ const BY_COUNTRY: Record<string, PaperItem[]> = {
     { key: "tax", nameKey: "c_tax", local: "Kfz-Steuer", costType: "tax", howTo: { key: "rn_DE_tax", url: "https://www.zoll.de" } },
     eu("Versicherung"),
     { key: "inspection", nameKey: "c_inspection", local: "HU / TÜV", costType: "other", howTo: { key: "rn_DE_inspection", url: "https://www.gesetze-im-internet.de/stvzo_2012/anlage_viii.html" } }
+  ],
+  // Türkiye (4 Nov 2026). MTV (motor vehicle tax) is paid in two instalments, January and July (GİB); compulsory
+  // traffic insurance (Zorunlu Mali Sorumluluk / trafik sigortası, Highway Traffic Act 2918 art. 91) is yearly; kasko is
+  // the optional own-damage cover, which the Ministry of Trade's rental regulation (from 1 Jan 2027) expects for cars
+  // (or the business's own guarantee). The periodic inspection is done by TÜVTÜRK: private cars first at 3 years, then
+  // every 2; commercial vehicles yearly. Whether a rental car counts as commercial for the interval is an open point
+  // (content/contracts/tr.yaml), so no minAge: the owner enters the date from the registration document.
+  TR: [
+    { key: "tax", nameKey: "c_tax", local: "MTV", costType: "tax", howTo: { key: "rn_TR_tax", url: "https://dijital.gib.gov.tr" } },
+    { key: "porbor", nameKey: "c_compulsory", local: "Trafik sigortası", costType: "insurance", howTo: { key: "rn_TR_porbor", url: "https://www.sbm.org.tr" } },
+    { key: "insurance", nameKey: "c_insurance", local: "Kasko", costType: "insurance" },
+    { key: "inspection", nameKey: "c_inspection", local: "TÜVTÜRK muayene", costType: "other", howTo: { key: "rn_TR_inspection", url: "https://www.tuvturk.com.tr" } }
   ]
 };
 

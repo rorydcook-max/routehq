@@ -1,18 +1,18 @@
 ---
 title: Privacy policy
-description: What RoveHQ collects, why, how long we keep it, where it is stored, and how to use your rights under GDPR, UK GDPR and Thailand's PDPA.
-updated: 2026-11-04
+description: What RoveHQ collects, why, how long we keep it, where it is stored, and how to use your rights under GDPR, UK GDPR, Thailand's PDPA and Türkiye's KVKK.
+updated: 2026-11-07
 order: 1
 ---
 
-> **About this page.** We wrote it ourselves from public guidance by the UK ICO, the European Data Protection Board, the European Commission and Thailand's PDPC. It has not been reviewed by a lawyer. Parts marked *[to be added]* are waiting for our company to be registered.
+> **About this page.** We wrote it ourselves from public guidance by the UK ICO, the European Data Protection Board, the European Commission, Thailand's PDPC and Türkiye's Personal Data Protection Authority (KVKK). It has not been reviewed by a lawyer. Parts marked *[to be added]* are waiting for our company to be registered.
 
 ## The short version
 
 - **Rental businesses use RoveHQ to run their rentals.** When you rent from one of them, that business decides what it collects about you and why. It is the *controller*; RoveHQ is its *processor* and only handles your information on its instructions. For those records, ask the business first (we will help them answer you).
 - **RoveHQ is the controller** for the accounts of the businesses that use RoveHQ, for our website, and for the *renter list*: renters who tick "Send me trip extras" so that we can send them offers from our partners.
 - **We do not sell personal information.** We don't use renters' booking records for our own marketing unless they joined the renter list.
-- **Your information is stored in Singapore.** For people in the EU, UK and Thailand we protect it with the transfer safeguards described below.
+- **Your information is stored in Singapore.** For people in the EU, UK, Thailand and Türkiye we protect it with the transfer safeguards described below.
 - **You can see, correct, download or delete your information**, object to how we use it, and complain to a supervisory authority.
 
 ## Who we are
@@ -92,6 +92,7 @@ Our database and file storage are in **Singapore** (Supabase, on Amazon Web Serv
 - **From the EU/EEA:** Singapore has no EU adequacy decision, and neither does the United States except for companies certified under the EU-US Data Privacy Framework. So we rely on the European Commission's **Standard Contractual Clauses** (Decision (EU) 2021/914): in our contracts with providers and, for businesses' data, in our [data processing agreement](/legal/dpa), together with the security measures described there.
 - **From the UK:** we use the ICO's **International Data Transfer Addendum** to the EU Standard Contractual Clauses (or its International Data Transfer Agreement). The EU's adequacy decisions for the UK were renewed in 2025 and run to 2031, so data can also flow from the EU to the UK.
 - **From Thailand:** transfers follow Section 29 of the PDPA and the PDPC's 2023 notifications on cross-border transfers, using contract clauses with appropriate safeguards.
+- **From Türkiye:** transfers follow Article 9 of KVKK (as amended by Law No. 7499 in 2024) and the 2024 Regulation on the Transfer of Personal Data Abroad, using the Board's standard contracts, notified to the Authority within five business days of signing (see the Türkiye section below).
 
 You can ask us for a copy of the safeguards that apply.
 
@@ -120,6 +121,20 @@ Please talk to us first. You can also complain to a supervisory authority, for e
 - **UK:** Information Commissioner's Office, ico.org.uk
 - **EU/EEA:** the data protection authority in the country where you live or work (list at edpb.europa.eu)
 - **Thailand:** Personal Data Protection Committee, pdpc.or.th
+- **Türkiye:** Personal Data Protection Board (Kişisel Verileri Koruma Kurulu), kvkk.gov.tr, after applying to us first (see the Türkiye section below)
+
+## Türkiye: information under KVKK (Law No. 6698)
+
+This section is RoveHQ's information notice (*aydınlatma metni*) under Article 10 of Türkiye's Personal Data Protection Law No. 6698 ("KVKK") for people in Türkiye. Everything else on this page applies too.
+
+- **Data controller:** **[Company legal name — to be added]**, **[registered address — to be added]**, privacy@rovehq.io, for business accounts, our website and the renter list. Representative in Türkiye (*veri sorumlusu temsilcisi*), if one is appointed: **[to be added]**.
+- **Renters of a business in Türkiye:** the rental business is the data controller of your booking records and must give you its own notice; RoveHQ is its data processor (*veri işleyen*). Turkish rental businesses must by law record renters' identity and licence details on the police's rental vehicle notification system (KABİS, Identity Notification Law No. 1774); the business does that itself, RoveHQ does not send data to KABİS.
+- **Purposes and legal bases (KVKK Article 5(2)):** running your account and our contract with you (5(2)(c)); tax, accounting and other legal duties (5(2)(ç)); security, support and improving RoveHQ, our legitimate interest (5(2)(f)); the renter list and analytics cookies only with your **explicit consent** (*açık rıza*, Article 5(1)), which you can withdraw at any time.
+- **How we collect it:** electronically, through the RoveHQ app, website, booking forms, chat and email, and from the rental business you deal with.
+- **Who we transfer it to (Articles 8 and 9):** the hosting, email, messaging, payment and AI providers on our [sub-processors page](/legal/subprocessors), several of which are outside Türkiye (Singapore, the United States, the EU). Türkiye has not declared those countries adequate, so these transfers rely on the appropriate safeguards of KVKK Article 9 as amended in 2024, mainly the **standard contracts** published by the Personal Data Protection Board, which are notified to the Personal Data Protection Authority within five business days of signing. We also disclose data to courts and public authorities when the law requires it.
+- **Your rights (Article 11):** to learn whether your data is processed and request information about it; to learn the purpose and whether it is used for that purpose; to know who it is transferred to in Türkiye or abroad; to have it corrected if incomplete or wrong; to have it deleted or destroyed under Article 7; to have corrections and deletions passed on to those it was transferred to; to object to a result against you arising only from automated analysis; and to claim compensation for damage from unlawful processing.
+- **How to apply:** write to privacy@rovehq.io (or to our registered address) following the Communiqué on the Procedures and Principles of Application to the Data Controller. We answer free of charge within **30 days**. If we refuse, don't answer or you disagree with the answer, you may complain to the **Personal Data Protection Board** (Kişisel Verileri Koruma Kurulu, kvkk.gov.tr) within 30 days of our answer, and in any case within 60 days of your application.
+- **Data controllers' registry (VERBIS):** *[to be confirmed: whether RoveHQ registers. Controllers established abroad that process the data of people in Türkiye are expected to register; the Board's exemption for small controllers (fewer than 50 employees and an annual balance sheet under the set threshold) covers businesses in Türkiye.]*
 
 ## Children
 

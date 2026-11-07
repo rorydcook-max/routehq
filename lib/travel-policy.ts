@@ -82,7 +82,11 @@ export const jurisdictionByCountry: Record<string, string> = {
   IT: "Italy",
   HR: "the Republic of Croatia",
   FR: "France",
-  DE: "the Federal Republic of Germany"
+  DE: "the Federal Republic of Germany",
+  // Türkiye (4 Nov 2026): the official English name since 2022 (UN registration); "Turkey" kept for older settings.
+  "Türkiye": "the Republic of Türkiye",
+  Turkey: "the Republic of Türkiye",
+  TR: "the Republic of Türkiye"
 };
 
 export const travelPolicyDefaults: TravelPolicySettings = {

@@ -73,5 +73,6 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
 
 const COUNTRY_NAMES: Record<string, string> = {
   TH: "Thailand", ID: "Indonesia", PH: "Philippines", VN: "Vietnam", MY: "Malaysia", SG: "Singapore", LA: "Laos", KH: "Cambodia",
-  CN: "China", JP: "Japan", TW: "Taiwan", KR: "South Korea", BN: "Brunei", IN: "India", BD: "Bangladesh", LK: "Sri Lanka"
+  CN: "China", JP: "Japan", TW: "Taiwan", KR: "South Korea", BN: "Brunei", IN: "India", BD: "Bangladesh", LK: "Sri Lanka",
+  TR: "Türkiye"
 };

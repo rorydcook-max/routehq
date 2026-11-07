@@ -2,7 +2,7 @@ import { tellRentalCustomer } from "@/lib/customer-messages";
 import { niceDate } from "@/lib/nice-date";
 import { bookingRules, clashes } from "@/lib/booking-rules";
 import { businessToday } from "@/lib/business-time";
-import { notifyOperator } from "@/lib/notify-operator";
+import { notifyOperator, type AlertText } from "@/lib/notify-operator";
 import { addMonthlyPayments, nextMonthlyDue } from "@/lib/open-ended-billing";
 import { openEndedMonthCount } from "@/lib/payment-schedule";
 import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
@@ -79,7 +79,7 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
   let outcome: ExtensionOutcome;
   let detail: string;
   let title: string;
-  let alert: string;
+  let alert: AlertText;
   let logMetadata: Record<string, unknown>;
 
   if (openEnded) {
@@ -103,7 +103,7 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
     outcome = { applied: true, openEnded: true, newEndDate: null, amount: card.monthlyRate, dueDate: firstDue, currency, explain: `${baht(card.monthlyRate)} a month` };
     title = "Rental changed to no end date";
     detail = `${who} asked to keep the ${vehicle} with no end date (was due back ${niceDate(currentEnd)}). ${options.byStaff ? "You approved it." : "Nothing was in the way, so it was changed automatically."} ${baht(card.monthlyRate)} is due each month from ${niceDate(firstDue)}.`;
-    alert = `📅 Now open-ended: ${who} keeps the ${vehicle} with no end date. ${baht(card.monthlyRate)} a month from ${niceDate(firstDue)}.`;
+    alert = { emoji: "📅", key: "openEndedAuto", values: { customer: rental.customers?.full_name || null, vehicle, amount: baht(card.monthlyRate) }, dates: { due: firstDue } };
     logMetadata = { adjustment_type: "extension", open_ended: true, previous_end_date: currentEnd, new_end_date: null, monthly_rate: card.monthlyRate, first_due: firstDue, source: "customer_request_auto" };
   } else {
     const endDate = String(newEndDate);
@@ -157,7 +157,7 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
     outcome = { applied: true, openEnded: false, newEndDate: endDate, amount, dueDate: currentEnd, currency, explain: quote?.explain || null };
     title = `Rental extended to ${niceDate(endDate)}`;
     detail = `${who} asked to keep the ${vehicle} until ${niceDate(endDate)} (was ${niceDate(currentEnd)}). ${options.byStaff ? "You approved it." : "Nothing was in the way, so it was extended automatically."} ${baht(amount)} is due on ${niceDate(currentEnd)}${quote ? ` (${quote.explain})` : ""}.`;
-    alert = `📅 Extended automatically: ${who} keeps the ${vehicle} until ${niceDate(endDate)}. ${baht(amount)} due on ${niceDate(currentEnd)}.`;
+    alert = { emoji: "📅", key: "extendedAuto", values: { customer: rental.customers?.full_name || null, vehicle, amount: baht(amount) }, dates: { end: endDate, due: currentEnd } };
     logMetadata = { adjustment_type: "extension", previous_end_date: currentEnd, new_end_date: endDate, extension_payment_amount: amount, source: "customer_request_auto" };
   }
 

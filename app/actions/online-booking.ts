@@ -200,7 +200,19 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     title: "Booked online",
     detail: `${name} booked the ${vehicle.name} ${when} from your booking page.`
   } as any).catch(() => null);
-  notifyOperator(organizationId, `🚗 New online booking: ${name} booked the ${vehicle.name} ${when}. They are filling in their details now.`, "operator_notification").catch(() => null);
+  notifyOperator(
+    organizationId,
+    {
+      emoji: "🚗",
+      key: "onlineBooking",
+      values: {
+        customer: name || null,
+        vehicle: vehicle.name || null,
+        when: endDate ? { key: "whenRange", dates: { start: startDate, end: endDate } } : { key: "whenOpenEnded", dates: { start: startDate } }
+      }
+    },
+    "operator_notification"
+  ).catch(() => null);
 
   revalidatePath("/");
   revalidatePath("/bookings");

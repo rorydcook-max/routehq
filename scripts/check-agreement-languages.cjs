@@ -18,7 +18,7 @@ for (const match of rest.matchAll(/ \/ ([^<{]*[฀-๿][^<{]*)/g)) {
   const label = match[1].replace(/:\s*$/, "").trim();
   if (!keys.has(label)) missing.push(`label: ${label}`);
 }
-const LANGS = ["id", "vi", "ms", "fil", "lo", "km", "el", "es", "pt", "it", "hr", "fr", "de"];
+const LANGS = ["id", "vi", "ms", "fil", "lo", "km", "el", "es", "pt", "it", "hr", "fr", "de", "tr"];
 const empty = rows.filter((row) => LANGS.some((lang) => !String(row[lang] || "").trim()));
 for (const row of empty) missing.push(`untranslated: ${row.th.slice(0, 60)} (${LANGS.filter((lang) => !String(row[lang] || "").trim()).join(", ")})`);
 
@@ -46,6 +46,12 @@ for (const key of ["use", "travel", "insurance", "fines", "law", "data", "esign"
   else for (const lang of EUROPE_LANGS) if (!String(countryRows[key][lang] || "").trim()) missing.push(`country clause ${key}: no ${lang}`);
 }
 for (const [code, lang] of Object.entries(COUNTRY_LANG)) if (countryRows[code] && !String(countryRows[code][lang] || "").trim()) missing.push(`country clause ${code}: no ${lang}`);
+// Türkiye's own clauses (lib/agreement-localize.ts OWN_COUNTRY_PLACES): every one in Turkish.
+for (const key of ["TRlicence", "TRdeposit", "TRuse", "TRtravel", "TRinsurance", "TR", "TRlaw", "TRdata", "TResign"]) {
+  if (!countryRows[key]) missing.push(`country clause missing: ${key}`);
+  else if (!String(countryRows[key].tr || "").trim()) missing.push(`country clause ${key}: no tr`);
+  else if (tokens(countryRows[key].en) !== tokens(countryRows[key].tr)) missing.push(`placeholders differ (tr): ${key}`);
+}
 
 if (missing.length) {
   console.error(`Agreement translations: ${missing.length} problem(s)\n${missing.join("\n")}`);

@@ -194,7 +194,7 @@ export async function activatePlanRequest(input: { organizationId: string }): Pr
     { userId: membership.userId, email: membership.email ?? null },
     { action: "plan_activated", organizationId: organization.id, details: { plan, interval } }
   );
-  await notifyOperator(organization.id, `✅ Your RoveHQ plan is now ${plan.charAt(0).toUpperCase()}${plan.slice(1)}`, "plan_activated", "/settings/billing");
+  await notifyOperator(organization.id, { emoji: "✅", key: "planActive", values: { plan: `${plan.charAt(0).toUpperCase()}${plan.slice(1)}` } }, "plan_activated", "/settings/billing");
   revalidatePath("/settings/billing");
   if (organization.plan_request_thread_id) revalidatePath(`/help/team/${organization.plan_request_thread_id}`);
   return { ok: true };

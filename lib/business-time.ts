@@ -63,9 +63,24 @@ export function rememberPageTimeZone(zone: unknown) {
   if (valid) pageZone = valid;
 }
 
-/** The business's time zone: the one recorded for this request or page, else Bangkok. */
+/**
+ * The zone of the business a scheduled job is working through right now (inBusinessTimeZone in
+ * lib/business-time-scope.ts, server only), read from a global so this file stays safe in the browser.
+ */
+function jobZone(): string | null {
+  try {
+    const store = (globalThis as any)[Symbol.for("rovehq.businessTimeZoneScope")];
+    return store?.getStore?.() || null;
+  } catch {
+    return null;
+  }
+}
+
+/** The business's time zone: the one a scheduled job is working in, else the one recorded for this request or page, else Bangkok. */
 export function businessTimeZone(): string {
   if (typeof window !== "undefined") return pageZone || BUSINESS_TIME_ZONE;
+  const scoped = jobZone();
+  if (scoped) return scoped;
   try {
     return requestZone().zone || pageZone || BUSINESS_TIME_ZONE;
   } catch {

@@ -24,7 +24,8 @@ import "../../../theme-dark.css";
 /* The website's two typefaces, only on the website: Geist for everything, and an italic serif for the one phrase
    a headline leans on. Non-Latin scripts fall through to Anuphan (Thai, self-hosted) and the system. */
 const geist = Geist({ subsets: ["latin", "latin-ext"], display: "swap", variable: "--font-site" });
-const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: "italic", display: "swap", variable: "--font-site-serif" });
+// latin-ext: Turkish ğ ş İ (and Polish, Croatian) in the italic heading accents, not a fallback font mid-word.
+const serif = Instrument_Serif({ subsets: ["latin", "latin-ext"], weight: "400", style: "italic", display: "swap", variable: "--font-site-serif" });
 
 export const metadata: Metadata = rootMetadata;
 export const viewport: Viewport = rootViewport;

@@ -263,16 +263,59 @@ export function listDocs(locale = DOCS_LOCALE): DocMeta[] {
     .sort((a, b) => DOC_CATEGORIES.indexOf(a.category) - DOC_CATEGORIES.indexOf(b.category) || a.order - b.order || a.title.localeCompare(b.title));
 }
 
-/** The article for an app screen: the most specific appPath that matches ("/fleet/[id]" matches "/fleet/abc"). */
+/**
+ * Screens several articles claim, pinned to the one that is about the whole screen (Rory, 7 Nov 2026: the "?" on
+ * Settings opened the booking-page article). Keys are the path plus the query that picks the tab; checked before the
+ * articles' own appPath.
+ */
+const SCREEN_ARTICLES: Record<string, string> = {
+  "/": "dashboard",
+  "/settings": "business-settings",
+  "/settings?tab=business": "business-settings",
+  "/settings?tab=rentals": "booking-and-price-rules",
+  "/settings?tab=messaging": "inbox-and-messaging",
+  "/settings?tab=notifications": "notifications",
+  "/settings?tab=team": "invite-your-team",
+  "/settings?tab=more": "plans-and-billing",
+  "/settings/billing": "plans-and-billing",
+  "/settings/notifications": "notifications",
+  "/settings/contracts": "rental-agreements",
+  "/bookings/new": "create-a-booking",
+  "/transactions/new": "record-a-payment",
+  "/transactions/new?cost=1": "add-a-cost",
+  "/fleet/import": "import-a-spreadsheet",
+  "/customers": "customers",
+  "/inspections/start/return": "handover-checks"
+};
+
+/** "?tab=rentals&x=1" as a map, for comparing with an article's appPath. */
+function queryOf(path: string) {
+  const query = path.split("#")[0].split("?")[1] || "";
+  return new URLSearchParams(query);
+}
+
+/**
+ * The article for an app screen. The pinned list first (path plus its tab), then the most specific appPath that
+ * matches ("/fleet/[id]" matches "/fleet/abc"). An appPath with a query ("/settings?tab=team") only matches that tab,
+ * and beats the same path without one; one with a #section loses to one about the whole tab.
+ */
 export function docForAppPath(pathname: string, locale = DOCS_LOCALE): DocMeta | null {
   const path = pathname.split(/[?#]/)[0].replace(/\/$/, "") || "/";
+  const query = queryOf(pathname);
+  const docs = listDocs(locale);
+  const tab = query.get("tab");
+  const pinned = SCREEN_ARTICLES[`${path}${tab ? `?tab=${tab}` : query.get("cost") ? `?cost=${query.get("cost")}` : ""}`] || (tab || query.get("cost") ? null : SCREEN_ARTICLES[path]);
+  const pinnedDoc = pinned ? docs.find((doc) => doc.slug === pinned) : null;
+  if (pinnedDoc) return pinnedDoc;
   let best: { doc: DocMeta; score: number } | null = null;
-  for (const doc of listDocs(locale)) {
+  for (const doc of docs) {
     if (!doc.appPath) continue;
     const pattern = doc.appPath.split(/[?#]/)[0].replace(/\/$/, "") || "/";
     const regex = new RegExp(`^${pattern.replace(/[.*+?^${}()|\\]/g, "\\$&").replace(/\\\[[^/]+?\\\]|\[[^/]+?\]/g, "[^/]+")}$`);
     if (!regex.test(path)) continue;
-    const score = pattern.length - (pattern.match(/\[/g)?.length || 0) * 3;
+    const wanted = [...queryOf(doc.appPath).entries()];
+    if (wanted.some(([key, value]) => query.get(key) !== value)) continue;
+    const score = pattern.length - (pattern.match(/\[/g)?.length || 0) * 3 + wanted.length * 100 - (doc.appPath.includes("#") ? 1 : 0);
     if (!best || score > best.score) best = { doc, score };
   }
   return best?.doc || null;

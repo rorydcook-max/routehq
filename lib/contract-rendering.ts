@@ -5,7 +5,9 @@ import {
   agreementLanguageFor,
   agreementWords,
   EUROPEAN_JURISDICTION,
+  hasOwnCountryClauses,
   isEuropeanAgreementCountry,
+  OWN_CLAUSE_JURISDICTION,
   secondCountryWords,
   secondDueLabel,
   secondPeriodLabel
@@ -416,8 +418,12 @@ export function buildContractVariables({
   const miles = agreementDistanceUnit(organization, country.code) === "mi";
   // A European business still carrying Thailand's default governing law gets its own country's.
   const europe = isEuropeanAgreementCountry(country.code);
+  // Türkiye (4 Nov 2026) has its own clauses and governing law the same way, without the EU/UK ones.
+  const ownClauses = hasOwnCountryClauses(country.code);
   const jurisdiction =
-    europe && (!settings.jurisdiction || /thailand/i.test(settings.jurisdiction)) ? EUROPEAN_JURISDICTION[country.code] || country.name : settings.jurisdiction;
+    (europe || ownClauses) && (!settings.jurisdiction || /thailand/i.test(settings.jurisdiction))
+      ? EUROPEAN_JURISDICTION[country.code] || OWN_CLAUSE_JURISDICTION[country.code] || country.name
+      : settings.jurisdiction;
   const paidExtras = (Array.isArray(rental?.extras) ? rental.extras : []).map((line: any) => {
     const price = `${Math.round(Number(line?.price || 0)).toLocaleString("en-US")} ${rental?.currency || "THB"}`;
     return `${line?.name} - ${line?.per === "day" ? `${price} ${second("per day", "ต่อวัน", words?.perDay)}` : `${price}`} (${second("paid extra", "บริการเสริม", words?.paidExtra)})`;
@@ -672,7 +678,7 @@ export function buildContractVariables({
   variables.agreement_country = country.name || settings.jurisdiction;
   // Europe and the UK: the country clauses lib/agreement-localize.ts adds are shown on these.
   variables.agreement_eu_uk = europe;
-  if (europe && country.code) variables[`country_${country.code}`] = true;
+  if ((europe || ownClauses) && country.code) variables[`country_${country.code}`] = true;
   // Greek serves Greece and Cyprus, so its country and law are filled in ("στην Ελλάδα" / "στην Κύπρο").
   variables.agreement_country_2 = secondCountryWords(country.code).name;
   variables.agreement_law_2 = secondCountryWords(country.code).law;

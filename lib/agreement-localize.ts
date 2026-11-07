@@ -36,7 +36,9 @@ const FONTS: Record<SecondLanguage, { link: string; family: string }> = {
   it: { link: "Noto+Sans", family: '"Noto Sans"' },
   hr: { link: "Noto+Sans", family: '"Noto Sans"' },
   fr: { link: "Noto+Sans", family: '"Noto Sans"' },
-  de: { link: "Noto+Sans", family: '"Noto Sans"' }
+  de: { link: "Noto+Sans", family: '"Noto Sans"' },
+  // Turkish ç ğ ı İ ö ş ü are all in Noto Sans.
+  tr: { link: "Noto+Sans", family: '"Noto Sans"' }
 };
 
 /**
@@ -63,6 +65,38 @@ const EUROPE_PLACES: Array<{ section: string; shared: string[]; countries: strin
   { section: "15. Fines and violations", shared: ["fines"], countries: ["GB", "IE", "IT", "FR", "ES", "DE", "PT"] },
   { section: "17. Governing law", shared: ["law"], countries: [] }
 ];
+
+/**
+ * Countries outside the EU/UK with clauses of their own (lib/agreement-language.ts hasOwnCountryClauses), each shown on
+ * country_<CC> only. Türkiye (7 Nov 2026): licences and KABİS, helmets, leaving the country, insurance, deposit and
+ * damage, fines to the renter (Law 7574), consumer law; KVKK and e-signature go before the special conditions.
+ */
+const OWN_COUNTRY_PLACES: Array<{ section: string; keys: string[]; guard: string }> = [
+  { section: "4. Renter qualifications", keys: ["TRlicence"], guard: "country_TR" },
+  { section: "7. Security deposit", keys: ["TRdeposit"], guard: "country_TR" },
+  { section: "10. Exclusions and prohibited use", keys: ["TRuse"], guard: "country_TR" },
+  { section: "11. Permitted travel", keys: ["TRtravel"], guard: "country_TR" },
+  { section: "12. Insurance and claims", keys: ["TRinsurance"], guard: "country_TR" },
+  { section: "15. Fines and violations", keys: ["TR"], guard: "country_TR" },
+  { section: "17. Governing law", keys: ["TRlaw"], guard: "country_TR" }
+];
+const OWN_COUNTRY_END: Array<{ keys: string[]; guard: string }> = [{ keys: ["TRdata", "TResign"], guard: "country_TR" }];
+
+function addOwnCountryClauses(html: string, second: SecondLanguage | null) {
+  let out = html;
+  for (const place of OWN_COUNTRY_PLACES) {
+    const at = out.indexOf(`>${place.section}`);
+    const end = at === -1 ? -1 : out.indexOf("\n    </div>\n  </section>", at);
+    if (end === -1) continue;
+    out = out.slice(0, end) + place.keys.map((key) => countryBlock(key, second, place.guard)).join("") + out.slice(end);
+  }
+  const special = out.indexOf("{{#if special_conditions}}");
+  if (special !== -1) {
+    const blocks = OWN_COUNTRY_END.flatMap((place) => place.keys.map((key) => countryBlock(key, second, place.guard, true))).join("");
+    if (blocks) out = `${out.slice(0, special)}${blocks.trimStart()}\n      ${out.slice(special)}`;
+  }
+  return out;
+}
 
 function countryBlock(key: string, second: SecondLanguage | null, guard: string, asClause = false) {
   const clause = COUNTRY_CLAUSES[key];
@@ -137,6 +171,7 @@ export function localizeAgreementTemplate(templateHtml: string, lang: AgreementL
 
   // Europe and the UK: the country clauses, each shown only for those countries.
   out = addEuropeanClauses(out, second);
+  out = addOwnCountryClauses(out, second);
 
   if (second) out = out.replace("</head>", `  ${fontStyle(second)}\n</head>`);
   return out.replace("<html>", '<html lang="en">');

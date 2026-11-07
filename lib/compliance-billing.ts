@@ -34,14 +34,20 @@ export function nextMonthly(start: string, current: string) {
  * Posts every instalment that has fallen due for these vehicles (all with a plan when vehicleId is left out).
  * Returns how many costs were added. Safe to run twice: an instalment already posted is not posted again.
  */
-export async function postDueComplianceInstalments(supabase: any, options: { organizationId?: string; vehicleId?: string; today?: string } = {}) {
+export async function postDueComplianceInstalments(
+  supabase: any,
+  /** organizationIds: the businesses the hourly job is running (at their local hour, inside their time zone). */
+  options: { organizationId?: string; organizationIds?: string[]; vehicleId?: string; today?: string } = {}
+) {
   const today = options.today || businessToday();
+  if (options.organizationIds && !options.organizationIds.length) return 0;
   let query = supabase
     .from("vehicles")
     .select("id, organization_id, metadata")
     .is("deleted_at", null)
     .not("metadata->compliance_plans", "is", null);
   if (options.organizationId) query = query.eq("organization_id", options.organizationId);
+  if (options.organizationIds) query = query.in("organization_id", options.organizationIds);
   if (options.vehicleId) query = query.eq("id", options.vehicleId);
   const { data: vehicles, error } = await query;
   if (error) throw new Error(error.message);

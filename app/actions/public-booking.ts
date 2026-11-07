@@ -20,7 +20,7 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { countersignRentalAgreementForCustomer } from "@/lib/rental-agreement-automation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { processCustomerPortalAction } from "@/lib/portal-notifications";
-import { notifyOperator } from "@/lib/notify-operator";
+import { notifyOperator, type AlertText } from "@/lib/notify-operator";
 import { firstRentCharge, generatePaymentSchedule } from "@/lib/payment-schedule";
 import {
   completeRentalDocumentCustomerSigning,
@@ -510,13 +510,17 @@ export async function submitCustomerPortalAction(formData: FormData) {
   const processed = await processCustomerPortalAction(supabase, action.id);
   const extension = processed.extension;
 
-  const portalActionMessages: Record<string, string> = {
-    extension_request: `📅 Extension requested — it needs your answer${extension && !extension.applied ? ` (${extension.reason})` : ""}`,
-    return_confirmation: `✅ Customer confirmed their return date`,
-    problem_report: `⚠️ Customer reported a problem with their rental`,
-    question: `💬 Customer asked a question via the booking portal`
+  // In the operator's language (lib/operator-alert-text.ts). The reason an extension wasn't applied stays as written.
+  const portalActionMessages: Record<string, AlertText> = {
+    extension_request:
+      extension && !extension.applied
+        ? { emoji: "📅", key: "extensionRequestedReason", values: { reason: extension.reason } }
+        : { emoji: "📅", key: "extensionRequested" },
+    return_confirmation: { emoji: "✅", key: "returnConfirmed" },
+    problem_report: { emoji: "⚠️", key: "problemReported" },
+    question: { emoji: "💬", key: "questionAsked" }
   };
-  const notifyMsg = portalActionMessages[actionType] ?? `📣 Customer submitted a portal action: ${actionType}`;
+  const notifyMsg: AlertText = portalActionMessages[actionType] ?? { emoji: "📣", key: "portalActionOther", values: { action: actionType } };
   // An extension applied automatically sends its own notice.
   if (!extension?.applied) notifyOperator(bookingLink.organization_id, notifyMsg, "portal_action", bookingLink.rental_id ? `/bookings/${bookingLink.rental_id}#customer-requests` : "/tasks").catch(() => null);
   revalidatePath(`/book/${token}`);
@@ -847,9 +851,7 @@ export async function completePublicBooking(formData: FormData) {
       // message: a thrown error reaches the browser as a bare "Minified React error".
       notifyOperator(
         organizationId,
-        countersigned.reason === "not_eligible"
-          ? "✍️ A customer filled in their booking link but can't sign yet. Add your signature in Settings, then send them the link again."
-          : "✍️ A customer filled in their booking link but the agreement couldn't be prepared. Open the booking to check.",
+        countersigned.reason === "not_eligible" ? { emoji: "✍️", key: "cantSignYet" } : { emoji: "✍️", key: "agreementNotReady" },
         "portal_action",
         countersigned.reason === "not_eligible" ? "/settings/signature" : `/bookings/${bookingLink.rental_id}`
       ).catch(() => null);
@@ -1022,7 +1024,7 @@ export async function completePublicBooking(formData: FormData) {
 
     notifyOperator(
       organizationId,
-      `✍️ ${fullName || signedName || "Your customer"} completed their booking and signed the rental agreement.`,
+      { emoji: "✍️", key: "contractSigned", values: { customer: fullName || signedName || null } },
       "contract_signed",
       bookingLink.rental_id ? `/bookings/${bookingLink.rental_id}` : "/bookings"
     ).catch(() => null);
@@ -1241,7 +1243,9 @@ export async function completePublicBooking(formData: FormData) {
   // One message for the whole step: filling in the form and signing happen together.
   notifyOperator(
     organizationId,
-    `✍️ ${customerDisplayName} completed their booking and signed the rental agreement for ${vehicleLabel || "their vehicle"}.`,
+    vehicleLabel
+      ? { emoji: "✍️", key: "contractSignedFor", values: { customer: customerDisplayName || null, vehicle: vehicleLabel } }
+      : { emoji: "✍️", key: "contractSigned", values: { customer: customerDisplayName || null } },
     "contract_signed",
     bookingLink.rental_id ? `/bookings/${bookingLink.rental_id}` : "/bookings"
   ).catch(() => null);
@@ -1435,7 +1439,7 @@ export async function submitPaymentReceipt(formData: FormData) {
     content: `Customer sent a payment receipt for ${amountText} (${method.replace(/_/g, " ")})`,
     metadata: { booking_link_id: bookingLink.id, rental_payment_id: payment.id, rental_payment_ids: receipt.covers, payment_method: method }
   });
-  notifyOperator(bookingLink.organization_id, `🧾 A customer sent a payment receipt for ${amountText}. Open To do to check it and confirm.`, "portal_action").catch(() => null);
+  notifyOperator(bookingLink.organization_id, { emoji: "🧾", key: "receiptSent", values: { amount: amountText } }, "portal_action").catch(() => null);
 
   revalidatePath("/tasks");
   revalidatePath("/");

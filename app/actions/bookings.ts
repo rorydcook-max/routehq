@@ -726,7 +726,9 @@ async function createBookingOrThrow(formData: FormData) {
   const customerLabel = customer ? customer.full_name : "Unknown customer";
   notifyOperator(
     organizationId,
-    `📋 New booking created for ${customerLabel} — ${vLabel}. Booking link sent.`,
+    customer
+      ? { emoji: "📋", key: "bookingCreated", values: { customer: customerLabel, vehicle: vLabel || null } }
+      : { emoji: "📋", key: "bookingCreatedNoCustomer", values: { vehicle: vLabel || null } },
     "operator_notification"
   ).catch(() => null);
 

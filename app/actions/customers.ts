@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildDocumentStoragePath } from "@/services/documents/storage-path";
-import { cleanDvlaCode, licenceCategoriesText } from "@/lib/licence";
+import { cleanDvlaCode, cleanTcKimlikNo, licenceCategoriesText } from "@/lib/licence";
 const contactMethods = ["whatsapp", "messenger", "line", "telegram", "sms", "email", "phone"];
 
 function optionalString(formData: FormData, key: string) {
@@ -351,6 +351,12 @@ export async function updateCustomer(formData: FormData) {
   // EU licence categories (AM, A1, A2, A, B, BE...) and, for UK businesses, the DVLA check code.
   if (formData.has("licenceCategoriesShown")) updates.license_type = licenceCategoriesText(formData.getAll("licenceCategories")) || null;
   if (formData.has("dvlaCheckCode")) updates.dvla_check_code = cleanDvlaCode(formData.get("dvlaCheckCode")) || null;
+  // Türkiye: the KABİS details (lib/kabis.ts). A T.C. Kimlik No that fails its checksum is not saved, so the
+  // KABİS block shows it as missing rather than copying a typo into the police system.
+  if (formData.has("nationalIdNumber")) updates.national_id_number = cleanTcKimlikNo(formData.get("nationalIdNumber")) || null;
+  if (formData.has("driverLicenseIssued")) updates.driver_license_issued = optionalString(formData, "driverLicenseIssued");
+  if (formData.has("dateOfBirth")) updates.date_of_birth = optionalString(formData, "dateOfBirth");
+  if (formData.has("address")) updates.address = optionalString(formData, "address");
   if (formData.has("emergencyContactName")) updates.emergency_contact_name = optionalString(formData, "emergencyContactName");
   if (formData.has("emergencyContactPhone")) updates.emergency_contact_phone = fullPhone(formData, "emergencyPhoneCountryCode", "emergencyContactPhone");
   if (notes !== undefined) updates.notes = notes;

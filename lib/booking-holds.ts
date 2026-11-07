@@ -1,6 +1,7 @@
 import { remindRentalCustomerOnce, tellRentalCustomer } from "@/lib/customer-messages";
 import { bookingRules, clashes } from "@/lib/booking-rules";
 import { businessTimeZone } from "@/lib/business-time";
+import { inBusinessTimeZone } from "@/lib/business-time-scope";
 
 export { clashes };
 import { notifyOperator } from "@/lib/notify-operator";
@@ -57,13 +58,20 @@ export async function releaseExpiredHolds(admin: any, organizationId: string) {
       detail: `${who} did not finish the booking form in time, so the ${vehicle} is open for those dates again. Their link still works if it is free when they come back.`
     } as any).catch(() => null);
     await tellRentalCustomer(admin, link.rental_id, ({ say }) => say("holdReleased", { vehicle }));
-    notifyOperator(organizationId, `⏳ Hold ended: ${who} hasn't finished the booking form for the ${vehicle}. The dates are open again; their link still works if the vehicle is free.`, "operator_notification").catch(() => null);
+    notifyOperator(
+      organizationId,
+      { emoji: "⏳", key: "holdEnded", values: { customer: link.customers?.full_name || null, vehicle: [link.vehicles?.make, link.vehicles?.model].filter(Boolean).join(" ") || null } },
+      "operator_notification"
+    ).catch(() => null);
   }
   return (stale || []).length;
 }
 
-/** The same, for every business at once. Run by the daily job so holds end even when nobody opens a page. */
-export async function releaseExpiredHoldsEverywhere(admin: any) {
+/**
+ * The same, for every business at once. Run by the hourly job so holds end even when nobody opens a page.
+ * `zoneOf` gives each business's time zone, so anything dated on the way follows its clock.
+ */
+export async function releaseExpiredHoldsEverywhere(admin: any, zoneOf?: (organizationId: string) => string | null | undefined) {
   const { data: stale } = await admin
     .from("booking_links")
     .select("organization_id")
@@ -73,7 +81,11 @@ export async function releaseExpiredHoldsEverywhere(admin: any) {
     .lt("hold_until", new Date().toISOString());
   const organizations = Array.from(new Set<string>((stale || []).map((row: any) => String(row.organization_id))));
   let released = 0;
-  for (const organizationId of organizations) released += await releaseExpiredHolds(admin, organizationId).catch(() => 0);
+  for (const organizationId of organizations) {
+    const zone = zoneOf?.(organizationId);
+    const release = () => releaseExpiredHolds(admin, organizationId);
+    released += await (zone ? inBusinessTimeZone(zone, release) : release()).catch(() => 0);
+  }
   return released;
 }
 

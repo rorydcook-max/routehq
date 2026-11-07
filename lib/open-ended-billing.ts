@@ -79,15 +79,19 @@ export async function addMonthlyPayments(
 
 /**
  * Keeps open-ended monthly rentals billed two months ahead: each month that
- * comes inside that window is added. Run daily.
+ * comes inside that window is added. Run daily; `organizationIds` limits it to the businesses the hourly job is
+ * running (inside their time zone, so the window starts on their today).
  */
-export async function topUpOpenEndedRent(admin: any): Promise<number> {
-  const { data: rentals } = await admin
+export async function topUpOpenEndedRent(admin: any, organizationIds?: string[]): Promise<number> {
+  if (organizationIds && !organizationIds.length) return 0;
+  let query = admin
     .from("rentals")
     .select("id, organization_id, customer_id, vehicle_id, currency, rental_rate, billing_interval, pricing_model")
     .is("deleted_at", null)
     .is("end_date", null)
     .in("status", ["active", "due_soon", "overdue", "extended"]);
+  if (organizationIds) query = query.in("organization_id", organizationIds);
+  const { data: rentals } = await query;
   const horizon = iso(addMonths(asDate(businessToday()), OPEN_ENDED_MONTHS_AHEAD));
   let added = 0;
   for (const rental of rentals || []) {

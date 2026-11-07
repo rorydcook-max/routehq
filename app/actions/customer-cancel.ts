@@ -104,7 +104,23 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
         })
       : Promise.resolve(null)
   ]);
-  notifyOperator(rental.organization_id, `❌ Booking cancelled by the customer: ${who}, ${vehicle}, ${when}. The dates are free again.${settle}`, "operator_notification", `/bookings/${rental.id}`).catch(() => null);
+  notifyOperator(
+    rental.organization_id,
+    {
+      emoji: "❌",
+      key: "bookingCancelled",
+      values: {
+        customer: rental.customers?.full_name || null,
+        vehicle: [rental.vehicles?.make, rental.vehicles?.model].filter(Boolean).join(" ") || null,
+        when: rental.end_date
+          ? { key: "whenRange", dates: { start: rental.start_date, end: rental.end_date } }
+          : { key: "whenMonthly", dates: { start: rental.start_date } }
+      },
+      then: [paid > 0 ? { key: "cancelPaid", values: { amount: money } } : receiptWaiting ? { key: "cancelReceipt" } : null]
+    },
+    "operator_notification",
+    `/bookings/${rental.id}`
+  ).catch(() => null);
 
   await tellRentalCustomer(admin, rental.id, ({ say, t, date }) =>
     `${say("cancelledAsAsked", { vehicle, when: rental.end_date ? t("whenRange", { start: date(rental.start_date), end: date(rental.end_date) }) : t("whenMonthly", { start: date(rental.start_date) }) })}${paid > 0 ? ` ${t("aboutWhatYouPaid", { amount: money })}` : ""}`,

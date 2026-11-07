@@ -245,7 +245,16 @@ export async function referCustomer(
   });
   try {
     const { notifyOperator } = await import("@/lib/notify-operator");
-    await notifyOperator(vehicle.organization_id, `ðŸ¤ Referral from ${referrerName}: ${input.customerName || "a customer"} wants your ${vehicle.make} ${vehicle.model} from ${longDate(input.startDate, "en")}. The booking link has been sent to them.`, "operator_notification");
+    await notifyOperator(
+      vehicle.organization_id,
+      {
+        emoji: "🤝",
+        key: "referral",
+        values: { partner: String(referrer?.trading_name || referrer?.name || "") || null, customer: input.customerName || null, vehicle: [vehicle.make, vehicle.model].filter(Boolean).join(" ") || null },
+        dates: { start: input.startDate }
+      },
+      "operator_notification"
+    );
   } catch {
     // The task on their list is enough.
   }

@@ -3,11 +3,11 @@
   "crons": [
     {
       "path": "/api/line/daily-summary",
-      "schedule": "0 1 * * *"
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/cron/payment-status",
-      "schedule": "0 1 * * *"
+      "schedule": "0 * * * *"
     }
   ]
 }

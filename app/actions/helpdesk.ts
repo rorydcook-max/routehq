@@ -142,7 +142,7 @@ export async function teamReply(formData: FormData): Promise<Result> {
   if (!thread.assigned_to) update.assigned_to = me.userId;
   const { error: threadError } = await admin.from("support_threads").update(update).eq("id", thread.id);
   if (threadError) return { ok: false, error: `Sent, but the conversation couldn't be updated: ${threadError.message}` };
-  if (thread.organization_id) await notifyOperator(thread.organization_id, `💬 RoveHQ replied: ${firstLine(body) || thread.subject}`, "support_reply", `/help/${thread.id}`);
+  if (thread.organization_id) await notifyOperator(thread.organization_id, { emoji: "💬", key: "supportReplied", values: { text: firstLine(body) || thread.subject || "" } }, "support_reply", `/help/${thread.id}`);
   refresh(thread.id);
   return { ok: true };
 }
@@ -247,7 +247,7 @@ export async function takeOver(id: string): Promise<Result> {
     .from("support_threads")
     .update({ mode: "human", handed_off_at: thread.handed_off_at || now, assigned_to: me.userId, status: "open", unread_by_business: true, unread_by_team: false, last_message_at: now })
     .eq("id", thread.id);
-  if (thread.organization_id) await notifyOperator(thread.organization_id, `💬 RoveHQ joined your chat: ${thread.subject}`, "support_reply", `/help/${thread.id}`);
+  if (thread.organization_id) await notifyOperator(thread.organization_id, { emoji: "💬", key: "supportJoined", values: { subject: thread.subject || "" } }, "support_reply", `/help/${thread.id}`);
   refresh(thread.id);
   return { ok: true };
 }

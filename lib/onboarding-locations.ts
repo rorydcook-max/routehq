@@ -320,6 +320,23 @@ export const locationOptions = [
       { name: "Hamburg", towns: ["Hamburg"] },
       { name: "Hesse", towns: ["Frankfurt"] }
     ]
+  },
+  // Türkiye (4 Nov 2026): the coast where small car, scooter, quad and van rental is busiest, plus the two big cities.
+  // Regions are provinces (il); "Muğla" covers the Bodrum–Marmaris–Fethiye coast.
+  {
+    country: "Türkiye",
+    regions: [
+      { name: "Antalya", towns: ["Antalya", "Antalya Airport", "Alanya", "Side", "Manavgat", "Kemer", "Belek", "Kaş", "Kalkan", "Demre", "Finike"] },
+      { name: "Muğla", towns: ["Bodrum", "Marmaris", "Fethiye", "Ölüdeniz", "Göcek", "Dalaman", "Dalaman Airport", "Datça", "Dalyan", "Milas-Bodrum Airport"] },
+      { name: "İzmir", towns: ["İzmir", "İzmir Airport", "Çeşme", "Alaçatı", "Urla", "Foça", "Seferihisar"] },
+      { name: "Aydın", towns: ["Kuşadası", "Didim", "Aydın"] },
+      { name: "İstanbul", towns: ["İstanbul Airport", "Sabiha Gökçen Airport", "Beyoğlu", "Kadıköy", "Şişli", "Fatih", "Beşiktaş"] },
+      { name: "Çanakkale", towns: ["Çanakkale", "Bozcaada", "Gökçeada"] },
+      { name: "Balıkesir", towns: ["Ayvalık", "Edremit", "Akçay"] },
+      { name: "Nevşehir", towns: ["Göreme", "Ürgüp", "Nevşehir"] },
+      { name: "Ankara", towns: ["Ankara", "Esenboğa Airport"] },
+      { name: "Trabzon", towns: ["Trabzon", "Trabzon Airport"] }
+    ]
   }
 ];
 
@@ -350,7 +367,9 @@ export const currencyOptionsByCountry: Record<string, string[]> = {
   Cyprus: ["EUR", "GBP"],
   Malta: ["EUR"],
   France: ["EUR"],
-  Germany: ["EUR"]
+  Germany: ["EUR"],
+  // Lira first (the legal currency, and what locals pay in); many coast businesses price tourists in euros or pounds.
+  "Türkiye": ["TRY", "EUR", "GBP", "USD"]
 };
 
 

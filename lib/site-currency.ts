@@ -12,7 +12,9 @@ const BY_COUNTRY: Record<string, string> = {
   ...Object.fromEntries(EURO.map((country) => [country, "EUR"])),
   TH: "THB", US: "USD", GB: "GBP", AU: "AUD", NZ: "NZD", CA: "CAD", SG: "SGD", MY: "MYR", ID: "IDR", PH: "PHP",
   VN: "VND", LA: "LAK", MM: "MMK", KH: "KHR", IN: "INR", LK: "LKR", CN: "CNY", TW: "TWD", HK: "HKD", JP: "JPY",
-  KR: "KRW", BR: "BRL", MX: "MXN", CO: "COP", SE: "SEK", NO: "NOK", IL: "ILS", AE: "AED", ZA: "ZAR"
+  KR: "KRW", BR: "BRL", MX: "MXN", CO: "COP", SE: "SEK", NO: "NOK", IL: "ILS", AE: "AED", ZA: "ZAR",
+  // Türkiye (4 Nov 2026): plans are shown and charged in euros, not lira (lib/plan-currency.ts PLAN_CURRENCY_FOR).
+  TR: "EUR"
 };
 
 /** A currency for a two-letter country code, or null when plan-currency can't price in it. */

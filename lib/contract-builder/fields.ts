@@ -37,7 +37,9 @@ export const CONTRACT_BUILDER_PAGES: Readonly<Record<string, string | null>> = {
   "rental-agreement-italy": "IT",
   "rental-agreement-croatia": "HR",
   "rental-agreement-france": "FR",
-  "rental-agreement-germany": "DE"
+  "rental-agreement-germany": "DE",
+  // Türkiye (4 Nov 2026).
+  "rental-agreement-turkey": "TR"
 };
 
 export const isContractBuilder = (slug: string) => Object.prototype.hasOwnProperty.call(CONTRACT_BUILDER_PAGES, slug);
@@ -45,6 +47,7 @@ export const isContractBuilder = (slug: string) => Object.prototype.hasOwnProper
 export const CONTRACT_COUNTRIES = [
   "TH", "ID", "VN", "MY", "PH", "LA", "KH",
   "GB", "IE", "MT", "CY", "GR", "ES", "PT", "IT", "HR", "FR", "DE",
+  "TR",
   "XX"
 ] as const;
 export type ContractCountry = (typeof CONTRACT_COUNTRIES)[number];
@@ -59,9 +62,10 @@ export function contractCountryFor(leadCountry: string | null | undefined): Cont
 export const CONTRACT_CURRENCY: Record<ContractCountry, string> = {
   TH: "THB", ID: "IDR", VN: "VND", MY: "MYR", PH: "PHP", LA: "LAK", KH: "USD",
   GB: "GBP", IE: "EUR", MT: "EUR", CY: "EUR", GR: "EUR", ES: "EUR", PT: "EUR", IT: "EUR", HR: "EUR", FR: "EUR", DE: "EUR",
+  TR: "TRY",
   XX: "USD"
 };
-export const CURRENCIES = ["THB", "IDR", "VND", "MYR", "PHP", "LAK", "KHR", "USD", "EUR", "GBP", "AUD", "SGD"] as const;
+export const CURRENCIES = ["THB", "IDR", "VND", "MYR", "PHP", "LAK", "KHR", "USD", "EUR", "GBP", "AUD", "SGD", "TRY"] as const;
 
 /** Countries whose agreement counts distance in miles (the form's mileage labels follow). */
 export const MILES_COUNTRIES: readonly string[] = ["GB"];

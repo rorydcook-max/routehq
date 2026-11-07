@@ -998,7 +998,7 @@ export async function submitInspection(formData: FormData) {
   if (mode === "return" && !isSwap) {
     notifyOperator(
       organizationId,
-      `🔄 Return complete — ${vehicleLabel} returned by ${customerName}`,
+      { emoji: "🔄", key: "returnComplete", values: { vehicle: vehicleLabel || null, customer: customerName || null } },
       "return_inspection"
     ).catch(() => null);
   }

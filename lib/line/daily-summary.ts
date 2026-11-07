@@ -2,6 +2,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { lineFlex, lineText, sendLinePushMessage, type LineMessage } from "@/lib/providers/messaging/line";
 import { paperworkFor } from "@/lib/country-paperwork";
+import { orgTimeZone } from "@/lib/scheduled-runs";
 
 const THB = (n: number) =>
   new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(n);
@@ -116,7 +117,8 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
   const lineUserId: string = org.line_user_id || org.settings?.line_user_id || "";
   if (!lineUserId) return null;
 
-  const timezone: string = org.timezone || "Asia/Bangkok";
+  // Its own clock (lib/scheduled-runs.ts): the saved zone, else its country's, else Bangkok.
+  const timezone: string = orgTimeZone(org);
   const today = todayStr(timezone);
   const tomorrow = tomorrowStr(timezone);
   const in7Days = addDays(today, 7);

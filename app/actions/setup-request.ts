@@ -62,7 +62,7 @@ export async function adminSetSetupRequestStatus(formData: FormData) {
     .eq("id", id);
   await logAdminAction(adminUser, { action: `setup_request_${status}`, organizationId: request.organization_id, details: { request_id: id } });
   if (status === "done" && request.status !== "done") {
-    await notifyOperator(request.organization_id, "✅ Your records are in RoveHQ. Have a look at your vehicles and bookings.", "setup_done", "/").catch(() => null);
+    await notifyOperator(request.organization_id, { emoji: "✅", key: "setupDone" }, "setup_done", "/").catch(() => null);
   }
   revalidatePath("/platform/setup");
   redirect("/platform/setup" as any);

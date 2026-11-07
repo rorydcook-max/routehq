@@ -8,14 +8,16 @@
  * Small and safe in the browser: the translations themselves live in lib/agreement-localize.ts (server side).
  */
 
-export type SecondLanguage = "id" | "vi" | "ms" | "fil" | "lo" | "km" | "el" | "es" | "pt" | "it" | "hr" | "fr" | "de";
+export type SecondLanguage = "id" | "vi" | "ms" | "fil" | "lo" | "km" | "el" | "es" | "pt" | "it" | "hr" | "fr" | "de" | "tr";
 export type AgreementLanguage = "th" | SecondLanguage | "en";
 
 // Europe (3 Nov 2026): the UK, Ireland and Malta are English only (English is official and the language of business in
 // Malta); Greek serves Greece and Cyprus; Portuguese is European Portuguese.
+// Türkiye (4 Nov 2026): Turkish, in formal legal register (consumer contracts must be readable in Turkish, Law 6502).
 const LANGUAGE_BY_COUNTRY: Record<string, AgreementLanguage> = {
   TH: "th", ID: "id", VN: "vi", MY: "ms", PH: "fil", LA: "lo", KH: "km",
-  GB: "en", IE: "en", MT: "en", CY: "el", GR: "el", ES: "es", PT: "pt", IT: "it", HR: "hr", FR: "fr", DE: "de"
+  GB: "en", IE: "en", MT: "en", CY: "el", GR: "el", ES: "es", PT: "pt", IT: "it", HR: "hr", FR: "fr", DE: "de",
+  TR: "tr"
 };
 const COUNTRY_BY_NAME: Record<string, string> = {
   thailand: "TH",
@@ -48,13 +50,28 @@ const COUNTRY_BY_NAME: Record<string, string> = {
   italy: "IT",
   croatia: "HR",
   france: "FR",
-  germany: "DE"
+  germany: "DE",
+  "türkiye": "TR",
+  turkiye: "TR",
+  turkey: "TR",
+  "republic of türkiye": "TR"
 };
 const COUNTRY_NAME: Record<string, string> = {
   TH: "Thailand", ID: "Indonesia", VN: "Vietnam", MY: "Malaysia", PH: "the Philippines", LA: "Laos", KH: "Cambodia",
   GB: "the United Kingdom", IE: "Ireland", MT: "Malta", CY: "Cyprus", GR: "Greece", ES: "Spain", PT: "Portugal", IT: "Italy",
-  HR: "Croatia", FR: "France", DE: "Germany"
+  HR: "Croatia", FR: "France", DE: "Germany", TR: "Türkiye"
 };
+
+/**
+ * Countries outside the EU/UK whose agreements get their own country clauses (lib/contract-templates/country-clauses.ts,
+ * guarded by country_<CC>), and the governing law used when the business still has Thailand's default.
+ * Türkiye (4 Nov 2026): not EU, so none of the GDPR/eIDAS clauses; its own KVKK, consumer-law, fines and licence clauses.
+ */
+export const OWN_CLAUSE_JURISDICTION: Record<string, string> = { TR: "the Republic of Türkiye" };
+
+export function hasOwnCountryClauses(countryCode: string) {
+  return Object.prototype.hasOwnProperty.call(OWN_CLAUSE_JURISDICTION, String(countryCode || "").toUpperCase());
+}
 
 /** EU and EEA countries and the UK: their agreements get the European country clauses (lib/contract-templates/country-clauses.ts). */
 const EUROPE = new Set([
@@ -244,6 +261,17 @@ const WORDS: Record<SecondLanguage, Words> = {
     unlimited: "Unbegrenzt",
     perDay: "pro Tag",
     paidExtra: "kostenpflichtige Zusatzleistung"
+  },
+  // The Turkish clause writes the rate as "{{currency_symbol}}{{rental_rate}} / {{billing_period_label_2}}", so the period
+  // stands alone ("ay", "tüm kiralama süresi") without a case ending.
+  tr: {
+    period: { once: "tüm kiralama süresi", week: "hafta", day: "gün", month: "ay" },
+    due: { once: "tamamı peşin olarak", month: "her ay aynı tarihte", week: "her hafta aynı günde", day: "tamamı teslimde", other: "kararlaştırıldığı şekilde" },
+    kmPerMonth: "km / ay",
+    milesPerMonth: "mil / ay",
+    unlimited: "Sınırsız",
+    perDay: "günlük",
+    paidExtra: "ücretli ek hizmet"
   }
 };
 

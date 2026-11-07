@@ -1,7 +1,7 @@
 ---
 title: Data processing agreement
 description: The Article 28 GDPR terms under which RoveHQ processes renters' and team members' personal data for rental businesses, with transfer clauses and the UK Addendum.
-updated: 2026-11-03
+updated: 2026-11-07
 order: 3
 ---
 
@@ -59,6 +59,7 @@ RoveHQ stores data in **Singapore** and some sub-processors process it in the Un
 2. **UK data.** The ICO's **International Data Transfer Addendum to the EU Standard Contractual Clauses** (version B1.0, in force 21 March 2022) is incorporated. Table 1: the parties' details are in this DPA. Table 2: the EU SCCs as described above. Table 3: Annexes 1 to 3 of this DPA. Table 4: either party may end the Addendum as set out in its Section 19.
 3. **Thai data.** Transfers outside Thailand are made under Section 29 of the PDPA and the PDPC's notifications on cross-border transfers (2023), with the safeguards in this DPA, which the parties agree to as contract clauses for that purpose.
 4. **Supplementary measures.** Encryption in transit and at rest, access controls and the other measures in Annex 2. We'll resist and tell you about any government request for your data where the law allows, and disclose only what we're legally forced to.
+5. **Turkish data.** Where you are established in Türkiye or the data is otherwise subject to Türkiye's Law No. 6698 (KVKK), the Türkiye addendum in Annex 4 applies.
 
 ## 9. Liability, term and changes
 
@@ -95,3 +96,16 @@ Each party's liability under this DPA follows the limits in the terms of service
 ## Annex 3: Sub-processors
 
 The current list, with each company's purpose, location and transfer safeguard, is on our [sub-processors page](/legal/subprocessors), which forms part of this Annex. Changes are notified as described in section 5.
+
+## Annex 4: Türkiye addendum (KVKK)
+
+This addendum applies when you are a data controller (*veri sorumlusu*) under Türkiye's Personal Data Protection Law No. 6698 ("KVKK") and RoveHQ processes personal data for you as your data processor (*veri işleyen*). It adds to this DPA; where it is more protective, it wins for that data. It was written from public sources (KVKK, the 2024 amendments by Law No. 7499, the Regulation on the Procedures and Principles for the Transfer of Personal Data Abroad of 10 July 2024 and the Personal Data Protection Board's published standard contracts) and has not been reviewed by a Turkish lawyer.
+
+1. **Roles and instructions.** You decide the purposes and means of processing; RoveHQ processes only on your instructions as set out in section 3. RoveHQ is jointly responsible with you for taking the technical and administrative measures in Article 12(1) KVKK for the data it processes for you (Article 12(2)); Annex 2 lists RoveHQ's measures.
+2. **Your duties as controller.** You give renters and others your own information notice (*aydınlatma metni*, Article 10), obtain explicit consent (*açık rıza*) where no other legal basis in Article 5 or 6 applies, register on the Data Controllers' Registry (VERBIS) where you are not exempt, answer data subjects' applications within 30 days (Article 13), and carry out duties the law gives you directly, such as recording renters on the police rental vehicle notification system (KABİS) under Identity Notification Law No. 1774. RoveHQ does not submit data to KABİS for you.
+3. **Transfers abroad (Article 9).** RoveHQ stores data in Singapore and uses the sub-processors in Annex 3, some of them in the United States and the EU, which the Personal Data Protection Board has not declared adequate. For those transfers the parties use the Board's **standard contract** for transfers from a controller to a processor (or from a processor to a sub-processor, as the case may be), without changing its text, completed with the details in Annexes 1 to 3. The party that must notify a standard contract to the Personal Data Protection Authority does so within **five business days** of signing it (Article 9(5) KVKK); where you are the data exporter, RoveHQ gives you a signed copy for that notification. *[To be confirmed: the signed standard contracts and who notifies each of them.]*
+4. **Breaches.** RoveHQ tells you of a breach affecting your data without undue delay and within 48 hours where possible (section 6), so that you can notify the Personal Data Protection Board within 72 hours and the people affected as soon as reasonably possible, as the Board's decision on breach notification requires.
+5. **Sub-processors.** Section 5 applies; each sub-processor is bound to protections equivalent to this addendum, including for transfers abroad.
+6. **Deletion.** At the end of the service RoveHQ deletes or destroys the data as described in section 3(7), in line with the Regulation on the Erasure, Destruction or Anonymisation of Personal Data, unless the law requires it to be kept.
+7. **Audits and the Board.** Section 7 applies, and RoveHQ will cooperate with requests from the Personal Data Protection Board about the processing it does for you.
+8. **Law.** Questions about this addendum under KVKK are governed by the law of the Republic of Türkiye; everything else in this DPA keeps its governing law.

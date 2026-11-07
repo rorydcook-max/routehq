@@ -35,6 +35,7 @@ const countries: Array<{ value: string; code: string | null }> = [
   { value: "Singapore", code: "SG" },
   { value: "Spain", code: "ES" },
   { value: "Thailand", code: "TH" },
+  { value: "Türkiye", code: "TR" },
   { value: "United Kingdom", code: "GB" },
   { value: "Vietnam", code: "VN" },
   { value: "Other", code: null }

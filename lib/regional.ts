@@ -48,7 +48,11 @@ export const COUNTRIES: CountryInfo[] = [
   { code: "CY", name: "Cyprus", currency: "EUR", zones: ["Asia/Nicosia"], unit: "km", vat: 19, vatName: "ΦΠΑ" },
   { code: "MT", name: "Malta", currency: "EUR", zones: ["Europe/Malta"], unit: "km", vat: 18 },
   { code: "FR", name: "France", currency: "EUR", zones: ["Europe/Paris"], unit: "km", vat: 20, vatName: "TVA" },
-  { code: "DE", name: "Germany", currency: "EUR", zones: ["Europe/Berlin"], unit: "km", vat: 19, vatName: "MwSt." }
+  { code: "DE", name: "Germany", currency: "EUR", zones: ["Europe/Berlin"], unit: "km", vat: 19, vatName: "MwSt." },
+  // Türkiye (4 Nov 2026): KDV general rate 20% since 10 July 2023 (Presidential Decision 7346, Resmî Gazete 7 Jul 2023);
+  // vehicle rental is not on the reduced-rate lists (accommodation is 10%). Prices to the public normally include KDV.
+  // One time zone (Europe/Istanbul, UTC+3 all year). The name is the one Intl and the customer lists use ("Türkiye").
+  { code: "TR", name: "Türkiye", currency: "TRY", zones: ["Europe/Istanbul"], unit: "km", vat: 20, vatName: "KDV" }
 ];
 
 const BY_CODE = new Map(COUNTRIES.map((country) => [country.code, country]));
@@ -58,7 +62,8 @@ const BY_NAME: Record<string, string> = {
   "united kingdom of great britain and northern ireland": "GB", "republic of ireland": "IE", eire: "IE", éire: "IE",
   españa: "ES", espana: "ES", "canary islands": "ES", canarias: "ES", "balearic islands": "ES", mallorca: "ES",
   italia: "IT", "ελλάδα": "GR", hellas: "GR", hrvatska: "HR", "κύπρος": "CY", deutschland: "DE", "viet nam": "VN",
-  madeira: "PT", azores: "PT", açores: "PT", "lao pdr": "LA", "kingdom of thailand": "TH", "ประเทศไทย": "TH", "ไทย": "TH"
+  madeira: "PT", azores: "PT", açores: "PT", "lao pdr": "LA", "kingdom of thailand": "TH", "ประเทศไทย": "TH", "ไทย": "TH",
+  turkey: "TR", turkiye: "TR", "türkiye": "TR", "republic of türkiye": "TR", "republic of turkey": "TR", "türkiye cumhuriyeti": "TR"
 };
 
 /** A two-letter country code from a code ("gb", "UK") or a name ("United Kingdom", "España"); "" when unknown. */

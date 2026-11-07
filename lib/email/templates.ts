@@ -121,8 +121,11 @@ function lineSummaryBlocks(messages: any[]): { eyebrow?: string; heading?: strin
   return out;
 }
 
-/** In the summary's own language (English or Thai, lib/line/daily-summary.ts): pass emailWords(data.locale). */
-export function morningSummaryEmail(input: { orgName: string | null | undefined; messages: any[]; appUrl: string; words: EmailWords }): BuiltEmail | null {
+/**
+ * In the summary's own language (English or Thai, lib/line/daily-summary.ts): pass emailWords(data.locale), and the
+ * subject in the same language (operatorAlerts.summarySubject, lib/operator-alert-text.ts); English when left out.
+ */
+export function morningSummaryEmail(input: { orgName: string | null | undefined; messages: any[]; appUrl: string; words: EmailWords; subject?: string }): BuiltEmail | null {
   const { words } = input;
   const text = lineSummaryText(input.messages);
   if (!text) return null;
@@ -140,7 +143,7 @@ export function morningSummaryEmail(input: { orgName: string | null | undefined;
       settings: settingsUrl(input.appUrl) ? { label: words.t("summarySettings"), url: settingsUrl(input.appUrl) } : null
     }
   });
-  return { subject: `${input.orgName || "RoveHQ"}: your morning summary`, text: `${text}${input.appUrl ? `\n\n${words.t("openApp")}: ${input.appUrl}` : ""}`, html };
+  return { subject: input.subject || `${input.orgName || "RoveHQ"}: your morning summary`, text: `${text}${input.appUrl ? `\n\n${words.t("openApp")}: ${input.appUrl}` : ""}`, html };
 }
 
 // ── Signed rental documents to the customer (lib/rental-document-email.ts) - the operator's brand ───────────────────

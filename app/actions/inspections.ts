@@ -26,6 +26,7 @@ import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { adoptBusinessClock } from "@/lib/auth/active-organization-server";
 import { enterBusinessTimeZone } from "@/lib/business-time-scope";
 import { businessDistanceUnit } from "@/lib/business-units";
+import { niceMoney } from "@/lib/nice-money";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
 
@@ -465,14 +466,13 @@ async function ensureHandoverCollectTask(
     .limit(1);
   if (open?.length) return;
   const currency = String(rental?.currency || "THB");
-  const symbol = currency === "THB" ? "฿" : `${currency} `;
   await admin.from("tasks").insert({
     organization_id: args.organizationId,
     vehicle_id: args.vehicleId,
     rental_id: args.rentalId,
     title_key: null,
     created_by: args.userId,
-    title: `Collect ${symbol}${uncovered.toLocaleString("en-US", { maximumFractionDigits: 2 })} from ${args.customerName || "the customer"}`,
+    title: `Collect ${niceMoney(uncovered, currency)} from ${args.customerName || "the customer"}`,
     task_type: "admin",
     action: "collect_payment",
     due_at: new Date().toISOString()
@@ -962,15 +962,15 @@ export async function submitInspection(formData: FormData) {
             .filter((payment: any) => ["paid", "reconciled"].includes(String(payment.status)) && payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true)
             .sort((a: any, b: any) => String(b.due_date).localeCompare(String(a.due_date)))[0];
           if (lastPaid) await admin.from("rental_payments").update({ metadata: { ...(lastPaid.metadata || {}), early_return: { ...suggestion, owed: Math.max(0, owed), return_date: returnDate } } }).eq("id", lastPaid.id);
-          const symbol = String(rental?.currency || "THB") === "THB" ? "฿" : `${rental?.currency} `;
-          const owedNote = owed > 0 ? `, ${symbol}${Math.round(owed).toLocaleString("en-US")} still owed` : "";
+          // "£330", not "GBP 330": the amount is read back from the title (lib/job-name.ts takes it up to the first space).
+          const owedNote = owed > 0 ? `, ${niceMoney(owed, rental?.currency || "THB")} still owed` : "";
           await admin.from("tasks").insert({
             organization_id: organizationId,
             vehicle_id: vehicleId,
             rental_id: rentalId,
             title_key: null,
             created_by: null,
-            title: `Refund to decide - returned ${suggestion.unusedDays} ${suggestion.unusedDays === 1 ? "day" : "days"} before the paid time ran out (pro rata ${symbol}${suggestion.amount.toLocaleString("en-US")}${owedNote})`,
+            title: `Refund to decide - returned ${suggestion.unusedDays} ${suggestion.unusedDays === 1 ? "day" : "days"} before the paid time ran out (pro rata ${niceMoney(suggestion.amount, rental?.currency || "THB")}${owedNote})`,
             task_type: "admin",
             action: "refund",
             due_at: new Date().toISOString()

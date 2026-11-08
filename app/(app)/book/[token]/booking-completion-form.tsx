@@ -5,7 +5,7 @@ import { shownError } from "@/lib/error-text";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound } from "lucide-react";
+import { CheckCircle2, ChevronDown, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound } from "lucide-react";
 import { checkReturningCustomer, completePublicBooking, reportPublicBookingPayment, setPartnerOffers } from "@/app/actions/public-booking";
 import { preparePublicBookingUploads } from "@/app/actions/uploads";
 import { readIdentityDocument } from "@/app/actions/identity-ocr";
@@ -1079,9 +1079,6 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <SectionTitle icon={MessageCircle} label={t("howContactYou")} />
-        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-          {t("contactIntro", { business: detail.organizationName })}
-        </p>
         {contactChannelError ? (
           <div style={{ background: "var(--warning-light)", border: "0.5px solid var(--warning-line)", borderRadius: 8, padding: "10px 14px", marginTop: 12, fontSize: 14, color: "var(--warning)" }}>
             {contactChannelError}
@@ -1109,12 +1106,13 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               value={preferredContactMethod}
             >
               <option disabled value="">{t("choose")}</option>
-              <option value="phone">{t("phoneCall")}</option>
+              {/* Alphabetical (English names). */}
               <option value="email">{t("email")}</option>
-              <option value="whatsapp">WhatsApp</option>
               <option value="messenger">Facebook Messenger</option>
               <option value="line">LINE</option>
+              <option value="phone">{t("phoneCall")}</option>
               <option value="telegram">Telegram</option>
+              <option value="whatsapp">WhatsApp</option>
             </select>
           </label>
         </div>
@@ -1480,7 +1478,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           <details className="group mt-4 rounded-xl border border-[var(--border)] bg-white" onToggle={(event) => setDraftOpen((event.currentTarget as HTMLDetailsElement).open)}>
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-bold text-[var(--primary)] [&::-webkit-details-marker]:hidden">
               <span>{t.has("previewOpen" as never) ? t("previewOpen" as never) : "Read the draft agreement"}</span>
-              <span aria-hidden="true" className="text-[var(--muted)] transition group-open:rotate-180">⌄</span>
+              <ChevronDown aria-hidden="true" className="shrink-0 text-[var(--muted)] transition group-open:rotate-180" size={18} />
             </summary>
             {draftOpen ? (
               <div className="routehq-contract-preview contract-preview h-[60vh] min-h-[420px] overflow-hidden border-t border-[var(--border)] bg-[var(--panel-secondary)] [overscroll-behavior:contain]">

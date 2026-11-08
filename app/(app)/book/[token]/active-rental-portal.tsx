@@ -284,7 +284,7 @@ function ActionForm({
           <>
             <input name="openEnded" type="hidden" value="true" />
             <p className="rounded-xl bg-[var(--primary-light)] p-3 text-sm leading-6 text-[var(--foreground)]">
-              {t.rich(endNoticeDays > 0 ? "openEndedOfferNotice" : "openEndedOffer", { amount: `฿${openEndedOffer.monthlyRate.toLocaleString("en-US")}`, date: niceDate(openEndedOffer.firstDue, locale), days: endNoticeDays, b: (chunks) => <span className="font-semibold">{chunks}</span> })}
+              {t.rich(endNoticeDays > 0 ? "openEndedOfferNotice" : "openEndedOffer", { amount: currency && currency !== "THB" ? formatRegionalMoney(openEndedOffer.monthlyRate, currency, "en-GB") : `฿${openEndedOffer.monthlyRate.toLocaleString("en-US")}`, date: niceDate(openEndedOffer.firstDue, locale), days: endNoticeDays, b: (chunks) => <span className="font-semibold">{chunks}</span> })}
             </p>
           </>
         ) : (

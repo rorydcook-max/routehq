@@ -244,6 +244,11 @@
   border-color: var(--rv-sea);
   outline: none;
 }
+/* The app's global input rule (44px) out-ranked .input on text and date fields, so they sat 4px shorter than the
+   Vehicle select beside them in the search bar. */
+.searchPanel .input {
+  height: 48px;
+}
 .inputRow {
   display: grid;
   grid-template-columns: 1fr 1fr;

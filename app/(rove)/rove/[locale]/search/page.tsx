@@ -23,7 +23,8 @@ type Props = { params: Promise<{ locale: string }>; searchParams: Promise<RoveQu
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const [locale, query] = await Promise.all([roveLocale(params), searchParams]);
   const t = await getTranslations("directory");
-  const place = String(query.place || "").trim().slice(0, 60);
+  // The place as the page shows it ("Koh Samui" for ?place=koh-samui).
+  const place = parseRoveQuery(query, roveToday()).place.slice(0, 60);
   const title = place ? t("rv.searchTitlePlace", { place }) : t("rv.searchTitle");
   // Search results change with every query: followed, but not indexed (the destination pages are what's indexed).
   return roveMetadata({ title: `${title} | Rove`, description: t("rv.homeDescription"), path: "/search", locale, section: "search", noindex: true, ogTitle: title });

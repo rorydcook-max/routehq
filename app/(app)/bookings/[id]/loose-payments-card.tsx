@@ -3,6 +3,7 @@ import { Link2 } from "lucide-react";
 import { dismissLoosePayments, linkLoosePayments } from "@/app/actions/loose-payments";
 import { longDate } from "@/lib/i18n/dates";
 import type { LoosePayment } from "@/lib/loose-payments";
+import { niceMoney } from "@/lib/nice-money";
 
 /**
  * "Are these payments from this booking?" (Rory, 2 Nov 2026): rent for this vehicle already in Money in & out, not
@@ -11,7 +12,7 @@ import type { LoosePayment } from "@/lib/loose-payments";
 export async function LoosePaymentsCard({ rentalId, payments, currency }: { rentalId: string; payments: LoosePayment[]; currency: string }) {
   if (!payments.length) return null;
   const [t, locale] = await Promise.all([getTranslations("booking"), getLocale()]);
-  const money = (value: number) => `${currency === "THB" ? "฿" : `${currency} `}${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+  const money = (value: number) => niceMoney(value, currency);
   const total = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
   return (

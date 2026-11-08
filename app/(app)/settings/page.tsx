@@ -98,18 +98,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     });
   // The small heading above each group of settings on the Rentals tab: quieter than the card titles under it.
   const groupHeading = "px-1 pt-1 text-[13px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]";
-  const { data: vehicleRates } = await ((await createSupabaseServerClient()) as any)
-    .from("vehicles")
-    .select("id, make, model, trim, registration_number, daily_rate, weekly_rate, monthly_rate, category_id")
-    .eq("organization_id", organization.id)
-    .is("deleted_at", null);
   const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-  const { data: addressRow } = await supabase.from("organizations").select("booking_subdomain, custom_domain, custom_domain_status, trial_ends_at").eq("id", organization.id).maybeSingle();
-  // Custom limits a RoveHQ admin set for this business (none: the plan's own), read separately so a missing column can't break the page.
-  const customPlan = await getCustomPlan(organization.id);
+  // These four don't depend on each other: one round trip instead of four in a row.
+  const [{ data: vehicleRates }, { data: { user } }, { data: addressRow }, customPlan] = await Promise.all([
+    supabase
+      .from("vehicles")
+      .select("id, make, model, trim, registration_number, daily_rate, weekly_rate, monthly_rate, category_id")
+      .eq("organization_id", organization.id)
+      .is("deleted_at", null),
+    supabase.auth.getUser(),
+    supabase.from("organizations").select("booking_subdomain, custom_domain, custom_domain_status, trial_ends_at").eq("id", organization.id).maybeSingle(),
+    // Custom limits a RoveHQ admin set for this business (none: the plan's own), read separately so a missing column can't break the page.
+    getCustomPlan(organization.id)
+  ]);
   const addressOrg = { ...(organization as any), ...(addressRow || {}), custom_limits: customPlan.custom_limits };
 
   const [
@@ -125,31 +126,40 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       .order("created_at", { ascending: true }),
     ensureDefaultBranch(organization),
     getVehicleCategories(organization.id),
-    supabase
-      .from("line_messages")
-      .select("id, type, status, sent_at, created_at, error, recipient_line_id")
-      .eq("organisation_id", organization.id)
-      .order("created_at", { ascending: false })
-      .limit(10)
+    // The LINE message log is only on the Notifications tab.
+    tab === "notifications"
+      ? supabase
+          .from("line_messages")
+          .select("id, type, status, sent_at, created_at, error, recipient_line_id")
+          .eq("organisation_id", organization.id)
+          .order("created_at", { ascending: false })
+          .limit(10)
+      : Promise.resolve({ data: [] })
   ]);
 
-  const { data: messagingChannels } = await supabase
-    .from("messaging_channels")
-    .select("id, provider, display_name, status, last_error, webhook_key, updated_at")
-    .eq("organization_id", organization.id)
-    .neq("status", "disconnected")
-    // The website's contact form isn't an account to connect or disconnect.
-    .neq("provider", "website")
-    .order("created_at", { ascending: true });
-  // An account can be connected and still not be delivering (a token that was revoked, say).
-  // The last message sent on each account says which: if it failed, the account says so here.
-  const { data: recentSends } = await supabase
-    .from("conversation_messages")
-    .select("status, error, created_at, conversations!inner(channel_id)")
-    .eq("organization_id", organization.id)
-    .eq("direction", "out")
-    .order("created_at", { ascending: false })
-    .limit(60);
+  // Chat accounts and their last sends are only shown on the Messaging tab: other tabs skip the two round trips.
+  const [{ data: messagingChannels }, { data: recentSends }] =
+    tab === "messaging"
+      ? await Promise.all([
+          supabase
+            .from("messaging_channels")
+            .select("id, provider, display_name, status, last_error, webhook_key, updated_at")
+            .eq("organization_id", organization.id)
+            .neq("status", "disconnected")
+            // The website's contact form isn't an account to connect or disconnect.
+            .neq("provider", "website")
+            .order("created_at", { ascending: true }),
+          // An account can be connected and still not be delivering (a token that was revoked, say).
+          // The last message sent on each account says which: if it failed, the account says so here.
+          supabase
+            .from("conversation_messages")
+            .select("status, error, created_at, conversations!inner(channel_id)")
+            .eq("organization_id", organization.id)
+            .eq("direction", "out")
+            .order("created_at", { ascending: false })
+            .limit(60)
+        ])
+      : [{ data: [] as any[] }, { data: [] as any[] }];
   const lastSendByChannel = new Map<string, { failed: boolean; error: string | null; at: string }>();
   for (const send of (recentSends || []) as any[]) {
     const channelId = String(send.conversations?.channel_id || "");
@@ -161,7 +171,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     const last = lastSendByChannel.get(channel.id);
     if (last?.failed && channel.updated_at && new Date(last.at).getTime() < new Date(channel.updated_at).getTime()) lastSendByChannel.delete(channel.id);
   }
-  const brandingDisplayUrls = await resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true });
+  // The logo and signature are only shown on the Business tab.
+  const brandingDisplayUrls: { logoUrl?: string | null; signatureUrl?: string | null } =
+    tab === "business" ? await resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true }) : { logoUrl: null, signatureUrl: null };
   const organizationSettings = organization.settings && typeof organization.settings === "object" && !Array.isArray(organization.settings)
     ? (organization.settings as Record<string, unknown>)
     : {};
@@ -378,7 +390,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               summary={[regionalInitial.country ? countryLabel : "", regionalInitial.currency, say(regionalInitial.distanceUnit === "mi" ? "reg_mi" : "reg_km"), regionalVat.on ? say("vat_summary", { rate: regionalVat.rate }) : ""].filter(Boolean).join(" · ")}
               title={say("reg_title")}
             >
-              <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("reg_body")}</p>
               <RegionalPanel initial={regionalInitial} />
             </Fold>
             </div>
@@ -512,7 +523,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <div className="space-y-3">
             <h2 className={groupHeading}>{say("grp_online")}</h2>
           {/* The booking page has its own tool now (side menu › Tools › Booking page; Rory, 7 Nov 2026): one row here. */}
-          <Link className="card pressable flex min-h-14 items-center justify-between gap-3 px-4 py-3.5" href={"/booking-page" as Route} id="booking-page">
+          {/* Same insets as the folding cards around it (their card margin plus px-4), so the titles line up. */}
+          <Link className="card pressable flex min-h-14 items-center justify-between gap-3 px-[30px] py-3.5" href={"/booking-page" as Route} id="booking-page">
             <span className="min-w-0">
               <span className="card-title block !text-[17px]">{say("book_title")}</span>
               <span className="mt-0.5 line-clamp-2 block font-medium text-[var(--foreground-secondary)]">
@@ -691,7 +703,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         {/* What's coming, so operators know it's on the way rather than missing. Alphabetical; FlowAccount is Thai only. */}
         <Card className="p-5">
           <h2 className="card-title">{say("ig_soonTitle")}</h2>
-          <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("ig_soonBody")}</p>
           <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {(["assistant", "flowaccount", "gbp", "mailchimp", "quickbooks", "xero", "zapierMake"] as const)
               .filter((key) => key !== "flowaccount" || orgCountry(organization) === "TH")
@@ -781,22 +792,27 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <Card className="p-5">
           <h2 className="card-title">{say("team_title")}</h2>
           <div className="mt-2 divide-y divide-[var(--border)]">
-            {(members || []).filter((member: any) => member.is_active).map((member: any) => (
+            {(members || []).filter((member: any) => member.is_active).map((member: any) => {
+              // The owner's own row: their name from sign-up, not just their email (the member row has no name for them).
+              const isMe = member.user_id === user?.id;
+              const name = String(member.display_name || (isMe ? user?.user_metadata?.full_name || "" : "")).trim();
+              const email = member.invited_email || (isMe ? userEmail : "") || "";
+              return (
               <div className="flex flex-col gap-3 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between" key={member.id}>
                 <div className="flex min-w-0 items-center gap-3">
                   <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[14px] font-bold uppercase text-[var(--primary)]">
-                    {String(member.display_name || member.invited_email || (member.user_id === user?.id ? userEmail : "") || "?")
+                    {String(name || email || "?")
                       .split(/[\s@.]+/)
                       .filter(Boolean)
-                      .slice(0, member.display_name ? 2 : 1)
+                      .slice(0, name ? 2 : 1)
                       .map((part: string) => part[0])
                       .join("")}
                   </span>
                 <div className="min-w-0">
-                  <p className="font-bold text-[var(--foreground)] [overflow-wrap:anywhere]">{member.display_name || member.invited_email || (member.user_id === user?.id ? userEmail : say("team_user"))}</p>
+                  <p className="font-bold text-[var(--foreground)] [overflow-wrap:anywhere]">{name || email || say("team_user")}</p>
                   {/* Second line only when it adds something: the email under a name, or that they've joined. */}
-                  {member.display_name && member.invited_email ? (
-                    <p className="text-sm text-[var(--muted)]">{member.invited_email}</p>
+                  {name && email ? (
+                    <p className="text-sm text-[var(--muted)] [overflow-wrap:anywhere]">{email}</p>
                   ) : member.user_id && !waitingMembers.has(member.id) ? (
                     <p className="text-sm text-[var(--muted)]">{say("team_activeAccount")}</p>
                   ) : null}
@@ -812,7 +828,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   </div>
                 ) : null}
               </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
 

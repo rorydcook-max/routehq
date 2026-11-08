@@ -21,6 +21,7 @@ import { distanceKey } from "@/lib/business-units";
 import { methodsFor } from "@/lib/payment-methods";
 import { firstRentCharge } from "@/lib/payment-schedule";
 import { HandoverPaymentStep, type HandoverPayOptions } from "@/components/handover-payment-step";
+import { currencySymbol } from "@/components/currency-symbol";
 
 type DamageItem = {
   id: string;
@@ -74,31 +75,31 @@ function shortDate(value: string | null | undefined, locale = "en-GB") {
 
 // The booking's currency (set when the form opens; one form per page). Was always THB, which showed ฿ to businesses elsewhere.
 let formCurrency = "THB";
+// Pence and cents are kept when there are any: a £39.50 day showed as "£40" here and "£39.50" on the booking.
 function money(value: unknown) {
-  try {
-    return new Intl.NumberFormat("en", { style: "currency", currency: formCurrency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(Number(value || 0));
-  } catch {
-    return `${formCurrency} ${Math.round(Number(value || 0)).toLocaleString("en-US")}`;
-  }
+  return exactMoney(Math.round(Number(value || 0) * 100) / 100);
 }
 
 /** As money(), keeping satang/cents when there are any (amounts at the payment step). */
 function exactMoney(value: number) {
   try {
-    return new Intl.NumberFormat("en", { style: "currency", currency: formCurrency, currencyDisplay: "narrowSymbol", minimumFractionDigits: 0, maximumFractionDigits: Number.isInteger(value) ? 0 : 2 }).format(Number(value || 0));
+    return new Intl.NumberFormat("en", { style: "currency", currency: formCurrency, currencyDisplay: "narrowSymbol", minimumFractionDigits: Number.isInteger(value) ? 0 : 2, maximumFractionDigits: Number.isInteger(value) ? 0 : 2 }).format(Number(value || 0));
   } catch {
     return `${formCurrency} ${Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
   }
 }
 
-/** Days a rental has run, counting the first day, on the business's calendar (the same on the server and on the phone). */
+/**
+ * Days a rental has run on the business's calendar (the same on the server and on the phone), counted as rent is:
+ * 25 Oct to 6 Nov is 12 days. It counted the first day as well, so a 12-day booking returned on time said "13 days".
+ */
 function daysBetween(start: string | null | undefined) {
   if (!start) {
     return 0;
   }
   const startDay = Date.parse(`${toWallTime(start).slice(0, 10)}T00:00:00Z`);
   if (Number.isNaN(startDay)) return 0;
-  return Math.max(0, Math.round((Date.parse(`${businessToday()}T00:00:00Z`) - startDay) / 86_400_000) + 1);
+  return Math.max(1, Math.round((Date.parse(`${businessToday()}T00:00:00Z`) - startDay) / 86_400_000));
 }
 
 /**
@@ -505,7 +506,12 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   const mode = context.mode;
   const isSwap = Boolean(context.swap);
   // Handing over before the booked start: the owner says what happens to the extra days (charged by default).
-  const early = useMemo(() => (mode === "delivery" && !isSwap ? earlyStartFor(context.rental, context.vehicle, businessToday()) : null), [mode, isSwap, context.rental, context.vehicle]);
+  // Already charged (cash was taken earlier in this handover, then the form was opened again): the schedule holds
+  // the charge, so asking again would add it twice. The server keeps that one charge when the handover is saved.
+  const early = useMemo(
+    () => (mode === "delivery" && !isSwap && !context.earlyChargeWritten ? earlyStartFor(context.rental, context.vehicle, businessToday()) : null),
+    [mode, isSwap, context.rental, context.vehicle, context.earlyChargeWritten]
+  );
   const [earlyChoice, setEarlyChoice] = useState<EarlyStartChoice>(() => (early && early.amount > 0 ? "charge" : "free"));
   const [earlyAdded, setEarlyAdded] = useState(0);
   // Handed over after the booked start: rent starts today (the default) or keeps the booked dates.
@@ -1505,7 +1511,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
                 <label className="block">
                   <span className="text-sm font-bold text-[var(--foreground)]">{t("rentalPaymentReceived")}</span>
                   <span className="relative block">
-                    <span aria-hidden="true" className="pointer-events-none absolute bottom-0 left-3 flex h-11 items-center font-semibold text-[var(--foreground-secondary)]">฿</span>
+                    <span aria-hidden="true" className="pointer-events-none absolute bottom-0 left-3 flex h-11 items-center font-semibold text-[var(--foreground-secondary)]">{currencySymbol(formCurrency)}</span>
                     <input
                     className={`${inputClass} !pl-9`}
                     inputMode="decimal"
@@ -1524,7 +1530,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
                 <label className={depositToCollect ? "block" : "hidden"}>
                   <span className="text-sm font-bold text-[var(--foreground)]">{t("depositAmountReceived")}</span>
                   <span className="relative block">
-                    <span aria-hidden="true" className="pointer-events-none absolute bottom-0 left-3 flex h-11 items-center font-semibold text-[var(--foreground-secondary)]">฿</span>
+                    <span aria-hidden="true" className="pointer-events-none absolute bottom-0 left-3 flex h-11 items-center font-semibold text-[var(--foreground-secondary)]">{currencySymbol(formCurrency)}</span>
                     <input
                     className={`${inputClass} !pl-9`}
                     inputMode="decimal"

@@ -17,7 +17,8 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 
 // In the business's own currency (was always baht).
 function money(value: number) {
-  return formatMoney(Math.round(value), businessCurrency(), "en-US");
+  // Exact (pence kept when there are any): "£2,100 spent" was really £2,099.50 after a refund.
+  return formatMoney(Math.round(value * 100) / 100, businessCurrency(), "en-US");
 }
 
 function formatDate(value: string | null, say: Say, locale: string) {

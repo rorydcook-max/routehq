@@ -90,16 +90,23 @@ function PostcardHero() {
         <div className={`${s.image} ${shape}isolate ${photo ? "aspect-[4/5] sm:aspect-[16/10] lg:aspect-[16/8.2]" : "aspect-[2/3] sm:aspect-[16/11] lg:aspect-[16/9]"}`}>
           <SiteImage image={images.hero} priority settle />
           {photo ? <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.62),rgba(0,0,0,0.08)_58%,rgba(0,0,0,0.18))]" /> : null}
-          <div className={`absolute inset-x-0 ${photo ? "bottom-0 p-6 pb-16 text-white sm:p-12 sm:pb-20 lg:p-16 lg:pb-24" : "top-0 p-6 pt-8 sm:p-12 lg:p-16"}`}>
-            {data.business.place ? (
-              <p className={`flex items-center gap-1.5 text-[15px] font-semibold ${photo ? "text-white/85" : s.soft}`}>
-                <MapPin aria-hidden="true" size={16} />
-                {data.business.place}
-              </p>
-            ) : null}
-            <Txt as="h1" id="hero-title" className={`${s.display} mt-3 max-w-[13ch] text-[46px] sm:text-[72px] lg:text-[92px]`} slot="hero.headline" />
-            <Txt as="p" className={`mt-4 max-w-[44ch] text-[18px] leading-relaxed sm:text-[20px] ${photo ? "text-white/88" : s.soft}`} slot="hero.subline" />
-          </div>
+          {/* Villa's arch rounds the top corners off: text at the top is centred under the arch, where nothing is cut off
+              (left-aligned, the place and the start of the headline were clipped by the curve). */}
+          {(() => {
+            const centred = Boolean(shape) && !photo;
+            return (
+              <div className={`absolute inset-x-0 ${photo ? "bottom-0 p-6 pb-16 text-white sm:p-12 sm:pb-20 lg:p-16 lg:pb-24" : "top-0 p-6 pt-8 sm:p-12 lg:p-16"} ${centred ? "text-center" : ""}`}>
+                {data.business.place ? (
+                  <p className={`flex items-center gap-1.5 text-[15px] font-semibold ${centred ? "justify-center" : ""} ${photo ? "text-white/85" : s.soft}`}>
+                    <MapPin aria-hidden="true" size={16} />
+                    {data.business.place}
+                  </p>
+                ) : null}
+                <Txt as="h1" id="hero-title" className={`${s.display} mt-3 max-w-[13ch] text-[46px] sm:text-[72px] lg:text-[92px] ${centred ? "mx-auto" : ""}`} slot="hero.headline" />
+                <Txt as="p" className={`mt-4 max-w-[44ch] text-[18px] leading-relaxed sm:text-[20px] ${centred ? "mx-auto" : ""} ${photo ? "text-white/88" : s.soft}`} slot="hero.subline" />
+              </div>
+            );
+          })()}
         </div>
         <div className="relative z-10 mx-3 -mt-9 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-[calc(var(--s-r-card)*1.1)] bg-[var(--s-surface)] p-3 ps-5 shadow-[0_18px_50px_-24px_rgba(10,20,30,0.45)] sm:mx-auto sm:max-w-[640px] sm:rounded-full">
           <p className="min-w-0 text-[15px] leading-tight">
@@ -419,7 +426,7 @@ function SearchHero() {
           <SiteImage image={images.hero} priority settle />
           <div
             aria-hidden="true"
-            className={`absolute inset-0 ${photo ? "bg-[linear-gradient(to_bottom,rgba(0,0,0,0.68),rgba(0,0,0,0.3)_45%,rgba(0,0,0,0.1)_70%,rgba(0,0,0,0.25))]" : "bg-[linear-gradient(to_bottom,var(--s-bg),color-mix(in_oklab,var(--s-bg)_75%,transparent)_40%,transparent_70%)]"}`}
+            className={`absolute inset-0 ${photo ? "bg-[linear-gradient(to_bottom,rgba(0,0,0,0.72),rgba(0,0,0,0.5)_50%,rgba(0,0,0,0.15)_75%,rgba(0,0,0,0.25))]" : "bg-[linear-gradient(to_bottom,var(--s-bg),color-mix(in_oklab,var(--s-bg)_75%,transparent)_40%,transparent_70%)]"}`}
           />
           <div className={`absolute inset-x-0 top-0 p-6 sm:p-12 lg:p-14 ${photo ? "text-white" : ""}`}>
             <Place className={photo ? "text-white/85" : s.soft} />

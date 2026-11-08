@@ -70,7 +70,6 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
         {guides.length ? (
           <section className="card p-5" id="guides">
             <h2 className="card-title">{t("guidesTitle")}</h2>
-            <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("guidesBody")}</p>
             <div className="mt-3">
               <HelpGuides categories={[...DOC_CATEGORIES]} guides={guides} />
             </div>

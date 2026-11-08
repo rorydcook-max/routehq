@@ -66,7 +66,7 @@ export function SearchForm({ action, today, words, initial, hidden = {} }: { act
         {words.kind}
         <select className={s.input} defaultValue={initial.kind} name="kind">
           <option value="">{words.anyKind}</option>
-          {words.kinds.map((kind) => (
+          {[...words.kinds].sort((a, b) => a.label.localeCompare(b.label)).map((kind) => (
             <option key={kind.value} value={kind.value}>
               {kind.label}
             </option>

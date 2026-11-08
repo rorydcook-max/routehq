@@ -297,7 +297,8 @@ function Glance({ detail, isOwner }: { detail: VehicleDetail; isOwner: boolean }
       </a>
       <a className={tile} href="#checks">
         <span className="tile-title">{tx.say("g_mileage")}</span>
-        <span className={`${value} text-[var(--foreground)]`}>{tx.say(distanceKey("km"), { km: Number(detail.vehicle.mileage || 0).toLocaleString("en-US") })}</span>
+        {/* A mileage nobody has entered yet isn't "0 km" (as on the fleet list). */}
+        <span className={`${value} text-[var(--foreground)]`}>{Number(detail.vehicle.mileage || 0) > 0 ? tx.say(distanceKey("km"), { km: Number(detail.vehicle.mileage).toLocaleString("en-US") }) : "—"}</span>
         <span className={`mt-auto font-semibold ${byDamage ? toneText.amber : toneText.neutral}`}>
           {/* "Good · checked 3 Oct 2026", or just "Last checked 3 Oct 2026"; never "Condition not set · 3 Oct". */}
           {condition?.value

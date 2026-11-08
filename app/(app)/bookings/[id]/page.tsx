@@ -479,18 +479,23 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         ].filter(Boolean);
         return {
           label: tx.say("fin_toGiveBack"),
-          detail: `${parts.join(" · ")}. ${tx.say("fin_toGiveBackHow")}`,
+          // Capitalised: with only unused rent to give back the line began "up to £330 ...".
+          detail: `${parts.join(" · ").replace(/^\p{Ll}/u, (letter) => letter.toLocaleUpperCase())}. ${tx.say("fin_toGiveBackHow")}`,
           amount: null as number | null,
           tone: "amber" as const
         };
       }
     }
     if (isCancelled) {
+      // What is still with the business: rent kept after refunds, plus any deposit not yet returned or kept. It used to
+      // show everything ever paid (deposit included, refunds ignored) and ask for a refund that had already been made.
+      const depositLeft = Math.max(0, Number(rental.deposit_held || 0) - Number(rental.deposit_refunded_amount || 0) - Number(rental.deposit_forfeited_amount || 0));
+      const stillHeld = Math.round((Math.max(0, totalPaid - rentGivenBack) + depositLeft) * 100) / 100;
       return {
         label: tx.say("fin_cancelled"),
-        detail: paidInAll > 0 ? tx.say("fin_cancelledPaid", { amount: money(paidInAll, rental.currency) }) : tx.say("fin_cancelledNothing"),
+        detail: stillHeld > 0 ? tx.say("fin_cancelledPaid", { amount: money(stillHeld, rental.currency) }) : paidInAll > 0 ? tx.say("fin_cancelledSettled") : tx.say("fin_cancelledNothing"),
         amount: null as number | null,
-        tone: paidInAll > 0 ? ("amber" as const) : ("neutral" as const)
+        tone: stillHeld > 0 ? ("amber" as const) : ("neutral" as const)
       };
     }
     if (needsExistingRentalPaymentSetup) {
@@ -872,7 +877,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   rentalId={rental.id}
                   organizationId={organization.id}
                   vehicleId={String(rental.vehicle_id || vehicle?.id || "")}
-                  totalPaid={totalPaid}
+                  totalPaid={Math.max(0, Math.round((totalPaid - rentGivenBack) * 100) / 100)}
                   depositHeld={Math.max(0, Number(rental.deposit_held || 0) - Number(rental.deposit_refunded_amount || 0) - Number(rental.deposit_forfeited_amount || 0))}
                   currency={rental.currency || "THB"}
                   rentalRate={Number(rental.rental_rate || 0)}
@@ -1000,8 +1005,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     {/* The form itself opens from "Start handover" at the top of the page. */}
                     <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} needsName={!rental.customer_id} rentalId={rental.id} />
                   </div>
-                ) : isRetrospective ? (
-                  // Retrospective, already active, no inspection: soft prompt
+                ) : isRetrospective && !isClosed ? (
+                  // Retrospective, already active, no inspection: soft prompt (not once it is returned: the amber
+                  // "No handover form" and its button stayed on finished rentals)
                   <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
                     <div className="flex items-center gap-2 font-semibold text-[var(--warning)]">
                       <AlertTriangle className="text-[var(--warning)]" size={18} />
@@ -1029,6 +1035,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} needsName={!rental.customer_id} rentalId={rental.id} />
                   </div>
                 ) : rental.status === "completed" ? (
+                  <div className="sub-surface p-3">
+                    <p className="font-semibold text-[var(--foreground)]">{tx.say("noHandoverDone")}</p>
+                  </div>
+                ) : isCancelled && (isRetrospective || rental.mileage_at_delivery != null) ? (
+                  // Canceled while it was out (a rental already under way when it was entered): it did go out.
                   <div className="sub-surface p-3">
                     <p className="font-semibold text-[var(--foreground)]">{tx.say("noHandoverDone")}</p>
                   </div>
@@ -1369,7 +1380,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   depositRefunded={Number(rental.deposit_refunded_amount || 0)}
                   depositForfeited={Number(rental.deposit_forfeited_amount || 0)}
                   depositStatus={String(rental.deposit_status || "pending")}
-                  totalPaid={totalPaid}
+                  totalPaid={Math.max(0, Math.round((totalPaid - rentGivenBack) * 100) / 100)}
                   currency={rental.currency || "THB"}
                   rentalStatus={displayStatus}
                   canRefund={isOwner}
@@ -1435,14 +1446,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 </>
               ) : (
                 <div className="space-y-3">
-                  <div className="rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)] p-3">
-                    <div className="flex items-start gap-2">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)]">
-                        <Clock className="text-[var(--primary)]" size={16} />
-                      </span>
-                      <p className="text-sm leading-6 text-[var(--primary)]">{tx.say("awaitingBody")}</p>
-                    </div>
-                  </div>
+                  {/* The heading already says it is waiting for the customer; the long how-it-works note was filler. */}
                   <AssignCustomerModal
                     customers={allCustomers}
                     organizationId={organization.id}

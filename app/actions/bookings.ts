@@ -2970,7 +2970,16 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   const vehicleId       = String(formData.get("vehicleId") || "").trim();
   const reasonRaw       = String(formData.get("reason") || "").trim();
   const reason          = reasonRaw;
-  const reasonLabel     = reasonRaw.split(",").map(r => r.replace(/_/g, " ")).join(" + ");
+  // Written into money notes people read ("Rental refund on cancellation — canceled by us"), not the stored code
+  // with its underscores swapped for spaces ("operator cancelled").
+  const reasonWords: Record<string, string> = {
+    customer_cancelled_before_delivery: "customer canceled before handover",
+    customer_cancelled_early: "customer ended the rental early",
+    vehicle_breakdown: "vehicle breakdown or fault",
+    operator_cancelled: "canceled by us",
+    other: "other reason"
+  };
+  const reasonLabel     = reasonRaw.split(",").map(r => reasonWords[r] || r.replace(/_/g, " ")).join(" + ");
   const refundOption    = String(formData.get("refundOption") || "").trim();
   const partialRefund   = Number(formData.get("partialRefundAmount") || 0);
   const partialDeposit  = Number(formData.get("partialDepositReturn") || 0);
@@ -3014,9 +3023,22 @@ export async function cancelBookingWithDisposition(formData: FormData) {
     .in("type", ["rental_income", "deposit_received"])
     .is("deleted_at", null);
 
-  const totalPaidIncome = (paidTransactions || [])
-    .filter((t: any) => t.type === "rental_income")
-    .reduce((sum: number, t: any) => sum + Number(t.amount || 0), 0);
+  // Rent already given back (a refund recorded earlier) is not refunded a second time on cancelling.
+  const { data: earlierRefunds } = await supabase
+    .from("transactions")
+    .select("amount, is_deposit, metadata")
+    .eq("rental_id", rentalId)
+    .eq("organization_id", organizationId)
+    .eq("voided", false)
+    .eq("type", "refund")
+    .is("deleted_at", null);
+  const alreadyRefunded = (earlierRefunds || []).filter((t: any) => !t.is_deposit && !t.metadata?.voided).reduce((sum: number, t: any) => sum + Math.abs(Number(t.amount || 0)), 0);
+  const totalPaidIncome = Math.max(
+    0,
+    Math.round(
+      ((paidTransactions || []).filter((t: any) => t.type === "rental_income").reduce((sum: number, t: any) => sum + Math.abs(Number(t.amount || 0)), 0) - alreadyRefunded) * 100
+    ) / 100
+  );
 
   const transactionsToInsert: any[] = [];
 
@@ -3025,6 +3047,14 @@ export async function cancelBookingWithDisposition(formData: FormData) {
     const isPartialRefund = refundOption.startsWith("partial_refund");
     const returnDeposit   = refundOption.endsWith("deposit_returned");
     const retainDeposit   = refundOption.endsWith("deposit_retained");
+
+    // Money must add up: never refund more rent than was paid, nor return more deposit than is held.
+    if (isPartialRefund && partialRefund > totalPaidIncome + 0.005) {
+      throw new Error(await said(`The most you can refund is ${niceMoney(totalPaidIncome, currency)}.`));
+    }
+    if (isPartialRefund && partialDeposit > depositHeld + 0.005) {
+      throw new Error(await said(`The deposit still held is ${niceMoney(depositHeld, currency)}.`));
+    }
 
     const refundAmount = isFullRefund
       ? totalPaidIncome
@@ -3110,9 +3140,11 @@ export async function cancelBookingWithDisposition(formData: FormData) {
     deposit_status: depositStatus,
     ...(refundOption?.endsWith("deposit_returned")
       ? {
-          deposit_refunded_amount: refundOption.startsWith("partial_refund") && partialDeposit > 0
+          // Added to what was already returned: depositHeld is only what is still held, so setting it replaced an
+          // earlier part-return and the booking showed that part as still held.
+          deposit_refunded_amount: Number(rental.deposit_refunded_amount || 0) + (refundOption.startsWith("partial_refund") && partialDeposit > 0
             ? partialDeposit
-            : depositHeld,
+            : depositHeld),
           deposit_reconciled_at: now,
           deposit_reconciled_by: user.id,
           deposit_deduction_reason: notes || reason
@@ -3120,7 +3152,7 @@ export async function cancelBookingWithDisposition(formData: FormData) {
       : {}),
     ...(refundOption?.endsWith("deposit_retained") && depositHeld > 0
       ? {
-          deposit_forfeited_amount: depositHeld,
+          deposit_forfeited_amount: Number(rental.deposit_forfeited_amount || 0) + depositHeld,
           deposit_deduction_reason: notes || reason,
           deposit_reconciled_at: now,
           deposit_reconciled_by: user.id
@@ -3261,6 +3293,25 @@ export async function recordPaymentRefund(formData: FormData) {
 
   enterBusinessTimeZone(await ensureMembership(supabase, organizationId, user.id));
 
+  // Never more than was paid for this booking, less what has already been given back: nothing stopped a refund
+  // bigger than the rent taken, or the same refund being recorded twice (the form offered the full amount again).
+  {
+    const { data: moneyRows, error: moneyError } = await supabase
+      .from("transactions")
+      .select("type, amount, is_deposit, voided, metadata")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .in("type", ["rental_income", "refund"]);
+    if (moneyError) throw new Error(moneyError.message);
+    const live = (moneyRows || []).filter((row: any) => !row.voided && !row.metadata?.voided && !row.is_deposit);
+    const paidIn = live.filter((row: any) => row.type === "rental_income").reduce((sum: number, row: any) => sum + Math.abs(Number(row.amount || 0)), 0);
+    const givenBack = live.filter((row: any) => row.type === "refund").reduce((sum: number, row: any) => sum + Math.abs(Number(row.amount || 0)), 0);
+    const refundable = Math.round((paidIn - givenBack) * 100) / 100;
+    if (amount > refundable + 0.005) {
+      throw new Error(await said(`The most you can refund is ${niceMoney(Math.max(0, refundable), rental.currency)} (paid for this booking, less refunds already made).`));
+    }
+  }
+
   const { error } = await supabase
     .from("transactions")
     .insert({
@@ -3295,11 +3346,11 @@ export async function recordPaymentRefund(formData: FormData) {
     customer_id: rental.customer_id,
     event_type: "payment_refunded",
     title: "Payment refunded",
-    detail: `Refund of ${amount} ${rental.currency || "THB"} recorded.${notes ? ` Notes: ${notes}` : ""}`
+    detail: `Refund of ${niceMoney(amount, rental.currency)} recorded.${notes ? ` Notes: ${notes}` : ""}`
   });
   {
     const admin = createSupabaseAdminClient() as any;
-    await completeRentalJobs(admin, rentalId, "refund", `Refund of ${amount.toLocaleString("en-US")} recorded`);
+    await completeRentalJobs(admin, rentalId, "refund", `Refund of ${niceMoney(amount, rental.currency)} recorded`);
     // The early-return suggestion has been dealt with; stop showing it.
     const { data: flagged } = await admin.from("rental_payments").select("id, metadata").eq("rental_id", rentalId).not("metadata->early_return", "is", null);
     for (const row of flagged || []) {

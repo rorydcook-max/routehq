@@ -13,6 +13,7 @@ import { ThemePicker } from "@/components/theme-picker";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { defaultCalendarForLocale, supportedCalendarOptions } from "@/lib/i18n/calendars";
 import { operatorLocaleOptions } from "@/lib/i18n/locales";
+import { orgCountry } from "@/lib/regional";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -43,6 +44,8 @@ export default async function AccountPage() {
   const privacySettings = ((organization?.settings as Record<string, any> | null)?.privacy || {}) as { idPhotoMonths?: number; idPhotoAutoDelete?: boolean };
 
   const locale = profile?.preferred_locale || organization?.default_locale || "en";
+  const calendarNow = profile?.preferred_calendar || defaultCalendarForLocale(locale);
+  const showCalendar = locale === "th" || calendarNow === "buddhist" || orgCountry(organization) === "TH";
   const roleLabel = membership.role === "owner" ? say("roleOwner") : membership.role === "manager" ? say("roleManager") : say("roleTeammate");
 
   return (
@@ -93,17 +96,22 @@ export default async function AccountPage() {
                 ))}
               </select>
             </label>
-            <label className="block">
-              <span className={labelClass}>{say("calendar")}</span>
-              <select className={inputClass} defaultValue={profile?.preferred_calendar || defaultCalendarForLocale(locale)} name="preferredCalendar">
-                {supportedCalendarOptions.map((calendar) => (
-                  <option key={calendar.code} value={calendar.code}>
-                    {say(`calendar_${calendar.code}`)}
-                  </option>
-                ))}
-              </select>
-              <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("calendarHelp")}</span>
-            </label>
+            {/* Western or Buddhist years only matters in Thailand: elsewhere the choice is kept as is, not shown. */}
+            {showCalendar ? (
+              <label className="block">
+                <span className={labelClass}>{say("calendar")}</span>
+                <select className={inputClass} defaultValue={calendarNow} name="preferredCalendar">
+                  {supportedCalendarOptions.map((calendar) => (
+                    <option key={calendar.code} value={calendar.code}>
+                      {say(`calendar_${calendar.code}`)}
+                    </option>
+                  ))}
+                </select>
+                <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("calendarHelp")}</span>
+              </label>
+            ) : (
+              <input name="preferredCalendar" type="hidden" value={calendarNow} />
+            )}
             <PendingButton className="primary-action w-full sm:w-auto" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
               {say("save")}
             </PendingButton>

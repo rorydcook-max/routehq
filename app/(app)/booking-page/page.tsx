@@ -14,6 +14,7 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { publicBookingSettings } from "@/lib/public-catalog";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { onlineSigningGaps } from "@/lib/online-signing-readiness";
 import { vehiclePhotoUrls } from "@/lib/vehicle-photos";
 import { BookingPageTool } from "./booking-page-tool";
 
@@ -35,7 +36,7 @@ export default async function BookingPagePage() {
   const admin = createSupabaseAdminClient() as any;
 
   const [{ data: addressRow }, customPlan, { data: vehicleRates }, brandingDisplayUrls] = await Promise.all([
-    supabase.from("organizations").select("booking_subdomain, custom_domain, custom_domain_status").eq("id", organization.id).maybeSingle(),
+    supabase.from("organizations").select("*").eq("id", organization.id).maybeSingle(),
     getCustomPlan(organization.id),
     supabase.from("vehicles").select("id, make, model, trim, daily_rate, weekly_rate, monthly_rate, vehicle_categories(code, name)").eq("organization_id", organization.id).is("deleted_at", null).order("monthly_rate", { ascending: true }),
     resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true })
@@ -56,6 +57,8 @@ export default async function BookingPagePage() {
   const logoUrl =
     organization.business_logo_storage_bucket && organization.business_logo_storage_path ? "/api/branding-assets/logo" : brandingDisplayUrls.logoUrl || browserSafeAssetFallback(organization.logo_url);
   const booking = publicBookingSettings(organization.settings);
+  // Without the business's saved signature a customer who books online can't sign (they are told to wait): say so here.
+  const signingReady = addressRow ? onlineSigningGaps(addressRow).length === 0 : true;
   const businessName = String(organization.trading_name || organization.name || "");
 
   return (
@@ -82,6 +85,7 @@ export default async function BookingPagePage() {
         uploads={uploads}
         link={bookingAddress(addressOrg).url}
         logoUrl={logoUrl}
+        signingReady={signingReady}
         slug={organization.slug}
         vehicles={{ priced, total: vehicles.length }}
       />

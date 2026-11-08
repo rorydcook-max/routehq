@@ -8,6 +8,7 @@ import { answerExtensionRequest } from "@/app/actions/portal-actions";
 import type { ExtensionPicture } from "@/lib/extension-picture";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
+import { niceMoney } from "@/lib/nice-money";
 
 /**
  * The owner's side of a request to stay longer. When nothing is in the way it
@@ -31,7 +32,7 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
   const [endDate, setEndDate] = useState(blocked ? freeUntil || "" : requestedEnd || "");
   const [moveTo, setMoveTo] = useState(blocker?.options[0]?.vehicleId || "");
 
-  const money = (amount: number) => `${!picture || picture.currency === "THB" ? "฿" : `${picture.currency} `}${Math.round(amount).toLocaleString("en-US")}`;
+  const money = (amount: number) => niceMoney(amount, picture?.currency || undefined);
 
   function answer(key: string, input: { newEndDate?: string | null; openEnded?: boolean; move?: { rentalId: string; vehicleId: string } | null }) {
     setError("");

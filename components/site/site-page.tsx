@@ -244,9 +244,10 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
               <p className="text-[17px] font-bold">{data.business.name}</p>
               {data.business.address ? <p className={`${s.footerSoft} mt-1 max-w-[52ch] whitespace-pre-line text-[15px]`}>{data.business.address}</p> : null}
             </div>
-            <div className="flex items-center gap-4">
+            {/* Phones: the copyright gets its own line instead of a thin column beside the language picker. */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
               {edit ? null : <CustomerLanguagePicker />}
-              <p className={`${s.footerSoft} text-[14px]`}>{t("footer_copy", { year: new Date().getFullYear(), business: data.business.name })}</p>
+              <p className={`${s.footerSoft} basis-full text-[14px] sm:basis-auto`}>{t("footer_copy", { year: new Date().getFullYear(), business: data.business.name })}</p>
             </div>
           </div>
         </footer>

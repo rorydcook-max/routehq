@@ -90,7 +90,7 @@ export function OnboardingChecklist({
         </form>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
-        <div className="h-full rounded-full bg-[var(--primary)] transition-[width] duration-500" style={{ width: `${Math.max(progress, 4)}%` }} />
+        <div className="h-full rounded-full bg-[var(--primary)] transition-[width] duration-500" style={{ width: `${progress > 0 ? Math.max(progress, 4) : 0}%` }} />
       </div>
       <ol className="mt-3 space-y-1">
         {shown.map((item, index) => {

@@ -36,7 +36,8 @@ export function BookingPageTool({
   colour,
   businessName,
   logoUrl,
-  address
+  address,
+  signingReady = true
 }: {
   slug: string;
   link: string;
@@ -50,8 +51,10 @@ export function BookingPageTool({
   businessName: string;
   logoUrl: string | null;
   address: React.ComponentProps<typeof BookingAddressPanel>;
+  signingReady?: boolean;
 }) {
   const say = useTranslations("settingsPage") as unknown as Say;
+  const signSay = useTranslations("newBooking");
   const [tab, setTab] = useState<"edit" | "preview">("edit");
   const [device, setDevice] = useState<Device>("mobile");
   const [version, setVersion] = useState(0);
@@ -137,6 +140,16 @@ export function BookingPageTool({
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(340px,440px)_minmax(0,1fr)]">
         <div className={`space-y-3 ${tab === "edit" ? "" : "hidden lg:block"}`}>
+          {/* Online bookings stop at "the agreement isn't ready to sign" until the owner's signature is saved. */}
+          {booking.enabled && !signingReady ? (
+            <div className="rounded-[var(--radius)] bg-[var(--warning-light)] p-4" role="alert">
+              <p className="text-[17px] font-bold text-[var(--foreground)]">{signSay("signTitle")}</p>
+              <p className="mt-1 font-medium text-[var(--foreground)]">{signSay("signBody")}</p>
+              <a className="primary-action pressable mt-3 w-full sm:w-auto" href="/settings/signature?back=/booking-page">
+                {signSay("goSettings")}
+              </a>
+            </div>
+          ) : null}
           <Fold
             id="page"
             open

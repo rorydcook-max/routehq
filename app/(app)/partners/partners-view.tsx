@@ -262,6 +262,26 @@ export function PartnersView({
                 <input className={inputClass} min={addDays(startDate || today, 1)} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
               </label>
             </div>
+            {/* Or pick a rental period: it sets the end date from the start date. Next to the dates it changes, not under Search. */}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("period")}</span>
+              {PERIODS.map((period) => {
+                const end = period.days === null ? "" : addDays(startDate || today, period.days);
+                const active = endDate === end;
+                return (
+                  <button
+                    aria-pressed={active}
+                    className={`rounded-full border px-3 py-1.5 text-sm font-semibold ${active ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] text-[var(--foreground-secondary)]"}`}
+                    key={period.key}
+                    onClick={() => setEndDate(end)}
+                    type="button"
+                  >
+                    {t(period.key)}
+                  </button>
+                );
+              })}
+            </div>
+            {!endDate ? <p className="mt-2 text-sm text-[var(--muted)]">{t("endDateHint")}</p> : null}
             {/* What kind of vehicle, and the budget: all applied by the search itself. */}
             <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]">
               <label className={labelClass}>
@@ -329,26 +349,6 @@ export function PartnersView({
                 {t("searchButton")}
               </button>
             </div>
-            {/* Or pick a rental period: it sets the end date from the start date. */}
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("period")}</span>
-              {PERIODS.map((period) => {
-                const end = period.days === null ? "" : addDays(startDate || today, period.days);
-                const active = endDate === end;
-                return (
-                  <button
-                    aria-pressed={active}
-                    className={`rounded-full border px-3 py-1.5 text-sm font-semibold ${active ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] text-[var(--foreground-secondary)]"}`}
-                    key={period.key}
-                    onClick={() => setEndDate(end)}
-                    type="button"
-                  >
-                    {t(period.key)}
-                  </button>
-                );
-              })}
-            </div>
-            {!endDate ? <p className="mt-2 text-sm text-[var(--muted)]">{t("endDateHint")}</p> : null}
             {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
           </section>
 

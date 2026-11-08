@@ -2,7 +2,9 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { InfoTip } from "@/components/info-tip";
 import { MoneyInput } from "@/components/money-input";
+import { formatMoney } from "@/lib/regional";
 
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
@@ -18,8 +20,10 @@ export function RatesFields({ currency, usualDeposit = 0 }: { currency: string; 
 
   return (
     <div className="card p-4" ref={cardRef}>
-      <h2 className="card-title">{say("ratesTitle")}</h2>
-      <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("ratesBody")}</p>
+      <h2 className="card-title flex items-center gap-1.5">
+        {say("ratesTitle")}
+        <InfoTip label={say("ratesTitle")} text={say("ratesBody")} />
+      </h2>
       <div className="mt-3 grid gap-4 sm:grid-cols-3">
         <label className="block">
           <span className={labelClass}>{say("daily")}</span>
@@ -37,7 +41,7 @@ export function RatesFields({ currency, usualDeposit = 0 }: { currency: string; 
       <label className="mt-4 block sm:max-w-xs">
         <span className={labelClass}>{say("deposit")}</span>
         <MoneyInput currency={currency} name="depositAmount" />
-        <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: `฿${usualDeposit.toLocaleString("en-US")}` }) : say("depositHintNone")}</span>
+        <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: formatMoney(usualDeposit, currency, "en-US") }) : say("depositHintNone")}</span>
       </label>
     </div>
   );

@@ -109,7 +109,9 @@ function deliveryText(rental: any, bookingData: Record<string, unknown>, t: T, l
 
   return {
     location: location ? `${methodLabel}:\n${displayLocation}${mapsUrl ? `\n${mapsUrl}` : ""}` : method === "tbd" ? methodLabel : `${methodLabel}\n${t("placeToBeConfirmed")}`,
-    time: formatDeliveryDateTime(dateTime, t, locale)
+    time: formatDeliveryDateTime(dateTime, t, locale),
+    // "Handover to be arranged" already says the time is open too: no second "To be confirmed" line under it.
+    arrangeLater: method === "tbd" && !location && !dateTime
   };
 }
 
@@ -415,7 +417,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
             {handedOver ? null : <Info icon={ReceiptText} label={t("firstPaymentDue")} value={paymentDueText(rental, bookingData, t, locale)} />}
             {/* Where and when in one tile, so no tile is left alone on the last row. */}
-            {handedOver ? null : <Info icon={MapPin} label={t("handover")} more={{ icon: Clock, label: t("handoverTime"), value: delivery.time }} value={delivery.location} />}
+            {handedOver ? null : <Info icon={MapPin} label={t("handover")} more={delivery.arrangeLater ? undefined : { icon: Clock, label: t("handoverTime"), value: delivery.time }} value={delivery.location} />}
           </div>
     </>
   );

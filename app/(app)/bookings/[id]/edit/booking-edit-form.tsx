@@ -15,6 +15,9 @@ import { toWallTime } from "@/lib/business-time";
 import { longDate } from "@/lib/i18n/dates";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places";
+import { niceMoney } from "@/lib/nice-money";
+import { businessCountry } from "@/lib/business-units";
+import { currencySymbol } from "@/components/currency-symbol";
 
 // The wording for this screen is in locales/<language>/common.json under
 // "bookingEdit"; billing periods, delivery choices and included items reuse "newBooking".
@@ -47,18 +50,18 @@ const includedOptions = [
 
 const paymentStatusOptions = ["pending", "paid", "overdue", "waived", "scheduled", "cancelled", "refunded", "reconciled"];
 const pricingOptions = ["daily", "weekly", "monthly", "custom"];
-const currencies = ["THB", "USD", "IDR", "PHP", "MYR", "SGD", "VND", "AUD", "GBP", "EUR"];
-const moneySymbol = "฿";
+// A to Z (THB used to lead the list for every business).
+const currencies = ["AUD", "EUR", "GBP", "IDR", "MYR", "PHP", "SGD", "THB", "USD", "VND"];
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 const sectionTitle = "card-title";
 
+// The booking's own currency: "£45.50", never "45 GBP" with the pence dropped.
 function money(value: unknown, currency = "THB") {
-  const amount = Math.round(Number(value || 0)).toLocaleString("en-US");
-  return currency === "THB" ? `${moneySymbol}${amount}` : `${amount} ${currency}`;
+  return niceMoney(value, currency);
 }
 
 function moneyInput(value: unknown) {
-  return Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: 0 });
+  return Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: 2 });
 }
 
 function parseMoneyInput(value: string) {
@@ -93,8 +96,9 @@ function isVoidedPayment(payment: any) {
 }
 
 const loadGooglePlaces = loadSharedGooglePlaces;
-function MoneyField({ label, name, value, required = false }: { label: string; name: string; value: unknown; required?: boolean }) {
+function MoneyField({ label, name, value, currency, required = false }: { label: string; name: string; value: unknown; currency: string; required?: boolean }) {
   const [display, setDisplay] = useState(moneyInput(value));
+  const moneySymbol = currencySymbol(currency);
   return (
     <label className="block">
       <span className={labelClass}>{label}</span>
@@ -102,7 +106,7 @@ function MoneyField({ label, name, value, required = false }: { label: string; n
         <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-[var(--foreground-secondary)]">{moneySymbol}</span>
         <input
           className="w-full"
-          inputMode="numeric"
+          inputMode="decimal"
           name={name}
           onBlur={() => setDisplay(moneyInput(parseMoneyInput(display)))}
           onChange={(event) => setDisplay(event.target.value)}
@@ -338,7 +342,7 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
                 </label>
                 <label className="block">
                   <span className={labelClass}>{say("p_f_amount")}</span>
-                  <input className="mt-1 w-full" defaultValue={moneyInput(payment.amount)} inputMode="numeric" name="amount" required />
+                  <input className="mt-1 w-full" defaultValue={moneyInput(payment.amount)} inputMode="decimal" name="amount" required />
                 </label>
                 <label className="block">
                   <span className={labelClass}>{say("p_f_due")}</span>
@@ -406,7 +410,7 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
           </label>
           <label className="block">
             <span className={labelClass}>{say("p_f_amount")}</span>
-            <input className="mt-1 w-full" inputMode="numeric" name="amount" placeholder="0" required />
+            <input className="mt-1 w-full" inputMode="decimal" name="amount" placeholder="0" required />
           </label>
           <label className="block">
             <span className={labelClass}>{say("p_f_due")}</span>
@@ -553,7 +557,6 @@ export function BookingEditForm({
               <input name="depositHeld" type="hidden" value={String(Number(rental.deposit_held || 0))} />
               <div className="mt-2.5">
                 <FixedTile label={say("t_depositHeld")} value={money(rental.deposit_held, currency)} />
-                <p className="mt-1.5 font-medium text-[var(--muted)]">{say("t_depositHeldHint")}</p>
               </div>
             </section>
           ) : (
@@ -600,14 +603,13 @@ export function BookingEditForm({
                       ))}
                     </select>
                   </label>
-                  <MoneyField label={say("t_rate")} name="rentalRate" required value={rental.rental_rate} />
-                  <MoneyField label={say("t_depositAgreed")} name="depositAmount" value={rental.deposit_amount} />
+                  <MoneyField currency={currency} label={say("t_rate")} name="rentalRate" required value={rental.rental_rate} />
+                  <MoneyField currency={currency} label={say("t_depositAgreed")} name="depositAmount" value={rental.deposit_amount} />
                 </div>
                 {/* What is held changes only when money is recorded, so the books always say where the deposit is. */}
                 <input name="depositHeld" type="hidden" value={String(Number(rental.deposit_held || 0))} />
                 <div className="mt-3">
                   <FixedTile label={say("t_depositHeld")} value={money(rental.deposit_held, currency)} />
-                  <p className="mt-1.5 font-medium text-[var(--muted)]">{say("t_depositHeldHint")}</p>
                 </div>
               </section>
             </>
@@ -633,7 +635,6 @@ export function BookingEditForm({
                   <label className="block">
                     <span className={labelClass}>{say("d_when")}</span>
                     <input className="mt-1 w-full" defaultValue={dateTimeInput(deliveryDateTime)} name="deliveryDateTime" type="datetime-local" />
-                    <span className="mt-1 block font-medium text-[var(--muted)]">{say("d_whenHint")}</span>
                   </label>
                 </>
               ) : null}
@@ -649,9 +650,12 @@ export function BookingEditForm({
                   const kind = kindFromCategory(vehicle?.vehicle_categories);
                   const fourWheels = kind === "car" || kind === "van";
                   const twoWheels = kind === "motorbike" || kind === "scooter" || kind === "ebike";
-                  const bikeOnly = ["Helmet", "Second helmet", "Rain poncho"].includes(item);
+                  // Same list as the new-booking form (a phone holder is a two-wheeler extra there too).
+                  const bikeOnly = ["Helmet", "Second helmet", "Phone holder", "Rain poncho"].includes(item);
                   const carOnly = item === "Car seat";
                   if (!selectedItems.includes(item) && ((fourWheels && bikeOnly) || (twoWheels && carOnly))) return null;
+                  // Thailand's compulsory insurance (Por Ror Bor) means nothing elsewhere.
+                  if (!selectedItems.includes(item) && item === includedOptions[1] && businessCountry() !== "TH") return null;
                   return (
                     <label className="checkbox-label min-h-11 rounded-xl bg-[var(--panel-secondary)] px-3.5 py-[11px] font-semibold text-[var(--foreground)]" key={item}>
                       <input className="flex-shrink-0" defaultChecked={selectedItems.includes(item)} name="includedItems" type="checkbox" value={item} />

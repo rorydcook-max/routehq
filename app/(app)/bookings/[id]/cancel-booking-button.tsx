@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type ReactNode } from "react";
 import { currencySymbol } from "@/components/currency-symbol";
+import { InfoTip } from "@/components/info-tip";
 import { createPortal } from "react-dom";
 import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
@@ -139,6 +140,13 @@ export function CancelBookingButton({
     if (!refundOption) { setError(say("cn_pickRefund")); return; }
     if (refundOption.startsWith("partial_refund") && !partialRefundAmount) {
       setError(say("cn_enterRefund")); return;
+    }
+    // Said here, before the summary promises "Refund £900" on £855 paid (the save refuses it anyway).
+    if (refundOption.startsWith("partial_refund") && Number(partialRefundAmount) > totalPaid + 0.005) {
+      setError(say("cn_refundTooMuch", { amount: money(totalPaid, currency) })); return;
+    }
+    if (refundOption.startsWith("partial_refund") && Number(partialDepositReturn || 0) > depositHeld + 0.005) {
+      setError(say("cn_depositTooMuch", { amount: money(depositHeld, currency) })); return;
     }
     setError("");
     setStep(isPreDelivery ? "confirm" : "vehicle");
@@ -302,7 +310,7 @@ export function CancelBookingButton({
                 <>
                   <div>
                     <p className="text-sm font-semibold text-[var(--foreground)] mb-1">{say("cn_why")}</p>
-                    <p className="text-xs text-[var(--muted)] mb-3">{say("cn_selectAll")}</p>
+                    
                     <div className="space-y-2">
                       {reasonOptions.map(r => (
                         <button
@@ -341,10 +349,7 @@ export function CancelBookingButton({
                   </label>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_when")}</span>
-                      <p className="mb-1 text-[11px] text-[var(--muted)]">
-                        {say("cn_whenHint")}
-                      </p>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_when")}<InfoTip label={say("cn_when")} text={say("cn_whenHint")} /></span>
                       <input
                         className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--danger)]"
                         onChange={(event) => setCancelledAt(event.target.value)}
@@ -355,9 +360,6 @@ export function CancelBookingButton({
                     {isPreDelivery ? null : (
                     <label className="block">
                       <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_collect")}</span>
-                      <p className="mb-1 text-[11px] text-[var(--muted)]">
-                        {say("cn_collectHint")}
-                      </p>
                       <input
                         className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--danger)]"
                         onChange={(event) => setCollectionDatetime(event.target.value)}
@@ -372,10 +374,7 @@ export function CancelBookingButton({
 
               {step === "disposition" && (
                 <div>
-                  <p className="text-sm font-semibold text-[var(--foreground)] mb-1">{say("cn_how")}</p>
-                  <p className="text-xs text-[var(--muted)] mb-3">
-                    {say("cn_howHint")}
-                  </p>
+                  <p className="mb-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground)]">{say("cn_how")}<InfoTip label={say("cn_how")} text={say("cn_howHint")} /></p>
                   <div className="space-y-2">
                     {REFUND_OPTIONS.map(opt => (
                       <div
@@ -443,7 +442,7 @@ export function CancelBookingButton({
               {step === "vehicle" && (
                 <div>
                   <p className="mb-1 text-sm font-semibold text-[var(--foreground)]">{say("cn_vehQ")}</p>
-                  <p className="mb-3 text-xs text-[var(--muted)]">{say("cn_vehHint")}</p>
+                  
                   <div className="space-y-2">
                     {([
                       {

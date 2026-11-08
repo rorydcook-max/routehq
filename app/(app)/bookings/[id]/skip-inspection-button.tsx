@@ -7,6 +7,7 @@ import type { EarlyStart, EarlyStartChoice } from "@/lib/early-start";
 import type { LateStart, LateStartChoice } from "@/lib/late-start";
 import { longDate } from "@/lib/i18n/dates";
 import { useLocale } from "next-intl";
+import { niceMoney } from "@/lib/nice-money";
 
 export function SkipInspectionButton({ rentalId, early = null, late = null, canWaive = true, needsName = false }: { rentalId: string; early?: EarlyStart | null; late?: LateStart | null; canWaive?: boolean; /** No customer on the booking yet: ask who is taking it. */ needsName?: boolean }) {
   const [customerName, setCustomerName] = useState("");
@@ -42,7 +43,7 @@ export function SkipInspectionButton({ rentalId, early = null, late = null, canW
             <div className="mt-1 space-y-1">
               {(
                 [
-                  early.amount > 0 ? { value: "charge", label: ask("earlyCharge", { days: early.days, amount: `฿${early.amount.toLocaleString("en-US")}` }) } : null,
+                  early.amount > 0 ? { value: "charge", label: ask("earlyCharge", { days: early.days, amount: niceMoney(early.amount) }) } : null,
                   early.shortenedEnd ? { value: "shorten", label: ask("earlyShorten", { date: longDate(early.shortenedEnd, locale) }) } : null,
                   { value: "free", label: canWaive || early.amount <= 0 ? (early.bookedEnd ? ask("earlyFreeBack", { date: longDate(early.bookedEnd, locale) }) : ask("earlyFree")) : ask("earlyAskFree") }
                 ].filter(Boolean) as { value: EarlyStartChoice; label: string }[]
@@ -72,7 +73,7 @@ export function SkipInspectionButton({ rentalId, early = null, late = null, canW
                     label: late.openEnded
                       ? ask("lateFromTodayMoves", { days: late.days })
                       : late.credit > 0
-                        ? ask("lateFromToday", { date: longDate(late.bookedEnd || "", locale), amount: `฿${late.credit.toLocaleString("en-US")}` })
+                        ? ask("lateFromToday", { date: longDate(late.bookedEnd || "", locale), amount: niceMoney(late.credit) })
                         : ask("lateFromTodayPlain", { date: longDate(late.bookedEnd || "", locale) })
                   },
                   { value: "as_booked", label: ask("lateAsBooked", { date: longDate(late.bookedStart, locale) }) }

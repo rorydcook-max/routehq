@@ -1,4 +1,5 @@
 import { getLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 import { InspectionForm } from "@/components/inspection-form";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -12,6 +13,11 @@ export default async function ReturnInspectionPage({ params, searchParams }: { p
   const [userEmail, organization, locale] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization(), getLocale()]);
   // ?swap=1&vehicle=...: collecting the original vehicle after a change of vehicle; the rental carries on.
   const context = await getInspectionContextByRental(rentalId, organization.id, "return", query.swap === "1" ? { vehicleId: query.vehicle || null } : undefined);
+  // A rental already returned (or cancelled) has nothing to take back: opening the link again (browser history, an old
+  // tab) walked through a second return form, "Deposit already given back", and saved a duplicate.
+  if (query.swap !== "1" && ["completed", "cancelled"].includes(String((context as any).rental?.status || ""))) {
+    redirect(`/bookings/${rentalId}`);
+  }
 
   // Damage noted at delivery may have been typed in another language; show it
   // to whoever does the return in theirs (the original stays alongside).

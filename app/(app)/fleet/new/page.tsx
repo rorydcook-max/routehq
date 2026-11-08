@@ -50,7 +50,8 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
   const firstCodes = fleetType === "motorcycles" ? ["scooter", "motorcycle"] : ["car"];
   const categories = [...allCategories].sort((a, b) => {
     const rank = (code: string) => (firstCodes.includes(code) ? firstCodes.indexOf(code) : firstCodes.length);
-    return rank(a.code) - rank(b.code);
+    // The kinds the business rents first, then the rest alphabetically (codes sort like their English names).
+    return rank(a.code) - rank(b.code) || a.code.localeCompare(b.code);
   });
   const preferredLocale = profile?.preferred_locale || organization.default_locale || "en";
   const preferredCalendar = profile?.preferred_calendar || defaultCalendarForLocale(preferredLocale);
@@ -89,7 +90,6 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
               </Link>
             ) : null}
           </div>
-          <p className="page-subtitle page-subtitle-keep mt-1">{quick ? say("quickSubtitle") : say("addSubtitle")}</p>
         </div>
 
         <form action={createVehicle} className="space-y-3">
@@ -98,15 +98,12 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
 
           <VehicleIdentityFields categories={categories} country={(organization as any).country_code} initialMakes={vehicleMakes || []} inputClass={inputClass} />
 
-          {quick ? (
-            <section className="card p-4">
-              <QuickPhotos />
-            </section>
-          ) : null}
+          {/* Photos on both forms: a vehicle without one shows a blank card on the booking page. */}
+          <section className="card p-4">
+            <QuickPhotos />
+          </section>
 
           <RatesFields currency={currency} usualDeposit={Number(organizationSettings?.settings?.public_booking?.deposit || 0)} />
-
-          {quick ? <p className="px-1 font-medium text-[var(--foreground-secondary)]">{say("quickLater")}</p> : null}
 
           {/* Everything below can wait: one tap away, filled in any time. The short form leaves it out altogether. */}
           {quick ? null : (<>

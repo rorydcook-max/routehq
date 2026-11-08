@@ -224,8 +224,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const now = new Date();
   const today = businessToday();
   const weekAhead = addDays(today, 7);
-  const bangkokHour = (now.getUTCHours() + 7) % 24;
-  const greeting = bangkokHour < 12 ? t("goodMorning") : bangkokHour < 18 ? t("goodAfternoon") : t("goodEvening");
+  // The hour where the business is (it was always Bangkok's: "Good morning" in Miami at 8 pm).
+  const businessHour = Number(new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: businessTimeZone() }).format(now)) % 24;
+  const greeting = businessHour < 12 ? t("goodMorning") : businessHour < 18 ? t("goodAfternoon") : t("goodEvening");
   const headerDate = dateFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: businessTimeZone() }).format(now);
 
   // ── Money ────────────────────────────────────────────────────────────────

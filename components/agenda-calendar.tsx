@@ -166,9 +166,18 @@ export function AgendaCalendar({
       ? fmt(locale, { weekday: "long", day: "numeric", month: "long" }).format(asDate(anchor))
       : view === "month"
         ? fmt(locale, { month: "long", year: "numeric" }).format(asDate(monthStart))
-        : span.from.slice(0, 7) === span.to.slice(0, 7)
-          ? `${asDate(span.from).getUTCDate()} – ${fmt(locale, { day: "numeric", month: "short" }).format(asDate(span.to))}`
-          : `${fmt(locale, { day: "numeric", month: "short" }).format(asDate(span.from))} – ${fmt(locale, { day: "numeric", month: "short" }).format(asDate(span.to))}`;
+        : // The date order follows the business: "Nov 7 – 13" month-first in the US ("7 – Nov 13" before), "8 – 14 Nov" elsewhere.
+          (() => {
+            // Usually an Intl.DateTimeFormat; the languages with their own month names (lib/i18n/dates.ts) have no formatRange.
+            const shortDay = fmt(locale, { day: "numeric", month: "short" }) as { format: (date: Date) => string; formatRange?: (from: Date, to: Date) => string };
+            try {
+              // Spaces evened out: the server's and the browser's ICU put thin or plain spaces around the dash, which broke hydration.
+              if (typeof shortDay.formatRange === "function") return shortDay.formatRange(asDate(span.from), asDate(span.to)).replace(/\s*[–-]\s*/g, " – ").replace(/\s+/g, " ");
+            } catch {
+              // Older browsers: the two dates in full below.
+            }
+            return `${shortDay.format(asDate(span.from))} – ${shortDay.format(asDate(span.to))}`;
+          })();
   const atToday = view === "month" ? anchor.slice(0, 7) === today.slice(0, 7) : anchor === today;
 
   const row = (event: CalendarEvent, late: boolean) => (

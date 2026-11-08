@@ -9,6 +9,7 @@ import { receiptOf } from "@/lib/payment-receipts";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
+import { niceMoney } from "@/lib/nice-money";
 
 type Result = { ok: true; paid: number; receiptWaiting: boolean } | { ok: false; error: string };
 
@@ -64,7 +65,7 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
   const who = rental.customers?.full_name || "The customer";
   const when = rental.end_date ? `${niceDate(rental.start_date)} to ${niceDate(rental.end_date)}` : `from ${niceDate(rental.start_date)}, monthly`;
   const currency = String(rental.currency || "THB");
-  const money = `${currency === "THB" ? "฿" : `${currency} `}${paid.toLocaleString("en-US")}`;
+  const money = niceMoney(paid, currency);
   const settle = paid > 0 ? ` They have paid ${money}: decide what to refund.` : receiptWaiting ? " They sent a payment receipt that has not been checked yet." : "";
   const detail = `${who} canceled their booking for the ${vehicle} (${when}) from their booking link.${reason ? ` Their reason: "${reason}".` : ""} The dates are free again.${settle}`;
 

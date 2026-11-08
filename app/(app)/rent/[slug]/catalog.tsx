@@ -169,6 +169,8 @@ export function Catalog({
     [vehicles, startDate, end, days, datesReady, gapDays]
   );
   const freeCount = rows.filter((row) => row.free).length;
+  // "2 of 3 available": only what can actually be booked for this choice (a vehicle not offered monthly is free, not available).
+  const bookableCount = rows.filter((row) => row.free && row.bookable).length;
   // The first vehicle to come free when none are (rows are sorted by that date).
   const earliest = rows.find((row) => row.freeFrom) || null;
 
@@ -291,8 +293,8 @@ export function Catalog({
             : !datesReady
               ? t("chooseDatesToSee")
               : end
-                ? t("freeCountDates", { free: freeCount, total: vehicles.length, start: shortDate(startDate, locale), end: shortDate(end, locale) })
-                : t("freeCountMonthly", { free: freeCount, total: vehicles.length, start: shortDate(startDate, locale) })}
+                ? t("freeCountDates", { free: bookableCount, total: vehicles.length, start: shortDate(startDate, locale), end: shortDate(end, locale) })
+                : t("freeCountMonthly", { free: bookableCount, total: vehicles.length, start: shortDate(startDate, locale) })}
         </p>
       )}
 

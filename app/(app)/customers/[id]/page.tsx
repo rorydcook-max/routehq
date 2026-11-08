@@ -64,7 +64,8 @@ const STATUS_TONE: Record<string, "neutral" | "green" | "amber" | "red" | "blue"
 
 // In the business's own currency (was always baht).
 function money(value: unknown) {
-  return formatMoney(Math.round(Number(value || 0)), businessCurrency(), "en-US");
+  // Exact, pence kept when there are any: the timeline said "Payment £271" for £270.75.
+  return formatMoney(Math.round(Number(value || 0) * 100) / 100, businessCurrency(), "en-US");
 }
 
 function formatDate(value: string | null | undefined, cx: Cx) {

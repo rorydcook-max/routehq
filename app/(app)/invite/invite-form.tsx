@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { inviteUser, type AuthActionState } from "@/app/actions/auth";
 import { operatorLocaleOptions } from "@/lib/i18n/locales";
 import { APP_ROLES } from "@/lib/auth/role-types";
@@ -11,6 +11,7 @@ const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
 export function InviteForm() {
   const say = useTranslations("settingsPage") as unknown as (key: string) => string;
+  const locale = useLocale();
   const [state, formAction, pending] = useActionState(inviteUser, initialState);
   // Kept in state so a failed invite doesn't wipe the address (the form resets plain fields after
   // every submit); it is only cleared once the invite has gone.
@@ -42,10 +43,11 @@ export function InviteForm() {
       </fieldset>
       <label className="block">
         <span className={labelClass}>{say("iv_language")}</span>
-        <select className="mt-1 w-full" defaultValue="th" name="preferredLocale">
-          {operatorLocaleOptions.map((locale) => (
-            <option key={locale.code} value={locale.code}>
-              {locale.label}
+        {/* Starts on the inviter's own language (it was always Thai, whatever the business's country). */}
+        <select className="mt-1 w-full" defaultValue={locale} name="preferredLocale">
+          {operatorLocaleOptions.map((option) => (
+            <option key={option.code} value={option.code}>
+              {option.label}
             </option>
           ))}
         </select>

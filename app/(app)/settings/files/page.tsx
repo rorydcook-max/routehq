@@ -25,7 +25,8 @@ export default async function FilesSettingsPage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto w-full max-w-4xl">
+      {/* Left-aligned like the other Settings pages (it sat centered, its back link and title out of line with theirs). */}
+      <div className="w-full max-w-4xl">
         <div className="page-hero mb-4">
           <BackLink href="/settings?tab=business" label={settings("title")} />
           <h1 className="page-title">{say("filesTitle")}</h1>

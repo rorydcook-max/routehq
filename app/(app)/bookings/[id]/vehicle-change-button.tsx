@@ -7,6 +7,7 @@ import { shortDate } from "@/lib/i18n/dates";
 import { X } from "lucide-react";
 import { createVehicleChange, getVehicleChangeOptions, type VehicleChangeOptions } from "@/app/actions/amendments";
 import { AmendmentLinkPanel } from "@/components/rental-adjustment-modal";
+import { niceMoney } from "@/lib/nice-money";
 
 // These are saved on the form the customer signs, so the saved text stays as it is; only what staff see is translated.
 const REASONS = ["Breakdown or fault", "Customer asked for a different vehicle", "Service or repair due", "Exchange between customers", "Other"];
@@ -60,7 +61,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
   const moveIn = choice.startsWith("move:") ? options?.moveIn.find((item) => item.vehicleId === choice.slice(5)) : null;
   const free = choice.startsWith("free:") ? options?.free.find((item) => item.vehicleId === choice.slice(5)) : moveIn;
   const range = (start: string, end: string | null) => (end ? `${shortDate(start, locale)} – ${shortDate(end, locale)}` : say("vc_fromOpen", { date: shortDate(start, locale) }));
-  const money = (amount: number) => `${!options || options.currency === "THB" ? "฿" : `${options.currency} `}${Math.round(amount).toLocaleString("en-US")}`;
+  const money = (amount: number) => niceMoney(amount, options?.currency || undefined);
 
   const priceText = (amount: number, pricing: string) => say(`ratePer_${["daily", "weekly", "monthly"].includes(pricing) ? pricing : "other"}`, { amount: money(amount) });
 

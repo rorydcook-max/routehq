@@ -11,6 +11,8 @@ export type InspectionContext = {
   unpaidPayments: any[];
   /** True when the booking has any rent/deposit rows at all. */
   hasPaymentSchedule?: boolean;
+  /** The charge for days before the booked start is already on the booking (cash taken earlier in this handover). */
+  earlyChargeWritten?: boolean;
   vehicle: any;
   customer: any | null;
   gpsDevice: any | null;
@@ -171,6 +173,23 @@ export async function getInspectionContextByRental(
   const handover = handoverIsForThisVehicle ? latestHandover : null;
   const vehicleWasChanged = Boolean(rental.original_vehicle_id && rental.original_vehicle_id !== rental.vehicle_id);
   const rentalForForm = vehicleWasChanged ? { ...rental, mileage_at_delivery: handover?.odometer_reading ?? null } : rental;
+  // Cash taken at an early handover writes the early-days charge straight away. Opened again (a reload, the phone
+  // locked), the form added that charge a second time on top of the schedule that already holds it.
+  const earlyChargeWritten =
+    mode === "delivery" && Number(scheduleCountResult.count || 0) > 0
+      ? Boolean(
+          (
+            await supabase
+              .from("rental_payments")
+              .select("id")
+              .eq("organization_id", organizationId)
+              .eq("rental_id", rentalId)
+              .is("deleted_at", null)
+              .not("metadata->early_start", "is", null)
+              .limit(1)
+          ).data?.length
+        )
+      : false;
 
   return {
     mode,
@@ -178,6 +197,7 @@ export async function getInspectionContextByRental(
     rental: rentalForForm,
     unpaidPayments: Array.isArray(unpaidPaymentsResult.data) ? unpaidPaymentsResult.data : unpaidPaymentsResult.data ? [unpaidPaymentsResult.data] : [],
     hasPaymentSchedule: Number(scheduleCountResult.count || 0) > 0,
+    earlyChargeWritten,
     vehicle: rental.vehicles,
     customer: rental.customers || null,
     gpsDevice: gpsResult.data || null,

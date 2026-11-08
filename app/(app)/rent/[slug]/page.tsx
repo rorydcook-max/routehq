@@ -8,7 +8,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { ratesFrom, visitorCurrency } from "@/lib/visitor-currency";
 import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 import { renterUrl } from "@/lib/booking-address";
-import { permanentRedirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { SitePage } from "@/components/site/site-page";
@@ -21,6 +21,18 @@ import type { SiteConfig } from "@/lib/sites/config";
 export const dynamic = "force-dynamic";
 
 type Query = { from?: string; to?: string; vehicle?: string; via?: string; embed?: string; ref?: string; draft?: string; edit?: string };
+
+/** The business's current address when `slug` is one it used before, else null. */
+async function renamedSlug(slug: string): Promise<string | null> {
+  const { data } = await (createSupabaseAdminClient() as any)
+    .from("organizations")
+    .select("slug")
+    .contains("settings", { previous_slugs: [slug] })
+    .is("deleted_at", null)
+    .limit(1)
+    .maybeSingle();
+  return data?.slug && data.slug !== slug ? String(data.slug) : null;
+}
 
 /** The signed-in owner of this business: they see the draft (and can preview while the page is off). */
 async function isOwnerOf(organizationId: string) {
@@ -41,12 +53,15 @@ async function siteMeta(config: SiteConfig, input: { name: string; place: string
 export async function generateMetadata({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<Query> }): Promise<Metadata> {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
   const catalog = await getPublicCatalog(slug);
+  // No such business (and not an old address of one, which the page redirects): a 404 status, decided here because
+  // the page itself streams (rent/loading.tsx) and its notFound() comes after a 200 has been sent.
+  if (!catalog && !(await renamedSlug(slug))) notFound();
   const t = await getTranslations("customer");
   // One address for search engines (Rory, 1 Nov 2026): the business's own domain or subdomain when it has one,
   // else rove.rent/<slug>, however the page was reached.
   const canonical = catalog && catalog.enabled ? catalog.canonicalUrl : `${renterUrl()}/${slug}`;
   // The owner's draft preview is never indexed.
-  const robots = query.draft || query.edit ? { robots: { index: false, follow: false } } : {};
+  const robots = query.draft || query.edit || !catalog || !catalog.enabled ? { robots: { index: false, follow: false } } : {};
   if (!catalog || !catalog.enabled) return { title: catalog ? `${catalog.name} · ${t("bookAVehicle")}` : t("bookAVehicle"), alternates: { canonical }, ...robots };
   const kinds = catalog.vehicles.map((vehicle) => vehicle.kind);
   const row = await loadSiteRow(catalog.organizationId, catalog.settings, kinds);
@@ -99,18 +114,13 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
 
   if (!catalog) {
     // A business that changed its address: its old links send people to the new one (Rory, 1 Nov 2026).
-    const { data: renamed } = await (createSupabaseAdminClient() as any)
-      .from("organizations")
-      .select("slug")
-      .contains("settings", { previous_slugs: [slug] })
-      .is("deleted_at", null)
-      .limit(1)
-      .maybeSingle();
-    if (renamed?.slug && renamed.slug !== slug) {
+    const renamed = await renamedSlug(slug);
+    if (renamed) {
       const rest = new URLSearchParams(Object.entries(query).filter(([, value]) => typeof value === "string") as Array<[string, string]>).toString();
-      permanentRedirect(`/rent/${renamed.slug}${rest ? `?${rest}` : ""}`);
+      permanentRedirect(`/rent/${renamed}${rest ? `?${rest}` : ""}`);
     }
-    return <Notice message={t("catalogNotFoundMessage")} title={t("catalogNotFoundTitle")} />;
+    // A real 404 (it was a 200 "Page not found", so rove.rent/<anything> looked like a page to search engines).
+    notFound();
   }
   if (!catalog.enabled) return <Notice message={t("catalogOffMessage", { business: catalog.name })} title={t("catalogOffTitle")} />;
   const owner = wantsDraft ? await isOwnerOf(catalog.organizationId) : false;

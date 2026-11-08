@@ -18,6 +18,9 @@ import { methodsFor } from "@/lib/payment-methods";
 import type { TaskListItem } from "@/lib/tasks";
 import { BOARD_BUCKETS, BUCKET_LABEL_KEY, bucketOf, type Bucket } from "./buckets";
 import { businessTimeZone } from "@/lib/business-time";
+import { niceMoney } from "@/lib/nice-money";
+import { currencySymbol } from "@/components/currency-symbol";
+import { businessCurrency } from "@/lib/business-units";
 
 type Filter = "open" | "done";
 
@@ -31,7 +34,8 @@ function useTx(): Tx {
   return { say: t as unknown as Say, has: (key) => (t as any).has(key), locale };
 }
 
-const money = (value: number) => `฿${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+// In the business's own currency (it always showed ฿, so a UK business saw "฿1,100 rent").
+const money = (value: number) => niceMoney(value);
 
 function addDays(iso: string, days: number) {
   const date = new Date(`${iso}T00:00:00Z`);
@@ -294,7 +298,7 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
           {tx.say("amountArrived")}
           {/* ฿ as a prefix, as in the app's other money fields; decimals stay allowed here (satang). */}
           <span className="relative mt-1 block">
-            <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 select-none text-sm font-medium text-[var(--foreground-secondary)]">฿</span>
+            <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 select-none text-sm font-medium text-[var(--foreground-secondary)]">{currencySymbol(businessCurrency())}</span>
             <input autoFocus className="input-with-leading-symbol w-full" inputMode="decimal" min="0" onChange={(event) => setValue(event.target.value)} step="0.01" type="number" value={value} />
           </span>
         </label>

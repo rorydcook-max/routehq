@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { initialsOf } from "@/components/glance";
+import { InfoTip } from "@/components/info-tip";
 import { UnsentMessages, type UnsentMessage } from "@/app/(app)/bookings/[id]/unsent-messages";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -23,8 +24,9 @@ export function MessagesToSend({ groups }: { groups: ToSendGroup[] }) {
       <div className="flex items-center gap-3">
         <span className="num inline-flex h-9 min-w-9 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary)] px-2.5 text-[16px] font-bold text-white">{total}</span>
         <h2 className="card-title">{say("toSendTitle", { count: total })}</h2>
+        {/* Why they are not sent for you: a tip, not a paragraph over the list. */}
+        <InfoTip label={say("toSendTitle", { count: total })} text={say("toSendWhy")} />
       </div>
-      <p className="measure mt-2 font-medium text-[var(--foreground-secondary)]">{say("toSendWhy")}</p>
       <div className="mt-4 grid gap-2">
         {groups.map((group) => (
           <details className="rounded-2xl bg-[var(--panel-secondary)]" key={group.key}>

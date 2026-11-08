@@ -57,9 +57,7 @@ export function EmailAlertsCard({ configured, emailTo, ownerEmail }: { configure
             {pending ? say("saving") : say("save")}
           </button>
         </form>
-      ) : (
-        <p className="text-[14px] font-medium text-[var(--muted)]">{say("ig_emailSoon")}</p>
-      )}
+      ) : null /* The "Coming soon" pill already says it; "Coming soon. Nothing to do." under it repeated it. */}
       {note ? <p className={`mt-2 text-[14px] font-semibold ${note.ok ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{note.text}</p> : null}
     </IntegrationCard>
   );

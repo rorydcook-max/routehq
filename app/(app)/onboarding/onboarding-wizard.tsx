@@ -147,20 +147,7 @@ export function OnboardingWizard({
                   ))}
                 </select>
               </label>
-              <label className="block">
-                <span className={labelClass}>{t("phone")}</span>
-                {/* The country code follows the Country chosen below (which starts from where the visitor is), with a picker to change it. */}
-                <PhoneField
-                  codeName="setupPhoneCode"
-                  defaultCountry={phoneCountryFor(country)}
-                  defaultNumber={phone}
-                  followCountry={phoneCountryFor(country)}
-                  inputClass={fieldClass}
-                  inputName="setupPhone"
-                  onValueChange={setPhone}
-                />
-                <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{t("phoneHint")}</span>
-              </label>
+              {/* Country first (audit, 8 Nov 2026): the phone's country code follows it, so it was odd to ask for the phone before it. */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className={labelClass}>{t("country")}</span>
@@ -189,6 +176,19 @@ export function OnboardingWizard({
                   </datalist>
                 </label>
               </div>
+              <label className="block">
+                <span className={labelClass}>{t("phone")}</span>
+                {/* The country code follows the Country chosen above (which starts from where the visitor is), with a picker to change it. */}
+                <PhoneField
+                  codeName="setupPhoneCode"
+                  defaultCountry={phoneCountryFor(country)}
+                  defaultNumber={phone}
+                  followCountry={phoneCountryFor(country)}
+                  inputClass={fieldClass}
+                  inputName="setupPhone"
+                  onValueChange={setPhone}
+                />
+              </label>
             </div>
             {error ? <p className="mt-4 rounded-xl bg-[var(--warning-light)] p-3 font-semibold text-[var(--foreground)]">{error}</p> : null}
             <button className="primary-action pressable mt-5 w-full justify-center" disabled={isPending} onClick={saveStepOne} type="button">
@@ -250,7 +250,6 @@ export function OnboardingWizard({
               {isPending ? <Loader2 className="animate-spin" size={18} /> : null}
               {vehicleCount ? t("toDashboard") : t("later")}
             </button>
-            {vehicleCount ? null : <p className="mt-2 text-center text-[14px] font-medium text-[var(--muted)]">{t("laterHint")}</p>}
           </section>
         )}
       </div>

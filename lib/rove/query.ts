@@ -63,7 +63,8 @@ export function parseRoveQuery(query: RoveQuery, today: string): ParsedQuery {
   const max = Number(query.max);
   const sort = SORTS.includes(query.sort as SearchSort) ? (query.sort as SearchSort) : "price";
   return {
-    place,
+    // A destination asked for by its address form ("koh-samui") shows by its name ("Koh Samui"), not the raw slug.
+    place: destination ? destination.name : place,
     point,
     within: destination ? { center: destination.center, radiusKm: destination.radiusKm } : null,
     placeUnknown,

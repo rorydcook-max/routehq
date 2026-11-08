@@ -172,7 +172,6 @@ export default async function BillingPage({ searchParams }: { searchParams: Prom
 
       <section className="card mt-3 p-4">
         <h2 className="card-title">{say("pl_everyTitle")}</h2>
-        <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("pl_everyBody")}</p>
         <ul className="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
           {INCLUDED.map((key) => (
             <li className="flex items-start gap-2 font-medium text-[var(--foreground)]" key={key}>

@@ -25,6 +25,8 @@ import { isIncomeTransactionType, TRANSACTION_TYPE_OPTIONS } from "@/lib/transac
 import type { TransactionListItem } from "@/lib/transactions";
 import { withShares } from "@/lib/cost-spread";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
+import { businessCurrency } from "@/lib/business-units";
+import { currencySymbol } from "@/components/currency-symbol";
 
 /** The real entry behind a row: a month's share of a yearly payment is edited and deleted as that payment. */
 const baseId = (transaction: TransactionListItem) => transaction.shareOf?.id || transaction.id;
@@ -32,7 +34,9 @@ const baseId = (transaction: TransactionListItem) => transaction.shareOf?.id || 
 type VehicleOption = { id: string; label: string };
 type TransactionKind = "income" | "refund" | "expense" | "deposit_received" | "deposit_refunded";
 
-function money(value: number, currency = "THB") {
+// Totals are not told a currency: they are in the business's own (a UK business saw "฿0").
+function money(value: number, currency: string | null | undefined = businessCurrency()) {
+  currency = currency || businessCurrency();
   if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(Math.abs(value), currency, "en-GB");
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Math.abs(value));
 }
@@ -120,7 +124,7 @@ function TransactionEditForm({
           {tx.say("f_amount")}
           <div className="relative mt-1">
             {/* The ฿ sits right against the number, as it is written (Rory, 1 Nov 2026: the gap looked odd). */}
-            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--foreground)]">฿</span>
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--foreground)]">{currencySymbol(businessCurrency())}</span>
             <input
               className="w-full !pl-7"
               min="0"

@@ -19,6 +19,7 @@ import { businessTimeZone } from "@/lib/business-time";
 import { businessCurrency, distanceKey } from "@/lib/business-units";
 import { currencySymbol } from "@/components/currency-symbol";
 import { formatMoney } from "@/lib/regional";
+import { niceMoney } from "@/lib/nice-money";
 
 /** An amount box with the business's currency symbol inside it (7 Nov 2026). Kept a plain controlled input: the amount is also filled in from receipts and matches. */
 function AmountBox(props: InputHTMLAttributes<HTMLInputElement> & { className: string }) {
@@ -96,7 +97,7 @@ export function TransactionForm({
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone() }).format(new Date());
   // A scheduled payment is named here, in the reader's language; anything else keeps the name it came with.
   const matchLabel = (match: MatchResult) =>
-    match.kind ? say(`match_${match.kind}`, { amount: `฿${Math.round(match.amount || 0).toLocaleString("en-US")}`, vehicle: match.vehicleName || match.vehicleLabel || "" }) : match.label;
+    match.kind ? say(`match_${match.kind}`, { amount: niceMoney(match.amount || 0), vehicle: match.vehicleName || match.vehicleLabel || "" }) : match.label;
   const matchWhen = (match: MatchResult) =>
     !match.kind
       ? match.subLabel

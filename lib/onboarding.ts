@@ -1,5 +1,6 @@
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
 import { organizationOffersPromptPay } from "@/lib/payment-methods";
+import { orgCountry } from "@/lib/regional";
 export const onboardingSteps = [
   // In the order that makes RoveHQ worth coming back to (Rory, 2 Nov 2026): the business in first (vehicles, then who is
   // renting them now, so money due and returns show at once), reminders that send themselves, the booking page out in
@@ -97,12 +98,16 @@ export async function getOnboardingStatus(supabase: any, organizationId: string,
     payment_methods: Boolean((organizationOffersPromptPay(organization) && (organization.promptpay_id || organization.promptpay_qr_url)) || organization.bank_account_number || organization.wise_link || organization.revolut_link),
     first_booking: rentalCount >= 1,
     contract_template: Boolean(checklistRows.get("contract_template")?.completed || settings.contract_template_reviewed_at),
-    line_connected: Boolean(settings.line_id),
+    // The morning summary on LINE is connected on Settings › Notifications (organizations.line_user_id).
+    line_connected: Boolean(organization.line_user_id || settings.line_id),
     team_invited: memberCount > 1
   };
+  // LINE's morning summary is offered only to businesses in Thailand (Settings › Notifications shows its card there,
+  // or where it is already connected), so a business elsewhere is never asked to set it up.
+  const offersLine = orgCountry(organization) === "TH" || Boolean(organization.line_user_id);
 
   // Steps already dealt with in setup, or not needed for this account, are left off the list (and the count).
-  const items = onboardingSteps.filter((item) => item.step !== "business_profile" && (item.step !== "verify_email" || options.emailPending)).map((item) => {
+  const items = onboardingSteps.filter((item) => item.step !== "business_profile" && (item.step !== "verify_email" || options.emailPending) && (item.step !== "line_connected" || offersLine)).map((item) => {
     const stored = checklistRows.get(item.step);
     const completed = item.step === "verify_email" ? !options.emailPending : Boolean(dynamicCompletion[item.step] || stored?.completed);
     return {

@@ -148,14 +148,58 @@ function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
+/** Currencies with no smaller unit in everyday use; every other one takes cents (same rule as components/money-input). */
+const NO_DECIMALS = new Set(["IDR", "VND"]);
+
 function moneyInput(value: number, currencyInfo: { symbol: string; locale: string }, showZero = false) {
   if (!showZero && !value) return "";
-  return `${currencyInfo.symbol} ${new Intl.NumberFormat(currencyInfo.locale, { maximumFractionDigits: 0 }).format(Number(value || 0))}`;
+  const amount = Number(value || 0);
+  // Grouped with commas and a point for cents whatever the currency, so a typed "39.50" reads back the same.
+  const shown = Number.isInteger(amount) ? amount.toLocaleString("en-US") : amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return `${currencyInfo.symbol} ${shown}`;
 }
 
-function parseMoneyInput(value: string) {
-  const digits = value.replace(/[^0-9]/g, "");
-  return digits ? Number(digits) : 0;
+/**
+ * A price box that keeps what is being typed (a "39." on its way to "39.50") and reports the number.
+ * It used to drop the point, so typing 39.50 saved 3950.
+ */
+function AmountInput({
+  value,
+  onValueChange,
+  currency,
+  currencyInfo,
+  showZero = false,
+  className,
+  required = false
+}: {
+  value: number;
+  onValueChange: (value: number) => void;
+  currency: string;
+  currencyInfo: { symbol: string; locale: string };
+  showZero?: boolean;
+  className: string;
+  required?: boolean;
+}) {
+  const decimals = NO_DECIMALS.has(String(currency).toUpperCase()) ? 0 : 2;
+  const [draft, setDraft] = useState<string | null>(null);
+  return (
+    <input
+      className={className}
+      inputMode={decimals ? "decimal" : "numeric"}
+      onBlur={() => setDraft(null)}
+      onChange={(event) => {
+        const kept = event.target.value.replace(/[^0-9.]/g, "");
+        const point = kept.indexOf(".");
+        const clean = !decimals ? kept.replace(/\./g, "") : point === -1 ? kept : `${kept.slice(0, point)}.${kept.slice(point + 1).replace(/\./g, "").slice(0, decimals)}`;
+        setDraft(clean);
+        onValueChange(clean && clean !== "." ? Number(clean) : 0);
+      }}
+      placeholder={`${currencyInfo.symbol} 0`}
+      required={required}
+      type="text"
+      value={draft !== null ? (draft ? `${currencyInfo.symbol} ${draft}` : "") : moneyInput(value, currencyInfo, showZero)}
+    />
+  );
 }
 
 // Today and now on the business's clock, so the form opens on the same day whether the page was built on the server (UTC) or on the phone.
@@ -921,7 +965,6 @@ export function BookingForm({
                 </button>
               </span>
               <input className={inputClass} onChange={(event) => setStartDate(event.target.value)} required type="date" value={startDate} />
-              {bookingMode === "existing_rental" ? <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{say("useActualStart")}</span> : null}
             </label>
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("endDate")}</span>
@@ -973,28 +1016,27 @@ export function BookingForm({
           <div className="mt-3 grid grid-cols-2 gap-3">
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say(`rate_${periodKey}`)}</span>
-              <input
+              <AmountInput
                 className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
-                inputMode="numeric"
-                onChange={(event) => {
+                currency={currency}
+                currencyInfo={currencyInfo}
+                onValueChange={(value) => {
                   rateTyped.current = true;
-                  setRentalRate(parseMoneyInput(event.target.value));
+                  setRentalRate(value);
                 }}
-                placeholder={`${currencyInfo.symbol} 0`}
                 required
-                type="text"
-                value={moneyInput(rentalRate, currencyInfo)}
+                value={rentalRate}
               />
             </label>
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("deposit")}</span>
-              <input
+              <AmountInput
                 className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
-                inputMode="numeric"
-                onChange={(event) => setDepositAmount(parseMoneyInput(event.target.value))}
-                placeholder={`${currencyInfo.symbol} 0`}
-                type="text"
-                value={moneyInput(depositAmount, currencyInfo, true)}
+                currency={currency}
+                currencyInfo={currencyInfo}
+                onValueChange={setDepositAmount}
+                showZero
+                value={depositAmount}
               />
             </label>
           </div>
@@ -1067,6 +1109,8 @@ export function BookingForm({
             <div className={`mt-3 auto-rows-fr grid-cols-2 gap-2 ${selectedVehicle?.included_items && !includedOpen ? "hidden" : "grid"}`}>
               {includedOptions
                 .filter((item) => (isTwoWheeler(selectedVehicle?.category_code) ? !notForTwoWheelers.has(item) : !twoWheelerOnly.has(item)) || includedItems.includes(item))
+                  // Thailand's compulsory insurance (Por Ror Bor) means nothing elsewhere.
+                  .filter((item) => item !== includedOptions[1] || businessCountry() === "TH" || includedItems.includes(item))
                 .map((item) => (
                 <label
                   className={`flex min-h-[56px] cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2 text-[15px] font-bold leading-tight ${
@@ -1162,13 +1206,12 @@ export function BookingForm({
                 </label>
                 <label className="block">
                   <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say(`rate_${periodKey}`)}</span>
-                  <input
+                  <AmountInput
                     className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
-                    inputMode="numeric"
-                    onChange={(event) => setUpfrontRate(parseMoneyInput(event.target.value))}
-                    placeholder={`${currencyInfo.symbol} 0`}
-                    type="text"
-                    value={moneyInput(upfrontRate, currencyInfo)}
+                    currency={currency}
+                    currencyInfo={currencyInfo}
+                    onValueChange={setUpfrontRate}
+                    value={upfrontRate}
                   />
                   <p className="mt-1 text-[11px] text-[var(--muted)]">{say("adjustDiscount")}</p>
                 </label>
@@ -1186,7 +1229,7 @@ export function BookingForm({
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("currency")}</span>
               <select className={inputClass} onChange={(event) => setCurrency(event.target.value)} value={currency}>
-                {Object.entries(CURRENCY_INFO).map(([code, info]) => (
+                {Object.entries(CURRENCY_INFO).sort(([a], [b]) => a.localeCompare(b)).map(([code, info]) => (
                   <option key={code} value={code}>
                     {info.symbol} - {code}
                   </option>
@@ -1230,7 +1273,6 @@ export function BookingForm({
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <GooglePlaceInput
                 label={say("deliveryLocation")}
-                helperText={say("locationHelper")}
                 homeTerritory={homeTerritory}
                 onChange={setDeliveryLocation}
                 onPlaceSelect={({ address, lat, lng, placeId }) => {
@@ -1253,7 +1295,6 @@ export function BookingForm({
                   {startsLater ? say("onStartDay") : say("now")}
                 </button>
                 <input className={inputClass} id="delivery-datetime" onChange={(event) => setDeliveryDateTime(event.target.value)} type="datetime-local" value={deliveryDateTime} />
-                <p className="mt-2 text-xs font-semibold text-[var(--muted)]">{say("leaveBlank")}</p>
               </div>
             </div>
           ) : (
@@ -1264,7 +1305,6 @@ export function BookingForm({
                   <InfoTip label={say("collectionAddress")} text={say("locationTooltip")} />
                 </span>
                 <input className={inputClass} onChange={(event) => setCollectionAddress(event.target.value)} placeholder={say("collectionPlaceholder")} value={collectionAddress} />
-                <p className="mt-2 text-xs font-semibold text-[var(--muted)]">{say("collectionHelper")}</p>
               </label>
               <div className="sm:col-span-2">
                 <div className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-[var(--foreground-secondary)]">
@@ -1275,7 +1315,6 @@ export function BookingForm({
                   {startsLater ? say("onStartDay") : say("now")}
                 </button>
                 <input className={inputClass} id="collection-datetime" onChange={(event) => setCollectionTime(event.target.value)} type="datetime-local" value={collectionTime} />
-                <p className="mt-2 text-xs font-semibold text-[var(--muted)]">{say("leaveBlank")}</p>
               </div>
             </div>
           )}
@@ -1321,24 +1360,24 @@ export function BookingForm({
                 <div className="mt-3 grid gap-3 rounded-lg border border-[var(--border)] bg-white p-3 sm:grid-cols-2">
                   <label className="block">
                     <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("paymentAmount")}</span>
-                    <input
+                    <AmountInput
                       className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
-                      inputMode="numeric"
-                      onChange={(event) => setWalkInPaymentAmount(parseMoneyInput(event.target.value))}
-                      placeholder={`${currencyInfo.symbol} 0`}
-                      type="text"
-                      value={moneyInput(walkInPay, currencyInfo, true)}
+                      currency={currency}
+                      currencyInfo={currencyInfo}
+                      onValueChange={setWalkInPaymentAmount}
+                      showZero
+                      value={walkInPay}
                     />
                   </label>
                   <label className="block">
                     <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("deposit")}</span>
-                    <input
+                    <AmountInput
                       className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
-                      inputMode="numeric"
-                      onChange={(event) => setWalkInDepositAmount(parseMoneyInput(event.target.value))}
-                      placeholder={`${currencyInfo.symbol} 0`}
-                      type="text"
-                      value={moneyInput(walkInDeposit, currencyInfo, true)}
+                      currency={currency}
+                      currencyInfo={currencyInfo}
+                      onValueChange={setWalkInDepositAmount}
+                      showZero
+                      value={walkInDeposit}
                     />
                   </label>
                   <label className="block">
@@ -1373,14 +1412,14 @@ export function BookingForm({
             </div>
           ) : null}
           <div className="mt-3 grid gap-3">
-            <SummaryRow label={say("s_vehicle")} value={selectedVehicle ? `${vehicleTitle(selectedVehicle)} - ${selectedVehicle.registration_number}` : say("notSelected")} />
+            <SummaryRow label={say("s_vehicle")} value={selectedVehicle ? `${vehicleTitle(selectedVehicle)} · ${selectedVehicle.registration_number}` : say("notSelected")} />
             <SummaryRow
               label={say("s_customer")}
               value={
                 customerSkipped
                   ? say("ownDetails")
                   : selectedCustomer
-                    ? `${selectedCustomer.full_name} - ${selectedCustomer.nationality || say("nationalityNotSet")}`
+                    ? `${selectedCustomer.full_name} · ${selectedCustomer.nationality || say("nationalityNotSet")}`
                     : say("notSelected")
               }
             />
@@ -1439,7 +1478,6 @@ export function BookingForm({
           {bookingMode === "existing_rental" && !walkInFastTrack ? (
             <div className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
               <p className="text-sm font-semibold text-[var(--foreground)]">{say("paidQ")}</p>
-              <p className="mt-1 text-xs text-[var(--muted)]">{say("paidHint")}</p>
               <div className="mt-3 space-y-2">
                 {(["up_to_date", "until", "none"] as const).map((value) => (
                   <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${existingPaid === value ? "border-[var(--primary)] bg-white" : "border-[var(--border)] bg-white"}`} key={value}>
@@ -1460,7 +1498,6 @@ export function BookingForm({
                   <span className="text-sm font-semibold text-[var(--foreground)]">{say("holding", { amount: money(depositAmount, currency) })}</span>
                 </label>
               ) : null}
-              <p className="mt-3 text-xs text-[var(--muted)]">{say("startsOnRent")}</p>
             </div>
           ) : null}
           {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
@@ -1568,7 +1605,8 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
     { key: "messenger", label: "Messenger", title: say("shareVia", { channel: "Messenger" }), icon: <MessengerLogo /> },
     { key: "sms", label: "SMS", title: say("shareVia", { channel: "SMS" }), icon: <SmsLogo /> },
     { key: "email", label: "Email", title: say("shareVia", { channel: "Email" }), icon: <EmailLogo /> }
-  ];
+    // LINE is only offered where people use it (Thailand, Japan, Taiwan).
+  ].filter((channel) => channel.key !== "line" || ["TH", "JP", "TW"].includes(String(businessCountry() || "")));
   const shareLinks: Record<string, string> = result
     ? {
         whatsapp: result.whatsappUrl || `https://wa.me/?text=${encodedMessage}`,
@@ -1620,7 +1658,6 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
         <CheckCircle2 size={20} />
         {say("created")}
       </p>
-      <p className="mt-1 text-sm leading-6 text-[var(--foreground-secondary)]">{say("nowSend")}</p>
 
       {canNativeShare ? (
         <button className="pressable mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-3 py-2 text-[15px] font-bold text-white" onClick={nativeShare} type="button">
@@ -1628,7 +1665,7 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
         </button>
       ) : null}
 
-      <div className="mt-3 grid grid-cols-3 gap-1 rounded-2xl border border-[var(--border)] bg-white p-1.5 sm:grid-cols-5">
+      <div className={`mt-3 grid gap-1 rounded-2xl border border-[var(--border)] bg-white p-1.5 ${shareChannels.length === 4 ? "grid-cols-4" : "grid-cols-3 sm:grid-cols-5"}`}>
         {shareChannels.map(({ icon, key, label, title }) => (
           <button
             aria-label={title}
@@ -1727,7 +1764,7 @@ function GooglePlaceInput({
   tooltip,
   value
 }: {
-  helperText: string;
+  helperText?: string;
   homeTerritory: string;
   label: string;
   onChange: (value: string) => void;
@@ -1813,10 +1850,7 @@ function GooglePlaceInput({
           </button>
         ) : null}
       </div>
-      <p className="mt-2 text-xs font-semibold text-[var(--muted)]">
-        {/* The map search is an extra. Without it the address is simply typed, so there is nothing to warn about. */}
-        {helperText}
-      </p>
+      {helperText ? <p className="mt-2 text-xs font-semibold text-[var(--muted)]">{helperText}</p> : null}
       {pinModalOpen ? (
         <GooglePinModal
           homeTerritory={homeTerritory}

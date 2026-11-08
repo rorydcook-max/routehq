@@ -18,7 +18,7 @@ export async function RoveHeader({ locale }: { locale: string }) {
   const links = [
     { href: `${roveHref("/search", locale)}?monthly=1`, label: t("rv.navMonthly"), icon: "ti-calendar-repeat" },
     { href: roveHref("/destinations", roveHasLocale("destinations", locale) ? locale : "en"), label: t("rv.navDestinations"), icon: "ti-map-2" },
-    { href: "/guides", label: t("rv.navGuides"), icon: "ti-book-2" }
+    { href: roveHref("/guides", locale), label: t("rv.navGuides"), icon: "ti-book-2" }
   ];
   return (
     <header className={s.header}>
@@ -35,7 +35,7 @@ export async function RoveHeader({ locale }: { locale: string }) {
           <LanguagePicker
             current={locale}
             label={t("rv.language")}
-            options={supportedLocaleOptions.map((option) => ({ code: option.code, label: option.label }))}
+            options={supportedLocaleOptions.map((option) => ({ code: option.code, label: option.label.replace(/ \(.*\)$/, "") }))}
             short={(current?.code || locale).toUpperCase()}
           />
           <a className={s.navCta} href={listFleetHref("list_your_fleet")}>

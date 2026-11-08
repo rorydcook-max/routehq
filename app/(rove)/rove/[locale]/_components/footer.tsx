@@ -26,7 +26,7 @@ export async function RoveFooter({ locale }: { locale: string }) {
         { href: roveHref("/search", locale), label: t("rv.searchTitle") },
         { href: `${roveHref("/search", locale)}?monthly=1`, label: t("rv.navMonthly") },
         { href: roveHref("/destinations", roveHasLocale("destinations", locale) ? locale : "en"), label: t("rv.navDestinations") },
-        { href: "/guides", label: t("rv.guidesTitle") }
+        { href: roveHref("/guides", locale), label: t("rv.guidesTitle") }
       ]
     },
     {
@@ -89,7 +89,7 @@ export async function RoveFooter({ locale }: { locale: string }) {
           <LanguagePicker
             current={locale}
             label={t("rv.language")}
-            options={supportedLocaleOptions.map((option) => ({ code: option.code, label: option.label }))}
+            options={supportedLocaleOptions.map((option) => ({ code: option.code, label: option.label.replace(/ \(.*\)$/, "") }))}
             placement="up"
             short={current?.label.replace(/ \(.*\)$/, "") || locale}
           />

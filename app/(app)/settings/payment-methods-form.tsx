@@ -3,9 +3,14 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { updatePaymentSettings } from "@/app/actions/settings";
+import { updatePaymentSettings as updatePaymentSettingsAction } from "@/app/actions/settings";
 import { SwitchField } from "@/components/switch-field";
 import { InfoTip } from "@/components/info-tip";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const updatePaymentSettings = (...args: Parameters<typeof updatePaymentSettingsAction>) => unwrap(updatePaymentSettingsAction(...args));
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
@@ -51,6 +56,7 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
   }, [settings.promptpay_qr_url]);
   const [defaultMethod, setDefaultMethod] = useState(initialMethods.includes(settings.default_payment_method || "") ? settings.default_payment_method || "cash" : "cash");
   const [result, setResult] = useState<"saved" | "failed" | null>(null);
+  const [failReason, setFailReason] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const previewPrefix = receiptPrefix.trim().slice(0, 6) || "REC";
@@ -73,7 +79,9 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
       try {
         await updatePaymentSettings(formData);
         setResult("saved");
-      } catch {
+      } catch (caught) {
+        // The server's reason (e.g. "PromptPay QR code must be a PNG, JPEG, or WebP image.") when it gave one.
+        setFailReason(shownError(caught, ""));
         setResult("failed");
       }
     });
@@ -192,7 +200,7 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
       </div>
 
       {result ? (
-        <p className={`rounded-xl px-4 py-3 font-bold ${result === "saved" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]"}`}>{result === "saved" ? say("pm_saved") : say("saveFailed")}</p>
+        <p className={`rounded-xl px-4 py-3 font-bold ${result === "saved" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]"}`}>{result === "saved" ? say("pm_saved") : failReason || say("saveFailed")}</p>
       ) : null}
 
       <button className="primary-action w-full sm:w-auto" disabled={isPending} type="submit">

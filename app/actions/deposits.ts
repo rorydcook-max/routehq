@@ -7,11 +7,27 @@ import { revalidatePath } from "next/cache";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
+import { guard } from "@/lib/action-error";
+
+/**
+ * The deposit panel's buttons. returnDeposit and applyDepositDeduction also run inside the return inspection, which
+ * needs them to throw; these hand a failure back as `{ actionError }` so the panel can say why ("more than is held").
+ */
+export async function returnDepositFromPanel(formData: FormData) {
+  return guard(() => returnDeposit(formData));
+}
+
+export async function applyDepositDeductionFromPanel(formData: FormData) {
+  return guard(() => applyDepositDeduction(formData));
+}
+
+/** What to ask for when a field the person fills in arrives empty (the rest are the page's own ids). */
+const MISSING_FIELD: Record<string, string> = {"reason":"Add the reason for keeping part of the deposit."};
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
   if (!value) {
-    throw new Error(`${key} is required.`);
+    throw new Error(MISSING_FIELD[key] || `${key} is required.`);
   }
   return value;
 }

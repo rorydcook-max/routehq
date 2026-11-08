@@ -308,7 +308,11 @@ async function addInspectionUrls(supabase: any, inspections: any[]) {
 }
 
 function isVehiclePhoto(document: VehicleDetailDocument) {
-  return document.mimeType?.startsWith("image/") || ["photo", "photos", "vehicle_photo", "vehicle_image"].includes(document.category);
+  if (["photo", "photos", "vehicle_photo", "vehicle_image"].includes(document.category)) return true;
+  // A photographed registration book, insurance or receipt is paperwork, not a vehicle photo (test-app-nov8: a logbook
+  // picture showed as the "Main photo" with an Enhance button that could only fail).
+  if (/logbook|registration|insurance|purchase|receipt|invoice|tax|contract/i.test(String(document.category || ""))) return false;
+  return Boolean(document.mimeType?.startsWith("image/"));
 }
 
 function vehiclePhotoOrder(document: VehicleDetailDocument) {

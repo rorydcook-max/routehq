@@ -5,6 +5,7 @@ import { longDate } from "@/lib/i18n/dates";
 import { LogoUploadSection } from "@/app/(app)/settings/logo-upload-section";
 import { SignatureUploadSection } from "@/app/(app)/settings/signature-upload-section";
 import { PendingButton } from "@/components/pending-button";
+import { ActionForm } from "@/components/action-form";
 import { Fold, Pane } from "@/components/ui";
 import { BrandColourField } from "@/app/(app)/settings/brand-colour-field";
 import { ContactChannels } from "@/app/(app)/settings/contact-channels";
@@ -88,7 +89,7 @@ export function ContractsBrandingSection({
     <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <div className="grid gap-3">
         <Pane summary={say("b_body")} title={say("b_title")}>
-          <form action={updateContractBrandingSettings} className="space-y-4" id={FORM_ID}>
+          <ActionForm action={updateContractBrandingSettings} className="space-y-4" id={FORM_ID}>
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block sm:col-span-2">
                 <span className={labelClass}>{say("b_name")}</span>
@@ -149,7 +150,7 @@ export function ContractsBrandingSection({
             <PendingButton className="primary-action w-full sm:w-auto" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
               {say("save")}
             </PendingButton>
-          </form>
+          </ActionForm>
           {footer ? <div className="mt-4 border-t border-[var(--border)] pt-3">{footer}</div> : null}
         </Pane>
         {locations}

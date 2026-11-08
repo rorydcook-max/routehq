@@ -3,7 +3,11 @@
 import { useEffect, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
-import { generatePaymentScheduleForRental } from "@/app/actions/bookings";
+import { generatePaymentScheduleForRental as generatePaymentScheduleForRentalAction } from "@/app/actions/bookings";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const generatePaymentScheduleForRental = (...args: Parameters<typeof generatePaymentScheduleForRentalAction>) => unwrap(generatePaymentScheduleForRentalAction(...args));
 
 const primaryBtnStyle = {
   background: "var(--primary)",

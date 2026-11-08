@@ -1,5 +1,7 @@
 "use server";
 
+import { userError } from "@/lib/action-error";
+
 import { revalidatePath } from "next/cache";
 import { said } from "@/lib/i18n/server-text";
 import { tellRentalCustomer } from "@/lib/customer-messages";
@@ -43,7 +45,7 @@ async function run(action: () => Promise<void>): Promise<Result> {
     await action();
     return { ok: true };
   } catch (error) {
-    return { ok: false, error: await said(error instanceof Error ? error.message : "Something went wrong.") };
+    return { ok: false, error: await userError(error, "Something went wrong.") };
   }
 }
 

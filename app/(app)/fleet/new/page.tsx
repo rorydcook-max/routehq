@@ -8,6 +8,7 @@ import { VehicleIdentityFields } from "@/app/(app)/fleet/new/vehicle-identity-fi
 import { AppShell } from "@/components/app-shell";
 import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
+import { ActionForm } from "@/components/action-form";
 import { QuickPhotos } from "@/app/(app)/fleet/new/quick-photos";
 import { BackLink, Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -92,7 +93,7 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
           </div>
         </div>
 
-        <form action={createVehicle} className="space-y-3">
+        <ActionForm action={createVehicle} className="space-y-3">
           <input name="organizationId" type="hidden" value={organization.id} />
           {fromSetup ? <input name="returnTo" type="hidden" value="onboarding" /> : null}
 
@@ -171,7 +172,7 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
               {say("save")}
             </PendingButton>
           </div>
-        </form>
+        </ActionForm>
       </div>
     </AppShell>
   );

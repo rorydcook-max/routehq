@@ -6,7 +6,7 @@ import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { MapPin, Plus } from "lucide-react";
-import { addRentalPayment, deleteRentalPayment, updateBooking, updateRentalPayment } from "@/app/actions/bookings";
+import { addRentalPayment as addRentalPaymentAction, deleteRentalPayment as deleteRentalPaymentAction, updateBooking as updateBookingAction, updateRentalPayment as updateRentalPaymentAction } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
 import { VehicleChangeButton } from "@/app/(app)/bookings/[id]/vehicle-change-button";
 import { Badge } from "@/components/ui";
@@ -18,6 +18,13 @@ import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places"
 import { niceMoney } from "@/lib/nice-money";
 import { businessCountry } from "@/lib/business-units";
 import { currencySymbol } from "@/components/currency-symbol";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const addRentalPayment = (...args: Parameters<typeof addRentalPaymentAction>) => unwrap(addRentalPaymentAction(...args));
+const deleteRentalPayment = (...args: Parameters<typeof deleteRentalPaymentAction>) => unwrap(deleteRentalPaymentAction(...args));
+const updateBooking = (...args: Parameters<typeof updateBookingAction>) => unwrap(updateBookingAction(...args));
+const updateRentalPayment = (...args: Parameters<typeof updateRentalPaymentAction>) => unwrap(updateRentalPaymentAction(...args));
 
 // The wording for this screen is in locales/<language>/common.json under
 // "bookingEdit"; billing periods, delivery choices and included items reuse "newBooking".

@@ -20,13 +20,19 @@ function useTx(): Tx {
   const locale = useLocale();
   return { say: t as unknown as Say, typeName: (type, fallback) => (t.has(`type_${type}`) ? t(`type_${type}`) : fallback || type.replace(/_/g, " ")), locale };
 }
-import { bulkDeleteTransactions, deleteTransaction, updateTransaction } from "@/app/actions/transactions";
+import { bulkDeleteTransactions as bulkDeleteTransactionsAction, deleteTransaction as deleteTransactionAction, updateTransaction as updateTransactionAction } from "@/app/actions/transactions";
 import { isIncomeTransactionType, TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import type { TransactionListItem } from "@/lib/transactions";
 import { withShares } from "@/lib/cost-spread";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 import { businessCurrency } from "@/lib/business-units";
 import { currencySymbol } from "@/components/currency-symbol";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const bulkDeleteTransactions = (...args: Parameters<typeof bulkDeleteTransactionsAction>) => unwrap(bulkDeleteTransactionsAction(...args));
+const deleteTransaction = (...args: Parameters<typeof deleteTransactionAction>) => unwrap(deleteTransactionAction(...args));
+const updateTransaction = (...args: Parameters<typeof updateTransactionAction>) => unwrap(updateTransactionAction(...args));
 
 /** The real entry behind a row: a month's share of a yearly payment is edited and deleted as that payment. */
 const baseId = (transaction: TransactionListItem) => transaction.shareOf?.id || transaction.id;

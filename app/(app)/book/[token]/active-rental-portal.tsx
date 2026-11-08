@@ -7,12 +7,17 @@ import { businessToday, daysFromToday } from "@/lib/business-time";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
+import { shownError } from "@/lib/error-text";
 import { AlertTriangle, CalendarCheck, CalendarPlus, Camera, FileText, ImageIcon, MessageCircle } from "lucide-react";
-import { submitCustomerPortalAction } from "@/app/actions/public-booking";
+import { submitCustomerPortalAction as submitCustomerPortalActionAction } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 import { planFor, quoteStay, type Rates } from "@/lib/rental-estimate";
 import { PortalPayments } from "./portal-payments";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const submitCustomerPortalAction = (...args: Parameters<typeof submitCustomerPortalActionAction>) => unwrap(submitCustomerPortalActionAction(...args));
 
 type OpenEndedOffer = { monthlyRate: number; firstDue: string };
 type ActionType = "extension_request" | "return_confirmation" | "problem_report" | "question";
@@ -70,6 +75,8 @@ export function ActiveRentalPortal({
   const router = useRouter();
   const [openAction, setOpenAction] = useState<ActionType | null>(null);
   const [confirmation, setConfirmation] = useState("");
+  // Why the customer's request wasn't sent, when it wasn't (it used to fail without a word).
+  const [actionError, setActionError] = useState("");
   const [isPending, startTransition] = useTransition();
   const endDate = rental?.end_date || "";
   const minExtensionDate = nextDate(endDate);
@@ -90,7 +97,14 @@ export function ActiveRentalPortal({
   function submitAction(formData: FormData, successMessage: string) {
     startTransition(async () => {
       formData.set("token", token);
-      const result = await submitCustomerPortalAction(formData);
+      setActionError("");
+      let result: Awaited<ReturnType<typeof submitCustomerPortalAction>>;
+      try {
+        result = await submitCustomerPortalAction(formData);
+      } catch (caught) {
+        setActionError(shownError(caught, t("actionFailed")));
+        return;
+      }
       const extension = result.extension;
       if (extension?.applied && extension.openEnded) {
         const amount = extension.currency === "THB" ? `฿${extension.amount.toLocaleString("en-US")}` : formatRegionalMoney(extension.amount, extension.currency, "en-GB");
@@ -143,6 +157,9 @@ export function ActiveRentalPortal({
         </section>
       ) : null}
 
+      {actionError ? (
+        <p className="rounded-2xl border border-[var(--danger-line)] bg-[var(--danger-light)] p-4 text-sm font-bold text-[var(--danger)]" role="alert">{actionError}</p>
+      ) : null}
       {confirmation ? (
         <p className="rounded-2xl border border-[var(--success-line)] bg-[var(--success-light)] p-4 text-sm font-bold text-[var(--success)]">{confirmation}</p>
       ) : null}

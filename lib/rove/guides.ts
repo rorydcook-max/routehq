@@ -1,8 +1,10 @@
 import { ROVE_SOURCES as S, type Source } from "@/lib/rove/destinations";
 import { WORLD_SOURCES as W } from "@/lib/rove/destinations-world";
+import { GUIDE_TRANSLATIONS } from "@/lib/rove/guides-i18n";
 
 /**
- * rove.rent's renter guides (task "roverent", 7 Nov 2026): short, practical, and sourced. English only for now.
+ * rove.rent's renter guides (task "roverent", 7 Nov 2026): short, practical, and sourced. Written here in English;
+ * every other language's words are in lib/rove/guides-i18n/<code>.ts (task rove-guides-i18n, 8 Nov 2026).
  * Facts come from government travel advice and named reporting (the sources under each article); anything we could
  * not confirm was left out. Researched 7 Nov 2026: re-check when editing, rules change.
  */
@@ -424,4 +426,15 @@ export const GUIDES: Guide[] = [
 
 export function findGuide(slug: string): Guide | null {
   return GUIDES.find((guide) => guide.slug === slug) || null;
+}
+
+/** A guide in a language: its translated words (lib/rove/guides-i18n) over the English facts, else the English. */
+export function localizedGuide(guide: Guide, locale: string): Guide & { locale: string } {
+  const text = locale === "en" ? null : GUIDE_TRANSLATIONS[locale]?.[guide.slug];
+  return text ? { ...guide, title: text.title, description: text.description, standfirst: text.standfirst, body: text.body, locale } : { ...guide, locale: "en" };
+}
+
+/** Every guide in a language (English where a guide isn't translated yet). */
+export function localizedGuides(locale: string) {
+  return GUIDES.map((guide) => localizedGuide(guide, locale));
 }

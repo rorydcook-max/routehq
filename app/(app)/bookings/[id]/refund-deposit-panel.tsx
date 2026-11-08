@@ -5,11 +5,22 @@ import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
-import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
-import { recordPaymentRefund } from "@/app/actions/bookings";
+import { applyDepositDeductionFromPanel, returnDepositFromPanel } from "@/app/actions/deposits";
+import { unwrap } from "@/lib/action-result";
+import { recordPaymentRefund as recordPaymentRefundAction } from "@/app/actions/bookings";
 import { MoneyInput } from "@/components/money-input";
 import { businessOffersPromptPay } from "@/lib/payment-methods";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
+
+// A save that fails hands back its reason ("more than is held", lib/action-error.ts); these throw it, for the catch
+// blocks below to show.
+const recordPaymentRefund = (...args: Parameters<typeof recordPaymentRefundAction>) => unwrap(recordPaymentRefundAction(...args));
+const returnDeposit = async (formData: FormData) => {
+  await unwrap(returnDepositFromPanel(formData));
+};
+const applyDepositDeduction = async (formData: FormData) => {
+  await unwrap(applyDepositDeductionFromPanel(formData));
+};
 
 type Props = {
   rentalId: string;

@@ -5,10 +5,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { CheckCircle2, Loader2, Receipt } from "lucide-react";
-import { readPaymentSlip, submitPaymentReceipt } from "@/app/actions/public-booking";
+import { readPaymentSlip, submitPaymentReceipt as submitPaymentReceiptAction } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 import type { SlipMatch } from "@/lib/slip-matching";
 import { niceMoney } from "@/lib/nice-money";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const submitPaymentReceipt = (...args: Parameters<typeof submitPaymentReceiptAction>) => unwrap(submitPaymentReceiptAction(...args));
 
 type Read = { amount: number | null; date: string | null; reference: string | null; paidBy: string | null } | null;
 type Choice = { paymentId: string; covers: string[]; amount: number; name: string; due: string };
@@ -114,8 +119,8 @@ export function SlipMatcher({
       }
       setStage("sent");
       router.refresh();
-    } catch {
-      setError(say("receiptFailed"));
+    } catch (caught) {
+      setError(shownError(caught, say("receiptFailed")));
       setStage(match ? "ask" : "pick");
     }
   }

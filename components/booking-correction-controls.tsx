@@ -10,9 +10,20 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
 import { monthPeriod } from "@/lib/i18n/period";
-import { addRentalPayment, deleteRentalPayment, recordPaymentReceived, setupExistingRentalPayments, updateRentalEndDate, updateRentalPayment } from "@/app/actions/bookings";
-import { deleteTransaction, updateTransaction } from "@/app/actions/transactions";
+import { addRentalPayment as addRentalPaymentAction, deleteRentalPayment as deleteRentalPaymentAction, recordPaymentReceivedFromScreen, setupExistingRentalPayments as setupExistingRentalPaymentsAction, updateRentalEndDate as updateRentalEndDateAction, updateRentalPayment as updateRentalPaymentAction } from "@/app/actions/bookings";
+import { deleteTransaction as deleteTransactionAction, updateTransaction as updateTransactionAction } from "@/app/actions/transactions";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const addRentalPayment = (...args: Parameters<typeof addRentalPaymentAction>) => unwrap(addRentalPaymentAction(...args));
+const deleteRentalPayment = (...args: Parameters<typeof deleteRentalPaymentAction>) => unwrap(deleteRentalPaymentAction(...args));
+const setupExistingRentalPayments = (...args: Parameters<typeof setupExistingRentalPaymentsAction>) => unwrap(setupExistingRentalPaymentsAction(...args));
+const updateRentalEndDate = (...args: Parameters<typeof updateRentalEndDateAction>) => unwrap(updateRentalEndDateAction(...args));
+const updateRentalPayment = (...args: Parameters<typeof updateRentalPaymentAction>) => unwrap(updateRentalPaymentAction(...args));
+const deleteTransaction = (...args: Parameters<typeof deleteTransactionAction>) => unwrap(deleteTransactionAction(...args));
+const updateTransaction = (...args: Parameters<typeof updateTransactionAction>) => unwrap(updateTransactionAction(...args));
+const recordPaymentReceived = (...args: Parameters<typeof recordPaymentReceivedFromScreen>) => unwrap(recordPaymentReceivedFromScreen(...args));
 
 type RentalPayment = {
   id: string;

@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { DESTINATIONS, destinationPath } from "@/lib/rove/destinations";
-import { findGuide, GUIDES } from "@/lib/rove/guides";
+import { findGuide, GUIDES, localizedGuide } from "@/lib/rove/guides";
 import { articleLd, roveMetadata, roveOgImage } from "@/lib/rove/seo";
-import { roveDate, roveLocale } from "@/lib/rove/static";
+import { roveHref } from "@/lib/rove/paths";
+import { roveDate, roveLocale, roveLocaleParams } from "@/lib/rove/static";
 import { Breadcrumbs } from "../../_components/breadcrumbs";
 import { SourceList } from "../../_components/country-rules";
 import { JsonLd } from "../../_components/json-ld";
@@ -14,16 +15,18 @@ export const dynamicParams = false;
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
-// The full address, language included (English only for now): see [country]/page.tsx for why.
+// The full address, language included: every guide in every language (lib/rove/guides-i18n; English where one
+// isn't translated yet). See [country]/page.tsx for why.
 export function generateStaticParams() {
-  return GUIDES.map((guide) => ({ locale: "en", slug: guide.slug }));
+  return roveLocaleParams().flatMap(({ locale }) => GUIDES.map((guide) => ({ locale, slug: guide.slug })));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const locale = await roveLocale(params.then((value) => ({ locale: value.locale })));
-  const guide = findGuide(slug);
-  if (!guide) return {};
+  const found = findGuide(slug);
+  if (!found) return {};
+  const guide = localizedGuide(found, locale);
   const meta = roveMetadata({ title: `${guide.title} | Rove`, description: guide.description, path: `/guides/${guide.slug}`, locale, section: "guide", ogTitle: guide.title });
   return { ...meta, openGraph: { ...meta.openGraph, type: "article", publishedTime: guide.published, modifiedTime: guide.updated } };
 }
@@ -31,12 +34,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function GuidePage({ params }: Props) {
   const { slug } = await params;
   const locale = await roveLocale(params.then((value) => ({ locale: value.locale })));
-  const guide = findGuide(slug);
-  if (!guide) notFound();
+  const found = findGuide(slug);
+  if (!found) notFound();
+  const guide = localizedGuide(found, locale);
   const t = await getTranslations("directory");
   const path = `/guides/${guide.slug}`;
   const related = guide.related.map((key) => DESTINATIONS.find((destination) => `${destination.country}/${destination.slug}` === key)).filter(Boolean) as typeof DESTINATIONS;
-  const others = GUIDES.filter((other) => other.slug !== guide.slug);
+  const others = GUIDES.filter((other) => other.slug !== guide.slug).map((other) => localizedGuide(other, locale));
 
   return (
     <div className={s.wrap}>
@@ -49,7 +53,7 @@ export default async function GuidePage({ params }: Props) {
         label={t("rv.breadcrumbs")}
         locale={locale}
       />
-      <JsonLd data={articleLd({ title: guide.title, description: guide.description, path, published: guide.published, updated: guide.updated, image: roveOgImage(guide.title, guide.description) })} />
+      <JsonLd data={articleLd({ title: guide.title, description: guide.description, path, published: guide.published, updated: guide.updated, image: roveOgImage(guide.title, guide.description), locale })} />
       <header className={s.pageHead}>
         <h1 className={s.pageTitle} style={{ maxWidth: "24ch" }}>
           {guide.title}
@@ -60,7 +64,7 @@ export default async function GuidePage({ params }: Props) {
         </p>
       </header>
       <div className={s.guideGrid} style={{ paddingBottom: 24 }}>
-        <article className={s.prose}>
+        <article className={s.prose} lang={guide.locale === locale ? undefined : guide.locale}>
           {guide.body.map((block, index) =>
             block.type === "h2" ? (
               <h2 key={index}>{block.text}</h2>
@@ -94,7 +98,9 @@ export default async function GuidePage({ params }: Props) {
             <ul className={s.list} style={{ paddingInlineStart: 18 }}>
               {others.map((other) => (
                 <li key={other.slug}>
-                  <a href={`/guides/${other.slug}`}>{other.title}</a>
+                  <a href={roveHref(`/guides/${other.slug}`, locale)} lang={other.locale === locale ? undefined : other.locale}>
+                    {other.title}
+                  </a>
                 </li>
               ))}
             </ul>

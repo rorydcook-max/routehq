@@ -21,7 +21,7 @@ import { isServedPhoto, sizedPhoto } from "@/lib/photo-url";
 
 export const dynamic = "force-dynamic";
 
-type Query = { from?: string; to?: string; vehicle?: string; via?: string; embed?: string; ref?: string; draft?: string; edit?: string };
+type Query = { from?: string; to?: string; monthly?: string; vehicle?: string; via?: string; embed?: string; ref?: string; draft?: string; edit?: string };
 
 /** The business's current address when `slug` is one it used before, else null. */
 async function renamedSlug(slug: string): Promise<string | null> {
@@ -145,6 +145,8 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
     visitorCurrency: visitor,
     initialStart: isoDay(query.from),
     initialEnd: isoDay(query.to),
+    // rove.rent's "Book" carries the kind of stay searched for: monthly=1, or set dates (from and to).
+    initialLongTerm: query.monthly === "1" ? true : isoDay(query.to) ? false : null,
     initialVehicleId: query.vehicle ? String(query.vehicle).slice(0, 60) : null,
     source: query.embed === "1" ? "website" : query.via === "directory" ? "directory" : null,
     referrer

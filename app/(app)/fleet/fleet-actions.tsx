@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Archive, Trash2 } from "lucide-react";
 import { PendingButton } from "@/components/pending-button";
+import { ActionForm } from "@/components/action-form";
 
 /**
  * Bulk actions for the fleet table. Hidden until at least one vehicle is
@@ -71,7 +72,8 @@ export function ConfirmDeleteVehicleButton({
   vehicleId: string;
   organizationId: string;
   label: string;
-  deleteAction: (formData: FormData) => void | Promise<void>;
+  /** May hand back `{ actionError }` (lib/action-error.ts); the form shows it. */
+  deleteAction: (formData: FormData) => Promise<unknown>;
   /** Current or upcoming bookings on this vehicle. */
   liveBookings?: number;
   /** Owner only: may delete those bookings together with the vehicle. */
@@ -97,7 +99,7 @@ export function ConfirmDeleteVehicleButton({
   }
   {
     return (
-      <form action={deleteAction} className="grid max-w-xs gap-2 rounded-xl border border-[var(--danger-line)] bg-[var(--danger-light)] p-3" role="alertdialog">
+      <ActionForm action={deleteAction} className="grid max-w-xs gap-2 rounded-xl border border-[var(--danger-line)] bg-[var(--danger-light)] p-3" role="alertdialog">
         <input name="vehicleId" type="hidden" value={vehicleId} />
         <input name="organizationId" type="hidden" value={organizationId} />
         <input name="deleteBookings" type="hidden" value="1" />
@@ -112,7 +114,7 @@ export function ConfirmDeleteVehicleButton({
             {t("keep")}
           </button>
         </div>
-      </form>
+      </ActionForm>
     );
   }
 }

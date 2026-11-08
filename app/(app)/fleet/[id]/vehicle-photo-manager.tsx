@@ -5,11 +5,18 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Camera, ImagePlus, Move, Sparkles, Trash2, Undo2, X } from "lucide-react";
 import { AiPhotoTools, useAiPhotos } from "@/components/ai-photos";
-import { removeVehiclePhoto, reorderVehiclePhotos, uploadVehiclePhotos } from "@/app/actions/vehicles";
+import { removeVehiclePhoto as removeVehiclePhotoAction, reorderVehiclePhotos as reorderVehiclePhotosAction, uploadVehiclePhotos as uploadVehiclePhotosAction } from "@/app/actions/vehicles";
 import type { VehicleDetailDocument } from "@/lib/vehicle-detail";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { compressImage } from "@/lib/direct-upload-client";
 import { refreshVehiclePhotos } from "@/components/vehicle-photo-store";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const uploadVehiclePhotos = (...args: Parameters<typeof uploadVehiclePhotosAction>) => unwrap(uploadVehiclePhotosAction(...args));
+const removeVehiclePhoto = (...args: Parameters<typeof removeVehiclePhotoAction>) => unwrap(removeVehiclePhotoAction(...args));
+const reorderVehiclePhotos = (...args: Parameters<typeof reorderVehiclePhotosAction>) => unwrap(reorderVehiclePhotosAction(...args));
 
 type VehiclePhotoManagerProps = {
   organizationId: string;
@@ -58,8 +65,8 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
         await reorderVehiclePhotos(formData);
         refreshVehiclePhotos();
         setMessage(say("ph_orderSaved"));
-      } catch {
-        setMessage(say("ph_orderFailed"));
+      } catch (caught) {
+        setMessage(shownError(caught, say("ph_orderFailed")));
         setOrderedPhotos(photos);
       }
     });
@@ -152,8 +159,8 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
         }
         refreshVehiclePhotos();
         setMessage(failed === chosen.length ? say("ph_uploadFailed") : say("ph_updated"));
-      } catch {
-        setMessage(say("ph_uploadFailed"));
+      } catch (caught) {
+        setMessage(shownError(caught, say("ph_uploadFailed")));
       } finally {
         if (fileInputRef.current) fileInputRef.current.value = "";
       }
@@ -169,8 +176,8 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
         const documentId = String(formData.get("documentId") || "");
         setOrderedPhotos((current) => current.filter((photo) => photo.id !== documentId));
         setMessage(say("ph_removed"));
-      } catch {
-        setMessage(say("ph_removeFailed"));
+      } catch (caught) {
+        setMessage(shownError(caught, say("ph_removeFailed")));
       }
     });
   }

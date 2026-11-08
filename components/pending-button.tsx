@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { useActionFormError } from "@/components/action-form";
 
 type PendingButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
@@ -17,6 +18,8 @@ type PendingButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function PendingButton({ children, className = "", pendingLabel, savedLabel, ...props }: PendingButtonProps) {
   const { pending } = useFormStatus();
+  // Inside an ActionForm: the reason the save failed, if it did (then no "Saved").
+  const failure = useActionFormError();
   const wasPending = useRef(false);
   const [justSaved, setJustSaved] = useState(false);
 
@@ -27,10 +30,11 @@ export function PendingButton({ children, className = "", pendingLabel, savedLab
     }
     if (!wasPending.current || !savedLabel) return;
     wasPending.current = false;
+    if (failure) return;
     setJustSaved(true);
     const timer = setTimeout(() => setJustSaved(false), 2500);
     return () => clearTimeout(timer);
-  }, [pending, savedLabel]);
+  }, [pending, savedLabel, failure]);
 
   return (
     <button {...props} className={`pressable ${className}`} disabled={pending || props.disabled}>

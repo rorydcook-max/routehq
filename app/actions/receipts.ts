@@ -1,5 +1,7 @@
 "use server";
 
+import { userError } from "@/lib/action-error";
+
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildDocumentStoragePath } from "@/services/documents/storage-path";
@@ -62,7 +64,7 @@ export async function attachReceipt(formData: FormData): Promise<{ ok: true } | 
     if (transaction.rental_id) revalidatePath(`/bookings/${transaction.rental_id}`);
     return { ok: true };
   } catch (caught) {
-    return { ok: false, error: caught instanceof Error ? caught.message : "The receipt could not be saved." };
+    return { ok: false, error: await userError(caught, "The receipt could not be saved.") };
   }
 }
 

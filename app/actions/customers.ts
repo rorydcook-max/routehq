@@ -6,6 +6,7 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildDocumentStoragePath } from "@/services/documents/storage-path";
 import { cleanDvlaCode, cleanTcKimlikNo, licenceCategoriesText } from "@/lib/licence";
+import { guard, userError } from "@/lib/action-error";
 const contactMethods = ["whatsapp", "messenger", "line", "telegram", "sms", "email", "phone"];
 
 function optionalString(formData: FormData, key: string) {
@@ -164,7 +165,12 @@ async function createCustomerDocumentUploads(supabase: any, formData: FormData, 
   }
 }
 
+/** The Add customer page. A reason it can't be saved comes back as `{ actionError }` for the form to show. */
 export async function createCustomer(formData: FormData) {
+  return guard(() => createCustomerOrThrow(formData), "Couldn't add the customer. Nothing was saved.");
+}
+
+async function createCustomerOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -215,7 +221,11 @@ export async function createCustomer(formData: FormData) {
     throw new Error(error?.message || "Unable to create customer.");
   }
 
-  await createCustomerDocumentUploads(supabase, formData, organizationId, data.id, user.id);
+  // The customer is saved by now: a photo that fails to upload must not show an error that makes the owner add them twice.
+  // The customer's page shows which documents are missing, and they can be added there.
+  await createCustomerDocumentUploads(supabase, formData, organizationId, data.id, user.id).catch((uploadError) =>
+    console.warn("[createCustomer] document upload:", uploadError instanceof Error ? uploadError.message : uploadError)
+  );
 
   await recordActivityEvent(supabase, {
     organization_id: organizationId,
@@ -251,7 +261,12 @@ export async function customerWithPhone(organizationId: string, code: string, lo
   return data ? { id: String(data.id), name: String(data.full_name || "") } : null;
 }
 
+/** "Add a new customer" inside the booking form. A reason it can't be saved comes back as `{ actionError }`. */
 export async function createInlineCustomer(formData: FormData) {
+  return guard(() => createInlineCustomerOrThrow(formData), "Couldn't add the customer. Nothing was saved.");
+}
+
+async function createInlineCustomerOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -318,7 +333,12 @@ export async function createInlineCustomer(formData: FormData) {
   };
 }
 
-export async function updateCustomer(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateCustomer(...args: Parameters<typeof updateCustomerOrThrow>) {
+  return guard(() => updateCustomerOrThrow(...args));
+}
+
+async function updateCustomerOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -397,7 +417,12 @@ export async function updateCustomer(formData: FormData) {
   revalidatePath(`/customers/${customerId}`);
 }
 
-export async function uploadCustomerDocument(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function uploadCustomerDocument(...args: Parameters<typeof uploadCustomerDocumentOrThrow>) {
+  return guard(() => uploadCustomerDocumentOrThrow(...args));
+}
+
+async function uploadCustomerDocumentOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -504,6 +529,6 @@ export async function uploadCustomerDocumentQuick(formData: FormData): Promise<{
     revalidatePath(`/customers/${customerId}`);
     return { success: true, documentStatus };
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : "Upload failed." };
+    return { success: false, error: await userError(error, "The upload didn't work. Try again.") };
   }
 }

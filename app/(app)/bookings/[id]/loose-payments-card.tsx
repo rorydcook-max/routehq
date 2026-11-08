@@ -4,6 +4,7 @@ import { dismissLoosePayments, linkLoosePayments } from "@/app/actions/loose-pay
 import { longDate } from "@/lib/i18n/dates";
 import type { LoosePayment } from "@/lib/loose-payments";
 import { niceMoney } from "@/lib/nice-money";
+import { ActionForm } from "@/components/action-form";
 
 /**
  * "Are these payments from this booking?" (Rory, 2 Nov 2026): rent for this vehicle already in Money in & out, not
@@ -16,7 +17,7 @@ export async function LoosePaymentsCard({ rentalId, payments, currency }: { rent
   const total = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
   return (
-    <form action={linkLoosePayments} className="rounded-2xl border border-[var(--info-line)] bg-[var(--info-light)] p-4">
+    <ActionForm action={linkLoosePayments} className="rounded-2xl border border-[var(--info-line)] bg-[var(--info-light)] p-4">
       <input name="rentalId" type="hidden" value={rentalId} />
       <div className="flex items-start gap-3">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--panel)] text-[var(--primary)]">
@@ -50,6 +51,6 @@ export async function LoosePaymentsCard({ rentalId, payments, currency }: { rent
           {t("lp_no")}
         </button>
       </div>
-    </form>
+    </ActionForm>
   );
 }

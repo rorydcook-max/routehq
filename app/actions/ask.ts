@@ -1,6 +1,8 @@
 "use server";
 
 import { said } from "@/lib/i18n/server-text";
+import { unwrap } from "@/lib/action-result";
+import { friendlyReason } from "@/lib/action-error";
 import { createBooking, recordPaymentReceived } from "@/app/actions/bookings";
 import { createInlineCustomer } from "@/app/actions/customers";
 import { createTransaction } from "@/app/actions/transactions";
@@ -59,7 +61,7 @@ export async function confirmAssistantAction(kind: string, args: Record<string, 
   try {
     if (checked.action.kind === "add_vehicle") {
       try {
-        await createVehicle(form(organizationId, { categoryId: a.categoryId, make: a.make, model: a.model, registrationNumber: a.registrationNumber, year: a.year, color: a.color, mileage: a.mileage, dailyRate: a.dailyRate, weeklyRate: a.weeklyRate, monthlyRate: a.monthlyRate, purchasePrice: a.purchasePrice, estimatedValue: a.currentValue, serviceArea: "home_branch" }));
+        await unwrap(createVehicle(form(organizationId, { categoryId: a.categoryId, make: a.make, model: a.model, registrationNumber: a.registrationNumber, year: a.year, color: a.color, mileage: a.mileage, dailyRate: a.dailyRate, weeklyRate: a.weeklyRate, monthlyRate: a.monthlyRate, purchasePrice: a.purchasePrice, estimatedValue: a.currentValue, serviceArea: "home_branch" })));
       } catch (error) {
         if (!isRedirect(error)) throw error;
       }
@@ -93,7 +95,8 @@ export async function confirmAssistantAction(kind: string, args: Record<string, 
 async function failed(error: unknown): Promise<Done> {
   if (isRedirect(error)) return { ok: true, message: await said("Done.") };
   // Server code hides its messages in production; this one is safe to show because it is ours.
-  const message = error instanceof Error && error.message && !/digest|NEXT_/.test(error.message) ? error.message : "";
+  // Database wording ("duplicate key value...") is never shown; friendlyReason turns the known ones into a sentence.
+  const message = error instanceof Error && error.message && !/digest|NEXT_/.test(error.message) ? friendlyReason(error.message) || "" : "";
   return { ok: false, error: message ? await said(`That couldn't be saved: ${message}`) : await said("That couldn't be saved. Nothing was changed.") };
 }
 
@@ -141,7 +144,7 @@ async function confirmTask(kind: "record_cost" | "record_payment" | "create_book
         const organization = (await getDefaultOrganization()) as any;
         // The business's own dialling code for a number given without one (none when its country isn't set).
         const phoneCountryCode = dialCodeFor(organization.country_code || toCountryCode(organization.settings?.main_location?.country));
-        const created = await createInlineCustomer(form(organizationId, { fullName: a.customerName, phone: a.customerPhone, phoneCountryCode }));
+        const created = await unwrap(createInlineCustomer(form(organizationId, { fullName: a.customerName, phone: a.customerPhone, phoneCountryCode })));
         customerId = created.id;
       }
     }

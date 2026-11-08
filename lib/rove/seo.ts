@@ -106,17 +106,17 @@ export function itemListLd(name: string, items: Array<{ name: string; path: stri
   };
 }
 
-export function articleLd(input: { title: string; description: string; path: string; published: string; updated: string; image: string }) {
+export function articleLd(input: { title: string; description: string; path: string; published: string; updated: string; image: string; locale?: string }) {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: input.title,
     description: input.description,
-    mainEntityOfPage: roveAbsolute(input.path),
+    mainEntityOfPage: roveAbsolute(input.path, input.locale),
     image: [input.image],
     datePublished: schemaDateTime(input.published),
     dateModified: schemaDateTime(input.updated),
-    inLanguage: "en",
+    inLanguage: input.locale || "en",
     author: { "@id": ROVE_ORG_ID(), "@type": "Organization", name: ROVE_NAME, url: `${roveOrigin()}/` },
     publisher: { "@id": ROVE_ORG_ID(), "@type": "Organization", name: ROVE_NAME, logo: { "@type": "ImageObject", url: `${roveOrigin()}/icon.svg` } }
   };

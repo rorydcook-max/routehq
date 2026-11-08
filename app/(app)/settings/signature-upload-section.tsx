@@ -3,8 +3,13 @@
 import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { updateOwnerSignature } from "@/app/actions/settings";
+import { updateOwnerSignature as updateOwnerSignatureAction } from "@/app/actions/settings";
 import { SignaturePad } from "@/components/signature-pad";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const updateOwnerSignature = (...args: Parameters<typeof updateOwnerSignatureAction>) => unwrap(updateOwnerSignatureAction(...args));
 
 export function SignatureUploadSection({
   authorisedSignatoryName,
@@ -31,8 +36,8 @@ export function SignatureUploadSection({
       try {
         await updateOwnerSignature(formData);
         setMessage({ text: say("sg_saved"), type: "success" });
-      } catch {
-        setMessage({ text: say("sg_failed"), type: "error" });
+      } catch (caught) {
+        setMessage({ text: shownError(caught, say("sg_failed")), type: "error" });
       }
     });
   }
@@ -127,8 +132,8 @@ export function SignatureUploadSection({
         setDrawn("");
         router.refresh();
         setPadKey((value) => value + 1);
-      } catch {
-        setMessage({ text: say("sg_failed"), type: "error" });
+      } catch (caught) {
+        setMessage({ text: shownError(caught, say("sg_failed")), type: "error" });
       }
     });
   }

@@ -1,5 +1,7 @@
 "use server";
 
+import { friendlyReason, guard } from "@/lib/action-error";
+
 import { revalidatePath } from "next/cache";
 import { requireOwner } from "@/lib/auth/roles";
 import { NotAnAgreementError, checkThaiEssentials, readDocxText, readImportedAgreement } from "@/lib/contract-import";
@@ -44,11 +46,16 @@ function cleanName(name: string) {
 }
 
 function errorText(error: unknown) {
-  return error instanceof Error ? error.message : String(error);
+  return friendlyReason(error instanceof Error ? error.message : String(error || "")) || "That didn't work. Try again.";
 }
 
 /** Signed upload links for the agreement's files: straight from the phone to storage (Vercel caps a request at 4.5 MB). */
-export async function prepareContractImportUploads(files: UploadRequest[]): Promise<PreparedUploads> {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function prepareContractImportUploads(...args: Parameters<typeof prepareContractImportUploadsOrThrow>) {
+  return guard(() => prepareContractImportUploadsOrThrow(...args));
+}
+
+async function prepareContractImportUploadsOrThrow(files: UploadRequest[]): Promise<PreparedUploads> {
   const membership = await requireOwner();
   if (!Array.isArray(files) || !files.length) return { uploads: [], error: await said("Choose a file first.") };
   if (files.length > IMPORT_MAX_PAGES) return { uploads: [], error: await said(`Send up to ${IMPORT_MAX_PAGES} photos at a time.`) };

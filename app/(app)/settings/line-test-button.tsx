@@ -8,11 +8,14 @@ export function LineTestButton() {
   const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<"ok" | "failed" | null>(null);
+  // Why it wasn't sent ("LINE isn't connected yet"...), when the server says.
+  const [reason, setReason] = useState("");
 
   function handleClick() {
     setResult(null);
     startTransition(async () => {
-      const res = await sendTestLineSummary().catch(() => ({ success: false }));
+      const res = await sendTestLineSummary().catch(() => ({ success: false, message: "" }));
+      setReason(res.success ? "" : res.message || "");
       setResult(res.success ? "ok" : "failed");
     });
   }
@@ -29,7 +32,7 @@ export function LineTestButton() {
           say("tb_send")
         )}
       </button>
-      {result ? <p className={`font-bold ${result === "ok" ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{result === "ok" ? say("tb_ok") : say("tb_failed")}</p> : null}
+      {result ? <p className={`font-bold ${result === "ok" ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{result === "ok" ? say("tb_ok") : reason || say("tb_failed")}</p> : null}
     </div>
   );
 }

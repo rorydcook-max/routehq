@@ -28,6 +28,8 @@ export function bookingHref(vehicle: RoveVehicle, stay: Stay) {
   const query = new URLSearchParams({ vehicle: vehicle.id });
   if (stay.mode !== "any" || stay.start) query.set("from", stay.start);
   if (stay.mode === "dates") query.set("to", stay.end);
+  // A monthly search opens the booking page on Monthly (rent/[slug]/page.tsx), not on set dates.
+  if (stay.mode === "monthly") query.set("monthly", "1");
   query.set("via", "directory");
   return `/${vehicle.business.slug}?${query.toString()}`;
 }

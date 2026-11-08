@@ -1,5 +1,7 @@
 "use server";
 
+import { guard } from "@/lib/action-error";
+
 import { businessToday, businessTimeZone } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
@@ -28,6 +30,7 @@ import { adoptBusinessClock } from "@/lib/auth/active-organization-server";
 import { enterBusinessTimeZone } from "@/lib/business-time-scope";
 import { businessDistanceUnit } from "@/lib/business-units";
 import { niceMoney } from "@/lib/nice-money";
+import { niceDate } from "@/lib/nice-date";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
 
@@ -502,7 +505,12 @@ async function ensureHandoverCollectTask(
   });
 }
 
-export async function submitInspection(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function submitInspection(...args: Parameters<typeof submitInspectionOrThrow>) {
+  return guard(() => submitInspectionOrThrow(...args));
+}
+
+async function submitInspectionOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -857,7 +865,9 @@ export async function submitInspection(formData: FormData) {
       late = lateReturnFor(rental, rates, returnDate);
     }
     // No answer on the form: the charge was already written (cash taken earlier on this return form), so it stands as it is.
-    const lateChoice = late && formData.has("lateReturn") ? asLateReturnChoice(stringField(formData, "lateReturn")) || "charge" : null;
+    let lateChoice = late && formData.has("lateReturn") ? asLateReturnChoice(stringField(formData, "lateReturn")) || "charge" : null;
+    // Waiving is a money decision, as for an early handover: the form only offers it to those who may (canWaive).
+    if (lateChoice === "waive" && !canDecideMoney((await getCurrentMembership())?.role)) lateChoice = "charge";
     const lateAmount = late ? (formData.has("lateReturnAmount") ? lateReturnAmount(formData.get("lateReturnAmount")) : late.amount) : 0;
     const endDate = returnDate;
 
@@ -926,8 +936,8 @@ export async function submitInspection(formData: FormData) {
         title: `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late`,
         detail:
           toldChoice === "waive" || toldAmount <= 0
-            ? `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${late.bookedEnd}). Charge waived.`
-            : `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${late.bookedEnd}). ${lateMoney} ${toldChoice === "deposit" ? "taken from the deposit" : "charged to the renter"}.`
+            ? `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${niceDate(late.bookedEnd)}). Charge waived.`
+            : `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${niceDate(late.bookedEnd)}). ${lateMoney} ${toldChoice === "deposit" ? "taken from the deposit" : "charged to the renter"}.`
       });
     }
 
@@ -976,7 +986,9 @@ export async function submitInspection(formData: FormData) {
       // Back early with rent still unpaid: part of what is owed is for days after the return. The owner decides
       // whether it stands (booking page), so the customer isn't told a figure that may change.
       let owedEarly = null as ReturnType<typeof earlyReturnOwed>;
-      if (owed > 0) {
+      // Back after the booked return date: nothing was early. (The late-days row, due today, otherwise read as a new
+      // rent period with unused days.)
+      if (owed > 0 && !late) {
         const admin = createSupabaseAdminClient() as any;
         const { data: rows } = await admin.from("rental_payments").select("id, amount, status, due_date, voided, metadata").eq("rental_id", rentalId).is("deleted_at", null);
         const before = rental?.end_date ? String(rental.end_date).slice(0, 10) : null;
@@ -986,13 +998,14 @@ export async function submitInspection(formData: FormData) {
             const row = (rows || []).find((payment: any) => payment.id === item.id);
             await admin.from("rental_payments").update({ metadata: { ...(row?.metadata || {}), early_return_owed: { share: item.share, unused_days: owedEarly.unusedDays, return_date: returnDate } } }).eq("id", item.id);
           }
-          const symbol = String(rental?.currency || "THB") === "THB" ? "฿" : `${rental?.currency} `;
+          // With the currency's symbol and the cents kept ("€102 of €118.50"), not "EUR 102 of EUR 119" (test-app-nov8).
+          const lateCurrency = rental?.currency || "THB";
           await admin.from("tasks").insert({
             organization_id: organizationId,
             vehicle_id: vehicleId,
             rental_id: rentalId,
             created_by: null,
-            title: `Rent to decide - returned ${owedEarly.unusedDays} ${owedEarly.unusedDays === 1 ? "day" : "days"} early (${symbol}${owedEarly.amount.toLocaleString("en-US")} of ${symbol}${Math.round(owed).toLocaleString("en-US")} owed is for days after)`,
+            title: `Rent to decide - returned ${owedEarly.unusedDays} ${owedEarly.unusedDays === 1 ? "day" : "days"} early (${niceMoney(owedEarly.amount, lateCurrency)} of ${niceMoney(owed, lateCurrency)} owed is for days after)`,
             task_type: "admin",
             action: "owed_early",
             due_at: new Date().toISOString()
@@ -1025,7 +1038,8 @@ export async function submitInspection(formData: FormData) {
         const admin = createSupabaseAdminClient() as any;
         const { data: allPayments } = await admin.from("rental_payments").select("id, amount, status, due_date, metadata").eq("rental_id", rentalId).is("deleted_at", null);
         const previousEnd = rental?.end_date ? String(rental.end_date).slice(0, 10) : null;
-        const suggestion = earlyReturnSuggestion({ payments: allPayments || [], returnDate, previousEnd: previousEnd && previousEnd > returnDate ? previousEnd : null, interval: String(rental?.billing_interval || rental?.pricing_model || "monthly"), currency: rental?.currency || null });
+        // A late return used all the time paid for: no refund to suggest (the late-days row is not a period paid ahead).
+        const suggestion = late ? null : earlyReturnSuggestion({ payments: allPayments || [], returnDate, previousEnd: previousEnd && previousEnd > returnDate ? previousEnd : null, interval: String(rental?.billing_interval || rental?.pricing_model || "monthly"), currency: rental?.currency || null });
         if (suggestion) {
           const lastPaid = (allPayments || [])
             .filter((payment: any) => ["paid", "reconciled"].includes(String(payment.status)) && payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true)

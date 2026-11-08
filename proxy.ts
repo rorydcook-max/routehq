@@ -238,7 +238,8 @@ export async function proxy(request: NextRequest) {
   // An English (unprefixed) website address for someone who reads another language: that language's address instead.
   if (isSitePage && !prefixedSite && request.method === "GET" && !request.headers.get("next-action")) {
     const wanted = preferredSiteLocale();
-    if (wanted !== DEFAULT_SITE_LOCALE) {
+    // Only when the page exists in that language: a guide written in English alone stays English (it was a 404).
+    if (wanted !== DEFAULT_SITE_LOCALE && !missingSiteContent(pathname, wanted)) {
       const url = request.nextUrl.clone();
       url.pathname = localizeSitePath(pathname, wanted);
       return languageRedirect(url);

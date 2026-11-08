@@ -34,7 +34,9 @@ async function kit() {
   // Outside Asia renters pay by transfer, Wise or Revolut rather than QR code (lib/site/region.ts).
   const qr = paysByQr(regionForCurrency(currency));
   const payName = qr ? qrName : t("mockBankTransfer");
-  return { t, money, local, format, number, date, currency, qrName, qr, payName };
+  // Anna's 7-day Pajero booking: the booking link, the QR payment and the ledger all show this same total.
+  const pajeroTotal = format(local(PAJERO_DAY) * BOOKING_DAYS);
+  return { t, money, local, format, number, date, currency, qrName, qr, payName, pajeroTotal };
 }
 
 /** The website's pictures use these amounts, so a page can show the same ones in its own words. */
@@ -406,9 +408,9 @@ function TabBar({ active = 0 }: { active?: number }) {
 /* ── A customer's booking link ──────────────────────────────────────────── */
 
 export async function BookingPhoneMock({ className = "" }: { className?: string }) {
-  const { t, money, local, format, date } = await kit();
+  const { t, money, date, pajeroTotal } = await kit();
   // The booking page's day price times the days, in the visitor's currency, so the total always adds up.
-  const total = format(local(PAJERO_DAY) * BOOKING_DAYS);
+  const total = pajeroTotal;
   const range = `${date("2026-11-12", { day: "numeric", month: "short" })} – ${date("2026-11-19", { day: "numeric", month: "short" })}`;
   return (
     <PhoneFrame className={className} label={t("mockBookingLabel")}>
@@ -548,7 +550,7 @@ export async function HandoverPhoneMock({ className = "" }: { className?: string
 /* ── Getting paid ───────────────────────────────────────────────────────── */
 
 export async function PaymentPhoneMock({ className = "" }: { className?: string }) {
-  const { t, money, qrName, qr } = await kit();
+  const { t, money, qrName, qr, pajeroTotal } = await kit();
   return (
     <PhoneFrame className={className} label={t(qr ? "mockPaymentLabel" : "mockPaymentLabelGlobal")}>
       <div className="flex h-full flex-col bg-[#f3f6f8]">
@@ -557,7 +559,7 @@ export async function PaymentPhoneMock({ className = "" }: { className?: string 
           <div className="mx-[0.9em] mt-[2em] rounded-[1.4em] bg-white p-[1.1em] text-center shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
             <p className="font-semibold text-[#5f6b7a]">{t("mockScanToPay")}</p>
             <p className="mt-[0.1em] text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
-              {money(5600)}
+              {pajeroTotal}
             </p>
             <div className="mx-auto mt-[0.8em] w-[62%] rounded-[0.8em] border-[0.15em] border-[#e6eaef] p-[0.5em]">
               <FakeQr className="block w-full" />
@@ -570,7 +572,7 @@ export async function PaymentPhoneMock({ className = "" }: { className?: string 
           <div className="mx-[0.9em] mt-[2em] rounded-[1.4em] bg-white p-[1.1em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
             <p className="text-center font-semibold text-[#5f6b7a]">{t("mockPayByTransfer")}</p>
             <p className="mt-[0.1em] text-center text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
-              {money(5600)}
+              {pajeroTotal}
             </p>
             <div className="mt-[0.8em] overflow-hidden rounded-[0.9em] bg-[#f3f6f8]">
               {[
@@ -595,7 +597,7 @@ export async function PaymentPhoneMock({ className = "" }: { className?: string 
           </span>
           <span className="min-w-0">
             <span className="block font-bold leading-tight">{t(qr ? "mockSlipMatched" : "mockReceiptMatched")}</span>
-            <span className="block text-[#5f6b7a]">{money(5600)} · Anna Becker</span>
+            <span className="block text-[#5f6b7a]">{pajeroTotal} · Anna Becker</span>
           </span>
         </div>
         <div className="mx-[0.9em] mt-[0.6em] flex items-center justify-between rounded-[1.3em] bg-white px-[0.9em] py-[0.75em] font-semibold shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
@@ -756,9 +758,9 @@ export async function ReturnCard({ className = "" }: { className?: string }) {
 
 /** A booking's money, all on record. */
 export async function LedgerCard({ className = "" }: { className?: string }) {
-  const { t, money, payName } = await kit();
+  const { t, money, payName, pajeroTotal } = await kit();
   const rows = [
-    { label: t("mockRental"), sub: t("mockDays", { count: 7 }), amount: money(5600), done: true },
+    { label: t("mockRental"), sub: t("mockDays", { count: BOOKING_DAYS }), amount: pajeroTotal, done: true },
     { label: t("mockDepositHeld"), sub: payName, amount: money(3000), done: true },
     { label: t("mockReceiptSent"), sub: "Email", amount: "", done: true }
   ];

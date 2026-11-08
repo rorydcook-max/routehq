@@ -7,6 +7,7 @@ import { saveAgreementTerms } from "@/app/actions/contracts";
 import { InfoTip } from "@/components/info-tip";
 import { PendingButton } from "@/components/pending-button";
 import { ownerTermsHtml, renderContractTemplate } from "@/lib/contract-rendering";
+import { ActionForm } from "@/components/action-form";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -105,7 +106,7 @@ export function AgreementTerms({
       <section className="card p-4">
         <h2 className={h2}>{say("ag_ownTitle")}</h2>
         <p className={`mt-1 ${soft}`}>{say("ag_ownBody")}</p>
-        <form action={saveAgreementTerms} className="mt-3 space-y-3">
+        <ActionForm action={saveAgreementTerms} className="mt-3 space-y-3">
           <input name="organizationId" type="hidden" value={organizationId} />
           {terms.map((term, index) => (
             <div key={index}>
@@ -148,7 +149,7 @@ export function AgreementTerms({
           <PendingButton className="primary-action w-full sm:w-auto" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
             {say("save")}
           </PendingButton>
-        </form>
+        </ActionForm>
       </section>
       </div>
     </div>

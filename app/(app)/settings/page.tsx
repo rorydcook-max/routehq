@@ -60,6 +60,7 @@ import { ensureDefaultBranch } from "@/lib/branches";
 import { getDefaultOrganization, getTravelPolicySettings, getVehicleCategories } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { businessTimeZone } from "@/lib/business-time";
+import { ActionForm } from "@/components/action-form";
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
@@ -434,7 +435,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </Fold>
             <Fold id="paying-ahead" summary={organization.upfront_discount_enabled ? stateLine("st_aheadOn", true) : stateLine("st_aheadOff", false)} title={say("ahead_title")}>
               <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("ahead_body")}</p>
-              <form action={updateUpfrontDiscountSettings} className="mt-3 space-y-3">
+              <ActionForm action={updateUpfrontDiscountSettings} className="mt-3 space-y-3">
                 <SwitchField
                   defaultChecked={Boolean(organization.upfront_discount_enabled)}
                   label={say("ahead_offer")}
@@ -476,7 +477,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 <PendingButton className="primary-action" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
                   {say("save")}
                 </PendingButton>
-              </form>
+              </ActionForm>
             </Fold>
             </div>
               <div className="space-y-3">
@@ -607,7 +608,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
           {/* Notification settings, shown when connected. */}
           {lineUserId && (
-            <form action={updateLineSettings} className="mt-4 space-y-3">
+            <ActionForm action={updateLineSettings} className="mt-4 space-y-3">
               <input name="organizationId" type="hidden" value={organization.id} />
               <input name="line_user_id" type="hidden" value={lineUserId} />
               {/* LINE carries only the morning summary now, so its master switch stays on and the summary has the one switch. */}
@@ -630,7 +631,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <PendingButton className="primary-action w-full sm:w-auto" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
                 {say("line_save")}
               </PendingButton>
-            </form>
+            </ActionForm>
           )}
 
           {/* Test button */}

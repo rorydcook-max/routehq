@@ -1,5 +1,7 @@
 "use server";
 
+import { guard, userError } from "@/lib/action-error";
+
 import { said } from "@/lib/i18n/server-text";
 import { promptPayQrPath } from "@/lib/promptpay-qr";
 import { revalidatePath } from "next/cache";
@@ -199,7 +201,12 @@ function parseAcceptedPaymentMethods(formData: FormData) {
   return Array.from(new Set(["cash", ...methods]));
 }
 
-export async function updatePaymentSettings(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updatePaymentSettings(...args: Parameters<typeof updatePaymentSettingsOrThrow>) {
+  return guard(() => updatePaymentSettingsOrThrow(...args));
+}
+
+async function updatePaymentSettingsOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -302,7 +309,12 @@ export async function updatePaymentSettings(formData: FormData) {
   revalidatePath("/");
 }
 
-export async function updateUpfrontDiscountSettings(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateUpfrontDiscountSettings(...args: Parameters<typeof updateUpfrontDiscountSettingsOrThrow>) {
+  return guard(() => updateUpfrontDiscountSettingsOrThrow(...args));
+}
+
+async function updateUpfrontDiscountSettingsOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -341,7 +353,12 @@ export async function updateUpfrontDiscountSettings(formData: FormData) {
   revalidatePath("/settings");
 }
 
-export async function updateBusinessLogo(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateBusinessLogo(...args: Parameters<typeof updateBusinessLogoOrThrow>) {
+  return guard(() => updateBusinessLogoOrThrow(...args));
+}
+
+async function updateBusinessLogoOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const { user, organizationId } = await requireActiveOrganizationMembership(supabase);
@@ -449,7 +466,12 @@ export async function updateBusinessLogo(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-export async function updateOwnerSignature(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateOwnerSignature(...args: Parameters<typeof updateOwnerSignatureOrThrow>) {
+  return guard(() => updateOwnerSignatureOrThrow(...args));
+}
+
+async function updateOwnerSignatureOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const { user, organizationId } = await requireActiveOrganizationMembership(supabase);
@@ -571,7 +593,12 @@ export async function updateOwnerSignature(formData: FormData) {
   revalidatePath("/settings/contracts");
 }
 
-export async function updateContractBrandingSettings(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateContractBrandingSettings(...args: Parameters<typeof updateContractBrandingSettingsOrThrow>) {
+  return guard(() => updateContractBrandingSettingsOrThrow(...args));
+}
+
+async function updateContractBrandingSettingsOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const { user, organizationId } = await requireActiveOrganizationMembership(supabase);
@@ -680,7 +707,12 @@ export async function updateContractBrandingSettings(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-export async function updateTravelPolicySettings(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateTravelPolicySettings(...args: Parameters<typeof updateTravelPolicySettingsOrThrow>) {
+  return guard(() => updateTravelPolicySettingsOrThrow(...args));
+}
+
+async function updateTravelPolicySettingsOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -770,7 +802,12 @@ function serviceRadiusFromForm(formData: FormData) {
   return value === null || value === undefined || !Number.isFinite(Number(value)) ? null : Math.min(500, Math.max(0, Math.round(Number(value) * 10) / 10));
 }
 
-export async function createBranch(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function createBranch(...args: Parameters<typeof createBranchOrThrow>) {
+  return guard(() => createBranchOrThrow(...args));
+}
+
+async function createBranchOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -785,14 +822,15 @@ export async function createBranch(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
   const address = String(formData.get("address") || "").trim();
 
-  if (!organizationId || !name || !address) {
-    throw new Error("Branch name and address are required.");
+  // The address can wait, as on Edit: the list already shows "No address yet" and the map pin sets the service area.
+  if (!organizationId || !name) {
+    throw new Error("Add a name for this location.");
   }
 
   const { error } = await supabase.from("branches").insert({
     organization_id: organizationId,
     name,
-    address,
+    address: address || null,
     latitude: optionalNumberFromForm(formData, "latitude"),
     longitude: optionalNumberFromForm(formData, "longitude"),
     service_radius_km: serviceRadiusFromForm(formData),
@@ -809,7 +847,12 @@ export async function createBranch(formData: FormData) {
   revalidatePath("/fleet/new");
 }
 
-export async function updateBranch(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateBranch(...args: Parameters<typeof updateBranchOrThrow>) {
+  return guard(() => updateBranchOrThrow(...args));
+}
+
+async function updateBranchOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -851,7 +894,12 @@ export async function updateBranch(formData: FormData) {
   revalidatePath("/fleet/new");
 }
 
-export async function deleteBranch(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function deleteBranch(...args: Parameters<typeof deleteBranchOrThrow>) {
+  return guard(() => deleteBranchOrThrow(...args));
+}
+
+async function deleteBranchOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -1434,7 +1482,12 @@ Rules:
   revalidatePath("/settings");
 }
 
-export async function updateLineSettings(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateLineSettings(...args: Parameters<typeof updateLineSettingsOrThrow>) {
+  return guard(() => updateLineSettingsOrThrow(...args));
+}
+
+async function updateLineSettingsOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -1525,11 +1578,17 @@ export async function disconnectLine(formData: FormData) {
 }
 
 export async function sendTestLineSummary(): Promise<{ success: boolean; message: string }> {
-  const membership = await requireOwner();
+  // The reason it wasn't sent goes back to the button (it only ever said "failed").
+  let membership: Awaited<ReturnType<typeof requireOwner>>;
+  try {
+    membership = await requireOwner();
+  } catch (error) {
+    return { success: false, message: await userError(error, "The summary could not be sent.") };
+  }
   // The summary for the business this person is working in, sent the same way as the morning one.
   const result = await sendDailySummary(membership.organizationId);
   if (!result.sent) {
-    return { success: false, message: result.reason || "The summary could not be sent." };
+    return { success: false, message: await userError(result.reason || "", "The summary could not be sent.") };
   }
   return { success: true, message: "Sent. Check LINE." };
 }

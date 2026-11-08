@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { GUIDES } from "@/lib/rove/guides";
+import { localizedGuides } from "@/lib/rove/guides";
+import { roveHref } from "@/lib/rove/paths";
 import { itemListLd, roveMetadata } from "@/lib/rove/seo";
 import { roveLocale } from "@/lib/rove/static";
 import { Breadcrumbs } from "../_components/breadcrumbs";
@@ -20,9 +20,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function GuidesPage({ params }: Props) {
   const locale = await roveLocale(params);
-  // Written in English only so far: other languages' addresses are sent to this one (proxy.ts).
-  if (locale !== "en") notFound();
   const t = await getTranslations("directory");
+  // Every guide in this language (English where one isn't translated yet).
+  const guides = localizedGuides(locale);
   return (
     <div className={s.wrap}>
       <Breadcrumbs
@@ -33,14 +33,14 @@ export default async function GuidesPage({ params }: Props) {
         label={t("rv.breadcrumbs")}
         locale={locale}
       />
-      <JsonLd data={itemListLd(t("rv.guidesTitle"), GUIDES.map((guide) => ({ name: guide.title, path: `/guides/${guide.slug}` })), locale)} />
+      <JsonLd data={itemListLd(t("rv.guidesTitle"), guides.map((guide) => ({ name: guide.title, path: `/guides/${guide.slug}` })), locale)} />
       <header className={s.pageHead}>
         <h1 className={s.pageTitle}>{t("rv.guidesTitle")}</h1>
         <p className={s.pageLede}>{t("rv.guidesLede")}</p>
       </header>
       <div className={s.cardGrid} style={{ paddingBottom: 32 }}>
-        {GUIDES.map((guide) => (
-          <a className={s.guideCard} href={`/guides/${guide.slug}`} key={guide.slug}>
+        {guides.map((guide) => (
+          <a className={s.guideCard} href={roveHref(`/guides/${guide.slug}`, locale)} key={guide.slug} lang={guide.locale === locale ? undefined : guide.locale}>
             <span className={s.h3}>{guide.title}</span>
             <span className={s.muted} style={{ display: "block", marginTop: 8 }}>
               {guide.standfirst}

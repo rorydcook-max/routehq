@@ -3,7 +3,12 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Ban } from "lucide-react";
-import { updateCustomer } from "@/app/actions/customers";
+import { updateCustomer as updateCustomerAction } from "@/app/actions/customers";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const updateCustomer = (...args: Parameters<typeof updateCustomerAction>) => unwrap(updateCustomerAction(...args));
 
 /**
  * "Don't rent to them again", with a reason. Shown on the customer's page; when
@@ -27,6 +32,7 @@ export function DoNotRent({
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [pending, start] = useTransition();
+  const [error, setError] = useState("");
 
   const save = (value: boolean) =>
     start(async () => {
@@ -35,9 +41,21 @@ export function DoNotRent({
       data.set("organizationId", organizationId);
       data.set("doNotRent", value ? "true" : "false");
       if (value) data.set("doNotRentReason", text.trim());
-      await updateCustomer(data);
+      setError("");
+      // A save that fails says why (it used to fail without a word).
+      try {
+        await updateCustomer(data);
+      } catch (caught) {
+        setError(shownError(caught, say("dnr_failed")));
+        return;
+      }
       setOpen(false);
     });
+  const errorLine = error ? (
+    <p className="mt-2 w-full font-semibold text-[var(--danger)]" role="alert">
+      {error}
+    </p>
+  ) : null;
 
   if (place === "banner" && !on) return null;
   if (place === "control" && on) return null;
@@ -55,6 +73,7 @@ export function DoNotRent({
         <button className="font-bold text-[var(--primary)] underline" disabled={pending} onClick={() => save(false)} type="button">
           {say("dnr_remove")}
         </button>
+        {errorLine}
       </div>
     );
   }
@@ -83,6 +102,7 @@ export function DoNotRent({
           {say("dnr_cancel")}
         </button>
       </div>
+      {errorLine}
     </div>
   );
 }

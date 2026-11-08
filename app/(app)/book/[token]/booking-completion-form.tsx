@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { CheckCircle2, ChevronDown, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound } from "lucide-react";
-import { checkReturningCustomer, completePublicBooking, reportPublicBookingPayment, setPartnerOffers } from "@/app/actions/public-booking";
+import { checkReturningCustomer, completePublicBooking as completePublicBookingAction, reportPublicBookingPayment as reportPublicBookingPaymentAction, setPartnerOffers as setPartnerOffersAction } from "@/app/actions/public-booking";
 import { preparePublicBookingUploads } from "@/app/actions/uploads";
 import { readIdentityDocument } from "@/app/actions/identity-ocr";
 import { uploadFormFiles } from "@/lib/direct-upload-client";
@@ -19,6 +19,14 @@ import { legalUrl } from "@/lib/site/legal-slugs";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 import { allCountries, countryLabel } from "@/lib/customer-options";
 import { dialCodeFor, phonePlaceholderFor } from "@/lib/phone";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const reportPublicBookingPayment = (...args: Parameters<typeof reportPublicBookingPaymentAction>) => unwrap(reportPublicBookingPaymentAction(...args));
+const setPartnerOffers = (...args: Parameters<typeof setPartnerOffersAction>) => unwrap(setPartnerOffersAction(...args));
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const completePublicBooking = (...args: Parameters<typeof completePublicBookingAction>) => unwrap(completePublicBookingAction(...args));
 
 declare global {
   interface Window {

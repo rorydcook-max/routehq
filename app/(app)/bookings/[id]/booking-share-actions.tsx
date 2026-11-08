@@ -4,7 +4,11 @@ import { useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
 import { Copy, MessageCircle, RotateCcw } from "lucide-react";
-import { resendBookingLink } from "@/app/actions/bookings";
+import { resendBookingLink as resendBookingLinkAction } from "@/app/actions/bookings";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const resendBookingLink = (...args: Parameters<typeof resendBookingLinkAction>) => unwrap(resendBookingLinkAction(...args));
 
 const defaultAppUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
 

@@ -57,6 +57,7 @@ import { KABIS_URL, isKabisBusiness, kabisFields } from "@/lib/kabis";
 import { KabisDetails } from "@/app/(app)/bookings/[id]/kabis-details";
 import { ReviewRequestButtons } from "@/app/(app)/bookings/[id]/review-request-buttons";
 import { reviewUrl } from "@/lib/reviews";
+import { ActionForm } from "@/components/action-form";
 
 function money(value: unknown, currency = "THB") {
   return currency === "THB" ? new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0)) : formatRegionalMoney(Number(value || 0), currency, "en-GB");
@@ -462,6 +463,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     activePayments.filter((payment: any) => payment.status === "paid" && test(payment)).reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
   const paidDeposit = paidOfKind((payment) => payment.metadata?.type === "deposit" || payment.metadata?.is_deposit === true);
   const paidCharges = paidOfKind((payment) => payment.metadata?.type === "charge");
+  // Rent taken from the deposit at the return (unpaid rent, late days) has no rent-income entry of its own, so it is
+  // added here: "rent paid so far" then matches the Billing card's "paid of total" (test-app-nov8: €480 vs €571).
+  const rentFromDeposit = paidOfKind((payment) => payment.metadata?.paid_from_deposit === true && payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true && payment.metadata?.type !== "charge");
+  const rentPaidShown = Math.round((totalPaid + rentFromDeposit) * 100) / 100;
   // Paid extras are rent income, followed on their own so the owner can see, refund or move them.
   const extras = extrasSummary(rental, payments, transactions);
   const hasExtras = extrasLines(rental).length > 0 || extras.paid > 0 || extras.open > 0;
@@ -1196,7 +1201,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <p className="text-sm text-[var(--muted)]">
                   {/* Rent and deposit are said separately: "฿0 paid so far" beside a paid deposit read as a mistake. */}
                   {t.rich(paidDeposit > 0 ? "paidLineDeposit" : "paidLine", {
-                    rent: money(totalPaid, rental.currency),
+                    rent: money(rentPaidShown, rental.currency),
                     deposit: money(paidDeposit, rental.currency),
                     b: (chunks: React.ReactNode) => <span className="font-semibold text-[var(--foreground)]">{chunks}</span>
                   })}
@@ -1370,7 +1375,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   />
                 )}
                 <Info icon={CreditCard} label={tx.say("deposit")} value={(() => { const text = formatDepositSummary(rental, tx); return text.charAt(0).toUpperCase() + text.slice(1); })()} />
-                <Info icon={CreditCard} label={tx.say("rentPaid")} value={rentGivenBack > 0 ? tx.say("paidLessBack", { paid: money(totalPaid, rental.currency), back: money(rentGivenBack, rental.currency) }) : money(totalPaid, rental.currency)} />
+                <Info icon={CreditCard} label={tx.say("rentPaid")} value={rentGivenBack > 0 ? tx.say("paidLessBack", { paid: money(rentPaidShown, rental.currency), back: money(rentGivenBack, rental.currency) }) : money(rentPaidShown, rental.currency)} />
                 <div className="scroll-mt-4" id="refunds" />
                 <RefundDepositPanel
                   rentalId={rental.id}
@@ -1945,7 +1950,7 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
       <div className="mt-3">
         {alreadyCovered ? (
           // An older request the rental has since outgrown: nothing to approve, and no need to message the customer.
-          <form action={resolvePortalAction} className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
+          <ActionForm action={resolvePortalAction} className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
@@ -1954,11 +1959,11 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <PendingButton className="secondary-action pressable mt-3 px-3 py-2" pendingLabel={tx.say("clearing")} type="submit">
               {tx.say("clearRequest")}
             </PendingButton>
-          </form>
+          </ActionForm>
         ) : action.action_type === "extension_request" ? (
           <div className="grid items-start gap-3 md:grid-cols-[1.6fr_1fr]">
             <ExtensionRequestAnswer actionId={action.id} picture={picture} rentalId={rentalId} requestedEnd={content.new_end_date || null} openEnded={!!content.open_ended} />
-            <form action={declinePortalAction} className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3">
+            <ActionForm action={declinePortalAction} className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3">
               <input name="organizationId" type="hidden" value={organizationId} />
               <input name="actionId" type="hidden" value={action.id} />
               <input name="rentalId" type="hidden" value={rentalId} />
@@ -1969,19 +1974,19 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
               <PendingButton className="pressable mt-3 w-full rounded-lg border border-[var(--danger-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--danger)]" pendingLabel={tx.say("declining")} type="submit">
                 {tx.say("decline")}
               </PendingButton>
-            </form>
+            </ActionForm>
           </div>
         ) : action.action_type === "return_confirmation" ? (
-          <form action={acknowledgePortalAction}>
+          <ActionForm action={acknowledgePortalAction}>
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
             <PendingButton className="primary-action pressable px-3 py-2" pendingLabel={tx.say("confirming")} type="submit">
               {tx.say("confirmToCustomer")}
             </PendingButton>
-          </form>
+          </ActionForm>
         ) : action.action_type === "problem_report" ? (
-          <form action={resolvePortalAction} className="space-y-3">
+          <ActionForm action={resolvePortalAction} className="space-y-3">
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
@@ -1997,9 +2002,9 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
                 </Link>
               ) : null}
             </div>
-          </form>
+          </ActionForm>
         ) : (
-          <form action={replyToPortalQuestion} className="space-y-3">
+          <ActionForm action={replyToPortalQuestion} className="space-y-3">
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
@@ -2008,7 +2013,7 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <PendingButton className="primary-action pressable px-3 py-2" pendingLabel={tx.say("sending")} type="submit">
               {tx.say("sendAnswer")}
             </PendingButton>
-          </form>
+          </ActionForm>
         )}
       </div>
     </div>

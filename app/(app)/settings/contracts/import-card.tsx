@@ -5,11 +5,16 @@ import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { FileUp, Loader2 } from "lucide-react";
-import { chooseRoveAgreement, importContractFromChat, prepareContractImportUploads, startContractImport } from "@/app/actions/contract-import";
+import { chooseRoveAgreement, importContractFromChat, prepareContractImportUploads as prepareContractImportUploadsAction, startContractImport } from "@/app/actions/contract-import";
 import { InfoTip } from "@/components/info-tip";
 import { DOCX_TYPE, IMPORT_MAX_PAGES } from "@/lib/contract-import-template";
 import { uploadFormFiles } from "@/lib/direct-upload-client";
 import { SUPPORT_BUCKET } from "@/lib/support-shared";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const prepareContractImportUploads = (...args: Parameters<typeof prepareContractImportUploadsAction>) => unwrap(prepareContractImportUploadsAction(...args));
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const soft = "font-medium text-[var(--foreground-secondary)]";
@@ -91,7 +96,7 @@ export function ContractImportCard({
         setStage("idle");
       }
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : say("error"));
+      setError(shownError(caught, say("error")));
       setStage("idle");
     }
   }

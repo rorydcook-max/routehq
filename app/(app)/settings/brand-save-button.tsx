@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { updateContractBrandingSettings } from "@/app/actions/settings";
+import { isActionFailure } from "@/lib/action-result";
 
 /** When the last save finished: the page is drawn again after a save, which starts this button afresh. */
 let savedAt = 0;
@@ -15,6 +16,8 @@ const SAVED_FOR_MS = 2500;
 export function BrandSaveButton({ form, label, pendingLabel, savedLabel, failedLabel }: { form: string; label: string; pendingLabel: string; savedLabel: string; failedLabel: string }) {
   const [pending, start] = useTransition();
   const [state, setState] = useState<"" | "saved" | "failed">(() => (Date.now() - savedAt < SAVED_FOR_MS ? "saved" : ""));
+  // Why it wasn't saved ("Business email must be a valid email address."), when the server says.
+  const [reason, setReason] = useState("");
 
   useEffect(() => {
     if (state !== "saved") return;
@@ -26,10 +29,16 @@ export function BrandSaveButton({ form, label, pendingLabel, savedLabel, failedL
     const element = document.getElementById(form);
     if (!(element instanceof HTMLFormElement) || !element.reportValidity()) return;
     setState("");
+    setReason("");
     start(async () => {
       try {
         // The action refreshes the page (and the app's colours) itself.
-        await updateContractBrandingSettings(new FormData(element));
+        const result = await updateContractBrandingSettings(new FormData(element));
+        if (isActionFailure(result)) {
+          setReason(result.actionError);
+          setState("failed");
+          return;
+        }
         savedAt = Date.now();
         setState("saved");
       } catch {
@@ -44,7 +53,7 @@ export function BrandSaveButton({ form, label, pendingLabel, savedLabel, failedL
         {pending ? <Loader2 className="animate-spin" size={18} /> : state === "saved" ? <Check size={18} /> : null}
         {pending ? pendingLabel : state === "saved" ? savedLabel : label}
       </button>
-      {state === "failed" ? <span className="text-sm font-semibold text-[var(--danger)]">{failedLabel}</span> : null}
+      {state === "failed" ? <span className="text-sm font-semibold text-[var(--danger)]">{reason || failedLabel}</span> : null}
     </div>
   );
 }

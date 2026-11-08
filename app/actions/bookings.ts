@@ -8,6 +8,7 @@ import { vatSettings, withVat } from "@/lib/regional";
 import { billingPeriodAmounts, generatePaymentSchedule } from "@/lib/payment-schedule";
 
 import { said } from "@/lib/i18n/server-text";
+import { guard, userError } from "@/lib/action-error";
 import { completeRentalJobs, retireUnsent, tellRentalCustomer } from "@/lib/customer-messages";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import { customerPaymentLabel } from "@/lib/payment-labels";
@@ -35,10 +36,20 @@ import { bookingRules } from "@/lib/booking-rules";
 import { removeStoredFiles } from "@/lib/supabase/remove-stored-files";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
+/** What to ask for when a form arrives without a field the person chooses (the rest are the page's own ids). */
+const MISSING_FIELD: Record<string, string> = {
+  vehicleId: "Choose a vehicle.",
+  customerId: "Choose a customer.",
+  startDate: "Choose a start date.",
+  pricingModel: "Choose a billing period.",
+  deliveryMethod: "Choose how the vehicle is handed over.",
+  dueDate: "Choose a due date."
+};
+
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
   if (!value) {
-    throw new Error(`${key} is required.`);
+    throw new Error(MISSING_FIELD[key] || `${key} is required.`);
   }
   return value;
 }
@@ -255,7 +266,19 @@ export async function createBooking(formData: FormData) {
   try {
     return { ok: true as const, ...(await createBookingOrThrow(formData)) };
   } catch (error) {
-    return { ok: false as const, error: await said(error instanceof Error ? error.message : "Unable to create booking.") };
+    // Our own sentences pass through; database wording never reaches the screen (lib/action-error.ts).
+    return { ok: false as const, error: await userError(error, "Couldn't create the booking. Nothing was saved.") };
+  }
+}
+
+/** A three-letter ISO 4217 code the runtime can format ("JPY", "BRL", "KES"...). */
+function isIsoCurrency(code: string) {
+  if (!/^[A-Z]{3}$/.test(code)) return false;
+  try {
+    new Intl.NumberFormat("en-US", { style: "currency", currency: code });
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -305,7 +328,8 @@ async function createBookingOrThrow(formData: FormData) {
   if (!["daily", "weekly", "monthly", "custom"].includes(pricingModel)) {
     throw new Error("Choose a valid billing period.");
   }
-  if (!["THB", "USD", "IDR", "PHP", "MYR", "SGD", "VND", "AUD", "GBP", "EUR"].includes(currency)) {
+  // Any ISO 4217 code (every country can sign up since 8 Nov 2026), not only the ten first offered.
+  if (!isIsoCurrency(currency)) {
     throw new Error("Choose a valid currency.");
   }
   if (!["delivery", "collection", "tbd"].includes(deliveryMethod)) {
@@ -317,6 +341,10 @@ async function createBookingOrThrow(formData: FormData) {
 
   if (!openEnded && !endDate) {
     throw new Error("Choose an end date or mark the booking open-ended.");
+  }
+  // A return date before the start was saved as a rental "19 days late" with rent charged twice (real-user-test, 8 Nov 2026).
+  if (endDate && endDate.slice(0, 10) < startDate.slice(0, 10)) {
+    throw new Error("The return date must be after the start date.");
   }
   if (createsActiveRental && !customerId) {
     throw new Error(walkInFastTrack ? "Choose a customer before recording a walk-in rental." : "Choose a customer before recording an existing rental.");
@@ -735,7 +763,12 @@ async function createBookingOrThrow(formData: FormData) {
   };
 }
 
-export async function assignCustomerToBooking(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function assignCustomerToBooking(...args: Parameters<typeof assignCustomerToBookingOrThrow>) {
+  return guard(() => assignCustomerToBookingOrThrow(...args));
+}
+
+async function assignCustomerToBookingOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -873,7 +906,12 @@ async function createBookingLinkForRental(supabase: any, organizationId: string,
   return link;
 }
 
-export async function resendBookingLink(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function resendBookingLink(...args: Parameters<typeof resendBookingLinkOrThrow>) {
+  return guard(() => resendBookingLinkOrThrow(...args));
+}
+
+async function resendBookingLinkOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1195,7 +1233,12 @@ function formatChange(value: unknown) {
   return String(value);
 }
 
-export async function updateBooking(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateBooking(...args: Parameters<typeof updateBookingOrThrow>) {
+  return guard(() => updateBookingOrThrow(...args));
+}
+
+async function updateBookingOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1233,6 +1276,9 @@ export async function updateBooking(formData: FormData) {
   }
   if (!openEnded && !endDate) {
     throw new Error("Choose an end date or mark the booking open-ended.");
+  }
+  if (endDate && endDate.slice(0, 10) < startDate.slice(0, 10)) {
+    throw new Error("The return date must be after the start date.");
   }
 
   const { data: rental, error: rentalError } = await supabase
@@ -1433,7 +1479,12 @@ export async function updateBooking(formData: FormData) {
   return { error: null as string | null, rentalId: rental.id as string };
 }
 
-export async function addRentalPayment(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function addRentalPayment(...args: Parameters<typeof addRentalPaymentOrThrow>) {
+  return guard(() => addRentalPaymentOrThrow(...args));
+}
+
+async function addRentalPaymentOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1533,7 +1584,12 @@ export async function addRentalPayment(formData: FormData) {
   revalidatePath("/bookings");
 }
 
-export async function setupExistingRentalPayments(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function setupExistingRentalPayments(...args: Parameters<typeof setupExistingRentalPaymentsOrThrow>) {
+  return guard(() => setupExistingRentalPaymentsOrThrow(...args));
+}
+
+async function setupExistingRentalPaymentsOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1916,7 +1972,12 @@ async function createNextMonthlyPaymentIfNeeded(supabase: any, payment: any) {
   });
 }
 
-export async function generatePaymentScheduleForRental(rentalId: string) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function generatePaymentScheduleForRental(...args: Parameters<typeof generatePaymentScheduleForRentalOrThrow>) {
+  return guard(() => generatePaymentScheduleForRentalOrThrow(...args));
+}
+
+async function generatePaymentScheduleForRentalOrThrow(rentalId: string) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -2130,7 +2191,8 @@ export async function adjustRental(params: AdjustRentalParams): Promise<{ succes
     await adjustRentalOrThrow(params);
     return { success: true };
   } catch (error) {
-    return { success: false, error: await said(error instanceof Error ? error.message : "Unable to adjust rental.") };
+    // Our own sentences pass through; database wording never reaches the screen (lib/action-error.ts).
+    return { success: false, error: await userError(error, "Couldn't change the rental. Nothing was saved.") };
   }
 }
 
@@ -2502,7 +2564,8 @@ export async function updateRentalEndDate(rentalId: string, newEndDate: string):
     await updateRentalEndDateOrThrow(rentalId, newEndDate);
     return { success: true };
   } catch (error) {
-    return { success: false, error: await said(error instanceof Error ? error.message : "Unable to update the end date.") };
+    // Our own sentences pass through; database wording never reaches the screen (lib/action-error.ts).
+    return { success: false, error: await userError(error, "Couldn't change the return date. Nothing was saved.") };
   }
 }
 
@@ -2583,7 +2646,12 @@ async function updateRentalEndDateOrThrow(rentalId: string, newEndDate: string) 
   return { success: true };
 }
 
-export async function updateRentalPayment(paymentId: string, fields: RentalPaymentCorrection) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateRentalPayment(...args: Parameters<typeof updateRentalPaymentOrThrow>) {
+  return guard(() => updateRentalPaymentOrThrow(...args));
+}
+
+async function updateRentalPaymentOrThrow(paymentId: string, fields: RentalPaymentCorrection) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -2681,6 +2749,14 @@ export async function updateRentalPayment(paymentId: string, fields: RentalPayme
   revalidatePath("/calendar");
 
   return { success: true };
+}
+
+/**
+ * "Record payment" on the booking screen: a reason it can't be saved comes back as `{ actionError }`.
+ * recordPaymentReceived itself still throws, for the receipt confirm and the assistant that call it.
+ */
+export async function recordPaymentReceivedFromScreen(paymentId: string, fields: RecordPaymentReceivedInput) {
+  return guard(() => recordPaymentReceived(paymentId, fields));
 }
 
 export async function recordPaymentReceived(paymentId: string, fields: RecordPaymentReceivedInput) {
@@ -2891,7 +2967,12 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
   return { success: true };
 }
 
-export async function deleteRentalPayment(paymentId: string) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function deleteRentalPayment(...args: Parameters<typeof deleteRentalPaymentOrThrow>) {
+  return guard(() => deleteRentalPaymentOrThrow(...args));
+}
+
+async function deleteRentalPaymentOrThrow(paymentId: string) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -2957,7 +3038,12 @@ export async function deleteRentalPayment(paymentId: string) {
   return { success: true };
 }
 
-export async function cancelBookingWithDisposition(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function cancelBookingWithDisposition(...args: Parameters<typeof cancelBookingWithDispositionOrThrow>) {
+  return guard(() => cancelBookingWithDispositionOrThrow(...args));
+}
+
+async function cancelBookingWithDispositionOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -3285,7 +3371,12 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   return { success: true };
 }
 
-export async function recordPaymentRefund(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function recordPaymentRefund(...args: Parameters<typeof recordPaymentRefundOrThrow>) {
+  return guard(() => recordPaymentRefundOrThrow(...args));
+}
+
+async function recordPaymentRefundOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -3409,7 +3500,12 @@ export async function recordPaymentRefund(formData: FormData) {
   revalidatePath(`/bookings/${rentalId}`);
 }
 
-export async function undoCancellation(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function undoCancellation(...args: Parameters<typeof undoCancellationOrThrow>) {
+  return guard(() => undoCancellationOrThrow(...args));
+}
+
+async function undoCancellationOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("You must be signed in.");
@@ -3562,7 +3658,12 @@ async function openPaymentsForRental(supabase: any, organizationId: string, rent
  * payment), or one transfer for several payments such as rent plus deposit.
  * The receipt is kept on every payment it settles.
  */
-export async function confirmReceiptPayment(input: ConfirmReceiptInput) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function confirmReceiptPayment(...args: Parameters<typeof confirmReceiptPaymentOrThrow>) {
+  return guard(() => confirmReceiptPaymentOrThrow(...args));
+}
+
+async function confirmReceiptPaymentOrThrow(input: ConfirmReceiptInput) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -3643,7 +3744,12 @@ export async function confirmReceiptPayment(input: ConfirmReceiptInput) {
  * was sent for stays due, and the customer's booking page asks them to get in
  * touch or send it again.
  */
-export async function declinePaymentReceipt(paymentId: string) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function declinePaymentReceipt(...args: Parameters<typeof declinePaymentReceiptOrThrow>) {
+  return guard(() => declinePaymentReceiptOrThrow(...args));
+}
+
+async function declinePaymentReceiptOrThrow(paymentId: string) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -3729,7 +3835,12 @@ export async function extendBookingHold(rentalId: string): Promise<{ success: bo
  * from them (no "extension" on a rental that hasn't begun). Only while nothing has been paid and the customer
  * hasn't signed; after that the change goes through an amendment the customer signs.
  */
-export async function rescheduleBooking(rentalId: string, startDate: string, endDate: string): Promise<{ ok: boolean; error?: string }> {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function rescheduleBooking(...args: Parameters<typeof rescheduleBookingOrThrow>) {
+  return guard(() => rescheduleBookingOrThrow(...args));
+}
+
+async function rescheduleBookingOrThrow(rentalId: string, startDate: string, endDate: string): Promise<{ ok: boolean; error?: string }> {
   try {
     const supabase = (await createSupabaseServerClient()) as any;
     const {
@@ -3818,6 +3929,6 @@ export async function rescheduleBooking(rentalId: string, startDate: string, end
     revalidatePath("/");
     return { ok: true };
   } catch (error) {
-    return { ok: false, error: await said(error instanceof Error ? error.message : "Couldn't change the dates.") };
+    return { ok: false, error: await userError(error, "Couldn't change the dates.") };
   }
 }

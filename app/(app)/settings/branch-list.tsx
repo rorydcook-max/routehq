@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { createBranch, deleteBranch, updateBranch } from "@/app/actions/settings";
 import { PendingButton } from "@/components/pending-button";
+import { ActionForm } from "@/components/action-form";
 import { Badge } from "@/components/ui";
 import type { Branch } from "@/lib/branches";
 import { validPoint } from "@/lib/place-coords";
@@ -24,7 +25,7 @@ function BranchFields({ branch, say, place }: { branch?: Branch; say: Say; place
       </label>
       <label className="block">
         <span className={labelClass}>{say("br_address")}</span>
-        <input className="mt-1 w-full" defaultValue={branch?.address || ""} name="address" required={!branch} />
+        <input className="mt-1 w-full" defaultValue={branch?.address || ""} name="address" />
       </label>
       <label className="block">
         <span className={labelClass}>{say("br_phone")}</span>
@@ -100,7 +101,7 @@ export function BranchList({
                 >
                   <Pencil size={18} />
                 </button>
-                <form action={deleteBranch}>
+                <ActionForm action={deleteBranch}>
                   <input name="organizationId" type="hidden" value={organizationId} />
                   <input name="branchId" type="hidden" value={branch.id} />
                   <PendingButton
@@ -116,12 +117,12 @@ export function BranchList({
                   >
                     <Trash2 size={18} />
                   </PendingButton>
-                </form>
+                </ActionForm>
               </div>
             </div>
 
             {isEditing ? (
-              <form action={updateBranch} className="mt-3 grid gap-3 sm:grid-cols-2">
+              <ActionForm action={updateBranch} className="mt-3 grid gap-3 sm:grid-cols-2">
                 <input name="organizationId" type="hidden" value={organizationId} />
                 <input name="branchId" type="hidden" value={branch.id} />
                 <BranchFields branch={branch} place={placeFor(branch.id)} say={say} />
@@ -137,14 +138,14 @@ export function BranchList({
                     {say("cancel")}
                   </button>
                 </div>
-              </form>
+              </ActionForm>
             ) : null}
           </div>
         );
       })}
 
       {isAddingBranch ? (
-        <form action={createBranch} className="grid gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5 sm:grid-cols-2">
+        <ActionForm action={createBranch} className="grid gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5 sm:grid-cols-2">
           <input name="organizationId" type="hidden" value={organizationId} />
           <BranchFields place={placeFor(null)} say={say} />
           <div className="flex flex-wrap gap-2 sm:col-span-2">
@@ -155,7 +156,7 @@ export function BranchList({
               {say("cancel")}
             </button>
           </div>
-        </form>
+        </ActionForm>
       ) : (
         <button className="secondary-action" onClick={() => setIsAddingBranch(true)} type="button">
           <Plus size={17} />

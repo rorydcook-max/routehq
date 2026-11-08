@@ -1,12 +1,19 @@
 "use server";
 
+import { guard } from "@/lib/action-error";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 
-export async function completeTask(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function completeTask(...args: Parameters<typeof completeTaskOrThrow>) {
+  return guard(() => completeTaskOrThrow(...args));
+}
+
+async function completeTaskOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const taskId = String(formData.get("taskId") || "");
   const organizationId = String(formData.get("organizationId") || "");
@@ -41,7 +48,12 @@ export async function completeTask(formData: FormData) {
   revalidatePath("/");
 }
 
-export async function createVehicleTask(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function createVehicleTask(...args: Parameters<typeof createVehicleTaskOrThrow>) {
+  return guard(() => createVehicleTaskOrThrow(...args));
+}
+
+async function createVehicleTaskOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }

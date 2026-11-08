@@ -5,8 +5,9 @@ import { ArrowDownLeft, ArrowUpRight, Camera, Loader2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useTransition, type InputHTMLAttributes } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { shortDate } from "@/lib/i18n/dates";
-import { createTransaction, findTransactionMatches } from "@/app/actions/transactions";
+import { createTransactionFromForm, findTransactionMatches } from "@/app/actions/transactions";
 import { PendingButton } from "@/components/pending-button";
+import { ActionForm } from "@/components/action-form";
 import { smallReceipt } from "@/components/receipt-attach";
 import { takePendingReceipt } from "@/components/receipt-handoff";
 import { Card } from "@/components/ui";
@@ -333,7 +334,7 @@ export function TransactionForm({
   };
 
   return (
-    <form action={createTransaction} className="space-y-3">
+    <ActionForm action={createTransactionFromForm} className="space-y-3">
       <input name="organizationId" type="hidden" value={organizationId} />
       <input name="rentalPaymentId" type="hidden" value={linkedRentalPaymentId} />
       <input name="taskId" type="hidden" value={linkedTaskId} />
@@ -739,6 +740,6 @@ export function TransactionForm({
       </div>
         </>
       ) : null}
-    </form>
+    </ActionForm>
   );
 }

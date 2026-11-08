@@ -1,5 +1,7 @@
 "use server";
 
+import { userError } from "@/lib/action-error";
+
 import { said } from "@/lib/i18n/server-text";
 import {
   bookingLinkUploadPrefix,
@@ -15,7 +17,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 // of an error thrown from a server action, and people need to see these.
 
 async function failed(error: unknown): Promise<PreparedUploads> {
-  return { uploads: [], error: await said(error instanceof Error ? error.message : "The upload could not be prepared.") };
+  return { uploads: [], error: await userError(error, "The upload could not be prepared.") };
 }
 
 /** Signed upload URLs for an inspection, for a signed-in member of the business. */

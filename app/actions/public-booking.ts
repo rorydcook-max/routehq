@@ -1,5 +1,7 @@
 "use server";
 
+import { guard } from "@/lib/action-error";
+
 import { said } from "@/lib/i18n/server-text";
 import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
 import { readReceipt } from "@/lib/receipt-reading";
@@ -375,7 +377,12 @@ async function uploadSignedContract({
   return { documentId: data.id as string, storagePath };
 }
 
-export async function reportPublicBookingPayment(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function reportPublicBookingPayment(...args: Parameters<typeof reportPublicBookingPaymentOrThrow>) {
+  return guard(() => reportPublicBookingPaymentOrThrow(...args));
+}
+
+async function reportPublicBookingPaymentOrThrow(formData: FormData) {
   const token = requiredString(formData, "token");
   const method = optionalString(formData, "preferredPaymentMethod");
   const timing = optionalString(formData, "paymentTiming");
@@ -436,7 +443,12 @@ export async function reportPublicBookingPayment(formData: FormData) {
   return { success: true, paymentReportedAt: reportedAt };
 }
 
-export async function submitCustomerPortalAction(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function submitCustomerPortalAction(...args: Parameters<typeof submitCustomerPortalActionOrThrow>) {
+  return guard(() => submitCustomerPortalActionOrThrow(...args));
+}
+
+async function submitCustomerPortalActionOrThrow(formData: FormData) {
   const token = requiredString(formData, "token");
   const actionType = requiredString(formData, "actionType");
   const supabase = createSupabaseAdminClient() as any;
@@ -538,7 +550,12 @@ function portalActionCommunicationText(actionType: string, content: Record<strin
   return "Customer submitted a booking portal action";
 }
 
-export async function completePublicBooking(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function completePublicBooking(...args: Parameters<typeof completePublicBookingOrThrow>) {
+  return guard(() => completePublicBookingOrThrow(...args));
+}
+
+async function completePublicBookingOrThrow(formData: FormData) {
   const token = requiredString(formData, "token");
   // Two steps: "review" saves the customer's details and prepares the final
   // agreement with them in it; "sign" signs the exact version they reviewed.
@@ -872,7 +889,17 @@ export async function completePublicBooking(formData: FormData) {
 
   if (currentRentalForAuthority) {
     if (customerDocumentStatus !== "complete") {
-      throw new Error("Please upload passport, driver's license and selfie documents before signing.");
+      // Name the photo that is missing: with the passport and license already showing "Added", a message asking for
+      // all three read as if those uploads had failed (real-user-test, 8 Nov 2026). Returned, not thrown, so the
+      // customer sees it in production too.
+      const have = new Set((documents || []).map((document: any) => String(document.category)));
+      const missing = ["passport", "driver_license", "selfie"].filter((category) => !have.has(category));
+      const onlyOne: Record<string, string> = {
+        passport: "Please add a photo of your passport or ID card before signing.",
+        driver_license: "Please add a photo of your driver's license before signing.",
+        selfie: "Please add a photo of yourself before signing."
+      };
+      return { success: false, error: await said(missing.length === 1 ? onlyOne[missing[0]] : "Please upload passport, driver's license and selfie documents before signing.") } as const;
     }
     if (
       !currentCustomerForSigning?.passport_number ||
@@ -880,7 +907,7 @@ export async function completePublicBooking(formData: FormData) {
       !currentCustomerForSigning?.driver_license_country ||
       !currentCustomerForSigning?.driver_license_expiry
     ) {
-      throw new Error("Passport or driver's license details are missing.");
+      return { success: false, error: await said("Passport or driver's license details are missing.") } as const;
     }
 
     const headerStore = await headers();
@@ -1344,7 +1371,12 @@ function slipReadFrom(formData: FormData) {
   }
 }
 
-export async function submitPaymentReceipt(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function submitPaymentReceipt(...args: Parameters<typeof submitPaymentReceiptOrThrow>) {
+  return guard(() => submitPaymentReceiptOrThrow(...args));
+}
+
+async function submitPaymentReceiptOrThrow(formData: FormData) {
   const token = requiredString(formData, "token");
   const paymentId = requiredString(formData, "paymentId");
   const rawMethod = optionalString(formData, "method") || "promptpay";
@@ -1511,7 +1543,12 @@ const PARTNER_OFFERS_VERSION = "2026-10-25c";
  * on their booking page afterwards. RoveHQ's own permission (not the rental business's), kept as a new row each time
  * with the words shown, the language and where it was given, so it can be proved and is as easy to take back as give.
  */
-export async function setPartnerOffers(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function setPartnerOffers(...args: Parameters<typeof setPartnerOffersOrThrow>) {
+  return guard(() => setPartnerOffersOrThrow(...args));
+}
+
+async function setPartnerOffersOrThrow(formData: FormData) {
   const token = requiredString(formData, "token");
   const granted = String(formData.get("granted") || "") === "yes";
   const source = String(formData.get("source") || "") === "booking_form" ? "booking_form" : "booking_page";

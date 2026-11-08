@@ -6,7 +6,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Car, CheckCircle2, ChevronLeft, ChevronRight, FileSpreadsheet, Loader2, PenLine, Sparkles } from "lucide-react";
-import { finishOnboarding, saveBusinessProfile } from "@/app/actions/onboarding";
+import { finishOnboarding as finishOnboardingAction, saveBusinessProfile as saveBusinessProfileAction } from "@/app/actions/onboarding";
 import { setMyLanguage } from "@/app/actions/settings";
 import { FleetAssistant } from "@/components/fleet-assistant";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
@@ -16,6 +16,12 @@ import { SearchSelect } from "@/components/search-select";
 import { allCountries } from "@/lib/customer-options";
 import { ALL_COUNTRY_CODES, englishCountryName, placeLabel, toCountryCode } from "@/lib/regional";
 import { displayNamesLocale } from "@/lib/i18n/dates";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const saveBusinessProfile = (...args: Parameters<typeof saveBusinessProfileAction>) => unwrap(saveBusinessProfileAction(...args));
+const finishOnboarding = (...args: Parameters<typeof finishOnboardingAction>) => unwrap(finishOnboardingAction(...args));
 
 type Organization = { id: string; name: string; default_locale: string; settings?: Record<string, any> };
 
@@ -112,8 +118,8 @@ export function OnboardingWizard({
         // A reload stays on this step.
         window.history.replaceState(window.history.state, "", "/onboarding?step=2");
         window.scrollTo({ top: 0 });
-      } catch {
-        setError(t("saveFailed"));
+      } catch (caught) {
+        setError(shownError(caught, t("saveFailed")));
       }
     });
   }

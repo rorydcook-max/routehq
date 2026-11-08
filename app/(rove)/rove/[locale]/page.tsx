@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { COUNTRIES, DESTINATIONS, destinationPath, type Destination } from "@/lib/rove/destinations";
-import { GUIDES } from "@/lib/rove/guides";
+import { localizedGuides } from "@/lib/rove/guides";
 import { sizedPhoto } from "@/lib/photo-url";
 import { distanceKm } from "@/lib/place-coords";
 import { loadMarket, nextFree, quoteFor, reachFrom, roveToday, type RoveVehicle } from "@/lib/rove/market";
@@ -294,14 +294,16 @@ export default async function RoveHome({ params }: RoveParams) {
         <div className={s.wrap}>
           <div className={s.sectionHead}>
             <h2 className={s.sectionTitle}>{t("rv.beforeYouDrive")}</h2>
-            <a className={s.textLink} href="/guides">
+            <a className={s.textLink} href={roveHref("/guides", locale)}>
               {t("rv.allGuides")}
             </a>
           </div>
           <ul className={s.guideList}>
-            {GUIDES.slice(0, 3).map((guide) => (
+            {localizedGuides(locale)
+              .slice(0, 3)
+              .map((guide) => (
               <li key={guide.slug}>
-                <a className={s.guideItem} href={`/guides/${guide.slug}`} lang="en">
+                <a className={s.guideItem} href={roveHref(`/guides/${guide.slug}`, locale)} lang={guide.locale === locale ? undefined : guide.locale}>
                   <span className={s.guideItemTitle}>{guide.title}</span>
                   <span className={s.guideItemBody}>{guide.standfirst}</span>
                 </a>

@@ -1,5 +1,7 @@
 "use server";
 
+import { guard } from "@/lib/action-error";
+
 import { englishDateLocale } from "@/lib/i18n/customer-dates";
 import { earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
 import { ensureLateReturnCharge, lateReturnAmount, lateReturnFor } from "@/lib/late-return";
@@ -258,7 +260,12 @@ export async function generateReceipt(input: GenerateReceiptInput) {
   return { receipt_number: receiptNumber, pdf_url: pdfUrl };
 }
 
-export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function recordDeliveryCashPaymentAndReceipt(...args: Parameters<typeof recordDeliveryCashPaymentAndReceiptOrThrow>) {
+  return guard(() => recordDeliveryCashPaymentAndReceiptOrThrow(...args));
+}
+
+async function recordDeliveryCashPaymentAndReceiptOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -549,6 +556,11 @@ function receiptReadFields(formData: FormData) {
   }
 }
 
+/** The Add transaction page: a reason it can't be saved comes back as `{ actionError }` for the form to show. */
+export async function createTransactionFromForm(formData: FormData) {
+  return guard(() => createTransaction(formData), "Couldn't save the transaction. Nothing was saved.");
+}
+
 export async function createTransaction(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -566,10 +578,14 @@ export async function createTransaction(formData: FormData) {
   const transactionDate = optionalString(formData, "transactionDate") || businessToday();
   // Money out can be a business cost (rent, phone, ads) that belongs to no vehicle.
   const businessCost = pickedVehicle === "none" && !["rental_income", "charge_recovered", "deposit_received", "deposit_forfeited", "deposit_deduction"].includes(type) && !/refund|deposit/.test(type);
-  const vehicleId = businessCost ? null : pickedVehicle;
+  const vehicleId = businessCost || pickedVehicle === "none" ? null : pickedVehicle;
 
-  if (!organizationId || (!vehicleId && !businessCost) || amount === null || amount <= 0) {
-    throw new Error("Vehicle, type, and a positive amount are required.");
+  // One reason at a time, so the person knows which box to fix.
+  if (amount === null || !Number.isFinite(amount) || amount <= 0) {
+    throw new Error("Enter an amount above zero.");
+  }
+  if (!organizationId || (!vehicleId && !businessCost)) {
+    throw new Error("Choose the vehicle this is for.");
   }
 
   // A cost the renter is responsible for (damage, a fine, fuel): the cost is still money out, and the booking gets a bill.
@@ -860,7 +876,12 @@ function dateOnly(value: string | null | undefined) {
   return String(value || "").slice(0, 10);
 }
 
-export async function updateTransaction(transactionId: string, fields: TransactionCorrection) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateTransaction(...args: Parameters<typeof updateTransactionOrThrow>) {
+  return guard(() => updateTransactionOrThrow(...args));
+}
+
+async function updateTransactionOrThrow(transactionId: string, fields: TransactionCorrection) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1041,7 +1062,12 @@ async function voidTransactions(supabase: any, transactions: any[], userId: stri
   }
 }
 
-export async function deleteTransaction(transactionId: string) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function deleteTransaction(...args: Parameters<typeof deleteTransactionOrThrow>) {
+  return guard(() => deleteTransactionOrThrow(...args));
+}
+
+async function deleteTransactionOrThrow(transactionId: string) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1097,7 +1123,12 @@ export async function deleteTransaction(transactionId: string) {
   return { success: true, warning: isDeposit ? "Deposit transaction deleted." : null };
 }
 
-export async function bulkDeleteTransactions(ids: string[]) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function bulkDeleteTransactions(...args: Parameters<typeof bulkDeleteTransactionsOrThrow>) {
+  return guard(() => bulkDeleteTransactionsOrThrow(...args));
+}
+
+async function bulkDeleteTransactionsOrThrow(ids: string[]) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }

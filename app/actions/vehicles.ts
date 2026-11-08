@@ -3,6 +3,7 @@
 import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { guard } from "@/lib/action-error";
 import { markOnboardingStep } from "@/lib/onboarding";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -217,6 +218,11 @@ const complianceFieldMap: Record<
  * From setup it goes back to setup; otherwise to the fleet.
  */
 export async function createVehicle(formData: FormData) {
+  // A reason it can't be added (a plate already used, a year typed wrong) comes back as `{ actionError }` for the form.
+  return guard(() => createVehicleOrThrow(formData), "Couldn't add the vehicle. Nothing was saved.");
+}
+
+async function createVehicleOrThrow(formData: FormData) {
   const created = await insertVehicle(formData);
   const photos = formData.getAll("vehiclePhotos").filter((item): item is File => item instanceof File && item.size > 0);
   if (photos.length) {
@@ -358,20 +364,21 @@ export async function insertVehicle(formData: FormData): Promise<{ id: string; o
       status: "pending_review"
     });
 
-    if (submissionError) {
-      throw new Error(submissionError.message);
-    }
+    // Only a note for the catalog team: the vehicle is already saved, so this must not show an error (and a second try
+    // would then fail on the plate).
+    if (submissionError) console.warn("[insertVehicle] catalog submission:", submissionError.message);
   }
 
   const logbookFile = formData.get("logbookFile");
   if (logbookFile instanceof File && logbookFile.size > 0) {
+    // The vehicle is saved: a logbook that fails to upload can be added again from its page.
     await attachLogbookDocument({
       supabase,
       file: logbookFile,
       organizationId,
       vehicleId: data.id,
       userId: user.id
-    });
+    }).catch((uploadError) => console.warn("[insertVehicle] logbook:", uploadError instanceof Error ? uploadError.message : uploadError));
   }
 
   await recordActivityEvent(supabase, {
@@ -392,6 +399,11 @@ export async function insertVehicle(formData: FormData): Promise<{ id: string; o
 }
 
 export async function updateVehicle(formData: FormData) {
+  // A reason it can't be saved (a plate already used, a year typed wrong) comes back as `{ actionError }` for the form.
+  return guard(() => updateVehicleOrThrow(formData));
+}
+
+async function updateVehicleOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -542,7 +554,12 @@ export async function updateVehicle(formData: FormData) {
   redirect(`/fleet/${vehicleId}`);
 }
 
-export async function uploadVehiclePhotos(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function uploadVehiclePhotos(...args: Parameters<typeof uploadVehiclePhotosOrThrow>) {
+  return guard(() => uploadVehiclePhotosOrThrow(...args));
+}
+
+async function uploadVehiclePhotosOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -639,7 +656,12 @@ export async function uploadVehiclePhotos(formData: FormData) {
   revalidatePath(`/fleet/${vehicleId}`);
 }
 
-export async function removeVehiclePhoto(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function removeVehiclePhoto(...args: Parameters<typeof removeVehiclePhotoOrThrow>) {
+  return guard(() => removeVehiclePhotoOrThrow(...args));
+}
+
+async function removeVehiclePhotoOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -713,7 +735,12 @@ export async function removeVehiclePhoto(formData: FormData) {
   revalidatePath(`/fleet/${vehicleId}`);
 }
 
-export async function reorderVehiclePhotos(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function reorderVehiclePhotos(...args: Parameters<typeof reorderVehiclePhotosOrThrow>) {
+  return guard(() => reorderVehiclePhotosOrThrow(...args));
+}
+
+async function reorderVehiclePhotosOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -795,6 +822,14 @@ export async function reorderVehiclePhotos(formData: FormData) {
 
   revalidatePath("/fleet");
   revalidatePath(`/fleet/${vehicleId}`);
+}
+
+/**
+ * The renewal form and the assistant's cards: a reason it can't be saved comes back as `{ actionError }`.
+ * renewVehicleCompliance itself still throws, for the assistant's confirm step (app/actions/ask.ts).
+ */
+export async function renewVehicleComplianceFromForm(formData: FormData) {
+  return guard(() => renewVehicleCompliance(formData));
 }
 
 export async function renewVehicleCompliance(formData: FormData) {
@@ -966,7 +1001,12 @@ export async function renewVehicleCompliance(formData: FormData) {
   revalidatePath(`/fleet/${vehicleId}`);
 }
 
-export async function logVehicleMaintenance(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function logVehicleMaintenance(...args: Parameters<typeof logVehicleMaintenanceOrThrow>) {
+  return guard(() => logVehicleMaintenanceOrThrow(...args));
+}
+
+async function logVehicleMaintenanceOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1062,7 +1102,12 @@ export async function logVehicleMaintenance(formData: FormData) {
   revalidatePath(`/fleet/${vehicleId}`);
 }
 
-export async function updateVehicleNotes(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function updateVehicleNotes(...args: Parameters<typeof updateVehicleNotesOrThrow>) {
+  return guard(() => updateVehicleNotesOrThrow(...args));
+}
+
+async function updateVehicleNotesOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1112,7 +1157,12 @@ export async function updateVehicleNotes(formData: FormData) {
   revalidatePath(`/fleet/${vehicleId}`);
 }
 
-export async function archiveVehicle(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function archiveVehicle(...args: Parameters<typeof archiveVehicleOrThrow>) {
+  return guard(() => archiveVehicleOrThrow(...args));
+}
+
+async function archiveVehicleOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1127,6 +1177,20 @@ export async function archiveVehicle(formData: FormData) {
 
   if (!vehicleId || !organizationId) {
     throw new Error("Vehicle is required.");
+  }
+
+  // A vehicle with bookings still to come or on the road was archived without a word, leaving those customers
+  // booked on a vehicle that is no longer in the fleet (real-user-test, 8 Nov 2026).
+  const { data: liveBookings } = await supabase
+    .from("rentals")
+    .select("id")
+    .eq("organization_id", organizationId)
+    .eq("vehicle_id", vehicleId)
+    .is("deleted_at", null)
+    .not("status", "in", "(draft,completed,cancelled)")
+    .limit(1);
+  if (liveBookings?.length) {
+    throw new Error("This vehicle has bookings that haven't finished. Move them to another vehicle or cancel them first.");
   }
 
   const { error } = await supabase
@@ -1202,7 +1266,12 @@ async function purgeVehicles(organizationId: string, vehicleIds: string[]) {
   revalidatePath("/bookings");
 }
 
-export async function deleteVehicle(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function deleteVehicle(...args: Parameters<typeof deleteVehicleOrThrow>) {
+  return guard(() => deleteVehicleOrThrow(...args));
+}
+
+async function deleteVehicleOrThrow(formData: FormData) {
   const vehicleId = String(formData.get("vehicleId") || "");
   const organizationId = String(formData.get("organizationId") || "");
   if (!vehicleId || !organizationId) {
@@ -1308,7 +1377,12 @@ export async function setVehicleRate(formData: FormData): Promise<{ success: boo
  * In the shop, or back and free to rent (Rory, 1 Nov 2026: there was no way to take a car out of "In the shop").
  * Only between those two: a car on rent or booked follows its booking.
  */
-export async function setVehicleInShop(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function setVehicleInShop(...args: Parameters<typeof setVehicleInShopOrThrow>) {
+  return guard(() => setVehicleInShopOrThrow(...args));
+}
+
+async function setVehicleInShopOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }

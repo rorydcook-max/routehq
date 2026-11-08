@@ -10,6 +10,7 @@ import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
+import { ActionForm } from "@/components/action-form";
 import { BackLink, Fold } from "@/components/ui";
 import { VehicleTitle } from "@/components/vehicle-identity";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -116,7 +117,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
   const textField = (labelKey: string, name: string, value: unknown, extra: { type?: string; required?: boolean } = {}) => (
     <label className="block">
       <span className={labelClass}>{say(labelKey)}</span>
-      <input className={inputClass} defaultValue={valueOrEmpty(value)} inputMode={extra.type === "number" ? "numeric" : undefined} min={extra.type === "number" ? "0" : undefined} name={name} required={extra.required} type={extra.type || "text"} />
+      <input className={inputClass} defaultValue={valueOrEmpty(value)} inputMode={extra.type === "number" ? "numeric" : undefined} min={extra.type === "number" ? "0" : undefined} name={name} required={extra.required} step={extra.type === "number" ? "any" : undefined} type={extra.type || "text"} />
     </label>
   );
   const moneyField = (labelKey: string, name: string, value: unknown) => (
@@ -134,7 +135,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
           <VehicleTitle as="h1" className="gap-x-3" name={say("editTitle", { name: `${vehicle.make} ${vehicle.model}` })} nameClassName="page-title" plate={vehicle.registration_number} plateClassName="!px-2 !py-1 !text-[14px]" province={vehicle.metadata?.registration_province} year={vehicle.year} />
         </div>
 
-        <form action={updateVehicle} className="space-y-3">
+        <ActionForm action={updateVehicle} className="space-y-3">
           <input name="vehicleId" type="hidden" value={vehicle.id} />
           <input name="organizationId" type="hidden" value={organization.id} />
 
@@ -151,7 +152,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <span className="block sm:max-w-[calc((100%-2rem)/3)]">
                 <MoneyInput currency={currency} defaultValue={valueOrEmpty((vehicle as any).deposit_amount)} name="depositAmount" />
               </span>
-              <span className="measure mt-1 block font-medium text-[var(--muted)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: `฿${usualDeposit.toLocaleString("en-US")}` }) : say("depositHintNone")}</span>
+              <span className="measure mt-1 block font-medium text-[var(--muted)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: niceMoney(usualDeposit, currency) }) : say("depositHintNone")}</span>
             </label>
           </Fold>
           <Fold summary={[`${vehicle.make} ${vehicle.model}`, vehicle.registration_number].filter(Boolean).join(" · ")} title={say("identTitle")}>
@@ -170,7 +171,9 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               {textField("model", "model", vehicle.model, { required: true })}
               {textField("year", "year", vehicle.year, { type: "number" })}
               {textField("trim", "trim", vehicle.trim)}
-              {textField("plate", "registrationNumber", vehicle.registration_number, { required: true })}
+              {/* Not required: a vehicle can be added without its plate (Rory, 31 Oct 2026), and a required field left empty
+                  inside this closed section made Save do nothing at all. */}
+              {textField("plate", "registrationNumber", vehicle.registration_number)}
               {textField("colour", "color", vehicle.color)}
               {textField("mileage", "mileage", vehicle.mileage, { type: "number" })}
               <label className="block sm:col-span-2">
@@ -296,14 +299,14 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               {say("saveChanges")}
             </PendingButton>
           </div>
-        </form>
+        </ActionForm>
 
         {/* Archiving and deleting live here, one step away from the list, so neither happens by a slip of the thumb. */}
         <div className="mt-8">
           <h2 className="card-subtitle mb-2 text-[var(--danger)]">{say("dangerZone")}</h2>
           <Fold summary={say("goneSummary")} title={say("goneTitle")}>
             <div className="space-y-4">
-              <form action={archiveVehicle} className="flex flex-wrap items-center justify-between gap-3">
+              <ActionForm action={archiveVehicle} className="flex flex-wrap items-center justify-between gap-3">
                 <input name="vehicleId" type="hidden" value={vehicle.id} />
                 <input name="organizationId" type="hidden" value={organization.id} />
                 <p className="min-w-0 flex-1 basis-60 font-medium text-[var(--foreground-secondary)]">
@@ -312,7 +315,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                 <PendingButton className="secondary-action pressable" pendingLabel={say("archiving")} type="submit">
                   {say("archiveBtn")}
                 </PendingButton>
-              </form>
+              </ActionForm>
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-4">
                 <p className="min-w-0 flex-1 basis-60 font-medium text-[var(--foreground-secondary)]">
                   <span className="font-bold text-[var(--foreground)]">{say("deleteLead")}</span>: {say("deleteBody")}

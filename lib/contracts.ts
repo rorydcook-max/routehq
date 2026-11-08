@@ -268,6 +268,21 @@ export async function ensureDefaultContractTemplate(supabase: any, organizationI
     .single();
 
   if (error) {
+    // Two pages opened at once (the customer's first booking link and its prefetch, real-user-test 8 Nov 2026) both
+    // found no agreement and both added one: the second hit the unique key and the customer saw a database error.
+    // The row the other request just added is the one to use.
+    if (error.code === "23505") {
+      const { data: added } = await supabase
+        .from("contract_templates")
+        .select("*")
+        .eq("organization_id", organizationId)
+        .eq("template_key", "standard_rental")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (added) return added;
+    }
     throw new Error(error.message);
   }
 

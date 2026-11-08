@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
+import { unwrap } from "@/lib/action-result";
 import { useTranslations, useLocale } from "next-intl";
 import { ChevronLeft, Plus, Search, UserRound, X } from "lucide-react";
 import { createInlineCustomer } from "@/app/actions/customers";
@@ -73,10 +74,17 @@ export function CustomerSelector({
           formData.set(field.name, field.value);
         });
         formData.set("organizationId", organizationId);
-        if (formData.get("preferredContactMethod") === "whatsapp" && !String(formData.get("whatsappNumber") || "").trim()) {
+        // No phone typed: leave WhatsApp empty rather than save the country code alone as a "number".
+        if (formData.get("preferredContactMethod") === "whatsapp" && !String(formData.get("whatsappNumber") || "").trim() && String(formData.get("phone") || "").trim()) {
           formData.set("whatsappNumber", `${String(formData.get("phoneCountryCode") || "")}${String(formData.get("phone") || "").replace(/^0/, "")}`);
         }
-        const result = await createInlineCustomer(formData);
+        // Said here, before saving: a name and any one way to reach them (a phone isn't needed when there's Messenger, LINE...).
+        const reachable = ["phone", "whatsappNumber", "messengerId", "lineId", "telegramUsername", "email"].some((key) => String(formData.get(key) || "").trim());
+        if (!String(formData.get("fullName") || "").trim() || !reachable) {
+          setError(say("sel_needContact"));
+          return;
+        }
+        const result = await unwrap(createInlineCustomer(formData));
         const fullName = result.full_name || String(formData.get("fullName") || "");
         const phone = result.phone || null;
         const nationality = result.nationality || String(formData.get("nationality") || "");
@@ -231,7 +239,6 @@ export function CustomerSelector({
                       const found = allCountries.find((country) => country.code === code);
                       if (found) setNationality(found.name);
                     }}
-                    required
                   />
                   <select
                     aria-label={say("sel_nationality")}

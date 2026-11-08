@@ -3,6 +3,7 @@ import { PendingButton } from "@/components/pending-button";
 import { saveNotificationMatrix } from "@/app/actions/integrations";
 import { ALERT_CHANNELS, ALERT_EVENTS, wantsAlert, wantsSummary, type AlertChannel } from "@/lib/alerts";
 import { isEmailConfigured } from "@/lib/email";
+import { ActionForm } from "@/components/action-form";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -31,7 +32,7 @@ export async function NotificationGrid({ settings }: { settings: Record<string, 
   );
 
   return (
-    <form action={saveNotificationMatrix}>
+    <ActionForm action={saveNotificationMatrix}>
       <section className="card overflow-hidden p-0">
         <div className="px-5 pt-5">
           <h2 className="card-title">{say("nt_gridTitle")}</h2>
@@ -77,6 +78,6 @@ export async function NotificationGrid({ settings }: { settings: Record<string, 
         </PendingButton>
         <p className="text-[14px] font-medium text-[var(--muted)]">{say("ig_notifFoot")}</p>
       </div>
-    </form>
+    </ActionForm>
   );
 }

@@ -5,7 +5,11 @@ import { createPortal } from "react-dom";
 import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
 import { RotateCcw, X } from "lucide-react";
-import { undoCancellation } from "@/app/actions/bookings";
+import { undoCancellation as undoCancellationAction } from "@/app/actions/bookings";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const undoCancellation = (...args: Parameters<typeof undoCancellationAction>) => unwrap(undoCancellationAction(...args));
 
 type Props = {
   rentalId: string;

@@ -1,13 +1,18 @@
 "use server";
 
+import { guard } from "@/lib/action-error";
+
 import { revalidatePath } from "next/cache";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+/** What to ask for when a field the person fills in arrives empty (the rest are the page's own ids). */
+const MISSING_FIELD: Record<string, string> = {"content":"Write the note first."};
+
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
   if (!value) {
-    throw new Error(`${key} is required.`);
+    throw new Error(MISSING_FIELD[key] || `${key} is required.`);
   }
   return value;
 }
@@ -16,7 +21,12 @@ function optionalString(formData: FormData, key: string) {
   return String(formData.get(key) || "").trim() || null;
 }
 
-export async function addCommunicationNote(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function addCommunicationNote(...args: Parameters<typeof addCommunicationNoteOrThrow>) {
+  return guard(() => addCommunicationNoteOrThrow(...args));
+}
+
+async function addCommunicationNoteOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }

@@ -1,5 +1,7 @@
 "use server";
 
+import { friendlyReason } from "@/lib/action-error";
+
 import { said } from "@/lib/i18n/server-text";
 import { customerMessageText } from "@/lib/i18n/customer-message-text";
 import { rentalRateCard, type Rates } from "@/lib/rental-estimate";
@@ -50,7 +52,7 @@ function cleanAmount(value: unknown) {
 }
 
 function errorMessage(error: unknown) {
-  return error instanceof Error ? error.message : String(error || "Something went wrong.");
+  return friendlyReason(error instanceof Error ? error.message : String(error || "")) || "Something went wrong.";
 }
 
 function vehicleLabel(vehicle: any) {

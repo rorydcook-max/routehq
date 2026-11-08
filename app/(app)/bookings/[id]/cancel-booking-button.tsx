@@ -7,8 +7,12 @@ import { createPortal } from "react-dom";
 import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, XCircle } from "lucide-react";
-import { cancelBookingWithDisposition } from "@/app/actions/bookings";
+import { cancelBookingWithDisposition as cancelBookingWithDispositionAction } from "@/app/actions/bookings";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const cancelBookingWithDisposition = (...args: Parameters<typeof cancelBookingWithDispositionAction>) => unwrap(cancelBookingWithDispositionAction(...args));
 
 type CancelReason =
   | "customer_cancelled_before_delivery"

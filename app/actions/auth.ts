@@ -1,5 +1,7 @@
 "use server";
 
+import { friendlyReason } from "@/lib/action-error";
+
 import { cookies, headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -376,7 +378,7 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
   try {
     inviter = await requireOwner();
   } catch (error) {
-    return { error: error instanceof Error ? error.message : OWNER_ONLY_MESSAGE };
+    return { error: (error instanceof Error && friendlyReason(error.message)) || OWNER_ONLY_MESSAGE };
   }
 
   if (inviter.email && inviter.email.toLowerCase() === email) {
@@ -485,7 +487,7 @@ export async function setTeamLevel(formData: FormData): Promise<AuthActionState>
   try {
     owner = await requireOwner();
   } catch (error) {
-    return { error: error instanceof Error ? error.message : OWNER_ONLY_MESSAGE };
+    return { error: (error instanceof Error && friendlyReason(error.message)) || OWNER_ONLY_MESSAGE };
   }
   const memberId = String(formData.get("memberId") || "");
   const role = appRoleFromForm(formData.get("role"));
@@ -509,7 +511,7 @@ export async function removeTeammate(formData: FormData): Promise<AuthActionStat
   try {
     owner = await requireOwner();
   } catch (error) {
-    return { error: error instanceof Error ? error.message : OWNER_ONLY_MESSAGE };
+    return { error: (error instanceof Error && friendlyReason(error.message)) || OWNER_ONLY_MESSAGE };
   }
   const memberId = String(formData.get("memberId") || "");
   const admin = createSupabaseAdminClient() as any;

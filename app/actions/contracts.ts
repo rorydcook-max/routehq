@@ -1,5 +1,7 @@
 "use server";
 
+import { guard } from "@/lib/action-error";
+
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireOwner } from "@/lib/auth/roles";
@@ -13,7 +15,12 @@ function requiredString(formData: FormData, key: string) {
 }
 
 /** The owner's own terms for the agreement: plain sentences, one per box on the Rental agreement page. */
-export async function saveAgreementTerms(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function saveAgreementTerms(...args: Parameters<typeof saveAgreementTermsOrThrow>) {
+  return guard(() => saveAgreementTermsOrThrow(...args));
+}
+
+async function saveAgreementTermsOrThrow(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const organizationId = requiredString(formData, "organizationId");

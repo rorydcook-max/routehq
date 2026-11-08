@@ -4,7 +4,7 @@ import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { shownError } from "@/lib/error-text";
 import { useEffect, useMemo, useState, useTransition, useRef } from "react";
 import { createPortal } from "react-dom";
-import { adjustRental, rescheduleBooking } from "@/app/actions/bookings";
+import { adjustRental as adjustRentalAction, rescheduleBooking as rescheduleBookingAction } from "@/app/actions/bookings";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
 import { quoteExplainIn } from "@/lib/i18n/quote-text";
@@ -14,6 +14,11 @@ import { businessCurrency } from "@/lib/business-units";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 import { amendmentShareText, cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, makeRentalOpenEnded, type AmendmentSummary } from "@/app/actions/amendments";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const adjustRental = (...args: Parameters<typeof adjustRentalAction>) => unwrap(adjustRentalAction(...args));
+const rescheduleBooking = (...args: Parameters<typeof rescheduleBookingAction>) => unwrap(rescheduleBookingAction(...args));
 
 type AdjustmentType = "extension" | "early_return" | "terms";
 

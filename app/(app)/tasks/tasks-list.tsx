@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState, useTransition, type ReactNode } from "rea
 import { useLocale, useTranslations } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { KindChip, jobKind } from "@/components/kind-chip";
-import { confirmReceiptPayment, declinePaymentReceipt } from "@/app/actions/bookings";
+import { confirmReceiptPayment as confirmReceiptPaymentAction, declinePaymentReceipt as declinePaymentReceiptAction } from "@/app/actions/bookings";
 import { completeTask } from "@/app/actions/tasks";
 import { decideEarlyWaiver } from "@/app/actions/early-start";
 import { decideEarlyReturnOwed } from "@/app/actions/early-return";
@@ -21,6 +21,13 @@ import { businessTimeZone } from "@/lib/business-time";
 import { niceMoney } from "@/lib/nice-money";
 import { currencySymbol } from "@/components/currency-symbol";
 import { businessCurrency } from "@/lib/business-units";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+import { ActionForm } from "@/components/action-form";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const confirmReceiptPayment = (...args: Parameters<typeof confirmReceiptPaymentAction>) => unwrap(confirmReceiptPaymentAction(...args));
+const declinePaymentReceipt = (...args: Parameters<typeof declinePaymentReceiptAction>) => unwrap(declinePaymentReceiptAction(...args));
 
 type Filter = "open" | "done";
 
@@ -270,8 +277,8 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
       try {
         await confirmReceiptPayment({ paymentId: item.rentalPaymentId as string, amount: received, date, method, paymentIds: chosenIds, tellCustomer });
         setSent(true);
-      } catch {
-        setError(tx.say("errRecord"));
+      } catch (caught) {
+        setError(shownError(caught, tx.say("errRecord")));
       }
     });
   }
@@ -282,8 +289,8 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
       try {
         await declinePaymentReceipt(item.rentalPaymentId as string);
         onClose();
-      } catch {
-        setError(tx.say("errUpdate"));
+      } catch (caught) {
+        setError(shownError(caught, tx.say("errUpdate")));
       }
     });
   }
@@ -434,8 +441,8 @@ function TaskRow({
     startConfirm(async () => {
       try {
         await confirmReceiptPayment({ paymentId: item.rentalPaymentId as string, amount: receipt.total, date: today, method: receipt.method, paymentIds: receipt.paymentIds });
-      } catch {
-        setReceiptError(tx.say("errConfirm"));
+      } catch (caught) {
+        setReceiptError(shownError(caught, tx.say("errConfirm")));
       }
     });
   }
@@ -520,7 +527,7 @@ function TaskRow({
             <ReceivePaymentPanel item={item} onClose={() => setRecording(false)} siblings={siblings} today={today} />
           ) : null}
           {showNote && !item.completedAt ? (
-            <form action={completeTask} className={`mt-2 flex flex-col gap-2 sm:flex-row ${stacked ? "lg:flex-col" : ""}`}>
+            <ActionForm action={completeTask} className={`mt-2 flex flex-col gap-2 sm:flex-row ${stacked ? "lg:flex-col" : ""}`}>
               <input name="organizationId" type="hidden" value={organizationId} />
               <input name="taskId" type="hidden" value={item.id} />
               <input
@@ -533,7 +540,7 @@ function TaskRow({
               <PendingButton className="primary-action min-h-11 px-4 text-sm" pendingLabel={tx.say("saving")} type="submit">
                 {tx.say("saveDone")}
               </PendingButton>
-            </form>
+            </ActionForm>
           ) : null}
       </div>
 
@@ -628,13 +635,13 @@ function TaskRow({
           <>
             {/* One main button per row. A job with its own next step keeps "mark done" and notes behind the dots. */}
             {(!item.action && !asksAnswer) || item.action === "refund" || showMore ? (
-              <form action={completeTask}>
+              <ActionForm action={completeTask}>
                 <input name="organizationId" type="hidden" value={organizationId} />
                 <input name="taskId" type="hidden" value={item.id} />
                 <PendingButton className={`${item.action || asksAnswer ? "secondary-action" : "primary-action"} min-h-9 px-3 text-xs`} pendingLabel={tx.say("saving")} type="submit">
                   {item.action === "refund" ? tx.say("noRefund") : tx.say("markDone")}
                 </PendingButton>
-              </form>
+              </ActionForm>
             ) : null}
             {showMore ? (
               <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setShowNote(true)} type="button">
@@ -829,14 +836,14 @@ export function VehicleJobs({ items, today, organizationId, vehicleId }: { items
                 {tx.say("openJob")}
               </Link>
             ) : (
-              <form action={completeTask} className="shrink-0">
+              <ActionForm action={completeTask} className="shrink-0">
                 <input name="organizationId" type="hidden" value={organizationId} />
                 <input name="taskId" type="hidden" value={item.id} />
                 <input name="vehicleId" type="hidden" value={vehicleId} />
                 <PendingButton className="secondary-action whitespace-nowrap" pendingLabel={tx.say("saving")} type="submit">
                   {tx.say("markDone")}
                 </PendingButton>
-              </form>
+              </ActionForm>
             )}
           </div>
         );

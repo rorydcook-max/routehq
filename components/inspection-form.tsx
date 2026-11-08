@@ -9,10 +9,10 @@ import { BackLink } from "@/components/ui";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { AlertTriangle, Camera, CheckCircle2, ChevronLeft, ChevronRight, FileVideo, Fuel, Gauge, MapPin, ShieldCheck, Smartphone, Trash2 } from "lucide-react";
-import { submitInspection } from "@/app/actions/inspections";
+import { submitInspection as submitInspectionAction } from "@/app/actions/inspections";
 import { prepareInspectionUploads } from "@/app/actions/uploads";
 import { compressImage, startEarlyUpload, uploadFormFiles } from "@/lib/direct-upload-client";
-import { recordDeliveryCashPaymentAndReceipt } from "@/app/actions/transactions";
+import { recordDeliveryCashPaymentAndReceipt as recordDeliveryCashPaymentAndReceiptAction } from "@/app/actions/transactions";
 import type { InspectionContext } from "@/lib/inspection-detail";
 import { earlyStartFor, type EarlyStartChoice } from "@/lib/early-start";
 import { lateStartFor, type LateStartChoice } from "@/lib/late-start";
@@ -23,6 +23,13 @@ import { methodsFor } from "@/lib/payment-methods";
 import { firstRentCharge } from "@/lib/payment-schedule";
 import { HandoverPaymentStep, type HandoverPayOptions } from "@/components/handover-payment-step";
 import { currencySymbol } from "@/components/currency-symbol";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const recordDeliveryCashPaymentAndReceipt = (...args: Parameters<typeof recordDeliveryCashPaymentAndReceiptAction>) => unwrap(recordDeliveryCashPaymentAndReceiptAction(...args));
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const submitInspection = (...args: Parameters<typeof submitInspectionAction>) => unwrap(submitInspectionAction(...args));
 
 type DamageItem = {
   id: string;

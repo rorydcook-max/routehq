@@ -44,6 +44,7 @@ import { longDate, dateFormat } from "@/lib/i18n/dates";
 import { hasLoan, loanFigures } from "@/lib/vehicle-loan";
 import { businessCurrency, distanceKey } from "@/lib/business-units";
 import { formatMoney } from "@/lib/regional";
+import { ActionForm } from "@/components/action-form";
 
 // The wording for this page is in locales/<language>/common.json under "vehiclePage".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -232,14 +233,14 @@ function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; stat
           })}
           {/* Free cars can be taken off the road while they're being fixed; booked and rented ones follow their booking. */}
           {status === "available" ? (
-            <form action={setVehicleInShop}>
+            <ActionForm action={setVehicleInShop}>
               <input name="vehicleId" type="hidden" value={vehicleId} />
               <input name="inShop" type="hidden" value="true" />
               <PendingButton className="pressable secondary-action w-full !px-3 text-center leading-tight" pendingLabel={tx.say("saving")} type="submit">
                 <Wrench className="shrink-0" size={18} />
                 {tx.say("sh_in")}
               </PendingButton>
-            </form>
+            </ActionForm>
           ) : null}
         </div>
       </details>
@@ -826,7 +827,7 @@ function MaintenanceSection({ detail, organizationId, currency }: { detail: Vehi
           <Wrench size={17} />
           {tx.say("m_log")}
         </summary>
-        <form action={logVehicleMaintenance} className="mt-3 grid gap-3 sm:grid-cols-2">
+        <ActionForm action={logVehicleMaintenance} className="mt-3 grid gap-3 sm:grid-cols-2">
           <input name="vehicleId" type="hidden" value={detail.vehicle.id} />
           <input name="organizationId" type="hidden" value={organizationId} />
           <label className="block">
@@ -878,7 +879,7 @@ function MaintenanceSection({ detail, organizationId, currency }: { detail: Vehi
           <PendingButton className="primary-action sm:col-span-2" pendingLabel={tx.say("saving")} type="submit">
             {tx.say("m_save")}
           </PendingButton>
-        </form>
+        </ActionForm>
       </details>
       <div className="mt-3 space-y-2">
         {detail.maintenanceEvents.length === 0 ? (
@@ -930,7 +931,7 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
       )}
       <details className="mt-3">
         <summary className="secondary-action pressable inline-flex cursor-pointer list-none [&::-webkit-details-marker]:hidden">{tx.say("t_add")}</summary>
-        <form action={createVehicleTask} className="mt-3 grid gap-3 sm:grid-cols-2">
+        <ActionForm action={createVehicleTask} className="mt-3 grid gap-3 sm:grid-cols-2">
           <input name="vehicleId" type="hidden" value={detail.vehicle.id} />
           <input name="organizationId" type="hidden" value={organizationId} />
           <label className="block sm:col-span-2">
@@ -952,7 +953,7 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
           <PendingButton className="primary-action sm:col-span-2" pendingLabel={tx.say("t_adding")} type="submit">
             {tx.say("t_add")}
           </PendingButton>
-        </form>
+        </ActionForm>
       </details>
     </Pane>
   );
@@ -1308,13 +1309,13 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
                     )}
                     {/* In the shop: one tap puts it back on the road (Rory, 1 Nov 2026). */}
                     {status === "maintenance" ? (
-                      <form action={setVehicleInShop}>
+                      <ActionForm action={setVehicleInShop}>
                         <input name="vehicleId" type="hidden" value={vehicle.id} />
                         <input name="inShop" type="hidden" value="false" />
                         <PendingButton className="pressable inline-flex min-h-9 items-center gap-1.5 rounded-full bg-[var(--success)] px-3.5 text-sm font-bold text-white" pendingLabel={tx.say("saving")} type="submit">
                           {tx.say("sh_back")}
                         </PendingButton>
-                      </form>
+                      </ActionForm>
                     ) : null}
                   </div>
                   {/* The one vehicle header: name, year, plate chip. */}

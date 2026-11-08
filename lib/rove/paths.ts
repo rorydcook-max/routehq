@@ -9,7 +9,7 @@ import { COUNTRY_SLUGS, DESTINATION_KEYS, GUIDE_SLUGS } from "@/lib/rove/guide-s
  *   /search                   search results (?place=&from=&to=&kind=...)
  *   /vehicles/<id>            one vehicle
  *   /destinations             every destination, by region
- *   /guides, /guides/<slug>   renter guides (English only for now)
+ *   /guides, /guides/<slug>   renter guides
  *   /<country>                a country's destinations (English only for now)
  *   /<country>/<place>        a destination (English only for now)
  * Each is drawn from app/(rove)/rove/[locale]/... (the internal prefix /rove/<locale>), which reads nothing from the
@@ -24,7 +24,8 @@ export const ROVE_LOCALES: readonly string[] = supportedLocaleCodes;
 /** Pages written in every language (their words are all in locales/<code>/common.json). */
 type Section = "home" | "search" | "vehicle" | "guides" | "guide" | "country" | "destination" | "destinations";
 // "destinations" (/destinations, every place by region; task build-rove, 8 Nov 2026): its words are all UI strings.
-const ALL_LANGUAGES: Section[] = ["home", "search", "vehicle", "destinations"];
+// "guides" and "guide" (task rove-guides-i18n, 8 Nov 2026): each guide's words are in lib/rove/guides-i18n/<code>.ts.
+const ALL_LANGUAGES: Section[] = ["home", "search", "vehicle", "destinations", "guides", "guide"];
 
 export type RovePage = { section: Section; locale: string; rest: string; prefixed: boolean };
 

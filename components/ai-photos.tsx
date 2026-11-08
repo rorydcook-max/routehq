@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Check, Loader2, Sparkles, X } from "lucide-react";
+import { dateFormat } from "@/lib/i18n/dates";
 import { InfoTip } from "@/components/info-tip";
 
 /**
@@ -31,6 +32,7 @@ async function call(body: Record<string, unknown>) {
 
 export function useAiPhotos({ vehicleId, getDetails, onChanged, onKeepDraft }: { vehicleId?: string; getDetails?: () => DraftDetails; onChanged?: () => void; onKeepDraft?: (preview: AiPreview) => void }) {
   const say = useTranslations("aiPhotos") as unknown as Say;
+  const locale = useLocale();
   const [progress, setProgress] = useState<{ mode: "generate" | "enhance"; done: number; total: number } | null>(null);
   const [previews, setPreviews] = useState<AiPreview[]>([]);
   const [message, setMessage] = useState("");
@@ -39,7 +41,8 @@ export function useAiPhotos({ vehicleId, getDetails, onChanged, onKeepDraft }: {
   const [saving, setSaving] = useState<string | null>(null);
 
   function explain(code: string, data: Record<string, any> = {}) {
-    if (code === "quota") return data.left?.resetsOn ? say("err_quota", { date: data.left.resetsOn }) : say("err_quotaNow");
+    // resetsOn is a yyyy-mm-dd day: shown as a date in the reader's language, not as the raw ISO text.
+    if (code === "quota") return data.left?.resetsOn ? say("err_quota", { date: dateFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${data.left.resetsOn}T00:00:00Z`)) }) : say("err_quotaNow");
     if (code === "no_provider" || code === "billing") return say("err_unavailable");
     if (code === "busy") return say("err_busy");
     if (code === "refused") return say("err_refused");

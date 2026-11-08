@@ -4,9 +4,14 @@ import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
-import { updateOwnerSignature } from "@/app/actions/settings";
+import { updateOwnerSignature as updateOwnerSignatureAction } from "@/app/actions/settings";
 import { SignaturePad } from "@/components/signature-pad";
 import { InfoTip } from "@/components/info-tip";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const updateOwnerSignature = (...args: Parameters<typeof updateOwnerSignatureAction>) => unwrap(updateOwnerSignatureAction(...args));
 
 type Say = (key: string, values?: Record<string, string>) => string;
 
@@ -71,8 +76,8 @@ export function SignatureForm({
         await updateOwnerSignature(formData);
         setSaved(true);
         window.setTimeout(() => router.push(backHref as never), 1200);
-      } catch {
-        setError(say("sig_failed"));
+      } catch (caught) {
+        setError(shownError(caught, say("sig_failed")));
       }
     });
   }

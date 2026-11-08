@@ -7,6 +7,7 @@ import type { Route } from "next";
 import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Mail, Share2, X } from "lucide-react";
 import { dismissChecklist, markBookingPageShared } from "@/app/actions/onboarding";
 import { sendEmailCheck } from "@/app/actions/auth";
+import { ActionForm } from "@/components/action-form";
 
 type ChecklistItem = {
   step: string;
@@ -89,7 +90,7 @@ export function OnboardingChecklist({
       </div>
       {/* Asked first (build-s, 8 Nov 2026): Help › "Show setup steps" brings the list back. */}
       {confirmHide ? (
-        <form action={dismissChecklist} className="mt-2 flex flex-wrap items-center gap-2 rounded-xl bg-[var(--panel-secondary)] p-2.5">
+        <ActionForm action={dismissChecklist} className="mt-2 flex flex-wrap items-center gap-2 rounded-xl bg-[var(--panel-secondary)] p-2.5">
           <input name="organizationId" type="hidden" value={organizationId} />
           <p className="min-w-0 flex-1 font-semibold text-[var(--foreground)]">{t("setupHideConfirm")}</p>
           <button className="secondary-action pressable" onClick={() => setConfirmHide(false)} type="button">
@@ -98,7 +99,7 @@ export function OnboardingChecklist({
           <button className="primary-action pressable" type="submit">
             {t("setupHide")}
           </button>
-        </form>
+        </ActionForm>
       ) : null}
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
         <div className="h-full rounded-full bg-[var(--primary)] transition-[width] duration-500" style={{ width: `${progress > 0 ? Math.max(progress, 4) : 0}%` }} />

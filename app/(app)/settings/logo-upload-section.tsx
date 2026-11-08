@@ -2,13 +2,18 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { updateBusinessLogo } from "@/app/actions/settings";
+import { updateBusinessLogo as updateBusinessLogoAction } from "@/app/actions/settings";
 import { BusinessLogoImage } from "@/components/business-logo-image";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const updateBusinessLogo = (...args: Parameters<typeof updateBusinessLogoAction>) => unwrap(updateBusinessLogoAction(...args));
 
 export function LogoUploadSection({ logoUrl, orgName, onDone }: { logoUrl: string | null | undefined; orgName: string; /** After the logo is saved (the Booking page tool reloads its preview). */ onDone?: () => void }) {
   const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ key: string; type: "error" | "success" } | null>(null);
+  const [message, setMessage] = useState<{ key: string; type: "error" | "success"; text?: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   function submit(formData: FormData) {
@@ -19,8 +24,9 @@ export function LogoUploadSection({ logoUrl, orgName, onDone }: { logoUrl: strin
         setMessage({ key: "lg_done", type: "success" });
         if (fileRef.current) fileRef.current.value = "";
         onDone?.();
-      } catch {
-        setMessage({ key: "lg_failed", type: "error" });
+      } catch (caught) {
+        // The server's reason ("must be 2MB or smaller") when it gave one.
+        setMessage({ key: "lg_failed", type: "error", text: shownError(caught, "") || undefined });
       }
     });
   }
@@ -74,7 +80,7 @@ export function LogoUploadSection({ logoUrl, orgName, onDone }: { logoUrl: strin
           </button>
         ) : null}
       </div>
-      {message ? <p className={`mt-2 font-bold ${message.type === "error" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{say(message.key)}</p> : null}
+      {message ? <p className={`mt-2 font-bold ${message.type === "error" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{message.text || say(message.key)}</p> : null}
     </div>
   );
 }

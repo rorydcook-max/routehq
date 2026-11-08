@@ -170,6 +170,17 @@ export function isHeldGuideLink(href: string, locale: string) {
 }
 
 /**
+ * True when a link names a guide or resource that has no file in this language but has one in English: the link then
+ * keeps the English address (a translated resource linked /id/guides/… pages that answer 404; test-web-nov8).
+ */
+function untranslatedContent(href: string, locale: string) {
+  if (locale === "en") return false;
+  const match = href.match(/^\/(guides|resources)\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?(?:[?#].*)?$/);
+  if (!match) return false;
+  return !existsSync(join(CONTENT, match[1], locale, `${match[2]}.md`)) && existsSync(join(CONTENT, match[1], "en", `${match[2]}.md`));
+}
+
+/**
  * Markdown to HTML: heading ids (H2s become the table of contents), website links kept in the page's language, tables
  * that scroll on phones. A paragraph that links to a guide held for a launch is left out until the launch, and such a
  * link anywhere else (a list, a table) shows as plain text, so no page links to a guide that answers 404.
@@ -211,7 +222,7 @@ export function renderMarkdown(body: string, locale: string): { html: string; he
         }
         const external = /^https?:\/\//i.test(href);
         const safe = /^(https?:\/\/|mailto:|\/|#)/i.test(href) ? href : "#";
-        const target = safe.startsWith("/") ? localizeSitePath(safe, locale) : safe;
+        const target = safe.startsWith("/") ? localizeSitePath(safe, untranslatedContent(safe, locale) ? "en" : locale) : safe;
         return `<a href="${escapeHtml(target)}"${title ? ` title="${escapeHtml(title)}"` : ""}${external ? ' rel="noopener noreferrer" target="_blank"' : ""}>${inner}</a>`;
       },
       image({ href, title, text }) {

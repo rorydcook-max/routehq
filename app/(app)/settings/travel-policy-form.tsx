@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { updateTravelPolicySettings } from "@/app/actions/settings";
 import { PendingButton } from "@/components/pending-button";
+import { ActionForm } from "@/components/action-form";
 import { feeOn, lawOptionsFor, type FeeKey, type LocationTravelRules, type PlaceRule, type TravelPolicySettings } from "@/lib/travel-policy";
 import { islandsOf, placeKind, placeName, placesFor } from "@/lib/travel-places";
 import { SwitchField } from "@/components/switch-field";
@@ -108,7 +109,7 @@ export function TravelPolicyForm({
     `pressable min-h-[40px] max-w-full truncate rounded-full px-3.5 font-semibold ${selected ? "bg-[var(--primary)] text-white" : "bg-[var(--panel-secondary)] text-[var(--foreground)]"}`;
 
   return (
-    <form action={updateTravelPolicySettings} className="mt-3 space-y-5">
+    <ActionForm action={updateTravelPolicySettings} className="mt-3 space-y-5">
       <input name="organizationId" type="hidden" value={organizationId} />
       <input name="travelRules" type="hidden" value={JSON.stringify(submitted)} />
 
@@ -304,7 +305,7 @@ export function TravelPolicyForm({
           {say("tp_seeWording")}
         </Link>
       </div>
-    </form>
+    </ActionForm>
   );
 }
 

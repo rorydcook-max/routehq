@@ -4,13 +4,18 @@ import { englishDateLocale } from "@/lib/i18n/customer-dates";
 import { daysFromToday } from "@/lib/business-time";
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { shownError } from "@/lib/error-text";
 import { longDate } from "@/lib/i18n/dates";
 import { niceMoney } from "@/lib/nice-money";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 import { Copy, Instagram, Mail, MessageCircle, Phone, Send, StickyNote } from "lucide-react";
-import { addCommunicationNote } from "@/app/actions/communication";
+import { addCommunicationNote as addCommunicationNoteAction } from "@/app/actions/communication";
 import { Badge } from "@/components/ui";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const addCommunicationNote = (...args: Parameters<typeof addCommunicationNoteAction>) => unwrap(addCommunicationNoteAction(...args));
 
 type Customer = {
   id?: string | null;
@@ -146,7 +151,13 @@ export function CommunicationPanel({
       if (customerId || customer.id) formData.set("customerId", customerId || customer.id || "");
       if (booking.vehicle_id) formData.set("vehicleId", booking.vehicle_id);
       if (revalidatePathname) formData.set("revalidatePathname", revalidatePathname);
-      await addCommunicationNote(formData);
+      // A note that didn't save says so (it used to fail without a word), keeping the text to try again.
+      try {
+        await addCommunicationNote(formData);
+      } catch (caught) {
+        showToast(shownError(caught, say("cp_noteFailed")));
+        return;
+      }
       setNote("");
       showToast(say("cp_noteSaved"));
     });
@@ -332,8 +343,15 @@ function messengerUrl(value: string) {
   const text = value.trim();
   const id = text.match(/[?&]id=(\d+)/)?.[1];
   if (id) return `https://m.me/${id}`;
-  const path = text.match(/(?:facebook\.com|fb\.com|messenger\.com\/t|m\.me)\/([^/?#\s]+)/i)?.[1];
-  if (path && path !== "profile.php") return `https://m.me/${path}`;
+  // A chat link copied from Messenger (facebook.com/messages/t/1000…, messenger.com/t/name): the person is after /t/.
+  // It used to open m.me/messages, which is nobody (real-user-test, 8 Nov 2026).
+  const chat = text.match(/(?:facebook\.com|fb\.com|messenger\.com)\/(?:messages\/)?t\/([^/?#\s]+)/i)?.[1];
+  if (chat) return `https://m.me/${chat}`;
+  // facebook.com/people/Their-Name/1000…: the number at the end is the person.
+  const person = text.match(/facebook\.com\/people\/[^/?#\s]+\/(\d+)/i)?.[1];
+  if (person) return `https://m.me/${person}`;
+  const path = text.match(/(?:facebook\.com|fb\.com|m\.me)\/([^/?#\s]+)/i)?.[1];
+  if (path && !["profile.php", "messages", "people"].includes(path.toLowerCase())) return `https://m.me/${path}`;
   if (/^[A-Za-z0-9.]{3,}$/.test(text)) return `https://m.me/${text}`;
   return "https://www.messenger.com/";
 }

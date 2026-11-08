@@ -1,5 +1,7 @@
 "use server";
 
+import { guard } from "@/lib/action-error";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ensureOnboardingChecklist, markOnboardingStep } from "@/lib/onboarding";
@@ -7,10 +9,19 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { placeLabel, timeZoneForPlace, toCountryCode } from "@/lib/regional";
 
+/** What to ask for when setup arrives without a field the person fills in (the rest are the page's own ids). */
+const MISSING_FIELD: Record<string, string> = {
+  businessName: "Add your business name.",
+  location: "Choose where your business is.",
+  country: "Choose your country.",
+  town: "Choose your town or area.",
+  language: "Choose a language."
+};
+
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
   if (!value) {
-    throw new Error(`${key} is required.`);
+    throw new Error(MISSING_FIELD[key] || `${key} is required.`);
   }
   return value;
 }
@@ -36,7 +47,12 @@ async function requireUser() {
   return { supabase, user };
 }
 
-export async function saveBusinessProfile(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function saveBusinessProfile(...args: Parameters<typeof saveBusinessProfileOrThrow>) {
+  return guard(() => saveBusinessProfileOrThrow(...args));
+}
+
+async function saveBusinessProfileOrThrow(formData: FormData) {
   const { supabase, user } = await requireUser();
   const organizationId = requiredString(formData, "organizationId");
   const name = requiredString(formData, "businessName");
@@ -151,7 +167,12 @@ export async function saveBusinessProfile(formData: FormData) {
   revalidatePath("/");
 }
 
-export async function finishOnboarding(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function finishOnboarding(...args: Parameters<typeof finishOnboardingOrThrow>) {
+  return guard(() => finishOnboardingOrThrow(...args));
+}
+
+async function finishOnboardingOrThrow(formData: FormData) {
   const { supabase } = await requireUser();
   const organizationId = requiredString(formData, "organizationId");
   const lineId = optionalString(formData, "lineId");
@@ -196,7 +217,12 @@ export async function finishOnboarding(formData: FormData) {
   revalidatePath("/onboarding");
 }
 
-export async function dismissChecklist(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function dismissChecklist(...args: Parameters<typeof dismissChecklistOrThrow>) {
+  return guard(() => dismissChecklistOrThrow(...args));
+}
+
+async function dismissChecklistOrThrow(formData: FormData) {
   const { supabase } = await requireUser();
   const organizationId = requiredString(formData, "organizationId");
   const { data: organization, error: orgError } = await supabase.from("organizations").select("settings").eq("id", organizationId).maybeSingle();

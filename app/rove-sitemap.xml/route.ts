@@ -2,7 +2,7 @@ import { renterUrl } from "@/lib/booking-address";
 import { listedBusinessesForSitemap } from "@/lib/directory";
 import { COUNTRIES, DESTINATIONS, destinationPath } from "@/lib/rove/destinations";
 import { GUIDES } from "@/lib/rove/guides";
-import { loadMarket } from "@/lib/rove/market";
+import { loadMarket, vehiclesIn } from "@/lib/rove/market";
 import { ROVE_LOCALES, roveHasLocale, roveHref } from "@/lib/rove/paths";
 
 /**
@@ -30,19 +30,27 @@ export async function GET() {
 
   let businesses: Awaited<ReturnType<typeof listedBusinessesForSitemap>> = [];
   let vehicleIds: string[] = [];
+  // Destinations with live listings: a place (or a whole country) with none is noindex (its page's metadata), so it
+  // is left out here too; a sitemap lists only pages meant to be indexed (task test-web-nov8, 8 Nov 2026).
+  const livePlaces = new Set<string>();
   try {
     const [listed, market] = await Promise.all([listedBusinessesForSitemap(), loadMarket()]);
     businesses = listed;
     vehicleIds = market.vehicles.map((vehicle) => vehicle.id);
+    const counts = await Promise.all(DESTINATIONS.map(async (destination) => [destination, (await vehiclesIn(destination)).length] as const));
+    for (const [destination, count] of counts) if (count > 0) livePlaces.add(`${destination.country}/${destination.slug}`);
   } catch {
     businesses = [];
   }
+  const liveCountries = new Set([...livePlaces].map((key) => key.split("/")[0]));
   const entries = [
     ...page("/", "home", "1"),
     // Every destination by region (task build-rove, 8 Nov 2026), in every language.
     ...page("/destinations", "destinations", "0.8"),
-    ...Object.keys(COUNTRIES).flatMap((country) => page(`/${country}`, "country", "0.7")),
-    ...DESTINATIONS.flatMap((destination) => page(destinationPath(destination), "destination", "0.9")),
+    ...Object.keys(COUNTRIES)
+      .filter((country) => liveCountries.has(country))
+      .flatMap((country) => page(`/${country}`, "country", "0.7")),
+    ...DESTINATIONS.filter((destination) => livePlaces.has(`${destination.country}/${destination.slug}`)).flatMap((destination) => page(destinationPath(destination), "destination", "0.9")),
     ...page("/guides", "guides", "0.6"),
     ...GUIDES.flatMap((guide) => page(`/guides/${guide.slug}`, "guide", "0.7", `${guide.updated}T00:00:00+07:00`)),
     ...vehicleIds.flatMap((id) => page(`/vehicles/${id}`, "vehicle", "0.6")),

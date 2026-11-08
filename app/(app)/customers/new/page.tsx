@@ -4,6 +4,7 @@ import { useLocale } from "next-intl";
 import { createCustomer } from "@/app/actions/customers";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
+import { ActionForm } from "@/components/action-form";
 import { BackLink, Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { countriesSorted, customerLanguages } from "@/lib/customer-options";
@@ -46,8 +47,9 @@ export default async function NewCustomerPage() {
           <p className="page-subtitle page-subtitle-keep mt-1">{say("new_subtitle")}</p>
         </div>
 
-        {/* Name and phone are all a booking needs. Everything else is one tap away, and the customer fills most of it in on their booking link anyway. */}
-        <form action={createCustomer} className="space-y-3">
+        {/* A name and one way to reach them are all a booking needs: a phone, or only Messenger, LINE, Telegram or email
+            (Rory, 8 Nov 2026). Everything else is one tap away, and the customer fills most of it in on their booking link anyway. */}
+        <ActionForm action={createCustomer} className="space-y-3">
           <input name="organizationId" type="hidden" value={organization.id} />
           <CountryDatalist id="nationality-options" />
           <CountryDatalist id="licence-country-options" />
@@ -60,7 +62,8 @@ export default async function NewCustomerPage() {
               </label>
               <label className="block">
                 <span className={labelClass}>{say("f_phone")}</span>
-                <PhoneField defaultCountry={(organization as any).country_code || ""} inputClass={inputClass} required />
+                <PhoneField defaultCountry={(organization as any).country_code || ""} inputClass={inputClass} />
+                <span className="mt-1 block font-medium text-[var(--muted)]">{say("new_phoneHint")}</span>
               </label>
               <DuplicatePhoneHint organizationId={organization.id} />
               <label className="block">
@@ -182,7 +185,7 @@ export default async function NewCustomerPage() {
               {say("new_save")}
             </PendingButton>
           </div>
-        </form>
+        </ActionForm>
       </div>
     </AppShell>
   );

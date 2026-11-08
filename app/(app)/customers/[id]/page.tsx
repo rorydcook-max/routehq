@@ -39,6 +39,7 @@ import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { CustomerTimeline, type TimelineRow } from "@/app/(app)/customers/[id]/customer-timeline";
 import { eventDay, getCustomerTimeline } from "@/lib/customer-timeline";
 import { activityTitle } from "@/lib/activity-display";
+import { ActionForm } from "@/components/action-form";
 
 // The wording for this page is in locales/<language>/common.json under "customerPage".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -229,7 +230,7 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
   // Türkiye: what a KABİS entry asks for beyond the usual (lib/kabis.ts), so the booking's KABİS block is complete.
   const turkey = country === "TR";
   return (
-    <form action={updateCustomer} className="grid gap-3 sm:grid-cols-2">
+    <ActionForm action={updateCustomer} className="grid gap-3 sm:grid-cols-2">
       <input name="customerId" type="hidden" value={customer.id} />
       <input name="organizationId" type="hidden" value={organizationId} />
       <datalist id="customer-country-options">
@@ -339,7 +340,7 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
       <PendingButton className="primary-action sm:col-span-2" pendingLabel={cx.say("saving")} type="submit">
         {cx.say("save")}
       </PendingButton>
-    </form>
+    </ActionForm>
   );
 }
 
@@ -347,7 +348,7 @@ function ContactChannelsForm({ customer, organizationId, country }: { customer: 
   const cx = useCx();
   const methods = ["whatsapp", "messenger", "line", "telegram", "sms", "email", "phone"];
   return (
-    <form action={updateCustomer} className="grid gap-3 sm:grid-cols-2">
+    <ActionForm action={updateCustomer} className="grid gap-3 sm:grid-cols-2">
       <input name="customerId" type="hidden" value={customer.id} />
       <input name="organizationId" type="hidden" value={organizationId} />
       <label className="block">
@@ -383,7 +384,7 @@ function ContactChannelsForm({ customer, organizationId, country }: { customer: 
       <PendingButton className="primary-action sm:col-span-2" pendingLabel={cx.say("saving")} type="submit">
         {cx.say("save")}
       </PendingButton>
-    </form>
+    </ActionForm>
   );
 }
 
@@ -434,7 +435,7 @@ function DocumentRow({ kind, files, customerId, organizationId }: { kind: "passp
           <Upload aria-hidden="true" size={16} />
           {have ? cx.say("doc_addAnother") : cx.say("doc_add")}
         </summary>
-        <form action={uploadCustomerDocument} className="mt-3 grid gap-3">
+        <ActionForm action={uploadCustomerDocument} className="mt-3 grid gap-3">
           <input name="customerId" type="hidden" value={customerId} />
           <input name="organizationId" type="hidden" value={organizationId} />
           <input name="category" type="hidden" value={kind} />
@@ -442,7 +443,7 @@ function DocumentRow({ kind, files, customerId, organizationId }: { kind: "passp
           <PendingButton className="primary-action" pendingLabel={cx.say("doc_uploading")} type="submit">
             {cx.say("doc_upload")}
           </PendingButton>
-        </form>
+        </ActionForm>
       </details>
     </div>
   );
@@ -549,6 +550,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   const dueNow = activeRental ? dueByRental.get(activeRental.id) || 0 : 0;
 
   const phoneDigits = String(customer.whatsapp_number || customer.phone || "").replace(/\D/g, "");
+  // No phone but another way to reach them (Messenger, LINE, Telegram, Instagram, email): a Message button that opens
+  // the Messages tab, where each of those has its own button. Without it the header offered no way to contact them.
+  const messageOnly = !customer.phone && phoneDigits.length < 8 && Boolean(customer.messenger_id || customer.line_id || customer.telegram_username || customer.instagram_handle || customer.email);
   const filesByKind = { passport: [] as CustomerFile[], driver_license: [] as CustomerFile[], selfie: [] as CustomerFile[], other: [] as CustomerFile[] };
   for (const file of detail.documentsWithUrls) filesByKind[fileKind(file.category) as keyof typeof filesByKind].push(file);
   const missingDocs = [
@@ -699,7 +703,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 {cx.say("whatsapp")}
               </a>
             ) : null}
-            <a className={`secondary-action pressable whitespace-nowrap ${(customer.phone ? 1 : 0) + (phoneDigits.length >= 8 ? 1 : 0) === 1 ? "" : "col-span-2"}`} href="#details">
+            {messageOnly ? (
+              <a className="secondary-action pressable" href="#messages">
+                <MessageCircle size={17} />
+                {cx.say("message")}
+              </a>
+            ) : null}
+            <a className={`secondary-action pressable whitespace-nowrap ${(customer.phone ? 1 : 0) + (phoneDigits.length >= 8 ? 1 : 0) + (messageOnly ? 1 : 0) === 1 ? "" : "col-span-2"}`} href="#details">
               <PenLine size={17} />
               {cx.say("editDetails")}
             </a>

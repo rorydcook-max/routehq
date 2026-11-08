@@ -5,10 +5,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { CheckCircle2, Clock, Copy, Wallet } from "lucide-react";
-import { submitPaymentReceipt } from "@/app/actions/public-booking";
+import { submitPaymentReceipt as submitPaymentReceiptAction } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 import { SlipMatcher } from "./slip-matcher";
 import { niceMoney } from "@/lib/nice-money";
+import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const submitPaymentReceipt = (...args: Parameters<typeof submitPaymentReceiptAction>) => unwrap(submitPaymentReceiptAction(...args));
 
 type OrgPayment = {
   promptpay_id?: string | null;
@@ -181,8 +186,8 @@ function PaymentRow({
         setSentAt(result.submittedAt || new Date().toISOString());
         onToggle();
         router.refresh();
-      } catch {
-        setError(t("receiptFailed"));
+      } catch (caught) {
+        setError(shownError(caught, t("receiptFailed")));
       }
     });
   }

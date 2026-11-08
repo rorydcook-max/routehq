@@ -4,8 +4,12 @@ import { useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
 import { UserPlus, X } from "lucide-react";
-import { assignCustomerToBooking } from "@/app/actions/bookings";
+import { assignCustomerToBooking as assignCustomerToBookingAction } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
+import { unwrap } from "@/lib/action-result";
+
+// A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
+const assignCustomerToBooking = (...args: Parameters<typeof assignCustomerToBookingAction>) => unwrap(assignCustomerToBookingAction(...args));
 
 type SelectorCustomer = {
   id: string;

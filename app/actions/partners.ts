@@ -1,5 +1,7 @@
 "use server";
 
+import { userError } from "@/lib/action-error";
+
 import { revalidatePath } from "next/cache";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { canDecideMoney } from "@/lib/auth/role-types";
@@ -126,6 +128,6 @@ export async function markReferralSettled(input: { referralId: string; method?: 
     revalidatePath("/transactions");
     return { ok: true };
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : await said("Couldn't mark it settled. Please try again.") };
+    return { ok: false, error: await userError(error, "Couldn't mark it settled. Please try again.") };
   }
 }

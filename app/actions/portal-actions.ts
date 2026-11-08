@@ -1,5 +1,7 @@
 "use server";
 
+import { guard, userError } from "@/lib/action-error";
+
 import { said } from "@/lib/i18n/server-text";
 import { revalidatePath } from "next/cache";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -17,9 +19,12 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
  * chat they first used (see lib/customer-messages.ts).
  */
 
+/** What to ask for when a field the person fills in arrives empty (the rest are the page's own ids). */
+const MISSING_FIELD: Record<string, string> = {"reply":"Write your reply first."};
+
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
-  if (!value) throw new Error(`${key} is required.`);
+  if (!value) throw new Error(MISSING_FIELD[key] || `${key} is required.`);
   return value;
 }
 
@@ -143,11 +148,16 @@ export async function answerExtensionRequest(input: { actionId: string; rentalId
     refresh(rentalId);
     return { ok: true };
   } catch (error) {
-    return { ok: false, error: await said(error instanceof Error ? error.message : "That didn't work. Try again.") };
+    return { ok: false, error: await userError(error, "That didn't work. Try again.") };
   }
 }
 
-export async function declinePortalAction(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function declinePortalAction(...args: Parameters<typeof declinePortalActionOrThrow>) {
+  return guard(() => declinePortalActionOrThrow(...args));
+}
+
+async function declinePortalActionOrThrow(formData: FormData) {
   const { membership, admin, action, actionId, rentalId } = await load(formData);
   const note = optionalString(formData, "note");
   await resolve(admin, action, membership.userId, { operator_note: note, outcome: "declined" });
@@ -163,7 +173,12 @@ export async function declinePortalAction(formData: FormData) {
   refresh(rentalId);
 }
 
-export async function acknowledgePortalAction(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function acknowledgePortalAction(...args: Parameters<typeof acknowledgePortalActionOrThrow>) {
+  return guard(() => acknowledgePortalActionOrThrow(...args));
+}
+
+async function acknowledgePortalActionOrThrow(formData: FormData) {
   const { membership, admin, action, actionId, rentalId } = await load(formData);
   await resolve(admin, action, membership.userId, { outcome: "acknowledged" }, "acknowledged");
   await completeRentalJobs(admin, rentalId, "request", "Acknowledged", actionId);
@@ -180,7 +195,12 @@ export async function acknowledgePortalAction(formData: FormData) {
   refresh(rentalId);
 }
 
-export async function resolvePortalAction(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function resolvePortalAction(...args: Parameters<typeof resolvePortalActionOrThrow>) {
+  return guard(() => resolvePortalActionOrThrow(...args));
+}
+
+async function resolvePortalActionOrThrow(formData: FormData) {
   const { membership, admin, action, actionId, rentalId } = await load(formData);
   const notes = optionalString(formData, "notes");
   // A problem can be answered as it is closed, so the customer hears what was done.
@@ -192,7 +212,12 @@ export async function resolvePortalAction(formData: FormData) {
 }
 
 /** Sends the answer to the customer's question; if they have no chat, it is kept on the booking marked "not sent". */
-export async function replyToPortalQuestion(formData: FormData) {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function replyToPortalQuestion(...args: Parameters<typeof replyToPortalQuestionOrThrow>) {
+  return guard(() => replyToPortalQuestionOrThrow(...args));
+}
+
+async function replyToPortalQuestionOrThrow(formData: FormData) {
   const { membership, admin, action, actionId, rentalId } = await load(formData);
   const reply = requiredString(formData, "reply");
   await resolve(admin, action, membership.userId, { reply });

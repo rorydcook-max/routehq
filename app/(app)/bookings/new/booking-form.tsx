@@ -143,13 +143,45 @@ const CURRENCY_INFO: Record<string, { symbol: string; locale: string; label: str
   EUR: { symbol: "€", locale: "de-DE", label: "Euro" },
 };
 
+/**
+ * The business's own currency when it isn't one of the above (every country can sign up since 8 Nov 2026: yen, real,
+ * shilling...). Before this, such a business's bookings were saved in baht (test-app-nov8).
+ */
+function currencyInfoFor(code: string): { symbol: string; locale: string; label: string } {
+  const known = CURRENCY_INFO[code];
+  if (known) return known;
+  try {
+    const symbol = new Intl.NumberFormat("en-US", { style: "currency", currency: code, currencyDisplay: "narrowSymbol" }).formatToParts(0).find((part) => part.type === "currency")?.value || code;
+    let label = code;
+    try {
+      label = new Intl.DisplayNames(["en"], { type: "currency" }).of(code) || code;
+    } catch {
+      label = code;
+    }
+    return { symbol, locale: "en-US", label };
+  } catch {
+    return CURRENCY_INFO.THB;
+  }
+}
+
+/** A real ISO 4217 code the runtime can format. */
+function isCurrencyCode(code: string) {
+  if (!/^[A-Z]{3}$/.test(code)) return false;
+  try {
+    new Intl.NumberFormat("en-US", { style: "currency", currency: code });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function money(value: unknown, currency = "THB") {
   if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(Number(value || 0), currency, "en-GB");
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
 /** Currencies with no smaller unit in everyday use; every other one takes cents (same rule as components/money-input). */
-const NO_DECIMALS = new Set(["IDR", "VND"]);
+const NO_DECIMALS = new Set(["IDR", "VND", "JPY", "KRW", "CLP", "ISK", "PYG", "UGX", "XAF", "XOF"]);
 
 function moneyInput(value: number, currencyInfo: { symbol: string; locale: string }, showZero = false) {
   if (!showZero && !value) return "";
@@ -347,7 +379,8 @@ export function BookingForm({
     const age = Number(startDate.slice(0, 4)) - Number(born.slice(0, 4)) - (startDate.slice(5) < born.slice(5) ? 1 : 0);
     if (age < (young.minAge || 25)) setChosenExtras((list) => (list.includes(young.id) ? list : [...list, young.id]));
   }, [selectedCustomer?.id, startDate]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [currency, setCurrency] = useState(CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB");
+  const homeCurrency = isCurrencyCode(String(defaultCurrency || "").toUpperCase()) ? String(defaultCurrency).toUpperCase() : "THB";
+  const [currency, setCurrency] = useState(homeCurrency);
   // Filled from the start when the vehicle is already chosen, so the rate never shows as empty while the page loads.
   const [rentalRate, setRentalRate] = useState(() => {
     const preselected = validPreselectedVehicle ? vehicles.find((vehicle) => vehicle.id === preselectedVehicleId) : null;
@@ -403,7 +436,7 @@ export function BookingForm({
   const dateConflict = anyClash && (openEnded || endDate || String(anyClash.startDate).slice(0, 10) <= startDate) ? anyClash : null;
   const nextBooking = !dateConflict && anyClash ? anyClash : null;
   const nextBookingStart = nextBooking ? String(nextBooking.startDate).slice(0, 10) : "";
-  const currencyInfo = CURRENCY_INFO[currency] ?? CURRENCY_INFO["THB"];
+  const currencyInfo = currencyInfoFor(currency);
   // Which set of words to use for the period the price is per.
   const periodKey = pricingModel === "monthly" || pricingModel === "weekly" || pricingModel === "daily" ? pricingModel : "custom";
   const handoverDateTime = deliveryMethod === "delivery" ? deliveryDateTime : deliveryMethod === "collection" ? collectionTime : "";
@@ -1163,7 +1196,7 @@ export function BookingForm({
             );
           })()}
           {/* Rarely needed: kept one tap away so the usual booking is a short screen. */}
-          <details className="mt-3" open={upfrontEnabled || Boolean(specialConditions) || currency !== (CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB")}>
+          <details className="mt-3" open={upfrontEnabled || Boolean(specialConditions) || currency !== homeCurrency}>
             <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">{say("moreOptions")}</summary>
           <div className="mt-3">
             <label
@@ -1229,7 +1262,7 @@ export function BookingForm({
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("currency")}</span>
               <select className={inputClass} onChange={(event) => setCurrency(event.target.value)} value={currency}>
-                {Object.entries(CURRENCY_INFO).sort(([a], [b]) => a.localeCompare(b)).map(([code, info]) => (
+                {Object.entries({ ...CURRENCY_INFO, [homeCurrency]: currencyInfoFor(homeCurrency) }).sort(([a], [b]) => a.localeCompare(b)).map(([code, info]) => (
                   <option key={code} value={code}>
                     {info.symbol} - {code}
                   </option>

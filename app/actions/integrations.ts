@@ -1,5 +1,7 @@
 "use server";
 
+import { guard } from "@/lib/action-error";
+
 import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -28,7 +30,12 @@ async function saveSettings(db: any, organizationId: string, settings: Record<st
 }
 
 /** The grid on Settings › Notifications: which events reach which channels, plus the morning summary. */
-export async function saveNotificationMatrix(formData: FormData): Promise<void> {
+/** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
+export async function saveNotificationMatrix(...args: Parameters<typeof saveNotificationMatrixOrThrow>) {
+  return guard(() => saveNotificationMatrixOrThrow(...args));
+}
+
+async function saveNotificationMatrixOrThrow(formData: FormData): Promise<void> {
   const found = await ownerOrg();
   if (!found) return;
   const settings = { ...(found.org.settings || {}) };

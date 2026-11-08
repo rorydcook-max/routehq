@@ -964,7 +964,8 @@
     "bs_vehicleCount": "{count, plural, one {# vehicle} other {# vehicles}}",
     "bs_demoBanner": "Demo business, example only. Bookings are turned off.",
     "bs_demoNoBooking": "This is a demo business, so bookings are turned off.",
-    "reason_late_return": "late return"
+    "reason_late_return": "late return",
+    "actionFailed": "That wasn't sent. Check your connection and try again."
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -2534,7 +2535,8 @@
     "cn_depositTooMuch": "The deposit still held is {amount}.",
     "fin_cancelledSettled": "Refunds recorded. Nothing left to settle.",
     "share_send": "Send booking link",
-    "hist_late_return": "Returned late"
+    "hist_late_return": "Returned late",
+    "cp_noteFailed": "The note wasn't saved. Try again."
   },
   "newBooking": {
     "docsSelfie": "Photo of the customer",
@@ -2946,7 +2948,8 @@
     "in_trend": "Rental length and spend",
     "in_avgLength": "Average length",
     "in_avgSpend": "Average spend",
-    "pillReviews": "{count, plural, one {# review} other {# reviews}}"
+    "pillReviews": "{count, plural, one {# review} other {# reviews}}",
+    "sel_needContact": "Add a name and one way to reach them: a phone number, Messenger, LINE, Telegram or email."
   },
   "calendar": {
     "title": "Calendar",
@@ -3595,7 +3598,10 @@
     "tl_paidCharge": "Paid a charge",
     "tl_refunded": "Refund",
     "tl_damage": "Damage found on return: {count, plural, one {# item} other {# items}}",
-    "tl_review": "Left a review: {rating}/5"
+    "tl_review": "Left a review: {rating}/5",
+    "new_phoneHint": "Not needed if you add Messenger, LINE, Telegram, Instagram or email below.",
+    "dnr_failed": "That wasn't saved. Try again.",
+    "message": "Message"
   },
   "vehicleForm": {
     "addTitle": "Add vehicle",

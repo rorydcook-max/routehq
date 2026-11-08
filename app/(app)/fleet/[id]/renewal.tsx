@@ -8,8 +8,9 @@ import { monthsCovered } from "@/lib/cost-spread";
 import { dateFormat } from "@/lib/i18n/dates";
 import { Camera, Check, Copy, ExternalLink, Loader2, ShieldCheck, X } from "lucide-react";
 import type { InsurancePartner } from "@/lib/insurance-partners";
-import { renewVehicleCompliance } from "@/app/actions/vehicles";
+import { renewVehicleComplianceFromForm } from "@/app/actions/vehicles";
 import { PendingButton } from "@/components/pending-button";
+import { ActionForm } from "@/components/action-form";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const inputClass = "mt-1 w-full";
@@ -100,7 +101,7 @@ export function RenewalForm({
   }
 
   return (
-    <form action={renewVehicleCompliance} className="mt-3 grid gap-3 sm:grid-cols-2">
+    <ActionForm action={renewVehicleComplianceFromForm} className="mt-3 grid gap-3 sm:grid-cols-2">
       <input name="vehicleId" type="hidden" value={vehicleId} />
       <input name="organizationId" type="hidden" value={organizationId} />
       <input name="complianceType" type="hidden" value={complianceType} />
@@ -182,7 +183,7 @@ export function RenewalForm({
       <PendingButton className="primary-action sm:col-span-2" pendingLabel={say("saving")} type="submit">
         {say("save")}
       </PendingButton>
-    </form>
+    </ActionForm>
   );
 }
 

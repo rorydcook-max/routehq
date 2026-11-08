@@ -8,7 +8,7 @@ import { roveLocale } from "@/lib/rove/static";
 import { Breadcrumbs } from "../_components/breadcrumbs";
 import { CountryRulesList, SourceList } from "../_components/country-rules";
 import { JsonLd } from "../_components/json-ld";
-import { PlaceArt } from "../_components/place-art";
+import { PlaceArt, PlaceCredit } from "../_components/place-art";
 import { vehiclePhotoUrl } from "../_components/vehicle-card";
 import s from "../rove.module.css";
 
@@ -72,6 +72,7 @@ export default async function CountryPage({ params }: Props) {
       <JsonLd data={itemListLd(t("rv.countryTitle", { country: rules.name }), rows.map(({ destination }) => ({ name: destination.name, path: destinationPath(destination) })), locale)} />
       <header className={s.placeHero}>
         {lead ? <PlaceArt destination={{ slug: rules.slug, name: rules.name, center: lead.destination.center }} eager sizes="(min-width: 1240px) 1184px, 100vw" vehiclePhoto={lead.photo ? vehiclePhotoUrl(lead.photo) : null} /> : null}
+        {lead ? <PlaceCredit slug={rules.slug} /> : null}
         <h1 className={s.pageTitle}>{t("rv.countryTitle", { country: rules.name })}</h1>
         <p className={s.pageLede}>{t("rv.countryDescription", { country: rules.name })}</p>
       </header>

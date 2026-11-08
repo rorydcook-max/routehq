@@ -14,6 +14,10 @@ import s from "../site.module.css";
  * Each picture is one image to a screen reader (role="img" with a label); what is inside it is hidden from them.
  */
 
+/** The Pajero's day price on the booking page (THB), and the days on the sample booking link (12 to 19 November). */
+const PAJERO_DAY = 2200;
+const BOOKING_DAYS = 7;
+
 async function kit() {
   // The visitor's currency: the page sets it from its address (setPageCurrency) before its pictures draw.
   const [t, locale] = await Promise.all([getTranslations("site"), getLocale()]);
@@ -248,7 +252,7 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
           <div className="mt-[1.1em] flex gap-[0.6em] overflow-hidden">
             <Chip dot="#d14343">{t("mockOverdue", { count: 1 })}</Chip>
             <Chip>{t("mockForToday", { count: 3 })}</Chip>
-            <Chip dot="#12bcb8">{t("mockGoingOut", { count: 2 })}</Chip>
+            <Chip dot="#12bcb8">{t("mockGoingOut", { count: 1 })}</Chip>
             <Chip dot="#4a9ad8">{t("mockComingBack", { count: 1 })}</Chip>
           </div>
           <div className="mt-[1.4em] grid grid-cols-[1.65fr_1fr] gap-[1.2em]">
@@ -402,7 +406,9 @@ function TabBar({ active = 0 }: { active?: number }) {
 /* ── A customer's booking link ──────────────────────────────────────────── */
 
 export async function BookingPhoneMock({ className = "" }: { className?: string }) {
-  const { t, money, date } = await kit();
+  const { t, money, local, format, date } = await kit();
+  // The booking page's day price times the days, in the visitor's currency, so the total always adds up.
+  const total = format(local(PAJERO_DAY) * BOOKING_DAYS);
   const range = `${date("2026-11-12", { day: "numeric", month: "short" })} – ${date("2026-11-19", { day: "numeric", month: "short" })}`;
   return (
     <PhoneFrame className={className} label={t("mockBookingLabel")}>
@@ -421,14 +427,14 @@ export async function BookingPhoneMock({ className = "" }: { className?: string 
             <span className="min-w-0">
               <span className="block text-[1.15em] font-bold leading-tight">{vehicleName("pajero")}</span>
               <span className="block text-[#5f6b7a]">
-                {range} · {t("mockDays", { count: 7 })}
+                {range} · {t("mockDays", { count: BOOKING_DAYS })}
               </span>
             </span>
           </div>
           <div className="mt-[0.9em] grid grid-cols-2 gap-[0.5em]">
             <span className="rounded-[0.8em] bg-[#f3f6f8] px-[0.8em] py-[0.55em]">
               <span className="block text-[0.9em] text-[#5f6b7a]">{t("mockTotal")}</span>
-              <span className="block text-[1.2em] font-bold">{money(5600)}</span>
+              <span className="block text-[1.2em] font-bold">{total}</span>
             </span>
             <span className="rounded-[0.8em] bg-[#f3f6f8] px-[0.8em] py-[0.55em]">
               <span className="block text-[0.9em] text-[#5f6b7a]">{t("mockDeposit")}</span>
@@ -790,7 +796,7 @@ export async function ShopPageMock({ className = "" }: { className?: string }) {
   const vehicles = [
     { id: "corolla" as VehicleId, price: money(1300) },
     { id: "vespa" as VehicleId, price: money(450) },
-    { id: "pajero" as VehicleId, price: money(2200) },
+    { id: "pajero" as VehicleId, price: money(PAJERO_DAY) },
     { id: "yaris" as VehicleId, price: money(1100) }
   ];
   return (

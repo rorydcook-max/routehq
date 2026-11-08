@@ -43,15 +43,25 @@ export function vehiclePhotoUrl(vehicle: Pick<RoveVehicle, "id" | "photoCount"> 
   return vehicle.photoCount > index ? vehicle.photos?.[index] || `${PHOTO_ROUTE}${vehicle.id}/${index}` : null;
 }
 
-export function VehiclePhoto({ vehicle, index = 0, eager = false, sizes = "(min-width: 960px) 360px, 100vw", aiLabel }: { vehicle: RoveVehicle; index?: number; eager?: boolean; sizes?: string; aiLabel?: string }) {
+/**
+ * What a vehicle is called on Rove: make and model (with trim), else its kind ("Car", "Scooter") in the page's
+ * language, so a card, link or photo never goes without a name.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function vehicleTitle(vehicle: Pick<RoveVehicle, "name" | "kind">, t: (key: any) => string) {
+  return (vehicle.name || "").trim() || t(`kind_${vehicle.kind === "other" ? "car" : vehicle.kind}`);
+}
+
+export function VehiclePhoto({ vehicle, index = 0, eager = false, sizes = "(min-width: 960px) 360px, 100vw", aiLabel, label }: { vehicle: RoveVehicle; index?: number; eager?: boolean; sizes?: string; aiLabel?: string; label?: string }) {
   const url = vehiclePhotoUrl(vehicle, index);
+  const name = (label || vehicle.name || "").trim();
   if (url) {
     // A stable address, resized to the slot (lib/photo-url.ts), so cached pages keep working and phones load less.
     // `aiLabel` (gallery.aiImage) marks a photo AI made (components/ai-image-label.tsx).
     return (
       <>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img alt={`${vehicle.name}${vehicle.year ? ` ${vehicle.year}` : ""}`} decoding="async" fetchPriority={eager ? "high" : undefined} height={900} loading={eager ? "eager" : "lazy"} width={1200} {...photoProps(url, sizes)} />
+        <img alt={`${name}${vehicle.year ? ` ${vehicle.year}` : ""}`} decoding="async" fetchPriority={eager ? "high" : undefined} height={900} loading={eager ? "eager" : "lazy"} width={1200} {...photoProps(url, sizes)} />
         {aiLabel ? <AiImageLabel label={aiLabel} show={vehicle.photoAi?.[index]} /> : null}
       </>
     );
@@ -111,6 +121,7 @@ export async function VehicleCard({
   const money = (value: number) => roveMoney(value, vehicle.business.currency, locale);
   const facts = await vehicleFacts(vehicle);
   const href = vehicleHref(vehicle, stay, locale);
+  const title = vehicleTitle(vehicle, t);
   const town = vehicle.business.town || vehicle.business.region;
   // The headline price: the exact total for set dates, else the rate for the period asked (or the business's lead rate).
   const showTotal = quote.total !== null;
@@ -126,8 +137,10 @@ export async function VehicleCard({
 
   return (
     <article className={layout === "grid" ? s.cardTile : s.card}>
-      <a aria-hidden="true" className={s.cardPhoto} href={href} tabIndex={-1}>
-        <VehiclePhoto aiLabel={gallery("aiImage")} eager={eager} sizes={layout === "grid" ? "(min-width: 1100px) 300px, (min-width: 640px) 45vw, 90vw" : "(min-width: 960px) 320px, (min-width: 640px) 40vw, 100vw"} vehicle={vehicle} />
+      {/* A second way in for pointers, hidden from screen readers; named too, so a vehicle with no photo (drawn art)
+          never leaves a bare link that tools read out as its address. */}
+      <a aria-hidden="true" aria-label={title} className={s.cardPhoto} href={href} tabIndex={-1}>
+        <VehiclePhoto aiLabel={gallery("aiImage")} eager={eager} label={title} sizes={layout === "grid" ? "(min-width: 1100px) 300px, (min-width: 640px) 45vw, 90vw" : "(min-width: 960px) 320px, (min-width: 640px) 40vw, 100vw"} vehicle={vehicle} />
         <span className={s.cardTags}>
           {delivers ? (
             <span className={s.tagDelivery}>
@@ -141,7 +154,7 @@ export async function VehicleCard({
         <div className={s.cardMain}>
           <h3 className={s.cardTitle}>
             <a href={href}>
-              {vehicle.name}
+              {title}
               {vehicle.year ? <span className={s.cardYear}> {vehicle.year}</span> : null}
             </a>
           </h3>

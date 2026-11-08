@@ -19,7 +19,7 @@ cover: "/site/covers/deposit.svg"
 coverAlt: "Illustration: a stack of coins and a lock for a held deposit"
 ---
 
-*By Anan · Updated 28 October 2026*
+*By Rory · Updated 28 October 2026*
 
 The deposit is where most rental arguments start. Too low and it does not cover a broken mirror. Too high and you lose bookings to the shop next door. Taken the wrong way, like holding a passport, it can land you in legal trouble.
 

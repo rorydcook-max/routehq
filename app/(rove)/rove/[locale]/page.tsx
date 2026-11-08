@@ -12,7 +12,7 @@ import { listFleetHref } from "./_components/header";
 import { JsonLd } from "./_components/json-ld";
 import { PlaceArt } from "./_components/place-art";
 import { SearchForm } from "./_components/search-form";
-import { OperatorMark, VehicleCard, vehiclePhotoUrl, VehiclePhoto } from "./_components/vehicle-card";
+import { OperatorMark, VehicleCard, vehiclePhotoUrl, VehiclePhoto, vehicleTitle } from "./_components/vehicle-card";
 import { searchWords } from "./_components/words";
 import s from "./rove.module.css";
 
@@ -24,10 +24,10 @@ const CURATED = ["indonesia/bali", "portugal/algarve", "greece/crete", "spain/ma
 
 /** Browse by type: the stock photos in public/site/vehicles (Pexels, see CREDITS.md), each a ready-made search. */
 const TYPES = [
-  { key: "Cars", photo: "toyota-corolla", query: "kind=car" },
-  { key: "SmallCars", photo: "toyota-yaris", query: "kind=car&size=small" },
-  { key: "Suvs", photo: "mitsubishi-pajero-sport", query: "kind=car&size=suv" },
-  { key: "Scooters", photo: "vespa-vxl", query: "kind=scooter" }
+  { key: "Cars", photo: "toyota-corolla", alt: "Toyota Corolla", query: "kind=car" },
+  { key: "SmallCars", photo: "toyota-yaris", alt: "Toyota Yaris", query: "kind=car&size=small" },
+  { key: "Suvs", photo: "mitsubishi-pajero-sport", alt: "Mitsubishi Pajero Sport", query: "kind=car&size=suv" },
+  { key: "Scooters", photo: "vespa-vxl", alt: "Vespa VXL", query: "kind=scooter" }
 ] as const;
 
 export async function generateMetadata({ params }: RoveParams): Promise<Metadata> {
@@ -108,16 +108,16 @@ export default async function RoveHome({ params }: RoveParams) {
             <div className={s.heroVisual}>
               <div className={s.heroPhoto}>
                 {heroVehicle ? (
-                  <VehiclePhoto eager sizes="(min-width: 900px) 560px, 92vw" vehicle={heroVehicle} />
+                  <VehiclePhoto eager label={vehicleTitle(heroVehicle, t)} sizes="(min-width: 900px) 560px, 92vw" vehicle={heroVehicle} />
                 ) : (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="" fetchPriority="high" sizes="(min-width: 900px) 560px, 92vw" src="/site/vehicles/toyota-corolla.webp" srcSet="/site/vehicles/toyota-corolla-thumb.webp 400w, /site/vehicles/toyota-corolla.webp 1200w" />
+                  <img alt="Toyota Corolla" fetchPriority="high" sizes="(min-width: 900px) 560px, 92vw" src="/site/vehicles/toyota-corolla.webp" srcSet="/site/vehicles/toyota-corolla-thumb.webp 400w, /site/vehicles/toyota-corolla.webp 1200w" />
                 )}
                 {heroVehicle ? (
                   <a className={s.heroCaption} href={roveHref(`/vehicles/${heroVehicle.id}`, locale)}>
                     <OperatorMark logoUrl={heroVehicle.business.logoUrl} name={heroVehicle.business.name} />
                     <span className={s.heroCaptionText}>
-                      <span className={s.heroCaptionName}>{heroVehicle.name}</span>
+                      <span className={s.heroCaptionName}>{vehicleTitle(heroVehicle, t)}</span>
                       <span className={s.heroCaptionMeta}>{t("rv.fromBusiness", { business: heroVehicle.business.name, town: heroVehicle.business.town || heroVehicle.business.region })}</span>
                     </span>
                     <span className={s.heroCaptionPrice}>
@@ -130,7 +130,7 @@ export default async function RoveHome({ params }: RoveParams) {
               {thumbVehicle && thumbVehicle !== heroVehicle ? (
                 <div className={s.heroThumb}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img alt="" loading="lazy" src={sizedPhoto(vehiclePhotoUrl(thumbVehicle) || "", 480)} />
+                  <img alt={vehicleTitle(thumbVehicle, t)} loading="lazy" src={sizedPhoto(vehiclePhotoUrl(thumbVehicle) || "", 480)} />
                 </div>
               ) : null}
             </div>
@@ -143,7 +143,7 @@ export default async function RoveHome({ params }: RoveParams) {
             {TYPES.map((type) => (
               <a className={s.kind} href={`${roveHref("/search", locale)}?${type.query}`} key={type.key}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img alt="" loading="lazy" sizes="(min-width: 900px) 290px, 46vw" src={`/site/vehicles/${type.photo}-thumb.webp`} srcSet={`/site/vehicles/${type.photo}-thumb.webp 400w, /site/vehicles/${type.photo}.webp 1200w`} />
+                <img alt={type.alt} loading="lazy" sizes="(min-width: 900px) 290px, 46vw" src={`/site/vehicles/${type.photo}-thumb.webp`} srcSet={`/site/vehicles/${type.photo}-thumb.webp 400w, /site/vehicles/${type.photo}.webp 1200w`} />
                 <span className={s.kindLabel}>{t(`rv.type${type.key}`)}</span>
               </a>
             ))}
@@ -266,10 +266,10 @@ export default async function RoveHome({ params }: RoveParams) {
           {monthlyPick ? (
             <a className={s.rateCard} href={roveHref(`/vehicles/${monthlyPick.id}`, locale)} style={{ textDecoration: "none" }}>
               <div className={s.rateCardPhoto}>
-                <VehiclePhoto sizes="(min-width: 960px) 520px, 92vw" vehicle={monthlyPick} />
+                <VehiclePhoto label={vehicleTitle(monthlyPick, t)} sizes="(min-width: 960px) 520px, 92vw" vehicle={monthlyPick} />
               </div>
               <div className={s.rateCardBody}>
-                <p className={s.rateCardName}>{monthlyPick.name}</p>
+                <p className={s.rateCardName}>{vehicleTitle(monthlyPick, t)}</p>
                 <p className={s.rateCardOp}>{t("rv.fromBusiness", { business: monthlyPick.business.name, town: monthlyPick.business.town || monthlyPick.business.region })}</p>
                 <div className={s.rateRows}>
                   <span className={s.rateCell}>

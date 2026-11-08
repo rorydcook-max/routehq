@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { CSSProperties } from "react";
 import { photoProps } from "@/lib/photo-url";
@@ -27,6 +27,35 @@ export function placePhoto(slug: string): string | null {
     if (existsSync(join(process.cwd(), "public", file))) return file;
   }
   return null;
+}
+
+type Credit = { photographer: string; photographer_url: string; source_url: string; license: string };
+let credits: Record<string, Credit> | null = null;
+
+/** Who took a place's photo, from public/rove/destinations/credits.json (Unsplash photos, task dest-photos). */
+function photoCredit(slug: string): Credit | null {
+  if (!placePhoto(slug)) return null;
+  if (!credits) {
+    try {
+      credits = JSON.parse(readFileSync(join(process.cwd(), "public", "rove", "destinations", "credits.json"), "utf8"));
+    } catch {
+      credits = {};
+    }
+  }
+  return credits?.[slug] || null;
+}
+
+/** A small credit in a hero's top corner, only when the place's own photo is the one shown. */
+export function PlaceCredit({ slug }: { slug: string }) {
+  const credit = photoCredit(slug);
+  if (!credit) return null;
+  const ref = "?utm_source=rove&utm_medium=referral";
+  return (
+    <p className={s.placeCredit}>
+      © <a href={`${credit.photographer_url}${ref}`} rel="noopener" target="_blank">{credit.photographer}</a> /{" "}
+      <a href={`https://unsplash.com/${ref}`} rel="noopener" target="_blank">Unsplash</a>
+    </p>
+  );
 }
 
 function coords(center: { lat: number; lng: number }) {

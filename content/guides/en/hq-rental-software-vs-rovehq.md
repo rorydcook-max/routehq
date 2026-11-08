@@ -42,7 +42,7 @@ All facts about HQ come from its own website **as of November 2026**. Prices and
 | Hosting | USA, Netherlands or Singapore | Managed for you |
 | Mobile | Web app plus iOS and Android app | Phone-first web app |
 | Contracts | Digital agreements and e-signatures | Agreement written for you in English and the local language (18 countries across Southeast Asia and Europe), e-signature on the customer's phone |
-| Booking channels | Booking engine on your site; channel management with sites like Expedia, Kayak and Turo | Booking page and website booking box; Rove directory with no commission |
+| Booking channels | Booking engine on your site; channel management with sites like Expedia, Kayak and Turo | Booking page and website booking box; Rove directory |
 | Integrations | QuickBooks, Xero, telematics (Geotab, Invers, Zubie), US toll systems | Accounting export from Starter; no telematics or accounting sync |
 | Customer chat | Email confirmations | LINE and Telegram inbox, automatic reminders; WhatsApp opens with the message ready |
 

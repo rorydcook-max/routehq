@@ -21,7 +21,7 @@ cover: "/site/covers/scooter.svg"
 coverAlt: "Illustration: a scooter by the sea"
 ---
 
-*By Anan · Updated 28 October 2026*
+*By Rory · Updated 28 October 2026*
 
 A scooter rental business looks simple from the outside: buy some bikes, put up a sign, hand over keys. The shops that last are the ones that treat it as a small finance business. Each bike is an asset that has to earn back its price, cover its running costs and survive renters who are not always careful.
 

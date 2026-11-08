@@ -11,7 +11,7 @@ import { sizedPhoto } from "@/lib/photo-url";
 import { Breadcrumbs } from "../../_components/breadcrumbs";
 import { CountryRulesList, SourceList } from "../../_components/country-rules";
 import { JsonLd } from "../../_components/json-ld";
-import { PlaceArt, placePhoto } from "../../_components/place-art";
+import { PlaceArt, PlaceCredit, placePhoto } from "../../_components/place-art";
 import { SearchForm } from "../../_components/search-form";
 import { VehicleCard, vehiclePhotoUrl } from "../../_components/vehicle-card";
 import { searchWords } from "../../_components/words";
@@ -106,6 +106,7 @@ export default async function DestinationPage({ params }: Props) {
 
       <header className={s.placeHero}>
         <PlaceArt destination={destination} eager sizes="(min-width: 1240px) 1184px, 100vw" vehiclePhoto={heroPhoto ? vehiclePhotoUrl(heroPhoto) : null} />
+        <PlaceCredit slug={destination.slug} />
         <p className={s.placeHeroKicker}>{rules.name}</p>
         <h1 className={s.pageTitle}>{t("rv.destTitle", { place: destination.name })}</h1>
         <p className={s.pageLede}>{destination.intro}</p>

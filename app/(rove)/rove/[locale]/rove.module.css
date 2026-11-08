@@ -1721,6 +1721,23 @@
   color: rgba(255, 255, 255, 0.86);
   max-width: 58ch;
 }
+/* The hero photo's credit, top corner (photos from public/rove/destinations/credits.json). */
+.placeCredit {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 16px;
+  margin: 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+.placeCredit a {
+  color: inherit;
+  text-decoration: none;
+}
+.placeCredit a:hover {
+  text-decoration: underline;
+}
 .placeHeroKicker {
   margin: 0;
   font-size: 15px;

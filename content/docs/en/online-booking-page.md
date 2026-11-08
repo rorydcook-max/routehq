@@ -48,7 +48,7 @@ Have a website? Copy the code under **Booking box for your own website** and pas
 
 ## Get found on rove.rent
 
-In **Settings** > **Rentals and payments**, open **Listing on rove.rent** and switch on **List my vehicles on rove.rent**. People searching rove.rent by place and dates see your free vehicles and book on your page. No commission.
+In **Settings** > **Rentals and payments**, open **Listing on rove.rent** and switch on **List my vehicles on rove.rent**. People searching rove.rent by place and dates see your free vehicles and book on your page.
 
 ## When someone books
 

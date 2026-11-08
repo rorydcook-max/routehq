@@ -85,7 +85,7 @@ export default async function SiteHomePage({ params }: Props) {
   const stats = [
     { label: t("mockOverdue", { count: 1 }), colour: "#d14343" },
     { label: t("mockForToday", { count: 3 }), colour: "#12bcb8" },
-    { label: t("mockGoingOut", { count: 2 }), colour: "#4a9ad8" }
+    { label: t("mockGoingOut", { count: 1 }), colour: "#4a9ad8" }
   ];
 
   // Structured data: the product with its plans in US dollars (lib/site/schema.ts), and the questions below.

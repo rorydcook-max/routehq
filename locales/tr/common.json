@@ -529,7 +529,14 @@
     "mockAvailable": "Müsait",
     "mockPerDay": "Günlük {amount}",
     "mockQrPay": "QR ödeme",
-    "inclImport": "Mevcut kayıtlarınızın ücretsiz içe aktarımı"
+    "inclImport": "Mevcut kayıtlarınızın ücretsiz içe aktarımı",
+    "inclPaymentsGlobal": "Havale, Wise ve Revolut ödemeleri, depozitolar ve makbuzlar",
+    "mockPaymentLabelGlobal": "Telefonda banka bilgileriyle bir ödeme talebi ve müşterinin rezervasyonla eşleşen dekontu",
+    "mockPayByTransfer": "Havaleyle öde",
+    "mockAccount": "Hesap",
+    "mockReference": "Açıklama",
+    "mockReceiptMatched": "Dekont rezervasyonla eşleşti",
+    "mockBankTransfer": "Banka havalesi"
   },
   "vehicleForm": {
     "addTitle": "Araç ekle",
@@ -1982,7 +1989,9 @@
     "dateRange": "{start} – {end}",
     "cn_refundTooMuch": "En fazla {amount} iade edebilirsiniz.",
     "cn_depositTooMuch": "Hâlâ tutulan depozito {amount}.",
-    "fin_cancelledSettled": "İadeler kaydedildi. Kapatılacak bir şey kalmadı."
+    "fin_cancelledSettled": "İadeler kaydedildi. Kapatılacak bir şey kalmadı.",
+    "share_send": "Rezervasyon bağlantısı gönder",
+    "hist_late_return": "Geç iade edildi"
   },
   "shell": {
     "quick_uploadReceipt": "Makbuz yükle",
@@ -2043,7 +2052,8 @@
     "setupShared": "Bağlantı kopyalandı. Google Haritalar kaydınıza, web sitenize, Instagram veya Facebook sayfanıza ve WhatsApp ya da LINE profilinize ekleyin.",
     "quick_askAssistant": "Sohbetle ekle",
     "quick_askAssistant_hint": "Araçlar ya da mevcut kiralamalar, mesajla veya fotoğrafla",
-    "paymentFailed": "Ödeme başarısız — kartı güncelleyin"
+    "paymentFailed": "Ödeme başarısız — kartı güncelleyin",
+    "setupHideConfirm": "Kurulum adımları gizlensin mi?"
   },
   "inbox": {
     "title": "Gelen kutusu",
@@ -2137,7 +2147,8 @@
     "optHelp": "Kayıtlarınızı gönderin, biz kuralım",
     "optHelpBody": "Defterinizin fotoğraflarını, bir tabloyu ya da sohbetleri gönderin. Hepsini biz aktarırız.",
     "countryChoose": "Ülkenizi seçin",
-    "needCountry": "Ülkenizi seçin."
+    "needCountry": "Ülkenizi seçin.",
+    "back": "Geri"
   },
   "settings": {
     "contractsBranding": {
@@ -2938,7 +2949,7 @@
     "ig_soon_flowaccount": "FlowAccount",
     "ig_soon_flowaccountBody": "Faturaları ve ödemeleri Tayland muhasebenize gönderin.",
     "ig_soon_gbp": "Google İşletme Profili yorumları",
-    "ig_soon_gbpBody": "Memnun müşterilerden Google yorumu isteyin.",
+    "ig_soon_gbpBody": "Müşterilerden Google yorumu isteyin.",
     "ig_soon_quickbooks": "QuickBooks",
     "ig_soon_quickbooksBody": "Gelir ve giderleri muhasebenize gönderin.",
     "ig_soon_xero": "Xero",
@@ -4234,7 +4245,14 @@
     "lateOptTodayDetailPlain": "Rezerve edildiği gibi {date} tarihinde dönüş",
     "lateOptTodayDetailMoves": "Tüm ödeme tarihleri {days, plural, one {# gün} other {# gün}} ileri kayar",
     "lateOptBookedTitle": "Rezerve tarihleri koru",
-    "lateOptBookedDetail": "{date} tarihinden itibaren ücretlendirilir"
+    "lateOptBookedDetail": "{date} tarihinden itibaren ücretlendirilir",
+    "lateBackHeading": "{count, plural, one {# gün geç iade edildi} other {# gün geç iade edildi}}",
+    "lateBackCharge": "Gecikme ücreti",
+    "lateBackFromDeposit": "Depozitodan düş",
+    "lateBackChargeRenter": "Kiracıdan tahsil et",
+    "lateBackWaive": "Vazgeç",
+    "lateBackOverDeposit": "Kalan depozito en fazla {amount} karşılar.",
+    "lateBackRow": "{count, plural, one {# gün gecikme} other {# gün gecikme}}"
   },
   "money": {
     "sv_title": "Bakım bilgileri",
@@ -4847,7 +4865,9 @@
     "showMore": "{count} tane daha göster ({left} kaldı)",
     "tr": {
       "operatorAlerts": {}
-    }
+    },
+    "search": "Ara",
+    "noMatches": "Sonuç yok"
   },
   "translation": {
     "translatedFrom": "{language} dilinden çevrildi",
@@ -5364,7 +5384,8 @@
     "bs_aboutPerDay": "Günde yaklaşık {amount}'a gelir",
     "bs_vehicleCount": "{count, plural, one {# araç} other {# araç}}",
     "bs_demoBanner": "Demo işletme, yalnızca örnek. Rezervasyonlar kapalı.",
-    "bs_demoNoBooking": "Bu bir demo işletme, bu yüzden rezervasyonlar kapalı."
+    "bs_demoNoBooking": "Bu bir demo işletme, bu yüzden rezervasyonlar kapalı.",
+    "reason_late_return": "geç iade"
   },
   "newBooking": {
     "docsSelfie": "Müşterinin fotoğrafı",
@@ -5727,7 +5748,8 @@
     "liveTitle": "Canlı sohbet",
     "liveBody": "Her şeyi sorun, dosya gönderin veya RoveHQ ekibinden biriyle konuşun.",
     "liveButton": "Canlı sohbeti aç",
-    "fromAssistant": "RoveHQ asistanı"
+    "fromAssistant": "RoveHQ asistanı",
+    "showSetup": "Kurulum adımlarını göster"
   },
   "dashboard": {
     "kmToGo": "{km} km kaldı",
@@ -6105,7 +6127,8 @@
     "close": "Kapat",
     "prev": "Önceki fotoğraf",
     "next": "Sonraki fotoğraf",
-    "more": "{count} fotoğraf daha"
+    "more": "{count} fotoğraf daha",
+    "aiImage": "Yapay zekâ görseli"
   },
   "marketing": {
     "footerLegal": "Yasal",
@@ -6336,17 +6359,17 @@
     "faqQ5": "Müşterilerimin bir uygulamaya ihtiyacı var mı?",
     "faqA5": "Hayır. Rezervasyon bağlantıları tarayıcılarında açılır.",
     "faqQ6": "Müşteriler nasıl rezervasyon yapar?",
-    "faqA6": "Onlara rezervasyon bağlantınızı gönderin veya rezervasyon kutusunu web sitenize ekleyin. Tarihleri seçer, pasaport ve ehliyetlerinin fotoğrafını çeker ve telefonlarından imzalarlar.",
+    "faqA6": "Rezervasyon bağlantınızı gönderin veya rezervasyon kutusunu web sitenize ekleyin. Tarihleri seçer, pasaport veya kimlik ile ehliyetlerinin fotoğrafını çeker ve telefonda imzalarlar.",
     "faqQ7": "WhatsApp, LINE ve Telegram ile çalışıyor mu?",
     "faqA7": "LINE ve Telegram bugün çalışıyor: mesajlar tek bir gelen kutusuna, ait oldukları rezervasyonun yanına düşer. WhatsApp yakında geliyor (Meta'nın onaylaması gerekiyor). O zamana kadar rezervasyon bağlantılarını ve hatırlatmaları kendi WhatsApp'ınızdan tek dokunuşla gönderebilirsiniz.",
     "faqQ8": "Personelim kullanabilir mi?",
     "faqA8": "Evet. Personel rezervasyonları ve teslimleri yürütür; raporlar ve ayarlar işletme sahibinde kalır.",
     "faqQ9": "Müşteriler nasıl öder?",
-    "faqA9": "Tam tutar için QR kodla, banka havalesiyle veya nakit. RoveHQ ödeme dekontlarını okur ve rezervasyonla eşleştirir.",
+    "faqA9": "Havale, Wise veya Revolut ile, ödemenin bu şekilde yapıldığı yerlerde QR kodla (Tayland'da PromptPay) ya da nakit. Müşteriler dekontu rezervasyon bağlantısından gönderir ve RoveHQ rezervasyonla eşleştirir. Stripe ile kartla ödeme yakında.",
     "faqQ10": "Depozitolar nasıl yönetilir?",
     "faqA10": "Her rezervasyon alınan depozitoyu ve nasıl iade edildiğini kaydeder; bir anlaşmazlık olursa teslim ve iade fotoğrafları da elinizdedir.",
-    "faqQ11": "RoveHQ rezervasyonlarımdan komisyon alıyor mu?",
-    "faqA11": "Hayır. Kendi aldığınız rezervasyonlar sizindir. Yalnızca paketinizin ücretini ödersiniz.",
+    "faqQ11": "RoveHQ rezervasyonlarımdan ücret alıyor mu?",
+    "faqA11": "Kendi rezervasyon sayfanızdan aldığınız rezervasyonlardan almaz. Çevrimiçi kartla ödemeler devreye girdiğinde, planınıza bağlı küçük bir platform ücreti içerir. rove.rent pazaryeri üzerinden gelen rezervasyonlara hizmet bedeli uygulanır.",
     "faqQ12": "Ödemeden önce deneyebilir miyim?",
     "faqA12": "Evet. Her işletme {days} gün boyunca her şeye erişimle başlar ve küçük filolar ücretsiz kalır.",
     "faqQ13": "Motosikletler nasıl sayılır?",
@@ -6385,9 +6408,9 @@
     "articleFaqTitle": "Sorular",
     "breadcrumbHome": "Ana sayfa",
     "byAuthor": "Yazar: {name}",
-    "authorName": "Anan",
+    "authorName": "Rory",
     "authorRole": "Kurucu, RoveHQ",
-    "authorBio": "Anan, Tayland'ın Koh Samui adasında bir araç kiralama işletmesi yönetiyor ve onu yönetmek için RoveHQ'yu geliştirdi.",
+    "authorBio": "Rory bir araç kiralama filosu işletiyor ve onu yönetmek için RoveHQ'yu geliştirdi.",
     "resourcesEyebrow": "Ücretsiz kaynaklar",
     "resourcesTitle": "Ücretsiz şablonlar ve araçlar",
     "resourcesBody": "İndirin, doldurun, bugün kullanın.",
@@ -6595,7 +6618,7 @@
     "segCarF2Title": "Fotoğraf, yakıt ve kilometreyle teslim",
     "segCarF2Body": "Kilometreyi fotoğraftan okuyun, yakıtı ve hasarı kaydedin, müşterinin imzasını alın. İadede RoveHQ, teslimden bu yana neyin değiştiğini gösterir.",
     "segCarF3Title": "Depozito ve ödemeler",
-    "segCarF3Body": "Depozito alın, iadede yakıt veya hasarı düşün ve kalanını geri verin, hepsi kayıtlı. Müşteriler QR kodla öder ve dekontu gönderir, RoveHQ da onu rezervasyonla eşleştirir.",
+    "segCarF3Body": "Depozito alın, iadede yakıt veya hasarı düşün, kalanı geri verin; hepsi kayıtta. Müşteriler havale, Wise, Revolut veya QR kodla öder ve dekontu gönderir, RoveHQ rezervasyonla eşleştirir.",
     "segCarF4Title": "Aylık kiralama ve sezon fiyatları",
     "segCarF4Body": "Aylık fiyatlar belirleyin, birkaç ayı peşin ödeyene indirim yapın ve yüksek sezonda fiyatları artırın. Kiralamayı uzatın, müşteri değişikliği telefonda imzalasın.",
     "segCarF5Title": "Vergi, sigorta ve bakım hatırlatmaları",
@@ -6723,7 +6746,20 @@
     "bxT_folio": "Folio",
     "bxTd_folio": "Bir dergi gibi, adınız logo başlığında.",
     "bxT_neon": "Neon",
-    "bxTd_neon": "Gece şehri renkleri, karanlık çöktükten sonra scooter ve arabalar için."
+    "bxTd_neon": "Gece şehri renkleri, karanlık çöktükten sonra scooter ve arabalar için.",
+    "heroBodyGlobal": "Müşteriler online rezervasyon yapar, belgelerini yükler ve sözleşmeyi kendileri imzalar. RoveHQ belgeleri okur, her ödemeyi ve depozitoyu takip eder ve sırada ne olduğunu söyler.",
+    "step1BodyGlobal": "Tek bir bağlantı gönderin ya da sayfanızdan rezervasyon yapmalarına izin verin. Tarihleri seçer, kimlik ve ehliyetlerinin fotoğrafını çeker ve telefonda imzalarlar.",
+    "step3TitleGlobal": "Ödemeler kayıtta, peşinden koşmadan",
+    "step3BodyGlobal": "Müşteriler rezervasyon bağlantısından havale, Wise veya Revolut ile öder ve dekontu yükler. RoveHQ eşleştirir ve rezervasyonu ödendi olarak işaretler. Stripe ile kartla ödeme yakında.",
+    "step3b1Global": "Her rezervasyonda ödeme bilgileriniz",
+    "step3b2Global": "Dekontlar otomatik eşleşir",
+    "auto2Global": "Ehliyet okundu",
+    "auto5Global": "Ödeme dekontu eşleşti",
+    "never1Global": "Ehliyet bilgilerini elle yazmak",
+    "never2Global": "Dekontlar için e-posta ve sohbetten peşinden koşmak",
+    "faqPayQ": "Müşterilerim nasıl öder?",
+    "faqPayA": "Rezervasyon bağlantısından havale, Wise veya Revolut ile ya da yüz yüze. Dekontu yüklerler ve RoveHQ rezervasyonla eşleştirir. Stripe ile Apple Pay ve Google Pay destekli kartla ödeme yakında.",
+    "faqPayAAsia": "Tam tutar için QR kodla (Tayland'da PromptPay), havaleyle veya nakit. Dekontu rezervasyon bağlantısından gönderirler ve RoveHQ rezervasyonla eşleştirir."
   },
   "calc": {
     "title": "Araç satın alma",
@@ -6977,7 +7013,13 @@
     "extrasRefunded": "ekstralarınız için {amount} iade ettik. Teşekkür ederiz.",
     "extrasCredited": "ekstralar için ödediğiniz {amount}, {date} tarihli kiranızdan düşülecek.",
     "extendCheck": "{vehicle} kiralamanız {date} tarihinde bitiyor. Uzatıyor musunuz? Buradan Uzat veya İade ediyorum'a dokunun: {link}",
-    "reviewRequest": "{vehicle} aracını kiraladığınız için teşekkürler. Nasıldı? Buradan kısa bir yorum bırakın: {link}"
+    "reviewRequest": "{vehicle} aracını kiraladığınız için teşekkürler. Nasıldı? Buradan kısa bir yorum bırakın: {link}",
+    "reason_late_return": "geç iade",
+    "cancelRefund": "Size {amount} iade ediyoruz.",
+    "cancelNoRefund": "İade yapılmayacak.",
+    "cancelDepositBack": "{amount} depozitonuz iade ediliyor.",
+    "cancelDepositPart": "{held} depozitonuzun {returned} kadarı iade ediliyor.",
+    "cancelDepositKept": "{amount} depozitonuz kesildi."
   },
   "auth": {
     "signInTitle": "Giriş yap",
@@ -7390,7 +7432,82 @@
       "region_americas": "Amerika kıtası",
       "region_asia-pacific": "Asya-Pasifik",
       "region_africa-middle-east": "Afrika ve Orta Doğu",
-      "budgetLabelPlain": "Günlük en fazla"
+      "budgetLabelPlain": "Günlük en fazla",
+      "startDate": "Başlangıç tarihi",
+      "modeLabel": "Kiralama türü",
+      "modeDates": "Belirli tarihler",
+      "modeMonthly": "Aylık",
+      "monthlyNote": "Bitiş tarihi yok, aylık fiyat",
+      "navMonthly": "Aylık kiralama",
+      "menu": "Menü",
+      "homeTitle2": "Rove: yerel bağımsız filolardan araç ve motor kiralama",
+      "homeDescription2": "Dünyanın her yerindeki küçük yerel kiralama işletmelerinden araba, scooter ve motor kiralayın. Canlı fiyatlar, aylık tarifeler, doğrudan rezervasyon.",
+      "heroTitle2": "Kiralama devlerinden değil, yerel filolardan kiralayın",
+      "heroLede2": "Küçük ve orta ölçekli bağımsız kiralama işletmelerinden araba, scooter ve motosikletler. Kendi fiyatları, günlük veya aylık, doğrudan onlarla rezervasyon.",
+      "heroPoint1": "Bağımsız yerel filolar",
+      "heroPoint2": "Aylık tarifeler hazır",
+      "heroPoint3": "Çoğu zaman büyük kiralama markalarından daha ucuz",
+      "typesTitle": "Araç türüne göre göz atın",
+      "typeCars": "Arabalar",
+      "typeSmallCars": "Küçük arabalar",
+      "typeSuvs": "SUV'lar",
+      "typeScooters": "Scooterlar",
+      "featuredTitle": "Yerel filolarda şimdi müsait",
+      "featuredLede": "Her sahibin kendi fiyatıyla canlı ilanlar. Kesin toplam için tarih ekleyin.",
+      "seeAllVehicles": "Tüm araçları gör",
+      "orMonthly": "veya aylık {amount}",
+      "orDaily": "veya günlük {amount}",
+      "monthlyTag": "Aylık tarife",
+      "viewDetails": "Detaylar",
+      "valueTitle": "Büyük kiralama markalarına bağımsız alternatif",
+      "valueLede": "Rove yalnızca küçük ve orta ölçekli yerel kiralama işletmelerini listeler. Araçların sahiplerinden kiralarsınız.",
+      "valueLocalTitle": "Yerel, bağımsız filolar",
+      "valueLocalBody": "Aile işletmeleri ve büyüyen yerel filolar, oradaki insanların gerçekten kullandığı araçları kiralar: scooterlardan yedi kişilik araçlara.",
+      "valueMonthlyTitle": "Uzun konaklamalar için",
+      "valueMonthlyBody": "Birçok sahip haftalık ve aylık fiyat belirler; bu yüzden uzun kiralama günlük bazda çoğu zaman çok daha ucuza gelir.",
+      "valuePriceTitle": "Yerel fiyatlar, sahibi belirler",
+      "valuePriceBody": "Her işletme kendi fiyatını belirler; küçük yerel filolar çoğu zaman büyük kiralama markalarından daha uygundur.",
+      "valueDirectTitle": "Doğrudan rezervasyon, doğrudan iletişim",
+      "valueDirectBody": "Rezervasyonunuz işletmenin kendisine gider. Teslimi onlar onaylar ve yolda arayacağınız kişiler onlardır.",
+      "placesTitle": "Popüler destinasyonlar",
+      "placesLede": "Nerede kiralanır; her yer için ehliyet, kask ve depozito hakkında kaynaklı yerel kurallarla.",
+      "allDestinations": "Tüm destinasyonlar",
+      "monthlyTitle": "Bir ay veya daha uzun mu kalıyorsunuz?",
+      "monthlyLede": "Sahibin aylık fiyatıyla aydan aya kiralayın. Bir başlangıç tarihi seçin, bitiş tarihi gerekmez.",
+      "monthlyCheck1": "Aylık fiyatlar her yerel sahip tarafından belirlenir",
+      "monthlyCheck2": "Yalnızca başlangıç tarihiyle rezervasyon",
+      "monthlyCheck3": "Sunan sahiplerden kapınıza teslimat",
+      "monthlyCta": "Aylık kiralama ara",
+      "aboutPerDay": "günlük yaklaşık {amount}",
+      "rateCardNote": "{business} işletmesinin Rove'daki canlı fiyatları.",
+      "beforeYouDrive": "Yola çıkmadan önce",
+      "allGuides": "Tüm rehberler",
+      "operatorsTitle": "Küçük bir kiralama filonuz mu var?",
+      "operatorsBody": "Arabalarınızı, scooterlarınızı ve motosikletlerinizi Rove'da listeleyin. Bağımsız kiralama işletmeleri için rezervasyon ve filo yazılımı RoveHQ ile birlikte gelir.",
+      "footerAbout": "Rove, küçük ve orta ölçekli bağımsız kiralama filolarının pazar yeridir. Her işletme kendi fiyatlarını ve koşullarını belirler ve rezervasyonunuzla ilgilenir.",
+      "footerRenters": "Kiracılar",
+      "footerOperatorsTitle": "Kiralama işletmeleri",
+      "footerHqPricing": "RoveHQ fiyatları",
+      "footerHqGuides": "İşletmeler için rehberler",
+      "footerCompany": "Şirket",
+      "footerAboutHq": "RoveHQ hakkında",
+      "footerCopyright": "© {year} Rove by RoveHQ",
+      "sortLabel": "Sonuçları sırala",
+      "emptyMonthly": "Aylık ara",
+      "emptyAnywhere": "Her yerde ara",
+      "emptyPlacesTitle": "Müsait araç olan yerler",
+      "specsTitle": "Teknik özellikler",
+      "moreFrom": "{business} işletmesinden daha fazlası",
+      "figureListings": "Listelenen araçlar",
+      "figureBusinesses": "Yerel işletmeler",
+      "gettingAroundIn": "{place} ulaşım",
+      "dailyMonthlyTitle": "Günlük mü aylık mı?",
+      "countryPlacesTitle": "{country} içinde nerede kiralanır",
+      "destinationsMetaTitle": "Dünya genelinde araba ve scooter kiralama | Rove",
+      "destIndexTitle": "Destinasyonlar",
+      "destIndexLede": "Rove'daki tüm yerler: listelendikleri yerlerde yerel işletmelerin araçları ve her yerdeki kiracılar için kaynaklı kurallar.",
+      "destinationsLive": "Şu an Rove'da",
+      "destinationsDescription": "Rove'daki araba, scooter ve motosiklet kiralama destinasyonları, bölgeye göre, yerel bağımsız işletmelerin müsait araçlarıyla."
     }
   },
   "errorPages": {
@@ -7738,7 +7855,8 @@
     "step3p_b": "{place} içindeki {business} işletmesinden teslim alın. Ehliyetinizi ve pasaportunuzu getirin.",
     "step3p_b_np": "{business} işletmesinden teslim alın. Ehliyetinizi ve pasaportunuzu getirin.",
     "spec_year": "Yıl",
-    "spec_deposit": "Depozito"
+    "spec_deposit": "Depozito",
+    "fleet_perMonth": "Aylık {amount}"
   },
   "siteEditor": {
     "look": "Görünüm",
@@ -7908,6 +8026,49 @@
     "role_surface": "Kartlar",
     "role_text": "Metin",
     "role_muted": "Soluk metin",
-    "role_dark": "Koyu bölümler"
+    "role_dark": "Koyu bölümler",
+    "pal_autoSummary": "Şablon renkleri",
+    "noReviewsYet": "Henüz yorum yok"
+  },
+  "roveListing": {
+    "title": "Filonuzu rove.rent'te paylaşıp oradan rezervasyon almak ister misiniz?",
+    "yes": "Evet, aç",
+    "notNow": "Şimdi değil",
+    "terms": "rove.rent koşulları",
+    "failed": "Kaydedilemedi. Lütfen tekrar deneyin."
+  },
+  "aiPhotos": {
+    "generate": "Yapay zekâ ile oluştur",
+    "enhanceAll": "Tümünü iyileştir",
+    "enhance": "Yapay zekâ ile iyileştir",
+    "revert": "Orijinale dön",
+    "infoLabel": "Yapay zekâ fotoğrafları hakkında",
+    "info": "Oluştur, aracın markası, modeli, yılı ve renginden plakasıyla birlikte uyumlu bir stüdyo seti hazırlar. İyileştir, aracı değiştirmeden kendi fotoğraflarınızın ışığını, açısını ve kadrajını düzeltir.",
+    "left": "{count, plural, one {# yapay zekâ görseli kaldı} other {# yapay zekâ görseli kaldı}}",
+    "missing": "Önce bunları ekleyin:",
+    "f_make": "Marka",
+    "f_model": "Model",
+    "f_year": "Yıl",
+    "f_color": "Renk",
+    "editVehicle": "Aracı düzenle",
+    "generating": "Oluşturuluyor: {done}/{total}",
+    "enhancing": "İyileştiriliyor: {done}/{total}",
+    "results": "Yapay zekâ sonuçları",
+    "keep": "Sakla",
+    "keepAll": "Tümünü sakla",
+    "discard": "At",
+    "enhanced": "İyileştirildi",
+    "generated": "Yapay zekâ görseli",
+    "a_front": "Ön",
+    "a_side": "Yan",
+    "a_rear": "Arka",
+    "a_interior": "İç mekân",
+    "a_detail": "Kokpit",
+    "err_unavailable": "Yapay zekâ fotoğrafları henüz kullanılamıyor.",
+    "err_busy": "Yapay zekâ hizmeti meşgul. Bir dakika sonra tekrar deneyin.",
+    "err_refused": "Yapay zekâ bu fotoğrafı oluşturamadı.",
+    "err_quota": "Bu ayın yapay zekâ görselleri bitti. Yenileri {date} tarihinde.",
+    "err_quotaNow": "Bu ayın yapay zekâ görselleri bitti.",
+    "err_failed": "Bir sorun oluştu. Tekrar deneyin."
   }
 }

@@ -40,7 +40,7 @@ Facts about RCM come from its own website **as of November 2026**, unless we say
 | Languages | "Ask us about our multilingual capability" | 29 languages for the app and customer pages |
 | Mobile | Cloud based, works on phone, tablet and desktop | Phone-first web app |
 | Contracts | Online pre-check-in, electronic signing, interactive inspection forms | Agreement written for you in English and the local language (18 countries across Southeast Asia and Europe), e-signature on the customer's phone |
-| Booking channels | Website integration plus agents such as Rentalcars.com and Motorhome Republic | Own booking page and website booking box; Rove directory with no commission |
+| Booking channels | Website integration plus agents such as Rentalcars.com and Motorhome Republic | Own booking page and website booking box; Rove directory |
 | Fleet and GPS | Servicing, depreciation, lease management; integrated telematics and GPS tracking | Service reminders and costs; no telematics integration |
 
 > "Not published" means we couldn't find it on RCM's website. Ask them.

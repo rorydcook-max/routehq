@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { allGuideSlugs, getGuide, guideLocales, guideRegions, listGuidesFor } from "@/lib/site/content";
 import { siteLocale } from "@/lib/site/static-page";
 import { siteMetadata, siteUrl } from "@/lib/site/seo";
-import { organizationLd, schemaDateTime } from "@/lib/site/schema";
+import { ORGANIZATION_ID, organizationLd, schemaDateTime } from "@/lib/site/schema";
 import { coverFor, coverOgImage } from "@/lib/site/covers";
 import { Avatar, CATEGORY_KEY, contentDate, CoverImage, GuideCard, JsonLd, LeadCard } from "../../_components/content-ui";
 import { FinalCta } from "../../_components/final-cta";
@@ -84,7 +84,7 @@ export default async function GuidePage({ params }: Props) {
       dateModified: schemaDateTime(guide.updated),
       mainEntityOfPage: { "@type": "WebPage", "@id": url },
       ...(ogImage ? { image: ogImage.url } : {}),
-      author: { "@type": "Person", name: author, jobTitle: m("authorRole"), description: m("authorBio") },
+      author: { "@type": "Person", name: author, jobTitle: "Founder", worksFor: { "@id": ORGANIZATION_ID() }, description: m("authorBio") },
       publisher: organizationLd()
     },
     {

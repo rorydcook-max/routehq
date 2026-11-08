@@ -7,6 +7,7 @@ import { Copy, ExternalLink, Monitor, Smartphone } from "lucide-react";
 import { savePublicBookingSettings } from "@/app/actions/online-booking";
 import { BookingAddressPanel } from "@/app/(app)/booking-page/booking-address-panel";
 import { PublishBar, SiteEditorParts, type EditorVehicle } from "@/app/(app)/booking-page/site-editor";
+import type { StockSetup } from "@/app/(app)/booking-page/stock-photos";
 import { useSiteDraft } from "@/app/(app)/booking-page/use-site-draft";
 import { LogoUploadSection } from "@/app/(app)/settings/logo-upload-section";
 import { SwitchField } from "@/components/switch-field";
@@ -38,7 +39,8 @@ export function BookingPageTool({
   logoUrl,
   address,
   signingReady = true,
-  reviewsReady = false
+  reviewsReady = false,
+  stock
 }: {
   slug: string;
   link: string;
@@ -55,6 +57,8 @@ export function BookingPageTool({
   signingReady?: boolean;
   /** Published reviews or a Google reviews link: the website's Reviews section has something to show. */
   reviewsReady?: boolean;
+  /** The image picker's Stock photos tab (Unsplash): set up or not, and suggested searches. */
+  stock?: StockSetup;
 }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const signSay = useTranslations("newBooking");
@@ -175,6 +179,7 @@ export function BookingPageTool({
             )}
             reviewsReady={reviewsReady}
             site={site}
+            stock={stock}
             vehicles={editorVehicles}
           />
           <PublishBar site={site} />

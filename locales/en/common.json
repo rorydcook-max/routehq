@@ -7853,7 +7853,8 @@
     "step3p_b_np": "Pick it up from {business}. Bring your license and passport.",
     "spec_year": "Year",
     "spec_deposit": "Deposit",
-    "fleet_perMonth": "{amount} a month"
+    "fleet_perMonth": "{amount} a month",
+    "photo_credit": "Photo by <author>{name}</author> on <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Look",
@@ -8025,7 +8026,21 @@
     "role_muted": "Muted text",
     "role_dark": "Dark sections",
     "pal_autoSummary": "Template colors",
-    "noReviewsYet": "No reviews yet"
+    "noReviewsYet": "No reviews yet",
+    "img_stock": "Stock photos",
+    "img_uploadPhoto": "Upload photo",
+    "stock_credit": "Photo by <author>{name}</author> on <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Couldn't load photos. Try again.",
+    "stock_loading": "Loading photos…",
+    "stock_more": "More photos",
+    "stock_none": "No photos found. Try another search.",
+    "stock_note": "Free photos from <unsplash>Unsplash</unsplash>. Your site credits the photographer.",
+    "stock_off": "Stock photos aren't set up yet.",
+    "stock_rateLimited": "Unsplash's hourly search limit is reached. Try again in a little while.",
+    "stock_search": "Search photos",
+    "stock_suggested": "Suggested searches",
+    "stock_use": "Use photo: {photo}",
+    "stock_useBy": "Use photo by {name}"
   },
   "roveListing": {
     "title": "Share your fleet on rove.rent and accept bookings there?",

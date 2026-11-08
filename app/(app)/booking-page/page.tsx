@@ -13,6 +13,7 @@ import { kindFromCategory } from "@/lib/vehicle-groups";
 import { getCustomPlan } from "@/lib/custom-plan";
 import { getDefaultOrganization } from "@/lib/organization";
 import { publicBookingSettings } from "@/lib/public-catalog";
+import { stockPhotosReady, stockSuggestions } from "@/lib/stock-photos";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
@@ -63,6 +64,11 @@ export default async function BookingPagePage() {
   // Without the business's saved signature a customer who books online can't sign (they are told to wait): say so here.
   const signingReady = addressRow ? onlineSigningGaps(addressRow).length === 0 : true;
   const businessName = String(organization.trading_name || organization.name || "");
+  // The image picker's Stock photos tab: suggested searches, and whether Unsplash is set up (UNSPLASH_ACCESS_KEY).
+  const stock = {
+    ready: stockPhotosReady(),
+    suggestions: stockSuggestions({ town: settings.main_location?.town, countryCode: addressRow?.country_code, kinds: vehicles.map((vehicle) => kindFromCategory(vehicle.vehicle_categories)) })
+  };
 
   return (
     <AppShell hero={<PageBand title={t("bt_title")} />} userEmail={userEmail}>
@@ -91,6 +97,7 @@ export default async function BookingPagePage() {
         reviewsReady={reviewsReady}
         signingReady={signingReady}
         slug={organization.slug}
+        stock={stock}
         vehicles={{ priced, total: vehicles.length }}
       />
     </AppShell>

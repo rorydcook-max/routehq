@@ -180,8 +180,10 @@ export async function createCustomer(formData: FormData) {
   const email = optionalString(formData, "email");
   const nationality = optionalString(formData, "nationality");
 
-  if (!organizationId || !fullName || !phone) {
-    throw new Error("Full name and phone number are required.");
+  const channels = contactChannelFields(formData, phone, email);
+  const hasContact = Boolean(phone || email || channels.messenger_id || channels.line_id || channels.telegram_username || channels.instagram_handle || channels.whatsapp_number);
+  if (!organizationId || !fullName || !hasContact) {
+    throw new Error("Add a name and one way to reach them.");
   }
 
   const { data, error } = await supabase
@@ -193,7 +195,7 @@ export async function createCustomer(formData: FormData) {
       whatsapp: phone,
       email,
       nationality,
-      ...contactChannelFields(formData, phone, email),
+      ...channels,
       preferred_locale: optionalString(formData, "preferredLocale") || "en",
       passport_number: optionalString(formData, "passportNumber"),
       passport_expiry: optionalString(formData, "passportExpiry"),
@@ -265,8 +267,12 @@ export async function createInlineCustomer(formData: FormData) {
   const nationality = optionalString(formData, "nationality");
   const email = optionalString(formData, "email");
 
-  if (!organizationId || !fullName || !phone) {
-    throw new Error("Name and phone are required.");
+  // A phone isn't required when the owner reaches the customer another way, e.g. a Messenger link
+  // (Rory, 8 Nov 2026: a customer with only a Facebook profile couldn't be added). Name plus any one contact is enough.
+  const channels = contactChannelFields(formData, phone, email);
+  const hasContact = Boolean(phone || email || channels.messenger_id || channels.line_id || channels.telegram_username || channels.instagram_handle || channels.whatsapp_number);
+  if (!organizationId || !fullName || !hasContact) {
+    throw new Error("Add a name and one way to reach them.");
   }
 
   const { data, error } = await supabase
@@ -278,7 +284,7 @@ export async function createInlineCustomer(formData: FormData) {
       whatsapp: phone,
       email,
       nationality,
-      ...contactChannelFields(formData, phone, email),
+      ...channels,
       preferred_locale: "en",
       document_status: "no_documents",
       created_by: user.id
@@ -308,7 +314,7 @@ export async function createInlineCustomer(formData: FormData) {
     phone: (data.phone as string | null) || null,
     nationality: (data.nationality as string | null) || null,
     document_status: (data.document_status as string | null) || "no_documents",
-    label: `${data.full_name} · ${data.phone || ""}`
+    label: data.phone ? `${data.full_name} · ${data.phone}` : String(data.full_name)
   };
 }
 

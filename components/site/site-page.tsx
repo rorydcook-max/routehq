@@ -8,7 +8,7 @@ import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 import { isSectionOn, SITE_MESSAGE, siteConfigFrom, type SectionId, type SiteConfig, type TextSlot } from "@/lib/sites/config";
 import { fontHref, fontPairing } from "@/lib/sites/fonts";
 import { fleetNoun, sitePrice, socialHref } from "@/lib/sites/format";
-import { resolveImage, type ResolvedImage } from "@/lib/sites/images";
+import { resolveImage, UNSPLASH_HOME, unsplashLink, type ResolvedImage } from "@/lib/sites/images";
 import { sitePalette, siteVars } from "@/lib/sites/palettes";
 import { templateDef, type TemplateDef } from "@/lib/sites/templates";
 import type { SiteBusiness, SiteData } from "@/lib/sites/types";
@@ -48,6 +48,41 @@ const SECTIONS: Record<SectionId, () => ReactNode> = { about: About, booking: Bo
 /** Brings the booking section into view (smoothly, unless reduced motion is on). */
 function toBooking() {
   requestAnimationFrame(() => document.getElementById("book")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
+}
+
+/**
+ * Credits for the Unsplash photos on the page (their API guidelines): "Photo by <name> on Unsplash", the photographer
+ * and Unsplash both linked with UTM parameters. A small line at the foot of the footer, once per photo.
+ */
+function PhotoCredits({ images }: { images: ResolvedImage[] }) {
+  const t = useTranslations("bsite");
+  const credits = images.flatMap((image) => (image.type === "url" && image.credit ? [{ url: image.url, credit: image.credit }] : []));
+  const unique = credits.filter((item, index) => credits.findIndex((other) => other.url === item.url) === index);
+  if (!unique.length) return null;
+  const link = `${s.focus} underline underline-offset-2 hover:opacity-80`;
+  return (
+    <div className={`${s.wrap} pb-6`}>
+      <p className={`${s.footerSoft} flex flex-wrap gap-x-4 gap-y-1 text-[12px]`} data-stock-credits="">
+        {unique.map(({ url, credit }) => (
+          <span key={url}>
+            {t.rich("photo_credit", {
+              name: credit.name,
+              author: (chunks) => (
+                <a className={link} href={unsplashLink(credit.url)} rel="noopener noreferrer" target="_blank">
+                  {chunks}
+                </a>
+              ),
+              unsplash: (chunks) => (
+                <a className={link} href={UNSPLASH_HOME} rel="noopener noreferrer" target="_blank">
+                  {chunks}
+                </a>
+              )
+            })}
+          </span>
+        ))}
+      </p>
+    </div>
+  );
 }
 
 /** Logos at or below this width-to-height ratio are marks or icons, so the name goes beside them. */
@@ -168,6 +203,8 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
   };
 
   const sections = config.sections.filter((section) => section.on || section.id === "booking");
+  // The pictures on the page, for the stock photo credits: the hero, and About's when its section (or the collage hero) shows it.
+  const shownImages = [images.hero, ...(sections.some((section) => section.id === "about") || template.layout.hero === "collage" ? [images.about] : [])];
   const nav = sections
     .filter((section) => ["about", "booking", "fleet", "reviews", "contact"].includes(section.id))
     .filter((section) => section.id !== "reviews" || data.reviews.length || config.reviewsUrl || data.googleReviewsUrl)
@@ -250,6 +287,7 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
               <p className={`${s.footerSoft} basis-full text-[14px] sm:basis-auto`}>{t("footer_copy", { year: new Date().getFullYear(), business: data.business.name })}</p>
             </div>
           </div>
+          <PhotoCredits images={shownImages} />
         </footer>
 
         {chatBar ? (

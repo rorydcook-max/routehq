@@ -7,10 +7,11 @@ import { uploadSiteImage } from "@/app/actions/sites";
 import { SiteArt } from "@/components/site/site-art";
 import { LIMITS, SECTION_IDS, SOCIAL_KEYS, type SectionId, type SiteConfig, type SiteSocial } from "@/lib/sites/config";
 import { FONT_PAIRINGS, fontPairing, fontPreviewHref, fontStack } from "@/lib/sites/fonts";
-import { ART_IDS, type ImageRef } from "@/lib/sites/images";
+import { ART_IDS, stockWidth, type ImageRef } from "@/lib/sites/images";
 import { sitePalette, siteVars, type Palette } from "@/lib/sites/palettes";
 import { TEMPLATE_IDS, TEMPLATE_TAGS, TEMPLATES, templateDef, type TemplateId, type TemplateTag } from "@/lib/sites/templates";
 import { PalettePicker } from "./palette-picker";
+import { StockCredit, StockPhotos, trackStockPick, type StockSetup } from "./stock-photos";
 import type { SiteDraft } from "./use-site-draft";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -38,7 +39,8 @@ export function SiteEditorParts({
   brandColour,
   vehicles,
   renderPart,
-  reviewsReady = false
+  reviewsReady = false,
+  stock
 }: {
   site: SiteDraft;
   brandColour: string;
@@ -46,6 +48,8 @@ export function SiteEditorParts({
   renderPart: (part: EditorPart) => ReactNode;
   /** The business has published reviews or a Google reviews link in Settings. */
   reviewsReady?: boolean;
+  /** The image picker's Stock photos tab (Unsplash). */
+  stock?: StockSetup;
 }) {
   const say = useTranslations("siteEditor") as unknown as Say;
   const { draft, update } = site;
@@ -103,8 +107,8 @@ export function SiteEditorParts({
 
   const images = (
     <div className="space-y-6">
-      <ImagePicker label={say("img_hero")} site={site} slot="hero" vehicles={vehicles} vars={sampleVars(draft, current)} />
-      <ImagePicker label={say("img_about")} site={site} slot="about" vehicles={vehicles} vars={sampleVars(draft, current)} />
+      <ImagePicker label={say("img_hero")} site={site} slot="hero" stock={stock} vehicles={vehicles} vars={sampleVars(draft, current)} />
+      <ImagePicker label={say("img_about")} site={site} slot="about" stock={stock} vehicles={vehicles} vars={sampleVars(draft, current)} />
     </div>
   );
 
@@ -206,11 +210,16 @@ function TemplateGallery({ current, onPick, onClose }: { current: TemplateId; on
   );
 }
 
-/** One image slot: the template's own, an upload, a vehicle photo or built-in art. */
-function ImagePicker({ site, slot, label, vehicles, vars }: { site: SiteDraft; slot: "hero" | "about"; label: string; vehicles: EditorVehicle[]; vars: CSSProperties }) {
+type ImageTab = "upload" | "stock" | "vehicles" | "library";
+const IMAGE_TABS: ImageTab[] = ["upload", "stock", "vehicles", "library"];
+const IMAGE_TAB_LABEL: Record<ImageTab, string> = { upload: "upload", stock: "img_stock", vehicles: "img_vehicles", library: "img_library" };
+const TAB_FOR: Record<ImageRef["kind"], ImageTab> = { upload: "upload", stock: "stock", vehicle: "vehicles", art: "library" };
+
+/** One image slot: the template's own, an upload, an Unsplash stock photo, a vehicle photo or built-in art. */
+function ImagePicker({ site, slot, label, vehicles, vars, stock }: { site: SiteDraft; slot: "hero" | "about"; label: string; vehicles: EditorVehicle[]; vars: CSSProperties; stock?: StockSetup }) {
   const say = useTranslations("siteEditor") as unknown as Say;
   const ref = site.draft.images[slot];
-  const [tab, setTab] = useState<"vehicles" | "library">(ref?.kind === "art" ? "library" : "vehicles");
+  const [tab, setTab] = useState<ImageTab>(ref ? TAB_FOR[ref.kind] : "upload");
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const file = useRef<HTMLInputElement>(null);
@@ -224,6 +233,9 @@ function ImagePicker({ site, slot, label, vehicles, vars }: { site: SiteDraft; s
     ) : ref?.kind === "vehicle" && vehicles.find((vehicle) => vehicle.id === ref.vehicleId)?.photoUrl ? (
       // eslint-disable-next-line @next/next/no-img-element
       <img alt="" className="h-full w-full object-cover" src={vehicles.find((vehicle) => vehicle.id === ref.vehicleId)?.photoUrl as string} />
+    ) : ref?.kind === "stock" ? (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img alt="" className="h-full w-full object-cover" src={stockWidth(ref.url, 480)} />
     ) : ref?.kind === "art" ? (
       <SiteArt className="h-full w-full" id={ref.id} />
     ) : (
@@ -253,12 +265,8 @@ function ImagePicker({ site, slot, label, vehicles, vars }: { site: SiteDraft; s
         <div className="h-20 w-32 shrink-0 overflow-hidden rounded-xl bg-[var(--panel-tertiary)]" style={vars}>
           {preview}
         </div>
-        <div className="flex flex-wrap gap-2">
-          <label className="secondary-action pressable cursor-pointer">
-            <Upload size={17} />
-            {pending ? say("uploading") : say("upload")}
-            <input accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={pending} onChange={upload} ref={file} type="file" />
-          </label>
+        <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
+          {ref?.kind === "stock" ? <StockCredit className="text-sm text-[var(--foreground-secondary)]" name={ref.credit} profileUrl={ref.creditUrl} /> : null}
           {ref ? (
             <button className="secondary-action pressable" onClick={() => set(null)} type="button">
               <RotateCcw size={17} />
@@ -267,15 +275,32 @@ function ImagePicker({ site, slot, label, vehicles, vars }: { site: SiteDraft; s
           ) : null}
         </div>
       </div>
-      {error ? <p className="mt-2 font-bold text-[var(--danger)]">{error}</p> : null}
-      <div className="mt-3 inline-flex rounded-full bg-[var(--panel-secondary)] p-1" role="tablist">
-        {(["vehicles", "library"] as const).map((value) => (
-          <button aria-selected={tab === value} className={`min-h-9 rounded-full px-4 text-sm font-bold ${tab === value ? "bg-[var(--panel)] text-[var(--foreground)] shadow-[var(--shadow-card)]" : "text-[var(--foreground-secondary)]"}`} key={value} onClick={() => setTab(value)} role="tab" type="button">
-            {say(value === "vehicles" ? "img_vehicles" : "img_library")}
+      <div className="mt-3 inline-flex max-w-full flex-wrap gap-1 rounded-[22px] bg-[var(--panel-secondary)] p-1" role="tablist">
+        {IMAGE_TABS.map((value) => (
+          <button aria-selected={tab === value} className={`min-h-9 shrink-0 rounded-full px-3.5 text-sm font-bold ${tab === value ? "bg-[var(--panel)] text-[var(--foreground)] shadow-[var(--shadow-card)]" : "text-[var(--foreground-secondary)]"}`} key={value} onClick={() => setTab(value)} role="tab" type="button">
+            {say(IMAGE_TAB_LABEL[value])}
           </button>
         ))}
       </div>
-      {tab === "vehicles" ? (
+      {tab === "upload" ? (
+        <div className="mt-2">
+          <label className="secondary-action pressable cursor-pointer">
+            <Upload size={17} />
+            {pending ? say("uploading") : say("img_uploadPhoto")}
+            <input accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={pending} onChange={upload} ref={file} type="file" />
+          </label>
+          {error ? <p className="mt-2 font-bold text-[var(--danger)]">{error}</p> : null}
+        </div>
+      ) : tab === "stock" ? (
+        <StockPhotos
+          onPick={(photo) => {
+            set({ kind: "stock", provider: "unsplash", id: photo.id, url: photo.url, credit: photo.name, creditUrl: photo.profileUrl, ...(photo.alt ? { alt: photo.alt } : {}) });
+            trackStockPick(photo);
+          }}
+          selectedId={ref?.kind === "stock" ? ref.id : null}
+          stock={stock}
+        />
+      ) : tab === "vehicles" ? (
         withPhotos.length ? (
           <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
             {withPhotos.map((vehicle) => {
@@ -303,7 +328,6 @@ function ImagePicker({ site, slot, label, vehicles, vars }: { site: SiteDraft; s
           })}
         </div>
       )}
-      {/* TODO(phase 2): a Stock tab (Unsplash) once RoveHQ has an Unsplash access key: lib/sites/images.ts. */}
     </div>
   );
 }

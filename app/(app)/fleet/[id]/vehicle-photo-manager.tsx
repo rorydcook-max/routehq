@@ -245,7 +245,6 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
                 <ImagePlus size={18} />
                 {isPending ? say("saving") : say("ph_choose")}
               </button>
-              <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{orderedPhotos.length > 1 ? say("ph_orderHint") : say("ph_hint")}</p>
 
               {message ? <p className="mt-3 rounded-xl bg-[var(--primary-light)] px-4 py-3 font-bold text-[var(--primary)]">{message}</p> : null}
 

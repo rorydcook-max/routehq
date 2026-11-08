@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Check, Info, Loader2, Sparkles, X } from "lucide-react";
+import { Check, Loader2, Sparkles, X } from "lucide-react";
+import { InfoTip } from "@/components/info-tip";
 
 /**
  * AI vehicle photos (task build-img, 8 Nov 2026): "Generate with AI" and "Enhance" beside a vehicle's photos, on the
@@ -132,13 +133,14 @@ export type AiPhotos = ReturnType<typeof useAiPhotos>;
 /** The two actions, progress, messages and the previews to keep or discard. `onEnhanceAll` is left out when there's nothing to enhance. */
 export function AiPhotoTools({ ai, onEnhanceAll, editHref, onFixField, compact = false }: { ai: AiPhotos; onEnhanceAll?: () => void; editHref?: string; onFixField?: (field: string) => void; compact?: boolean }) {
   const { say } = ai;
-  const button = `secondary-action pressable inline-flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap ${compact ? "text-[14px]" : ""}`;
+  const button = `secondary-action pressable inline-flex min-h-11 w-full min-w-0 items-center justify-center gap-1.5 whitespace-nowrap px-3 text-[14px] sm:text-[15px] ${compact ? "sm:text-[14px]" : ""}`;
   const icon = "shrink-0";
   return (
     <div className="mt-3">
-      {/* The actions one under the other on a phone, side by side from tablet width; the (i) beside them. */}
-      <div className="flex items-start gap-2">
-        <div className={`grid flex-1 gap-2 ${onEnhanceAll ? "sm:grid-cols-2" : ""}`}>
+      {/* The two actions side by side at every width, centred, with the (i) after them (Rory, 8 Nov 2026: the stacked
+          buttons sat off-centre and the hover-only tip didn't open on a phone). */}
+      <div className="flex items-center gap-1">
+        <div className={`grid flex-1 gap-2 ${onEnhanceAll ? "grid-cols-2" : ""}`}>
         <button className={button} disabled={ai.busy} onClick={() => void ai.generate()} type="button">
           <Sparkles aria-hidden="true" className={icon} size={17} />
           {say("generate")}
@@ -150,14 +152,7 @@ export function AiPhotoTools({ ai, onEnhanceAll, editHref, onFixField, compact =
           </button>
         ) : null}
         </div>
-        <span className="group relative inline-flex shrink-0">
-          <button aria-label={say("infoLabel")} className="flex h-11 w-9 items-center justify-center text-[var(--foreground-secondary)]" type="button">
-            <Info size={17} />
-          </button>
-          <span className="pointer-events-none absolute right-0 top-full z-10 mt-1 hidden w-64 rounded-xl bg-[var(--foreground)] px-3 py-2 text-[13px] font-medium leading-snug text-white shadow-lg group-focus-within:block group-hover:block" role="tooltip">
-            {say("info")}
-          </span>
-        </span>
+        <InfoTip className="shrink-0" label={say("infoLabel")} text={say("info")} />
       </div>
       {ai.left && ai.left.left <= 10 ? <p className="mt-1.5 text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("left", { count: ai.left.left })}</p> : null}
 

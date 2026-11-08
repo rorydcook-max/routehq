@@ -325,13 +325,13 @@ function CollageHero() {
         </div>
         <div className="grid aspect-[5/4] grid-cols-[1.3fr_1fr] grid-rows-2 gap-3 sm:gap-4">
           <div className={`${s.image} ${treat} row-span-2`}>
-            <SiteImage image={images.hero} priority settle />
+            <SiteImage image={images.hero} priority settle sizes="(min-width: 1024px) 30vw, 60vw" />
           </div>
           <div className={`${s.image} ${template.image === "arch" ? "" : treat}`}>
-            <SiteImage image={second} />
+            <SiteImage image={second} sizes="(min-width: 1024px) 22vw, 45vw" />
           </div>
           <div className={`${s.image} ${template.image === "arch" ? "" : treat}`}>
-            <SiteImage image={third} />
+            <SiteImage image={third} sizes="(min-width: 1024px) 22vw, 45vw" />
           </div>
         </div>
       </div>

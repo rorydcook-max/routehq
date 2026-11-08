@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { allGuideSlugs, getGuide, guideLocales, listGuides } from "@/lib/site/content";
+import { allGuideSlugs, getGuide, guideLocales, guideRegions, listGuidesFor } from "@/lib/site/content";
 import { siteLocale } from "@/lib/site/static-page";
 import { siteMetadata, siteUrl } from "@/lib/site/seo";
 import { organizationLd, schemaDateTime } from "@/lib/site/schema";
@@ -65,7 +65,8 @@ export default async function GuidePage({ params }: Props) {
   const author = m("authorName");
   const topic = m(CATEGORY_KEY[guide.category]);
   const [first, second] = halves(guide.html);
-  const related = listGuides(locale)
+  // Same topic, guides about the same region first (a US guide suggests US guides before Thailand's).
+  const related = listGuidesFor(locale, guideRegions(guide)[0] || null)
     .filter((item) => item.slug !== slug && item.category === guide.category)
     .slice(0, 3);
   const url = siteUrl(`/guides/${slug}`, locale);

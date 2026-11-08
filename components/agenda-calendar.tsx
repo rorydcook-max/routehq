@@ -7,6 +7,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { Bell, ChevronLeft, ChevronRight, FileWarning, KeyRound, RotateCcw, Wallet, Wrench } from "lucide-react";
 import { dateFormat } from "@/lib/i18n/dates";
 import type { CalendarEvent } from "@/lib/calendar";
+import { businessCountry } from "@/lib/business-units";
+import { weekStartFor } from "@/lib/regional";
 
 export type AgendaView = "day" | "week" | "month" | "custom";
 
@@ -60,8 +62,11 @@ export function AgendaCalendar({
   autoLoad = false,
   roomy = false,
   carryLate = true,
+  weekStart,
   action
 }: {
+  /** First day of the week, 0 Sunday to 6 Saturday: worked out on the server (weekStartFor) so both sides draw the same week. */
+  weekStart?: number;
   events: CalendarEvent[];
   /** Late items (an overdue return, an unpaid payment) listed under today as well as on their own day. The dashboard has its own Today list, so it turns this off. */
   carryLate?: boolean;
@@ -144,11 +149,14 @@ export function AgendaCalendar({
   const carried = useMemo(() => (carryLate ? events.filter((event) => event.date < today && event.tone === "red" && event.type !== "compliance" && event.type !== "task") : []), [carryLate, events, today]);
   const on = (date: string) => [...(date === today ? carried : []), ...(byDate.get(date) || [])];
 
-  // The days on screen for each view.
+  // The days on screen for each view. Weeks start on the business's first day of the week (build-s, 8 Nov 2026):
+  // Monday, or Sunday in the US, Canada and other Sunday-first countries.
+  const firstDay = weekStart ?? weekStartFor(businessCountry());
+  const weekFrom = addDays(anchor, -((asDate(anchor).getUTCDay() - firstDay + 7) % 7));
   const monthStart = `${anchor.slice(0, 7)}-01`;
   const monthEnd = addDays(`${addDays(monthStart, 32).slice(0, 7)}-01`, -1);
   const span =
-    view === "day" ? { from: anchor, to: anchor } : view === "week" ? { from: anchor, to: addDays(anchor, 6) } : view === "month" ? { from: monthStart, to: monthEnd } : range;
+    view === "day" ? { from: anchor, to: anchor } : view === "week" ? { from: weekFrom, to: addDays(weekFrom, 6) } : view === "month" ? { from: monthStart, to: monthEnd } : range;
   const outside = span.from < covers.from || span.to > covers.to;
   const chosen = selected >= span.from && selected <= span.to ? selected : today >= span.from && today <= span.to ? today : span.from;
   const loadHref = `${fullCalendarHref}?month=${span.from.slice(0, 7)}&v=${view}&on=${view === "custom" ? range.from : anchor}${view === "custom" ? `&until=${range.to}` : ""}`;
@@ -178,7 +186,7 @@ export function AgendaCalendar({
             }
             return `${shortDay.format(asDate(span.from))} – ${shortDay.format(asDate(span.to))}`;
           })();
-  const atToday = view === "month" ? anchor.slice(0, 7) === today.slice(0, 7) : anchor === today;
+  const atToday = view === "month" ? anchor.slice(0, 7) === today.slice(0, 7) : view === "week" ? today >= span.from && today <= span.to : anchor === today;
 
   const row = (event: CalendarEvent, late: boolean) => (
     <Link className="pressable flex min-h-12 items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-[var(--panel-secondary)]" href={event.href as any} key={`${event.id}${late ? "-late" : ""}`}>
@@ -219,7 +227,7 @@ export function AgendaCalendar({
   // The week as one strip: each day with a dot per entry. Tap a day to list it underneath.
   const weekStrip = (
     <div className="grid grid-cols-7 gap-1">
-      {Array.from({ length: 7 }, (_, index) => addDays(anchor, index)).map((date) => {
+      {Array.from({ length: 7 }, (_, index) => addDays(weekFrom, index)).map((date) => {
         const list = on(date);
         const isChosen = date === chosen;
         const isToday = date === today;
@@ -244,11 +252,12 @@ export function AgendaCalendar({
   );
 
   const monthGrid = (() => {
-    const pad = asDate(monthStart).getUTCDay();
+    const pad = (asDate(monthStart).getUTCDay() - firstDay + 7) % 7;
     const count = daysBetween(monthStart, monthEnd) + 1;
     const cells = [...Array.from({ length: pad }, () => null), ...Array.from({ length: count }, (_, index) => addDays(monthStart, index))];
-    const names = Array.from({ length: 7 }, (_, index) => fmt(locale, { weekday: "short" }).format(new Date(Date.UTC(1970, 0, 4 + index))));
-    const short = names.some((name) => name.length > 4) ? Array.from({ length: 7 }, (_, index) => fmt(locale, { weekday: "narrow" }).format(new Date(Date.UTC(1970, 0, 4 + index)))) : names;
+    // 4 Jan 1970 was a Sunday: the column names start from the business's first day of the week.
+    const names = Array.from({ length: 7 }, (_, index) => fmt(locale, { weekday: "short" }).format(new Date(Date.UTC(1970, 0, 4 + firstDay + index))));
+    const short = names.some((name) => name.length > 4) ? Array.from({ length: 7 }, (_, index) => fmt(locale, { weekday: "narrow" }).format(new Date(Date.UTC(1970, 0, 4 + firstDay + index)))) : names;
     return (
       <div>
         <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[14px] font-bold text-[var(--muted)]">

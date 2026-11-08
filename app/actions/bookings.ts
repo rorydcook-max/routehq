@@ -3041,6 +3041,10 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   );
 
   const transactionsToInsert: any[] = [];
+  // What the customer is told on cancelling: their refund and what happens to the deposit.
+  let refundTold = 0;
+  let depositBackTold = 0;
+  let depositKeptTold = 0;
 
   if (refundOption) {
     const isFullRefund    = refundOption.startsWith("full_refund");
@@ -3061,6 +3065,7 @@ export async function cancelBookingWithDisposition(formData: FormData) {
       : isPartialRefund
         ? partialRefund
         : 0;
+    refundTold = Math.max(0, refundAmount);
 
     if (refundAmount > 0) {
       transactionsToInsert.push({
@@ -3081,6 +3086,7 @@ export async function cancelBookingWithDisposition(formData: FormData) {
 
     if (returnDeposit && depositHeld > 0) {
       const depositReturnAmount = isPartialRefund && partialDeposit > 0 ? partialDeposit : depositHeld;
+      depositBackTold = depositReturnAmount;
       transactionsToInsert.push({
         organization_id: organizationId,
         vehicle_id: vehicleId,
@@ -3099,6 +3105,7 @@ export async function cancelBookingWithDisposition(formData: FormData) {
     }
 
     if (retainDeposit && depositHeld > 0) {
+      depositKeptTold = depositHeld;
       transactionsToInsert.push({
         organization_id: organizationId,
         vehicle_id: vehicleId,
@@ -3239,7 +3246,21 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   throwCancellationError("Could not cancel the payment schedule", paymentScheduleResult.error);
   // Any refund chosen in this dialog settles a "Refund to decide" job.
   if (refundOption) await completeRentalJobs(createSupabaseAdminClient() as any, rentalId, "refund", "Settled when the booking was canceled");
-  await tellRentalCustomer(createSupabaseAdminClient() as any, rentalId, ({ say, t, vehicle }) => `${say("rentalCancelled", { vehicle })} ${t("anyQuestions")}`, { sentBy: user.id, withLink: false, replacesEarlier: true });
+  // In the customer's language and the booking's currency: the refund (or that there is none) and the deposit.
+  await tellRentalCustomer(
+    createSupabaseAdminClient() as any,
+    rentalId,
+    ({ say, t, vehicle, money }) => {
+      const lines = [say("rentalCancelled", { vehicle })];
+      if (refundTold > 0) lines.push(t("cancelRefund", { amount: money(refundTold) }));
+      else if (refundOption && totalPaidIncome > 0) lines.push(t("cancelNoRefund"));
+      if (depositBackTold > 0) lines.push(depositBackTold < depositHeld - 0.005 ? t("cancelDepositPart", { returned: money(depositBackTold), held: money(depositHeld) }) : t("cancelDepositBack", { amount: money(depositBackTold) }));
+      else if (depositKeptTold > 0) lines.push(t("cancelDepositKept", { amount: money(depositKeptTold) }));
+      lines.push(t("anyQuestions"));
+      return lines.join(" ");
+    },
+    { sentBy: user.id, withLink: false, replacesEarlier: true }
+  );
 
   const refundLabel = refundOption ? ` — ${refundOption.replace(/_/g, " ")}` : "";
 

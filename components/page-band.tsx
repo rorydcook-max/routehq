@@ -11,9 +11,12 @@ export function PageBand({
   subtitle,
   action,
   keepSubtitle = false,
+  info,
   children
 }: {
   title: string;
+  /** An (i) tip beside the title, in place of an intro paragraph. */
+  info?: React.ReactNode;
   subtitle?: string | null;
   keepSubtitle?: boolean;
   /** `desktopOnly`: the action is already on the phone's + button, so phones keep the band short. */
@@ -24,7 +27,10 @@ export function PageBand({
     <div>
       <div className="flex items-center justify-between gap-3 sm:flex-wrap">
         <div className="min-w-0">
-          <h1 className="text-[32px] leading-tight text-[var(--foreground)]">{title}</h1>
+          <h1 className="text-[32px] leading-tight text-[var(--foreground)]">
+            {title}
+            {info ? <span className="ms-2 inline-flex align-middle text-base">{info}</span> : null}
+          </h1>
           {/* Phones keep the header short: the line under the name shows from tablet width, unless the page needs it. */}
           {subtitle ? <p className={`mt-1 font-medium text-[var(--foreground-secondary)] ${keepSubtitle ? "" : "hidden sm:block"}`}>{subtitle}</p> : null}
         </div>

@@ -34,6 +34,7 @@ import { ChatLauncher } from "@/components/chat/chat-launcher";
 import { SidebarLanguage } from "@/components/sidebar-language";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { BrandStyle } from "@/components/brand-style";
+import { brandCss } from "@/lib/brand";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { useInitialShellBrand } from "@/components/shell-brand-provider";
 import { FastActionSheet } from "@/components/fast-action-sheet";
@@ -164,6 +165,25 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   const initialBrand = useInitialShellBrand();
   // Every page draws its own shell, so the last answer is reused across taps: the badges are right away, not after a fetch.
   const [shell, setShell] = useState<ShellContext>(() => shellCache.value ?? { role: null, organizations: [], unreadChats: 0, dueTasks: 0, helpReplies: 0, brand: initialBrand });
+  // A brand colour or name just saved (build-s, 8 Nov 2026): the page comes back from the server with the new brand,
+  // but the shell kept the one it had cached for the last 15 seconds, so the colour looked unsaved after Save.
+  // Before the load below, so it never brings the old brand back from the cache.
+  useEffect(() => {
+    if (!initialBrand) return;
+    if (shellCache.value) shellCache.value = { ...shellCache.value, brand: initialBrand };
+    setShell((current) => (current.brand?.colour === initialBrand.colour && current.brand?.name === initialBrand.name ? current : { ...current, brand: initialBrand }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialBrand?.colour, initialBrand?.name]);
+  // React keeps every brand colour <style> it has put in <head> (BrandStyle) until a full reload, so after saving a new
+  // colour, or going back to RoveHQ's own, the old one could still win. Only the current colour's style stays on.
+  const brandColour = shell.brand?.colour ?? initialBrand?.colour ?? null;
+  useEffect(() => {
+    const wanted = brandCss(brandColour) ? `brand-${String(brandColour).replace("#", "")}` : null;
+    document.querySelectorAll<HTMLStyleElement>('style[data-precedence="brand"]').forEach((style) => {
+      const href = style.getAttribute("data-href") || style.getAttribute("href");
+      style.media = href === wanted ? "" : "not all";
+    });
+  }, [brandColour]);
   useEffect(() => {
     let cancelled = false;
     loadShellContext()

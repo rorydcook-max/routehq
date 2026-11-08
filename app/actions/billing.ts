@@ -6,7 +6,7 @@ import type Stripe from "stripe";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { said } from "@/lib/i18n/server-text";
 import { planCurrency } from "@/lib/plan-currency";
-import { PLANS, effectiveLimits, planById } from "@/lib/plans";
+import { PLANS, effectiveLimits, planById, stripeTrialEnd } from "@/lib/plans";
 import { planItems, type BillingInterval, type PaidPlanId } from "@/lib/billing/catalog";
 import { applyPlanToFleet, chooseActive, loadFleet } from "@/lib/billing/parking";
 import { getStripe, portalConfigurationId, priceIds, stripeConfigured } from "@/lib/billing/stripe";
@@ -153,7 +153,8 @@ export async function choosePaidPlan(input: { plan: string; interval: string; ke
       const items = await itemsFor(admin, organization.id, plan, interval, null);
       const origin = await appOrigin();
       // A trial still running: the first payment waits for its end (Stripe needs at least two days' notice).
-      const trialEnd = organization.subscription_status === "trial" && organization.trial_ends_at ? Math.floor(new Date(organization.trial_ends_at).getTime() / 1000) : 0;
+      // Whole days, the same count the app shows (lib/plans.ts trialDaysLeft): Stripe said "29 days free" beside "30 days left".
+      const trialEnd = organization.subscription_status === "trial" && organization.trial_ends_at ? stripeTrialEnd(organization.trial_ends_at) : 0;
       const keepTrial = trialEnd > Math.floor(Date.now() / 1000) + 2 * 24 * 60 * 60 + 300;
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",

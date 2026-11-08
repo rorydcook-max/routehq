@@ -902,6 +902,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
   if (completed) {
     return (
+      <>
       <section ref={doneRef} className="-order-1 scroll-mt-4 rounded-2xl border border-[var(--success-line)] bg-white p-5 text-center shadow-sm">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--success-light)] text-[var(--success)]">
           <CheckCircle2 size={34} />
@@ -933,9 +934,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </a>
         ) : null}
         </div>
+      </section>
         {/* Their choice stays here to change at any time: turning it off is as easy as turning it on.
-            "What's shared" sits inside the same box, lined up with the text it explains. */}
-        <div className="mt-5 rounded-2xl bg-[var(--panel-secondary)] p-3.5 text-left text-sm text-[var(--foreground)]">
+            "What's shared" sits inside the same box, lined up with the text it explains. Below the booking summary
+            (the confirmation above rises to the top of the page; this stays in the page's own order). */}
+        <div className="rounded-2xl border border-[var(--border)] bg-white p-4 text-left text-sm text-[var(--foreground)] shadow-sm">
           <label className="flex cursor-pointer items-start gap-3">
             <input checked={offersOn} className="mt-0 h-5 w-5 flex-shrink-0 cursor-pointer accent-[var(--primary)]" disabled={offersSaving} onChange={(event) => void saveOffers(event.target.checked, "booking_page")} type="checkbox" />
             <span>
@@ -951,7 +954,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             {t("privacyLink", { business: detail.organizationName })}
           </a>
         </div>
-      </section>
+      </>
     );
   }
 

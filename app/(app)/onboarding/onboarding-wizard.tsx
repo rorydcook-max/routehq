@@ -5,15 +5,17 @@ import type { Route } from "next";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Car, CheckCircle2, ChevronRight, FileSpreadsheet, Loader2, PenLine, Sparkles } from "lucide-react";
+import { Car, CheckCircle2, ChevronLeft, ChevronRight, FileSpreadsheet, Loader2, PenLine, Sparkles } from "lucide-react";
 import { finishOnboarding, saveBusinessProfile } from "@/app/actions/onboarding";
 import { setMyLanguage } from "@/app/actions/settings";
 import { FleetAssistant } from "@/components/fleet-assistant";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
-import { defaultCurrencyForCountry, locationOptions, townsFor } from "@/lib/onboarding-locations";
+import { defaultCurrencyForCountry, townsFor } from "@/lib/onboarding-locations";
 import { PhoneField } from "@/components/phone-field";
+import { SearchSelect } from "@/components/search-select";
 import { allCountries } from "@/lib/customer-options";
-import { placeLabel, toCountryCode } from "@/lib/regional";
+import { ALL_COUNTRY_CODES, englishCountryName, placeLabel, toCountryCode } from "@/lib/regional";
+import { displayNamesLocale } from "@/lib/i18n/dates";
 
 type Organization = { id: string; name: string; default_locale: string; settings?: Record<string, any> };
 
@@ -59,7 +61,16 @@ export function OnboardingWizard({
   const [country, setCountry] = useState(String(saved.country || defaultCountry || ""));
   const [town, setTown] = useState(String(saved.town || ""));
   const towns = useMemo(() => townsFor(country), [country]);
-  const countries = useMemo(() => [...locationOptions.map((option) => option.country)].sort((a, b) => a.localeCompare(b)), []);
+  // Every country (build-s, 8 Nov 2026), named and sorted in the reader's language; saved by its English name as before.
+  const countries = useMemo(() => {
+    let names: Intl.DisplayNames | null = null;
+    try {
+      names = new Intl.DisplayNames([displayNamesLocale(locale)], { type: "region" });
+    } catch {
+      names = null;
+    }
+    return ALL_COUNTRY_CODES.map((code) => ({ value: englishCountryName(code), label: names?.of(code) || englishCountryName(code) })).sort((a, b) => a.label.localeCompare(b.label, locale));
+  }, [locale]);
   const languages = useMemo(() => [...supportedLocaleOptions].sort((a, b) => a.label.localeCompare(b.label)), []);
   // Adding vehicles re-draws this page with the new list, so the count is always the real one.
   const vehicleCount = vehicles.length;
@@ -149,24 +160,23 @@ export function OnboardingWizard({
               </label>
               {/* Country first (audit, 8 Nov 2026): the phone's country code follows it, so it was odd to ask for the phone before it. */}
               <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block">
+                <div className="block">
                   <span className={labelClass}>{t("country")}</span>
-                  <select className={fieldClass} onChange={(event) => { setCountry(event.target.value); setError(""); }} required value={country}>
-                    {!country ? (
-                      <option disabled value="">
-                        {t("countryChoose")}
-                      </option>
-                    ) : null}
-                    {countries.map((name) => (
-                      <option key={name} value={name}>
-                        {name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                  <SearchSelect
+                    ariaLabel={t("country")}
+                    onChange={(next) => {
+                      setCountry(next);
+                      setError("");
+                    }}
+                    options={countries}
+                    placeholder={t("countryChoose")}
+                    value={country}
+                  />
+                </div>
                 <label className="block">
                   <span className={labelClass}>{t("town")}</span>
-                  <input className={fieldClass} list="setup-towns" onChange={(event) => setTown(event.target.value)} placeholder={towns[0]?.town || ""} value={town} />
+                  {/* Countries without a list of towns: typed freely (no place search: maps billing is off). */}
+                  <input className={fieldClass} list={towns.length ? "setup-towns" : undefined} onChange={(event) => setTown(event.target.value)} placeholder={towns[0]?.town || ""} value={town} />
                   <datalist id="setup-towns">
                     {towns.map((entry) => (
                       <option key={`${entry.region}-${entry.town}`} value={entry.town}>
@@ -198,6 +208,20 @@ export function OnboardingWizard({
           </section>
         ) : (
           <section className="card p-4 sm:p-7">
+            {/* Back to step 1, so a wrong country (or phone) can be put right. */}
+            <button
+              className="pressable -ms-1 mb-2 inline-flex min-h-11 items-center gap-1 rounded-full pe-3 ps-1 font-bold text-[var(--primary)]"
+              onClick={() => {
+                setStep(1);
+                setError("");
+                window.history.replaceState(window.history.state, "", "/onboarding?step=1");
+                window.scrollTo({ top: 0 });
+              }}
+              type="button"
+            >
+              <ChevronLeft className="rtl:rotate-180" size={20} />
+              {t("back")}
+            </button>
             <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
               {vehicleCount ? <CheckCircle2 size={24} /> : <Car size={24} />}
             </span>

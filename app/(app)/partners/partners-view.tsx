@@ -1,6 +1,6 @@
 "use client";
 
-import { Car, Check, Copy, Handshake, Loader2, MapPin, Search, Share2, Truck } from "lucide-react";
+import { Car, Check, Copy, Loader2, MapPin, Search, Truck } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -11,6 +11,7 @@ import { markReferralSettled, savePartnerNetwork, searchPartnerVehicles } from "
 import { MoneyInput } from "@/components/money-input";
 import { PlaceField, type PickedPlace } from "@/components/place-field";
 import { SwitchField } from "@/components/switch-field";
+import { InfoTip } from "@/components/info-tip";
 import type { PartnerVehicle, ReferralRow } from "@/lib/partner-pricing";
 import { searchPlaces } from "@/lib/place-coords";
 import { CAR_SIZES, ENGINE_BANDS, ENGINE_KINDS } from "@/lib/vehicle-filters";
@@ -194,9 +195,12 @@ export function PartnersView({
       <section className="card p-4">
         <SwitchField
           checked={sharing}
-          description={t("shareBody")}
           disabled={saving || !canEdit}
-          label={t("shareTitle")}
+          label={
+            <>
+              {t("shareTitle")} <InfoTip label={t("shareTitle")} text={t("shareBody")} />
+            </>
+          }
           onChange={(event) => toggleSharing(event.target.checked)}
         />
         {!canEdit ? <p className="mt-2 text-sm text-[var(--muted)]">{t("shareOwnerOnly")}</p> : null}
@@ -204,23 +208,22 @@ export function PartnersView({
       </section>
 
       {!sharing ? (
-        // Only businesses that share can search: a friendly nudge, and how it works in three steps.
+        // Only businesses that share can search: a friendly nudge, with how it works in three steps behind the (i).
         <section className="card p-5 lg:p-7">
-          <h2 className="card-title">{t("joinTitle")}</h2>
+          <h2 className="card-title">
+            {t("joinTitle")}{" "}
+            <InfoTip
+              label={t("joinTitle")}
+              text={
+                <ol className="list-decimal space-y-1 ps-4">
+                  <li>{t("step1")}</li>
+                  <li>{t("step2")}</li>
+                  <li>{t("step3", { pct })}</li>
+                </ol>
+              }
+            />
+          </h2>
           <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{t("joinBody")}</p>
-          <ol className="mt-5 grid gap-3 md:grid-cols-3">
-            {[
-              { icon: <Search size={22} />, text: t("step1") },
-              { icon: <Share2 size={22} />, text: t("step2") },
-              { icon: <Handshake size={22} />, text: t("step3", { pct }) }
-            ].map((step, index) => (
-              <li className="rounded-2xl bg-[var(--panel-secondary)] p-4" key={index}>
-                <span aria-hidden="true" className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">{step.icon}</span>
-                <p className="mt-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--muted)]">{t("how_step", { n: index + 1 })}</p>
-                <p className="mt-0.5 font-semibold text-[var(--foreground)]">{step.text}</p>
-              </li>
-            ))}
-          </ol>
         </section>
       ) : (
         <>

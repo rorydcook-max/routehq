@@ -3,9 +3,10 @@
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { saveRegionalSettings, type RegionalInput } from "@/app/actions/regional";
-import { COUNTRIES, countryInfo, zoneName, zoneOffset, type DistanceUnit } from "@/lib/regional";
+import { ALL_COUNTRY_CODES, allCurrencies, countryInfo, englishCountryName, zoneName, zoneOffset, zonesFor, type DistanceUnit } from "@/lib/regional";
 import { displayNamesLocale } from "@/lib/i18n/dates";
 import { InfoTip } from "@/components/info-tip";
+import { SearchSelect } from "@/components/search-select";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const small = "text-[13px] font-semibold text-[var(--foreground-secondary)]";
@@ -20,6 +21,7 @@ export function RegionalPanel({ initial }: { initial: RegionalInput }) {
   const [form, setForm] = useState<RegionalInput>(initial);
   const [pending, start] = useTransition();
   const [note, setNote] = useState<string | null>(null);
+  // Every country and every ISO currency (build-s, 8 Nov 2026), searchable and alphabetical in the reader's language.
   const names = useMemo(() => {
     let display: Intl.DisplayNames | null = null;
     try {
@@ -27,11 +29,22 @@ export function RegionalPanel({ initial }: { initial: RegionalInput }) {
     } catch {
       display = null;
     }
-    return COUNTRIES.map((country) => ({ code: country.code, name: display?.of(country.code) || country.name })).sort((a, b) => a.name.localeCompare(b.name, locale));
+    return ALL_COUNTRY_CODES.map((code) => ({ value: code, label: display?.of(code) || englishCountryName(code) })).sort((a, b) => a.label.localeCompare(b.label, locale));
   }, [locale]);
+  const currencies = useMemo(() => {
+    let display: Intl.DisplayNames | null = null;
+    try {
+      display = new Intl.DisplayNames([displayNamesLocale(locale)], { type: "currency" });
+    } catch {
+      display = null;
+    }
+    return Array.from(new Set([...allCurrencies(), form.currency].filter(Boolean)))
+      .sort()
+      .map((code) => ({ value: code, label: code, hint: display?.of(code) && display.of(code) !== code ? display.of(code) : undefined }));
+  }, [locale, form.currency]);
   const info = countryInfo(form.country);
-  const zones = Array.from(new Set([...(info?.zones || []), form.timezone].filter(Boolean)));
-  const currencies = Array.from(new Set([info?.currency || "", form.currency, "EUR", "USD"].filter(Boolean))).sort();
+  // Every IANA time zone in the country, alphabetical by place.
+  const zones = Array.from(new Set([...zonesFor(form.country), form.timezone].filter(Boolean))).sort((a, b) => zoneName(a).localeCompare(zoneName(b), locale));
   const update = (patch: Partial<RegionalInput>) => {
     setNote(null);
     setForm((current) => ({ ...current, ...patch }));
@@ -52,17 +65,11 @@ export function RegionalPanel({ initial }: { initial: RegionalInput }) {
   return (
     <div className="space-y-3">
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block">
+        <div className="block">
           <span className={small}>{say("reg_country")}</span>
-          <select className="mt-1 w-full" onChange={(event) => pickCountry(event.target.value)} value={form.country}>
-            {names.map((country) => (
-              <option key={country.code} value={country.code}>
-                {country.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
+          <SearchSelect ariaLabel={say("reg_country")} onChange={pickCountry} options={names} value={form.country} />
+        </div>
+        <div className="block">
           <span className={small}>{say("reg_zone")}</span>
           {/* A country with one time zone (Thailand) shows it as a fact, not a dropdown with one choice. */}
           {zones.length < 2 ? (
@@ -70,25 +77,18 @@ export function RegionalPanel({ initial }: { initial: RegionalInput }) {
               {zoneName(form.timezone)} {zoneOffset(form.timezone)}
             </span>
           ) : (
-            <select className="mt-1 w-full" onChange={(event) => update({ timezone: event.target.value })} value={form.timezone}>
-              {zones.map((zone) => (
-                <option key={zone} value={zone}>
-                  {zoneName(zone)} {zoneOffset(zone)}
-                </option>
-              ))}
-            </select>
+            <SearchSelect
+              ariaLabel={say("reg_zone")}
+              onChange={(zone) => update({ timezone: zone })}
+              options={zones.map((zone) => ({ value: zone, label: zoneName(zone), hint: zoneOffset(zone) }))}
+              value={form.timezone}
+            />
           )}
-        </label>
-        <label className="block">
+        </div>
+        <div className="block">
           <span className={small}>{say("reg_currency")}</span>
-          <select className="mt-1 w-full" onChange={(event) => update({ currency: event.target.value })} value={form.currency}>
-            {currencies.map((code) => (
-              <option key={code} value={code}>
-                {code}
-              </option>
-            ))}
-          </select>
-        </label>
+          <SearchSelect ariaLabel={say("reg_currency")} onChange={(code) => update({ currency: code })} options={currencies} value={form.currency} />
+        </div>
         <label className="block">
           <span className={small}>
             {say("reg_distance")} <InfoTip label={say("reg_distance")} text={say("reg_distanceTip")} />

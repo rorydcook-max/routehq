@@ -5,6 +5,7 @@ import { numberLocale } from "@/lib/i18n/dates";
 import { formatPlanPrice } from "@/lib/plan-currency";
 import { sampleAmount } from "@/lib/site-currency";
 import { pageCurrency } from "@/lib/site/static-page";
+import { paysByQr, regionForCurrency } from "@/lib/site/region";
 import s from "../site.module.css";
 
 /*
@@ -26,7 +27,10 @@ async function kit() {
   const date = (iso: string, options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(nl, { timeZone: "UTC", ...options }).format(new Date(`${iso}T12:00:00Z`));
   /** Thailand's QR payment is PromptPay; elsewhere the pictures say "QR payment" so they read right for any visitor. */
   const qrName = currency === "THB" ? "PromptPay" : t("mockQrPay");
-  return { t, money, local, format, number, date, currency, qrName };
+  // Outside Asia renters pay by transfer, Wise or Revolut rather than QR code (lib/site/region.ts).
+  const qr = paysByQr(regionForCurrency(currency));
+  const payName = qr ? qrName : t("mockBankTransfer");
+  return { t, money, local, format, number, date, currency, qrName, qr, payName };
 }
 
 /** The website's pictures use these amounts, so a page can show the same ones in its own words. */
@@ -538,27 +542,53 @@ export async function HandoverPhoneMock({ className = "" }: { className?: string
 /* ── Getting paid ───────────────────────────────────────────────────────── */
 
 export async function PaymentPhoneMock({ className = "" }: { className?: string }) {
-  const { t, money, qrName } = await kit();
+  const { t, money, qrName, qr } = await kit();
   return (
-    <PhoneFrame className={className} label={t("mockPaymentLabel")}>
+    <PhoneFrame className={className} label={t(qr ? "mockPaymentLabel" : "mockPaymentLabelGlobal")}>
       <div className="flex h-full flex-col bg-[#f3f6f8]">
         <StatusBar />
-        <div className="mx-[0.9em] mt-[2em] rounded-[1.4em] bg-white p-[1.1em] text-center shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
-          <p className="font-semibold text-[#5f6b7a]">{t("mockScanToPay")}</p>
-          <p className="mt-[0.1em] text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
-            {money(5600)}
-          </p>
-          <div className="mx-auto mt-[0.8em] w-[62%] rounded-[0.8em] border-[0.15em] border-[#e6eaef] p-[0.5em]">
-            <FakeQr className="block w-full" />
+        {qr ? (
+          <div className="mx-[0.9em] mt-[2em] rounded-[1.4em] bg-white p-[1.1em] text-center shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
+            <p className="font-semibold text-[#5f6b7a]">{t("mockScanToPay")}</p>
+            <p className="mt-[0.1em] text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
+              {money(5600)}
+            </p>
+            <div className="mx-auto mt-[0.8em] w-[62%] rounded-[0.8em] border-[0.15em] border-[#e6eaef] p-[0.5em]">
+              <FakeQr className="block w-full" />
+            </div>
+            <p className="mt-[0.6em] text-[0.95em] font-bold tracking-[0.02em] text-[#1f4f7a]">{qrName}</p>
           </div>
-          <p className="mt-[0.6em] text-[0.95em] font-bold tracking-[0.02em] text-[#1f4f7a]">{qrName}</p>
-        </div>
+        ) : (
+          // Outside Asia: the booking's payment request with the business's transfer details and its Wise and Revolut
+          // links, as the customer's booking page shows them (the account number is made up and masked).
+          <div className="mx-[0.9em] mt-[2em] rounded-[1.4em] bg-white p-[1.1em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
+            <p className="text-center font-semibold text-[#5f6b7a]">{t("mockPayByTransfer")}</p>
+            <p className="mt-[0.1em] text-center text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
+              {money(5600)}
+            </p>
+            <div className="mt-[0.8em] overflow-hidden rounded-[0.9em] bg-[#f3f6f8]">
+              {[
+                [t("mockAccount"), "Harbor Rentals · •••• 4821"],
+                [t("mockReference"), "HR-1042"]
+              ].map(([label, value], index) => (
+                <div className={`flex items-center justify-between gap-[0.6em] px-[0.9em] py-[0.6em] ${index ? "border-t border-[#e6eaef]" : ""}`} key={label}>
+                  <span className="text-[#5f6b7a]">{label}</span>
+                  <span className="truncate font-semibold tabular-nums">{value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-[0.8em] grid grid-cols-2 gap-[0.5em]">
+              <Pill>Wise</Pill>
+              <Pill>Revolut</Pill>
+            </div>
+          </div>
+        )}
         <div className="mx-[0.9em] mt-[0.8em] flex items-start gap-[0.7em] rounded-[1.3em] bg-white p-[0.9em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_14px_30px_rgba(6,22,43,0.12)]">
           <span className="flex h-[2.3em] w-[2.3em] shrink-0 items-center justify-center rounded-full bg-[#dcf3e6] text-[#1f7a4d]">
             <Check className="h-[1.3em] w-[1.3em]" strokeWidth={3} />
           </span>
           <span className="min-w-0">
-            <span className="block font-bold leading-tight">{t("mockSlipMatched")}</span>
+            <span className="block font-bold leading-tight">{t(qr ? "mockSlipMatched" : "mockReceiptMatched")}</span>
             <span className="block text-[#5f6b7a]">{money(5600)} · Anna Becker</span>
           </span>
         </div>
@@ -720,10 +750,10 @@ export async function ReturnCard({ className = "" }: { className?: string }) {
 
 /** A booking's money, all on record. */
 export async function LedgerCard({ className = "" }: { className?: string }) {
-  const { t, money, qrName } = await kit();
+  const { t, money, payName } = await kit();
   const rows = [
     { label: t("mockRental"), sub: t("mockDays", { count: 7 }), amount: money(5600), done: true },
-    { label: t("mockDepositHeld"), sub: qrName, amount: money(3000), done: true },
+    { label: t("mockDepositHeld"), sub: payName, amount: money(3000), done: true },
     { label: t("mockReceiptSent"), sub: "Email", amount: "", done: true }
   ];
   return (

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { PageBand } from "@/components/page-band";
+import { InfoTip } from "@/components/info-tip";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { canDecideMoney } from "@/lib/auth/role-types";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -22,7 +23,7 @@ export default async function PartnersPage() {
   const town = mainTown(organization.settings);
 
   return (
-    <AppShell hero={<PageBand keepSubtitle subtitle={t("help", { pct: PARTNER_COMMISSION_PCT })} title={t("title")} />} userEmail={userEmail}>
+    <AppShell hero={<PageBand info={<InfoTip label={t("title")} text={t("help", { pct: PARTNER_COMMISSION_PCT })} />} title={t("title")} />} userEmail={userEmail}>
       <PartnersView
         canEdit={membership?.role === "owner"}
         canSettle={canDecideMoney(membership?.role)}

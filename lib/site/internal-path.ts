@@ -1,6 +1,7 @@
 import { CONTRACT_BUILDER_PAGES, isContractBuilder } from "@/lib/contract-builder/fields";
 import { LEAD_COUNTRIES } from "@/lib/leads";
 import { currencyForCountry, isSiteCurrency, PRICING_CURRENCIES } from "@/lib/site-currency";
+import { regionForCurrency } from "@/lib/site/region";
 
 /**
  * Where proxy.ts serves each website address from (Rory, 3 Nov 2026: the website is drawn ahead of time and served
@@ -67,6 +68,8 @@ export function visitorCurrencyFrom(headers: Headers) {
 export function siteInternalPath(path: string, locale: string, headers: Headers, search: URLSearchParams) {
   const base = `${SITE_INTERNAL_PREFIX}/${locale}`;
   if (path === "/" || path === "/home") return `${base}/home/${visitorCurrencyFrom(headers)}`;
+  // The guides list puts the visitor's region first (lib/site/region.ts), worked out from the same currency.
+  if (path === "/guides") return `${base}/guides/for/${regionForCurrency(visitorCurrencyFrom(headers))}`;
   if (path === "/pricing") {
     const detected = visitorCurrencyFrom(headers);
     const asked = String(search.get("currency") || "").toUpperCase();

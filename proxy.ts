@@ -113,6 +113,18 @@ const ROVE_SECTION_MISS = new RegExp(`^/(?:[a-z]{2,3}(?:-[A-Z]{2})?/)?(?:guides|
 /** Search engines and link previews: never sent to a language by their Accept-Language (they index each address as it is). */
 const BOT = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|lighthouse|headless/i;
 
+/**
+ * A redirect from an English (unprefixed) address to the visitor's language (task build-rove, 8 Nov 2026): temporary
+ * (307), never cached by a browser or CDN, and marked as depending on the language header and the saved choice. The
+ * English page itself is the same for everyone (it's served from the cache), so it carries no Vary.
+ */
+function languageRedirect(url: URL) {
+  const response = NextResponse.redirect(url, 307);
+  response.headers.set("Vary", "Accept-Language, Cookie");
+  response.headers.set("Cache-Control", "private, no-store");
+  return response;
+}
+
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const requestHost = request.headers.get("host");
@@ -146,7 +158,7 @@ export async function proxy(request: NextRequest) {
         if (wanted !== ROVE_DEFAULT_LOCALE && roveHasLocale(rovePage.section, wanted)) {
           const url = request.nextUrl.clone();
           url.pathname = roveHref(rovePage.rest, wanted);
-          return NextResponse.redirect(url);
+          return languageRedirect(url);
         }
       }
       const url = request.nextUrl.clone();
@@ -229,7 +241,7 @@ export async function proxy(request: NextRequest) {
     if (wanted !== DEFAULT_SITE_LOCALE) {
       const url = request.nextUrl.clone();
       url.pathname = localizeSitePath(pathname, wanted);
-      return NextResponse.redirect(url);
+      return languageRedirect(url);
     }
   }
   /** "/" for someone not signed in: the website's home page, at the same address (a rewrite, not a redirect). */
@@ -238,7 +250,7 @@ export async function proxy(request: NextRequest) {
     if (wanted !== DEFAULT_SITE_LOCALE) {
       const url = request.nextUrl.clone();
       url.pathname = `/${wanted}`;
-      return NextResponse.redirect(url);
+      return languageRedirect(url);
     }
     return NextResponse.rewrite(internalSite("/home", DEFAULT_SITE_LOCALE), { request });
   };

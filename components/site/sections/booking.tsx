@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { BadgeCheck, CalendarX, CreditCard, MapPin, ShieldCheck, Truck, Wallet } from "lucide-react";
 import { Catalog } from "@/app/(app)/rent/[slug]/catalog";
-import { headlineRate } from "@/lib/rental-estimate";
+import { cardRates } from "@/lib/rental-estimate";
 import { bookingPanelVars } from "@/lib/sites/palettes";
 import { kindsOffered } from "@/lib/sites/format";
 import type { SitePolicy } from "@/lib/sites/types";
@@ -31,6 +31,8 @@ export function Booking() {
   const [budget, setBudget] = useState(0);
 
   // The unit most prices are in (a day, a week or a month), for the budget choices.
+  // The same headline price the cards show (the day price first).
+  const headlineRate = (vehicle: (typeof data.vehicles)[number]) => cardRates(vehicle, data.catalog.offer === "monthly").headline;
   const rates = data.vehicles.map((vehicle) => headlineRate(vehicle)).filter(Boolean) as Array<{ amount: number; per: "day" | "week" | "month" }>;
   const per = (["day", "month", "week"] as const).map((unit) => ({ unit, n: rates.filter((rate) => rate.per === unit).length })).sort((a, b) => b.n - a.n)[0]?.unit || "day";
   const budgets = useMemo(() => {

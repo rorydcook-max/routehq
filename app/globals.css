@@ -2187,5 +2187,20 @@ details[open] > summary:not([class*="flex"]):not([class*="grid"]):not(:has(svg, 
   }
 }
 
+/* The same white box and chevron at every width, for drop-downs that looked like the browser's own on a computer
+   (Account language, Team language and level; build-s, 8 Nov 2026). */
+select.app-select:not([multiple]):not([size]) {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--surface, #fff);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b6b70' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px 16px;
+  padding-left: 12px;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
 /* The website's footer ends with room for the chat button, so its last links are never under it. */
 body:has(.chat-launcher) footer { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }

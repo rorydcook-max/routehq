@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { Bricolage_Grotesque, Figtree } from "next/font/google";
+import { Bricolage_Grotesque, Geist } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { CookieBanner } from "@/components/cookie-banner";
@@ -22,7 +22,8 @@ import "../../../globals.css";
 import "../../../theme-dark.css";
 
 const display = Bricolage_Grotesque({ subsets: ["latin", "latin-ext"], axes: ["wdth"], display: "swap", variable: "--rv-display" });
-const body = Figtree({ subsets: ["latin", "latin-ext"], display: "swap", variable: "--rv-body" });
+// Geist for reading and tapping (task build-rove, 8 Nov 2026): neutral, exact, made for interfaces.
+const body = Geist({ subsets: ["latin", "latin-ext", "cyrillic"], display: "swap", variable: "--rv-body" });
 
 export const metadata: Metadata = { ...rootMetadata, metadataBase: new URL(roveOrigin()), applicationName: "Rove", title: { default: "Rove", template: "%s | Rove" } };
 export const viewport: Viewport = rootViewport;

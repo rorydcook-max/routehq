@@ -613,7 +613,8 @@ export async function uploadVehiclePhotos(formData: FormData) {
       size_bytes: file.size,
       category: "vehicle_photo",
       ocr_status: "not_started",
-      extracted_data: { vehicle_photo_order: nextOrder++ },
+      // A photo AI made on the Add vehicle form (components/ai-photos.tsx names it so): it carries the "AI image" label.
+      extracted_data: { vehicle_photo_order: nextOrder++, ...(/^ai-generated-/.test(file.name || "") ? { ai_generated: true } : {}) },
       uploaded_by: user.id
     });
 

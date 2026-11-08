@@ -12,17 +12,21 @@ export function BookingShareActions({
   organizationId,
   rentalId,
   currentUrl,
-  formDone = false
+  formDone = false,
+  sentBefore = false
 }: {
   organizationId: string;
   rentalId: string;
   currentUrl: string | null;
   /** The customer has finished the booking form, so the link is now their own page (payments, extending, returning). */
   formDone?: boolean;
+  /** The link has gone to the customer at least once: until then the button says "Send", not "Resend". */
+  sentBefore?: boolean;
 }) {
   const say = useTranslations("booking") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const [message, setMessage] = useState("");
   const [link, setLink] = useState(currentUrl || "");
+  const [sent, setSent] = useState(sentBefore);
   const [isPending, startTransition] = useTransition();
 
   async function copyText(text: string) {
@@ -74,6 +78,7 @@ export function BookingShareActions({
         formData.set("baseUrl", defaultAppUrl || window.location.origin);
         const result = await resendBookingLink(formData);
         setLink(result.bookingUrl);
+        if (channel === "share") setSent(true);
         const done = result.created ? say("share_created") : say("share_renewed");
         const copyBlocked = ` ${say("share_blockedShort")}`;
 
@@ -110,7 +115,7 @@ export function BookingShareActions({
       <div className="flex flex-col gap-2 sm:flex-row">
         <button className={`${formDone ? "secondary-action" : "primary-action"} pressable flex-1 whitespace-nowrap disabled:opacity-70`} disabled={isPending} onClick={() => resend("share")} type="button">
           {isPending ? <span className="spinner" /> : <MessageCircle size={18} />}
-          {!link ? say("share_create") : formDone ? say("share_sendPage") : say("share_resend")}
+          {!link ? say("share_create") : formDone ? say("share_sendPage") : sent ? say("share_resend") : say("share_send")}
         </button>
         <button className="secondary-action pressable flex-1 whitespace-nowrap disabled:opacity-70" disabled={isPending || !link} onClick={copyCurrentLink} type="button">
           {isPending ? <RotateCcw size={18} /> : <Copy size={18} />}

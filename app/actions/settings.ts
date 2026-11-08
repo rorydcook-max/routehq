@@ -602,12 +602,20 @@ export async function updateContractBrandingSettings(formData: FormData) {
   }
 
   const settings = settingsObject(organization.settings);
+  // The phone picker (build-s, 8 Nov 2026) sends the country code and the number apart: saved as one "+66812345678".
+  const phoneDigits = String(formData.get("business_phone_national") || "").replace(/[^\d]/g, "");
+  const phoneCode = String(formData.get("business_phone_code") || "").replace(/[^\d+]/g, "");
+  const businessPhone = formData.has("business_phone_national")
+    ? phoneDigits
+      ? `${phoneCode}${phoneCode ? phoneDigits.replace(/^0/, "") : phoneDigits}`.slice(0, 80)
+      : null
+    : limitedString(formData, "business_phone", 80);
   const updatePayload = {
     trading_name: tradingName,
     legal_name: legalName,
     registration_or_tax_number: limitedString(formData, "registration_or_tax_number", 80),
     business_address: limitedString(formData, "business_address", 500),
-    business_phone: limitedString(formData, "business_phone", 80),
+    business_phone: businessPhone,
     business_email: businessEmail,
     whatsapp: limitedString(formData, "whatsapp", 80),
     line_id: limitedString(formData, "line_id", 80),
@@ -622,7 +630,7 @@ export async function updateContractBrandingSettings(formData: FormData) {
     authorised_signatory_title: limitedString(formData, "authorised_signatory_title", 160),
     settings: {
       ...settings,
-      business_phone: limitedString(formData, "business_phone", 80),
+      business_phone: businessPhone,
       business_email: businessEmail,
       owner_whatsapp: limitedString(formData, "whatsapp", 80),
       owner_line_id: limitedString(formData, "line_id", 80),

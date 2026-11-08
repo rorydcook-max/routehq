@@ -6,7 +6,7 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { dateFormat } from "@/lib/i18n/dates";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
-import { effectiveLimits, fleetMix, fleetText, planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
+import { effectiveLimits, fleetMix, fleetText, planById, planForFleet, trialDaysLeft, vehiclesOverLimit } from "@/lib/plans";
 import { getCustomPlan } from "@/lib/custom-plan";
 import { loadFleet } from "@/lib/billing/parking";
 import { getStripe, stripeConfigured } from "@/lib/billing/stripe";
@@ -41,8 +41,8 @@ const INCLUDED = [
 ];
 
 function daysUntil(value: string | null | undefined) {
-  if (!value) return null;
-  return Math.max(0, Math.ceil((new Date(value).getTime() - Date.now()) / (24 * 60 * 60 * 1000)));
+  // The same whole-day count as Stripe's checkout (lib/plans.ts).
+  return trialDaysLeft(value);
 }
 
 /** Back from a Checkout redirect (some payment methods leave the page): put the new plan on before showing it. */

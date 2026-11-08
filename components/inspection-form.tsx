@@ -16,6 +16,7 @@ import { recordDeliveryCashPaymentAndReceipt } from "@/app/actions/transactions"
 import type { InspectionContext } from "@/lib/inspection-detail";
 import { earlyStartFor, type EarlyStartChoice } from "@/lib/early-start";
 import { lateStartFor, type LateStartChoice } from "@/lib/late-start";
+import { lateReturnAmount, lateReturnFor, type LateReturnChoice } from "@/lib/late-return";
 import { dateFormat } from "@/lib/i18n/dates";
 import { distanceKey } from "@/lib/business-units";
 import { methodsFor } from "@/lib/payment-methods";
@@ -518,6 +519,23 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   const late = useMemo(() => (mode === "delivery" && !isSwap ? lateStartFor(context.rental, businessToday()) : null), [mode, isSwap, context.rental]);
   const [lateChoice, setLateChoice] = useState<LateStartChoice>("from_handover");
   const [lateTakenOff, setLateTakenOff] = useState(0);
+  // Back after the booked return date: the late days, priced from the booking's rates. The owner can change the
+  // figure and takes it from the deposit, charges it to the renter, or waives it.
+  // Already written (cash taken earlier on this form, then reopened): it is on the booking, so it isn't asked again.
+  const lateBack = useMemo(
+    () => (mode === "return" && !isSwap && !context.lateChargeWritten ? lateReturnFor(context.rental, context.vehicle, businessToday()) : null),
+    [mode, isSwap, context.rental, context.vehicle, context.lateChargeWritten]
+  );
+  const lateDepositFree = Math.max(0, Number(context.rental?.deposit_held || 0) - Number(context.rental?.deposit_refunded_amount || 0) - Number(context.rental?.deposit_forfeited_amount || 0));
+  // From the deposit when what is left of it (after unpaid rent) covers the charge; otherwise charged to the renter.
+  const [lateBackChoice, setLateBackChoice] = useState<LateReturnChoice>(() => {
+    const unpaidRent = (context.unpaidPayments || []).filter((payment: any) => payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true).reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+    return lateBack && context.rental?.deposit_status !== "fully_returned" && lateDepositFree - unpaidRent >= lateBack.amount && lateDepositFree - unpaidRent > 0 ? "deposit" : "charge";
+  });
+  const [lateBackInput, setLateBackInput] = useState(() => (lateBack && lateBack.amount > 0 ? String(lateBack.amount) : ""));
+  const lateBackAmount = lateBack && lateBackChoice !== "waive" ? lateReturnAmount(lateBackInput) : 0;
+  const lateFromDeposit = lateBackChoice === "deposit" ? lateBackAmount : 0;
+  const lateToCharge = lateBackChoice === "charge" ? lateBackAmount : 0;
   // A vehicle collected in a swap doesn't settle the deposit: the rental carries on.
   const depositAlreadyReturned = mode === "return" && !isSwap && context.rental?.deposit_status === "fully_returned";
   // No tracker fitted: skip the GPS step rather than show an empty screen.
@@ -606,12 +624,17 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   const outstandingBalance = (context.unpaidPayments || [])
     .filter((payment: any) => payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true)
     .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
-  const requestedDeductions = outstandingBalance + fuelDeficitCharge + damageCharge + cleaningCharge;
+  // Late days taken from the deposit come after any unpaid rent, and never more than is left of it.
+  const lateDepositMax = Math.max(0, Math.round((availableToReconcile - outstandingBalance) * 100) / 100);
+  const lateOverDeposit = lateFromDeposit > lateDepositMax + 0.005;
+  const requestedDeductions = outstandingBalance + lateFromDeposit + fuelDeficitCharge + damageCharge + cleaningCharge;
   const appliedDeductions = Math.min(availableToReconcile, requestedDeductions);
-  const calculatedRefund = Math.max(0, availableToReconcile - appliedDeductions);
+  const calculatedRefund = Math.max(0, Math.round((availableToReconcile - appliedDeductions) * 100) / 100);
   const depositRefundAmount = holdForDamage ? 0 : Math.min(availableToReconcile, Math.max(0, refundOverride ? Number(refundOverride) : calculatedRefund));
-  // Rent still owed comes out of the deposit first (as on the server); fuel, damage and cleaning take what is left.
-  const uncoveredCharges = Math.max(0, fuelDeficitCharge + damageCharge + cleaningCharge - Math.max(0, availableToReconcile - outstandingBalance));
+  // Rent still owed comes out of the deposit first (as on the server), then late days; fuel, damage and cleaning take what is left.
+  const uncoveredCharges = Math.max(0, fuelDeficitCharge + damageCharge + cleaningCharge - Math.max(0, availableToReconcile - outstandingBalance - lateFromDeposit));
+  // What the renter is asked for at the return: rent still unpaid plus late days charged to them.
+  const owedAtReturn = Math.round((outstandingBalance + lateToCharge) * 100) / 100;
   // No deposit held and no new charge to bill: a screen of "0 held, 0 returned" is not a step. Rent still owed
   // on its own is said on the signature screen, where it can be collected.
   const nothingToSettle = mode === "return" && !isSwap && availableToReconcile <= 0 && fuelDeficitCharge + damageCharge + cleaningCharge <= 0;
@@ -793,6 +816,10 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
     formData.set("paymentMethod", "cash");
     formData.set("earlyStart", early ? earlyChoice : "");
     if (late) formData.set("lateStart", lateChoice);
+    if (lateBack) {
+      formData.set("lateReturn", lateBackChoice);
+      formData.set("lateReturnAmount", String(lateBackAmount));
+    }
     formData.set("customerName", context.customer?.full_name || signedName.trim());
     formData.set("vehicleMakeModel", [context.vehicle.make, context.vehicle.model, context.vehicle.trim].filter(Boolean).join(" "));
     formData.set("vehiclePlate", context.vehicle.registration_number || "");
@@ -963,6 +990,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
       <input name="depositCleaningCharge" type="hidden" value={cleaningCharge} />
       <input name="billUncoveredCharges" type="hidden" value={billUncovered && uncoveredCharges > 0 ? "true" : ""} />
       <input name="holdDepositForDamage" type="hidden" value={holdForDamage ? "true" : ""} />
+      {lateBack ? <input name="lateReturn" type="hidden" value={lateBackChoice} /> : null}
+      {lateBack ? <input name="lateReturnAmount" type="hidden" value={lateBackAmount} /> : null}
       <input name="handoverPayLeft" type="hidden" value={payStep ? payLeft : ""} />
 
       {/* The way back sits above everything, like every other sub-page. */}
@@ -1071,10 +1100,50 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               </div>
             </fieldset>
           ) : null}
+          {lateBack ? (
+            <fieldset className="mt-5">
+              <legend className="card-subtitle">{t("lateBackHeading", { count: lateBack.days })}</legend>
+              <label className="mt-2 block">
+                <span className="text-sm font-semibold text-[var(--foreground)]">{t("lateBackCharge")}</span>
+                <span className="relative block">
+                  <span aria-hidden="true" className="pointer-events-none absolute bottom-0 left-3 flex h-11 items-center font-semibold text-[var(--foreground-secondary)]">{currencySymbol(formCurrency)}</span>
+                  <input
+                    className={`${inputClass} !pl-9 disabled:opacity-50`}
+                    disabled={lateBackChoice === "waive"}
+                    inputMode="decimal"
+                    min="0"
+                    onChange={(event) => setLateBackInput(event.target.value)}
+                    placeholder="0"
+                    step="0.01"
+                    type="number"
+                    value={lateBackChoice === "waive" ? "" : lateBackInput}
+                  />
+                </span>
+              </label>
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                {(
+                  [
+                    lateDepositFree > 0 && !depositAlreadyReturned ? { value: "deposit", label: t("lateBackFromDeposit") } : null,
+                    { value: "charge", label: t("lateBackChargeRenter") },
+                    canWaive ? { value: "waive", label: t("lateBackWaive") } : null
+                  ].filter(Boolean) as { value: LateReturnChoice; label: string }[]
+                ).map((option) => (
+                  <label className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl border px-3.5 py-2.5 text-sm font-semibold ${lateBackChoice === option.value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`} key={option.value}>
+                    <input checked={lateBackChoice === option.value} className="h-4 w-4 accent-[var(--primary)]" name="lateReturnChoice" onChange={() => setLateBackChoice(option.value)} type="radio" value={option.value} />
+                    {option.label}
+                  </label>
+                ))}
+              </div>
+              {lateOverDeposit ? <p className="mt-2 text-sm font-semibold text-[var(--danger)]">{t("lateBackOverDeposit", { amount: money(lateDepositMax) })}</p> : null}
+            </fieldset>
+          ) : null}
           {blocker ? null : (
             <button
-              className={`${touchButton} mt-5 w-full bg-[var(--primary)] text-white sm:w-auto sm:min-w-[240px] sm:px-8`}
+              className={`${touchButton} mt-5 w-full bg-[var(--primary)] text-white disabled:opacity-40 sm:w-auto sm:min-w-[240px] sm:px-8`}
+              disabled={Boolean(lateBack) && lateOverDeposit}
               onClick={() => {
+                // Late days charged to the renter are asked for with any unpaid rent on the last screen.
+                if (lateBack) setDeliveryPaymentAmount(owedAtReturn > 0 ? String(owedAtReturn) : "");
                 // Charged extra days are collected with the rent at handover (and come off again if the answer changes).
                 const add = early && earlyChoice === "charge" ? early.amount : 0;
                 if (add !== earlyAdded) {
@@ -1357,6 +1426,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
             {alreadyForfeited > 0 ? <Row label={t("alreadyForfeited")} value={`-${money(alreadyForfeited)}`} danger /> : null}
             {availableToReconcile !== depositHeld ? <Row label={t("availableToReconcile")} value={money(availableToReconcile)} /> : null}
             {outstandingBalance > 0 ? <Row label={t("outstandingBalance")} value={`-${money(outstandingBalance)}`} danger /> : null}
+            {lateFromDeposit > 0 && lateBack ? <Row label={t("lateBackRow", { count: lateBack.days })} value={`-${money(lateFromDeposit)}`} danger /> : null}
             {fuelDeficitCharge > 0 ? <Row label={t("fuelDeficitCharge")} value={`-${money(fuelDeficitCharge)}`} danger /> : null}
             {damageCharge > 0 ? <Row label={t("damageExcess")} value={`-${money(damageCharge)}`} danger /> : null}
             {cleaningCharge > 0 ? <Row label={t("cleaningFee")} value={`-${money(cleaningCharge)}`} danger /> : null}
@@ -1474,10 +1544,10 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               )}
             </div>
           ) : null}
-          {mode === "return" && !isSwap && outstandingBalance > 0 && !receiptResult ? (
+          {mode === "return" && !isSwap && owedAtReturn > 0 && !receiptResult ? (
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-4">
               <div className="min-w-0">
-                <p className="text-sm font-bold text-[var(--danger)]">{t("stillOwed", { amount: money(outstandingBalance) })}</p>
+                <p className="text-sm font-bold text-[var(--danger)]">{t("stillOwed", { amount: money(owedAtReturn) })}</p>
                 <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{t("stillOwedHint")}</p>
               </div>
               {/* The same cash boxes as the handover, so what is owed can be taken here and receipted. */}

@@ -1,8 +1,10 @@
 /*
  * RoveHQ booking box for a rental business's own website.
  *
- *   <div data-routehq-booking="your-shop"></div>
+ *   <div data-rove-booking="your-shop"></div>
  *   <script src="https://rovehq.app/embed.js" async></script>
+ *
+ * data-routehq-booking, from earlier snippets, still works.
  *
  * Optional on the div: data-lang="th" (or en, zh, ru…), data-vehicle="<vehicle id>" to open on one vehicle.
  * The box shows the business's vehicles, prices and free dates and grows to fit; booking continues on RoveHQ,
@@ -14,7 +16,7 @@
 
   function mount(box) {
     if (box.getAttribute("data-routehq-mounted")) return;
-    var slug = (box.getAttribute("data-routehq-booking") || "").trim();
+    var slug = (box.getAttribute("data-rove-booking") || box.getAttribute("data-routehq-booking") || "").trim();
     if (!/^[a-z0-9-]{2,80}$/i.test(slug)) return;
     box.setAttribute("data-routehq-mounted", "1");
     var params = new URLSearchParams({ embed: "1" });
@@ -38,7 +40,7 @@
   }
 
   function mountAll() {
-    var boxes = document.querySelectorAll("[data-routehq-booking]");
+    var boxes = document.querySelectorAll("[data-rove-booking],[data-routehq-booking]");
     for (var i = 0; i < boxes.length; i++) mount(boxes[i]);
   }
 

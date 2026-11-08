@@ -10,13 +10,16 @@ import { seasonsFrom, seasonalRate } from "@/lib/price-rules";
 import { planFor } from "@/lib/rental-estimate";
 import { busyOnOrAfter } from "@/lib/rental-conflicts";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { vehiclePhotoAddress } from "@/lib/photo-url";
 
-export type DirectorySettings = { enabled: boolean };
+/** `ask`: a new business not yet asked whether to list on rove.rent (asked once its first vehicle is in; migration 0140). */
+export type DirectorySettings = { enabled: boolean; ask: boolean };
 
 export function directorySettings(settings: unknown): DirectorySettings {
   const raw = (settings && typeof settings === "object" ? (settings as Record<string, any>).directory : null) || {};
-  // On by default (26 Oct 2026): every business is listed unless it switches it off.
-  return { enabled: raw.enabled !== false };
+  // Opt-in for new businesses (8 Nov 2026): they start with { enabled: false, ask: true }. A business from before then
+  // with no setting keeps what it had: listed unless it switched it off. Only businesses with a vehicle appear.
+  return { enabled: raw.enabled !== false, ask: raw.ask === true && raw.enabled !== true };
 }
 
 /** Every plan can be listed (26 Oct 2026); kept as one place to change if that ever becomes a plan feature again. */
@@ -147,24 +150,22 @@ export async function searchDirectory(input: DirectorySearch): Promise<Directory
   // Each vehicle's lead photo (the first in the order set on the vehicle page), as on the business's own page.
   const { data: photos } = await admin
     .from("documents")
-    .select("owner_id, storage_path, extracted_data")
+    .select("id, owner_id, storage_path, extracted_data")
     .in("owner_id", wanted.map((vehicle) => vehicle.id))
     .eq("owner_type", "vehicle")
     .eq("category", "vehicle_photo")
+    .is("deleted_at", null)
     .order("created_at", { ascending: true });
-  const leadPhoto = new Map<string, { path: string; order: number }>();
+  const leadPhoto = new Map<string, { id: string; path: string; order: number }>();
   for (const row of (photos || []) as any[]) {
     if (!row.owner_id || !row.storage_path) continue;
     const order = Number(row.extracted_data?.vehicle_photo_order ?? 9999);
     const current = leadPhoto.get(row.owner_id);
-    if (!current || order < current.order) leadPhoto.set(row.owner_id, { path: row.storage_path, order });
+    if (!current || order < current.order) leadPhoto.set(row.owner_id, { id: String(row.id), path: row.storage_path, order });
   }
+  // The stable, cacheable address (app/api/rove-photo), not a signed link that expires.
   const photoUrls = new Map<string, string>();
-  const photoPaths = [...leadPhoto.values()].map((photo) => photo.path);
-  if (photoPaths.length) {
-    const { data: signed } = await admin.storage.from("documents").createSignedUrls(photoPaths, 6 * 3600);
-    for (const row of signed || []) if (row?.path && row?.signedUrl) photoUrls.set(row.path, row.signedUrl);
-  }
+  for (const [vehicleId, photo] of leadPhoto) photoUrls.set(photo.path, vehiclePhotoAddress(vehicleId, photo.id, photo.path));
 
   const { resolveOrganizationBrandingDisplayUrls } = await import("@/lib/branding-assets");
   const businesses: DirectoryBusiness[] = [];

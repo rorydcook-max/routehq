@@ -50,6 +50,27 @@ export const YEARLY_MONTHS = 11;
 /** Partner network finder's fee: share of the first rental payment, one time. */
 export const FINDERS_FEE_PCT = 10;
 export const TRIAL_DAYS = 30;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Days left in a trial, the one count every screen shows (build-s, 8 Nov 2026). The trial end is a moment
+ * (signed up + 30 days), so right after signing up 29.9 days are left: rounding up said "30 days left" while Stripe's
+ * checkout, which rounds down, said "29 days free". Both now use whole days: this rounds to the nearest day (never 0
+ * while the trial still runs) and checkout gets that many whole days (stripeTrialEnd).
+ */
+export function trialDaysLeft(endsAt: string | null | undefined, now = Date.now()): number | null {
+  if (!endsAt) return null;
+  const left = new Date(endsAt).getTime() - now;
+  if (!Number.isFinite(left)) return null;
+  return left <= 0 ? 0 : Math.max(1, Math.round(left / DAY_MS));
+}
+
+/** The trial end sent to Stripe, in seconds: exactly trialDaysLeft() whole days from now (plus an hour, so its count never drops a day). */
+export function stripeTrialEnd(endsAt: string | null | undefined, now = Date.now()): number {
+  const days = trialDaysLeft(endsAt, now) || 0;
+  return days ? Math.floor((now + days * DAY_MS + 60 * 60 * 1000) / 1000) : 0;
+}
 export const PLANS: Plan[] = [
   { id: "free", monthly: 0, cars: 2, motorbikes: 5, extraCar: 0, extraMotorbike: 0, team: 1, documentReads: 10, comparisonLookups: 0, accountingExport: false, severalLocations: false, whiteLabel: false, customDomain: false, setupService: false, prioritySupport: false },
   { id: "starter", monthly: 490, cars: 5, motorbikes: 10, extraCar: 0, extraMotorbike: 0, team: 2, documentReads: 50, comparisonLookups: 10, accountingExport: true, severalLocations: false, whiteLabel: false, customDomain: false, setupService: false, prioritySupport: false },

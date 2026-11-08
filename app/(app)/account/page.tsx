@@ -88,7 +88,7 @@ export default async function AccountPage() {
           <form action={updatePreferredLocale} className="mt-3 space-y-3" key={`${locale}-${profile?.preferred_calendar || ""}`}>
             <label className="block">
               <span className={labelClass}>{say("language")}</span>
-              <select className={inputClass} defaultValue={locale} name="preferredLocale">
+              <select className={`${inputClass} app-select`} defaultValue={locale} name="preferredLocale">
                 {operatorLocaleOptions.map((option) => (
                   <option key={option.code} value={option.code}>
                     {option.label}
@@ -100,7 +100,7 @@ export default async function AccountPage() {
             {showCalendar ? (
               <label className="block">
                 <span className={labelClass}>{say("calendar")}</span>
-                <select className={inputClass} defaultValue={calendarNow} name="preferredCalendar">
+                <select className={`${inputClass} app-select`} defaultValue={calendarNow} name="preferredCalendar">
                   {supportedCalendarOptions.map((calendar) => (
                     <option key={calendar.code} value={calendar.code}>
                       {say(`calendar_${calendar.code}`)}
@@ -124,14 +124,18 @@ export default async function AccountPage() {
           <ThemePicker />
         </section>
 
-        <section className="card p-5">
-          <h2 className="card-title">{say("alertsTitle")}</h2>
-          <div className="mt-2">
-            <PushToggle />
-          </div>
-        </section>
+        {/* "Alerts on this device" (build-s, 8 Nov 2026): the owner has it on Settings › Notifications, so it is not repeated
+            here for them; managers and teammates can't open Settings, so this is where they switch it on. */}
+        {membership.role !== "owner" ? (
+          <section className="card p-5">
+            <h2 className="card-title">{say("alertsTitle")}</h2>
+            <div className="mt-2">
+              <PushToggle />
+            </div>
+          </section>
+        ) : null}
 
-        {/* GDPR / UK GDPR / PDPA (3 Nov 2026): the legal pages for everyone; download, ID-photo retention and delete for the owner. */}
+        {/* GDPR / UK GDPR / PDPA (3 Nov 2026): the legal pages for everyone; ID-photo retention and delete for the owner (download: Settings › Plan). */}
         <section className="card p-5" id="privacy">
           <h2 className="card-title">{privacy("title")}</h2>
           <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{privacy("body")}</p>

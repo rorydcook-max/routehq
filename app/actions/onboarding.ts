@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { ensureOnboardingChecklist, markOnboardingStep } from "@/lib/onboarding";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -220,6 +221,23 @@ export async function dismissChecklist(formData: FormData) {
   }
 
   revalidatePath("/");
+}
+
+/** Help › "Show setup steps" (build-s, 8 Nov 2026): the Get ready list hidden with its X comes back on the dashboard. */
+export async function showChecklist(formData: FormData) {
+  const { supabase } = await requireUser();
+  const organizationId = requiredString(formData, "organizationId");
+  const { data: organization, error: orgError } = await supabase.from("organizations").select("settings").eq("id", organizationId).maybeSingle();
+  if (orgError || !organization) {
+    throw new Error(orgError?.message || "Organization was not found.");
+  }
+  const { onboarding_checklist_dismissed_at: _dismissed, ...settings } = settingsObject(organization.settings);
+  const { error } = await supabase.from("organizations").update({ settings }).eq("id", organizationId);
+  if (error) {
+    throw new Error(error.message);
+  }
+  revalidatePath("/");
+  redirect("/");
 }
 
 /** "Share your booking page" on the Get ready list: ticked when they copy or share the link. */

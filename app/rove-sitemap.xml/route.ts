@@ -39,6 +39,8 @@ export async function GET() {
   }
   const entries = [
     ...page("/", "home", "1"),
+    // Every destination by region (task build-rove, 8 Nov 2026), in every language.
+    ...page("/destinations", "destinations", "0.8"),
     ...Object.keys(COUNTRIES).flatMap((country) => page(`/${country}`, "country", "0.7")),
     ...DESTINATIONS.flatMap((destination) => page(destinationPath(destination), "destination", "0.9")),
     ...page("/guides", "guides", "0.6"),

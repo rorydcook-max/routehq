@@ -13,7 +13,8 @@ import { setPageCurrency, siteLocale } from "@/lib/site/static-page";
 import { BookingPhoneMock, DashboardWindowMock, HandoverPhoneMock, ImportMock, LedgerCard, PassportCard, PaymentPhoneMock, ReturnCard, ShopPageMock, TodayPhoneMock, sampleMoney } from "../../_components/mockups";
 import { Arrow, Check, Container, Eyebrow, Plus, RICH, RICH_SERIF, SITE_LINKS, SiteLink } from "../../_components/site-ui";
 import { siteMetadata } from "@/lib/site/seo";
-import { getResource, listGuides } from "@/lib/site/content";
+import { getResource, listGuidesFor } from "@/lib/site/content";
+import { paysByQr, regionForCurrency } from "@/lib/site/region";
 import { CATEGORY_KEY, JsonLd } from "../../_components/content-ui";
 import { FinalCta } from "../../_components/final-cta";
 import s from "../../site.module.css";
@@ -23,6 +24,9 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /** The free resource the home page offers. */
 const FEATURED_RESOURCE = "rental-agreement";
+
+/** Keys with a "<key>Global" wording for visitors outside Asia, who don't pay by QR code and slip (lib/site/region.ts). */
+const GLOBAL_VARIANTS = new Set(["heroBody", "step1Body", "step3Title", "step3Body", "step3b1", "step3b2", "auto2", "auto5", "never1", "never2"]);
 
 /** The home page in a language and a currency: proxy.ts picks the visitor's currency (lib/site/internal-path.ts). */
 type Props = { params: Promise<{ locale: string; cur: string }> };
@@ -62,9 +66,14 @@ export default async function SiteHomePage({ params }: Props) {
   const TWELVE_HOUR = ["USD", "CAD", "AUD", "NZD", "PHP", "INR"];
   const summaryTime = siteTime("07:00", locale === "en" ? (TWELVE_HOUR.includes(String(currency).toUpperCase()) ? "en-US" : "en-GB") : locale);
   // The free template and the latest guides, in this language when written, else English.
-  const ownGuides = listGuides(locale);
+  // The visitor's region (from the currency in the address, lib/site/region.ts): guides about it first, and outside
+  // Asia the copy leads with online booking, agreements and transfer/Wise/Revolut payments instead of QR codes and slips.
+  const region = regionForCurrency(currency);
+  const qr = paysByQr(region);
+  const g = (key: string) => (!qr && GLOBAL_VARIANTS.has(key) ? `${key}Global` : key);
+  const ownGuides = listGuidesFor(locale, region);
   const guidesLocale = ownGuides.length ? undefined : "en";
-  const latest = (ownGuides.length ? ownGuides : listGuides("en")).slice(0, 3);
+  const latest = (ownGuides.length ? ownGuides : listGuidesFor("en", region)).slice(0, 3);
   const magnetResource = getResource(locale, FEATURED_RESOURCE);
   const magnet = magnetResource ? { resource: magnetResource, locale: undefined } : getResource("en", FEATURED_RESOURCE) ? { resource: getResource("en", FEATURED_RESOURCE)!, locale: "en" } : null;
 
@@ -81,7 +90,9 @@ export default async function SiteHomePage({ params }: Props) {
 
   // Structured data: the product with its plans in US dollars (lib/site/schema.ts), and the questions below.
   // Organization and WebSite come from the layout.
+  // How customers pay, answered for the visitor's region, after "Do my customers need an app?".
   const homeFaq = [1, 2, 3, 4, 5].map((n) => ({ q: m(`faq${n}Q`), a: m(`faq${n}A`) }));
+  homeFaq.splice(2, 0, { q: m("faqPayQ"), a: m(qr ? "faqPayAAsia" : "faqPayA") });
   const jsonLd = [softwareApplicationLd({ description: m("metaDescription"), locale }), faqLd(homeFaq)];
   // The page's one H1 says what RoveHQ is (SEO, 7 Nov 2026), set small above the headline, which stays the brand line.
   // Until a language has the new words, it uses its translated "For car, scooter and bike rental businesses".
@@ -97,7 +108,7 @@ export default async function SiteHomePage({ params }: Props) {
           <div className={s.rise}>
             <h1 className={s.eyebrow}>{heading}</h1>
             <p className={`${s.h1} mt-6`}>{m.rich("heroTitle", RICH_SERIF)}</p>
-            <p className={`${s.lede} ${s.heroBody}`}>{m("heroBody")}</p>
+            <p className={`${s.lede} ${s.heroBody}`}>{m(g("heroBody"))}</p>
             <div className={s.heroActions}>
               <SiteLink className={`${s.btn} ${s.btnLight}`} href={SITE_LINKS.signUp}>
                 {m("heroCta")}
@@ -131,7 +142,7 @@ export default async function SiteHomePage({ params }: Props) {
               {[1, 2, 3, 4, 5, 6].map((n) => (
                 <li className={s.autoItem} key={n}>
                   <Check />
-                  <span className={s.autoText}>{m(`auto${n}`)}</span>
+                  <span className={s.autoText}>{m(g(`auto${n}`))}</span>
                   <time className={s.autoTime}>{m(`auto${n}Time`)}</time>
                 </li>
               ))}
@@ -158,7 +169,7 @@ export default async function SiteHomePage({ params }: Props) {
           <ul className={s.never}>
             {[1, 2, 3, 4, 5].map((n) => (
               <li key={n}>
-                <s>{m(`never${n}`)}</s>
+                <s>{m(g(`never${n}`))}</s>
               </li>
             ))}
           </ul>
@@ -179,13 +190,13 @@ export default async function SiteHomePage({ params }: Props) {
                   <p aria-hidden="true" className={s.stepNum}>
                     {step.n}
                   </p>
-                  <h3 className={s.stepTitle}>{m(`${step.key}Title`)}</h3>
-                  <p className={`${s.body} ${s.stepBody}`}>{m(`${step.key}Body`)}</p>
+                  <h3 className={s.stepTitle}>{m(g(`${step.key}Title`))}</h3>
+                  <p className={`${s.body} ${s.stepBody}`}>{m(g(`${step.key}Body`))}</p>
                   <ul className={s.checks}>
                     {[1, 2, 3].map((b) => (
                       <li key={b}>
                         <Check />
-                        {m(`${step.key}b${b}`)}
+                        {m(g(`${step.key}b${b}`))}
                       </li>
                     ))}
                   </ul>
@@ -359,13 +370,13 @@ export default async function SiteHomePage({ params }: Props) {
             <h2 className={s.h2}>{m("faqTitle")}</h2>
             <div>
               <div className={s.faq}>
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <details className={s.faqItem} key={n}>
+                {homeFaq.map((item) => (
+                  <details className={s.faqItem} key={item.q}>
                     <summary>
-                      {m(`faq${n}Q`)}
+                      {item.q}
                       <Plus />
                     </summary>
-                    <p>{m(`faq${n}A`)}</p>
+                    <p>{item.a}</p>
                   </details>
                 ))}
               </div>

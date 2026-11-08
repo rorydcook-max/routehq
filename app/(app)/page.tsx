@@ -29,6 +29,7 @@ import { vehiclePhotoUrls } from "@/lib/vehicle-photos";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { Dot, FleetLot, InOutBars, Ring, Spark, TileHead, type LotState, type LotVehicle } from "@/components/glance";
 import { AgendaCalendar } from "@/components/agenda-calendar";
+import { weekStartFor } from "@/lib/regional";
 import { getCalendarEventsBetween, type CalendarEvent } from "@/lib/calendar";
 import { taskCalendarEvents } from "@/lib/calendar-tasks";
 import { businessCountry, distanceKey } from "@/lib/business-units";
@@ -892,7 +893,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               <PanelLink href="/calendar">{t("calendar")}</PanelLink>
             </header>
             {/* Late items are not carried into today here: the Today list below already has them, with the action to take. */}
-            <AgendaCalendar carryLate={false} covers={{ from: calendarFrom, to: calendarTo }} defaultView="week" events={calendarEvents} storageKey="routehq.dashboard.calendar" today={today} />
+            <AgendaCalendar carryLate={false} covers={{ from: calendarFrom, to: calendarTo }} defaultView="week" events={calendarEvents} storageKey="routehq.dashboard.calendar" today={today} weekStart={weekStartFor(businessCountry())} />
           </section>
 
           {/* Phones: the car park comes after the week. Computers: under Today, so a quiet day doesn't leave a big gap beside a long side column (Rory, 2 Nov 2026). */}

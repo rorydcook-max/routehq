@@ -8,13 +8,17 @@ import { CalendarDays } from "lucide-react";
 import { bookOnline } from "@/app/actions/online-booking";
 import { VehicleArt } from "@/components/vehicle-art";
 import { PhotoGallery } from "@/components/photo-gallery";
+import { AiImageLabel } from "@/components/ai-image-label";
+import { photoProps } from "@/lib/photo-url";
 import type { CatalogVehicle } from "@/lib/public-catalog";
 import { clashes } from "@/lib/booking-rules";
-import { daysBetween, headlineRate, minimumStay, planFor } from "@/lib/rental-estimate";
+import { cardRates, daysBetween, minimumStay, mostlyMonthly, planFor } from "@/lib/rental-estimate";
 import { billingPeriodAmounts } from "@/lib/payment-schedule";
 import { extrasFor, priceExtras, seasonalRate, type Extra, type Season } from "@/lib/price-rules";
 import { isTwoWheeler } from "@/lib/vehicle-groups";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
+import { phonePlaceholderFor } from "@/lib/phone";
+import { businessCountry } from "@/lib/business-units";
 
 // The app's standard 44px field: the same height on every public page.
 const inputClass = "mt-1.5 w-full text-base";
@@ -93,6 +97,7 @@ export function Catalog({
   referrer?: string | null;
 }) {
   const t = useTranslations("customer");
+  const gallery = useTranslations("gallery");
   const locale = useLocale();
   const router = useRouter();
   const [startDate, setStartDate] = useState(initialStart && initialStart >= today ? initialStart : today);
@@ -103,7 +108,8 @@ export function Catalog({
       ? initialLongTerm
       : initialEnd
         ? offer === "monthly"
-        : offer === "monthly" || offer === "both_monthly"
+        : // Offering both: Monthly only when most of the vehicles have a monthly price, else set dates (Rory, 8 Nov 2026).
+          offer === "monthly" || (offer === "both_monthly" && mostlyMonthly(vehicles))
   );
   // The dates and kind of stay as the renter sets them, for a parent that remounts this (the website's fleet "Book").
   useEffect(() => {
@@ -300,7 +306,8 @@ export function Catalog({
 
       <section className={list ? "grid gap-2.5" : tiles ? "grid grid-cols-2 items-stretch gap-3 lg:grid-cols-4" : "grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3"}>
         {rows.map(({ vehicle, free, freeFrom, openEndedClash }) => {
-          const headline = headlineRate(vehicle);
+          // The day price leads; the month (and week) on the line under it, never mixed into the headline.
+          const { headline, others } = cardRates(vehicle, offer === "monthly");
           // A monthly-only vehicle can't be booked for a weekend.
           const basePlan = planFor(vehicle, days);
           // High season: the price for these dates, not the usual one.
@@ -316,11 +323,8 @@ export function Catalog({
           const lastPart = amounts.length > 1 && amounts[amounts.length - 1] !== plan?.rate ? amounts[amounts.length - 1] : null;
           const wholePeriods = plan?.pricingModel === "daily" ? days || 0 : amounts.length - (lastPart !== null ? 1 : 0);
           const tooShort = datesReady && free && !bookable ? (longTerm ? t("notOfferedMonthly") : minimumStay(vehicle) === "Minimum 1 week" ? t("minimumOneWeek") : minimumStay(vehicle) ? t("minimumOneMonth") : null) : null;
-          const otherRates = [
-            // A business that only rents by the month does not show prices customers cannot book at.
-            offer !== "monthly" && vehicle.dailyRate > 0 && headline?.per !== "day" ? t("perDay", { rate: money(vehicle.dailyRate) }) : null,
-            offer !== "monthly" && vehicle.weeklyRate > 0 && headline?.per !== "week" ? t("perWeek", { rate: money(vehicle.weeklyRate) }) : null
-          ].filter(Boolean);
+          // A business that only rents by the month does not show prices customers cannot book at (cardRates leaves them out).
+          const otherRates = others.map((rate) => t(rate.per === "day" ? "perDay" : rate.per === "week" ? "perWeek" : "perMonth", { rate: money(rate.amount) }));
           const isOpen = openId === vehicle.id;
           const headlineKey = headline ? (headline.per === "day" ? "perDay" : headline.per === "week" ? "perWeek" : "perMonth") : null;
           // "฿11,000" big, "/ month" small: the unit is whatever the translation puts around the amount.
@@ -334,6 +338,8 @@ export function Catalog({
                 {isOpen && vehicle.photoUrls.length > 0 ? (
                   <div className="relative p-3 pb-0 sm:w-80 sm:shrink-0 sm:p-0">
                     <PhotoGallery
+                      aiLabel={gallery("aiImage")}
+                      aiPhotos={vehicle.photoAi}
                       alt={vehicle.name}
                       dimmed={!free}
                       overlay={
@@ -350,12 +356,21 @@ export function Catalog({
                 <div className={`relative bg-[var(--panel-secondary)] ${list && !isOpen ? "w-28 shrink-0 self-stretch sm:w-44" : "aspect-[4/3] w-full"} ${isOpen ? "sm:w-80 sm:shrink-0 sm:overflow-hidden sm:rounded-xl" : ""} ${!free ? "[&>div]:opacity-60 [&>img]:opacity-60" : ""}`}>
                   {vehicle.photoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img alt={vehicle.name} className={`h-full w-full object-cover ${list && !isOpen ? "absolute inset-0" : ""}`} src={vehicle.photoUrl} />
+                    <img
+                      alt={vehicle.name}
+                      className={`h-full w-full object-cover ${list && !isOpen ? "absolute inset-0" : ""}`}
+                      decoding="async"
+                      height={900}
+                      loading="lazy"
+                      width={1200}
+                      {...photoProps(vehicle.photoUrl, list ? "(min-width: 640px) 176px, 112px" : "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw", 640)}
+                    />
                   ) : (
                     <div className={`flex h-full w-full items-center justify-center ${list && !isOpen ? "absolute inset-0" : ""}`}>
                       <VehicleArt className="!h-full !w-full !rounded-none" colour={vehicle.color} kind={vehicle.kind} model={vehicle.name} size="xl" />
                     </div>
                   )}
+                  <AiImageLabel label={gallery("aiImage")} show={Boolean(vehicle.photoUrl) && vehicle.photoAi?.[0]} />
                   {!free ? (
                     // A light, neutral badge with dark ink (readable on any photo), saying until when rather than just "taken".
                     <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-[var(--foreground)] shadow-sm">
@@ -444,7 +459,7 @@ export function Catalog({
                     </label>
                     <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
                       {t("phoneOrWhatsApp")}
-                      <input autoComplete="tel" className={inputClass} inputMode="tel" name="phone" placeholder="+ ..." required />
+                      <input autoComplete="tel" className={inputClass} inputMode="tel" name="phone" placeholder={phonePlaceholderFor(businessCountry())} required />
                     </label>
                   </div>
                   {offered.length ? (

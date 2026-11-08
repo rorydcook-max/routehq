@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Camera, ImagePlus, Move, Trash2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Camera, ImagePlus, Move, Sparkles, Trash2, Undo2, X } from "lucide-react";
+import { AiPhotoTools, useAiPhotos } from "@/components/ai-photos";
 import { removeVehiclePhoto, reorderVehiclePhotos, uploadVehiclePhotos } from "@/app/actions/vehicles";
 import type { VehicleDetailDocument } from "@/lib/vehicle-detail";
 import { PhotoGallery } from "@/components/photo-gallery";
@@ -29,6 +31,16 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
   const [orderedPhotos, setOrderedPhotos] = useState(photos);
   const [isPending, startTransition] = useTransition();
   const primaryPhoto = orderedPhotos[0];
+  const router = useRouter();
+  // AI photos: generated sets and enhanced copies come back as previews; kept ones join the photos (task build-img).
+  const ai = useAiPhotos({
+    vehicleId,
+    onChanged: () => {
+      refreshVehiclePhotos();
+      router.refresh();
+    }
+  });
+  const enhanceable = orderedPhotos.filter((photo) => photo.extractedData?.ai_generated !== true && photo.extractedData?.enhanced !== true);
 
   useEffect(() => {
     setOrderedPhotos(photos);
@@ -237,6 +249,12 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
 
               {message ? <p className="mt-3 rounded-xl bg-[var(--primary-light)] px-4 py-3 font-bold text-[var(--primary)]">{message}</p> : null}
 
+              <AiPhotoTools
+                ai={ai}
+                editHref={`/fleet/${vehicleId}/edit`}
+                onEnhanceAll={enhanceable.length ? () => void ai.enhance(enhanceable.map((photo) => ({ documentId: photo.id }))) : undefined}
+              />
+
               {/* Two to a row, so most of a car's photos are on screen at once and can be dragged into order with a finger
                   or the mouse (Rory, 1 Nov 2026: dragging only worked with a mouse). Hold the arrows and move. */}
               <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -269,6 +287,35 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
                           <Trash2 size={18} />
                         </button>
                       </form>
+                      {/* AI: a generated photo says so; an enhanced one can go back to its original; any other can be enhanced. */}
+                      {photo.extractedData?.ai_generated === true ? (
+                        <span className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/55 text-white" title={ai.say("generated")}>
+                          <Sparkles aria-hidden="true" size={15} />
+                          <span className="sr-only">{ai.say("generated")}</span>
+                        </span>
+                      ) : photo.extractedData?.enhanced === true ? (
+                        <button
+                          aria-label={ai.say("revert")}
+                          className="absolute bottom-2 right-2 flex h-11 w-11 items-center justify-center rounded-full bg-white/95 text-[var(--foreground)] shadow-sm"
+                          disabled={ai.busy || ai.saving === photo.id}
+                          onClick={() => void ai.revert(photo.id)}
+                          title={ai.say("revert")}
+                          type="button"
+                        >
+                          <Undo2 size={18} />
+                        </button>
+                      ) : (
+                        <button
+                          aria-label={ai.say("enhance")}
+                          className="absolute bottom-2 right-2 flex h-11 w-11 items-center justify-center rounded-full bg-white/95 text-[var(--primary)] shadow-sm"
+                          disabled={ai.busy}
+                          onClick={() => void ai.enhance([{ documentId: photo.id }])}
+                          title={ai.say("enhance")}
+                          type="button"
+                        >
+                          <Sparkles size={18} />
+                        </button>
+                      )}
                     </div>
                     {index > 0 ? (
                       <button className="block min-h-11 w-full px-2 text-sm font-bold text-[var(--primary)]" disabled={isPending} onClick={() => makeMain(photo.id)} type="button">

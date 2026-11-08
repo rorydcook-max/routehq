@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { GUIDE_CATEGORIES, listGuides, type GuideCategory } from "@/lib/site/content";
+import { GUIDE_CATEGORIES, listGuides, listGuidesFor, type GuideCategory } from "@/lib/site/content";
+import type { SiteRegion } from "@/lib/site/region";
 import { siteMetadata } from "@/lib/site/seo";
 import { breadcrumbLd } from "@/lib/site/schema";
 import { CATEGORY_KEY, GuideCard, JsonLd } from "../_components/content-ui";
@@ -21,11 +22,13 @@ export async function guidesMetadata(category: GuideCategory | null): Promise<Me
  * The guides: a dark hero with the topics as links (/guides/category/<topic>, a real page per topic for search),
  * then the guides as cards, newest first. A language with no guides yet shows the English ones, saying so.
  */
-export async function GuidesIndex({ category }: { category: GuideCategory | null }) {
+export async function GuidesIndex({ category, region = null }: { category: GuideCategory | null; region?: SiteRegion | null }) {
   const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
-  let guides = listGuides(locale);
+  // The visitor's region first, then guides for every market (lib/site/region.ts); the plain list without a region.
+  const list = (code: string) => (region ? listGuidesFor(code, region) : listGuides(code));
+  let guides = list(locale);
   const fallback = !guides.length && locale !== "en";
-  if (fallback) guides = listGuides("en");
+  if (fallback) guides = list("en");
   const shown = category ? guides.filter((guide) => guide.category === category) : guides;
   const say = m as unknown as (key: string, values?: Record<string, string | number>) => string;
   const filters: Array<{ key: GuideCategory | null; label: string }> = [{ key: null, label: m("guidesAll") }, ...GUIDE_CATEGORIES.map((key) => ({ key, label: m(CATEGORY_KEY[key]) }))];

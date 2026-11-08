@@ -33,14 +33,28 @@ function sampleVars(draft: SiteConfig, palette: Palette) {
  * The website editor's parts (Booking page tool, Rory 7 Nov 2026): Look (template, colours, fonts), Images and
  * Sections. Text is edited by clicking it in the preview. `renderPart` draws each part (the tool folds them).
  */
-export function SiteEditorParts({ site, brandColour, vehicles, renderPart }: { site: SiteDraft; brandColour: string; vehicles: EditorVehicle[]; renderPart: (part: EditorPart) => ReactNode }) {
+export function SiteEditorParts({
+  site,
+  brandColour,
+  vehicles,
+  renderPart,
+  reviewsReady = false
+}: {
+  site: SiteDraft;
+  brandColour: string;
+  vehicles: EditorVehicle[];
+  renderPart: (part: EditorPart) => ReactNode;
+  /** The business has published reviews or a Google reviews link in Settings. */
+  reviewsReady?: boolean;
+}) {
   const say = useTranslations("siteEditor") as unknown as Say;
   const { draft, update } = site;
   const [gallery, setGallery] = useState(false);
   const template = templateDef(draft.template);
   const current = sitePalette(draft, template, brandColour);
   const font = fontPairing(draft.font, template.font);
-  const paletteName = say(`pal_${draft.palette}`);
+  // "Template colors", not a bare "Template" beside the template's own name.
+  const paletteName = say(draft.palette === "auto" ? "pal_autoSummary" : `pal_${draft.palette}`);
 
   const look = (
     <div className="space-y-6">
@@ -94,12 +108,14 @@ export function SiteEditorParts({ site, brandColour, vehicles, renderPart }: { s
     </div>
   );
 
-  const shown = draft.sections.filter((section) => section.on).length;
+  // Reviews only shows on the page once there is something to show (published reviews or a Google reviews link).
+  const reviewsShown = reviewsReady || Boolean(draft.reviewsUrl.trim());
+  const shown = draft.sections.filter((section) => section.on && (section.id !== "reviews" || reviewsShown)).length;
   return (
     <>
       {renderPart({ id: "look", title: say("look"), summary: `${say(`t_${draft.template}`)}, ${paletteName}, ${font.name}`, body: look })}
       {renderPart({ id: "images", title: say("images"), body: images })}
-      {renderPart({ id: "sections", title: say("sections"), summary: say("sectionsOn", { count: shown }), body: <SectionList site={site} vehicles={vehicles} /> })}
+      {renderPart({ id: "sections", title: say("sections"), summary: say("sectionsOn", { count: shown }), body: <SectionList reviewsShown={reviewsShown} site={site} vehicles={vehicles} /> })}
       {gallery ? <TemplateGallery current={draft.template} onClose={() => setGallery(false)} onPick={(id) => update({ template: id })} /> : null}
     </>
   );
@@ -293,7 +309,7 @@ function ImagePicker({ site, slot, label, vehicles, vars }: { site: SiteDraft; s
 }
 
 /** Sections: on or off, in order, and what each one says beyond its clickable text. */
-function SectionList({ site, vehicles }: { site: SiteDraft; vehicles: EditorVehicle[] }) {
+function SectionList({ site, vehicles, reviewsShown }: { site: SiteDraft; vehicles: EditorVehicle[]; reviewsShown: boolean }) {
   const say = useTranslations("siteEditor") as unknown as Say;
   const { draft, update } = site;
   const [open, setOpen] = useState<SectionId | null>(null);
@@ -304,7 +320,7 @@ function SectionList({ site, vehicles }: { site: SiteDraft; vehicles: EditorVehi
       sections.splice(index + by, 0, item);
       return { ...current, sections };
     });
-  const toggle = (id: SectionId) => update((current) => ({ ...current, sections: current.sections.map((section) => (section.id === id ? { ...section, on: !section.on } : section)) }));
+  const toggle = (id: SectionId) => update((current) => ({ ...current, sections: current.sections.map((section) => (section.id === id ? { ...section, on: !section.on, ...(id === "fleet" ? { set: true } : {}) } : section)) }));
 
   return (
     <ul className="space-y-2">
@@ -314,6 +330,7 @@ function SectionList({ site, vehicles }: { site: SiteDraft; vehicles: EditorVehi
       </li>
       {draft.sections.map((section, index) => {
         const isOpen = open === section.id;
+        const waiting = section.id === "reviews" && section.on && !reviewsShown;
         return (
           <li className="rounded-xl border border-[var(--border)] bg-white" key={section.id}>
             <div className="flex min-h-12 items-center gap-2 px-3 py-1.5">
@@ -325,7 +342,10 @@ function SectionList({ site, vehicles }: { site: SiteDraft; vehicles: EditorVehi
                 onChange={() => toggle(section.id)}
                 type="checkbox"
               />
-              <span className={`min-w-0 flex-1 font-semibold ${section.on ? "text-[var(--foreground)]" : "text-[var(--muted)]"}`}>{say(`s_${section.id}`)}</span>
+              <span className={`min-w-0 flex-1 font-semibold ${section.on && !waiting ? "text-[var(--foreground)]" : "text-[var(--muted)]"}`}>
+                {say(`s_${section.id}`)}
+                {waiting ? <span className="ms-2 whitespace-nowrap rounded-full bg-[var(--panel-secondary)] px-2 py-0.5 text-xs font-bold text-[var(--foreground-secondary)]">{say("noReviewsYet")}</span> : null}
+              </span>
               <button className="min-h-10 rounded-full px-3 text-sm font-bold text-[var(--primary)]" onClick={() => setOpen(isOpen ? null : section.id)} type="button">
                 {isOpen ? say("done") : say("edit")}
               </button>

@@ -2,6 +2,7 @@
 
 import { englishDateLocale } from "@/lib/i18n/customer-dates";
 import { earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
+import { ensureLateReturnCharge, lateReturnAmount, lateReturnFor } from "@/lib/late-return";
 import { applyLateStart } from "@/lib/late-start";
 import { tellRentalCustomer } from "@/lib/customer-messages";
 import { toInternationalPhone } from "@/lib/phone";
@@ -312,6 +313,16 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
     const early = earlyStartFor(booked, rates, today);
     if (early) await ensureEarlyStartCharge(supabase, { organizationId, rentalId, vehicleId, customerId: customerId || rental.customer_id || null, currency: rental.currency || "THB", today, early });
+  }
+
+  // Returned late with the late days charged to the renter: the charge is written before the cash is set against it,
+  // so it can be paid here. The form's save then finds it already there.
+  if (String(formData.get("lateReturn") || "") === "charge") {
+    const { data: booked } = await supabase.from("rentals").select("end_date, rental_rate, pricing_model, billing_interval, currency").eq("id", rentalId).eq("organization_id", organizationId).maybeSingle();
+    const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
+    const late = lateReturnFor(booked, rates, today);
+    const lateAmount = formData.has("lateReturnAmount") ? lateReturnAmount(formData.get("lateReturnAmount")) : late?.amount || 0;
+    if (late && lateAmount > 0) await ensureLateReturnCharge(supabase, { organizationId, rentalId, vehicleId, customerId: customerId || rental.customer_id || null, currency: rental.currency || "THB", today, late, amount: lateAmount, choice: "charge" });
   }
 
   // Handed over late: the missed days come off the rent (or the schedule moves) before the cash is set against it,

@@ -8,6 +8,7 @@ import { bookingAddress, canUseOwnDomain, canUseSubdomain, cleanSubdomain, rente
 import { bookingRules } from "@/lib/booking-rules";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { loadSiteRow, uploadUrls } from "@/lib/sites/data";
+import { getPublishedReviews, googleReviewUrl } from "@/lib/reviews";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { getCustomPlan } from "@/lib/custom-plan";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -46,10 +47,12 @@ export default async function BookingPagePage() {
   const priced = vehicles.filter((v) => Number(v.daily_rate) > 0 || Number(v.weekly_rate) > 0 || Number(v.monthly_rate) > 0).length;
 
   // The website: the draft being edited and what is published (booking_sites), and each vehicle's main photo for the image picker.
-  const [siteRow, photos] = await Promise.all([
+  const [siteRow, photos, publishedReviews] = await Promise.all([
     loadSiteRow(organization.id, organization.settings, vehicles.map((vehicle) => kindFromCategory(vehicle.vehicle_categories))),
-    vehiclePhotoUrls(admin, organization.id, 1).catch(() => new Map<string, string[]>())
+    vehiclePhotoUrls(admin, organization.id, 1).catch(() => new Map<string, string[]>()),
+    getPublishedReviews(organization.id, 1).catch(() => [])
   ]);
+  const reviewsReady = publishedReviews.length > 0 || Boolean(googleReviewUrl(organization.settings));
   const uploads = { ...(await uploadUrls(siteRow.published)), ...(await uploadUrls(siteRow.draft)) };
   const editorVehicles = vehicles.map((vehicle) => ({ id: vehicle.id, name: [vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" ") || "—", photoUrl: photos.get(vehicle.id)?.[0] || null }));
 
@@ -85,6 +88,7 @@ export default async function BookingPagePage() {
         uploads={uploads}
         link={bookingAddress(addressOrg).url}
         logoUrl={logoUrl}
+        reviewsReady={reviewsReady}
         signingReady={signingReady}
         slug={organization.slug}
         vehicles={{ priced, total: vehicles.length }}

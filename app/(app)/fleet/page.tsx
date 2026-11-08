@@ -22,6 +22,8 @@ import { groupVehiclesByKind, kindLabel } from "@/lib/vehicle-groups";
 import { dateFormat } from "@/lib/i18n/dates";
 import { businessDistanceUnit } from "@/lib/business-units";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { directorySettings } from "@/lib/directory";
+import { RoveListingPrompt } from "@/components/rove-listing-prompt";
 
 const statusTone = {
   Rented: "blue",
@@ -434,6 +436,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
           </section>
         ))}
       </div>
+      {/* A new business's first vehicle is in (the Add vehicle form lands here): ask once about rove.rent. */}
+      {isOwner && vehicles.length > 0 && directorySettings(organization.settings).ask ? <RoveListingPrompt /> : null}
     </AppShell>
   );
 }

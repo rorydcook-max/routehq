@@ -1,5 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { VehicleArt } from "@/components/vehicle-art";
+import { AiImageLabel } from "@/components/ai-image-label";
+import { photoProps, PHOTO_ROUTE } from "@/lib/photo-url";
 import type { Quote, RoveVehicle, Stay } from "@/lib/rove/market";
 import { roveHref } from "@/lib/rove/paths";
 import { roveDate, roveMoney } from "@/lib/rove/static";
@@ -35,13 +37,52 @@ export function vehicleHref(vehicle: RoveVehicle, stay: Stay, locale: string) {
   return `${roveHref(`/vehicles/${vehicle.id}`, locale)}${query ? `?${query}` : ""}`;
 }
 
-export function VehiclePhoto({ vehicle, index = 0, eager = false }: { vehicle: RoveVehicle; index?: number; eager?: boolean }) {
-  if (vehicle.photoCount > index) {
-    // A stable address that always hands out a fresh signed link (app/api/rove-photo), so cached pages keep working.
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img alt={`${vehicle.name}${vehicle.year ? ` ${vehicle.year}` : ""}`} decoding="async" loading={eager ? "eager" : "lazy"} src={`/api/rove-photo/${vehicle.id}/${index}`} />;
+/** A listed vehicle's nth photo at its stable address (app/api/rove-photo), or null when it has none. */
+export function vehiclePhotoUrl(vehicle: Pick<RoveVehicle, "id" | "photoCount"> & { photos?: string[] }, index = 0) {
+  // The photo's own address (cached for a year, changes when the photo does); the nth-photo address as a fallback.
+  return vehicle.photoCount > index ? vehicle.photos?.[index] || `${PHOTO_ROUTE}${vehicle.id}/${index}` : null;
+}
+
+export function VehiclePhoto({ vehicle, index = 0, eager = false, sizes = "(min-width: 960px) 360px, 100vw", aiLabel }: { vehicle: RoveVehicle; index?: number; eager?: boolean; sizes?: string; aiLabel?: string }) {
+  const url = vehiclePhotoUrl(vehicle, index);
+  if (url) {
+    // A stable address, resized to the slot (lib/photo-url.ts), so cached pages keep working and phones load less.
+    // `aiLabel` (gallery.aiImage) marks a photo AI made (components/ai-image-label.tsx).
+    return (
+      <>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img alt={`${vehicle.name}${vehicle.year ? ` ${vehicle.year}` : ""}`} decoding="async" fetchPriority={eager ? "high" : undefined} height={900} loading={eager ? "eager" : "lazy"} width={1200} {...photoProps(url, sizes)} />
+        {aiLabel ? <AiImageLabel label={aiLabel} show={vehicle.photoAi?.[index]} /> : null}
+      </>
+    );
   }
   return <VehicleArt className="!absolute !inset-0 !h-full !w-full !rounded-none" colour={vehicle.color || ""} kind={vehicle.kind as any} model={vehicle.name} size="xl" />;
+}
+
+/** The key facts as short icon-led items: kind, seats, gearbox, engine (two-wheelers), year. */
+export async function vehicleFacts(vehicle: RoveVehicle) {
+  const t = await getTranslations("directory");
+  return [
+    { icon: vehicle.kind === "car" || vehicle.kind === "van" || vehicle.kind === "other" ? "ti-car" : "ti-motorbike", text: t(`kind_${vehicle.kind === "other" ? "car" : vehicle.kind}`) },
+    vehicle.seats ? { icon: "ti-users", text: t("seats", { count: vehicle.seats }) } : null,
+    vehicle.gearbox ? { icon: "ti-manual-gearbox", text: t(`rv.gearbox_${vehicle.gearbox}`) } : null,
+    vehicle.engineCc && vehicle.kind !== "car" ? { icon: "ti-engine", text: `${vehicle.engineCc} cc` } : null,
+    vehicle.year ? { icon: "ti-calendar", text: String(vehicle.year) } : null
+  ].filter(Boolean) as Array<{ icon: string; text: string }>;
+}
+
+/** The business as a small mark: its logo, else its initial. */
+export function OperatorMark({ name, logoUrl }: { name: string; logoUrl: string | null }) {
+  return (
+    <span aria-hidden="true" className={s.opMark}>
+      {logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img alt="" loading="lazy" src={logoUrl} />
+      ) : (
+        name.trim().charAt(0).toUpperCase()
+      )}
+    </span>
+  );
 }
 
 export async function VehicleCard({
@@ -52,7 +93,8 @@ export async function VehicleCard({
   freeFrom,
   stay,
   locale,
-  eager = false
+  eager = false,
+  layout = "list"
 }: {
   vehicle: RoveVehicle;
   quote: Quote;
@@ -62,63 +104,89 @@ export async function VehicleCard({
   stay: Stay;
   locale: string;
   eager?: boolean;
+  layout?: "list" | "grid";
 }) {
   const t = await getTranslations("directory");
+  const gallery = await getTranslations("gallery");
   const money = (value: number) => roveMoney(value, vehicle.business.currency, locale);
-  const facts = [
-    t(`kind_${vehicle.kind === "other" ? "car" : vehicle.kind}`),
-    vehicle.seats ? t("seats", { count: vehicle.seats }) : null,
-    vehicle.gearbox ? t(`rv.gearbox_${vehicle.gearbox}`) : null,
-    vehicle.engineCc && vehicle.kind !== "car" ? `${vehicle.engineCc} cc` : null,
-    vehicle.year ? String(vehicle.year) : null
-  ].filter(Boolean) as string[];
+  const facts = await vehicleFacts(vehicle);
   const href = vehicleHref(vehicle, stay, locale);
+  const town = vehicle.business.town || vehicle.business.region;
+  // The headline price: the exact total for set dates, else the rate for the period asked (or the business's lead rate).
+  const showTotal = quote.total !== null;
+  const lead = showTotal ? money(quote.total as number) : money(quote.rate);
+  const leadUnit = showTotal ? t("rv.totalFor", { count: quote.days || 0 }) : t(`per_${quote.model}`);
+  // A second line: the monthly rate when the lead isn't monthly (long stays are Rove's thing), else the daily one.
+  const second =
+    quote.model !== "monthly" && vehicle.monthlyRate > 0
+      ? t("rv.orMonthly", { amount: money(vehicle.monthlyRate) })
+      : quote.model === "monthly" && vehicle.dailyRate > 0
+        ? t("rv.orDaily", { amount: money(vehicle.dailyRate) })
+        : null;
+
   return (
-    <article className={s.result}>
-      <a aria-hidden="true" className={s.resultPhoto} href={href} tabIndex={-1}>
-        <VehiclePhoto eager={eager} vehicle={vehicle} />
+    <article className={layout === "grid" ? s.cardTile : s.card}>
+      <a aria-hidden="true" className={s.cardPhoto} href={href} tabIndex={-1}>
+        <VehiclePhoto aiLabel={gallery("aiImage")} eager={eager} sizes={layout === "grid" ? "(min-width: 1100px) 300px, (min-width: 640px) 45vw, 90vw" : "(min-width: 960px) 320px, (min-width: 640px) 40vw, 100vw"} vehicle={vehicle} />
+        <span className={s.cardTags}>
+          {delivers ? (
+            <span className={s.tagDelivery}>
+              <i aria-hidden="true" className="ti ti-truck-delivery" /> {km !== null ? t("rv.deliversHere") : t("rv.delivers")}
+            </span>
+          ) : null}
+          {vehicle.monthlyRate > 0 ? <span className={s.tagMonthly}>{t("rv.monthlyTag")}</span> : null}
+        </span>
       </a>
-      <div className={s.resultBody}>
-        <div>
-          <h3 className={s.resultName}>
-            <a href={href}>{vehicle.name}</a>
+      <div className={s.cardBody}>
+        <div className={s.cardMain}>
+          <h3 className={s.cardTitle}>
+            <a href={href}>
+              {vehicle.name}
+              {vehicle.year ? <span className={s.cardYear}> {vehicle.year}</span> : null}
+            </a>
           </h3>
           <ul className={s.facts}>
-            {facts.map((fact) => (
-              <li key={fact}>{fact}</li>
-            ))}
+            {facts
+              .filter((fact) => fact.text !== String(vehicle.year))
+              .map((fact) => (
+                <li key={fact.text}>
+                  <i aria-hidden="true" className={`ti ${fact.icon}`} />
+                  {fact.text}
+                </li>
+              ))}
           </ul>
           <p className={s.operator}>
-            {t("rv.fromBusiness", { business: vehicle.business.name, town: vehicle.business.town || vehicle.business.region })}
-            {km !== null ? <span className={s.muted}> {t("rv.kmAway", { km: km < 1 ? "<1" : String(Math.round(km)) })}</span> : null}
-          </p>
-          <div className={s.badges}>
-            {delivers ? (
-              <span className={s.badgeDelivery}>
-                <i aria-hidden="true" className="ti ti-truck-delivery" /> {km !== null ? t("rv.deliversHere") : t("rv.delivers")}
+            <OperatorMark logoUrl={vehicle.business.logoUrl} name={vehicle.business.name} />
+            <span>
+              <span className={s.operatorName}>{vehicle.business.name}</span>
+              <span className={s.operatorTown}>
+                {town}
+                {km !== null ? ` ${t("rv.kmAway", { km: km < 1 ? "<1" : String(Math.round(km)) })}` : ""}
               </span>
-            ) : null}
-            {freeFrom ? <span className={s.badge}>{t("rv.freeFrom", { date: roveDate(freeFrom, locale) })}</span> : null}
-            {quote.seasonal ? <span className={s.badge}>{t("rv.seasonPrice")}</span> : null}
-          </div>
+            </span>
+          </p>
+          {freeFrom || quote.seasonal ? (
+            <p className={s.cardNotes}>
+              {freeFrom ? <span>{t("rv.freeFrom", { date: roveDate(freeFrom, locale) })}</span> : null}
+              {quote.seasonal ? <span>{t("rv.seasonPrice")}</span> : null}
+            </p>
+          ) : null}
         </div>
-        <div className={s.priceBox}>
-          {quote.total !== null ? (
-            <>
-              <span className={s.price}>{money(quote.total)}</span>
-              <span className={s.priceUnit}>{t("rv.totalFor", { count: quote.days || 0 })}</span>
-              <span className={`${s.small} ${s.muted}`}>{t("rv.ratePer", { amount: money(quote.rate), per: t(`per_${quote.model}`) })}</span>
-            </>
-          ) : (
-            <>
-              <span className={s.price}>{money(quote.rate)}</span>
-              <span className={s.priceUnit}>{t(`per_${quote.model}`)}</span>
-            </>
-          )}
-          <span className={`${s.small} ${s.muted}`}>{vehicle.deposit > 0 ? t("deposit", { amount: money(vehicle.deposit) }) : t("noDeposit")}</span>
-          <a className={s.button} href={bookingHref(vehicle, stay)}>
-            {t("book")}
-          </a>
+        <div className={s.cardPrice}>
+          <p className={s.priceLine}>
+            <span className={s.price}>{lead}</span>
+            <span className={s.priceUnit}>{leadUnit}</span>
+          </p>
+          {showTotal ? <p className={s.priceSub}>{t("rv.ratePer", { amount: money(quote.rate), per: t(`per_${quote.model}`) })}</p> : second ? <p className={s.priceSub}>{second}</p> : null}
+          <p className={s.priceSub}>{vehicle.deposit > 0 ? t("deposit", { amount: money(vehicle.deposit) }) : t("noDeposit")}</p>
+          <div className={s.cardActions}>
+            <a className={s.btnQuiet} href={href}>
+              {t("rv.viewDetails")}
+            </a>
+            <a className={s.btn} href={bookingHref(vehicle, stay)}>
+              {t("book")}
+            </a>
+          </div>
         </div>
       </div>
     </article>

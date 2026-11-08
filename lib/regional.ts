@@ -9,6 +9,8 @@
  * Distances are stored as typed, in the business's unit: nothing is converted when the unit changes.
  */
 
+import { WORLD_COUNTRIES, worldCountry } from "@/lib/world-countries";
+
 export type DistanceUnit = "km" | "mi";
 
 export type CountryInfo = {
@@ -68,7 +70,21 @@ export const COUNTRIES: CountryInfo[] = [
 ];
 
 const BY_CODE = new Map(COUNTRIES.map((country) => [country.code, country]));
+const englishNames = (() => {
+  try {
+    return new Intl.DisplayNames(["en"], { type: "region" });
+  } catch {
+    return null;
+  }
+})();
+/** A country's English name ("Australia"), as setup saves it; the code when the runtime has no names. */
+export function englishCountryName(code: string): string {
+  return BY_CODE.get(code)?.name || englishNames?.of(code) || code;
+}
+/** Every country code (build-s, 8 Nov 2026): setup and Settings offer them all, not only the ones in COUNTRIES. */
+export const ALL_COUNTRY_CODES: string[] = WORLD_COUNTRIES.map((country) => country.code);
 const BY_NAME: Record<string, string> = {
+  ...Object.fromEntries(WORLD_COUNTRIES.map((country) => [englishCountryName(country.code).toLowerCase(), country.code])),
   ...Object.fromEntries(COUNTRIES.map((country) => [country.name.toLowerCase(), country.code])),
   uk: "GB", "great britain": "GB", britain: "GB", england: "GB", scotland: "GB", wales: "GB", "northern ireland": "GB",
   "united kingdom of great britain and northern ireland": "GB", "republic of ireland": "IE", eire: "IE", éire: "IE",
@@ -87,8 +103,54 @@ export function toCountryCode(value: unknown): string {
   return BY_NAME[text.toLowerCase()] || "";
 }
 
+/**
+ * The country's details: the table above where it has one, else the world list (lib/world-countries.ts) with no VAT
+ * set (the owner adds theirs). Null only for an unknown code.
+ */
 export function countryInfo(value: unknown): CountryInfo | null {
-  return BY_CODE.get(toCountryCode(value)) || null;
+  const code = toCountryCode(value);
+  const known = BY_CODE.get(code);
+  if (known) return known;
+  const world = worldCountry(code);
+  if (!world) return null;
+  return { code, name: englishCountryName(code), currency: world.currency, zones: world.zones, unit: world.unit, vat: 0 };
+}
+
+/** Every time zone a business in this country can pick: the usual ones first, then the rest of the country's. */
+export function zonesFor(country: unknown): string[] {
+  const code = toCountryCode(country);
+  return Array.from(new Set([...(BY_CODE.get(code)?.zones || []), ...(worldCountry(code)?.zones || [])]));
+}
+
+/**
+ * The first day of the week for a country, 0 Sunday to 6 Saturday (build-s, 8 Nov 2026): Monday unless the country
+ * starts on another day (the US, Canada, Thailand... on Sunday). Intl.Locale's weekInfo where the runtime has it,
+ * else the same CLDR data from the world list, so the server and every browser agree.
+ */
+export function weekStartFor(country: unknown): number {
+  const code = toCountryCode(country);
+  if (!code) return 1;
+  try {
+    const locale = new Intl.Locale(`und-${code}`) as Intl.Locale & { getWeekInfo?: () => { firstDay: number }; weekInfo?: { firstDay: number } };
+    const info = typeof locale.getWeekInfo === "function" ? locale.getWeekInfo() : locale.weekInfo;
+    // Intl counts 1 Monday to 7 Sunday.
+    if (info && Number.isFinite(info.firstDay)) return info.firstDay % 7;
+  } catch {
+    // fall through
+  }
+  // No weekInfo here (Firefox): the same CLDR data, from the world list.
+  return worldCountry(code)?.firstDay ?? 1;
+}
+
+/** Every ISO 4217 currency the runtime knows, alphabetical (the world list's when Intl can't say). */
+export function allCurrencies(): string[] {
+  try {
+    const listed = (Intl as unknown as { supportedValuesOf?: (key: string) => string[] }).supportedValuesOf?.("currency");
+    if (listed?.length) return Array.from(new Set([...listed, ...WORLD_COUNTRIES.map((country) => country.currency)])).sort();
+  } catch {
+    // fall through
+  }
+  return Array.from(new Set(WORLD_COUNTRIES.map((country) => country.currency))).sort();
 }
 
 /**
@@ -111,8 +173,8 @@ export function distanceUnitFor(organization: any): DistanceUnit {
 
 /** The time zone a business in this country (and, for Spain and Portugal, region) normally uses. */
 export function defaultTimeZone(country: unknown): string {
-  // No country chosen yet: UTC, not Bangkok.
-  return countryInfo(country)?.zones[0] || (toCountryCode(country) ? "Asia/Bangkok" : "UTC");
+  // No country chosen yet, or one with no time zone of its own: UTC, not Bangkok.
+  return countryInfo(country)?.zones[0] || "UTC";
 }
 
 export function defaultCurrency(country: unknown): string {

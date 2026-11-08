@@ -20,7 +20,7 @@ import type { Destination } from "@/lib/rove/destinations";
  * expired holds released, booked and held dates, gap days, lead time, high seasons, VAT; the price for a stay worked
  * out exactly as the booking page charges it). So a price shown on Rove is the price the booking page then asks.
  *
- * Listed = directory on (settings.directory.enabled, on by default; test accounts are switched off) AND the online
+ * Listed = directory on (settings.directory.enabled: opt-in for businesses new since 8 Nov 2026, see lib/directory.ts) AND the online
  * booking page on, with at least one priced vehicle. Nothing here is invented: no listings, prices or ratings that
  * don't come from a listed business.
  */
@@ -58,6 +58,9 @@ export type RoveVehicle = {
   engineCc: number | null;
   fuel: string | null;
   photoCount: number;
+  /** Its photos at their stable, cacheable address (lib/photo-url.ts), main first; and which ones AI made. */
+  photos: string[];
+  photoAi: boolean[];
   dailyRate: number;
   weeklyRate: number;
   monthlyRate: number;
@@ -147,6 +150,8 @@ async function loadMarketUncached(): Promise<{ businesses: RoveBusiness[]; vehic
         engineCc: engineCcOf(specs),
         fuel: specs.fuel_type ? String(specs.fuel_type) : null,
         photoCount: vehicle.photoUrls.length,
+        photos: vehicle.photoUrls,
+        photoAi: vehicle.photoAi || [],
         dailyRate: vehicle.dailyRate,
         weeklyRate: vehicle.weeklyRate,
         monthlyRate: vehicle.monthlyRate,

@@ -13,6 +13,8 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getAvailability, getCalendarEventsBetween } from "@/lib/calendar";
 import { taskCalendarEvents } from "@/lib/calendar-tasks";
 import { AgendaCalendar, type AgendaView } from "@/components/agenda-calendar";
+import { businessCountry } from "@/lib/business-units";
+import { weekStartFor } from "@/lib/regional";
 import { getDefaultOrganization } from "@/lib/organization";
 import { getTaskList } from "@/lib/tasks";
 import { AvailabilityView } from "./availability-view";
@@ -98,6 +100,7 @@ export default async function CalendarPage({
             <AgendaCalendar
               autoLoad
               roomy
+              weekStart={weekStartFor(businessCountry())}
               covers={covers}
               defaultView={(["day", "week", "month", "custom"].includes(String(params.v)) ? params.v : "month") as AgendaView}
               events={[

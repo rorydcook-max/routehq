@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ChevronRight, MessageCircle } from "lucide-react";
+import { ChevronRight, ListChecks, MessageCircle } from "lucide-react";
+import { showChecklist } from "@/app/actions/onboarding";
 import { AppShell } from "@/components/app-shell";
 import { OpenChatButton } from "@/components/chat/open-chat-button";
 import { PageBand } from "@/components/page-band";
@@ -66,6 +67,17 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
           </div>
           <OpenChatButton className="primary-action pressable shrink-0 justify-center" label={t("liveButton")} />
         </section>
+
+        {/* The dashboard's setup steps, hidden with their X: brought back from here (build-s, 8 Nov 2026). */}
+        {org.settings?.onboarding_checklist_dismissed_at ? (
+          <form action={showChecklist}>
+            <input name="organizationId" type="hidden" value={organization.id} />
+            <button className="pressable inline-flex min-h-11 items-center gap-2 rounded-full px-1 font-bold text-[var(--primary)]" type="submit">
+              <ListChecks size={18} />
+              {t("showSetup")}
+            </button>
+          </form>
+        ) : null}
 
         {guides.length ? (
           <section className="card p-5" id="guides">

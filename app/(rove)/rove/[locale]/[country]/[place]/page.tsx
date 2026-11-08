@@ -5,13 +5,15 @@ import { COUNTRIES, DESTINATIONS, destinationPath, findDestination } from "@/lib
 import { GUIDES } from "@/lib/rove/guides";
 import { quoteFor, reachFrom, roveToday, statsFor, vehiclesIn, nextFree } from "@/lib/rove/market";
 import { roveHref } from "@/lib/rove/paths";
-import { itemListLd, roveHqSite, roveMetadata } from "@/lib/rove/seo";
+import { itemListLd, roveHqSite, roveMetadata, roveOrigin } from "@/lib/rove/seo";
 import { roveLocale, roveMoney } from "@/lib/rove/static";
+import { sizedPhoto } from "@/lib/photo-url";
 import { Breadcrumbs } from "../../_components/breadcrumbs";
 import { CountryRulesList, SourceList } from "../../_components/country-rules";
 import { JsonLd } from "../../_components/json-ld";
+import { PlaceArt, placePhoto } from "../../_components/place-art";
 import { SearchForm } from "../../_components/search-form";
-import { VehicleCard } from "../../_components/vehicle-card";
+import { VehicleCard, vehiclePhotoUrl } from "../../_components/vehicle-card";
 import { searchWords } from "../../_components/words";
 import s from "../../rove.module.css";
 
@@ -34,11 +36,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const destination = findDestination(country, place);
   if (!destination) return {};
   const t = await getTranslations("directory");
-  const stats = statsFor(await vehiclesIn(destination));
+  const vehicles = await vehiclesIn(destination);
+  const stats = statsFor(vehicles);
   const description = stats.vehicleCount
     ? t("rv.destDescriptionLive", { place: destination.name, count: stats.vehicleCount, businesses: stats.businesses.length })
     : t("rv.destDescriptionGuide", { place: destination.name });
-  return roveMetadata({ title: t("rv.destMetaTitle", { place: destination.name }), description, path: destinationPath(destination), locale, section: "destination", ogTitle: t("rv.destTitle", { place: destination.name }) });
+  // Share picture: the place's own photo, else a listed vehicle there, else the drawn card (app/api/rove-og).
+  const own = placePhoto(destination.slug);
+  const withPhoto = vehicles.find((vehicle) => vehicle.photoCount > 0);
+  const image = own ? `${roveOrigin()}${own}` : null;
+  // A place with no live listings yet is followed but not indexed (thin for search; its rules are on the country page).
+  return roveMetadata({
+    title: t("rv.destMetaTitle", { place: destination.name }),
+    description,
+    path: destinationPath(destination),
+    locale,
+    section: "destination",
+    ogTitle: t("rv.destTitle", { place: destination.name }),
+    image: image || (withPhoto ? absolutePhoto(vehiclePhotoUrl(withPhoto)) : null),
+    noindex: stats.vehicleCount === 0
+  });
+}
+
+/** A listed vehicle's photo as a JPEG for link previews (some apps don't show WebP). */
+function absolutePhoto(url: string | null) {
+  return url ? `${roveOrigin()}${sizedPhoto(url, 1280, "jpg")}` : null;
 }
 
 export default async function DestinationPage({ params }: Props) {
@@ -59,13 +81,15 @@ export default async function DestinationPage({ params }: Props) {
   // Price ranges in the listed businesses' own currency (only shown when there are listings).
   const money = (value: number) => roveMoney(value, stats.currency || "USD", locale);
   const path = destinationPath(destination);
+  const heroPhoto = vehicles.find((vehicle) => vehicle.photoCount > 0);
   // The same country's other places first, then the worldwide set.
   const others = [
     ...DESTINATIONS.filter((other) => other !== destination && other.country === destination.country),
     ...DESTINATIONS.filter((other) => other.country !== destination.country && other.featured)
-  ].slice(0, 12);
+  ].slice(0, 10);
   // Guides about this place, plus the two that apply everywhere (permits, insurance).
   const guides = GUIDES.filter((guide) => guide.related.includes(`${destination.country}/${destination.slug}`) || guide.slug === "do-i-need-an-international-driving-permit" || guide.slug === "car-rental-insurance-explained");
+  const range = (min: number, max: number, key: "rangeDay" | "rangeMonth", per: "per_daily" | "per_monthly") => (min === max ? t("rv.ratePer", { amount: money(min), per: t(per) }) : t(`rv.${key}`, { min: money(min), max: money(max) }));
 
   return (
     <div className={s.wrap}>
@@ -79,47 +103,14 @@ export default async function DestinationPage({ params }: Props) {
         locale={locale}
       />
       {listed.length ? <JsonLd data={itemListLd(t("rv.destTitle", { place: destination.name }), listed.slice(0, 30).map((row) => ({ name: row.vehicle.name, path: `/vehicles/${row.vehicle.id}` })), locale)} /> : null}
-      <header className={s.pageHead}>
+
+      <header className={s.placeHero}>
+        <PlaceArt destination={destination} eager sizes="(min-width: 1240px) 1184px, 100vw" vehiclePhoto={heroPhoto ? vehiclePhotoUrl(heroPhoto) : null} />
+        <p className={s.placeHeroKicker}>{rules.name}</p>
         <h1 className={s.pageTitle}>{t("rv.destTitle", { place: destination.name })}</h1>
         <p className={s.pageLede}>{destination.intro}</p>
-        {stats.vehicleCount ? (
-          <div className={s.stats}>
-            <span className={s.stat}>
-              <strong>{t("rv.vehicleCount", { count: stats.vehicleCount })}</strong>
-              {t("rv.fromBusinesses", { count: stats.businesses.length })}
-            </span>
-            {stats.ranges.map((range) =>
-              range.daily || range.monthly ? (
-                <span className={s.stat} key={range.kind}>
-                  <strong>{t(`kind_${range.kind === "other" ? "car" : range.kind}`)}</strong>
-                  {[
-                    range.daily
-                      ? range.daily.min === range.daily.max
-                        ? t("rv.ratePer", { amount: money(range.daily.min), per: t("per_daily") })
-                        : t("rv.rangeDay", { min: money(range.daily.min), max: money(range.daily.max) })
-                      : null,
-                    range.monthly
-                      ? range.monthly.min === range.monthly.max
-                        ? t("rv.ratePer", { amount: money(range.monthly.min), per: t("per_monthly") })
-                        : t("rv.rangeMonth", { min: money(range.monthly.min), max: money(range.monthly.max) })
-                      : null
-                  ]
-                    .filter(Boolean)
-                    .join(", ")}
-                </span>
-              ) : null
-            )}
-            {stats.deposits ? (
-              <span className={s.stat}>
-                <strong>{t("rv.depositLabel")}</strong>
-                {stats.deposits.min === stats.deposits.max ? money(stats.deposits.min) : t("rv.rangePlain", { min: money(stats.deposits.min), max: money(stats.deposits.max) })}
-              </span>
-            ) : null}
-          </div>
-        ) : null}
       </header>
-
-      <div style={{ marginTop: 22 }}>
+      <div className={s.placeSearch}>
         <SearchForm
           action={roveHref("/search", locale)}
           initial={{ place: destination.name, lat: destination.center.lat, lng: destination.center.lng, from: "", to: "", kind: "", monthly: false }}
@@ -128,37 +119,69 @@ export default async function DestinationPage({ params }: Props) {
         />
       </div>
 
-      <section className={s.sectionTight}>
-        <h2 className={s.sectionTitle}>{t("rv.destListTitle", { place: destination.name })}</h2>
-        {listed.length ? (
-          <>
-            <p className={s.sectionLede}>{t("rv.destListLede")}</p>
-            <div className={s.resultList}>
-              {listed.map((row, index) => (
-                <VehicleCard delivers={Boolean(row.reach?.delivers)} eager={index < 2} freeFrom={row.next && row.next !== "open" ? row.next : null} key={row.vehicle.id} km={null} locale={locale} quote={row.quote!} stay={stay} vehicle={row.vehicle} />
-              ))}
+      {stats.vehicleCount ? (
+        <dl className={s.figures}>
+          <div className={s.figure}>
+            <dt>{t("rv.figureListings")}</dt>
+            <dd>{t("rv.vehicleCount", { count: stats.vehicleCount })}</dd>
+          </div>
+          <div className={s.figure}>
+            <dt>{t("rv.figureBusinesses")}</dt>
+            <dd>{stats.businesses.length}</dd>
+          </div>
+          {stats.ranges.map((row) =>
+            row.daily || row.monthly ? (
+              <div className={s.figure} key={row.kind}>
+                <dt>{t(`kind_${row.kind === "other" ? "car" : row.kind}`)}</dt>
+                <dd>
+                  {[row.daily ? range(row.daily.min, row.daily.max, "rangeDay", "per_daily") : null, row.monthly ? range(row.monthly.min, row.monthly.max, "rangeMonth", "per_monthly") : null].filter(Boolean).join(", ")}
+                </dd>
+              </div>
+            ) : null
+          )}
+          {stats.deposits ? (
+            <div className={s.figure}>
+              <dt>{t("rv.depositLabel")}</dt>
+              <dd>{stats.deposits.min === stats.deposits.max ? money(stats.deposits.min) : t("rv.rangePlain", { min: money(stats.deposits.min), max: money(stats.deposits.max) })}</dd>
             </div>
-          </>
+          ) : null}
+        </dl>
+      ) : null}
+
+      <section className={s.sectionTight} style={{ paddingTop: 48 }}>
+        <div className={s.sectionHead} style={{ marginBottom: 8 }}>
+          <div>
+            <h2 className={s.sectionTitle}>{t("rv.destListTitle", { place: destination.name })}</h2>
+            {listed.length ? <p className={s.sectionLede}>{t("rv.destListLede")}</p> : null}
+          </div>
+        </div>
+        {listed.length ? (
+          <div className={s.resultList}>
+            {listed.map((row, index) => (
+              <VehicleCard delivers={Boolean(row.reach?.delivers)} eager={index < 1} freeFrom={row.next && row.next !== "open" ? row.next : null} key={row.vehicle.id} km={null} locale={locale} quote={row.quote!} stay={stay} vehicle={row.vehicle} />
+            ))}
+          </div>
         ) : (
           <div className={s.tellBox} style={{ marginTop: 16 }}>
-            <h3 className={s.h3}>{t("rv.tellTitle")}</h3>
-            <p className={s.muted} style={{ margin: "8px 0 16px", maxWidth: "60ch" }}>
-              {t("rv.tellBody", { place: destination.name })}
-            </p>
-            <a className={s.buttonGhost} href={`${roveHqSite()}/?utm_source=rove.rent&utm_medium=referral&utm_campaign=tell_a_business`}>
+            <span aria-hidden="true" className={s.emptyIcon}>
+              <i className="ti ti-building-store" />
+            </span>
+            <h3 className={s.emptyTitle}>{t("rv.tellTitle")}</h3>
+            <p className={s.emptyBody}>{t("rv.tellBody", { place: destination.name })}</p>
+            <a className={s.btnQuiet} href={`${roveHqSite()}/?utm_source=rove.rent&utm_medium=referral&utm_campaign=tell_a_business`}>
               {t("rv.tellButton")}
             </a>
           </div>
         )}
       </section>
 
-      <div className={s.guideGrid}>
+      <div className={s.guideGrid} style={{ paddingTop: 40 }}>
         <section>
           <h2 className={s.sectionTitle}>{t("rv.guideTitle", { place: destination.name })}</h2>
-          <div lang="en" style={{ marginTop: 18 }}>
+          <div lang="en" style={{ marginTop: 24 }}>
             <div className={s.rule}>
-              <h3 className={s.h3} style={{ fontSize: 19 }}>
-                {t("rv.gettingAround")}
+              <h3 className={s.h3} style={{ fontSize: 18 }}>
+                {t("rv.gettingAroundIn", { place: destination.name })}
               </h3>
               <ul>
                 {destination.gettingAround.map((item) => (
@@ -167,8 +190,8 @@ export default async function DestinationPage({ params }: Props) {
               </ul>
             </div>
             <div className={s.rule}>
-              <h3 className={s.h3} style={{ fontSize: 19 }}>
-                {t("rv.whenMonthlyTitle")}
+              <h3 className={s.h3} style={{ fontSize: 18 }}>
+                {t("rv.dailyMonthlyTitle")}
               </h3>
               <ul>
                 <li>{destination.monthly}</li>
@@ -184,13 +207,16 @@ export default async function DestinationPage({ params }: Props) {
               </ul>
             </div>
           </div>
+          <h2 className={s.h3} style={{ margin: "40px 0 4px" }}>
+            {t("rv.countryRulesTitle", { country: rules.name })}
+          </h2>
           <CountryRulesList rules={rules} />
           <SourceList checked={CHECKED} sources={[...destination.sources, ...rules.sources]} />
         </section>
         <aside className={s.aside}>
           {guides.length ? (
             <div className={s.asideCard}>
-              <p style={{ margin: 0, fontWeight: 700 }}>{t("rv.guidesTitle")}</p>
+              <p className={s.asideTitle}>{t("rv.guidesTitle")}</p>
               <ul className={s.list} style={{ paddingInlineStart: 18 }}>
                 {guides.map((guide) => (
                   <li key={guide.slug}>
@@ -201,7 +227,7 @@ export default async function DestinationPage({ params }: Props) {
             </div>
           ) : null}
           <div className={s.asideCard}>
-            <p style={{ margin: 0, fontWeight: 700 }}>{t("rv.otherPlaces")}</p>
+            <p className={s.asideTitle}>{t("rv.otherPlaces")}</p>
             <ul className={s.list} style={{ paddingInlineStart: 18 }}>
               {others.map((other) => (
                 <li key={other.slug}>

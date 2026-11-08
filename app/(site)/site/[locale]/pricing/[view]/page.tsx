@@ -9,6 +9,7 @@ import { formatPlanPrice, planCurrency, planPrices, yearlyOf } from "@/lib/plan-
 import { notFound } from "next/navigation";
 import { isSiteCurrency, pricingCurrenciesFor } from "@/lib/site-currency";
 import { parsePricingView, pricingView } from "@/lib/site/internal-path";
+import { paysByQr, regionForCurrency } from "@/lib/site/region";
 import { siteLocale } from "@/lib/site/static-page";
 import { localizeSitePath } from "@/lib/site/locale-path";
 import { siteMetadata } from "@/lib/site/seo";
@@ -101,19 +102,23 @@ export default async function PricingPage({ params }: Props) {
   const cardLines = Object.fromEntries(PLANS.map((plan) => [plan.id, differences(plan, say, number, m("planLogoShort"))]));
   const moreLines = PLANS.some((plan) => lines[plan.id].length > CARD_LINES);
 
-  const included = ["Import", "Bookings", "Handover", "Payments", "Reminders", "Inbox", "Paperwork", "Reports", "Owners", "BookingPage", "Partners", "Languages"];
-  const faqs = ["Yearly", "Trial", "Bikes", "Currency", "Grow"];
+  // The visitor's region (from their currency, lib/site/region.ts): outside Asia, payments are transfer, Wise and
+  // Revolut rather than QR codes, and the questions say how renters pay, with card payments as coming soon.
+  const qr = paysByQr(regionForCurrency(detected));
+  const included = ["Import", "Bookings", "Handover", qr ? "Payments" : "PaymentsGlobal", "Reminders", "Inbox", "Paperwork", "Reports", "Owners", "BookingPage", "Partners", "Languages"];
   const faqValues: Record<string, Record<string, string | number>> = {
     Yearly: { months: YEARLY_MONTHS },
     Trial: { days: TRIAL_DAYS }
   };
+  const faqItems = ["Yearly", "Trial", "Bikes", "Currency", "Grow"].map((key) => ({ q: t(`pfaq${key}Q`), a: t(`pfaq${key}A`, faqValues[key] || {}) }));
+  faqItems.splice(3, 0, { q: m("faqPayQ"), a: m(qr ? "faqPayAAsia" : "faqPayA") });
 
   // Structured data: the product with its plans in US dollars whatever the visitor's currency (search engines index
   // one page), the questions below, and where the page sits.
   const cheapestPaid = PLANS.filter((plan) => plan.monthly > 0).sort((a, b) => a.monthly - b.monthly)[0];
   const jsonLd = [
     softwareApplicationLd({ description: t("metaPricingDescription", { price: formatPlanPrice(planPrices(cheapestPaid, "USD").monthly, "USD", nl), days: TRIAL_DAYS }), locale }),
-    faqLd(faqs.map((key) => ({ q: t(`pfaq${key}Q`), a: t(`pfaq${key}A`, faqValues[key] || {}) }))),
+    faqLd(faqItems),
     breadcrumbLd(
       [
         { name: m("breadcrumbHome"), path: "/" },
@@ -252,13 +257,13 @@ export default async function PricingPage({ params }: Props) {
         <Container className={s.twoCol}>
           <h2 className={s.h2}>{t("pricingFaqTitle")}</h2>
           <div className={s.faq}>
-            {faqs.map((key) => (
-              <details className={s.faqItem} key={key}>
+            {faqItems.map((item) => (
+              <details className={s.faqItem} key={item.q}>
                 <summary>
-                  {t(`pfaq${key}Q`)}
+                  {item.q}
                   <Plus />
                 </summary>
-                <p>{t(`pfaq${key}A`, faqValues[key] || {})}</p>
+                <p>{item.a}</p>
               </details>
             ))}
           </div>

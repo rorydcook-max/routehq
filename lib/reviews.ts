@@ -14,7 +14,7 @@ import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
  *     returned 1-3 days ago gets one request (normally the day after the return) on the renter's chat, else email,
  *     with a link to /book/review/<token>. One per rental; Settings > Messaging > "Ask for a review after return".
  *   - loadReviewPage / submitReview: the renter's form. Every rating is kept and the form is the same whatever the
- *     stars (no review gating: Google's policy). 4-5 stars and a Google review link set: "Also post it on Google".
+ *     stars (no review gating: Google's policy). Any rating with a Google review link set: "Also post it on Google".
  *   - getPublishedReviews / getReviewStats: what the business's website shows. Published = the renter said yes
  *     AND the business published it.
  */
@@ -288,7 +288,7 @@ export async function submitReview(admin: any, input: { token: string; rating: n
     .then(() => null, () => null);
   await notifyOperator(page.organizationId, { emoji: "⭐", key: "reviewReceived", values: { customer: page.displayName || null, rating } }, "portal_action", "/customers/reviews").catch(() => null);
 
-  return { ok: true, googleUrl: rating >= 4 ? page.googleUrl : null };
+  return { ok: true, googleUrl: page.googleUrl };
 }
 
 // ── The business's side ──────────────────────────────────────────────────────

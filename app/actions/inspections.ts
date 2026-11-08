@@ -22,6 +22,7 @@ import { earlyHandoverBlocker, isDoubleBookingError } from "@/lib/rental-conflic
 import { said } from "@/lib/i18n/server-text";
 import { earlyStartFor, ensureEarlyStartCharge, requestEarlyWaiver, settleEarlyChoice } from "@/lib/early-start";
 import { applyLateStart, lateStartNote } from "@/lib/late-start";
+import { asLateReturnChoice, ensureLateReturnCharge, lateReturnAmount, lateReturnFor } from "@/lib/late-return";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { adoptBusinessClock } from "@/lib/auth/active-organization-server";
 import { enterBusinessTimeZone } from "@/lib/business-time-scope";
@@ -249,6 +250,26 @@ async function payRentFromDeposit(admin: any, organizationId: string, rentalId: 
   }
 }
 
+/**
+ * Late days taken from the deposit pay off the late-return row: in full, or the covered part (split off as
+ * paid) with the rest still owed on the row.
+ */
+async function payLateReturnFromDeposit(admin: any, organizationId: string, paymentId: string, amount: number) {
+  if (!paymentId || !(amount > 0)) return;
+  const { data: payment } = await admin.from("rental_payments").select("*").eq("id", paymentId).eq("organization_id", organizationId).maybeSingle();
+  if (!payment || !UNPAID.includes(String(payment.status))) return;
+  const due = Number(payment.amount || 0);
+  const now = new Date().toISOString();
+  const metadata = { ...(payment.metadata || {}), paid_from_deposit: true };
+  if (amount >= due) {
+    await admin.from("rental_payments").update({ status: "paid", paid_at: now, paid_date: businessToday(), metadata }).eq("id", payment.id);
+    return;
+  }
+  const { id: _id, created_at: _created, updated_at: _updated, ...copy } = payment;
+  await admin.from("rental_payments").insert({ ...copy, amount, status: "paid", paid_at: now, paid_date: businessToday(), metadata: { ...metadata, split_from: payment.id } });
+  await admin.from("rental_payments").update({ amount: Math.round((due - amount) * 100) / 100, metadata: { ...(payment.metadata || {}), part_paid_from_deposit: amount } }).eq("id", payment.id);
+}
+
 /** Rent and charges still unpaid on a rental, deposit rows left out. */
 async function stillOwed(admin: any, organizationId: string, rentalId: string) {
   const { data: rows } = await admin.from("rental_payments").select("amount, status, voided, metadata").eq("organization_id", organizationId).eq("rental_id", rentalId).in("status", UNPAID).is("deleted_at", null);
@@ -275,6 +296,7 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
 
   const deductions = [
     { key: "depositOutstandingBalance", reason: "Unpaid rent" },
+    { key: "depositLateReturnCharge", reason: "Late return" },
     { key: "depositFuelDeficitCharge", reason: "Fuel deficit" },
     { key: "depositDamageCharge", reason: "Damage" },
     { key: "depositCleaningCharge", reason: "Cleaning fee" }
@@ -283,8 +305,8 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
   for (const item of deductions) {
     const requested = numberField(formData, item.key) || 0;
     const amount = Math.min(remaining, requested);
-    // What the deposit could not cover is kept, so it can be billed to the customer.
-    if (requested > amount && item.key !== "depositOutstandingBalance") {
+    // What the deposit could not cover is kept, so it can be billed to the customer. (Late days not covered stay owed on their own row.)
+    if (requested > amount && item.key !== "depositOutstandingBalance" && item.key !== "depositLateReturnCharge") {
       settlement.uncovered = [...(settlement.uncovered || []), { reason: item.reason, amount: Math.round((requested - amount) * 100) / 100 }];
     }
     if (amount <= 0) continue;
@@ -297,6 +319,7 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
     deductionData.set("notes", "Recorded on the return form.");
     await applyDepositDeduction(deductionData);
     if (item.key === "depositOutstandingBalance") await payRentFromDeposit(createSupabaseAdminClient() as any, organizationId, rentalId, amount);
+    if (item.key === "depositLateReturnCharge") await payLateReturnFromDeposit(createSupabaseAdminClient() as any, organizationId, stringField(formData, "lateReturnPaymentId"), amount);
     settlement.deductions.push({ reason: item.reason, amount });
     remaining -= amount;
   }
@@ -791,7 +814,7 @@ export async function submitInspection(formData: FormData) {
   if (mode === "return" && rentalId && !isSwap) {
     const { data: rental, error: rentalFetchError } = await supabase
       .from("rentals")
-      .select("mileage_at_delivery, end_date, billing_interval, pricing_model, currency, vehicle_id, original_vehicle_id")
+      .select("mileage_at_delivery, end_date, billing_interval, pricing_model, currency, vehicle_id, original_vehicle_id, rental_rate, customer_id")
       .eq("id", rentalId)
       .eq("organization_id", organizationId)
       .maybeSingle();
@@ -826,7 +849,17 @@ export async function submitInspection(formData: FormData) {
     // open-ended or later end date is closed off and rent scheduled after
     // today is voided, otherwise it would show as owed and later as overdue.
     const returnDate = new Intl.DateTimeFormat("en-CA", { timeZone: businessTimeZone() }).format(new Date());
-    const endDate = rental?.end_date && String(rental.end_date).slice(0, 10) < returnDate ? String(rental.end_date).slice(0, 10) : returnDate;
+    // Back after the booked return date: the booking now runs to today, and the late days are charged (or taken
+    // from the deposit, or waived) as the owner chose on the return form.
+    let late = null as ReturnType<typeof lateReturnFor>;
+    if (rental?.end_date && String(rental.end_date).slice(0, 10) < returnDate) {
+      const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", rental.vehicle_id || vehicleId).eq("organization_id", organizationId).maybeSingle();
+      late = lateReturnFor(rental, rates, returnDate);
+    }
+    // No answer on the form: the charge was already written (cash taken earlier on this return form), so it stands as it is.
+    const lateChoice = late && formData.has("lateReturn") ? asLateReturnChoice(stringField(formData, "lateReturn")) || "charge" : null;
+    const lateAmount = late ? (formData.has("lateReturnAmount") ? lateReturnAmount(formData.get("lateReturnAmount")) : late.amount) : 0;
+    const endDate = returnDate;
 
     const { error: rentalError } = await supabase
       .from("rentals")
@@ -860,6 +893,42 @@ export async function submitInspection(formData: FormData) {
         .eq("id", payment.id)
         .eq("organization_id", organizationId);
       if (voidError) throw new Error(voidError.message);
+    }
+
+    // The late days as rent due today (once: cash taken on the form may have written and paid it already).
+    // Taken from the deposit: deducted after any unpaid rent, never more than is held (what isn't covered stays owed).
+    formData.set("depositLateReturnCharge", "0");
+    if (late && lateChoice && lateChoice !== "waive" && lateAmount > 0) {
+      const latePaymentId = await ensureLateReturnCharge(supabase, { organizationId, rentalId, vehicleId: rental?.vehicle_id || vehicleId, customerId: rental?.customer_id || customerId || null, currency: rental?.currency || "THB", today: returnDate, late, amount: lateAmount, choice: lateChoice });
+      if (lateChoice === "deposit" && latePaymentId) {
+        formData.set("depositLateReturnCharge", String(lateAmount));
+        formData.set("lateReturnPaymentId", latePaymentId);
+      }
+    }
+    // Said on the booking's history; a charge written earlier on this form (cash taken) is described from its row.
+    let lateTold = late && lateChoice ? { choice: lateChoice, amount: lateAmount } : null;
+    if (late && !lateChoice) {
+      const { data: written } = await supabase.from("rental_payments").select("amount, metadata").eq("organization_id", organizationId).eq("rental_id", rentalId).is("deleted_at", null).not("metadata->late_return", "is", null).limit(1).maybeSingle();
+      if (written) lateTold = { choice: asLateReturnChoice(written.metadata?.late_return?.choice) || "charge", amount: Number(written.amount || 0) };
+    }
+    if (late && lateTold) {
+      const { choice: toldChoice, amount: toldAmount } = lateTold;
+      const lateMoney = niceMoney(toldAmount, rental?.currency || "THB");
+      await recordActivityEvent(supabase, {
+        organization_id: organizationId,
+        actor_id: user.id,
+        entity_type: "rental",
+        entity_id: rentalId,
+        vehicle_id: vehicleId,
+        rental_id: rentalId,
+        customer_id: customerId,
+        event_type: "late_return",
+        title: `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late`,
+        detail:
+          toldChoice === "waive" || toldAmount <= 0
+            ? `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${late.bookedEnd}). Charge waived.`
+            : `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${late.bookedEnd}). ${lateMoney} ${toldChoice === "deposit" ? "taken from the deposit" : "charged to the renter"}.`
+      });
     }
 
     depositSettlement = await reconcileReturnDeposit(formData, organizationId, rentalId);

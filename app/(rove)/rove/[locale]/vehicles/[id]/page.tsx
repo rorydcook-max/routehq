@@ -9,10 +9,11 @@ import { extrasForVehicle, findVehicle, loadMarket, quoteFor, roveToday, type St
 import { roveHref } from "@/lib/rove/paths";
 import { parseRoveQuery, type RoveQuery } from "@/lib/rove/query";
 import { roveAbsolute, roveMetadata, roveOrigin } from "@/lib/rove/seo";
+import { sizedPhoto } from "@/lib/photo-url";
 import { roveDate, roveLocale, roveMoney } from "@/lib/rove/static";
 import { Breadcrumbs } from "../../_components/breadcrumbs";
 import { JsonLd } from "../../_components/json-ld";
-import { bookingHref, VehiclePhoto } from "../../_components/vehicle-card";
+import { bookingHref, OperatorMark, VehicleCard, vehicleFacts, VehiclePhoto } from "../../_components/vehicle-card";
 import s from "../../rove.module.css";
 
 // Availability and the price for the dates asked are live: drawn for each visit.
@@ -36,7 +37,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const lead = vehicle.dailyRate > 0 ? t("rv.ratePer", { amount: money(vehicle.dailyRate), per: t("per_daily") }) : vehicle.monthlyRate > 0 ? t("rv.ratePer", { amount: money(vehicle.monthlyRate), per: t("per_monthly") }) : t("rv.ratePer", { amount: money(vehicle.weeklyRate), per: t("per_weekly") });
   const title = t("rv.vehicleTitle", { vehicle: `${vehicle.name}${vehicle.year ? ` ${vehicle.year}` : ""}`, place });
   const description = t("rv.vehicleDescription", { vehicle: vehicle.name, business: vehicle.business.name, place, price: lead });
-  const image = vehicle.photoCount ? `${roveOrigin()}/api/rove-photo/${vehicle.id}/0` : null;
+  // The main photo's own stable address as a JPEG for link previews (some apps don't show WebP).
+  const image = vehicle.photoCount ? `${roveOrigin()}${sizedPhoto(vehicle.photos?.[0] || `/api/rove-photo/${vehicle.id}/0`, 1280, "jpg")}` : null;
   return roveMetadata({ title: `${title} | Rove`, description, path: `/vehicles/${vehicle.id}`, locale, section: "vehicle", image, ogTitle: title });
 }
 
@@ -46,6 +48,7 @@ export default async function VehiclePage({ params, searchParams }: Props) {
   const t = await getTranslations("directory");
   const vehicle = await findVehicle(id);
   if (!vehicle) notFound();
+  const aiLabel = (await getTranslations("gallery"))("aiImage");
   const business = vehicle.business;
   const today = roveToday();
   const parsed = parseRoveQuery(query, today);
@@ -92,7 +95,7 @@ export default async function VehiclePage({ params, searchParams }: Props) {
     name: fullName,
     description: t("rv.vehicleDescription", { vehicle: vehicle.name, business: business.name, place, price: rates[0] ? t("rv.ratePer", { amount: money(rates[0].amount), per: rates[0].unit === "DAY" ? t("per_daily") : rates[0].unit === "WEE" ? t("per_weekly") : t("per_monthly") }) : "" }),
     url: roveAbsolute(path, locale),
-    ...(vehicle.photoCount ? { image: photos.map((index) => `${roveOrigin()}/api/rove-photo/${vehicle.id}/${index}`) } : {}),
+    ...(vehicle.photoCount ? { image: photos.map((index) => `${roveOrigin()}${sizedPhoto(vehicle.photos?.[index] || `/api/rove-photo/${vehicle.id}/${index}`, 1280, "jpg")}`) } : {}),
     category: t(`kind_${vehicle.kind === "other" ? "car" : vehicle.kind}`),
     offers: rates.map((rate) => ({
       "@type": "Offer",
@@ -111,67 +114,128 @@ export default async function VehiclePage({ params, searchParams }: Props) {
     { name: fullName, path }
   ];
 
+  const facts = await vehicleFacts(vehicle);
+  const deliveryKm = publicDeliveryKm(vehicle.area);
+  const perOf = (unit: string) => (unit === "DAY" ? t("per_daily") : unit === "WEE" ? t("per_weekly") : t("per_monthly"));
+  const headline = quote
+    ? { amount: quote.total !== null ? quote.total : quote.rate, unit: quote.total !== null ? t("rv.totalFor", { count: quote.days || 0 }) : t(`per_${quote.model}`) }
+    : rates[0]
+      ? { amount: rates[0].amount, unit: perOf(rates[0].unit) }
+      : null;
+  const perDayOf = (rate: { amount: number; unit: string }) => (rate.unit === "WEE" ? rate.amount / 7 : rate.unit === "MON" ? rate.amount / 30 : rate.amount);
+  const longStay = vehicle.dailyRate > 0 && vehicle.monthlyRate > 0 && vehicle.monthlyRate / 30 < vehicle.dailyRate;
+  // The gallery: one big photo and up to four more (two or four, so the grid stays even); a swipeable row on phones.
+  const shown = photos.length >= 5 ? photos.slice(0, 5) : photos.length >= 3 ? photos.slice(0, 3) : photos;
+  const galleryClass = shown.length <= 1 ? `${s.gallery} ${s.galleryOne}` : shown.length === 2 ? `${s.gallery} ${s.galleryTwo}` : shown.length === 3 ? `${s.gallery} ${s.galleryThree}` : s.gallery;
+  const stayAny: Stay = { mode: "any", start: today };
+  const more = market.vehicles
+    .filter((other) => other.business.organizationId === business.organizationId && other.id !== vehicle.id)
+    .map((other) => ({ vehicle: other, quote: quoteFor(other, stayAny) }))
+    .filter((row) => row.quote)
+    .sort((a, b) => Number(b.vehicle.photoCount > 0) - Number(a.vehicle.photoCount > 0))
+    .slice(0, 4);
+
   return (
     <div className={s.wrap}>
       <Breadcrumbs items={crumbs} label={t("rv.breadcrumbs")} locale={locale} />
       <JsonLd data={productLd} />
+      <div className={galleryClass}>
+        <div className={s.galleryMain}>
+          <VehiclePhoto aiLabel={aiLabel} eager sizes="(min-width: 900px) 760px, 92vw" vehicle={vehicle} />
+        </div>
+        {shown.slice(1).map((index) => (
+          <div className={s.galleryThumb} key={index}>
+            <VehiclePhoto aiLabel={aiLabel} index={index} sizes="(min-width: 900px) 380px, 92vw" vehicle={vehicle} />
+          </div>
+        ))}
+      </div>
+
       <div className={s.vehicleLayout}>
         <div>
-          <div className={s.gallery}>
-            <div className={s.galleryMain} style={{ position: "relative" }}>
-              <VehiclePhoto eager vehicle={vehicle} />
-            </div>
-            {photos.slice(1).map((index) => (
-              <div className={s.galleryThumb} key={index}>
-                <VehiclePhoto index={index} vehicle={vehicle} />
-              </div>
-            ))}
-          </div>
-          <h1 className={s.pageTitle} style={{ marginTop: 22 }}>
-            {fullName}
+          <h1 className={s.vehicleTitle}>
+            {vehicle.name}
+            {vehicle.year ? <span> {vehicle.year}</span> : null}
           </h1>
-          <p className={s.pageLede} style={{ fontSize: 17 }}>
-            {t("rv.fromBusiness", { business: business.name, town: place })}
+          <p className={s.operator} style={{ marginTop: 16 }}>
+            <OperatorMark logoUrl={business.logoUrl} name={business.name} />
+            <span>
+              <span className={s.operatorName}>{business.name}</span>
+              <span className={s.operatorTown}>{place}</span>
+            </span>
           </p>
-          <dl className={s.specs}>
-            {specs.map((spec) => (
-              <div key={spec.label}>
-                <dt>{spec.label}</dt>
-                <dd>{spec.value}</dd>
-              </div>
+          <ul className={s.vehicleMeta}>
+            {facts.map((fact) => (
+              <li key={fact.text}>
+                <i aria-hidden="true" className={`ti ${fact.icon}`} />
+                {fact.text}
+              </li>
             ))}
-          </dl>
+            {deliveryKm > 0 ? (
+              <li>
+                <i aria-hidden="true" className="ti ti-truck-delivery" />
+                {t("rv.delivers")}
+              </li>
+            ) : null}
+          </ul>
 
-          <section className={s.sectionTight}>
-            <h2 className={s.h3}>{t("rv.pricesTitle")}</h2>
-            <table className={s.rateTable} style={{ marginTop: 10 }}>
-              <tbody>
-                {rates.map((rate) => (
-                  <tr key={rate.unit}>
-                    <td>{rate.label}</td>
-                    <td>{money(rate.amount)}</td>
-                  </tr>
-                ))}
-                <tr>
-                  <td>{t("rv.depositLabel")}</td>
-                  <td>{vehicle.deposit > 0 ? money(vehicle.deposit) : t("noDeposit")}</td>
-                </tr>
-              </tbody>
-            </table>
-            {business.seasons.length ? <p className={`${s.small} ${s.muted}`}>{t("rv.seasonNote")}</p> : null}
+          <section className={s.block}>
+            <h2 className={s.blockTitle}>{t("rv.pricesTitle")}</h2>
+            <div className={s.rates}>
+              {rates.map((rate) => (
+                <div className={rate.unit === "MON" && longStay ? s.rateBest : s.rate} key={rate.unit}>
+                  <span className={s.rateLabel}>{rate.label}</span>
+                  <span className={s.rateValue}>{money(rate.amount)}</span>
+                  <span className={s.rateSub}>{rate.unit === "DAY" ? perOf(rate.unit) : t("rv.aboutPerDay", { amount: money(perDayOf(rate)) })}</span>
+                </div>
+              ))}
+            </div>
+            <p className={s.priceSub} style={{ marginTop: 14 }}>
+              {vehicle.deposit > 0 ? t("deposit", { amount: money(vehicle.deposit) }) : t("noDeposit")}
+            </p>
+            {business.seasons.length ? <p className={s.priceSub} style={{ marginTop: 6 }}>{t("rv.seasonNote")}</p> : null}
           </section>
 
-          <section className={s.sectionTight} style={{ paddingTop: 0 }}>
-            <h2 className={s.h3}>{t("rv.includedTitle")}</h2>
-            <ul className={s.list}>
-              {publicDeliveryKm(vehicle.area) > 0 ? <li>{t("rv.includedDelivery", { km: Math.round(publicDeliveryKm(vehicle.area)), place })}</li> : <li>{t("rv.includedPickup", { place })}</li>}
-              <li>{t("rv.includedDirect", { business: business.name })}</li>
+          <section className={s.block}>
+            <h2 className={s.blockTitle}>{t("rv.specsTitle")}</h2>
+            <dl className={s.specs}>
+              {specs.map((spec) => (
+                <div key={spec.label}>
+                  <dt>{spec.label}</dt>
+                  <dd>{spec.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          <section className={s.block}>
+            <h2 className={s.blockTitle}>{t("rv.includedTitle")}</h2>
+            <ul className={s.included}>
+              {deliveryKm > 0 ? (
+                <li>
+                  <i aria-hidden="true" className="ti ti-truck-delivery" />
+                  <span>{t("rv.includedDelivery", { km: Math.round(deliveryKm), place })}</span>
+                </li>
+              ) : (
+                <li>
+                  <i aria-hidden="true" className="ti ti-map-pin" />
+                  <span>{t("rv.includedPickup", { place })}</span>
+                </li>
+              )}
+              <li>
+                <i aria-hidden="true" className="ti ti-message-circle" />
+                <span>{t("rv.includedDirect", { business: business.name })}</span>
+              </li>
               {/* Thailand's compulsory motor insurance: only for vehicles of a business in Thailand. */}
-              {business.country.toLowerCase() === "thailand" ? <li>{t("rv.includedCmi", { business: business.name })}</li> : null}
+              {business.country.toLowerCase() === "thailand" ? (
+                <li>
+                  <i aria-hidden="true" className="ti ti-shield-check" />
+                  <span>{t("rv.includedCmi", { business: business.name })}</span>
+                </li>
+              ) : null}
             </ul>
             {extras.length ? (
               <>
-                <h3 style={{ fontSize: 16, margin: "18px 0 0" }}>{t("rv.extrasTitle")}</h3>
+                <h3 style={{ fontSize: 16, fontWeight: 650, margin: "24px 0 0" }}>{t("rv.extrasTitle")}</h3>
                 <ul className={s.list}>
                   {extras.map((extra) => (
                     <li key={extra.id}>
@@ -183,24 +247,21 @@ export default async function VehiclePage({ params, searchParams }: Props) {
             ) : null}
           </section>
 
-          <section className={s.sectionTight} style={{ paddingTop: 0 }}>
-            <h2 className={s.h3}>{t("rv.aboutBusiness", { business: business.name })}</h2>
-            <div style={{ display: "flex", gap: 14, alignItems: "center", marginTop: 12 }}>
-              {business.logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img alt={`${business.name} logo`} src={business.logoUrl} style={{ maxHeight: 48, maxWidth: 120, objectFit: "contain" }} />
-              ) : null}
-              <p style={{ margin: 0 }}>
-                {t("rv.businessFacts", { town: place, count: fleetCount })}
-                <br />
-                <a href={`/${business.slug}`} style={{ fontWeight: 700 }}>
+          <section className={s.block}>
+            <h2 className={s.blockTitle}>{t("rv.aboutBusiness", { business: business.name })}</h2>
+            <div className={s.business}>
+              <OperatorMark logoUrl={business.logoUrl} name={business.name} />
+              <div>
+                <p className={s.businessName}>{business.name}</p>
+                <p className={s.priceSub}>{t("rv.businessFacts", { town: place, count: fleetCount })}</p>
+                <a className={s.textLink} href={`/${business.slug}`} style={{ fontSize: 14.5, marginTop: 4 }}>
                   {t("allVehicles")}
                 </a>
-              </p>
+              </div>
             </div>
             {stats.count > 0 ? (
-              <div style={{ marginTop: 18 }}>
-                <p style={{ margin: 0, fontWeight: 700 }}>
+              <div style={{ marginTop: 22 }}>
+                <p style={{ margin: 0, fontWeight: 650 }}>
                   <span aria-hidden="true" className={s.stars}>
                     {"★".repeat(Math.round(stats.average))}
                   </span>{" "}
@@ -208,11 +269,11 @@ export default async function VehiclePage({ params, searchParams }: Props) {
                 </p>
                 {reviews.map((review) => (
                   <div className={s.review} key={review.id}>
-                    <p style={{ margin: 0, fontWeight: 700 }}>
+                    <p style={{ margin: 0, fontWeight: 650 }}>
                       <span className={s.stars}>{"★".repeat(review.rating)}</span> {review.name}
                     </p>
                     {review.text ? <p style={{ margin: "6px 0 0" }}>{review.text}</p> : null}
-                    {review.reply ? <p className={`${s.small} ${s.muted}`} style={{ margin: "6px 0 0" }}>{t("rv.replyFrom", { business: business.name, reply: review.reply })}</p> : null}
+                    {review.reply ? <p className={s.priceSub} style={{ margin: "6px 0 0" }}>{t("rv.replyFrom", { business: business.name, reply: review.reply })}</p> : null}
                   </div>
                 ))}
               </div>
@@ -220,48 +281,85 @@ export default async function VehiclePage({ params, searchParams }: Props) {
           </section>
         </div>
 
-        <aside className={s.bookBox} aria-label={t("rv.bookBoxLabel")}>
+        <aside aria-label={t("rv.bookBoxLabel")} className={s.bookBox}>
+          {headline && (quote || stay.mode === "any") ? (
+            <p className={s.bookPrice}>
+              <span className={s.price}>{money(headline.amount)}</span>
+              <span className={s.priceUnit}>{headline.unit}</span>
+            </p>
+          ) : null}
           {quote ? (
-            <div>
-              <span className={s.price}>{quote.total !== null ? money(quote.total) : money(quote.rate)}</span>{" "}
-              <span className={s.priceUnit}>{quote.total !== null ? t("rv.totalFor", { count: quote.days || 0 }) : t(`per_${quote.model}`)}</span>
-              <p className={`${s.small} ${s.muted}`} style={{ margin: "6px 0 0" }}>
-                {stay.mode === "dates" ? t("rv.whenDates", { from: roveDate(stay.start, locale), to: roveDate(stay.end, locale) }) : t("rv.whenMonthly", { from: roveDate(stay.start, locale) })}
-              </p>
-            </div>
+            <p className={s.priceSub} style={{ marginTop: -8 }}>
+              {stay.mode === "dates" ? t("rv.whenDates", { from: roveDate(stay.start, locale), to: roveDate(stay.end, locale) }) : t("rv.whenMonthly", { from: roveDate(stay.start, locale) })}
+            </p>
           ) : stay.mode !== "any" ? (
-            <p style={{ margin: 0, fontWeight: 700 }}>{t("rv.notForDates")}</p>
-          ) : (
-            <div>
-              <span className={s.price}>{money(rates[0]?.amount || 0)}</span> <span className={s.priceUnit}>{rates[0]?.unit === "DAY" ? t("per_daily") : rates[0]?.unit === "WEE" ? t("per_weekly") : t("per_monthly")}</span>
-            </div>
-          )}
-          <p className={`${s.small} ${s.muted}`} style={{ margin: 0 }}>
-            {vehicle.deposit > 0 ? t("deposit", { amount: money(vehicle.deposit) }) : t("noDeposit")}
-          </p>
+            <p style={{ margin: 0, fontWeight: 650 }}>{t("rv.notForDates")}</p>
+          ) : null}
           <form action={roveHref(path, locale)} method="get" style={{ display: "grid", gap: 10 }}>
-            <div className={s.inputRow} style={{ display: "grid" }}>
-              <label className={s.field}>
-                {t("rv.pickUp")}
-                <input className={s.input} defaultValue={stay.start} min={today} name="from" type="date" />
+            <div className={s.bookDates}>
+              <label className={s.cell}>
+                <span className={s.cellLabel}>{t("rv.pickUp")}</span>
+                <input className={s.cellInput} defaultValue={stay.start} min={today} name="from" type="date" />
               </label>
-              <label className={s.field}>
-                {t("rv.dropOff")}
-                <input className={s.input} defaultValue={stay.mode === "dates" ? stay.end : ""} min={today} name="to" type="date" />
+              <label className={s.cell}>
+                <span className={s.cellLabel}>{t("rv.dropOff")}</span>
+                <input className={s.cellInput} defaultValue={stay.mode === "dates" ? stay.end : ""} min={today} name="to" type="date" />
               </label>
             </div>
-            <button className={s.buttonGhost} type="submit">
+            <button className={s.btnQuiet} type="submit">
               {t("rv.checkPrice")}
             </button>
           </form>
-          <a className={s.button} href={bookingHref(vehicle, stay)}>
+          <a className={s.btnLarge} href={bookingHref(vehicle, stay)}>
             {t("rv.bookWith", { business: business.name })}
           </a>
-          <p className={`${s.small} ${s.muted}`} style={{ margin: 0 }}>
-            {t("rv.bookNote", { business: business.name })}
-          </p>
+          <dl className={s.bookRows}>
+            <div>
+              <dt>{t("rv.depositLabel")}</dt>
+              <dd>{vehicle.deposit > 0 ? money(vehicle.deposit) : t("noDeposit")}</dd>
+            </div>
+            {vehicle.monthlyRate > 0 && quote?.model !== "monthly" ? (
+              <div>
+                <dt>{t("rv.rateMonth")}</dt>
+                <dd>{money(vehicle.monthlyRate)}</dd>
+              </div>
+            ) : null}
+            <div>
+              <dt>{t("rv.deliveryTitle")}</dt>
+              <dd>{deliveryKm > 0 ? t("rv.delivers") : t("rv.includedPickup", { place })}</dd>
+            </div>
+          </dl>
+          <p className={s.bookNote}>{t("rv.bookNote", { business: business.name })}</p>
         </aside>
       </div>
+
+      {more.length ? (
+        <section className={s.block} style={{ marginTop: 40 }}>
+          <h2 className={s.sectionTitle} style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", marginBottom: 24 }}>
+            {t("rv.moreFrom", { business: business.name })}
+          </h2>
+          <div className={`${s.tiles} ${s.tilesScroll}`}>
+            {more.map((row) => (
+              <VehicleCard delivers={publicDeliveryKm(row.vehicle.area) > 0} freeFrom={null} key={row.vehicle.id} km={null} layout="grid" locale={locale} quote={row.quote!} stay={stayAny} vehicle={row.vehicle} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {headline ? (
+        <>
+          <div aria-hidden="true" className={s.mobileBarSpace} />
+          <div className={s.mobileBar}>
+            <p className={s.bookPrice} style={{ display: "grid", gap: 0 }}>
+              <span className={s.price}>{money(headline.amount)}</span>
+              <span className={s.priceUnit}>{headline.unit}</span>
+            </p>
+            <a className={s.btnLarge} href={bookingHref(vehicle, stay)}>
+              {t("book")}
+            </a>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

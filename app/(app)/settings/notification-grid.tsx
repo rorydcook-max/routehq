@@ -17,11 +17,14 @@ export async function NotificationGrid({ settings }: { settings: Record<string, 
   const label: Record<(typeof ALERT_CHANNELS)[number], string> = { push: say("nt_chPush"), email: say("ig_chEmail") };
   const cell = (name: string, channel: (typeof ALERT_CHANNELS)[number], checked: boolean) => (
     <td className="px-2 py-3 text-center" key={channel}>
+      {/* A channel marked Coming soon can't be ticked (build-s, 8 Nov 2026); its saved choice is kept as it was. */}
+      {ready[channel] ? null : checked ? <input name={`${name}__${channel}`} type="hidden" value="on" /> : null}
       <input
         aria-label={label[channel]}
-        className={`h-5 w-5 cursor-pointer accent-[var(--primary)] ${ready[channel] ? "" : "opacity-40"}`}
+        className={`h-5 w-5 accent-[var(--primary)] ${ready[channel] ? "cursor-pointer" : "cursor-not-allowed opacity-40"}`}
         defaultChecked={checked}
-        name={`${name}__${channel}`}
+        disabled={!ready[channel]}
+        name={ready[channel] ? `${name}__${channel}` : undefined}
         type="checkbox"
       />
     </td>

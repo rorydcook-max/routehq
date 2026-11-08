@@ -1,4 +1,9 @@
-/** Countries, provinces and towns offered in setup (moved from the old setup screen, 2 Nov 2026). */
+import { defaultCurrency } from "@/lib/regional";
+
+/**
+ * Countries with a curated list of provinces and towns for setup (moved from the old setup screen, 2 Nov 2026).
+ * Setup offers every country (build-s, 8 Nov 2026); the others get a free-text town.
+ */
 export const locationOptions = [
   {
     country: "United States",
@@ -389,7 +394,8 @@ export const currencyOptionsByCountry: Record<string, string[]> = {
 
 /** The currency a business in this country normally charges in. */
 export function defaultCurrencyForCountry(country: string) {
-  return (currencyOptionsByCountry[country] || ["USD"])[0] || "USD";
+  // Countries without their own list here take their usual currency from lib/regional.ts (every country, build-s).
+  return currencyOptionsByCountry[country]?.[0] || defaultCurrency(country);
 }
 
 /** Every town listed for a country, with its province, for the "Town or area" suggestions. */

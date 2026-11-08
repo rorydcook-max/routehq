@@ -8,6 +8,7 @@ import { COUNTRY_SLUGS, DESTINATION_KEYS, GUIDE_SLUGS } from "@/lib/rove/guide-s
  *   /                         home
  *   /search                   search results (?place=&from=&to=&kind=...)
  *   /vehicles/<id>            one vehicle
+ *   /destinations             every destination, by region
  *   /guides, /guides/<slug>   renter guides (English only for now)
  *   /<country>                a country's destinations (English only for now)
  *   /<country>/<place>        a destination (English only for now)
@@ -21,8 +22,9 @@ export const ROVE_DEFAULT_LOCALE = "en";
 export const ROVE_LOCALES: readonly string[] = supportedLocaleCodes;
 
 /** Pages written in every language (their words are all in locales/<code>/common.json). */
-type Section = "home" | "search" | "vehicle" | "guides" | "guide" | "country" | "destination";
-const ALL_LANGUAGES: Section[] = ["home", "search", "vehicle"];
+type Section = "home" | "search" | "vehicle" | "guides" | "guide" | "country" | "destination" | "destinations";
+// "destinations" (/destinations, every place by region; task build-rove, 8 Nov 2026): its words are all UI strings.
+const ALL_LANGUAGES: Section[] = ["home", "search", "vehicle", "destinations"];
 
 export type RovePage = { section: Section; locale: string; rest: string; prefixed: boolean };
 
@@ -37,6 +39,7 @@ function sectionOf(rest: string): Section | null {
   if (rest === "/") return "home";
   if (rest === "/search") return "search";
   if (rest === "/guides") return "guides";
+  if (rest === "/destinations") return "destinations";
   const parts = rest.split("/").filter(Boolean);
   if (parts[0] === "vehicles" && parts.length === 2 && UUID.test(parts[1])) return "vehicle";
   if (parts[0] === "guides" && parts.length === 2 && GUIDE_SLUGS.includes(parts[1])) return "guide";

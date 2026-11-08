@@ -238,7 +238,7 @@ export function HandoverPaymentStep({
           methodName={methodName(method)}
           money={money}
           onClose={() => setScreenOpen(false)}
-          onPaid={() => record(method, left, () => setScreenOpen(false))}
+          onPaid={(paid) => record(method, paid, () => setScreenOpen(false))}
           pay={pay}
         />
       ) : null}
@@ -275,15 +275,21 @@ function PayScreen({
   money: (value: number) => string;
   pay: HandoverPayOptions;
   busy: boolean;
-  onPaid: () => void;
+  /** Records what was paid: the whole amount, or the part typed after "Part" (as with cash). */
+  onPaid: (paid: number) => void;
   onClose: () => void;
 }) {
   const t = useTranslations("handoverPay");
   const [svg, setSvg] = useState<string | null>(null);
+  // A part payment: the amount shown (and carried by a PromptPay code) is the part typed, recorded the same way.
+  const [partOn, setPartOn] = useState(false);
+  const [partAmount, setPartAmount] = useState("");
+  const part = round2(Math.min(amount, Math.max(0, Number(partAmount) || 0)));
+  const shown = partOn && part > 0 ? part : amount;
   const portal = pay.portalUrl || (pay.portalPath && typeof window !== "undefined" ? `${window.location.origin}${pay.portalPath}` : null);
   // PromptPay carries the exact amount; Wise and Revolut open the business's own link; a bank transfer opens
   // the customer's booking page, where the details are and a slip can be sent (and matched).
-  const promptPayText = method === "promptpay" && pay.promptpayId && currency === "THB" ? promptPayPayload(pay.promptpayId, amount) : null;
+  const promptPayText = method === "promptpay" && pay.promptpayId && currency === "THB" ? promptPayPayload(pay.promptpayId, shown) : null;
   const qrText = method === "promptpay" ? promptPayText : method === "wise" ? pay.wiseLink : method === "revolut" ? pay.revolutLink : portal;
   const staticQr = method === "promptpay" && !promptPayText ? pay.promptpayQrUrl : null;
 
@@ -318,7 +324,7 @@ function PayScreen({
         </button>
       </div>
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-4 py-2 text-center">
-        <p className="font-mono-data text-4xl font-bold text-[var(--foreground)] sm:text-5xl">{money(amount)}</p>
+        <p className="font-mono-data text-4xl font-bold text-[var(--foreground)] sm:text-5xl">{money(shown)}</p>
         {svg ? (
           <div aria-label={methodName} className="w-[min(82vw,52vh,400px)] rounded-2xl border border-[var(--border)] bg-white p-3 [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} role="img" />
         ) : staticQr ? (
@@ -337,11 +343,30 @@ function PayScreen({
           {(method === "wise" || method === "revolut") && qrText ? <p className="break-all text-sm font-medium text-[var(--foreground-secondary)]">{qrText}</p> : null}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-2 border-t border-[var(--border)] px-4 pt-3 pb-[max(16px,env(safe-area-inset-bottom))]">
-        <button className="pressable min-h-14 rounded-full border border-[var(--border)] bg-white text-base font-semibold text-[var(--foreground-secondary)]" onClick={onClose} type="button">
+      {partOn ? (
+        <label className="mx-auto block w-full max-w-sm px-4 pb-2 text-left">
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("amountPaid")}</span>
+          <MoneyInput currency={currency} name="handoverPartAmountScreen" onValueChange={setPartAmount} />
+        </label>
+      ) : null}
+      <div className="grid grid-cols-3 gap-2 border-t border-[var(--border)] px-4 pt-3 pb-[max(16px,env(safe-area-inset-bottom))]">
+        <button className="pressable min-h-14 whitespace-nowrap rounded-full border border-[var(--border)] bg-white text-base font-semibold text-[var(--foreground-secondary)]" onClick={onClose} type="button">
           {t("notYet")}
         </button>
-        <button className="pressable min-h-14 rounded-full bg-[var(--primary)] text-base font-bold text-white disabled:opacity-50" disabled={busy} onClick={onPaid} type="button">
+        <button
+          aria-pressed={partOn}
+          className={`pressable min-h-14 whitespace-nowrap rounded-full border-2 text-base font-bold ${partOn ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`}
+          onClick={() => setPartOn((value) => !value)}
+          type="button"
+        >
+          {t("part")}
+        </button>
+        <button
+          className="pressable min-h-14 whitespace-nowrap rounded-full bg-[var(--primary)] text-base font-bold text-white disabled:opacity-50"
+          disabled={busy || (partOn && !(part > 0))}
+          onClick={() => onPaid(partOn ? part : amount)}
+          type="button"
+        >
           {busy ? t("saving") : t("markPaid")}
         </button>
       </div>

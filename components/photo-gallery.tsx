@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { AiImageLabel } from "@/components/ai-image-label";
+import { photoProps } from "@/lib/photo-url";
 
 /**
  * A vehicle's photos (Rory, 1 Nov 2026): the main photo large, in the 4:3 shape phone cameras take, so it is not
@@ -16,9 +18,14 @@ export function PhotoGallery({
   maxThumbs = 4,
   overlay,
   className = "",
-  dimmed = false
+  dimmed = false,
+  aiPhotos,
+  aiLabel
 }: {
   photos: string[];
+  /** Per photo: made by AI. With `aiLabel` (gallery.aiImage), those carry the small "AI image" label. */
+  aiPhotos?: boolean[];
+  aiLabel?: string;
   alt: string;
   /** How many thumbnails sit under the main photo; the last becomes "+N" when there are more. */
   maxThumbs?: number;
@@ -38,8 +45,9 @@ export function PhotoGallery({
       <div className="relative">
         <button aria-label={say("open")} className="block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[var(--panel-secondary)]" onClick={() => setOpenAt(0)} type="button">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt={alt} className={`h-full w-full object-cover ${dimmed ? "opacity-60" : ""}`} src={photos[0]} />
+          <img alt={alt} className={`h-full w-full object-cover ${dimmed ? "opacity-60" : ""}`} decoding="async" height={900} width={1200} {...photoProps(photos[0], "(min-width: 1024px) 40vw, 100vw", 960)} />
         </button>
+        {aiLabel ? <AiImageLabel label={aiLabel} show={aiPhotos?.[0]} /> : null}
         {overlay}
       </div>
       {thumbs.length ? (
@@ -55,7 +63,8 @@ export function PhotoGallery({
                 type="button"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img alt="" className={`h-full w-full object-cover ${dimmed ? "opacity-60" : ""}`} loading="lazy" src={url} />
+                <img alt="" className={`h-full w-full object-cover ${dimmed ? "opacity-60" : ""}`} decoding="async" height={320} loading="lazy" width={320} {...photoProps(url, "(min-width: 640px) 120px, 25vw", 320)} />
+                {aiLabel && !isLast ? <AiImageLabel className="!bottom-1 !left-1 !px-1.5 !text-[10px]" label={aiLabel} show={aiPhotos?.[index + 1]} /> : null}
                 {isLast ? <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-[20px] font-bold text-white">+{hidden + 1}</span> : null}
               </button>
             );

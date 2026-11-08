@@ -44,19 +44,26 @@ export async function savePartnerNetwork(input: { enabled: boolean; reach?: stri
   return { ok: true };
 }
 
-/** Listing on the public directory. */
-export async function saveDirectoryListing(input: { enabled: boolean }): Promise<Result<{}>> {
+/**
+ * Listing on rove.rent (Settings, or the one-time question when the first vehicle is added). `enabled` null: only
+ * records that the question was answered ("Not now"), leaving the listing as it is. Either way it isn't asked again.
+ */
+export async function saveDirectoryListing(input: { enabled: boolean | null }): Promise<Result<{}>> {
   const who = await member();
   if ("error" in who) return { ok: false, error: who.error };
   if (who.membership.role !== "owner") return { ok: false, error: await said("Only the business owner can change this.") };
   const supabase = (await createSupabaseServerClient()) as any;
-  const current = (who.organization.settings && typeof who.organization.settings === "object" ? who.organization.settings : {}) as Record<string, unknown>;
+  // Read fresh, so a settings change made elsewhere in the meantime is kept.
+  const { data: fresh } = await supabase.from("organizations").select("settings").eq("id", who.organization.id).maybeSingle();
+  const current = (fresh?.settings && typeof fresh.settings === "object" ? fresh.settings : who.organization.settings && typeof who.organization.settings === "object" ? who.organization.settings : {}) as Record<string, unknown>;
+  const directory = (current.directory && typeof current.directory === "object" ? current.directory : {}) as Record<string, unknown>;
   const { error } = await supabase
     .from("organizations")
-    .update({ settings: { ...current, directory: { ...((current.directory as Record<string, unknown>) || {}), enabled: input.enabled === true } } })
+    .update({ settings: { ...current, directory: { ...directory, ...(input.enabled === null ? {} : { enabled: input.enabled === true }), ask: false, asked_at: directory.asked_at || new Date().toISOString() } } })
     .eq("id", who.organization.id);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/settings");
+  revalidatePath("/fleet");
   return { ok: true };
 }
 

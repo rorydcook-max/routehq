@@ -17,6 +17,7 @@ import { loadSiteData, loadSiteRow, uploadUrls } from "@/lib/sites/data";
 import { ldScript, siteJsonLd } from "@/lib/sites/seo";
 import { fleetNoun } from "@/lib/sites/format";
 import type { SiteConfig } from "@/lib/sites/config";
+import { isServedPhoto, sizedPhoto } from "@/lib/photo-url";
 
 export const dynamic = "force-dynamic";
 
@@ -70,12 +71,15 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   // The share picture: their own hero photo, else a vehicle photo, else their logo.
   const uploads = await uploadUrls(row.published);
   const hero = row.published.images.hero;
-  const image =
+  const picked =
     (hero?.kind === "upload" && uploads[hero.path]) ||
     (hero?.kind === "vehicle" && catalog.vehicles.find((vehicle) => vehicle.id === hero.vehicleId)?.photoUrl) ||
     catalog.vehicles.find((vehicle) => vehicle.photoUrl)?.photoUrl ||
     catalog.logoUrl ||
     null;
+  // A photo's stable address on the business's own booking address, as a 1200px JPEG (link previews don't all take WebP).
+  const origin = /^https?:\/\/[^/]+/.exec(canonical)?.[0] || "";
+  const image = isServedPhoto(picked) ? `${origin}${sizedPhoto(picked, 1280, "jpg")}` : picked;
   return {
     title: { absolute: title },
     description,

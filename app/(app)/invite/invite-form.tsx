@@ -44,7 +44,7 @@ export function InviteForm() {
       <label className="block">
         <span className={labelClass}>{say("iv_language")}</span>
         {/* Starts on the inviter's own language (it was always Thai, whatever the business's country). */}
-        <select className="mt-1 w-full" defaultValue={locale} name="preferredLocale">
+        <select className="app-select mt-1 w-full" defaultValue={locale} name="preferredLocale">
           {operatorLocaleOptions.map((option) => (
             <option key={option.code} value={option.code}>
               {option.label}

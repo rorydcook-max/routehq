@@ -5,6 +5,7 @@ date: 2026-10-28
 updated: 2026-10-28
 category: operations
 country: global
+launch: payments
 faq:
   - q: "How much does HQ Rental Software cost?"
     a: "As of October 2026, HQ's public pricing page lists Basic at $120 a month (up to 10 vehicles), Standard at $175 (25 vehicles) and Professional at $250 (50 vehicles), plus a one-time onboarding fee of $550 to $1,500. Larger fleets use a price calculator. Check their site for current prices."

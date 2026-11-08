@@ -2,15 +2,15 @@
 
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Download, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { deleteBusiness, updateIdPhotoRetention, type PrivacyActionState } from "@/app/actions/privacy";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const start: PrivacyActionState = { ok: false };
 
 /**
- * The owner's privacy tools on My account (GDPR / UK GDPR / PDPA, 3 Nov 2026): download everything, how long to keep
- * renters' ID photos, and delete the business (typed name, can't be undone).
+ * The owner's privacy tools on My account (GDPR / UK GDPR / PDPA, 3 Nov 2026): how long to keep renters' ID photos,
+ * and delete the business (typed name, can't be undone). Downloading everything is on Settings › Plan.
  */
 export function BusinessPrivacy({ businessName, months, autoDelete }: { businessName: string; months: number; autoDelete: boolean }) {
   const say = useTranslations("privacy") as unknown as Say;
@@ -22,15 +22,7 @@ export function BusinessPrivacy({ businessName, months, autoDelete }: { business
 
   return (
     <div className="mt-4 space-y-3">
-      <div className="rounded-2xl bg-[var(--panel-secondary)] p-3.5">
-        <p className="text-[16px] font-bold text-[var(--foreground)]">{say("exportTitle")}</p>
-        <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("exportBody")}</p>
-        <a className="secondary-action pressable mt-3 whitespace-nowrap" download href="/account/export">
-          <Download size={17} />
-          {say("exportButton")}
-        </a>
-      </div>
-
+      {/* "Download all your data" lives on Settings › Plan only (build-s, 8 Nov 2026): it was here as well. */}
       <form action={saveRetention} className="rounded-2xl bg-[var(--panel-secondary)] p-3.5">
         <p className="text-[16px] font-bold text-[var(--foreground)]">{say("retentionTitle")}</p>
         <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("retentionBody")}</p>

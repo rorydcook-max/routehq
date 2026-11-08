@@ -439,7 +439,14 @@
     "lateOptTodayDetailPlain": "Back {date} as booked",
     "lateOptTodayDetailMoves": "Every payment date moves {days, plural, one {# day} other {# days}} later",
     "lateOptBookedTitle": "Keep booked dates",
-    "lateOptBookedDetail": "Charged from {date}"
+    "lateOptBookedDetail": "Charged from {date}",
+    "lateBackHeading": "{count, plural, one {Returned # day late} other {Returned # days late}}",
+    "lateBackCharge": "Late charge",
+    "lateBackFromDeposit": "Take from deposit",
+    "lateBackChargeRenter": "Charge the renter",
+    "lateBackWaive": "Waive",
+    "lateBackOverDeposit": "The deposit left covers up to {amount}.",
+    "lateBackRow": "{count, plural, one {# day late} other {# days late}}"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -956,7 +963,8 @@
     "bs_aboutPerDay": "Works out at about {amount} a day",
     "bs_vehicleCount": "{count, plural, one {# vehicle} other {# vehicles}}",
     "bs_demoBanner": "Demo business, example only. Bookings are turned off.",
-    "bs_demoNoBooking": "This is a demo business, so bookings are turned off."
+    "bs_demoNoBooking": "This is a demo business, so bookings are turned off.",
+    "reason_late_return": "late return"
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -1027,7 +1035,13 @@
     "extrasRefunded": "we've refunded {amount} for your extras. Thank you.",
     "extrasCredited": "the {amount} you paid for extras will come off your rent due {date}.",
     "extendCheck": "your rental of the {vehicle} ends on {date}. Are you extending? Tap Extend or Returning here: {link}",
-    "reviewRequest": "thank you for renting the {vehicle}. How was it? Leave a short review here: {link}"
+    "reviewRequest": "thank you for renting the {vehicle}. How was it? Leave a short review here: {link}",
+    "reason_late_return": "late return",
+    "cancelRefund": "We're refunding {amount} to you.",
+    "cancelNoRefund": "There is no refund.",
+    "cancelDepositBack": "Your {amount} deposit is being returned.",
+    "cancelDepositPart": "{returned} of your {held} deposit is being returned.",
+    "cancelDepositKept": "Your {amount} deposit has been kept."
   },
   "common": {
     "kinds_car": "Cars",
@@ -1044,7 +1058,9 @@
     "countOut": "{count} out",
     "countFree": "{count} free",
     "countBookedOrShop": "{count} booked / in shop",
-    "showMore": "Show {count} more ({left} left)"
+    "showMore": "Show {count} more ({left} left)",
+    "search": "Search",
+    "noMatches": "No matches"
   },
   "shell": {
     "quick_uploadReceipt": "Upload a receipt",
@@ -1105,7 +1121,8 @@
     "setupShared": "Link copied. Put it on your Google Maps listing, website, Instagram or Facebook page, and your WhatsApp or LINE profile.",
     "quick_askAssistant": "Add by chat",
     "quick_askAssistant_hint": "Vehicles or current rentals, by message or photo",
-    "paymentFailed": "Payment failed — update card"
+    "paymentFailed": "Payment failed — update card",
+    "setupHideConfirm": "Hide setup steps?"
   },
   "todo": {
     "eyebrow": "To do",
@@ -2515,7 +2532,9 @@
     "dateRange": "{start} to {end}",
     "cn_refundTooMuch": "The most you can refund is {amount}.",
     "cn_depositTooMuch": "The deposit still held is {amount}.",
-    "fin_cancelledSettled": "Refunds recorded. Nothing left to settle."
+    "fin_cancelledSettled": "Refunds recorded. Nothing left to settle.",
+    "share_send": "Send booking link",
+    "hist_late_return": "Returned late"
   },
   "newBooking": {
     "docsSelfie": "Photo of the customer",
@@ -4617,7 +4636,7 @@
     "ig_soon_flowaccount": "FlowAccount",
     "ig_soon_flowaccountBody": "Send invoices and payments to your Thai accounts.",
     "ig_soon_gbp": "Google Business Profile reviews",
-    "ig_soon_gbpBody": "Ask happy customers for a Google review.",
+    "ig_soon_gbpBody": "Ask customers for a Google review.",
     "ig_soon_quickbooks": "QuickBooks",
     "ig_soon_quickbooksBody": "Send income and costs to your accounts.",
     "ig_soon_xero": "Xero",
@@ -5945,7 +5964,82 @@
       "region_americas": "The Americas",
       "region_asia-pacific": "Asia-Pacific",
       "region_africa-middle-east": "Africa and the Middle East",
-      "budgetLabelPlain": "Most per day"
+      "budgetLabelPlain": "Most per day",
+      "startDate": "Start date",
+      "modeLabel": "Rental type",
+      "modeDates": "Set dates",
+      "modeMonthly": "Monthly",
+      "monthlyNote": "No end date, monthly price",
+      "navMonthly": "Monthly rentals",
+      "menu": "Menu",
+      "homeTitle2": "Rove: car, scooter and motorbike rental from local independent fleets",
+      "homeDescription2": "Rent cars, scooters and motorbikes from small and mid-sized local rental businesses worldwide. Live prices, monthly rates and booking direct with the owner.",
+      "heroTitle2": "Rent from local fleets, not rental giants",
+      "heroLede2": "Cars, scooters and motorbikes from small and mid-sized independent rental businesses. Their own prices, by the day or by the month, booked directly with them.",
+      "heroPoint1": "Independent local fleets",
+      "heroPoint2": "Monthly rates built in",
+      "heroPoint3": "No markup on the owner's price",
+      "typesTitle": "Browse by vehicle type",
+      "typeCars": "Cars",
+      "typeSmallCars": "Small cars",
+      "typeSuvs": "SUVs",
+      "typeScooters": "Scooters",
+      "featuredTitle": "Available now from local fleets",
+      "featuredLede": "Live listings at each owner's own prices. Add dates to see exact totals.",
+      "seeAllVehicles": "See all vehicles",
+      "orMonthly": "or {amount} a month",
+      "orDaily": "or {amount} a day",
+      "monthlyTag": "Monthly rate",
+      "viewDetails": "Details",
+      "valueTitle": "The independent alternative to the big rental brands",
+      "valueLede": "Rove only lists small and mid-sized local rental businesses. You rent from the people who own the vehicles.",
+      "valueLocalTitle": "Local, independent fleets",
+      "valueLocalBody": "Family-run shops and growing local fleets that rent what people there actually drive, from scooters to seven-seaters.",
+      "valueMonthlyTitle": "Built for long stays",
+      "valueMonthlyBody": "Many owners set weekly and monthly prices, so a longer rental often works out much cheaper per day.",
+      "valuePriceTitle": "The owner's price, nothing added",
+      "valuePriceBody": "Prices on Rove come straight from each business's own booking page. Rove adds no booking fee or markup.",
+      "valueDirectTitle": "Book and deal direct",
+      "valueDirectBody": "Your booking goes to the business itself. They confirm the handover, and they're who you call on the road.",
+      "placesTitle": "Popular destinations",
+      "placesLede": "Where to rent, with sourced local rules on licenses, helmets and deposits for each place.",
+      "allDestinations": "All destinations",
+      "monthlyTitle": "Staying a month or longer?",
+      "monthlyLede": "Rent month to month at the owner's monthly price. Pick a start date; no end date needed.",
+      "monthlyCheck1": "Monthly prices set by each local owner",
+      "monthlyCheck2": "Book with just a start date",
+      "monthlyCheck3": "Delivery to your door from owners who offer it",
+      "monthlyCta": "Search monthly rentals",
+      "aboutPerDay": "about {amount} a day",
+      "rateCardNote": "Live prices from {business} on Rove.",
+      "beforeYouDrive": "Before you drive",
+      "allGuides": "All guides",
+      "operatorsTitle": "Run a small rental fleet?",
+      "operatorsBody": "List your cars, scooters and bikes on Rove. It comes with RoveHQ, the booking and fleet software built for independent rental businesses.",
+      "footerAbout": "Rove is the marketplace for small and mid-sized independent rental fleets. Each business sets its own prices and terms and handles your booking.",
+      "footerRenters": "Renters",
+      "footerOperatorsTitle": "Rental businesses",
+      "footerHqPricing": "RoveHQ pricing",
+      "footerHqGuides": "Guides for operators",
+      "footerCompany": "Company",
+      "footerAboutHq": "About RoveHQ",
+      "footerCopyright": "© {year} Rove by RoveHQ",
+      "sortLabel": "Sort results",
+      "emptyMonthly": "Search monthly instead",
+      "emptyAnywhere": "Search everywhere",
+      "emptyPlacesTitle": "Places with live vehicles",
+      "specsTitle": "Specifications",
+      "figureListings": "Vehicles listed",
+      "figureBusinesses": "Local businesses",
+      "gettingAroundIn": "Getting around {place}",
+      "dailyMonthlyTitle": "Daily or monthly?",
+      "countryPlacesTitle": "Where to rent in {country}",
+      "destinationsMetaTitle": "Car and scooter rental destinations worldwide | Rove",
+      "destinationsLive": "Live on Rove now",
+      "destinationsDescription": "Car, scooter and motorbike rental destinations on Rove, by region, with live vehicles from local independent businesses.",
+      "destIndexTitle": "Destinations",
+      "destIndexLede": "Every place on Rove: live vehicles from local businesses where they're listed, and sourced rules for renters everywhere.",
+      "moreFrom": "More from {business}"
     }
   },
   "help": {
@@ -6059,7 +6153,8 @@
     "liveTitle": "Live chat",
     "liveBody": "Ask anything, send files, or talk to a person from the RoveHQ team.",
     "liveButton": "Open live chat",
-    "fromAssistant": "RoveHQ assistant"
+    "fromAssistant": "RoveHQ assistant",
+    "showSetup": "Show setup steps"
   },
   "inspectStart": {
     "titleOut": "Hand over a vehicle",
@@ -6458,7 +6553,14 @@
     "mockAvailable": "Available",
     "mockPerDay": "{amount} a day",
     "mockQrPay": "QR payment",
-    "inclImport": "Free import of your existing records"
+    "inclImport": "Free import of your existing records",
+    "inclPaymentsGlobal": "Bank transfer, Wise and Revolut payments, deposits and receipts",
+    "mockPaymentLabelGlobal": "A payment request on a phone with bank transfer details, and the customer's receipt matched to the booking",
+    "mockPayByTransfer": "Pay by bank transfer",
+    "mockAccount": "Account",
+    "mockReference": "Reference",
+    "mockReceiptMatched": "Receipt matched to the booking",
+    "mockBankTransfer": "Bank transfer"
   },
   "businessClosed": {
     "title": "This business was closed",
@@ -6701,13 +6803,13 @@
     "faqQ5": "Do my customers need an app?",
     "faqA5": "No. Booking links open in their browser.",
     "faqQ6": "How do customers book?",
-    "faqA6": "Send them your booking link or put the booking box on your website. They choose dates, photograph their passport and license, and sign on their phone.",
+    "faqA6": "Send them your booking link or put the booking box on your website. They choose dates, photograph their passport or ID and their driver's license, and sign on their phone.",
     "faqQ7": "Does it work with WhatsApp, LINE and Telegram?",
     "faqA7": "LINE and Telegram work today: messages arrive in one inbox, next to the booking they belong to. WhatsApp is coming soon (Meta has to approve it). Until then you can send booking links and reminders from your own WhatsApp in one tap.",
     "faqQ8": "Can my staff use it?",
     "faqA8": "Yes. Staff handle bookings and handovers; reports and settings stay with the owner.",
     "faqQ9": "How do customers pay?",
-    "faqA9": "By QR code for the exact amount, bank transfer or cash. RoveHQ reads payment slips and matches them to the booking.",
+    "faqA9": "By bank transfer, Wise or Revolut, by QR code where that's how people pay (PromptPay in Thailand), or cash. Customers send the receipt or slip from their booking link and RoveHQ matches it to the booking. Card payments through Stripe are coming soon.",
     "faqQ10": "How are deposits handled?",
     "faqA10": "Each booking records the deposit taken and how it was returned, with photos from handover and return if there's a dispute.",
     "faqQ11": "Does RoveHQ take a cut of my bookings?",
@@ -6752,7 +6854,7 @@
     "byAuthor": "By {name}",
     "authorName": "Anan",
     "authorRole": "Founder, RoveHQ",
-    "authorBio": "Anan runs a car rental business on Koh Samui, Thailand, and built RoveHQ to run it.",
+    "authorBio": "Anan runs a car rental business and built RoveHQ to run it.",
     "resourcesEyebrow": "Free resources",
     "resourcesTitle": "Free templates and tools",
     "resourcesBody": "Download, fill in, use today.",
@@ -6960,7 +7062,7 @@
     "segCarF2Title": "Handover with photos, fuel and mileage",
     "segCarF2Body": "Read the odometer from a photo, record fuel and damage, and get the customer's signature. At return, RoveHQ shows what changed since handover.",
     "segCarF3Title": "Deposits and payments",
-    "segCarF3Body": "Take a deposit, deduct fuel or damage at return and give back the rest, all on record. Customers pay by QR code and send the slip, and RoveHQ matches it to the booking.",
+    "segCarF3Body": "Take a deposit, deduct fuel or damage at return and give back the rest, all on record. Customers pay by bank transfer, Wise, Revolut or QR code and send the receipt, and RoveHQ matches it to the booking.",
     "segCarF4Title": "Monthly rentals and season prices",
     "segCarF4Body": "Set monthly prices, offer a lower price for paying months ahead and raise prices for high season. Extend a rental and the customer signs the change on their phone.",
     "segCarF5Title": "Tax, insurance and service reminders",
@@ -7088,14 +7190,28 @@
     "bxT_folio": "Folio",
     "bxTd_folio": "Like a magazine, with your name as the masthead.",
     "bxT_neon": "Neon",
-    "bxTd_neon": "Night city colors, for scooters and cars after dark."
+    "bxTd_neon": "Night city colors, for scooters and cars after dark.",
+    "heroBodyGlobal": "Customers book online, upload their documents and sign the agreement on their own. RoveHQ reads the documents, tracks every payment and deposit, and tells you what's next.",
+    "step1BodyGlobal": "Send one link, or let them book on your page. They pick dates, photograph their ID and driver's license, and sign on their phone.",
+    "step3TitleGlobal": "Payments on record, without the chasing",
+    "step3BodyGlobal": "Customers pay by bank transfer, Wise or Revolut from their booking link and upload the receipt. RoveHQ matches it and marks the booking paid. Card payments through Stripe are coming soon.",
+    "step3b1Global": "Your payment details on every booking",
+    "step3b2Global": "Receipts matched automatically",
+    "auto2Global": "License read",
+    "auto5Global": "Payment receipt matched",
+    "never1Global": "Type license details by hand",
+    "never2Global": "Chase payment receipts by email and chat",
+    "faqPayQ": "How do my customers pay?",
+    "faqPayA": "By bank transfer, Wise or Revolut from their booking link, or in person. They upload the receipt and RoveHQ matches it to the booking. Card payments through Stripe, with Apple Pay and Google Pay, are coming soon.",
+    "faqPayAAsia": "By QR code for the exact amount (PromptPay in Thailand), bank transfer or cash. They send the slip from their booking link and RoveHQ matches it to the booking."
   },
   "gallery": {
     "open": "Open photo",
     "close": "Close",
     "prev": "Previous photo",
     "next": "Next photo",
-    "more": "{count} more photos"
+    "more": "{count} more photos",
+    "aiImage": "AI image"
   },
   "onboarding": {
     "title": "Set up RoveHQ",
@@ -7126,7 +7242,8 @@
     "optHelp": "Send us your records, we'll set it up",
     "optHelpBody": "Send photos of your notebook, a spreadsheet or chats. We bring it all in.",
     "countryChoose": "Choose your country",
-    "needCountry": "Choose your country."
+    "needCountry": "Choose your country.",
+    "back": "Back"
   },
   "fleetAssistant": {
     "title": "Fleet assistant",
@@ -7735,7 +7852,8 @@
     "step3p_b": "Pick it up from {business} in {place}. Bring your license and passport.",
     "step3p_b_np": "Pick it up from {business}. Bring your license and passport.",
     "spec_year": "Year",
-    "spec_deposit": "Deposit"
+    "spec_deposit": "Deposit",
+    "fleet_perMonth": "{amount} a month"
   },
   "siteEditor": {
     "look": "Look",
@@ -7905,6 +8023,49 @@
     "role_surface": "Cards",
     "role_text": "Text",
     "role_muted": "Muted text",
-    "role_dark": "Dark sections"
+    "role_dark": "Dark sections",
+    "pal_autoSummary": "Template colors",
+    "noReviewsYet": "No reviews yet"
+  },
+  "roveListing": {
+    "title": "Share your fleet on rove.rent and accept bookings there?",
+    "yes": "Yes, turn on",
+    "notNow": "Not now",
+    "terms": "rove.rent terms",
+    "failed": "Couldn't save. Please try again."
+  },
+  "aiPhotos": {
+    "generate": "Generate with AI",
+    "enhanceAll": "Enhance all",
+    "enhance": "Enhance with AI",
+    "revert": "Revert to original",
+    "infoLabel": "About AI photos",
+    "info": "Generate makes a matching studio set from the vehicle's make, model, year and color, with its plate. Enhance fixes light, angle and framing of your own photos without changing the vehicle.",
+    "left": "{count, plural, one {# AI image left} other {# AI images left}}",
+    "missing": "Add these first:",
+    "f_make": "Make",
+    "f_model": "Model",
+    "f_year": "Year",
+    "f_color": "Color",
+    "editVehicle": "Edit vehicle",
+    "generating": "Generating {done} of {total}",
+    "enhancing": "Enhancing {done} of {total}",
+    "results": "AI results",
+    "keep": "Keep",
+    "keepAll": "Keep all",
+    "discard": "Discard",
+    "enhanced": "Enhanced",
+    "generated": "AI image",
+    "a_front": "Front",
+    "a_side": "Side",
+    "a_rear": "Rear",
+    "a_interior": "Interior",
+    "a_detail": "Cockpit",
+    "err_unavailable": "AI photos aren't available yet.",
+    "err_busy": "The AI service is busy. Try again in a minute.",
+    "err_refused": "The AI couldn't make this photo.",
+    "err_quota": "This month's AI images are used up. More on {date}.",
+    "err_quotaNow": "This month's AI images are used up.",
+    "err_failed": "Something went wrong. Try again."
   }
 }

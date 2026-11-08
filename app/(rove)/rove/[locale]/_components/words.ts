@@ -12,9 +12,13 @@ export async function searchWords(): Promise<SearchWords> {
     wherePlaceholder: t("rv.wherePlaceholder"),
     from: t("rv.pickUp"),
     to: t("rv.dropOff"),
+    start: t("rv.startDate"),
     kind: t("kind"),
     anyKind: t("anyKind"),
-    monthly: t("rv.monthlyOpen"),
+    modeLabel: t("rv.modeLabel"),
+    modeDates: t("rv.modeDates"),
+    modeMonthly: t("rv.modeMonthly"),
+    monthlyNote: t("rv.monthlyNote"),
     search: t("search"),
     kinds: ROVE_KINDS.map((value) => ({ value, label: t(`kind_${value}`) }))
   };

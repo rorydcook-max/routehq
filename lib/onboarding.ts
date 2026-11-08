@@ -107,7 +107,9 @@ export async function getOnboardingStatus(supabase: any, organizationId: string,
   const offersLine = orgCountry(organization) === "TH" || Boolean(organization.line_user_id);
 
   // Steps already dealt with in setup, or not needed for this account, are left off the list (and the count).
-  const items = onboardingSteps.filter((item) => item.step !== "business_profile" && (item.step !== "verify_email" || options.emailPending) && (item.step !== "line_connected" || offersLine)).map((item) => {
+  // "Take your first booking" was the same step as "Add who's renting now" (both done by the first booking): one step
+  // now (build-s, 8 Nov 2026). The row stays in the table for older lists.
+  const items = onboardingSteps.filter((item) => item.step !== "business_profile" && item.step !== "first_booking" && (item.step !== "verify_email" || options.emailPending) && (item.step !== "line_connected" || offersLine)).map((item) => {
     const stored = checklistRows.get(item.step);
     const completed = item.step === "verify_email" ? !options.emailPending : Boolean(dynamicCompletion[item.step] || stored?.completed);
     return {

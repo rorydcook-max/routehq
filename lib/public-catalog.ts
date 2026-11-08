@@ -9,7 +9,7 @@ import { displayPhone } from "@/lib/phone";
 import { kindFromCategory, type VehicleKind } from "@/lib/vehicle-groups";
 import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { vatSettings, withVat } from "@/lib/regional";
-import { vehiclePhotoUrls } from "@/lib/vehicle-photos";
+import { publicVehiclePhotos, vehiclePhotoUrls } from "@/lib/vehicle-photos";
 import { bookingAddress } from "@/lib/booking-address";
 
 /**
@@ -33,6 +33,8 @@ export type CatalogVehicle = {
   photoUrl: string | null;
   /** All its photos, main first, for the gallery when the card is opened. */
   photoUrls: string[];
+  /** Per photo (same order as photoUrls): made by AI, not photographed (lib/photo-url.ts SHOW_AI_IMAGE_LABEL). */
+  photoAi?: boolean[];
   details: string[];
   dailyRate: number;
   weeklyRate: number;
@@ -107,7 +109,19 @@ export async function getPublicCatalog(slug: string, options: { includeOff?: boo
   }
 
   // Each vehicle's photos in the order set on the vehicle page: the first on the card, the rest in its gallery.
-  const photosByVehicle = await vehiclePhotoUrls(admin, organization.id, 12).catch(() => new Map<string, string[]>());
+  // At their stable, cacheable address (app/api/rove-photo), so shared and cached pages never show an expired link.
+  // That address only serves a page that's on; the owner's preview of a page that's off gets signed links.
+  const photosByVehicle = new Map<string, string[]>();
+  const aiByVehicle = new Map<string, boolean[]>();
+  if (settings.enabled) {
+    const served = await publicVehiclePhotos(admin, organization.id, 12).catch(() => new Map<string, Array<{ url: string; aiGenerated: boolean }>>());
+    for (const [vehicleId, list] of served) {
+      photosByVehicle.set(vehicleId, list.map((photo) => photo.url));
+      aiByVehicle.set(vehicleId, list.map((photo) => photo.aiGenerated));
+    }
+  } else {
+    for (const [vehicleId, urls] of await vehiclePhotoUrls(admin, organization.id, 12).catch(() => new Map<string, string[]>())) photosByVehicle.set(vehicleId, urls);
+  }
 
   const vehicles: CatalogVehicle[] = ((vehiclesResult.data || []) as any[])
     .filter((vehicle) => !HIDDEN_STATUS.test(String(vehicle.status || "")))
@@ -122,6 +136,7 @@ export async function getPublicCatalog(slug: string, options: { includeOff?: boo
         kind: kindFromCategory(vehicle.vehicle_categories),
         photoUrl: photosByVehicle.get(vehicle.id)?.[0] || null,
         photoUrls: photosByVehicle.get(vehicle.id) || [],
+        photoAi: aiByVehicle.get(vehicle.id) || [],
         details: [specs.transmission, specs.fuel_type, seats > 0 ? `${seats} seats` : null].filter(Boolean).map(String),
         dailyRate: gross(vehicle.daily_rate),
         weeklyRate: gross(vehicle.weekly_rate),

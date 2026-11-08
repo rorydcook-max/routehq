@@ -10,7 +10,7 @@ import s from "../rove.module.css";
  * only written in English so far), and remembers the choice (the same cookie as businesses' booking pages), so
  * rove.rent/ opens in it next time instead of following the phone's language.
  */
-export function LanguagePicker({ current, label, short, options }: { current: string; label: string; short: string; options: Array<{ code: string; label: string }> }) {
+export function LanguagePicker({ current, label, short, options, placement = "down" }: { current: string; label: string; short: string; options: Array<{ code: string; label: string }>; placement?: "down" | "up" }) {
   const [here, setHere] = useState<{ path: string; search: string; section: Parameters<typeof roveHasLocale>[0] } | null>(null);
 
   useEffect(() => {
@@ -24,8 +24,8 @@ export function LanguagePicker({ current, label, short, options }: { current: st
   };
 
   return (
-    <details className={s.lang}>
-      <summary aria-label={label} className={s.navLink}>
+    <details className={placement === "up" ? `${s.lang} ${s.langUp}` : s.lang}>
+      <summary aria-label={label} className={placement === "up" ? s.footerLang : s.navLink}>
         <i aria-hidden="true" className="ti ti-world" style={{ marginInlineEnd: 6, fontSize: 18 }} />
         {short}
       </summary>

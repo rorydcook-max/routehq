@@ -16,6 +16,12 @@ const BASE = 16;
 // Customers of a business (booking, amending, the rental directory) aren't RoveHQ's users: no chat for them. Nor in
 // RoveHQ's own admin pages, where the team answers chats rather than starting them.
 const NO_CHAT = /^\/(book|amend|rent|platform)(\/|$)|^\/help\/team(\/|$)/;
+/**
+ * Form pages (build-s, 8 Nov 2026): on a phone the button sat on fields at the right edge (the new booking's end-date
+ * icon, the fleet form, the vehicle page) as well as the save bars, so it is not shown there below tablet width.
+ * Help's "Open live chat" and Ctrl/⌘+K still open the chat.
+ */
+const FORM_PAGE = /^\/(bookings\/(new|[^/]+\/edit)|customers\/new|fleet\/(new|import|[^/]+(\/edit)?)|receipts\/new|transactions\/new|inspections(\/.*)?)\/?$/;
 
 /**
  * Bars pinned to the bottom of the screen that the button must sit above: the phone tab bar (.glass-bar), form
@@ -196,7 +202,7 @@ export function ChatLauncher({ site = false, owner }: { site?: boolean; owner?: 
         aria-label={open ? t("launcherClose") : unread ? `${t("launcher")} (${t("unread")})` : t("launcher")}
         className={`chat-launcher fixed z-[45] flex items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_12px_28px_-10px_rgba(16,38,43,0.55)] transition-[bottom,transform,opacity] duration-200 hover:bg-[var(--primary-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] ${
           hidden ? "pointer-events-none scale-75 opacity-0" : ""
-        } ${open ? "max-lg:hidden" : ""}`}
+        } ${open ? "max-lg:hidden" : FORM_PAGE.test(pathname) ? "max-md:hidden" : ""}`}
         onClick={() => (open ? setOpen(false) : show())}
         ref={button}
         style={{ width: SIZE, height: SIZE, right: `max(${BASE}px, env(safe-area-inset-right))`, bottom }}

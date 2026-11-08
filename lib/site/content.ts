@@ -6,6 +6,7 @@ import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { localizeSitePath } from "@/lib/site/locale-path";
 import { isLaunched } from "@/lib/site/launch";
 import { imageSize } from "@/lib/site/covers";
+import { regionsForCountries, type SiteRegion } from "@/lib/site/region";
 
 /**
  * The website's written content: guides (content/guides/<locale>/<slug>.md) and free resources
@@ -284,11 +285,23 @@ export function listGuides(locale: string): GuideMeta[] {
     .sort((a, b) => regionRank(a) - regionRank(b) || b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
 }
 
-/** 0 for a guide that applies everywhere ("global" or no country), 1 for one about a single country. */
-function regionRank(guide: GuideMeta) {
-  const country = String(guide.country || "").trim().toLowerCase();
-  return !country || country === "global" ? 0 : 1;
+/** 0 for a guide that applies everywhere ("global" or no country), 1 for one about a single country or region. */
+function regionRank(guide: GuideMeta, region?: SiteRegion | null) {
+  const regions = regionsForCountries(guide.country);
+  if (region && regions.includes(region)) return -1;
+  return regions.length ? 1 : 0;
 }
+
+/**
+ * Every published guide in a language for a visitor from a region (lib/site/region.ts): the ones about their region
+ * first, then the ones for every market, then guides about other regions. Newest first within each.
+ */
+export function listGuidesFor(locale: string, region: SiteRegion | null): GuideMeta[] {
+  return listGuides(locale).sort((a, b) => regionRank(a, region) - regionRank(b, region) || b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
+}
+
+/** The regions a guide is about (none for a guide for every market). */
+export const guideRegions = (guide: Pick<GuideMeta, "country">) => regionsForCountries(guide.country);
 
 /** The languages a guide has been written in. */
 export function guideLocales(slug: string): string[] {

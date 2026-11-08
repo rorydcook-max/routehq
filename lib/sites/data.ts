@@ -6,6 +6,7 @@ import { serviceAreasFor, type BranchRow } from "@/lib/service-area";
 import { siteConfigFrom, siteConfigFromLegacy, templateForFleet, type SiteConfig } from "@/lib/sites/config";
 import { buildPolicies } from "@/lib/sites/policies";
 import { displayPhone } from "@/lib/phone";
+import { sitePhotoAddress } from "@/lib/photo-url";
 import type { SiteCatalog, SiteData } from "@/lib/sites/types";
 import type { getPublicCatalog } from "@/lib/public-catalog";
 
@@ -34,10 +35,14 @@ export async function loadSiteRow(organizationId: string, settings: unknown, kin
   return { draft, published, publishedAt: data?.published_at || null, hasRow: Boolean(data) };
 }
 
-/** Signed URLs for a config's uploaded images (an hour, like the rest of the booking page's photos). */
-export async function uploadUrls(config: SiteConfig): Promise<Record<string, string>> {
-  const admin = createSupabaseAdminClient() as any;
+/**
+ * URLs for a config's uploaded images: their stable, cacheable address (app/api/rove-photo) while the page is on,
+ * so shared links never break; signed links (an hour) for the owner's preview of a page that's off.
+ */
+export async function uploadUrls(config: SiteConfig, options: { pageOn?: boolean } = {}): Promise<Record<string, string>> {
   const paths = [config.images.hero, config.images.about].flatMap((ref) => (ref?.kind === "upload" ? [ref.path] : []));
+  if (options.pageOn !== false) return Object.fromEntries(paths.map((path) => [path, sitePhotoAddress(path)]));
+  const admin = createSupabaseAdminClient() as any;
   const entries = await Promise.all(
     paths.map(async (path) => [path, await resolveBrandingAssetUrl(admin, { bucket: "branding", path }, { expiresIn: 60 * 60 }).catch(() => null)] as const)
   );
@@ -57,7 +62,7 @@ export async function loadSiteData(input: { catalog: Catalog; slug: string; conf
     admin.from("branches").select("id, name, address, latitude, longitude, service_radius_km, is_active").eq("organization_id", catalog.organizationId),
     getPublishedReviews(catalog.organizationId, 12).catch(() => []),
     getReviewStats(catalog.organizationId).catch(() => ({ average: 0, count: 0 })),
-    uploadUrls(config)
+    uploadUrls(config, { pageOn: !catalog.pageOff })
   ]);
   const settings = organization?.settings && typeof organization.settings === "object" ? (organization.settings as Record<string, any>) : {};
   const areas = serviceAreasFor({ name: organization?.name, settings }, ((branches || []) as BranchRow[]))

@@ -9,6 +9,8 @@ import { Fold, Pane } from "@/components/ui";
 import { BrandColourField } from "@/app/(app)/settings/brand-colour-field";
 import { ContactChannels } from "@/app/(app)/settings/contact-channels";
 import { InfoTip } from "@/components/info-tip";
+import { PhoneField } from "@/components/phone-field";
+import { BrandSaveButton } from "@/app/(app)/settings/brand-save-button";
 
 // Fields take the global 44px height and regular weight; only the radius/border are set here.
 const inputClass =
@@ -55,8 +57,14 @@ export function ContractsBrandingSection({
   whiteLabel = false,
   footer,
   aside,
-  locations
+  locations,
+  phoneCountry = "",
+  ownerEmail = ""
 }: {
+  /** The business's country (ISO code): where the phone picker starts. */
+  phoneCountry?: string;
+  /** The owner's sign-up email, shown in Business email while that is empty. */
+  ownerEmail?: string;
   /** A line under the details (currency and time zone). */
   footer?: React.ReactNode;
   /** The rental agreement card, under the signature on the right. */
@@ -88,11 +96,13 @@ export function ContractsBrandingSection({
               </label>
               <label className="block">
                 <span className={labelClass}>{say("b_phone")}</span>
-                <input className={inputClass} defaultValue={organization.business_phone || ""} name="business_phone" type="tel" />
+                {/* The country code picker, as in setup (build-s, 8 Nov 2026), instead of typing +66… by hand. */}
+                <PhoneField codeName="business_phone_code" defaultCountry={phoneCountry} defaultNumber={organization.business_phone || ""} inputClass={inputClass} inputName="business_phone_national" />
               </label>
               <label className="block">
                 <span className={labelClass}>{say("b_email")}</span>
-                <input className={inputClass} defaultValue={organization.business_email || ""} name="business_email" type="email" />
+                {/* Empty: starts as the owner's sign-up email (build-s, 8 Nov 2026), saved with the form. */}
+                <input className={inputClass} defaultValue={organization.business_email || ownerEmail || ""} name="business_email" type="email" />
               </label>
               <ContactChannels
                 inputClass={inputClass}
@@ -165,9 +175,7 @@ export function ContractsBrandingSection({
               </span>
             </label>
           </div>
-          <button className="primary-action pressable mt-4 w-full sm:w-auto" form={FORM_ID} type="submit">
-            {say("save")}
-          </button>
+          <BrandSaveButton failedLabel={say("extra_saveFailed")} form={FORM_ID} label={say("save")} pendingLabel={say("saving")} savedLabel={say("saved")} />
         </section>
 
         <section className="card p-4">

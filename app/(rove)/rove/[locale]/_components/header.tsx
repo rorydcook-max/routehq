@@ -1,15 +1,25 @@
 import { getTranslations } from "next-intl/server";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
-import { roveHref } from "@/lib/rove/paths";
+import { roveHasLocale, roveHref } from "@/lib/rove/paths";
 import { roveHqSite } from "@/lib/rove/seo";
 import { LanguagePicker } from "./language-picker";
 import s from "../rove.module.css";
 
-/** Rove's header: the logo home, destinations, guides, the language list and "List your fleet" (RoveHQ's website). */
+/** Where "List your fleet" goes: RoveHQ's website, tagged so RoveHQ knows the visit came from rove.rent. */
+export function listFleetHref(campaign: string) {
+  return `${roveHqSite()}/?utm_source=rove.rent&utm_medium=referral&utm_campaign=${campaign}`;
+}
+
+/** Rove's header: the logo home, monthly rentals, destinations, guides, the language list and "List your fleet". */
 export async function RoveHeader({ locale }: { locale: string }) {
   const t = await getTranslations("directory");
   const current = supportedLocaleOptions.find((option) => option.code === locale);
+  const links = [
+    { href: `${roveHref("/search", locale)}?monthly=1`, label: t("rv.navMonthly"), icon: "ti-calendar-repeat" },
+    { href: roveHref("/destinations", roveHasLocale("destinations", locale) ? locale : "en"), label: t("rv.navDestinations"), icon: "ti-map-2" },
+    { href: "/guides", label: t("rv.navGuides"), icon: "ti-book-2" }
+  ];
   return (
     <header className={s.header}>
       <div className={`${s.wrap} ${s.headerRow}`}>
@@ -17,21 +27,36 @@ export async function RoveHeader({ locale }: { locale: string }) {
           <RouteHqLogo product="keys" showDescriptor={false} />
         </a>
         <nav aria-label={t("rv.navLabel")} className={s.nav}>
-          <a className={`${s.navLink} ${s.navHideSmall}`} href={`${roveHref("/", locale)}#destinations`}>
-            {t("rv.navDestinations")}
-          </a>
-          <a className={`${s.navLink} ${s.navHideSmall}`} href="/guides">
-            {t("rv.navGuides")}
-          </a>
+          {links.map((link) => (
+            <a className={`${s.navLink} ${s.navWide}`} href={link.href} key={link.href}>
+              {link.label}
+            </a>
+          ))}
           <LanguagePicker
             current={locale}
             label={t("rv.language")}
             options={supportedLocaleOptions.map((option) => ({ code: option.code, label: option.label }))}
             short={(current?.code || locale).toUpperCase()}
           />
-          <a className={`${s.listCta} ${s.navHideSmall}`} href={`${roveHqSite()}/?utm_source=rove.rent&utm_medium=referral&utm_campaign=list_your_fleet`}>
+          <a className={s.navCta} href={listFleetHref("list_your_fleet")}>
             {t("rv.listFleet")}
           </a>
+          <details className={s.menu}>
+            <summary aria-label={t("rv.menu")} className={s.menuButton}>
+              <i aria-hidden="true" className="ti ti-menu-2" />
+            </summary>
+            <div className={s.menuPanel}>
+              {links.map((link) => (
+                <a href={link.href} key={link.href}>
+                  <i aria-hidden="true" className={`ti ${link.icon}`} style={{ fontSize: 20, color: "var(--jade)" }} />
+                  {link.label}
+                </a>
+              ))}
+              <a className={s.menuCta} href={listFleetHref("list_your_fleet")}>
+                {t("rv.listFleet")}
+              </a>
+            </div>
+          </details>
         </nav>
       </div>
     </header>

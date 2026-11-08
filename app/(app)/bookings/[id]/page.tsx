@@ -1508,7 +1508,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               {isCancelled ? null : (
                 <div className="mt-3">
                   <div className="scroll-mt-4" id="send-link" />
-                <BookingShareActions currentUrl={bookingLink?.public_url || null} formDone={String(bookingLink?.status || "") === "completed"} organizationId={organization.id} rentalId={rental.id} />
+                <BookingShareActions currentUrl={bookingLink?.public_url || null} formDone={String(bookingLink?.status || "") === "completed"} organizationId={organization.id} rentalId={rental.id} sentBefore={Boolean(bookingLink?.sent_at) || ["sent", "viewed", "details_submitted", "contract_signed"].includes(String(bookingLink?.status || ""))} />
                 </div>
               )}
             </Pane>

@@ -44,6 +44,7 @@ export function OnboardingChecklist({
   const [emailSent, setEmailSent] = useState<"" | "sent" | "failed">("");
   const [sending, startSending] = useTransition();
   const [shared, setShared] = useState(false);
+  const [confirmHide, setConfirmHide] = useState(false);
   const allComplete = completedCount === totalCount;
   const progress = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
   const remaining = items.filter((item) => !item.completed);
@@ -82,13 +83,23 @@ export function OnboardingChecklist({
           <h2 className="card-title">{t(firstBookingTaken ? "setupTitleLater" : "setupTitle")}</h2>
           <p className="font-medium text-[var(--foreground-secondary)]">{t("setupProgress", { done: completedCount, total: totalCount })}</p>
         </div>
-        <form action={dismissChecklist}>
+        <button aria-expanded={confirmHide} aria-label={t("setupHide")} className="pressable flex h-11 w-11 items-center justify-center rounded-full text-[var(--foreground-secondary)]" onClick={() => setConfirmHide((open) => !open)} title={t("setupHide")} type="button">
+          <X size={20} />
+        </button>
+      </div>
+      {/* Asked first (build-s, 8 Nov 2026): Help › "Show setup steps" brings the list back. */}
+      {confirmHide ? (
+        <form action={dismissChecklist} className="mt-2 flex flex-wrap items-center gap-2 rounded-xl bg-[var(--panel-secondary)] p-2.5">
           <input name="organizationId" type="hidden" value={organizationId} />
-          <button aria-label={t("setupHide")} className="pressable flex h-11 w-11 items-center justify-center rounded-full text-[var(--foreground-secondary)]" title={t("setupHide")} type="submit">
-            <X size={20} />
+          <p className="min-w-0 flex-1 font-semibold text-[var(--foreground)]">{t("setupHideConfirm")}</p>
+          <button className="secondary-action pressable" onClick={() => setConfirmHide(false)} type="button">
+            {t("cancel")}
+          </button>
+          <button className="primary-action pressable" type="submit">
+            {t("setupHide")}
           </button>
         </form>
-      </div>
+      ) : null}
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
         <div className="h-full rounded-full bg-[var(--primary)] transition-[width] duration-500" style={{ width: `${progress > 0 ? Math.max(progress, 4) : 0}%` }} />
       </div>

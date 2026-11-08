@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
+import { trialDaysLeft } from "@/lib/plans";
 
 export async function GET() {
   const supabase = (await createSupabaseServerClient()) as any;
@@ -28,8 +29,8 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  const trialEndsAt = organization?.trial_ends_at ? new Date(organization.trial_ends_at).getTime() : null;
-  const daysRemaining = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt - Date.now()) / (24 * 60 * 60 * 1000))) : null;
+  // The same whole-day count as Settings and Stripe's checkout (lib/plans.ts).
+  const daysRemaining = trialDaysLeft(organization?.trial_ends_at);
   // Whether a Stripe subscription runs (a trial with a card on file needs no "Subscribe" reminder); the id stays server-side.
   const { stripe_subscription_id: subscriptionId, ...shown } = (organization || {}) as Record<string, unknown>;
 

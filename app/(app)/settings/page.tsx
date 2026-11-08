@@ -7,7 +7,7 @@ import { NotificationGrid } from "@/app/(app)/settings/notification-grid";
 import { SwitchField } from "@/components/switch-field";
 import { InfoTip } from "@/components/info-tip";
 import { currencySymbol } from "@/components/currency-symbol";
-import { effectiveLimits, fleetMix, planById } from "@/lib/plans";
+import { effectiveLimits, fleetMix, planById, trialDaysLeft as trialDaysLeftFor } from "@/lib/plans";
 import { getCustomPlan } from "@/lib/custom-plan";
 import { BillingSummary } from "@/app/(app)/settings/billing/billing-summary";
 import { SettingsTabs } from "@/app/(app)/settings/settings-tabs";
@@ -231,7 +231,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const currentPlan = effectiveLimits({ subscription_tier: organization.subscription_tier, custom_limits: customPlan.custom_limits });
   const planStatus = String(organization.subscription_status || "trial");
   const trialEndsAt = addressOrg.trial_ends_at as string | null | undefined;
-  const trialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (24 * 60 * 60 * 1000))) : null;
+  // The same whole-day count as Stripe's checkout (lib/plans.ts).
+  const trialDaysLeft = trialDaysLeftFor(trialEndsAt);
   const fleetNow = fleetMix((vehicleRates || []) as Array<{ category_id: string | null }>, categories);
   // Friendly names for the currency and time zone line; anything else is shown as stored.
   const currencyName = organization.currency === "THB" ? say("currencyThb") : organization.currency;
@@ -322,6 +323,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           }
           logoDisplayUrl={logoDisplayUrl}
           organization={{ ...organization, contact_channels: (organization as any).settings?.contact_channels || null }}
+          ownerEmail={viewerIsOwner ? userEmail || "" : ""}
+          phoneCountry={orgCountry(organization)}
           signatureDisplayUrl={signatureDisplayUrl}
           whiteLabel={String(organization.subscription_status || "trial") === "trial" || planById(organization.subscription_tier).whiteLabel}
         />
@@ -819,7 +822,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge tone="neutral">{member.role === "owner" ? say("team_owner") : member.role === "manager" ? say("team_manager") : say("team_mate")}</Badge>
+                  {/* No badge where the Level dropdown below already says it (build-s, 8 Nov 2026). */}
+                  {viewerIsOwner && member.user_id !== user?.id && member.role !== "owner" ? null : (
+                    <Badge tone="neutral">{member.role === "owner" ? say("team_owner") : member.role === "manager" ? say("team_manager") : say("team_mate")}</Badge>
+                  )}
                   {waitingMembers.has(member.id) ? <Badge tone="amber">{say("team_waiting")}</Badge> : null}
                 </div>
                 {viewerIsOwner && member.user_id !== user?.id ? (

@@ -76,7 +76,8 @@ export type SiteConfig = {
   customDark: boolean;
   /** A font pairing (lib/sites/fonts.ts); null uses the template's. */
   font: string | null;
-  sections: Array<{ id: SectionId; on: boolean }>;
+  /** `set`: the owner switched this section on or off themselves (only kept for Fleet, which starts off). */
+  sections: Array<{ id: SectionId; on: boolean; set?: boolean }>;
   text: Partial<Record<TextSlot, string>>;
   images: { hero: ImageRef | null; about: ImageRef | null };
   /** Up to four short points beside About ("Free delivery nearby"). */
@@ -138,10 +139,16 @@ function sectionsFrom(value: unknown): SiteConfig["sections"] {
     const id = record(item).id as SectionId;
     if (!SECTION_IDS.includes(id) || seen.has(id)) continue;
     seen.add(id);
+    // Fleet repeats the vehicles the booking section already lists (Rory, 8 Nov 2026): off unless the owner turned it on.
+    if (id === "fleet") {
+      const set = record(item).set === true;
+      sections.push(set ? { id, on: record(item).on !== false, set } : { id, on: false });
+      continue;
+    }
     sections.push({ id, on: id === "booking" ? true : record(item).on !== false });
   }
   // A section missing from what was stored goes at the end, so new sections always appear somewhere.
-  for (const id of SECTION_IDS) if (!seen.has(id)) sections.push({ id, on: true });
+  for (const id of SECTION_IDS) if (!seen.has(id)) sections.push({ id, on: id !== "fleet" });
   return sections;
 }
 
@@ -172,7 +179,7 @@ export function defaultSiteConfig(template: TemplateId = "coast"): SiteConfig {
     customAccent: null,
     customDark: false,
     font: null,
-    sections: SECTION_IDS.map((id) => ({ id, on: true })),
+    sections: SECTION_IDS.map((id) => ({ id, on: id !== "fleet" })),
     text: {},
     images: { hero: null, about: null },
     highlights: [],

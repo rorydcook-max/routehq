@@ -37,7 +37,8 @@ export function BookingPageTool({
   businessName,
   logoUrl,
   address,
-  signingReady = true
+  signingReady = true,
+  reviewsReady = false
 }: {
   slug: string;
   link: string;
@@ -52,6 +53,8 @@ export function BookingPageTool({
   logoUrl: string | null;
   address: React.ComponentProps<typeof BookingAddressPanel>;
   signingReady?: boolean;
+  /** Published reviews or a Google reviews link: the website's Reviews section has something to show. */
+  reviewsReady?: boolean;
 }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const signSay = useTranslations("newBooking");
@@ -73,7 +76,7 @@ export function BookingPageTool({
   // Their own address (subdomain or domain) when they have one; otherwise this app's /rent page.
   const link = shareLink && !shareLink.includes("/rent/") ? shareLink : `${origin}/rent/${slug}`;
   const src = `/rent/${slug}?draft=1&edit=1${version ? `&v=${version}` : ""}`;
-  const snippet = `<div data-routehq-booking="${slug}"></div>\n<script src="${origin}/embed.js" async></script>`;
+  const snippet = `<div data-rove-booking="${slug}"></div>\n<script src="${origin}/embed.js" async></script>`;
 
   function copy(text: string, what: "link" | "code") {
     navigator.clipboard
@@ -170,6 +173,7 @@ export function BookingPageTool({
                 {part.body}
               </Fold>
             )}
+            reviewsReady={reviewsReady}
             site={site}
             vehicles={editorVehicles}
           />
@@ -271,17 +275,19 @@ function Preview({ src, device, title, frameRef }: { src: string; device: Device
   useEffect(() => setLoading(true), [src]);
 
   const mobile = device === "mobile";
-  const deviceWidth = mobile ? 390 : 1280;
-  const frame = mobile ? 8 : 1;
+  // Already on a phone: the page full width, not a phone drawn inside the phone.
+  const bare = mobile && size.w > 0 && size.w < 480;
+  const deviceWidth = bare ? size.w - 2 : mobile ? 390 : 1280;
+  const frame = bare ? 1 : mobile ? 8 : 1;
   const scale = size.w ? Math.min(1, (size.w - frame * 2) / deviceWidth) : 1;
-  const outerHeight = mobile ? Math.min(size.h, 844 * scale + frame * 2) : size.h;
+  const outerHeight = mobile && !bare ? Math.min(size.h, 844 * scale + frame * 2) : size.h;
   const innerHeight = Math.max(0, outerHeight - frame * 2);
 
   return (
     <div className="relative h-full w-full overflow-hidden" ref={box}>
       {size.w ? (
         <div
-          className={`relative mx-auto overflow-hidden bg-white ${mobile ? "rounded-[30px] border-[8px] border-[#1f2329]" : "rounded-xl border border-[var(--border)]"}`}
+          className={`relative mx-auto overflow-hidden bg-white ${mobile && !bare ? "rounded-[30px] border-[8px] border-[#1f2329]" : "rounded-xl border border-[var(--border)]"}`}
           style={{ width: deviceWidth * scale + frame * 2, height: outerHeight }}
         >
           <iframe

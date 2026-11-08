@@ -13,6 +13,8 @@ export type InspectionContext = {
   hasPaymentSchedule?: boolean;
   /** The charge for days before the booked start is already on the booking (cash taken earlier in this handover). */
   earlyChargeWritten?: boolean;
+  /** The charge for days after the booked return date is already on the booking (cash taken earlier on this return form). */
+  lateChargeWritten?: boolean;
   vehicle: any;
   customer: any | null;
   gpsDevice: any | null;
@@ -190,11 +192,30 @@ export async function getInspectionContextByRental(
           ).data?.length
         )
       : false;
+  // The same for a late return: cash taken on the return form writes the late-days charge first, so a reopened
+  // form doesn't ask for it again.
+  const lateChargeWritten =
+    mode === "return"
+      ? Boolean(
+          (
+            await supabase
+              .from("rental_payments")
+              .select("id")
+              .eq("organization_id", organizationId)
+              .eq("rental_id", rentalId)
+              .is("deleted_at", null)
+              .not("metadata->late_return", "is", null)
+              .not("status", "in", "(voided,cancelled,waived)")
+              .limit(1)
+          ).data?.length
+        )
+      : false;
 
   return {
     mode,
     organizationId,
     rental: rentalForForm,
+    lateChargeWritten,
     unpaidPayments: Array.isArray(unpaidPaymentsResult.data) ? unpaidPaymentsResult.data : unpaidPaymentsResult.data ? [unpaidPaymentsResult.data] : [],
     hasPaymentSchedule: Number(scheduleCountResult.count || 0) > 0,
     earlyChargeWritten,

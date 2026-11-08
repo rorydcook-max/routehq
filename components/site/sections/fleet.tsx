@@ -1,8 +1,11 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { VehicleArt } from "@/components/vehicle-art";
-import { headlineRate } from "@/lib/rental-estimate";
+import { AiImageLabel } from "@/components/ai-image-label";
+import { photoProps } from "@/lib/photo-url";
+import { cardRates } from "@/lib/rental-estimate";
 import type { CatalogVehicle } from "@/lib/public-catalog";
 import { useSite } from "../site-context";
 import { imageTreatment, SectionHead } from "./parts";
@@ -14,18 +17,31 @@ export function featuredVehicles(vehicles: CatalogVehicle[], featured: string[])
   return [...vehicles].sort((a, b) => Number(Boolean(b.photoUrl)) - Number(Boolean(a.photoUrl))).slice(0, 6);
 }
 
+/** "From ฿500 a day", with the month price on a line under it (Rory, 8 Nov 2026): the day price leads, as on the booking cards. */
 function usePrice() {
-  const { money, t } = useSite();
-  return (vehicle: CatalogVehicle) => {
-    const rate = headlineRate(vehicle);
-    return rate ? t(`fleet_from_${rate.per}`, { amount: money(rate.amount) }) : null;
+  const { money, t, data } = useSite();
+  return (vehicle: CatalogVehicle): ReactNode => {
+    const { headline, others } = cardRates(vehicle, data.catalog.offer === "monthly");
+    if (!headline) return null;
+    const month = others.find((rate) => rate.per === "month");
+    return (
+      <>
+        {t(`fleet_from_${headline.per}`, { amount: money(headline.amount) })}
+        {month ? <span className={`${s.muted} block text-[14px] font-semibold`}>{t("fleet_perMonth", { amount: money(month.amount) })}</span> : null}
+      </>
+    );
   };
 }
 
-function Picture({ vehicle, className = "" }: { vehicle: CatalogVehicle; className?: string }) {
+/** `sizes`: how wide the picture's box is, so the browser fetches that width (lib/photo-url.ts), not the full photo. */
+function Picture({ vehicle, className = "", sizes = "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" }: { vehicle: CatalogVehicle; className?: string; sizes?: string }) {
+  const gallery = useTranslations("gallery");
   return vehicle.photoUrl ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img alt={vehicle.name} className={`absolute inset-0 h-full w-full object-cover ${className}`} decoding="async" height={900} loading="lazy" src={vehicle.photoUrl} width={1200} />
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img alt={vehicle.name} className={`absolute inset-0 h-full w-full object-cover ${className}`} decoding="async" height={900} loading="lazy" {...photoProps(vehicle.photoUrl, sizes, 640)} width={1200} />
+      <AiImageLabel label={gallery("aiImage")} show={vehicle.photoAi?.[0]} />
+    </>
   ) : (
     <div className="absolute inset-0 flex items-center justify-center">
       <VehicleArt className="!h-full !w-full !rounded-none !bg-transparent" colour={vehicle.color} kind={vehicle.kind} model={vehicle.name} size="xl" />
@@ -67,7 +83,7 @@ export function Fleet() {
             {vehicles.map((vehicle) => (
               <li className="flex flex-col" key={vehicle.id}>
                 <div className={`${s.image} aspect-[4/5] bg-[var(--s-raised)]`}>
-                  <Picture vehicle={vehicle} />
+                  <Picture sizes="(min-width: 1024px) 25vw, 80vw" vehicle={vehicle} />
                 </div>
                 <h3 className={`${s.display} mt-5 text-[26px]`}>{vehicle.name}</h3>
                 <p className={`${s.muted} mt-1 min-h-6 text-[15px]`}>{details(vehicle)}</p>
@@ -84,7 +100,7 @@ export function Fleet() {
             {vehicles.map((vehicle, index) => (
               <li className={`${s.card} flex flex-col overflow-hidden`} key={vehicle.id}>
                 <div className={`relative aspect-square ${index % 2 ? "bg-[var(--s-raised)]" : "bg-[var(--s-accent-soft)]"}`}>
-                  <Picture vehicle={vehicle} />
+                  <Picture sizes="(min-width: 1024px) 25vw, 50vw" vehicle={vehicle} />
                 </div>
                 <div className="flex flex-1 flex-col p-4">
                   <h3 className={`${s.display} text-[22px] sm:text-[26px]`}>{vehicle.name}</h3>
@@ -135,7 +151,7 @@ export function Fleet() {
 
 type LayoutProps = {
   vehicles: CatalogVehicle[];
-  price: (vehicle: CatalogVehicle) => string | null;
+  price: (vehicle: CatalogVehicle) => ReactNode;
   book: (vehicle: CatalogVehicle, className: string) => ReactNode;
   details?: (vehicle: CatalogVehicle) => string;
 };
@@ -149,7 +165,7 @@ function FleetList({ vehicles, price, book }: LayoutProps) {
       {vehicles.map((vehicle) => (
         <li className="grid grid-cols-[104px_1fr] items-center gap-x-4 gap-y-3 py-5 sm:grid-cols-[180px_1fr_auto] sm:gap-x-8" key={vehicle.id}>
           <div className="relative aspect-[4/3] overflow-hidden rounded-[calc(var(--s-r-image)*0.6)] bg-[var(--s-raised)]">
-            <Picture vehicle={vehicle} />
+            <Picture sizes="(min-width: 640px) 180px, 104px" vehicle={vehicle} />
           </div>
           <div className="min-w-0">
             <h3 className={`${s.display} text-[22px] sm:text-[30px]`}>{vehicle.name}</h3>
@@ -180,7 +196,7 @@ function FleetSpotlight({ vehicles, price, book }: LayoutProps) {
     <>
       <div className="mt-10 grid items-center gap-8 lg:grid-cols-[1.45fr_1fr] lg:gap-14">
         <div className={`${s.image} ${template.image === "slant" ? "" : treat} aspect-[4/3] bg-[var(--s-raised)] sm:aspect-[16/10]`}>
-          <Picture vehicle={first} />
+          <Picture sizes="(min-width: 1024px) 58vw, 100vw" vehicle={first} />
         </div>
         <div>
           <h3 className={`${s.display} text-[36px] sm:text-[52px]`}>{first.name}</h3>
@@ -205,7 +221,7 @@ function FleetSpotlight({ vehicles, price, book }: LayoutProps) {
           {rest.map((vehicle) => (
             <li className="flex flex-col" key={vehicle.id}>
               <div className={`${s.image} aspect-[4/3] bg-[var(--s-raised)]`}>
-                <Picture vehicle={vehicle} />
+                <Picture sizes="(min-width: 1024px) 25vw, 50vw" vehicle={vehicle} />
               </div>
               <h3 className="mt-3 text-[17px] font-bold leading-tight">{vehicle.name}</h3>
               <p className={`${s.muted} mt-1 text-[15px]`}>{price(vehicle)}</p>
@@ -229,7 +245,7 @@ function FleetMasonry({ vehicles, price, book, details }: LayoutProps) {
       {vehicles.map((vehicle, index) => (
         <li key={vehicle.id}>
           <div className={`${s.image} ${treat} ${MASONRY_SHAPES[index % MASONRY_SHAPES.length]} bg-[var(--s-raised)]`}>
-            <Picture vehicle={vehicle} />
+            <Picture sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" vehicle={vehicle} />
           </div>
           <h3 className={`${s.display} mt-4 text-[22px] sm:text-[28px]`}>{vehicle.name}</h3>
           {details?.(vehicle) ? <p className={`${s.muted} mt-1 text-[14.5px]`}>{details(vehicle)}</p> : null}

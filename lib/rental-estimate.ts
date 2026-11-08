@@ -102,6 +102,26 @@ export function headlineRate(rates: Rates): { amount: number; per: "month" | "we
   return null;
 }
 
+/**
+ * A booking-page card's prices (Rory, 8 Nov 2026): it leads with the day price (else the week, else the month) and
+ * the longer prices, the month first, go on the line under it. A business that only rents by the month shows the month.
+ */
+export function cardRates(rates: Rates, monthlyOnly = false): { headline: { amount: number; per: "month" | "week" | "day" } | null; others: Array<{ amount: number; per: "month" | "week" | "day" }> } {
+  if (monthlyOnly) return { headline: rates.monthlyRate > 0 ? { amount: rates.monthlyRate, per: "month" } : null, others: [] };
+  const all = [
+    rates.dailyRate > 0 ? { amount: rates.dailyRate, per: "day" as const } : null,
+    rates.weeklyRate > 0 ? { amount: rates.weeklyRate, per: "week" as const } : null,
+    rates.monthlyRate > 0 ? { amount: rates.monthlyRate, per: "month" as const } : null
+  ].filter(Boolean) as Array<{ amount: number; per: "month" | "week" | "day" }>;
+  const [headline = null, ...rest] = all;
+  return { headline, others: rest.reverse() };
+}
+
+/** Most of these vehicles have a monthly price: a booking page offering both opens on Monthly, else on set dates. */
+export function mostlyMonthly(vehicles: Rates[]): boolean {
+  return vehicles.length > 0 && vehicles.filter((vehicle) => vehicle.monthlyRate > 0).length * 2 > vehicles.length;
+}
+
 export type RentalPlan = { pricingModel: "daily" | "weekly" | "monthly"; rate: number };
 
 /**

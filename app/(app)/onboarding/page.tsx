@@ -8,8 +8,7 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
-import { locationOptions } from "@/lib/onboarding-locations";
-import { toCountryCode } from "@/lib/regional";
+import { ALL_COUNTRY_CODES, englishCountryName } from "@/lib/regional";
 
 export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ preview?: string; step?: string; added?: string; rentals?: string }> }) {
   // On a developer's machine only: /onboarding?preview=2 shows a step of the wizard for an account that has already finished it. Never on the live site.
@@ -64,19 +63,15 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   // skipped straight past the vehicles step.
   const profileDone = Boolean(organizationDetail.settings?.location);
 
-  // Where they are, guessed from where they are browsing, until they say. No guess (no IP country, or a country not
-  // on the setup list): nothing is picked, and they choose it themselves.
+  // Where they are, guessed from where they are browsing, until they say. No guess (no IP country): nothing is picked,
+  // and they choose it themselves. Every country is offered (build-s, 8 Nov 2026), by its English name.
   const countryCode = ((await headers()).get("x-vercel-ip-country") || "").toUpperCase();
-  const defaultCountry =
-    COUNTRY_NAMES[countryCode] || (countryCode ? locationOptions.find((option) => toCountryCode(option.country) === countryCode)?.country : "") || "";
+  const defaultCountry = ALL_COUNTRY_CODES.includes(countryCode) ? englishCountryName(countryCode) : "";
   const names = (vehicles || []).map((row: any) => [row.make, row.model, row.registration_number].filter(Boolean).join(" "));
-  const initialStep = previewStep === 1 || previewStep === 2 ? previewStep : profileDone ? 2 : 1;
+  // ?step=1: "Back" from the vehicles step, kept on a reload.
+  const askedStep = (await searchParams).step === "1" ? 1 : 0;
+  const initialStep = previewStep === 1 || previewStep === 2 ? previewStep : askedStep || (profileDone ? 2 : 1);
   const openAssistant = (await searchParams).rentals === "1";
   return <OnboardingWizard defaultCountry={defaultCountry} openAssistant={openAssistant} initialStep={initialStep as 1 | 2} organization={organizationDetail} vehicles={names} />;
 }
 
-const COUNTRY_NAMES: Record<string, string> = {
-  TH: "Thailand", ID: "Indonesia", PH: "Philippines", VN: "Vietnam", MY: "Malaysia", SG: "Singapore", LA: "Laos", KH: "Cambodia",
-  CN: "China", JP: "Japan", TW: "Taiwan", KR: "South Korea", BN: "Brunei", IN: "India", BD: "Bangladesh", LK: "Sri Lanka",
-  TR: "Türkiye"
-};

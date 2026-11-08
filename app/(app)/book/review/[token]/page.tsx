@@ -40,7 +40,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ token: 
       <FlagFont />
       <section className="rounded-2xl border border-[var(--border)] bg-white p-6 shadow-sm">
         {page.state === "done" ? (
-          <ReviewThanks googleUrl={page.rating && page.rating >= 4 ? page.googleUrl : null} />
+          <ReviewThanks googleUrl={page.rating ? page.googleUrl : null} />
         ) : (
           <>
             <h1 className="text-2xl font-semibold [text-wrap:balance]">{page.vehicle ? t("titleVehicle", { vehicle: page.vehicle }) : t("title")}</h1>

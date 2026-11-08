@@ -49,7 +49,7 @@ export function TeamMemberActions({ memberId, email, role, waiting }: { memberId
       {role !== "owner" ? (
         <label className="mb-2 block">
           <span className="font-semibold text-[var(--foreground-secondary)]">{say("team_level")}</span>
-          <select className="mt-1 w-full" disabled={saving} onChange={(event) => changeLevel(event.target.value as AppRole)} value={level}>
+          <select className="app-select mt-1 w-full" disabled={saving} onChange={(event) => changeLevel(event.target.value as AppRole)} value={level}>
             <option value="manager">{say("iv_manager")}</option>
             <option value="teammate">{say("iv_teammate")}</option>
           </select>

@@ -10,6 +10,7 @@ import { allCountries, countriesSorted, flagForNationality } from "@/lib/custome
 import { initialsOf } from "@/components/glance";
 import { PhoneField } from "@/components/phone-field";
 import { ContactChoice } from "@/components/contact-choice";
+import { DuplicatePhoneHint } from "@/components/duplicate-phone-hint";
 import { businessCountry } from "@/lib/business-units";
 
 type SelectorCustomer = {
@@ -48,9 +49,10 @@ export function CustomerSelector({
   const formRef = useRef<HTMLDivElement>(null);
   const [contact, setContact] = useState("whatsapp");
   const nationalityOptions = useMemo(() => countriesSorted(locale), [locale]);
-  // The business's own country to start (it was always "Thai"); the phone number's country replaces it when found.
+  // Starts empty (customers are often visitors, not from the business's country); a pasted number's country fills it.
   const homeCountry = businessCountry();
-  const [nationality, setNationality] = useState(() => allCountries.find((country) => country.code === homeCountry)?.name || "");
+  const [nationality, setNationality] = useState("");
+  const [phoneTyped, setPhoneTyped] = useState("");
   const [nationalityTouched, setNationalityTouched] = useState(false);
 
   const selectedCustomer = localCustomers.find((customer) => customer.id === selectedId);
@@ -79,7 +81,7 @@ export function CustomerSelector({
           formData.set("whatsappNumber", `${String(formData.get("phoneCountryCode") || "")}${String(formData.get("phone") || "").replace(/^0/, "")}`);
         }
         // Said here, before saving: a name and any one way to reach them (a phone isn't needed when there's Messenger, LINE...).
-        const reachable = ["phone", "whatsappNumber", "messengerId", "lineId", "telegramUsername", "email"].some((key) => String(formData.get(key) || "").trim());
+        const reachable = ["phone", "whatsappNumber", "messengerId", "lineId", "telegramUsername", "instagramHandle", "email"].some((key) => String(formData.get(key) || "").trim());
         if (!String(formData.get("fullName") || "").trim() || !reachable) {
           setError(say("sel_needContact"));
           return;
@@ -234,6 +236,8 @@ export function CustomerSelector({
                   <PhoneField
                     defaultCountry={homeCountry || undefined}
                     inputClass={inputClass}
+                    keepWords
+                    onValueChange={setPhoneTyped}
                     onCountryFound={(code) => {
                       if (nationalityTouched) return;
                       const found = allCountries.find((country) => country.code === code);
@@ -248,16 +252,17 @@ export function CustomerSelector({
                       setNationality(event.target.value);
                       setNationalityTouched(true);
                     }}
-                    required
                     value={nationality}
                   >
+                    <option value="">{say("sel_nationality")}</option>
                     {nationalityOptions.map((country) => (
                       <option key={country.code} value={country.name}>
                         {country.flag} {country.label}
                       </option>
                     ))}
                   </select>
-                  <ContactChoice contact={contact} inputClass={inputClass} say={say} setContact={setContact} />
+                  <ContactChoice contact={contact} inputClass={inputClass} phoneGiven={Boolean(phoneTyped)} say={say} setContact={setContact} />
+                  <DuplicatePhoneHint organizationId={organizationId} />
                   {error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
                   <button className="inline-flex w-full justify-center rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white disabled:opacity-70" disabled={isPending} onClick={handleCreateCustomer} type="button">
                     {isPending ? say("sel_creating") : say("sel_createSelect")}

@@ -27,7 +27,7 @@ export function jobKind(item: { kind: string; action?: string | null; taskType?:
   if (action === "refund") return "refund";
   if (action === "request") return "message";
   if (action === "swap_handover" || action === "swap_collection") return "move";
-  if (action === "swap_signature") return "form";
+  if (action === "swap_signature" || action === "inspection_signature") return "form";
   const type = String(item.taskType || "");
   if (type === "delivery" || type === "return") return "move";
   if (type === "maintenance" || type === "compliance" || type === "inspection") return "vehicle";

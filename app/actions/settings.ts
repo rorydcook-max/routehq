@@ -768,6 +768,11 @@ async function updateTravelPolicySettingsOrThrow(formData: FormData) {
     mileage_limit: requiredNumberFromForm(formData, "mileageLimit", 1500),
     fuel_charge_per_increment: requiredNumberFromForm(formData, "fuelChargePerIncrement", 150),
     late_fee_percentage: requiredNumberFromForm(formData, "lateFeePercentage", 5),
+    // Empty: priced from the vehicle's rates at the return (lib/late-return.ts).
+    late_return_fee_per_day: (() => {
+      const value = optionalNumberFromForm(formData, "lateReturnFeePerDay");
+      return value !== null && Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : null;
+    })(),
     cleaning_fee_minimum: requiredNumberFromForm(formData, "cleaningFeeMinimum", 500),
     smoking_fee_maximum: requiredNumberFromForm(formData, "smokingFeeMaximum", 2000),
     emergency_repair_limit: requiredNumberFromForm(formData, "emergencyRepairLimit", 2000),

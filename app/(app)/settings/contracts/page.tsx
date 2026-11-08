@@ -55,6 +55,8 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
   const numbers = [
     { label: say(distanceKey("tp_km")), value: feeOn(policy, "mileage_limit") ? policy.mileage_limit.toLocaleString("en-US") : say("tp_off_mileage_limit") },
     { label: say("ag_n_late"), value: feeOn(policy, "late_fee_percentage") ? `${policy.late_fee_percentage}%` : off },
+    // Only when set: without it a late return is priced from the vehicle's rates (lib/late-return.ts).
+    ...(policy.late_return_fee_per_day ? [{ label: say("ag_n_lateReturn"), value: say("ag_n_perDay", { amount: `${money}${policy.late_return_fee_per_day.toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(policy.late_return_fee_per_day) ? 0 : 2, maximumFractionDigits: 2 })}` }) }] : []),
     { label: say("ag_n_depositBack"), value: feeOn(policy, "deposit_return_days") ? say("ag_n_days", { count: policy.deposit_return_days }) : say("tp_off_deposit_return_days") },
     { label: say("ag_n_fuel"), value: feeOn(policy, "fuel_charge_per_increment") ? amount(policy.fuel_charge_per_increment) : off },
     { label: say("ag_n_cleaning"), value: feeOn(policy, "cleaning_fee_minimum") ? amount(policy.cleaning_fee_minimum) : off },

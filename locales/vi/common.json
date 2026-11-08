@@ -401,9 +401,15 @@
     "lateBackCharge": "Phí trả trễ",
     "lateBackFromDeposit": "Trừ vào tiền cọc",
     "lateBackChargeRenter": "Tính phí người thuê",
-    "lateBackWaive": "Miễn phí",
+    "lateBackWaive": "Miễn (đã thỏa thuận với người thuê)",
     "lateBackOverDeposit": "Tiền cọc còn lại bù được tối đa {amount}.",
-    "lateBackRow": "{count, plural, other {Trễ # ngày}}"
+    "lateBackRow": "{count, plural, other {Trễ # ngày}}",
+    "customerNotPresent": "Khách không có mặt",
+    "customerNotPresentNote": "Khách sẽ nhận được liên kết để ký biên bản.",
+    "waitingSignature": "Đang chờ khách ký",
+    "resendSignatureLink": "Gửi lại liên kết ký",
+    "signatureLinkSent": "Đã gửi liên kết",
+    "signatureLinkNotSent": "Không được gửi tự động. Hãy gửi từ tin nhắn của lượt đặt."
   },
   "vehicles": {
     "addVehicle": "Thêm xe"
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, other {# xe}}",
     "bs_demoBanner": "Cửa hàng mẫu, chỉ để minh họa. Không thể đặt xe.",
     "bs_demoNoBooking": "Đây là cửa hàng mẫu nên không thể đặt xe.",
-    "reason_late_return": "trả xe trễ"
+    "reason_late_return": "trả xe trễ",
+    "actionFailed": "Chưa được gửi. Kiểm tra kết nối và thử lại.",
+    "stillNeeded": "Vẫn còn thiếu: {items}",
+    "need_agreeTick": "Dấu tích đồng ý hợp đồng",
+    "idType": "Giấy tờ tùy thân",
+    "idType_passport": "Hộ chiếu",
+    "idType_national_id": "CCCD",
+    "idCardNumber": "Số CCCD",
+    "passportNo": "Số hộ chiếu",
+    "reportTitle_delivery": "Biên bản giao xe",
+    "reportTitle_return": "Biên bản trả xe",
+    "reportToSign_delivery": "Ký biên bản giao xe của bạn",
+    "reportToSign_return": "Ký biên bản trả xe của bạn",
+    "reportSeeAndSign": "Kiểm tra ảnh và thông tin, sau đó ký.",
+    "reportOdometer": "Đồng hồ công-tơ-mét",
+    "reportFuel": "Nhiên liệu",
+    "reportPhotos": "Ảnh",
+    "reportDamage": "Hư hỏng",
+    "reportNoDamage": "Không ghi nhận hư hỏng.",
+    "reportDeposit": "Tiền cọc",
+    "reportDepositHeld": "Đang giữ",
+    "reportDeducted": "Đã trừ",
+    "reportRefunded": "Đã trả lại cho bạn",
+    "reportConsent": "Tôi xác nhận tình trạng xe đúng như ghi nhận trong biên bản này.",
+    "reportSign": "Ký biên bản",
+    "reportSignedTitle": "Đã ký biên bản",
+    "reportSignedOn": "{name} đã ký ngày {date}.",
+    "reportDownload": "Tải biên bản",
+    "reportNotFoundTitle": "Không tìm thấy biên bản",
+    "reportNotFoundMessage": "Hãy nhờ doanh nghiệp cho thuê gửi liên kết mới."
   },
   "customerMessages": {
     "hi": "Chào {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "Không có hoàn tiền.",
     "cancelDepositBack": "Tiền cọc {amount} của bạn đang được hoàn lại.",
     "cancelDepositPart": "Đang hoàn lại {returned} trong số tiền cọc {held} của bạn.",
-    "cancelDepositKept": "Tiền cọc {amount} của bạn đã bị giữ lại."
+    "cancelDepositKept": "Tiền cọc {amount} của bạn đã bị giữ lại.",
+    "signHandoverReport": "biên bản giao xe {vehicle} của bạn đã sẵn sàng để kiểm tra và ký: {link}",
+    "signReturnReport": "biên bản trả xe {vehicle} của bạn đã sẵn sàng để kiểm tra và ký: {link}"
   },
   "directory": {
     "title": "Thuê ô tô hoặc xe máy ở Thái Lan",
@@ -1564,7 +1601,8 @@
     "collect_extension": "Thu tiền gia hạn",
     "collect_extras": "Thu tiền dịch vụ thêm",
     "job_review": "Đánh giá từ {name} cần kiểm tra",
-    "job_review_open": "Mở đánh giá"
+    "job_review_open": "Mở đánh giá",
+    "job_inspection_signature": "Cần chữ ký của khách: {ref}"
   },
   "bookings": {
     "eyebrow": "Đặt xe",
@@ -1645,7 +1683,8 @@
     "deleteRecordsInspections": "Kiểm tra lúc giao và nhận lại xe, kèm ảnh: {count}",
     "deleteRecordsSigned": "Hợp đồng đã ký",
     "deleteRecordsBody": "Không thể hoàn tác.",
-    "deleteAnyway": "Vẫn xóa"
+    "deleteAnyway": "Vẫn xóa",
+    "emptyNone": "Chưa có lượt đặt nào."
   },
   "inbox": {
     "title": "Hộp thư",
@@ -2825,7 +2864,18 @@
     "cn_depositTooMuch": "Tiền cọc còn đang giữ là {amount}.",
     "fin_cancelledSettled": "Đã ghi nhận hoàn tiền. Không còn gì cần thanh toán.",
     "share_send": "Gửi liên kết đặt xe",
-    "hist_late_return": "Trả xe trễ"
+    "hist_late_return": "Trả xe trễ",
+    "cp_noteFailed": "Ghi chú chưa được lưu. Hãy thử lại.",
+    "contact": "Liên hệ",
+    "contactOpen": "Mở",
+    "walkInNoPayment": "Đã ghi nhận lượt thuê tại chỗ.",
+    "pc_refundBtn": "Hoàn tiền",
+    "pc_refundAmount": "Số tiền hoàn",
+    "pc_refundConfirm": "Ghi nhận hoàn tiền",
+    "pc_refundDone": "Đã ghi nhận hoàn tiền.",
+    "pc_refundEnter": "Nhập số tiền hoàn.",
+    "pc_refundMax": "Số tiền hoàn tối đa từ khoản thanh toán này là {amount}.",
+    "pc_refundFailed": "Chưa lưu được hoàn tiền. Hãy thử lại."
   },
   "newBooking": {
     "docsSelfie": "Ảnh khách hàng",
@@ -3075,7 +3125,12 @@
     "saveRate_monthly": "Lưu {amount} một tháng làm giá của phương tiện này",
     "extraFree": "Miễn phí",
     "clashHeld": "Đang giữ chờ gia hạn: {who} muốn gia hạn. Hãy xác nhận hoặc bỏ giữ xe trước.",
-    "clashHeldRenter": "người thuê"
+    "clashHeldRenter": "người thuê",
+    "startMoved": "Bắt đầu {date}, ngày xe này trống.",
+    "endBeforeStart": "Ngày trả xe phải sau ngày bắt đầu.",
+    "freeQ": "Đặt miễn phí?",
+    "freeYes": "Đặt miễn phí",
+    "errAmountReceived": "Nhập số tiền đã nhận."
   },
   "fleet": {
     "title": "Đội xe",
@@ -3151,7 +3206,10 @@
     "qp_save": "Lưu",
     "qp_cancel": "Hủy",
     "qp_failed": "Không lưu được giá. Hãy thử lại.",
-    "assistant": "Trợ lý"
+    "assistant": "Trợ lý",
+    "bandArchived": "đã lưu trữ",
+    "status_Archived": "Đã lưu trữ",
+    "noticeArchiveLive": "Một số xe vẫn còn lượt đặt chưa kết thúc. Hãy chuyển chúng sang xe khác hoặc hủy trước."
   },
   "customers": {
     "sel_nationality": "Quốc tịch",
@@ -3237,7 +3295,12 @@
     "in_trend": "Thời gian thuê và chi tiêu",
     "in_avgLength": "Thời gian trung bình",
     "in_avgSpend": "Chi tiêu trung bình",
-    "pillReviews": "{count, plural, other {# đánh giá}}"
+    "pillReviews": "{count, plural, other {# đánh giá}}",
+    "sel_needContact": "Thêm tên và một cách liên lạc: số điện thoại, Messenger, LINE, Telegram, Instagram hoặc email.",
+    "sel_messengerNameOnly": "Tên hoặc liên kết trang cá nhân",
+    "sel_lineIdOnly": "LINE ID hoặc số điện thoại",
+    "sel_telegramIdOnly": "Tên người dùng Telegram hoặc số điện thoại",
+    "sel_instagram": "Tên người dùng Instagram"
   },
   "calendar": {
     "title": "Lịch",
@@ -3331,7 +3394,7 @@
     "vs_reserved": "Đã đặt",
     "vs_maintenance": "Đang sửa chữa",
     "vs_available": "Trống",
-    "vs_inactive": "Không dùng",
+    "vs_inactive": "Đã lưu trữ",
     "vs_retired": "Ngừng hoạt động",
     "c_tax": "Thuế đường bộ",
     "c_porbor": "Bảo hiểm bắt buộc (Por Ror Bor)",
@@ -3682,7 +3745,8 @@
     "tl_out": "Đang ở với {name}",
     "tl_service": "Bảo dưỡng",
     "tl_repair": "Sửa chữa",
-    "tl_damage": "Hư hỏng khi trả xe: {count, plural, other {# mục}}"
+    "tl_damage": "Hư hỏng khi trả xe: {count, plural, other {# mục}}",
+    "unarchive": "Bỏ lưu trữ"
   },
   "customerPage": {
     "back": "Khách hàng",
@@ -3783,7 +3847,7 @@
     "n_placeholder": "Bất cứ điều gì cần nhớ: sở thích, thói quen thanh toán, nhắc nhở",
     "n_auto": "Tự động lưu khi bạn bấm ra ngoài",
     "new_title": "Thêm khách hàng",
-    "new_subtitle": "Tên và số điện thoại là đủ. Thêm phần còn lại ngay hoặc sau.",
+    "new_subtitle": "Chỉ cần tên và một cách liên lạc. Thêm phần còn lại ngay bây giờ hoặc sau.",
     "new_chatTitle": "Ứng dụng chat và email",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, email",
     "new_whatsappHint": "Để trống nếu giống số điện thoại của họ.",
@@ -3886,7 +3950,17 @@
     "tl_paidCharge": "Đã trả một khoản phí",
     "tl_refunded": "Hoàn tiền",
     "tl_damage": "Hư hỏng khi trả xe: {count, plural, other {# mục}}",
-    "tl_review": "Đã đánh giá: {rating}/5"
+    "tl_review": "Đã đánh giá: {rating}/5",
+    "new_phoneHint": "Không cần nếu bạn thêm Messenger, LINE, Telegram, Instagram hoặc email bên dưới.",
+    "dnr_failed": "Chưa được lưu. Hãy thử lại.",
+    "message": "Nhắn tin",
+    "dupContact": "{name} đã được lưu với thông tin liên lạc này.",
+    "f_licenceClass": "Hạng bằng lái",
+    "f_idType": "Giấy tờ tùy thân",
+    "f_idType_passport": "Hộ chiếu",
+    "f_idType_national_id": "CCCD",
+    "f_idCardNo": "Số CCCD",
+    "f_idCardExpiry": "CCCD hết hạn"
   },
   "vehicleForm": {
     "addTitle": "Thêm xe",
@@ -4061,7 +4135,9 @@
     "quickSubtitle": "Chỉ các thông tin cơ bản. Chỉ cần loại xe, hãng và dòng xe.",
     "quickLater": "Ngày đóng thuế, bảo hiểm, số km, khoản vay và thông tin khác có thể thêm sau ở phần Đội xe.",
     "valueSummaryMi": "Số dặm hiện tại, giá đã mua, giá trị hiện tại",
-    "valueSummaryEditMi": "Giá mua, giá trị, số dặm lúc mua"
+    "valueSummaryEditMi": "Giá mua, giá trị, số dặm lúc mua",
+    "archivedNow": "Xe này đã được lưu trữ.",
+    "unarchiveBtn": "Bỏ lưu trữ"
   },
   "bookingEdit": {
     "booking": "Đơn đặt xe",
@@ -4339,7 +4415,7 @@
     "tp_fees": "Phí và giới hạn",
     "tp_km": "Quãng đường cho phép mỗi tháng (km)",
     "tp_fuel": "Phí xăng cho mỗi 1/8 bình thiếu",
-    "tp_late": "Phí trả xe muộn (% mỗi ngày)",
+    "tp_late": "Phí trả chậm (% mỗi ngày)",
     "tp_cleaning": "Phí vệ sinh, từ",
     "tp_smoking": "Phí hút thuốc, tối đa",
     "tp_repairs": "Chi phí sửa chữa khách được tự duyệt, tối đa",
@@ -5071,7 +5147,14 @@
     "ba_or": "hoặc",
     "ba_ownLabel": "Kết nối tên miền riêng",
     "bt_showName": "Hiện tên doanh nghiệp cạnh logo",
-    "bt_showNameHint": "Khi tắt, logo ngang sẽ hiện một mình và logo vuông có tên của bạn bên cạnh. Xuất bản để áp dụng."
+    "bt_showNameHint": "Khi tắt, logo ngang sẽ hiện một mình và logo vuông có tên của bạn bên cạnh. Xuất bản để áp dụng.",
+    "reg_confirmCurrency": "Giá xe sẽ hiển thị bằng {to} nhưng không được quy đổi. Các lượt đặt hiện có vẫn giữ {from}.",
+    "reg_confirmCountry": "Thao tác này cũng đổi tiền tệ thành {currency}, múi giờ thành {zone}, đơn vị khoảng cách thành {unit} và VAT thành {vat}%.",
+    "reg_confirmChange": "Đổi",
+    "reg_confirmCancel": "Hủy",
+    "tp_lateReturnPerDay": "Phí trả xe muộn mỗi ngày",
+    "ag_n_lateReturn": "Phí trả xe muộn",
+    "ag_n_perDay": "{amount} mỗi ngày"
   },
   "accountPage": {
     "roleOwner": "Chủ sở hữu",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "Thêm chữ ký của bạn một lần, khách có thể ký hợp đồng thuê xe ngay trên điện thoại.",
     "nudgePaymentMethods": "Thêm cách khách có thể trả tiền cho bạn (thông tin ngân hàng, Wise, Revolut hoặc PromptPay) để họ thanh toán ngay từ trang đặt xe.",
     "extensionHoldReturning": "{customer} không gia hạn: {vehicle} sẽ được trả vào {date}. Những ngày sau đó đã mở lại để đặt.",
-    "reviewReceived": "{customer} đã đánh giá {rating} sao."
+    "reviewReceived": "{customer} đã đánh giá {rating} sao.",
+    "handoverReportSigned": "{customer} đã ký biên bản giao xe {vehicle}.",
+    "returnReportSigned": "{customer} đã ký biên bản trả xe {vehicle}."
   },
   "handoverPay": {
     "title": "Thanh toán",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "Nhận xe tại {business}. Mang theo bằng lái và hộ chiếu.",
     "spec_year": "Năm",
     "spec_deposit": "Tiền cọc",
-    "fleet_perMonth": "{amount} một tháng"
+    "fleet_perMonth": "{amount} một tháng",
+    "photo_credit": "Ảnh của <author>{name}</author> trên <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Giao diện",
@@ -8097,7 +8183,21 @@
     "role_muted": "Chữ phụ",
     "role_dark": "Phần nền tối",
     "pal_autoSummary": "Màu theo mẫu",
-    "noReviewsYet": "Chưa có đánh giá"
+    "noReviewsYet": "Chưa có đánh giá",
+    "img_stock": "Ảnh có sẵn",
+    "img_uploadPhoto": "Tải ảnh lên",
+    "stock_credit": "Ảnh của <author>{name}</author> trên <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Không tải được ảnh. Hãy thử lại.",
+    "stock_loading": "Đang tải ảnh…",
+    "stock_more": "Thêm ảnh",
+    "stock_none": "Không tìm thấy ảnh. Hãy thử tìm từ khác.",
+    "stock_note": "Ảnh miễn phí từ <unsplash>Unsplash</unsplash>. Trang của bạn ghi tên nhiếp ảnh gia.",
+    "stock_off": "Ảnh có sẵn chưa được thiết lập.",
+    "stock_rateLimited": "Đã đạt giới hạn tìm kiếm mỗi giờ của Unsplash. Hãy thử lại sau ít phút.",
+    "stock_search": "Tìm ảnh",
+    "stock_suggested": "Gợi ý tìm kiếm",
+    "stock_use": "Dùng ảnh: {photo}",
+    "stock_useBy": "Dùng ảnh của {name}"
   },
   "roveListing": {
     "title": "Chia sẻ đội xe của bạn trên rove.rent và nhận đặt xe ở đó?",

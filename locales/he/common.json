@@ -407,9 +407,15 @@
     "lateBackCharge": "דמי איחור",
     "lateBackFromDeposit": "לגבות מהפיקדון",
     "lateBackChargeRenter": "לחייב את השוכר",
-    "lateBackWaive": "לוותר",
+    "lateBackWaive": "ויתור (בהסכמה עם השוכר)",
     "lateBackOverDeposit": "יתרת הפיקדון מכסה עד {amount}.",
-    "lateBackRow": "{count, plural, one {איחור של יום אחד} other {איחור של # ימים}}"
+    "lateBackRow": "{count, plural, one {איחור של יום אחד} other {איחור של # ימים}}",
+    "customerNotPresent": "הלקוח לא נוכח",
+    "customerNotPresentNote": "יישלח אליו קישור לחתימה על הדוח.",
+    "waitingSignature": "ממתין לחתימת הלקוח",
+    "resendSignatureLink": "שליחה חוזרת של קישור החתימה",
+    "signatureLinkSent": "הקישור נשלח",
+    "signatureLinkNotSent": "לא נשלח אוטומטית. שלחו אותו מההודעות של ההזמנה."
   },
   "translation": {
     "translatedFrom": "תורגם מ-{language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {רכב #} other {# רכבים}}",
     "bs_demoBanner": "עסק לדוגמה בלבד. ההזמנות כבויות.",
     "bs_demoNoBooking": "זה עסק לדוגמה, ולכן ההזמנות כבויות.",
-    "reason_late_return": "החזרה מאוחרת"
+    "reason_late_return": "החזרה מאוחרת",
+    "actionFailed": "לא נשלח. בדקו את החיבור ונסו שוב.",
+    "stillNeeded": "עדיין חסר: {items}",
+    "need_agreeTick": "סימון הסכמה להסכם",
+    "idType": "מסמך מזהה",
+    "idType_passport": "דרכון",
+    "idType_national_id": "תעודת זהות",
+    "idCardNumber": "מספר תעודת זהות",
+    "passportNo": "מספר דרכון",
+    "reportTitle_delivery": "דוח מסירה",
+    "reportTitle_return": "דוח החזרה",
+    "reportToSign_delivery": "חתמו על דוח המסירה שלכם",
+    "reportToSign_return": "חתמו על דוח ההחזרה שלכם",
+    "reportSeeAndSign": "בדקו את התמונות והפרטים, ואז חתמו.",
+    "reportOdometer": "מד אוץ",
+    "reportFuel": "דלק",
+    "reportPhotos": "תמונות",
+    "reportDamage": "נזק",
+    "reportNoDamage": "לא נרשם נזק.",
+    "reportDeposit": "פיקדון",
+    "reportDepositHeld": "מוחזק",
+    "reportDeducted": "נוכה",
+    "reportRefunded": "הוחזר לך",
+    "reportConsent": "אני מאשר/ת שמצב הרכב הוא כפי שנרשם בדוח הזה.",
+    "reportSign": "חתימה על הדוח",
+    "reportSignedTitle": "הדוח נחתם",
+    "reportSignedOn": "נחתם על ידי {name}, {date}.",
+    "reportDownload": "הורדת הדוח",
+    "reportNotFoundTitle": "הדוח לא נמצא",
+    "reportNotFoundMessage": "בקשו מעסק ההשכרה קישור חדש."
   },
   "customerMessages": {
     "hi": "שלום {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "אין החזר כספי.",
     "cancelDepositBack": "הפיקדון שלך בסך {amount} מוחזר אליך.",
     "cancelDepositPart": "{returned} מתוך הפיקדון שלך בסך {held} מוחזרים אליך.",
-    "cancelDepositKept": "הפיקדון שלך בסך {amount} נגבה."
+    "cancelDepositKept": "הפיקדון שלך בסך {amount} נגבה.",
+    "signHandoverReport": "דוח המסירה שלך עבור {vehicle} מוכן לבדיקה וחתימה: {link}",
+    "signReturnReport": "דוח ההחזרה שלך עבור {vehicle} מוכן לבדיקה וחתימה: {link}"
   },
   "directory": {
     "title": "השכרת רכב או קטנוע בתאילנד",
@@ -1564,7 +1601,8 @@
     "collect_extension": "לגבות הארכה",
     "collect_extras": "לגבות תוספות",
     "job_review": "ביקורת מאת {name} לבדיקה",
-    "job_review_open": "פתיחת ביקורות"
+    "job_review_open": "פתיחת ביקורות",
+    "job_inspection_signature": "נדרשת חתימת לקוח: {ref}"
   },
   "bookings": {
     "eyebrow": "הזמנות",
@@ -1645,7 +1683,8 @@
     "deleteRecordsInspections": "בדיקות מסירה והחזרה, עם תמונות: {count}",
     "deleteRecordsSigned": "החוזה החתום",
     "deleteRecordsBody": "אי אפשר לבטל את זה.",
-    "deleteAnyway": "למחוק בכל זאת"
+    "deleteAnyway": "למחוק בכל זאת",
+    "emptyNone": "עדיין אין הזמנות."
   },
   "inbox": {
     "title": "תיבת הודעות",
@@ -2825,7 +2864,18 @@
     "cn_depositTooMuch": "הפיקדון שעדיין מוחזק הוא {amount}.",
     "fin_cancelledSettled": "ההחזרים נרשמו. אין עוד מה להסדיר.",
     "share_send": "שליחת קישור הזמנה",
-    "hist_late_return": "הוחזר באיחור"
+    "hist_late_return": "הוחזר באיחור",
+    "cp_noteFailed": "ההערה לא נשמרה. נסו שוב.",
+    "contact": "פרטי קשר",
+    "contactOpen": "פתיחה",
+    "walkInNoPayment": "השכרה ללא הזמנה מראש נרשמה.",
+    "pc_refundBtn": "החזר כספי",
+    "pc_refundAmount": "סכום ההחזר",
+    "pc_refundConfirm": "רישום החזר",
+    "pc_refundDone": "ההחזר נרשם.",
+    "pc_refundEnter": "הזינו את סכום ההחזר.",
+    "pc_refundMax": "אפשר להחזיר מהתשלום הזה לכל היותר {amount}.",
+    "pc_refundFailed": "ההחזר לא נשמר. נסו שוב."
   },
   "newBooking": {
     "docsSelfie": "תמונה של הלקוח",
@@ -3075,7 +3125,12 @@
     "saveRate_monthly": "שמירת {amount} לחודש כמחיר של רכב זה",
     "extraFree": "חינם",
     "clashHeld": "מוחזק להארכה: {who} רוצה להאריך. אשרו או שחררו קודם את ההחזקה.",
-    "clashHeldRenter": "השוכר"
+    "clashHeldRenter": "השוכר",
+    "startMoved": "מתחיל ב-{date}, היום שבו הרכב הזה פנוי.",
+    "endBeforeStart": "תאריך ההחזרה חייב להיות אחרי תאריך ההתחלה.",
+    "freeQ": "להזמין בחינם?",
+    "freeYes": "הזמנה בחינם",
+    "errAmountReceived": "הזינו את הסכום שהתקבל."
   },
   "fleet": {
     "title": "צי הרכבים",
@@ -3151,7 +3206,10 @@
     "qp_save": "שמירה",
     "qp_cancel": "ביטול",
     "qp_failed": "לא ניתן לשמור את המחיר. נסו שוב.",
-    "assistant": "עוזר"
+    "assistant": "עוזר",
+    "bandArchived": "בארכיון",
+    "status_Archived": "בארכיון",
+    "noticeArchiveLive": "לחלק מהרכבים האלה יש הזמנות שעוד לא הסתיימו. קודם העבירו אותן לרכב אחר או בטלו אותן."
   },
   "customers": {
     "sel_nationality": "אזרחות",
@@ -3237,7 +3295,12 @@
     "in_trend": "משך השכרה והוצאה",
     "in_avgLength": "משך ממוצע",
     "in_avgSpend": "הוצאה ממוצעת",
-    "pillReviews": "{count, plural, one {ביקורת אחת} other {# ביקורות}}"
+    "pillReviews": "{count, plural, one {ביקורת אחת} other {# ביקורות}}",
+    "sel_needContact": "יש להוסיף שם ודרך אחת ליצירת קשר: מספר טלפון, Messenger, LINE, Telegram, Instagram או אימייל.",
+    "sel_messengerNameOnly": "השם או קישור לפרופיל",
+    "sel_lineIdOnly": "מזהה LINE או טלפון",
+    "sel_telegramIdOnly": "שם משתמש בטלגרם או טלפון",
+    "sel_instagram": "שם משתמש באינסטגרם"
   },
   "calendar": {
     "title": "יומן",
@@ -3331,7 +3394,7 @@
     "vs_reserved": "מוזמן",
     "vs_maintenance": "במוסך",
     "vs_available": "פנוי",
-    "vs_inactive": "לא בשימוש",
+    "vs_inactive": "בארכיון",
     "vs_retired": "לא בשימוש",
     "c_tax": "אגרת רישוי",
     "c_porbor": "ביטוח חובה (Por Ror Bor)",
@@ -3682,7 +3745,8 @@
     "tl_out": "אצל {name}",
     "tl_service": "טיפול",
     "tl_repair": "תיקון",
-    "tl_damage": "נזק בהחזרה: {count, plural, one {פריט #} other {# פריטים}}"
+    "tl_damage": "נזק בהחזרה: {count, plural, one {פריט #} other {# פריטים}}",
+    "unarchive": "הוצאה מהארכיון"
   },
   "customerPage": {
     "back": "לקוחות",
@@ -3783,7 +3847,7 @@
     "n_placeholder": "כל דבר שכדאי לזכור: העדפות, הרגלי תשלום, תזכורות",
     "n_auto": "נשמר כשמקישים במקום אחר",
     "new_title": "הוספת לקוח",
-    "new_subtitle": "שם ומספר טלפון מספיקים. את השאר אפשר להוסיף עכשיו או אחר כך.",
+    "new_subtitle": "שם ודרך אחת ליצירת קשר מספיקים. את השאר אפשר להוסיף עכשיו או אחר כך.",
     "new_chatTitle": "אפליקציות צ'אט ואימייל",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, אימייל",
     "new_whatsappHint": "השאירו ריק אם זה זהה למספר הטלפון שלהם.",
@@ -3886,7 +3950,17 @@
     "tl_paidCharge": "שילם חיוב",
     "tl_refunded": "החזר כספי",
     "tl_damage": "נזק בהחזרה: {count, plural, one {פריט #} other {# פריטים}}",
-    "tl_review": "השאיר/ה ביקורת: {rating}/5"
+    "tl_review": "השאיר/ה ביקורת: {rating}/5",
+    "new_phoneHint": "לא נדרש אם מוסיפים למטה Messenger, LINE, Telegram, Instagram או אימייל.",
+    "dnr_failed": "לא נשמר. נסו שוב.",
+    "message": "שליחת הודעה",
+    "dupContact": "{name} כבר שמור עם פרטי הקשר האלה.",
+    "f_licenceClass": "סוג רישיון",
+    "f_idType": "מסמך מזהה",
+    "f_idType_passport": "דרכון",
+    "f_idType_national_id": "תעודת זהות",
+    "f_idCardNo": "מספר תעודת זהות",
+    "f_idCardExpiry": "תוקף תעודת הזהות"
   },
   "vehicleForm": {
     "addTitle": "הוספת רכב",
@@ -4061,7 +4135,9 @@
     "quickSubtitle": "רק הבסיס. צריך רק סוג, יצרן ודגם.",
     "quickLater": "תאריכי טסט וביטוח, קילומטראז', הלוואות ועוד ניתן להוסיף בהמשך דרך ניהול הצי.",
     "valueSummaryMi": "קילומטראז' נוכחי, מחיר הקנייה, השווי",
-    "valueSummaryEditMi": "מחיר קנייה, שווי, קילומטראז' בקנייה"
+    "valueSummaryEditMi": "מחיר קנייה, שווי, קילומטראז' בקנייה",
+    "archivedNow": "הרכב הזה בארכיון.",
+    "unarchiveBtn": "הוצאה מהארכיון"
   },
   "bookingEdit": {
     "booking": "הזמנה",
@@ -4340,7 +4416,7 @@
     "tp_fees": "עמלות ומגבלות",
     "tp_km": "מרחק מותר לחודש (km)",
     "tp_fuel": "דלק לכל 1/8 מיכל חסר",
-    "tp_late": "קנס על החזרה באיחור (% ליום)",
+    "tp_late": "קנס על איחור בתשלום (% ליום)",
     "tp_cleaning": "דמי ניקיון, החל מ-",
     "tp_smoking": "קנס עישון, עד",
     "tp_repairs": "תיקונים שהלקוח יכול לאשר, עד",
@@ -5071,7 +5147,14 @@
     "ba_or": "או",
     "ba_ownLabel": "חיבור דומיין משלכם",
     "bt_showName": "הצגת שם העסק ליד הלוגו",
-    "bt_showNameHint": "כשזה כבוי, לוגו רחב מוצג לבד ולוגו מרובע מקבל את השם שלכם לצדו. פרסמו כדי שזה יעלה לאוויר."
+    "bt_showNameHint": "כשזה כבוי, לוגו רחב מוצג לבד ולוגו מרובע מקבל את השם שלכם לצדו. פרסמו כדי שזה יעלה לאוויר.",
+    "reg_confirmCurrency": "מחירי הרכבים יוצגו ב-{to} אבל לא יומרו. הזמנות קיימות יישארו ב-{from}.",
+    "reg_confirmCountry": "זה משנה גם את המטבע ל-{currency}, את אזור הזמן ל-{zone}, את יחידות המרחק ל-{unit} ואת המע\"מ ל-{vat}%.",
+    "reg_confirmChange": "שינוי",
+    "reg_confirmCancel": "ביטול",
+    "tp_lateReturnPerDay": "קנס על החזרה מאוחרת ליום",
+    "ag_n_lateReturn": "קנס על החזרה מאוחרת",
+    "ag_n_perDay": "{amount} ליום"
   },
   "accountPage": {
     "roleOwner": "בעלים",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "הוסיפו את החתימה שלכם פעם אחת, והלקוחות יוכלו לחתום על הסכם ההשכרה בטלפון.",
     "nudgePaymentMethods": "הוסיפו איך לקוחות יכולים לשלם לכם (פרטי בנק, Wise, Revolut או PromptPay), כדי שישלמו ישירות מדף ההזמנה.",
     "extensionHoldReturning": "{customer} לא מאריך/ה: {vehicle} צריך לחזור ב-{date}. הימים שאחרי פתוחים שוב להזמנה.",
-    "reviewReceived": "{customer} השאיר/ה ביקורת של {rating} כוכבים."
+    "reviewReceived": "{customer} השאיר/ה ביקורת של {rating} כוכבים.",
+    "handoverReportSigned": "{customer} חתם/ה על דוח המסירה עבור {vehicle}.",
+    "returnReportSigned": "{customer} חתם/ה על דוח ההחזרה עבור {vehicle}."
   },
   "handoverPay": {
     "title": "תשלום",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "איסוף מ־{business}. הביאו רישיון נהיגה ודרכון.",
     "spec_year": "שנה",
     "spec_deposit": "פיקדון",
-    "fleet_perMonth": "{amount} לחודש"
+    "fleet_perMonth": "{amount} לחודש",
+    "photo_credit": "צילום: <author>{name}</author> ב-<unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "מראה",
@@ -8097,7 +8183,21 @@
     "role_muted": "טקסט משני",
     "role_dark": "אזורים כהים",
     "pal_autoSummary": "צבעי התבנית",
-    "noReviewsYet": "עדיין אין ביקורות"
+    "noReviewsYet": "עדיין אין ביקורות",
+    "img_stock": "תמונות סטוק",
+    "img_uploadPhoto": "העלאת תמונה",
+    "stock_credit": "צילום: <author>{name}</author> ב-<unsplash>Unsplash</unsplash>",
+    "stock_failed": "לא ניתן לטעון תמונות. נסו שוב.",
+    "stock_loading": "טוען תמונות…",
+    "stock_more": "עוד תמונות",
+    "stock_none": "לא נמצאו תמונות. נסו חיפוש אחר.",
+    "stock_note": "תמונות חינמיות מ-<unsplash>Unsplash</unsplash>. האתר שלכם מציין את שם הצלם.",
+    "stock_off": "תמונות סטוק עדיין לא הוגדרו.",
+    "stock_rateLimited": "הגעתם למגבלת החיפושים השעתית של Unsplash. נסו שוב בעוד זמן קצר.",
+    "stock_search": "חיפוש תמונות",
+    "stock_suggested": "חיפושים מוצעים",
+    "stock_use": "שימוש בתמונה: {photo}",
+    "stock_useBy": "שימוש בתמונה של {name}"
   },
   "roveListing": {
     "title": "לשתף את הצי שלך ב-rove.rent ולקבל שם הזמנות?",

@@ -49,11 +49,30 @@ export function RegionalPanel({ initial }: { initial: RegionalInput }) {
     setNote(null);
     setForm((current) => ({ ...current, ...patch }));
   };
+  // Changing the country or currency after setup asks first and says what changes (real-user test, 8 Nov 2026).
+  const [confirm, setConfirm] = useState<{ patch: Partial<RegionalInput>; lines: string[] } | null>(null);
+  const currencyLine = (to: string) => say("reg_confirmCurrency", { to, from: initial.currency || form.currency });
   const pickCountry = (code: string) => {
     const next = countryInfo(code);
-    if (!next) return;
+    if (!next || code === form.country) return;
     // A new country brings its usual time zone, money, distance unit and VAT rate; each can still be changed.
-    update({ country: code, timezone: next.zones[0], currency: next.currency, distanceUnit: next.unit, vat: { ...form.vat, rate: next.vat } });
+    const patch = { country: code, timezone: next.zones[0], currency: next.currency, distanceUnit: next.unit, vat: { ...form.vat, rate: next.vat } };
+    if (!initial.country) return update(patch);
+    const lines = [
+      say("reg_confirmCountry", {
+        currency: next.currency,
+        zone: `${zoneName(next.zones[0])} ${zoneOffset(next.zones[0])}`.trim(),
+        unit: say(next.unit === "mi" ? "reg_mi" : "reg_km"),
+        vat: next.vat
+      })
+    ];
+    if (next.currency !== (initial.currency || form.currency)) lines.push(currencyLine(next.currency));
+    setConfirm({ patch, lines });
+  };
+  const pickCurrency = (code: string) => {
+    if (code === form.currency) return;
+    if (!initial.currency || code === initial.currency) return update({ currency: code });
+    setConfirm({ patch: { currency: code }, lines: [currencyLine(code)] });
   };
   const save = () =>
     start(async () => {
@@ -87,7 +106,7 @@ export function RegionalPanel({ initial }: { initial: RegionalInput }) {
         </div>
         <div className="block">
           <span className={small}>{say("reg_currency")}</span>
-          <SearchSelect ariaLabel={say("reg_currency")} onChange={(code) => update({ currency: code })} options={currencies} value={form.currency} />
+          <SearchSelect ariaLabel={say("reg_currency")} onChange={pickCurrency} options={currencies} value={form.currency} />
         </div>
         <label className="block">
           <span className={small}>
@@ -127,8 +146,32 @@ export function RegionalPanel({ initial }: { initial: RegionalInput }) {
           </div>
         ) : null}
       </div>
+      {confirm ? (
+        <div className="rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3" role="alertdialog" aria-label={say("reg_confirmChange")}>
+          {confirm.lines.map((line) => (
+            <p className="text-sm font-semibold text-[var(--foreground)]" key={line}>
+              {line}
+            </p>
+          ))}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button className="secondary-action pressable" onClick={() => setConfirm(null)} type="button">
+              {say("reg_confirmCancel")}
+            </button>
+            <button
+              className="primary-action pressable"
+              onClick={() => {
+                update(confirm.patch);
+                setConfirm(null);
+              }}
+              type="button"
+            >
+              {say("reg_confirmChange")}
+            </button>
+          </div>
+        </div>
+      ) : null}
       <div className="flex flex-wrap items-center gap-3">
-        <button className="primary-action pressable" disabled={pending} onClick={save} type="button">
+        <button className="primary-action pressable" disabled={pending || Boolean(confirm)} onClick={save} type="button">
           {pending ? say("saving") : say("save")}
         </button>
         {note ? <span className={`text-sm font-semibold ${note === "saved" ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{note === "saved" ? say("saved") : note}</span> : null}

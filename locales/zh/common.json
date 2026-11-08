@@ -407,9 +407,15 @@
     "lateBackCharge": "逾期费用",
     "lateBackFromDeposit": "从押金中扣除",
     "lateBackChargeRenter": "向租客收取",
-    "lateBackWaive": "免除",
+    "lateBackWaive": "免除（已与租客商定）",
     "lateBackOverDeposit": "剩余押金最多可抵扣 {amount}。",
-    "lateBackRow": "{count, plural, other {逾期 # 天}}"
+    "lateBackRow": "{count, plural, other {逾期 # 天}}",
+    "customerNotPresent": "客户不在场",
+    "customerNotPresentNote": "将向其发送签署报告的链接。",
+    "waitingSignature": "等待客户签名",
+    "resendSignatureLink": "重新发送签名链接",
+    "signatureLinkSent": "链接已发送",
+    "signatureLinkNotSent": "未自动发送。请从预订消息中发送。"
   },
   "translation": {
     "translatedFrom": "翻译自{language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, other {# 辆车}}",
     "bs_demoBanner": "演示商家，仅作示例。预订已关闭。",
     "bs_demoNoBooking": "这是演示商家，因此预订已关闭。",
-    "reason_late_return": "逾期还车"
+    "reason_late_return": "逾期还车",
+    "actionFailed": "未发送。请检查网络连接后重试。",
+    "stillNeeded": "仍需：{items}",
+    "need_agreeTick": "同意条款勾选",
+    "idType": "身份证件",
+    "idType_passport": "护照",
+    "idType_national_id": "身份证",
+    "idCardNumber": "身份证号码",
+    "passportNo": "护照号码",
+    "reportTitle_delivery": "交车报告",
+    "reportTitle_return": "还车报告",
+    "reportToSign_delivery": "签署您的交车报告",
+    "reportToSign_return": "签署您的还车报告",
+    "reportSeeAndSign": "请检查照片和详细信息，然后签名。",
+    "reportOdometer": "里程表",
+    "reportFuel": "燃油",
+    "reportPhotos": "照片",
+    "reportDamage": "损伤",
+    "reportNoDamage": "未记录损伤。",
+    "reportDeposit": "押金",
+    "reportDepositHeld": "冻结中",
+    "reportDeducted": "已扣除",
+    "reportRefunded": "已退还给您",
+    "reportConsent": "我确认车辆状况与本报告记录一致。",
+    "reportSign": "签署报告",
+    "reportSignedTitle": "报告已签署",
+    "reportSignedOn": "由 {name} 于 {date} 签署。",
+    "reportDownload": "下载报告",
+    "reportNotFoundTitle": "找不到报告",
+    "reportNotFoundMessage": "请向租车商家索取新链接。"
   },
   "customerMessages": {
     "hi": "{name}，您好！",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "不予退款。",
     "cancelDepositBack": "你的 {amount} 押金正在退还。",
     "cancelDepositPart": "你的 {held} 押金中有 {returned} 正在退还。",
-    "cancelDepositKept": "你的 {amount} 押金已被扣留。"
+    "cancelDepositKept": "你的 {amount} 押金已被扣留。",
+    "signHandoverReport": "您的 {vehicle} 交车报告已可查看并签署：{link}",
+    "signReturnReport": "您的 {vehicle} 还车报告已可查看并签署：{link}"
   },
   "directory": {
     "title": "在泰国租车或租摩托车",
@@ -1564,7 +1601,8 @@
     "collect_extension": "收取续租费",
     "collect_extras": "收取附加项费用",
     "job_review": "待审核：{name}的评价",
-    "job_review_open": "打开评价"
+    "job_review_open": "打开评价",
+    "job_inspection_signature": "需要客户签名：{ref}"
   },
   "bookings": {
     "eyebrow": "预订",
@@ -1645,7 +1683,8 @@
     "deleteRecordsInspections": "交车和还车检查（含照片）：{count}",
     "deleteRecordsSigned": "已签署的合同",
     "deleteRecordsBody": "此操作无法撤销。",
-    "deleteAnyway": "仍然删除"
+    "deleteAnyway": "仍然删除",
+    "emptyNone": "还没有预订。"
   },
   "inbox": {
     "title": "收件箱",
@@ -2825,7 +2864,18 @@
     "cn_depositTooMuch": "仍在保留的押金为 {amount}。",
     "fin_cancelledSettled": "退款已记录，没有需要结算的款项了。",
     "share_send": "发送预订链接",
-    "hist_late_return": "逾期还车"
+    "hist_late_return": "逾期还车",
+    "cp_noteFailed": "备注未保存。请重试。",
+    "contact": "联系方式",
+    "contactOpen": "打开",
+    "walkInNoPayment": "已记录现场租车。",
+    "pc_refundBtn": "退款",
+    "pc_refundAmount": "退款金额",
+    "pc_refundConfirm": "记录退款",
+    "pc_refundDone": "已记录退款。",
+    "pc_refundEnter": "请输入退款金额。",
+    "pc_refundMax": "此笔付款最多可退款 {amount}。",
+    "pc_refundFailed": "退款未保存。请重试。"
   },
   "newBooking": {
     "docsSelfie": "客户照片",
@@ -3075,7 +3125,12 @@
     "saveRate_monthly": "保存每月 {amount} 作为此车辆的价格",
     "extraFree": "免费",
     "clashHeld": "为续租保留中：{who}想续租。请先确认或解除保留。",
-    "clashHeldRenter": "租客"
+    "clashHeldRenter": "租客",
+    "startMoved": "从 {date} 开始，即这辆车空出来的那天。",
+    "endBeforeStart": "还车日期必须晚于开始日期。",
+    "freeQ": "免费预订？",
+    "freeYes": "免费预订",
+    "errAmountReceived": "请输入收到的金额。"
   },
   "fleet": {
     "title": "车队",
@@ -3151,7 +3206,10 @@
     "qp_save": "保存",
     "qp_cancel": "取消",
     "qp_failed": "价格保存失败，请重试。",
-    "assistant": "助手"
+    "assistant": "助手",
+    "bandArchived": "已归档",
+    "status_Archived": "已归档",
+    "noticeArchiveLive": "其中部分车辆有尚未结束的预订。请先将其移到其他车辆或取消。"
   },
   "customers": {
     "sel_nationality": "国籍",
@@ -3237,7 +3295,12 @@
     "in_trend": "租期和消费",
     "in_avgLength": "平均租期",
     "in_avgSpend": "平均消费",
-    "pillReviews": "{count, plural, other {#条评价}}"
+    "pillReviews": "{count, plural, other {#条评价}}",
+    "sel_needContact": "请添加姓名和一种联系方式：电话、Messenger、LINE、Telegram、Instagram 或邮箱。",
+    "sel_messengerNameOnly": "姓名或个人主页链接",
+    "sel_lineIdOnly": "LINE ID 或电话",
+    "sel_telegramIdOnly": "Telegram 用户名或电话",
+    "sel_instagram": "Instagram 用户名"
   },
   "calendar": {
     "title": "日历",
@@ -3331,7 +3394,7 @@
     "vs_reserved": "已预订",
     "vs_maintenance": "维修中",
     "vs_available": "可用",
-    "vs_inactive": "未使用",
+    "vs_inactive": "已归档",
     "vs_retired": "未使用",
     "c_tax": "路税",
     "c_porbor": "强制险 (Por Ror Bor)",
@@ -3682,7 +3745,8 @@
     "tl_out": "{name} 使用中",
     "tl_service": "保养",
     "tl_repair": "维修",
-    "tl_damage": "还车时发现车损：{count, plural, other {# 处}}"
+    "tl_damage": "还车时发现车损：{count, plural, other {# 处}}",
+    "unarchive": "取消归档"
   },
   "customerPage": {
     "back": "客户",
@@ -3783,7 +3847,7 @@
     "n_placeholder": "值得记录的内容：偏好、付款习惯、提醒事项",
     "n_auto": "点击别处即可自动保存",
     "new_title": "添加客户",
-    "new_subtitle": "只需姓名和电话号码。其余信息现在或稍后添加皆可。",
+    "new_subtitle": "有姓名和一种联系方式就够了。其余信息可以现在或以后添加。",
     "new_chatTitle": "聊天应用与邮箱",
     "new_chatSummary": "WhatsApp、LINE、Messenger、Telegram、Instagram、邮箱",
     "new_whatsappHint": "若与电话号码相同，请留空。",
@@ -3886,7 +3950,17 @@
     "tl_paidCharge": "支付了费用",
     "tl_refunded": "退款",
     "tl_damage": "还车时发现车损：{count, plural, other {# 处}}",
-    "tl_review": "留下评价：{rating}/5"
+    "tl_review": "留下评价：{rating}/5",
+    "new_phoneHint": "如果在下方添加了 Messenger、LINE、Telegram、Instagram 或邮箱，则无需填写。",
+    "dnr_failed": "未保存。请重试。",
+    "message": "发消息",
+    "dupContact": "{name} 已使用这些联系方式保存。",
+    "f_licenceClass": "驾照类别",
+    "f_idType": "身份证件",
+    "f_idType_passport": "护照",
+    "f_idType_national_id": "身份证",
+    "f_idCardNo": "身份证号码",
+    "f_idCardExpiry": "身份证到期日"
   },
   "vehicleForm": {
     "addTitle": "添加车辆",
@@ -4061,7 +4135,9 @@
     "quickSubtitle": "只需基本信息。仅需填写车辆类型、品牌和型号。",
     "quickLater": "税费、保险日期、里程、贷款等信息以后可以在车队中补充。",
     "valueSummaryMi": "当前里程、购买价格、当前价值",
-    "valueSummaryEditMi": "购买价格、价值、购买时里程"
+    "valueSummaryEditMi": "购买价格、价值、购买时里程",
+    "archivedNow": "此车辆已归档。",
+    "unarchiveBtn": "取消归档"
   },
   "bookingEdit": {
     "booking": "预订",
@@ -4339,7 +4415,7 @@
     "tp_fees": "费用与限制",
     "tp_km": "每月允许行驶里程 (km)",
     "tp_fuel": "每少 1/8 油箱的油费",
-    "tp_late": "逾期还车费（按每天 % 计算）",
+    "tp_late": "逾期付款费（每天 %）",
     "tp_cleaning": "清洁费，起价",
     "tp_smoking": "吸烟罚款，最高",
     "tp_repairs": "客户可自行批准的维修费，最高",
@@ -5071,7 +5147,14 @@
     "ba_or": "或",
     "ba_ownLabel": "绑定自己的域名",
     "bt_showName": "在标志旁显示商家名称",
-    "bt_showNameHint": "关闭时，宽标志单独显示，方形标志旁会显示你的名称。发布后生效。"
+    "bt_showNameHint": "关闭时，宽标志单独显示，方形标志旁会显示你的名称。发布后生效。",
+    "reg_confirmCurrency": "车辆价格将以 {to} 显示，但不会换算。现有预订仍为 {from}。",
+    "reg_confirmCountry": "这也会将货币改为 {currency}、时区改为 {zone}、距离单位改为 {unit}、增值税改为 {vat}%。",
+    "reg_confirmChange": "更改",
+    "reg_confirmCancel": "取消",
+    "tp_lateReturnPerDay": "每天逾期还车费",
+    "ag_n_lateReturn": "逾期还车费",
+    "ag_n_perDay": "每天 {amount}"
   },
   "accountPage": {
     "roleOwner": "所有者",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "添加一次签名，客户就能在手机上签署租车合同。",
     "nudgePaymentMethods": "添加客户的付款方式（银行账户、Wise、Revolut 或 PromptPay），让他们直接在预订页付款。",
     "extensionHoldReturning": "{customer} 不续租：{vehicle}将于 {date} 归还。之后的日期已重新开放预订。",
-    "reviewReceived": "{customer}给出了{rating}星评价。"
+    "reviewReceived": "{customer}给出了{rating}星评价。",
+    "handoverReportSigned": "{customer} 已签署 {vehicle} 的交车报告。",
+    "returnReportSigned": "{customer} 已签署 {vehicle} 的还车报告。"
   },
   "handoverPay": {
     "title": "付款",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "在{business}取车。请带上驾照和护照。",
     "spec_year": "年份",
     "spec_deposit": "押金",
-    "fleet_perMonth": "每月 {amount}"
+    "fleet_perMonth": "每月 {amount}",
+    "photo_credit": "照片：<author>{name}</author>，来自 <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "外观",
@@ -8097,7 +8183,21 @@
     "role_muted": "次要文字",
     "role_dark": "深色区块",
     "pal_autoSummary": "模板配色",
-    "noReviewsYet": "暂无评价"
+    "noReviewsYet": "暂无评价",
+    "img_stock": "图库照片",
+    "img_uploadPhoto": "上传照片",
+    "stock_credit": "照片：<author>{name}</author>，来自 <unsplash>Unsplash</unsplash>",
+    "stock_failed": "无法加载照片。请重试。",
+    "stock_loading": "正在加载照片…",
+    "stock_more": "更多照片",
+    "stock_none": "未找到照片。请换个关键词搜索。",
+    "stock_note": "来自 <unsplash>Unsplash</unsplash> 的免费照片。您的网站会注明摄影师。",
+    "stock_off": "图库照片尚未设置。",
+    "stock_rateLimited": "已达到 Unsplash 每小时搜索上限。请稍后再试。",
+    "stock_search": "搜索照片",
+    "stock_suggested": "推荐搜索",
+    "stock_use": "使用照片：{photo}",
+    "stock_useBy": "使用 {name} 的照片"
   },
   "roveListing": {
     "title": "在 rove.rent 上共享你的车辆并在那里接受预订？",

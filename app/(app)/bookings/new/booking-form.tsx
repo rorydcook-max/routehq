@@ -177,7 +177,10 @@ function isCurrencyCode(code: string) {
 
 function money(value: unknown, currency = "THB") {
   if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(Number(value || 0), currency, "en-GB");
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
+  // Satang kept when the price has them (real-user test, 8 Nov 2026); whole baht shown without ".00".
+  const amount = Number(value || 0);
+  const whole = Math.abs(amount - Math.round(amount)) < 0.005;
+  return new Intl.NumberFormat("th-TH", { style: "currency", currency, minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(amount);
 }
 
 /** Currencies with no smaller unit in everyday use; every other one takes cents (same rule as components/money-input). */
@@ -386,8 +389,8 @@ export function BookingForm({
     const preselected = validPreselectedVehicle ? vehicles.find((vehicle) => vehicle.id === preselectedVehicleId) : null;
     return preselected ? rateFor(preselected, "monthly") : 0;
   });
-  // A price typed for a car with none saved is kept on the car unless this is unticked.
-  const [saveVehicleRate, setSaveVehicleRate] = useState(true);
+  // A price typed for a car with none saved is kept on the car only when this is ticked (unticked by default, real-user test 8 Nov 2026).
+  const [saveVehicleRate, setSaveVehicleRate] = useState(false);
   const [depositAmount, setDepositAmount] = useState(defaultDeposit > 0 ? defaultDeposit : 0);
   // For a rental that has already started: what the customer has paid so far.
   const [existingPaid, setExistingPaid] = useState<"up_to_date" | "until" | "none">("up_to_date");
@@ -411,6 +414,13 @@ export function BookingForm({
   const [shareResult, setShareResult] = useState<BookingShareResult | null>(null);
   const [walkInNow, setWalkInNow] = useState(false);
   const [walkInFastTrack, setWalkInFastTrack] = useState(false);
+  // Money is recorded for a walk-in only once "Payment already collected?" has been opened (real-user test, 8 Nov 2026).
+  const [walkInPaymentOpen, setWalkInPaymentOpen] = useState(false);
+  // Set when the start date was moved to the day the vehicle comes back, so the screen can say so.
+  const [startMovedTo, setStartMovedTo] = useState("");
+  // A price of zero (a replacement or free rental) is asked about once before going on.
+  const [askFree, setAskFree] = useState(false);
+  const [freeOk, setFreeOk] = useState(false);
   // null until typed: until then the amounts follow the booking (2 days at ฿1,080 is ฿2,160, not one day's rate).
   const [walkInPaymentAmount, setWalkInPaymentAmount] = useState<number | null>(null);
   const [walkInDepositAmount, setWalkInDepositAmount] = useState<number | null>(null);
@@ -495,7 +505,10 @@ export function BookingForm({
     if (!vehicleId) return;
     const today = businessToday();
     const current = (busyPeriods[vehicleId] || []).find((period) => period.startDate <= today && period.endDate && period.endDate >= today);
-    if (current?.endDate && startDate < current.endDate) setStartDate(current.endDate);
+    if (current?.endDate && startDate < current.endDate) {
+      setStartDate(current.endDate);
+      setStartMovedTo(current.endDate);
+    } else setStartMovedTo("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vehicleId]);
 
@@ -507,10 +520,13 @@ export function BookingForm({
   const walkInPay = walkInPaymentAmount ?? firstRentDue + pricedExtras.upfront;
   const walkInDeposit = walkInDepositAmount ?? depositAmount;
 
+  // A return date before the start can't go on (it was saved as a rental "19 days late", real-user test 8 Nov 2026).
+  const endBeforeStart = !openEnded && Boolean(startDate && endDate) && endDate < startDate;
+
   function canContinue() {
     if (step === 0) return Boolean(selectedVehicle && selectable(selectedVehicle));
     if (step === 1) return Boolean(selectedCustomer); // Only reached when not skipped
-    if (step === 2) return Boolean(startDate && rentalRate > 0 && (openEnded || endDate) && !dateConflict);
+    if (step === 2) return Boolean(startDate && rentalRate >= 0 && (openEnded || endDate) && !endBeforeStart && !dateConflict);
     if (step === 3) return true;
     return true;
   }
@@ -520,11 +536,16 @@ export function BookingForm({
     if (step !== 2 || dateConflict) return null;
     if (!startDate) return say("needStart");
     if (!openEnded && !endDate) return say("needReturn");
-    if (!(rentalRate > 0)) return say("needRate");
     return null;
   }
 
   function goNext() {
+    // No price: a replacement or free rental is fine, after one question.
+    if (step === 2 && canContinue() && !(rentalRate > 0) && !freeOk) {
+      setAskFree(true);
+      return;
+    }
+    setAskFree(false);
     // After vehicle selection, show the customer modal instead of advancing directly
     if (step === 0 && canContinue()) {
       if (bookingMode === "existing_rental") handleAddCustomer();
@@ -599,9 +620,12 @@ export function BookingForm({
     setBookingMode("existing_rental");
     setCustomerSkipped(false);
     setStartDate(localDate());
-    setDeliveryMethod("delivery");
-    setDeliveryDateTime(now);
+    setStartMovedTo("");
+    // Someone standing at the counter collects the vehicle: no delivery with a blank place.
+    setDeliveryMethod("collection");
+    setCollectionTime(now);
     setWalkInFastTrack(true);
+    setWalkInPaymentOpen(false);
     setWalkInPaymentAmount(null);
     setWalkInDepositAmount(null);
   }
@@ -623,6 +647,10 @@ export function BookingForm({
       setError(say("errWalkIn"));
       return;
     }
+    if (shouldFastTrackWalkIn && walkInPaymentOpen && !(walkInPay > 0) && !(walkInDeposit > 0)) {
+      setError(say("errAmountReceived"));
+      return;
+    }
 
     startTransition(async () => {
       try {
@@ -635,8 +663,9 @@ export function BookingForm({
         formData.set("baseUrl", baseUrl || defaultAppUrl || window.location.origin);
         formData.set("bookingMode", requestedBookingMode);
         formData.set("walkInFastTrack", String(fastTrack));
-        formData.set("walkInPaymentAmount", String(walkInPay || 0));
-        formData.set("walkInDepositAmount", String(walkInDeposit || 0));
+        formData.set("walkInPaymentCollected", String(fastTrack && walkInPaymentOpen));
+        formData.set("walkInPaymentAmount", String(fastTrack && walkInPaymentOpen ? walkInPay || 0 : 0));
+        formData.set("walkInDepositAmount", String(fastTrack && walkInPaymentOpen ? walkInDeposit || 0 : 0));
         formData.set("walkInPaymentMethod", walkInPaymentMethod);
         formData.set("walkInPaymentNote", walkInPaymentNote);
         formData.set("existingPaid", existingPaid);
@@ -997,13 +1026,32 @@ export function BookingForm({
                   {say("today")}
                 </button>
               </span>
-              <input className={inputClass} onChange={(event) => setStartDate(event.target.value)} required type="date" value={startDate} />
+              <input
+                className={inputClass}
+                onChange={(event) => {
+                  setStartDate(event.target.value);
+                  setStartMovedTo("");
+                }}
+                required
+                type="date"
+                value={startDate}
+              />
             </label>
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("endDate")}</span>
-              <input className={inputClass} disabled={openEnded} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
+              <input aria-invalid={endBeforeStart || undefined} className={inputClass} disabled={openEnded} min={startDate || undefined} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
             </label>
           </div>
+          {startMovedTo && startMovedTo === startDate ? (
+            <p className="mt-2 text-sm font-semibold text-[var(--foreground-secondary)]" role="status">
+              {say("startMoved", { date: shortDate(startMovedTo, locale) })}
+            </p>
+          ) : null}
+          {endBeforeStart ? (
+            <p className="mt-2 text-sm font-bold text-[var(--danger)]" role="alert">
+              {say("endBeforeStart")}
+            </p>
+          ) : null}
           <label className="checkbox-label sub-surface mt-3 min-h-12 font-bold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}>
             <input
               checked={openEnded}
@@ -1383,13 +1431,14 @@ export function BookingForm({
                   onClick={() => {
                     // The amounts follow the booking (a daily price is paid for the whole stay) until typed over.
                     setWalkInFastTrack(true);
+                    setWalkInPaymentOpen(true);
                   }}
                   type="button"
                 >
                   {say("alreadyCollected")}
                 </button>
               </div>
-              {walkInFastTrack ? (
+              {walkInFastTrack && walkInPaymentOpen ? (
                 <div className="mt-3 grid gap-3 rounded-lg border border-[var(--border)] bg-white p-3 sm:grid-cols-2">
                   <label className="block">
                     <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("paymentAmount")}</span>
@@ -1544,8 +1593,28 @@ export function BookingForm({
             {whatIsMissing()}
           </p>
         ) : null}
+        {step === 2 && askFree && !(rentalRate > 0) ? (
+          <div className="flex w-full flex-wrap items-center justify-center gap-2" role="alertdialog" aria-label={say("freeQ")}>
+            <p className="w-full text-center text-sm font-bold text-[var(--foreground)]">{say("freeQ")}</p>
+            <button className="secondary-action pressable flex-1" onClick={() => setAskFree(false)} type="button">
+              {say("cancel")}
+            </button>
+            <button
+              className="primary-action pressable flex-1"
+              onClick={() => {
+                setFreeOk(true);
+                setAskFree(false);
+                setStep((current) => (current === 2 && skipDelivery ? 4 : current + 1));
+              }}
+              type="button"
+            >
+              {say("freeYes")}
+            </button>
+          </div>
+        ) : null}
         <button
           className="secondary-action pressable flex-1 disabled:opacity-40 sm:flex-none"
+          style={step === 2 && askFree && !(rentalRate > 0) ? { display: "none" } : undefined}
           disabled={backDisabled}
           onClick={goBack}
           type="button"
@@ -1557,6 +1626,7 @@ export function BookingForm({
         {step < steps.length - 1 ? (
           <button
             className="primary-action pressable flex-1 disabled:opacity-50 sm:ml-auto sm:flex-none sm:min-w-[180px]"
+            style={step === 2 && askFree && !(rentalRate > 0) ? { display: "none" } : undefined}
             disabled={!canContinue() || showCustomerModal}
             key="continue"
             onClick={goNext}

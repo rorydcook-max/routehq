@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { UserRound } from "lucide-react";
-import { customerWithPhone } from "@/app/actions/customers";
+import { customerWithContact } from "@/app/actions/customers";
 
-/** Watches the phone fields of the form it sits in and says so when that number is already saved. */
+/** Watches the contact fields of the form it sits in (phone, email, chat handles) and says so when one is already saved. */
 export function DuplicatePhoneHint({ organizationId, codeName = "phoneCountryCode", inputName = "phone" }: { organizationId: string; codeName?: string; inputName?: string }) {
   const say = useTranslations("customerPage");
   const marker = useRef<HTMLSpanElement>(null);
-  const [match, setMatch] = useState<{ id: string; name: string } | null>(null);
+  const [match, setMatch] = useState<{ id: string; name: string; byPhone: boolean } | null>(null);
 
   useEffect(() => {
     const form = marker.current?.closest("form");
@@ -21,12 +21,23 @@ export function DuplicatePhoneHint({ organizationId, codeName = "phoneCountryCod
     const check = () => {
       if (timer) clearTimeout(timer);
       timer = setTimeout(async () => {
-        const input = form.querySelector<HTMLInputElement>(`[name="${inputName}"]`);
-        const code = form.querySelector<HTMLInputElement>(`[name="${codeName}"]`);
-        if (!input?.value) return setMatch(null);
+        const value = (name: string) => form.querySelector<HTMLInputElement>(`[name="${name}"]`)?.value.trim() || "";
+        const fields = {
+          code: value(codeName),
+          phone: value(inputName),
+          whatsapp: value("whatsappNumber"),
+          email: value("email"),
+          messenger: value("messengerId"),
+          line: value("lineId"),
+          telegram: value("telegramUsername"),
+          instagram: value("instagramHandle")
+        };
+        if (!Object.entries(fields).some(([key, entry]) => key !== "code" && entry)) return setMatch(null);
         const ask = ++asked;
-        const found = await customerWithPhone(organizationId, code?.value || "+66", input.value).catch(() => null);
-        if (ask === asked) setMatch(found);
+        const found = await customerWithContact(organizationId, fields).catch(() => null);
+        // Found by the phone number, or by one of the other ways to reach them.
+        const byPhone = Boolean(found && fields.phone && !fields.email && !fields.messenger && !fields.line && !fields.telegram && !fields.instagram);
+        if (ask === asked) setMatch(found ? { ...found, byPhone } : null);
       }, 450);
     };
     form.addEventListener("input", check);
@@ -43,7 +54,7 @@ export function DuplicatePhoneHint({ organizationId, codeName = "phoneCountryCod
       {match ? (
         <span className="tile-sky flex items-center gap-3 rounded-xl p-3 sm:col-span-2" role="status">
           <UserRound className="shrink-0" size={20} />
-          <span className="min-w-0 flex-1 font-semibold">{say("dupPhone", { name: match.name })}</span>
+          <span className="min-w-0 flex-1 font-semibold">{say(match.byPhone ? "dupPhone" : "dupContact", { name: match.name })}</span>
           <Link className="shrink-0 whitespace-nowrap font-bold text-[var(--primary)] underline" href={`/customers/${match.id}`}>
             {say("dupOpen")}
           </Link>

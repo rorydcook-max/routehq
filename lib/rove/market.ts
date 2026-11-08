@@ -181,7 +181,7 @@ function cheapestPerDay(vehicle: Pick<RoveVehicle, "dailyRate" | "weeklyRate" | 
 }
 
 /**
- * The price for a stay, worked out as the business's booking page does (app/(app)/rent/[slug]/catalog.tsx): the
+ * The price for a stay, worked out as the business's booking page does (app/(rent)/rent/[slug]/catalog.tsx): the
  * plan rule (planFor), high-season prices, then a day price for each day or one payment per week or month started.
  * Null when the vehicle can't be booked for it (taken, too short for its prices, before the lead time, or a stay the
  * business doesn't offer online).
@@ -282,10 +282,26 @@ export async function searchMarket(input: MarketSearch): Promise<SearchResult[]>
   return results;
 }
 
+/** Whether a vehicle is based in a destination (its home location within the place's radius). */
+export function basedIn(destination: Pick<Destination, "center" | "radiusKm">, vehicle: Pick<RoveVehicle, "area">) {
+  return Boolean(vehicle.area) && distanceKm(destination.center, vehicle.area as { lat: number; lng: number }) <= destination.radiusKm;
+}
+
 /** The vehicles based in a destination (their home location within its radius). */
 export async function vehiclesIn(destination: Pick<Destination, "center" | "radiusKm">): Promise<RoveVehicle[]> {
   const { vehicles } = await loadMarket();
-  return vehicles.filter((vehicle) => vehicle.area && distanceKm(destination.center, vehicle.area) <= destination.radiusKm);
+  return vehicles.filter((vehicle) => basedIn(destination, vehicle));
+}
+
+/**
+ * The destinations with live listings, most first: the places whose pages are indexed ([place]/page.tsx noindexes a
+ * place with none), so the home page and the search box suggest only places a renter can book in (task perf, 8 Nov 2026).
+ */
+export function liveDestinations<D extends Pick<Destination, "center" | "radiusKm">>(destinations: readonly D[], vehicles: RoveVehicle[]) {
+  return destinations
+    .map((destination) => ({ destination, count: vehicles.filter((vehicle) => basedIn(destination, vehicle)).length }))
+    .filter((row) => row.count > 0)
+    .sort((a, b) => b.count - a.count);
 }
 
 export type PriceRange = { min: number; max: number; count: number };

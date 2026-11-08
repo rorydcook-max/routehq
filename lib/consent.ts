@@ -69,6 +69,15 @@ export function getConsent(): ConsentChoice | null {
   return null;
 }
 
+/**
+ * A tiny inline script, run while the page is read: marks <html data-consent-set> when the visitor has a valid choice
+ * (the same test as getConsent), so the cookie notice drawn with the page is hidden before the first paint for them
+ * (components/cookie-banner.tsx; task perf, 8 Nov 2026). Goes in the <head> of every layout that shows the notice.
+ */
+export function consentChosenScript() {
+  return `(function(){try{var k=${JSON.stringify(CONSENT_KEY)};function ok(v){try{var c=JSON.parse(v);return c&&c.version===${VERSION}&&typeof c.analytics==="boolean"&&Date.now()-Date.parse(c.decidedAt)<${MAX_AGE_DAYS * 86_400_000};}catch(e){return false;}}var s=null;try{s=localStorage.getItem(k);}catch(e){}var m=document.cookie.match(new RegExp("(?:^|; )"+k+"=([^;]*)"));if((s&&ok(s))||(m&&ok(decodeURIComponent(m[1]))))document.documentElement.setAttribute("data-consent-set","");}catch(e){}})();`;
+}
+
 /** True only when the visitor said yes to this category. No choice yet means no. */
 export function hasConsent(category: ConsentCategory): boolean {
   const choice = getConsent();

@@ -19,6 +19,7 @@ import { niceMoney } from "@/lib/nice-money";
 import { businessCountry } from "@/lib/business-units";
 import { currencySymbol } from "@/components/currency-symbol";
 import { unwrap } from "@/lib/action-result";
+import { shownError } from "@/lib/error-text";
 
 // A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
 const addRentalPayment = (...args: Parameters<typeof addRentalPaymentAction>) => unwrap(addRentalPaymentAction(...args));
@@ -277,8 +278,8 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
           paidDate: String(formData.get("paidDate") || "") || null
         });
         setEditingId(null);
-      } catch {
-        setMessage(say("p_failed"));
+      } catch (caught) {
+        setMessage(shownError(caught, say("p_failed")));
       }
     });
   }
@@ -289,8 +290,8 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
       try {
         await deleteRentalPayment(paymentId);
         setConfirmDeleteId(null);
-      } catch {
-        setMessage(say("p_failed"));
+      } catch (caught) {
+        setMessage(shownError(caught, say("p_failed")));
       }
     });
   }
@@ -301,8 +302,8 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
       try {
         await addRentalPayment(formData);
         setAdding(false);
-      } catch {
-        setMessage(say("p_failed"));
+      } catch (caught) {
+        setMessage(shownError(caught, say("p_failed")));
       }
     });
   }
@@ -515,8 +516,8 @@ export function BookingEditForm({
               return;
             }
             router.push(`/bookings/${rental.id}?updated=1` as Route);
-          } catch {
-            setSaveError(say("saveFailed"));
+          } catch (caught) {
+            setSaveError(shownError(caught, say("saveFailed")));
             setSaving(false);
             window.scrollTo({ top: 0, behavior: "smooth" });
           }

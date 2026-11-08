@@ -316,7 +316,7 @@ async function extractDocumentOcr(file: File, category: "passport" | "driver_lic
     const bytes = Buffer.from(await file.arrayBuffer());
     const prompt =
       category === "passport"
-        ? "Extract from this passport image: passport_number, full_name, nationality, date_of_birth (YYYY-MM-DD), expiry_date (YYYY-MM-DD). Respond ONLY with a JSON object with these exact keys. If a field is not visible, use null."
+        ? "Extract from this passport or national identity card image (either side of an ID card): passport_number (the passport or ID card number), full_name, nationality, date_of_birth (YYYY-MM-DD), expiry_date (YYYY-MM-DD). Respond ONLY with a JSON object with these exact keys. If a field is not visible, use null."
         : "Extract from this driving licence image: licence_number, issuing_country, expiry_date (YYYY-MM-DD). Respond ONLY with a JSON object with these exact keys. If a field is not visible, use null.";
     const parsed = await readFileAsJson({ system: "You read identity documents for a vehicle rental business.", prompt, bytes, mediaType: file.type || "image/jpeg", maxTokens: 300, personal: true });
 
@@ -720,6 +720,13 @@ async function completePublicBookingOrThrow(formData: FormData) {
     if (customerError) {
       throw new Error(customerError.message);
     }
+  }
+
+  // Passport or national ID card (Rory, 8 Nov 2026): the number above belongs to the document they chose. Saved on its
+  // own so a database without the column yet (migration 0142) still takes the booking.
+  const idDocumentType = optionalString(formData, "idDocumentType");
+  if (customerId && (idDocumentType === "passport" || idDocumentType === "national_id")) {
+    await supabase.from("customers").update({ id_document_type: idDocumentType }).eq("id", customerId).eq("organization_id", organizationId).then(() => null, () => null);
   }
 
   // customerId is guaranteed non-null beyond this point

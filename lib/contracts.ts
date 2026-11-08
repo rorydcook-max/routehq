@@ -246,6 +246,9 @@ export async function ensureDefaultContractTemplate(supabase: any, organizationI
     return data;
   }
 
+  // The agreement follows the business's own country (it was always "TH", real-user test 8 Nov 2026).
+  const { data: business } = await supabase.from("organizations").select("country_code, settings").eq("id", organizationId).maybeSingle();
+  const jurisdiction = String((business as any)?.country_code || (business as any)?.settings?.main_location?.country || "").trim().toUpperCase() || null;
   const { data, error } = await supabase
     .from("contract_templates")
     .insert({
@@ -260,7 +263,7 @@ export async function ensureDefaultContractTemplate(supabase: any, organizationI
       body: defaultRentalContractTemplate,
       content_html: defaultRentalContractTemplate,
       variables: contractVariableKeys,
-      jurisdiction: "TH",
+      jurisdiction,
       is_default: true,
       is_active: true
     })

@@ -1,12 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { MessageCircle, X } from "lucide-react";
 import { chatPoll } from "@/app/actions/chat";
-import { ChatPanel, storedThread, type ChatRequest } from "@/components/chat/chat-panel";
+import type { ChatRequest } from "@/components/chat/chat-panel";
+import { storedThread } from "@/components/chat/chat-thread";
 import { CHAT_OPEN_EVENT, type ChatOpenDetail } from "@/lib/chat-suggestions";
+
+// The panel (and everything it brings) loads only when the chat is first opened, not with every page (task perf, 8 Nov 2026).
+const ChatPanel = dynamic(() => import("@/components/chat/chat-panel").then((module) => module.ChatPanel), { ssr: false });
 
 const SIZE = 52;
 const GAP = 12;

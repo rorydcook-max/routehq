@@ -445,9 +445,15 @@
     "lateBackCharge": "ค่าปรับคืนช้า",
     "lateBackFromDeposit": "หักจากเงินมัดจำ",
     "lateBackChargeRenter": "เรียกเก็บจากผู้เช่า",
-    "lateBackWaive": "ยกเว้น",
+    "lateBackWaive": "ยกเว้น (ตกลงกับผู้เช่าแล้ว)",
     "lateBackOverDeposit": "เงินมัดจำที่เหลือครอบคลุมได้สูงสุด {amount}",
-    "lateBackRow": "{count, plural, other {ช้า # วัน}}"
+    "lateBackRow": "{count, plural, other {ช้า # วัน}}",
+    "customerNotPresent": "ลูกค้าไม่อยู่",
+    "customerNotPresentNote": "จะส่งลิงก์ให้ลูกค้าลงนามในรายงาน",
+    "waitingSignature": "รอลายเซ็นลูกค้า",
+    "resendSignatureLink": "ส่งลิงก์ลงนามอีกครั้ง",
+    "signatureLinkSent": "ส่งลิงก์แล้ว",
+    "signatureLinkNotSent": "ไม่ได้ส่งอัตโนมัติ ส่งจากข้อความของการจอง"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",
@@ -1002,7 +1008,36 @@
     "bs_vehicleCount": "{count, plural, other {รถ # คัน}}",
     "bs_demoBanner": "ร้านตัวอย่าง ใช้สาธิตเท่านั้น ปิดการจองไว้",
     "bs_demoNoBooking": "นี่คือร้านตัวอย่าง จึงปิดการจองไว้",
-    "reason_late_return": "คืนรถช้า"
+    "reason_late_return": "คืนรถช้า",
+    "actionFailed": "ยังไม่ได้ส่ง ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+    "stillNeeded": "ยังต้องการ: {items}",
+    "need_agreeTick": "ติ๊กยอมรับข้อตกลง",
+    "idType": "เอกสารยืนยันตัวตน",
+    "idType_passport": "หนังสือเดินทาง",
+    "idType_national_id": "บัตรประชาชน",
+    "idCardNumber": "เลขบัตรประชาชน",
+    "passportNo": "เลขหนังสือเดินทาง",
+    "reportTitle_delivery": "รายงานส่งมอบรถ",
+    "reportTitle_return": "รายงานคืนรถ",
+    "reportToSign_delivery": "ลงนามในรายงานส่งมอบรถ",
+    "reportToSign_return": "ลงนามในรายงานคืนรถ",
+    "reportSeeAndSign": "ตรวจดูรูปภาพและรายละเอียด แล้วลงนาม",
+    "reportOdometer": "เลขไมล์",
+    "reportFuel": "น้ำมัน",
+    "reportPhotos": "รูปภาพ",
+    "reportDamage": "ความเสียหาย",
+    "reportNoDamage": "ไม่พบความเสียหาย",
+    "reportDeposit": "เงินมัดจำ",
+    "reportDepositHeld": "ถืออยู่",
+    "reportDeducted": "หักไป",
+    "reportRefunded": "คืนให้คุณ",
+    "reportConsent": "ฉันยืนยันว่าสภาพรถตรงตามที่บันทึกไว้ในรายงานนี้",
+    "reportSign": "ลงนามในรายงาน",
+    "reportSignedTitle": "ลงนามในรายงานแล้ว",
+    "reportSignedOn": "ลงนามโดย {name} เมื่อ {date}",
+    "reportDownload": "ดาวน์โหลดรายงาน",
+    "reportNotFoundTitle": "ไม่พบรายงาน",
+    "reportNotFoundMessage": "ขอลิงก์ใหม่จากร้านเช่า"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",
@@ -1079,7 +1114,9 @@
     "cancelNoRefund": "ไม่มีการคืนเงิน",
     "cancelDepositBack": "เราจะคืนเงินมัดจำ {amount} ให้คุณ",
     "cancelDepositPart": "เราจะคืนเงินมัดจำ {returned} จาก {held} ให้คุณ",
-    "cancelDepositKept": "เงินมัดจำ {amount} ของคุณถูกหักไว้"
+    "cancelDepositKept": "เงินมัดจำ {amount} ของคุณถูกหักไว้",
+    "signHandoverReport": "รายงานส่งมอบ {vehicle} ของคุณพร้อมให้ตรวจและลงนามแล้ว: {link}",
+    "signReturnReport": "รายงานคืน {vehicle} ของคุณพร้อมให้ตรวจและลงนามแล้ว: {link}"
   },
   "common": {
     "kinds_car": "รถยนต์",
@@ -1337,7 +1374,8 @@
     "collect_extension": "เก็บค่าต่อสัญญา",
     "collect_extras": "เก็บค่าบริการเสริม",
     "job_review": "รีวิวจาก {name} รอตรวจ",
-    "job_review_open": "เปิดรีวิว"
+    "job_review_open": "เปิดรีวิว",
+    "job_inspection_signature": "ต้องการลายเซ็นลูกค้า: {ref}"
   },
   "bookings": {
     "eyebrow": "การจอง",
@@ -1418,7 +1456,8 @@
     "deleteRecordsInspections": "การตรวจรถตอนส่งมอบและรับคืน พร้อมรูปถ่าย: {count}",
     "deleteRecordsSigned": "สัญญาที่ลงนามแล้ว",
     "deleteRecordsBody": "ย้อนกลับไม่ได้",
-    "deleteAnyway": "ลบเลย"
+    "deleteAnyway": "ลบเลย",
+    "emptyNone": "ยังไม่มีการจอง"
   },
   "inbox": {
     "title": "ข้อความ",
@@ -2598,7 +2637,18 @@
     "cn_depositTooMuch": "เงินมัดจำที่ยังถืออยู่คือ {amount}",
     "fin_cancelledSettled": "บันทึกการคืนเงินแล้ว ไม่มีอะไรต้องชำระเพิ่ม",
     "share_send": "ส่งลิงก์การจอง",
-    "hist_late_return": "คืนรถช้า"
+    "hist_late_return": "คืนรถช้า",
+    "cp_noteFailed": "ยังไม่ได้บันทึกโน้ต ลองอีกครั้ง",
+    "contact": "ติดต่อ",
+    "contactOpen": "เปิด",
+    "walkInNoPayment": "บันทึกการเช่าแบบวอล์กอินแล้ว",
+    "pc_refundBtn": "คืนเงิน",
+    "pc_refundAmount": "จำนวนเงินที่คืน",
+    "pc_refundConfirm": "บันทึกการคืนเงิน",
+    "pc_refundDone": "บันทึกการคืนเงินแล้ว",
+    "pc_refundEnter": "ใส่จำนวนเงินที่คืน",
+    "pc_refundMax": "คืนเงินจากรายการชำระนี้ได้สูงสุด {amount}",
+    "pc_refundFailed": "ยังไม่ได้บันทึกการคืนเงิน ลองอีกครั้ง"
   },
   "newBooking": {
     "docsSelfie": "รูปถ่ายลูกค้า",
@@ -2848,7 +2898,12 @@
     "saveRate_monthly": "บันทึก {amount} ต่อเดือน เป็นราคาของรถคันนี้",
     "extraFree": "ฟรี",
     "clashHeld": "กันไว้เผื่อต่อสัญญา: {who}อยากต่อสัญญา ยืนยันหรือยกเลิกการกันรถก่อน",
-    "clashHeldRenter": "ผู้เช่า"
+    "clashHeldRenter": "ผู้เช่า",
+    "startMoved": "เริ่ม {date} ซึ่งเป็นวันที่รถคันนี้ว่าง",
+    "endBeforeStart": "วันคืนรถต้องอยู่หลังวันเริ่มต้น",
+    "freeQ": "จองฟรีไหม?",
+    "freeYes": "จองฟรี",
+    "errAmountReceived": "ใส่จำนวนเงินที่ได้รับ"
   },
   "fleet": {
     "title": "รถ",
@@ -2924,7 +2979,10 @@
     "qp_save": "บันทึก",
     "qp_cancel": "ยกเลิก",
     "qp_failed": "บันทึกราคาไม่ได้ ลองอีกครั้ง",
-    "assistant": "ผู้ช่วย"
+    "assistant": "ผู้ช่วย",
+    "bandArchived": "เก็บถาวร",
+    "status_Archived": "เก็บถาวร",
+    "noticeArchiveLive": "รถบางคันยังมีการจองที่ยังไม่สิ้นสุด ย้ายไปรถคันอื่นหรือยกเลิกก่อน"
   },
   "customers": {
     "sel_nationality": "สัญชาติ",
@@ -3010,7 +3068,12 @@
     "in_trend": "ระยะเช่าและยอดใช้จ่าย",
     "in_avgLength": "ระยะเช่าเฉลี่ย",
     "in_avgSpend": "ยอดใช้จ่ายเฉลี่ย",
-    "pillReviews": "{count, plural, other {# รีวิว}}"
+    "pillReviews": "{count, plural, other {# รีวิว}}",
+    "sel_needContact": "ใส่ชื่อและช่องทางติดต่ออย่างน้อยหนึ่งช่องทาง: เบอร์โทร, Messenger, LINE, Telegram, Instagram หรืออีเมล",
+    "sel_messengerNameOnly": "ชื่อหรือลิงก์โปรไฟล์ของเขา",
+    "sel_lineIdOnly": "LINE ID หรือเบอร์โทร",
+    "sel_telegramIdOnly": "ชื่อผู้ใช้ Telegram หรือเบอร์โทร",
+    "sel_instagram": "ชื่อผู้ใช้ Instagram"
   },
   "calendar": {
     "title": "ปฏิทิน",
@@ -3104,7 +3167,7 @@
     "vs_reserved": "จองแล้ว",
     "vs_maintenance": "อยู่ที่อู่",
     "vs_available": "ว่าง",
-    "vs_inactive": "ไม่ได้ใช้งาน",
+    "vs_inactive": "เก็บถาวร",
     "vs_retired": "ไม่ได้ใช้งาน",
     "c_tax": "ภาษีรถ",
     "c_porbor": "พ.ร.บ.",
@@ -3455,7 +3518,8 @@
     "tl_out": "เช่าโดย {name}",
     "tl_service": "เข้าศูนย์",
     "tl_repair": "ซ่อม",
-    "tl_damage": "พบรอยเสียหายตอนคืนรถ: {count, plural, other {# รายการ}}"
+    "tl_damage": "พบรอยเสียหายตอนคืนรถ: {count, plural, other {# รายการ}}",
+    "unarchive": "เลิกเก็บถาวร"
   },
   "customerPage": {
     "back": "ลูกค้า",
@@ -3556,7 +3620,7 @@
     "n_placeholder": "สิ่งที่ควรจำ เช่น ความชอบ นิสัยการจ่ายเงิน หรือเรื่องที่ต้องเตือน",
     "n_auto": "บันทึกให้เองเมื่อแตะที่อื่น",
     "new_title": "เพิ่มลูกค้า",
-    "new_subtitle": "มีแค่ชื่อกับเบอร์โทรก็พอ ที่เหลือเพิ่มตอนนี้หรือทีหลังก็ได้",
+    "new_subtitle": "แค่ชื่อและช่องทางติดต่อหนึ่งช่องทางก็พอ ข้อมูลอื่นเพิ่มตอนนี้หรือภายหลังก็ได้",
     "new_chatTitle": "แอปแชตและอีเมล",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, อีเมล",
     "new_whatsappHint": "เว้นว่างได้ถ้าเป็นเบอร์เดียวกับเบอร์โทร",
@@ -3659,7 +3723,17 @@
     "tl_paidCharge": "ชำระค่าใช้จ่ายเพิ่มเติม",
     "tl_refunded": "คืนเงิน",
     "tl_damage": "พบรอยเสียหายตอนคืนรถ: {count, plural, other {# รายการ}}",
-    "tl_review": "ให้รีวิว: {rating}/5"
+    "tl_review": "ให้รีวิว: {rating}/5",
+    "new_phoneHint": "ไม่จำเป็นถ้าคุณใส่ Messenger, LINE, Telegram, Instagram หรืออีเมลด้านล่าง",
+    "dnr_failed": "ยังไม่ได้บันทึก ลองอีกครั้ง",
+    "message": "ส่งข้อความ",
+    "dupContact": "{name} ถูกบันทึกไว้แล้วด้วยข้อมูลติดต่อนี้",
+    "f_licenceClass": "ประเภทใบขับขี่",
+    "f_idType": "เอกสารยืนยันตัวตน",
+    "f_idType_passport": "หนังสือเดินทาง",
+    "f_idType_national_id": "บัตรประชาชน",
+    "f_idCardNo": "เลขบัตรประชาชน",
+    "f_idCardExpiry": "บัตรประชาชนหมดอายุ"
   },
   "vehicleForm": {
     "addTitle": "เพิ่มรถ",
@@ -3834,7 +3908,9 @@
     "quickSubtitle": "ข้อมูลเบื้องต้น: ใส่แค่ประเภท ยี่ห้อ และรุ่นก็พอ",
     "quickLater": "วันต่อภาษี/ประกัน, เลขไมล์, ข้อมูลเงินกู้ และอื่นๆ ค่อยมาใส่ทีหลังได้ที่เมนูรถ",
     "valueSummaryMi": "ระยะทางปัจจุบัน ราคาที่ซื้อ มูลค่าปัจจุบัน",
-    "valueSummaryEditMi": "ราคาซื้อ มูลค่า ระยะทางตอนซื้อ"
+    "valueSummaryEditMi": "ราคาซื้อ มูลค่า ระยะทางตอนซื้อ",
+    "archivedNow": "รถคันนี้ถูกเก็บถาวรแล้ว",
+    "unarchiveBtn": "เลิกเก็บถาวร"
   },
   "bookingEdit": {
     "booking": "การจอง",
@@ -4113,7 +4189,7 @@
     "tp_fees": "ค่าธรรมเนียมและข้อจำกัด",
     "tp_km": "ระยะทางที่ใช้ได้ต่อเดือน (กม.)",
     "tp_fuel": "ค่าน้ำมันต่อ 1/8 ถังที่ขาด",
-    "tp_late": "ค่าปรับคืนรถช้า (% ต่อวัน)",
+    "tp_late": "ค่าปรับชำระล่าช้า (% ต่อวัน)",
     "tp_cleaning": "ค่าทำความสะอาด เริ่มต้น",
     "tp_smoking": "ค่าปรับสูบบุหรี่ สูงสุด",
     "tp_repairs": "ค่าซ่อมที่ลูกค้าอนุมัติเองได้ สูงสุด",
@@ -4845,7 +4921,14 @@
     "ba_or": "หรือ",
     "ba_ownLabel": "เชื่อมต่อโดเมนของคุณเอง",
     "bt_showName": "แสดงชื่อร้านข้างโลโก้",
-    "bt_showNameHint": "เมื่อปิดไว้ โลโก้แนวนอนจะแสดงเดี่ยวๆ ส่วนโลโก้สี่เหลี่ยมจัตุรัสจะมีชื่อร้านอยู่ข้างๆ กดเผยแพร่เพื่อให้มีผล"
+    "bt_showNameHint": "เมื่อปิดไว้ โลโก้แนวนอนจะแสดงเดี่ยวๆ ส่วนโลโก้สี่เหลี่ยมจัตุรัสจะมีชื่อร้านอยู่ข้างๆ กดเผยแพร่เพื่อให้มีผล",
+    "reg_confirmCurrency": "ราคารถจะแสดงเป็น {to} แต่จะไม่ถูกแปลงค่า การจองที่มีอยู่ยังคงเป็น {from}",
+    "reg_confirmCountry": "การเปลี่ยนนี้จะเปลี่ยนสกุลเงินเป็น {currency} เขตเวลาเป็น {zone} หน่วยระยะทางเป็น {unit} และ VAT เป็น {vat}% ด้วย",
+    "reg_confirmChange": "เปลี่ยน",
+    "reg_confirmCancel": "ยกเลิก",
+    "tp_lateReturnPerDay": "ค่าปรับคืนรถล่าช้าต่อวัน",
+    "ag_n_lateReturn": "ค่าปรับคืนรถล่าช้า",
+    "ag_n_perDay": "{amount} ต่อวัน"
   },
   "accountPage": {
     "roleOwner": "เจ้าของ",
@@ -7665,7 +7748,9 @@
     "nudgeSignature": "เพิ่มลายเซ็นของคุณครั้งเดียว แล้วลูกค้าเซ็นสัญญาเช่าบนมือถือได้เลย",
     "nudgePaymentMethods": "เพิ่มช่องทางที่ลูกค้าชำระเงินได้ (บัญชีธนาคาร, Wise, Revolut หรือ PromptPay) ให้ลูกค้าชำระได้ทันทีจากหน้าจอง",
     "extensionHoldReturning": "{customer} ไม่ต่อสัญญา: {vehicle} จะคืนวันที่ {date} วันหลังจากนั้นเปิดให้จองได้อีกครั้ง",
-    "reviewReceived": "{customer} ให้รีวิว {rating} ดาว"
+    "reviewReceived": "{customer} ให้รีวิว {rating} ดาว",
+    "handoverReportSigned": "{customer} ลงนามในรายงานส่งมอบ {vehicle} แล้ว",
+    "returnReportSigned": "{customer} ลงนามในรายงานคืน {vehicle} แล้ว"
   },
   "handoverPay": {
     "title": "ชำระเงิน",
@@ -7932,7 +8017,8 @@
     "step3p_b_np": "รับรถที่ {business} อย่าลืมนำใบขับขี่และพาสปอร์ตมาด้วย",
     "spec_year": "ปี",
     "spec_deposit": "เงินมัดจำ",
-    "fleet_perMonth": "{amount} ต่อเดือน"
+    "fleet_perMonth": "{amount} ต่อเดือน",
+    "photo_credit": "ภาพโดย <author>{name}</author> บน <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "หน้าตา",
@@ -8104,7 +8190,21 @@
     "role_muted": "ข้อความรอง",
     "role_dark": "ส่วนสีเข้ม",
     "pal_autoSummary": "สีตามเทมเพลต",
-    "noReviewsYet": "ยังไม่มีรีวิว"
+    "noReviewsYet": "ยังไม่มีรีวิว",
+    "img_stock": "ภาพสต็อก",
+    "img_uploadPhoto": "อัปโหลดรูปภาพ",
+    "stock_credit": "ภาพโดย <author>{name}</author> บน <unsplash>Unsplash</unsplash>",
+    "stock_failed": "โหลดรูปภาพไม่ได้ ลองอีกครั้ง",
+    "stock_loading": "กำลังโหลดรูปภาพ…",
+    "stock_more": "รูปภาพเพิ่มเติม",
+    "stock_none": "ไม่พบรูปภาพ ลองค้นหาคำอื่น",
+    "stock_note": "รูปภาพฟรีจาก <unsplash>Unsplash</unsplash> เว็บไซต์ของคุณจะให้เครดิตช่างภาพ",
+    "stock_off": "ยังไม่ได้ตั้งค่าภาพสต็อก",
+    "stock_rateLimited": "ค้นหาใน Unsplash ครบโควตารายชั่วโมงแล้ว ลองใหม่อีกสักครู่",
+    "stock_search": "ค้นหารูปภาพ",
+    "stock_suggested": "คำค้นหาแนะนำ",
+    "stock_use": "ใช้รูปภาพ: {photo}",
+    "stock_useBy": "ใช้รูปภาพของ {name}"
   },
   "roveListing": {
     "title": "แชร์รถของคุณบน rove.rent และรับการจองจากที่นั่นไหม?",

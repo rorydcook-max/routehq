@@ -444,9 +444,15 @@
     "lateBackCharge": "Penale per ritardo",
     "lateBackFromDeposit": "Trattieni dal deposito",
     "lateBackChargeRenter": "Addebita al cliente",
-    "lateBackWaive": "Condona",
+    "lateBackWaive": "Condona (concordato con il cliente)",
     "lateBackOverDeposit": "Il deposito rimasto copre fino a {amount}.",
-    "lateBackRow": "{count, plural, one {# giorno di ritardo} other {# giorni di ritardo}}"
+    "lateBackRow": "{count, plural, one {# giorno di ritardo} other {# giorni di ritardo}}",
+    "customerNotPresent": "Cliente non presente",
+    "customerNotPresentNote": "Riceverà un link per firmare il verbale.",
+    "waitingSignature": "In attesa della firma del cliente",
+    "resendSignatureLink": "Reinvia link per la firma",
+    "signatureLinkSent": "Link inviato",
+    "signatureLinkNotSent": "Non inviato automaticamente. Invialo dai messaggi della prenotazione."
   },
   "translation": {
     "translatedFrom": "Tradotto da: {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {# veicolo} other {# veicoli}}",
     "bs_demoBanner": "Attività demo, solo un esempio. Le prenotazioni sono disattivate.",
     "bs_demoNoBooking": "Questa è un'attività demo, quindi le prenotazioni sono disattivate.",
-    "reason_late_return": "riconsegna in ritardo"
+    "reason_late_return": "riconsegna in ritardo",
+    "actionFailed": "Non è stato inviato. Controlla la connessione e riprova.",
+    "stillNeeded": "Manca ancora: {items}",
+    "need_agreeTick": "Spunta di accettazione del contratto",
+    "idType": "Documento d'identità",
+    "idType_passport": "Passaporto",
+    "idType_national_id": "Carta d'identità",
+    "idCardNumber": "Numero della carta d'identità",
+    "passportNo": "Numero del passaporto",
+    "reportTitle_delivery": "Verbale di consegna",
+    "reportTitle_return": "Verbale di riconsegna",
+    "reportToSign_delivery": "Firma il tuo verbale di consegna",
+    "reportToSign_return": "Firma il tuo verbale di riconsegna",
+    "reportSeeAndSign": "Controlla foto e dettagli, poi firma.",
+    "reportOdometer": "Contachilometri",
+    "reportFuel": "Carburante",
+    "reportPhotos": "Foto",
+    "reportDamage": "Danni",
+    "reportNoDamage": "Nessun danno rilevato.",
+    "reportDeposit": "Cauzione",
+    "reportDepositHeld": "Trattenuta",
+    "reportDeducted": "Detratto",
+    "reportRefunded": "Restituito a te",
+    "reportConsent": "Confermo che le condizioni del veicolo sono quelle registrate in questo verbale.",
+    "reportSign": "Firma il verbale",
+    "reportSignedTitle": "Verbale firmato",
+    "reportSignedOn": "Firmato da {name}, {date}.",
+    "reportDownload": "Scarica il verbale",
+    "reportNotFoundTitle": "Verbale non trovato",
+    "reportNotFoundMessage": "Chiedi un nuovo link all'attività di noleggio."
   },
   "customerMessages": {
     "hi": "Ciao {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "Non è previsto alcun rimborso.",
     "cancelDepositBack": "Ti restituiamo il deposito di {amount}.",
     "cancelDepositPart": "Ti restituiamo {returned} del tuo deposito di {held}.",
-    "cancelDepositKept": "Il tuo deposito di {amount} è stato trattenuto."
+    "cancelDepositKept": "Il tuo deposito di {amount} è stato trattenuto.",
+    "signHandoverReport": "il tuo verbale di consegna per {vehicle} è pronto da controllare e firmare: {link}",
+    "signReturnReport": "il tuo verbale di riconsegna per {vehicle} è pronto da controllare e firmare: {link}"
   },
   "common": {
     "kinds_car": "Auto",
@@ -1273,7 +1310,8 @@
     "collect_extension": "Incassa la proroga",
     "collect_extras": "Incassa gli extra",
     "job_review": "Recensione di {name} da controllare",
-    "job_review_open": "Apri recensioni"
+    "job_review_open": "Apri recensioni",
+    "job_inspection_signature": "Serve la firma del cliente: {ref}"
   },
   "bookings": {
     "eyebrow": "Prenotazioni",
@@ -1354,7 +1392,8 @@
     "deleteRecordsInspections": "Controlli di consegna e rientro, con foto: {count}",
     "deleteRecordsSigned": "Il contratto firmato",
     "deleteRecordsBody": "L'operazione non si può annullare.",
-    "deleteAnyway": "Elimina comunque"
+    "deleteAnyway": "Elimina comunque",
+    "emptyNone": "Ancora nessuna prenotazione."
   },
   "inbox": {
     "title": "Messaggi",
@@ -2534,7 +2573,18 @@
     "cn_depositTooMuch": "Il deposito ancora trattenuto è {amount}.",
     "fin_cancelledSettled": "Rimborsi registrati. Non resta niente da saldare.",
     "share_send": "Invia link di prenotazione",
-    "hist_late_return": "Riconsegnato in ritardo"
+    "hist_late_return": "Riconsegnato in ritardo",
+    "cp_noteFailed": "La nota non è stata salvata. Riprova.",
+    "contact": "Contatto",
+    "contactOpen": "Apri",
+    "walkInNoPayment": "Noleggio senza prenotazione registrato.",
+    "pc_refundBtn": "Rimborsa",
+    "pc_refundAmount": "Importo del rimborso",
+    "pc_refundConfirm": "Registra rimborso",
+    "pc_refundDone": "Rimborso registrato.",
+    "pc_refundEnter": "Inserisci l'importo del rimborso.",
+    "pc_refundMax": "Puoi rimborsare al massimo {amount} da questo pagamento.",
+    "pc_refundFailed": "Il rimborso non è stato salvato. Riprova."
   },
   "newBooking": {
     "docsSelfie": "Foto del cliente",
@@ -2784,7 +2834,12 @@
     "saveRate_monthly": "Salva {amount} al mese come prezzo di questo veicolo",
     "extraFree": "Gratis",
     "clashHeld": "Bloccato per proroga: {who} vuole prolungare. Conferma o togli prima il blocco.",
-    "clashHeldRenter": "il cliente"
+    "clashHeldRenter": "il cliente",
+    "startMoved": "Inizia il {date}, il giorno in cui questo veicolo è libero.",
+    "endBeforeStart": "La data di riconsegna deve essere successiva a quella di inizio.",
+    "freeQ": "Prenotare gratis?",
+    "freeYes": "Prenota gratis",
+    "errAmountReceived": "Inserisci l'importo ricevuto."
   },
   "fleet": {
     "title": "Flotta",
@@ -2860,7 +2915,10 @@
     "qp_save": "Salva",
     "qp_cancel": "Annulla",
     "qp_failed": "Impossibile salvare il prezzo. Riprova.",
-    "assistant": "Assistente"
+    "assistant": "Assistente",
+    "bandArchived": "archiviato",
+    "status_Archived": "Archiviato",
+    "noticeArchiveLive": "Alcuni di questi veicoli hanno prenotazioni non concluse. Spostale su un altro veicolo o annullale prima."
   },
   "customers": {
     "sel_nationality": "Nazionalità",
@@ -2946,7 +3004,12 @@
     "in_trend": "Durata e spesa",
     "in_avgLength": "Durata media",
     "in_avgSpend": "Spesa media",
-    "pillReviews": "{count, plural, one {# recensione} other {# recensioni}}"
+    "pillReviews": "{count, plural, one {# recensione} other {# recensioni}}",
+    "sel_needContact": "Aggiungi un nome e un modo per contattarlo: telefono, Messenger, LINE, Telegram, Instagram o email.",
+    "sel_messengerNameOnly": "Nome o link al profilo",
+    "sel_lineIdOnly": "ID LINE o telefono",
+    "sel_telegramIdOnly": "Nome utente Telegram o telefono",
+    "sel_instagram": "Nome utente Instagram"
   },
   "calendar": {
     "title": "Calendario",
@@ -3046,7 +3109,7 @@
     "vs_reserved": "Prenotato",
     "vs_maintenance": "In officina",
     "vs_available": "Libero",
-    "vs_inactive": "Non in uso",
+    "vs_inactive": "Archiviato",
     "vs_retired": "Non in uso",
     "c_tax": "Bollo",
     "c_porbor": "Assicurazione obbligatoria (Por Ror Bor)",
@@ -3391,7 +3454,8 @@
     "tl_out": "Con {name}",
     "tl_service": "Tagliando",
     "tl_repair": "Riparazione",
-    "tl_damage": "Danni al rientro: {count, plural, one {# elemento} other {# elementi}}"
+    "tl_damage": "Danni al rientro: {count, plural, one {# elemento} other {# elementi}}",
+    "unarchive": "Ripristina"
   },
   "customerPage": {
     "back": "Clienti",
@@ -3493,7 +3557,7 @@
     "n_placeholder": "Qualcosa da ricordare: preferenze, abitudini di pagamento, promemoria",
     "n_auto": "Si salva quando tocchi altrove",
     "new_title": "Aggiungi cliente",
-    "new_subtitle": "Bastano nome e telefono. Il resto puoi aggiungerlo ora o dopo.",
+    "new_subtitle": "Bastano un nome e un modo per contattarlo. Aggiungi il resto ora o più tardi.",
     "new_chatTitle": "App di chat ed email",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, email",
     "new_whatsappHint": "Lascia vuoto se è lo stesso del telefono.",
@@ -3595,7 +3659,17 @@
     "tl_paidCharge": "Ha pagato un addebito",
     "tl_refunded": "Rimborso",
     "tl_damage": "Danni al rientro: {count, plural, one {# elemento} other {# elementi}}",
-    "tl_review": "Ha lasciato una recensione: {rating}/5"
+    "tl_review": "Ha lasciato una recensione: {rating}/5",
+    "new_phoneHint": "Non serve se aggiungi Messenger, LINE, Telegram, Instagram o un'email qui sotto.",
+    "dnr_failed": "Non è stato salvato. Riprova.",
+    "message": "Messaggio",
+    "dupContact": "{name} è già salvato con questi recapiti.",
+    "f_licenceClass": "Categoria della patente",
+    "f_idType": "Documento d'identità",
+    "f_idType_passport": "Passaporto",
+    "f_idType_national_id": "Carta d'identità",
+    "f_idCardNo": "Numero della carta d'identità",
+    "f_idCardExpiry": "Scadenza della carta d'identità"
   },
   "vehicleForm": {
     "addTitle": "Aggiungi veicolo",
@@ -3770,7 +3844,9 @@
     "qp_add": "Aggiungi",
     "backSetup": "Configurazione",
     "quickSubtitle": "Solo l'essenziale. Servono solo tipo, marca e modello.",
-    "quickLater": "Scadenze di bollo e assicurazione, chilometraggio, finanziamento e altro si aggiungono dopo da Flotta."
+    "quickLater": "Scadenze di bollo e assicurazione, chilometraggio, finanziamento e altro si aggiungono dopo da Flotta.",
+    "archivedNow": "Questo veicolo è archiviato.",
+    "unarchiveBtn": "Ripristina"
   },
   "bookingEdit": {
     "booking": "Prenotazione",
@@ -4050,7 +4126,7 @@
     "tp_km": "Km consentiti al mese",
     "tp_kmMi": "Miglia consentite al mese",
     "tp_fuel": "Carburante per ogni 1/8 di serbatoio mancante",
-    "tp_late": "Penale per ritardata riconsegna (% al giorno)",
+    "tp_late": "Penale per pagamento in ritardo (% al giorno)",
     "tp_cleaning": "Costo pulizia, da",
     "tp_smoking": "Penale per fumo, fino a",
     "tp_repairs": "Riparazioni che il cliente può approvare, fino a",
@@ -4779,7 +4855,14 @@
     "ba_or": "oppure",
     "ba_ownLabel": "Collega un dominio personalizzato",
     "bt_showName": "Mostra il nome dell'attività accanto al logo",
-    "bt_showNameHint": "Se disattivato, un logo largo appare da solo e accanto a un logo quadrato compare il tuo nome. Pubblica per renderlo visibile."
+    "bt_showNameHint": "Se disattivato, un logo largo appare da solo e accanto a un logo quadrato compare il tuo nome. Pubblica per renderlo visibile.",
+    "reg_confirmCurrency": "I prezzi dei veicoli saranno mostrati in {to} ma non convertiti. Le prenotazioni esistenti restano in {from}.",
+    "reg_confirmCountry": "Questo cambia anche la valuta in {currency}, il fuso orario in {zone}, le distanze in {unit} e l'IVA al {vat}%.",
+    "reg_confirmChange": "Cambia",
+    "reg_confirmCancel": "Annulla",
+    "tp_lateReturnPerDay": "Penale per riconsegna in ritardo al giorno",
+    "ag_n_lateReturn": "Penale per riconsegna in ritardo",
+    "ag_n_perDay": "{amount} al giorno"
   },
   "accountPage": {
     "roleOwner": "Titolare",
@@ -7585,7 +7668,9 @@
     "nudgeSignature": "Aggiungi la tua firma una volta e i clienti potranno firmare il contratto di noleggio dal telefono.",
     "nudgePaymentMethods": "Aggiungi come possono pagarti i clienti (coordinate bancarie, Wise, Revolut o PromptPay), così pagano direttamente dalla loro pagina di prenotazione.",
     "extensionHoldReturning": "{customer} non prolunga: il veicolo {vehicle} va riconsegnato il {date}. I giorni successivi sono di nuovo prenotabili.",
-    "reviewReceived": "{customer} ha lasciato una recensione da {rating} stelle."
+    "reviewReceived": "{customer} ha lasciato una recensione da {rating} stelle.",
+    "handoverReportSigned": "{customer} ha firmato il verbale di consegna per {vehicle}.",
+    "returnReportSigned": "{customer} ha firmato il verbale di riconsegna per {vehicle}."
   },
   "handoverPay": {
     "title": "Pagamento",
@@ -7852,7 +7937,8 @@
     "step3p_b_np": "Ritiralo da {business}. Porta patente e passaporto.",
     "spec_year": "Anno",
     "spec_deposit": "Deposito",
-    "fleet_perMonth": "{amount} al mese"
+    "fleet_perMonth": "{amount} al mese",
+    "photo_credit": "Foto di <author>{name}</author> su <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Aspetto",
@@ -8024,7 +8110,21 @@
     "role_muted": "Testo secondario",
     "role_dark": "Sezioni scure",
     "pal_autoSummary": "Colori del modello",
-    "noReviewsYet": "Ancora nessuna recensione"
+    "noReviewsYet": "Ancora nessuna recensione",
+    "img_stock": "Foto stock",
+    "img_uploadPhoto": "Carica foto",
+    "stock_credit": "Foto di <author>{name}</author> su <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Impossibile caricare le foto. Riprova.",
+    "stock_loading": "Caricamento foto…",
+    "stock_more": "Altre foto",
+    "stock_none": "Nessuna foto trovata. Prova un'altra ricerca.",
+    "stock_note": "Foto gratuite da <unsplash>Unsplash</unsplash>. Il tuo sito cita il fotografo.",
+    "stock_off": "Le foto stock non sono ancora configurate.",
+    "stock_rateLimited": "Raggiunto il limite orario di ricerca di Unsplash. Riprova tra poco.",
+    "stock_search": "Cerca foto",
+    "stock_suggested": "Ricerche suggerite",
+    "stock_use": "Usa foto: {photo}",
+    "stock_useBy": "Usa la foto di {name}"
   },
   "roveListing": {
     "title": "Condividere la tua flotta su rove.rent e accettare prenotazioni lì?",

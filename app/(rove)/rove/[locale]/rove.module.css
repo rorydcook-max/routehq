@@ -59,6 +59,16 @@
 .rove img {
   max-width: 100%;
 }
+/* An inline icon (_components/path-icon.tsx): sits on the text like the Tabler font's glyphs did (one em square,
+   line-height 1, its foot 0.1em below the baseline: the font's 900/100 ascent and descent). */
+.icon {
+  font-style: normal;
+  line-height: 1;
+}
+.icon svg {
+  display: inline-block;
+  vertical-align: -0.1em;
+}
 .display {
   font-family: var(--rv-display), "Anuphan", system-ui, sans-serif;
   font-variation-settings: "wdth" 80;

@@ -1,3 +1,4 @@
+import { preload } from "react-dom";
 import { getTranslations } from "next-intl/server";
 import { VehicleArt } from "@/components/vehicle-art";
 import { AiImageLabel } from "@/components/ai-image-label";
@@ -5,6 +6,7 @@ import { photoProps, PHOTO_ROUTE } from "@/lib/photo-url";
 import type { Quote, RoveVehicle, Stay } from "@/lib/rove/market";
 import { roveHref } from "@/lib/rove/paths";
 import { roveDate, roveMoney } from "@/lib/rove/static";
+import { Icon, type IconName } from "./icon";
 import s from "../rove.module.css";
 
 /** The query a vehicle's own page and its booking link carry: the dates asked for. */
@@ -60,10 +62,13 @@ export function VehiclePhoto({ vehicle, index = 0, eager = false, sizes = "(min-
   if (url) {
     // A stable address, resized to the slot (lib/photo-url.ts), so cached pages keep working and phones load less.
     // `aiLabel` (gallery.aiImage) marks a photo AI made (components/ai-image-label.tsx).
+    const picture = photoProps(url, sizes);
+    // The page's lead photo is its largest paint: asked for from the <head>, before the stylesheets and fonts.
+    if (eager) preload(picture.src, { as: "image", fetchPriority: "high", ...("srcSet" in picture && picture.srcSet ? { imageSrcSet: picture.srcSet, imageSizes: sizes } : {}) });
     return (
       <>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img alt={`${name}${vehicle.year ? ` ${vehicle.year}` : ""}`} decoding="async" fetchPriority={eager ? "high" : undefined} height={900} loading={eager ? "eager" : "lazy"} width={1200} {...photoProps(url, sizes)} />
+        <img alt={`${name}${vehicle.year ? ` ${vehicle.year}` : ""}`} decoding="async" fetchPriority={eager ? "high" : undefined} height={900} loading={eager ? "eager" : "lazy"} width={1200} {...picture} />
         {aiLabel ? <AiImageLabel label={aiLabel} show={vehicle.photoAi?.[index]} /> : null}
       </>
     );
@@ -75,12 +80,12 @@ export function VehiclePhoto({ vehicle, index = 0, eager = false, sizes = "(min-
 export async function vehicleFacts(vehicle: RoveVehicle) {
   const t = await getTranslations("directory");
   return [
-    { icon: vehicle.kind === "car" || vehicle.kind === "van" || vehicle.kind === "other" ? "ti-car" : "ti-motorbike", text: t(`kind_${vehicle.kind === "other" ? "car" : vehicle.kind}`) },
-    vehicle.seats ? { icon: "ti-users", text: t("seats", { count: vehicle.seats }) } : null,
-    vehicle.gearbox ? { icon: "ti-manual-gearbox", text: t(`rv.gearbox_${vehicle.gearbox}`) } : null,
-    vehicle.engineCc && vehicle.kind !== "car" ? { icon: "ti-engine", text: `${vehicle.engineCc} cc` } : null,
-    vehicle.year ? { icon: "ti-calendar", text: String(vehicle.year) } : null
-  ].filter(Boolean) as Array<{ icon: string; text: string }>;
+    { icon: vehicle.kind === "car" || vehicle.kind === "van" || vehicle.kind === "other" ? "car" : "motorbike", text: t(`kind_${vehicle.kind === "other" ? "car" : vehicle.kind}`) },
+    vehicle.seats ? { icon: "users", text: t("seats", { count: vehicle.seats }) } : null,
+    vehicle.gearbox ? { icon: "manual-gearbox", text: t(`rv.gearbox_${vehicle.gearbox}`) } : null,
+    vehicle.engineCc && vehicle.kind !== "car" ? { icon: "engine", text: `${vehicle.engineCc} cc` } : null,
+    vehicle.year ? { icon: "calendar", text: String(vehicle.year) } : null
+  ].filter(Boolean) as Array<{ icon: IconName; text: string }>;
 }
 
 /** The business as a small mark: its logo, else its initial. */
@@ -142,11 +147,11 @@ export async function VehicleCard({
       {/* A second way in for pointers, hidden from screen readers; named too, so a vehicle with no photo (drawn art)
           never leaves a bare link that tools read out as its address. */}
       <a aria-hidden="true" aria-label={title} className={s.cardPhoto} href={href} tabIndex={-1}>
-        <VehiclePhoto aiLabel={gallery("aiImage")} eager={eager} label={title} sizes={layout === "grid" ? "(min-width: 1100px) 300px, (min-width: 640px) 45vw, 90vw" : "(min-width: 960px) 320px, (min-width: 640px) 40vw, 100vw"} vehicle={vehicle} />
+        <VehiclePhoto aiLabel={gallery("aiImage")} eager={eager} label={title} sizes={layout === "grid" ? "(min-width: 1100px) 300px, (min-width: 640px) 45vw, 82vw" : "(min-width: 960px) 320px, (min-width: 640px) 40vw, 100vw"} vehicle={vehicle} />
         <span className={s.cardTags}>
           {delivers ? (
             <span className={s.tagDelivery}>
-              <i aria-hidden="true" className="ti ti-truck-delivery" /> {km !== null ? t("rv.deliversHere") : t("rv.delivers")}
+              <Icon name="truck-delivery" /> {km !== null ? t("rv.deliversHere") : t("rv.delivers")}
             </span>
           ) : null}
           {vehicle.monthlyRate > 0 ? <span className={s.tagMonthly}>{t("rv.monthlyTag")}</span> : null}
@@ -165,7 +170,7 @@ export async function VehicleCard({
               .filter((fact) => fact.text !== String(vehicle.year))
               .map((fact) => (
                 <li key={fact.text}>
-                  <i aria-hidden="true" className={`ti ${fact.icon}`} />
+                  <Icon name={fact.icon} />
                   {fact.text}
                 </li>
               ))}

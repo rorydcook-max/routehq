@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { CSSProperties } from "react";
+import { preload } from "react-dom";
 import { photoProps } from "@/lib/photo-url";
 import type { Destination } from "@/lib/rove/destinations";
 import s from "../rove.module.css";
@@ -27,6 +28,16 @@ export function placePhoto(slug: string): string | null {
     if (existsSync(join(process.cwd(), "public", file))) return file;
   }
   return null;
+}
+
+/**
+ * The place's photo with its smaller copies (scripts/rove-destination-sizes.mjs makes <slug>-480/-800/-1200.webp
+ * beside the 1600px original), so a phone or a small tile loads a file its size (task perf, 8 Nov 2026).
+ */
+function placePhotoProps(slug: string, file: string, sizes: string) {
+  const widths = [480, 800, 1200].filter((width) => existsSync(join(process.cwd(), "public", "rove", "destinations", `${slug}-${width}.webp`)));
+  if (!widths.length) return { src: file };
+  return { src: file, srcSet: [...widths.map((width) => `/rove/destinations/${slug}-${width}.webp ${width}w`), `${file} 1600w`].join(", "), sizes };
 }
 
 type Credit = { photographer: string; photographer_url: string; source_url: string; license: string };
@@ -88,11 +99,16 @@ export function PlaceArt({ destination, vehiclePhoto, eager = false, sizes = "(m
   const seed = hash(destination.slug);
   const own = placePhoto(destination.slug);
   const style = { "--art": TONES[seed % TONES.length] } as CSSProperties;
+  // The hero's picture is the page's largest paint: asked for from the <head>, before the stylesheets and fonts.
+  if (eager) {
+    const picture = own ? placePhotoProps(destination.slug, own, sizes) : vehiclePhoto ? photoProps(vehiclePhoto, sizes) : null;
+    if (picture) preload(picture.src, { as: "image", fetchPriority: "high", ...("srcSet" in picture && picture.srcSet ? { imageSrcSet: picture.srcSet, imageSizes: sizes } : {}) });
+  }
   return (
     <span aria-hidden="true" className={s.placeArt} style={style}>
       {own ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img alt="" decoding="async" fetchPriority={eager ? "high" : undefined} loading={eager ? "eager" : "lazy"} src={own} />
+        <img alt="" decoding="async" fetchPriority={eager ? "high" : undefined} loading={eager ? "eager" : "lazy"} {...placePhotoProps(destination.slug, own, sizes)} />
       ) : vehiclePhoto ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img alt="" decoding="async" fetchPriority={eager ? "high" : undefined} loading={eager ? "eager" : "lazy"} {...photoProps(vehiclePhoto, sizes)} />

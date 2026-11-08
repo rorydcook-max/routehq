@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { compressImage } from "@/lib/direct-upload-client";
 
 const SHRUNK = "__routehqShrunk";
 
@@ -27,6 +26,9 @@ export function ImageShrinker() {
       event.stopImmediatePropagation();
       input.setAttribute("data-shrinking", "true");
       try {
+        // Loaded when a photo is first picked, not with every page (task perf, 8 Nov 2026): the upload helpers bring the
+        // storage client with them (about 60 KB), which the website and booking pages otherwise never use.
+        const { compressImage } = await import("@/lib/direct-upload-client");
         const smaller = await Promise.all(files.map((file) => compressImage(file)));
         const transfer = new DataTransfer();
         smaller.forEach((file) => transfer.items.add(file));

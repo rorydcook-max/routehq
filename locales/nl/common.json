@@ -444,9 +444,15 @@
     "lateBackCharge": "Kosten te laat",
     "lateBackFromDeposit": "Inhouden op borg",
     "lateBackChargeRenter": "Doorberekenen aan huurder",
-    "lateBackWaive": "Kwijtschelden",
+    "lateBackWaive": "Kwijtschelden (afgesproken met de huurder)",
     "lateBackOverDeposit": "De resterende borg dekt maximaal {amount}.",
-    "lateBackRow": "{count, plural, one {# dag te laat} other {# dagen te laat}}"
+    "lateBackRow": "{count, plural, one {# dag te laat} other {# dagen te laat}}",
+    "customerNotPresent": "Klant niet aanwezig",
+    "customerNotPresentNote": "De klant krijgt een link om het rapport te ondertekenen.",
+    "waitingSignature": "Wacht op handtekening van de klant",
+    "resendSignatureLink": "Ondertekeningslink opnieuw sturen",
+    "signatureLinkSent": "Link verstuurd",
+    "signatureLinkNotSent": "Niet automatisch verstuurd. Stuur hem via de berichten van de boeking."
   },
   "translation": {
     "translatedFrom": "Vertaald uit: {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {# voertuig} other {# voertuigen}}",
     "bs_demoBanner": "Demobedrijf, alleen een voorbeeld. Boeken staat uit.",
     "bs_demoNoBooking": "Dit is een demobedrijf, daarom staat boeken uit.",
-    "reason_late_return": "te laat ingeleverd"
+    "reason_late_return": "te laat ingeleverd",
+    "actionFailed": "Dat is niet verzonden. Controleer je verbinding en probeer het opnieuw.",
+    "stillNeeded": "Nog nodig: {items}",
+    "need_agreeTick": "Vinkje voor akkoord",
+    "idType": "Identiteitsbewijs",
+    "idType_passport": "Paspoort",
+    "idType_national_id": "Identiteitskaart",
+    "idCardNumber": "Nummer identiteitskaart",
+    "passportNo": "Paspoortnummer",
+    "reportTitle_delivery": "Overdrachtsrapport",
+    "reportTitle_return": "Inleverrapport",
+    "reportToSign_delivery": "Onderteken je overdrachtsrapport",
+    "reportToSign_return": "Onderteken je inleverrapport",
+    "reportSeeAndSign": "Bekijk de foto's en gegevens en onderteken daarna.",
+    "reportOdometer": "Kilometerstand",
+    "reportFuel": "Brandstof",
+    "reportPhotos": "Foto's",
+    "reportDamage": "Schade",
+    "reportNoDamage": "Geen schade vastgesteld.",
+    "reportDeposit": "Borg",
+    "reportDepositHeld": "Ingehouden",
+    "reportDeducted": "Afgetrokken",
+    "reportRefunded": "Aan jou terugbetaald",
+    "reportConsent": "Ik bevestig dat de staat van het voertuig is zoals vastgelegd in dit rapport.",
+    "reportSign": "Rapport ondertekenen",
+    "reportSignedTitle": "Rapport ondertekend",
+    "reportSignedOn": "Ondertekend door {name}, {date}.",
+    "reportDownload": "Rapport downloaden",
+    "reportNotFoundTitle": "Rapport niet gevonden",
+    "reportNotFoundMessage": "Vraag het verhuurbedrijf om een nieuwe link."
   },
   "customerMessages": {
     "hi": "Hoi {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "Er is geen terugbetaling.",
     "cancelDepositBack": "Je borg van {amount} wordt teruggestort.",
     "cancelDepositPart": "{returned} van je borg van {held} wordt teruggestort.",
-    "cancelDepositKept": "Je borg van {amount} is ingehouden."
+    "cancelDepositKept": "Je borg van {amount} is ingehouden.",
+    "signHandoverReport": "je overdrachtsrapport voor de {vehicle} staat klaar om te controleren en te ondertekenen: {link}",
+    "signReturnReport": "je inleverrapport voor de {vehicle} staat klaar om te controleren en te ondertekenen: {link}"
   },
   "common": {
     "kinds_car": "Auto's",
@@ -1273,7 +1310,8 @@
     "collect_extension": "Verlenging innen",
     "collect_extras": "Extra's innen",
     "job_review": "Review van {name} controleren",
-    "job_review_open": "Reviews openen"
+    "job_review_open": "Reviews openen",
+    "job_inspection_signature": "Handtekening van klant nodig: {ref}"
   },
   "bookings": {
     "eyebrow": "Boekingen",
@@ -1354,7 +1392,8 @@
     "deleteRecordsInspections": "Controles bij overdracht en inleveren, met foto's: {count}",
     "deleteRecordsSigned": "De ondertekende overeenkomst",
     "deleteRecordsBody": "Dit kan niet ongedaan worden gemaakt.",
-    "deleteAnyway": "Toch verwijderen"
+    "deleteAnyway": "Toch verwijderen",
+    "emptyNone": "Nog geen boekingen."
   },
   "inbox": {
     "title": "Inbox",
@@ -2534,7 +2573,18 @@
     "cn_depositTooMuch": "De borg die nog wordt vastgehouden is {amount}.",
     "fin_cancelledSettled": "Terugbetalingen vastgelegd. Niets meer te verrekenen.",
     "share_send": "Boekingslink sturen",
-    "hist_late_return": "Te laat ingeleverd"
+    "hist_late_return": "Te laat ingeleverd",
+    "cp_noteFailed": "De notitie is niet opgeslagen. Probeer het opnieuw.",
+    "contact": "Contact",
+    "contactOpen": "Openen",
+    "walkInNoPayment": "Huur zonder reservering vastgelegd.",
+    "pc_refundBtn": "Terugbetalen",
+    "pc_refundAmount": "Terugbetalingsbedrag",
+    "pc_refundConfirm": "Terugbetaling vastleggen",
+    "pc_refundDone": "Terugbetaling vastgelegd.",
+    "pc_refundEnter": "Voer het terugbetalingsbedrag in.",
+    "pc_refundMax": "Je kunt van deze betaling maximaal {amount} terugbetalen.",
+    "pc_refundFailed": "De terugbetaling is niet opgeslagen. Probeer het opnieuw."
   },
   "newBooking": {
     "docsSelfie": "Foto van de klant",
@@ -2784,7 +2834,12 @@
     "saveRate_monthly": "{amount} per maand opslaan als prijs van dit voertuig",
     "extraFree": "Gratis",
     "clashHeld": "Vastgehouden voor verlenging: {who} wil verlengen. Bevestig het verzoek of hef het vasthouden eerst op.",
-    "clashHeldRenter": "de huurder"
+    "clashHeldRenter": "de huurder",
+    "startMoved": "Begint op {date}, de dag dat dit voertuig vrij is.",
+    "endBeforeStart": "De retourdatum moet na de startdatum liggen.",
+    "freeQ": "Gratis boeken?",
+    "freeYes": "Gratis boeken",
+    "errAmountReceived": "Voer het ontvangen bedrag in."
   },
   "fleet": {
     "title": "Wagenpark",
@@ -2860,7 +2915,10 @@
     "qp_save": "Opslaan",
     "qp_cancel": "Annuleren",
     "qp_failed": "Kon de prijs niet opslaan. Probeer het opnieuw.",
-    "assistant": "Assistent"
+    "assistant": "Assistent",
+    "bandArchived": "gearchiveerd",
+    "status_Archived": "Gearchiveerd",
+    "noticeArchiveLive": "Sommige van deze voertuigen hebben boekingen die nog niet klaar zijn. Verplaats ze eerst naar een ander voertuig of annuleer ze."
   },
   "customers": {
     "sel_nationality": "Nationaliteit",
@@ -2946,7 +3004,12 @@
     "in_trend": "Huurduur en besteding",
     "in_avgLength": "Gemiddelde duur",
     "in_avgSpend": "Gemiddelde besteding",
-    "pillReviews": "{count, plural, one {# review} other {# reviews}}"
+    "pillReviews": "{count, plural, one {# review} other {# reviews}}",
+    "sel_needContact": "Voeg een naam toe en één manier om ze te bereiken: telefoonnummer, Messenger, LINE, Telegram, Instagram of e-mail.",
+    "sel_messengerNameOnly": "Naam of profiellink",
+    "sel_lineIdOnly": "LINE-ID of telefoon",
+    "sel_telegramIdOnly": "Telegram-gebruikersnaam of telefoon",
+    "sel_instagram": "Instagram-gebruikersnaam"
   },
   "calendar": {
     "title": "Agenda",
@@ -3046,7 +3109,7 @@
     "vs_reserved": "Geboekt",
     "vs_maintenance": "In de garage",
     "vs_available": "Vrij",
-    "vs_inactive": "Niet in gebruik",
+    "vs_inactive": "Gearchiveerd",
     "vs_retired": "Niet in gebruik",
     "c_tax": "Wegenbelasting",
     "c_porbor": "Verplichte verzekering (Por Ror Bor)",
@@ -3391,7 +3454,8 @@
     "tl_out": "Bij {name}",
     "tl_service": "Onderhoud",
     "tl_repair": "Reparatie",
-    "tl_damage": "Schade bij inleveren: {count, plural, one {# punt} other {# punten}}"
+    "tl_damage": "Schade bij inleveren: {count, plural, one {# punt} other {# punten}}",
+    "unarchive": "Uit archief halen"
   },
   "customerPage": {
     "back": "Klanten",
@@ -3493,7 +3557,7 @@
     "n_placeholder": "Alles wat het onthouden waard is: voorkeuren, betaalgedrag, herinneringen",
     "n_auto": "Wordt opgeslagen als je ergens anders tikt",
     "new_title": "Klant toevoegen",
-    "new_subtitle": "Een naam en telefoonnummer zijn genoeg. Vul de rest nu of later in.",
+    "new_subtitle": "Een naam en één manier om ze te bereiken is genoeg. Vul de rest nu of later aan.",
     "new_chatTitle": "Chatapps en e-mail",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, e-mail",
     "new_whatsappHint": "Laat leeg als het hetzelfde is als hun telefoon.",
@@ -3595,7 +3659,17 @@
     "tl_paidCharge": "Betaalde een toeslag",
     "tl_refunded": "Terugbetaling",
     "tl_damage": "Schade bij inleveren: {count, plural, one {# punt} other {# punten}}",
-    "tl_review": "Gaf een review: {rating}/5"
+    "tl_review": "Gaf een review: {rating}/5",
+    "new_phoneHint": "Niet nodig als je hieronder Messenger, LINE, Telegram, Instagram of e-mail toevoegt.",
+    "dnr_failed": "Dat is niet opgeslagen. Probeer het opnieuw.",
+    "message": "Bericht",
+    "dupContact": "{name} is al opgeslagen met deze contactgegevens.",
+    "f_licenceClass": "Rijbewijscategorie",
+    "f_idType": "Identiteitsbewijs",
+    "f_idType_passport": "Paspoort",
+    "f_idType_national_id": "Identiteitskaart",
+    "f_idCardNo": "Nummer identiteitskaart",
+    "f_idCardExpiry": "Identiteitskaart verloopt"
   },
   "vehicleForm": {
     "addTitle": "Voertuig toevoegen",
@@ -3770,7 +3844,9 @@
     "qp_add": "Toevoegen",
     "backSetup": "Instellen",
     "quickSubtitle": "Alleen de basis. Alleen soort, merk en model zijn nodig.",
-    "quickLater": "Data van belasting en verzekering, kilometerstand, lening en meer kun je later toevoegen via Wagenpark."
+    "quickLater": "Data van belasting en verzekering, kilometerstand, lening en meer kun je later toevoegen via Wagenpark.",
+    "archivedNow": "Dit voertuig is gearchiveerd.",
+    "unarchiveBtn": "Uit archief halen"
   },
   "bookingEdit": {
     "booking": "Boeking",
@@ -4050,7 +4126,7 @@
     "tp_km": "Toegestane afstand per maand (km)",
     "tp_kmMi": "Toegestane mijlen per maand",
     "tp_fuel": "Brandstof per ontbrekende 1/8 tank",
-    "tp_late": "Boete te laat inleveren (% per dag)",
+    "tp_late": "Boete voor te late betaling (% per dag)",
     "tp_cleaning": "Schoonmaakkosten, vanaf",
     "tp_smoking": "Rookboete, tot",
     "tp_repairs": "Reparaties die de klant mag goedkeuren, tot",
@@ -4779,7 +4855,14 @@
     "ba_or": "of",
     "ba_ownLabel": "Eigen domein koppelen",
     "bt_showName": "Bedrijfsnaam naast logo tonen",
-    "bt_showNameHint": "Staat dit uit, dan staat een breed logo op zichzelf en krijgt een vierkant logo je naam ernaast. Publiceer om het live te zetten."
+    "bt_showNameHint": "Staat dit uit, dan staat een breed logo op zichzelf en krijgt een vierkant logo je naam ernaast. Publiceer om het live te zetten.",
+    "reg_confirmCurrency": "Voertuigprijzen worden in {to} getoond, maar niet omgerekend. Bestaande boekingen blijven in {from}.",
+    "reg_confirmCountry": "Hiermee verandert ook de valuta naar {currency}, de tijdzone naar {zone}, afstanden naar {unit} en btw naar {vat}%.",
+    "reg_confirmChange": "Wijzigen",
+    "reg_confirmCancel": "Annuleren",
+    "tp_lateReturnPerDay": "Boete voor te late inlevering per dag",
+    "ag_n_lateReturn": "Boete voor te late inlevering",
+    "ag_n_perDay": "{amount} per dag"
   },
   "accountPage": {
     "roleOwner": "Eigenaar",
@@ -7585,7 +7668,9 @@
     "nudgeSignature": "Voeg één keer je handtekening toe en klanten kunnen de huurovereenkomst op hun telefoon ondertekenen.",
     "nudgePaymentMethods": "Voeg toe hoe klanten je kunnen betalen (bankgegevens, Wise, Revolut of PromptPay), zodat ze direct vanaf hun boekingspagina betalen.",
     "extensionHoldReturning": "{customer} verlengt niet: {vehicle} moet op {date} terug. De dagen daarna zijn weer te boeken.",
-    "reviewReceived": "{customer} gaf een review van {rating} sterren."
+    "reviewReceived": "{customer} gaf een review van {rating} sterren.",
+    "handoverReportSigned": "{customer} heeft het overdrachtsrapport voor de {vehicle} ondertekend.",
+    "returnReportSigned": "{customer} heeft het inleverrapport voor de {vehicle} ondertekend."
   },
   "handoverPay": {
     "title": "Betaling",
@@ -7852,7 +7937,8 @@
     "step3p_b_np": "Haal hem op bij {business}. Neem je rijbewijs en paspoort mee.",
     "spec_year": "Bouwjaar",
     "spec_deposit": "Borg",
-    "fleet_perMonth": "{amount} per maand"
+    "fleet_perMonth": "{amount} per maand",
+    "photo_credit": "Foto door <author>{name}</author> op <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Uiterlijk",
@@ -8024,7 +8110,21 @@
     "role_muted": "Gedempte tekst",
     "role_dark": "Donkere secties",
     "pal_autoSummary": "Kleuren van sjabloon",
-    "noReviewsYet": "Nog geen reviews"
+    "noReviewsYet": "Nog geen reviews",
+    "img_stock": "Stockfoto's",
+    "img_uploadPhoto": "Foto uploaden",
+    "stock_credit": "Foto door <author>{name}</author> op <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Foto's konden niet worden geladen. Probeer het opnieuw.",
+    "stock_loading": "Foto's laden…",
+    "stock_more": "Meer foto's",
+    "stock_none": "Geen foto's gevonden. Probeer een andere zoekopdracht.",
+    "stock_note": "Gratis foto's van <unsplash>Unsplash</unsplash>. Je site vermeldt de fotograaf.",
+    "stock_off": "Stockfoto's zijn nog niet ingesteld.",
+    "stock_rateLimited": "De zoeklimiet per uur van Unsplash is bereikt. Probeer het zo meteen opnieuw.",
+    "stock_search": "Foto's zoeken",
+    "stock_suggested": "Voorgestelde zoekopdrachten",
+    "stock_use": "Foto gebruiken: {photo}",
+    "stock_useBy": "Foto van {name} gebruiken"
   },
   "roveListing": {
     "title": "Je vloot delen op rove.rent en daar boekingen aannemen?",

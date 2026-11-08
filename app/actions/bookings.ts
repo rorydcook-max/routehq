@@ -253,7 +253,7 @@ async function createWalkInPaymentRecords({
   // Mark state machine as confirmed so delivery inspection knows payment is already done
   await supabase
     .from("rentals")
-    .update({ payment_due_trigger: "confirmed" })
+    .update({ payment_due_trigger: "manual" })
     .eq("id", rental.id)
     .eq("organization_id", organizationId);
 }
@@ -320,6 +320,8 @@ async function createBookingOrThrow(formData: FormData) {
   const walkInDepositAmount = numberFromForm(formData, "walkInDepositAmount");
   const walkInPaymentMethod = String(formData.get("walkInPaymentMethod") || "cash").trim() || "cash";
   const walkInPaymentNote = optionalString(formData, "walkInPaymentNote");
+  // A walk-in records money only when the operator opened "Payment already collected?" and confirmed it (real-user test, 8 Nov 2026).
+  const walkInPaymentCollected = walkInFastTrack && String(formData.get("walkInPaymentCollected") || "") === "true";
   const upfrontPeriods = Math.max(0, numberFromForm(formData, "upfrontPeriods"));
   const upfrontRate = numberFromForm(formData, "upfrontRate");
   const upfrontTotal = numberFromForm(formData, "upfrontTotal");
@@ -348,6 +350,9 @@ async function createBookingOrThrow(formData: FormData) {
   }
   if (createsActiveRental && !customerId) {
     throw new Error(walkInFastTrack ? "Choose a customer before recording a walk-in rental." : "Choose a customer before recording an existing rental.");
+  }
+  if (walkInPaymentCollected && !(walkInPaymentAmount > 0) && !(walkInDepositAmount > 0)) {
+    throw new Error("Enter the amount received.");
   }
 
   // Fetch vehicle and organisation; only fetch customer when one is provided
@@ -447,7 +452,7 @@ async function createBookingOrThrow(formData: FormData) {
     // With no end date, per-day extras are a monthly amount on top of the rent.
     rental_rate: rentalRate + extrasPriced.monthly,
     deposit_amount: depositAmount,
-    balance_due: walkInFastTrack ? Math.max(0, rentalRate - (walkInPaymentAmount || 0)) : rentalRate + depositAmount,
+    balance_due: walkInPaymentCollected ? Math.max(0, rentalRate - (walkInPaymentAmount || 0)) : rentalRate + depositAmount,
     currency,
     delivery_method: deliveryMethod,
     delivery_location: bookingData.delivery_location,
@@ -550,7 +555,7 @@ async function createBookingOrThrow(formData: FormData) {
       throw new Error(existingUpdateError.message);
     }
 
-    if (walkInFastTrack) {
+    if (walkInPaymentCollected) {
       try {
         await createWalkInPaymentRecords({
           supabase,
@@ -560,8 +565,8 @@ async function createBookingOrThrow(formData: FormData) {
           customerId: customerId!,
           userId: user.id,
           currency,
-          paymentAmount: walkInPaymentAmount || rentalRate,
-          depositAmount: walkInDepositAmount || depositAmount,
+          paymentAmount: walkInPaymentAmount,
+          depositAmount: walkInDepositAmount,
           paymentMethod: walkInPaymentMethod,
           note: walkInPaymentNote
         });
@@ -589,9 +594,9 @@ async function createBookingOrThrow(formData: FormData) {
     // Auto-generate payment schedule for operator-entered rentals
     await activateRental(rental.id, supabase).catch(() => null);
 
-    if (!walkInFastTrack) {
-      // What the owner said has been paid already: up to date, until a date, or nothing.
-      const paidMode = String(formData.get("existingPaid") || "up_to_date");
+    if (!walkInPaymentCollected) {
+      // What the owner said has been paid already: up to date, until a date, or nothing. A walk-in with no payment recorded has paid nothing yet.
+      const paidMode = walkInFastTrack ? "none" : String(formData.get("existingPaid") || "up_to_date");
       const paidUntil = dateOnly(String(formData.get("existingPaidUntil") || ""));
       const tomorrow = new Date(`${todayDate()}T00:00:00Z`);
       tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
@@ -620,7 +625,7 @@ async function createBookingOrThrow(formData: FormData) {
           if (rentIds.length) await supabase.from("rental_payments").update({ amount: upfrontRate }).in("id", rentIds);
         }
       }
-      const depositHeld = String(formData.get("existingDepositHeld") || "") === "true" ? depositAmount : 0;
+      const depositHeld = !walkInFastTrack && String(formData.get("existingDepositHeld") || "") === "true" ? depositAmount : 0;
       await settleExistingRental(supabase, { rental: { ...rental, vehicle_id: vehicleId, customer_id: customerId, start_date: startDate }, organizationId, userId: user.id, paidBefore, depositHeld, currency, upfrontUntil }).catch(() => null);
     }
 
@@ -649,7 +654,7 @@ async function createBookingOrThrow(formData: FormData) {
       mode: "existing_rental" as const,
       rentalId: rental.id as string,
       bookingUrl: "",
-      message: walkInFastTrack ? `Walk-in rental recorded. Payment of ${walkInPaymentAmount || rentalRate} collected.` : "Existing rental recorded.",
+      message: walkInPaymentCollected ? `Walk-in rental recorded. Payment of ${walkInPaymentAmount} collected.` : walkInFastTrack ? "Walk-in rental recorded." : "Existing rental recorded.",
       whatsappUrl: "",
       lineUrl: "",
       smsUrl: "",
@@ -961,12 +966,13 @@ async function resendBookingLinkOrThrow(formData: FormData) {
   const bookingLink = existingLink || (await createBookingLinkForRental(supabase, organizationId, rental, user.id));
 
   const bookingUrl = bookingLink.public_url || `${baseUrl}/book/${bookingLink.token}`;
+  // Copying the link isn't sending it: only a real send marks it sent (real-user test, 8 Nov 2026).
+  const copyOnly = String(formData.get("channel") || "") === "copy";
   const { error: updateError } = await supabase
     .from("booking_links")
     .update({
       public_url: bookingUrl,
-      status: "sent",
-      sent_at: new Date().toISOString(),
+      ...(copyOnly ? {} : { status: "sent", sent_at: new Date().toISOString() }),
       expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
     })
     .eq("id", bookingLink.id)
@@ -2775,8 +2781,11 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
   const method = String(fields.method || "cash").trim() || "cash";
   const note = String(fields.note || "").trim() || null;
 
-  if (!cleanPaymentId || amount <= 0) {
+  if (!cleanPaymentId) {
     throw new Error("Payment and amount are required.");
+  }
+  if (!(amount > 0)) {
+    throw new Error("Enter the amount received.");
   }
 
   const { data: payment, error } = await supabase
@@ -3405,6 +3414,34 @@ async function recordPaymentRefundOrThrow(formData: FormData) {
 
   enterBusinessTimeZone(await ensureMembership(supabase, organizationId, user.id));
 
+  // Refunding part of one payment from its row on the booking: never more than that payment, less what was
+  // already given back from it (real-user test, 8 Nov 2026).
+  const paymentId = String(formData.get("paymentId") || "").trim();
+  if (paymentId) {
+    const { data: payment } = await supabase
+      .from("rental_payments")
+      .select("id, amount, status, metadata")
+      .eq("id", paymentId)
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (!payment || payment.status !== "paid") throw new Error(await said("Only a payment that has been received can be refunded."));
+    if (payment.metadata?.type === "deposit" || payment.metadata?.is_deposit === true) throw new Error(await said("Give the deposit back with Return deposit."));
+    const { data: earlier } = await supabase
+      .from("transactions")
+      .select("amount, voided, metadata")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .eq("type", "refund")
+      .eq("metadata->>refund_of_payment", paymentId);
+    const before = ((earlier || []) as any[]).filter((row) => !row.voided && !row.metadata?.voided).reduce((sum, row) => sum + Math.abs(Number(row.amount || 0)), 0);
+    const left = Math.round((Number(payment.amount || 0) - before) * 100) / 100;
+    if (amount > left + 0.005) {
+      throw new Error(await said(`The most you can refund from this payment is ${niceMoney(Math.max(0, left), rental.currency)}.`));
+    }
+  }
+
   // Never more than was paid for this booking, less what has already been given back: nothing stopped a refund
   // bigger than the rent taken, or the same refund being recorded twice (the form offered the full amount again).
   {
@@ -3440,6 +3477,7 @@ async function recordPaymentRefundOrThrow(formData: FormData) {
         description: "Payment refund",
         notes,
         created_by_operator: true,
+        ...(paymentId ? { refund_of_payment: paymentId } : {}),
         ...(["cash", "bank_transfer", "promptpay"].includes(String(formData.get("paymentMethod") || "")) ? { payment_method: String(formData.get("paymentMethod")) } : {})
       },
       is_deposit: false,

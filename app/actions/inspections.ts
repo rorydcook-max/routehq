@@ -24,7 +24,8 @@ import { earlyHandoverBlocker, isDoubleBookingError } from "@/lib/rental-conflic
 import { said } from "@/lib/i18n/server-text";
 import { earlyStartFor, ensureEarlyStartCharge, requestEarlyWaiver, settleEarlyChoice } from "@/lib/early-start";
 import { applyLateStart, lateStartNote } from "@/lib/late-start";
-import { asLateReturnChoice, ensureLateReturnCharge, lateReturnAmount, lateReturnFor } from "@/lib/late-return";
+import { asLateReturnChoice, ensureLateReturnCharge, lateFeePerDayFor, lateReturnAmount, lateReturnFor } from "@/lib/late-return";
+import { requestInspectionSignature, type PendingReport } from "@/lib/inspection-signature";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { adoptBusinessClock } from "@/lib/auth/active-organization-server";
 import { enterBusinessTimeZone } from "@/lib/business-time-scope";
@@ -444,7 +445,7 @@ async function createOnDeliveryPaymentRecords(supabase: any, organizationId: str
   // Advance state machine to 'confirmed' to prevent any future re-triggering
   const { error: clearError } = await supabase
     .from("rentals")
-    .update({ payment_due_after_delivery: false, payment_due_trigger: "confirmed" })
+    .update({ payment_due_after_delivery: false, payment_due_trigger: "manual" })
     .eq("id", rental.id)
     .eq("organization_id", rental.organization_id);
 
@@ -534,6 +535,8 @@ async function submitInspectionOrThrow(formData: FormData) {
   const customerSignedName = optionalStringField(formData, "customerSignedName");
   // A change of vehicle during a rental: record the form without starting or ending the rental.
   const isSwap = String(formData.get("swap") || "") === "1";
+  // "Customer not present": finished without their signature; they sign the report from a link (lib/inspection-signature.ts).
+  const signLater = mode !== "condition_report" && !customerSignature && stringField(formData, "customerAbsent") === "1";
 
   if (!organizationId || !vehicleId || !["delivery", "return", "condition_report"].includes(mode)) {
     throw new Error("Inspection context is missing.");
@@ -550,8 +553,11 @@ async function submitInspectionOrThrow(formData: FormData) {
     throw new Error("Confirm the odometer reading before submitting.");
   }
 
-  if (mode !== "condition_report" && !customerSignature) {
+  if (mode !== "condition_report" && !customerSignature && !signLater) {
     throw new Error("Customer signature is required before submitting.");
+  }
+  if (signLater && !customerId) {
+    throw new Error(await said("Add the customer to the booking first, so they can be sent the report to sign."));
   }
 
   // An early handover needs the vehicle free from today: say so before the form is saved.
@@ -586,7 +592,8 @@ async function submitInspectionOrThrow(formData: FormData) {
       video_url: null,
       customer_signature: customerSignature,
       customer_signed_at: customerSignature ? now : null,
-      customer_signed_name: customerSignedName,
+      customer_signed_name: signLater ? null : customerSignedName,
+      signature_requested_at: signLater ? now : null,
       notes,
       submitted_at: now,
       submitted_by: user.id,
@@ -862,7 +869,8 @@ async function submitInspectionOrThrow(formData: FormData) {
     let late = null as ReturnType<typeof lateReturnFor>;
     if (rental?.end_date && String(rental.end_date).slice(0, 10) < returnDate) {
       const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", rental.vehicle_id || vehicleId).eq("organization_id", organizationId).maybeSingle();
-      late = lateReturnFor(rental, rates, returnDate);
+      // The business's late return fee per day when set, else the vehicle's day rate, else monthly x 12 / 365.
+      late = lateReturnFor(rental, rates, returnDate, await lateFeePerDayFor(supabase, organizationId).catch(() => null));
     }
     // No answer on the form: the charge was already written (cash taken earlier on this return form), so it stands as it is.
     let lateChoice = late && formData.has("lateReturn") ? asLateReturnChoice(stringField(formData, "lateReturn")) || "charge" : null;
@@ -935,9 +943,11 @@ async function submitInspectionOrThrow(formData: FormData) {
         event_type: "late_return",
         title: `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late`,
         detail:
-          toldChoice === "waive" || toldAmount <= 0
-            ? `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${niceDate(late.bookedEnd)}). Charge waived.`
-            : `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${niceDate(late.bookedEnd)}). ${lateMoney} ${toldChoice === "deposit" ? "taken from the deposit" : "charged to the renter"}.`
+          toldChoice === "waive"
+            ? `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${niceDate(late.bookedEnd)}). Late fee${late.amount > 0 ? ` of ${niceMoney(late.amount, rental?.currency || "THB")}` : ""} waived (agreed with the renter).`
+            : toldAmount <= 0
+              ? `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${niceDate(late.bookedEnd)}). No late fee charged.`
+              : `Returned ${late.days} ${late.days === 1 ? "day" : "days"} late (due back ${niceDate(late.bookedEnd)}). ${lateMoney} ${toldChoice === "deposit" ? "taken from the deposit" : "charged to the renter"}.`
       });
     }
 
@@ -1136,6 +1146,16 @@ async function submitInspectionOrThrow(formData: FormData) {
     };
     if (accessToken) after(makeReport);
     else await makeReport();
+  }
+
+  // Customer not present: the report waits for their signature. What it needs that the inspection row doesn't hold
+  // is kept with it; the owner gets a To do and the customer a link to review and sign (lib/inspection-signature.ts).
+  if ((mode === "delivery" || mode === "return") && rentalId && signLater) {
+    const admin = createSupabaseAdminClient() as any;
+    const pending: PendingReport = { depositSettlement: depositSettlement || null, swap: isSwap };
+    await admin.from("inspections").update({ pending_report: pending }).eq("id", inspection.id).eq("organization_id", organizationId);
+    await requestInspectionSignature(admin, { organizationId, rentalId, vehicleId, inspectionId: inspection.id, mode, userId: user.id });
+    revalidatePath("/tasks");
   }
 
   if (mode === "return" && !isSwap) {

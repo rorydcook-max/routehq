@@ -10,6 +10,7 @@ import { roveDate, roveLocale } from "@/lib/rove/static";
 import { CAR_SIZES, GEARBOXES } from "@/lib/vehicle-filters";
 import { Breadcrumbs } from "../_components/breadcrumbs";
 import { FiltersDisclosure } from "../_components/filters-disclosure";
+import { Icon } from "../_components/icon";
 import { JsonLd } from "../_components/json-ld";
 import { SearchForm } from "../_components/search-form";
 import { VehicleCard } from "../_components/vehicle-card";
@@ -117,7 +118,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
       />
       {parsed.placeUnknown ? (
         <p className={s.hint}>
-          <i aria-hidden="true" className="ti ti-info-circle" />
+          <Icon name="info-circle" />
           {t("rv.placeUnknown", { place: parsed.place })}
         </p>
       ) : null}
@@ -194,7 +195,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
           </div>
           {stay.mode === "any" && results.length ? (
             <p className={s.hint}>
-              <i aria-hidden="true" className="ti ti-calendar-event" />
+              <Icon name="calendar-event" />
               {t("rv.addDatesHint")}
             </p>
           ) : null}
@@ -207,7 +208,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
           ) : (
             <div className={s.empty} style={{ marginTop: 0 }}>
               <span aria-hidden="true" className={s.emptyIcon}>
-                <i className="ti ti-car-off" />
+                <Icon name="car-off" />
               </span>
               <h2 className={s.emptyTitle}>{t("noneTitle")}</h2>
               <p className={s.emptyBody}>{t("noneBody")}</p>

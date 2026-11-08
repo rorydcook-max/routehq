@@ -54,8 +54,9 @@ async function siteMeta(config: SiteConfig, input: { name: string; place: string
 export async function generateMetadata({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<Query> }): Promise<Metadata> {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
   const catalog = await getPublicCatalog(slug);
-  // No such business (and not an old address of one, which the page redirects): a 404 status, decided here because
-  // the page itself streams (rent/loading.tsx) and its notFound() comes after a 200 has been sent.
+  // No such business (and not an old address of one, which the page redirects): a 404 status. Booking pages have their
+  // own root layout with no loading screen above them (app/(rent)/layout.tsx), so the page's notFound() also comes
+  // before anything is sent; the app's loading screen used to stream a 200 first.
   if (!catalog && !(await renamedSlug(slug))) notFound();
   const t = await getTranslations("customer");
   // One address for search engines (Rory, 1 Nov 2026): the business's own domain or subdomain when it has one,

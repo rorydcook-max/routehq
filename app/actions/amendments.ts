@@ -570,7 +570,7 @@ async function applySignedAmendment(admin: any, amendmentId: string) {
     rentalUpdate.rental_rate = changes.new_rate;
     rentalUpdate.contracted_rate = changes.new_rate;
     // Not delivered yet: the first payment collected at delivery is one period of rent.
-    if (Number(rental.first_payment_amount || 0) === Number(changes.previous_rate || 0) && rental.payment_due_trigger !== "confirmed") {
+    if (Number(rental.first_payment_amount || 0) === Number(changes.previous_rate || 0) && rental.payment_due_trigger !== "confirmed" && rental.payment_due_trigger !== "manual") {
       rentalUpdate.first_payment_amount = changes.new_rate;
     }
   }
@@ -924,7 +924,7 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
     const from = freeFrom(rental);
     const end = cleanDate(rental.end_date);
 
-    const [{ data: vehicles }, busy, { data: others }] = await Promise.all([
+    const [{ data: vehicles }, busy, { data: others }, { data: lateOut }] = await Promise.all([
       admin.from("vehicles").select("id, make, model, year, registration_number, status, monthly_rate, deposit_amount").eq("organization_id", organizationId).is("deleted_at", null),
       loadBusyPeriods(admin, organizationId),
       handedOver
@@ -935,8 +935,18 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
             .in("status", ON_RENT)
             .neq("id", rentalId)
             .is("deleted_at", null)
-        : Promise.resolve({ data: [] })
+        : Promise.resolve({ data: [] }),
+      // Still with a customer past the return date: not back yet, so not free (real-user test, 8 Nov 2026).
+      admin
+        .from("rentals")
+        .select("vehicle_id")
+        .eq("organization_id", organizationId)
+        .in("status", ON_RENT)
+        .neq("id", rentalId)
+        .lt("end_date", businessToday())
+        .is("deleted_at", null)
     ]);
+    const stillOut = new Set(((lateOut || []) as any[]).map((row) => String(row.vehicle_id)));
     const label = (vehicle: any) => [vehicle?.make, vehicle?.model].filter(Boolean).join(" ") || "Vehicle";
     const byId = new Map<string, any>((vehicles || []).map((vehicle: any) => [vehicle.id, vehicle]));
     const clear = (vehicleId: string, startDate: string, endDate: string | null, ignore: string[]) =>
@@ -944,7 +954,7 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
 
     const free = ((vehicles || []) as any[])
       .filter((vehicle) => vehicle.id !== rental.vehicle_id && !/sold|retired|inactive|archived|written|maintenance/i.test(String(vehicle.status || "")))
-      .filter((vehicle) => clear(vehicle.id, from, end, [rentalId]))
+      .filter((vehicle) => !stillOut.has(String(vehicle.id)) && clear(vehicle.id, from, end, [rentalId]))
       .map((vehicle) => ({
         vehicleId: String(vehicle.id),
         label: label(vehicle),
@@ -957,7 +967,7 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
     // Taken only by bookings that haven't started, and the vehicle given up is free for them: they can move to it.
     const role = (await getCurrentMembership())?.role;
     const freeIds = new Set(free.map((item) => item.vehicleId));
-    const candidates = ((vehicles || []) as any[]).filter((vehicle) => vehicle.id !== rental.vehicle_id && !freeIds.has(vehicle.id) && !/sold|retired|inactive|archived|written|maintenance/i.test(String(vehicle.status || "")));
+    const candidates = ((vehicles || []) as any[]).filter((vehicle) => vehicle.id !== rental.vehicle_id && !freeIds.has(vehicle.id) && !stillOut.has(String(vehicle.id)) && !/sold|retired|inactive|archived|written|maintenance/i.test(String(vehicle.status || "")));
     const blockingIds = candidates.flatMap((vehicle) => (busy[vehicle.id] || []).filter((period) => period.rentalId !== rentalId && clashes(from, end, period, gapDays)).map((period) => period.rentalId));
     const { data: blockingRows } = canDecideMoney(role) && rental.vehicle_id && blockingIds.length ? await admin.from("rentals").select("id, status").in("id", blockingIds) : { data: [] };
     const notStarted = new Set(((blockingRows || []) as any[]).filter((row) => row.status === "booked").map((row) => String(row.id)));

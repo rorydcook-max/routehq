@@ -167,6 +167,8 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   if (item.action === "swap_handover" || item.action === "swap_collection" || item.action === "swap_signature") {
     return { title: tx.say(`job_${item.action}`), detail: null };
   }
+  // A handover or return form finished without the customer (lib/inspection-signature.ts): "Customer signature needed: VR-0012".
+  if (item.action === "inspection_signature") return { title: tx.say("job_inspection_signature", { ref: raw.match(/: (.+)$/)?.[1] || "" }), detail: null };
   // Türkiye: raised at handover (lib/rental-activation.ts); the booking's KABİS block has every line to copy.
   if (item.action === "kabis") return { title: tx.say("job_kabis"), detail: tx.say("job_kabis_detail") };
   // A renter's review came in (lib/reviews.ts): "Review from Anna M. to check".
@@ -616,6 +618,11 @@ function TaskRow({
         {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "kabis" ? (
           <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#kabis`}>
             {tx.say("job_kabis_open")}
+          </Link>
+        ) : null}
+        {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "inspection_signature" ? (
+          <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}`}>
+            {tx.say("openBooking")}
           </Link>
         ) : null}
         {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "swap_signature" ? (

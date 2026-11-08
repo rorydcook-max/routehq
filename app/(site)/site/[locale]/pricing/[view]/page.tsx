@@ -12,7 +12,7 @@ import { parsePricingView, pricingView } from "@/lib/site/internal-path";
 import { paysByQr, regionForCurrency } from "@/lib/site/region";
 import { siteLocale } from "@/lib/site/static-page";
 import { localizeSitePath } from "@/lib/site/locale-path";
-import { siteMetadata } from "@/lib/site/seo";
+import { SITE_OG, siteMetadata } from "@/lib/site/seo";
 import { breadcrumbLd, faqLd, softwareApplicationLd } from "@/lib/site/schema";
 import { JsonLd } from "../../_components/content-ui";
 import { FinalCta } from "../../_components/final-cta";
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cheapestPaid = PLANS.filter((plan) => plan.monthly > 0).sort((a, b) => a.monthly - b.monthly)[0];
   const title = t("metaPricingTitle");
   const description = t("metaPricingDescription", { price: formatPlanPrice(planPrices(cheapestPaid, currency).monthly, currency, numberLocale(locale)), days: TRIAL_DAYS });
-  return siteMetadata({ path: "/pricing", locale, title, description });
+  return siteMetadata({ path: "/pricing", locale, title, description, image: SITE_OG.pricing });
 }
 
 /** What a plan has: the same lines as the plan cards in Settings → Plan, worded by the same (already translated) keys. */

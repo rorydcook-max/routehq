@@ -711,7 +711,9 @@
     "qp_add": "Ekle",
     "backSetup": "Kurulum",
     "quickSubtitle": "Sadece temel bilgiler. Yalnızca tür, marka ve model gerekli.",
-    "quickLater": "Vergi ve sigorta tarihleri, kilometre, kredi ve daha fazlası sonra Filo'dan eklenebilir."
+    "quickLater": "Vergi ve sigorta tarihleri, kilometre, kredi ve daha fazlası sonra Filo'dan eklenebilir.",
+    "archivedNow": "Bu araç arşivlendi.",
+    "unarchiveBtn": "Arşivden çıkar"
   },
   "contractImport": {
     "yourAgreement": "sözleşmeniz",
@@ -1991,7 +1993,18 @@
     "cn_depositTooMuch": "Hâlâ tutulan depozito {amount}.",
     "fin_cancelledSettled": "İadeler kaydedildi. Kapatılacak bir şey kalmadı.",
     "share_send": "Rezervasyon bağlantısı gönder",
-    "hist_late_return": "Geç iade edildi"
+    "hist_late_return": "Geç iade edildi",
+    "cp_noteFailed": "Not kaydedilmedi. Tekrar deneyin.",
+    "contact": "İletişim",
+    "contactOpen": "Aç",
+    "walkInNoPayment": "Rezervasyonsuz kiralama kaydedildi.",
+    "pc_refundBtn": "İade et",
+    "pc_refundAmount": "İade tutarı",
+    "pc_refundConfirm": "İadeyi kaydet",
+    "pc_refundDone": "İade kaydedildi.",
+    "pc_refundEnter": "İade tutarını girin.",
+    "pc_refundMax": "Bu ödemeden en fazla {amount} iade edebilirsiniz.",
+    "pc_refundFailed": "İade kaydedilmedi. Tekrar deneyin."
   },
   "shell": {
     "quick_uploadReceipt": "Makbuz yükle",
@@ -2363,7 +2376,7 @@
     "tp_km": "Aylık izin verilen mesafe (km)",
     "tp_kmMi": "Aylık izin verilen mil",
     "tp_fuel": "Eksik her 1/8 depo yakıt için",
-    "tp_late": "Geç iade ücreti (günlük %)",
+    "tp_late": "Geç ödeme ücreti (günlük %)",
     "tp_cleaning": "Temizlik ücreti, en az",
     "tp_smoking": "Sigara ücreti, en fazla",
     "tp_repairs": "Müşterinin onaylayabileceği onarım, en fazla",
@@ -3093,7 +3106,14 @@
     "ba_or": "veya",
     "ba_ownLabel": "Kendi alan adını bağla",
     "bt_showName": "İşletme adını logonun yanında göster",
-    "bt_showNameHint": "Kapalıyken geniş bir logo tek başına görünür, kare bir logonun yanında ise adınız yer alır. Yayına almak için yayınlayın."
+    "bt_showNameHint": "Kapalıyken geniş bir logo tek başına görünür, kare bir logonun yanında ise adınız yer alır. Yayına almak için yayınlayın.",
+    "reg_confirmCurrency": "Araç fiyatları {to} olarak gösterilecek ama dönüştürülmeyecek. Mevcut rezervasyonlar {from} olarak kalır.",
+    "reg_confirmCountry": "Bu ayrıca para birimini {currency}, saat dilimini {zone}, mesafeleri {unit} ve KDV'yi %{vat} olarak değiştirir.",
+    "reg_confirmChange": "Değiştir",
+    "reg_confirmCancel": "İptal",
+    "tp_lateReturnPerDay": "Günlük geç iade ücreti",
+    "ag_n_lateReturn": "Geç iade ücreti",
+    "ag_n_perDay": "Günlük {amount}"
   },
   "customerPage": {
     "back": "Müşteriler",
@@ -3195,7 +3215,7 @@
     "n_placeholder": "Hatırlanmaya değer her şey: tercihler, ödeme alışkanlıkları, hatırlatmalar",
     "n_auto": "Başka yere dokunduğunuzda kaydedilir",
     "new_title": "Müşteri ekle",
-    "new_subtitle": "Ad ve telefon numarası yeterli. Gerisini şimdi veya sonra ekleyin.",
+    "new_subtitle": "Bir ad ve bir iletişim yolu yeterli. Gerisini şimdi veya daha sonra ekleyin.",
     "new_chatTitle": "Sohbet uygulamaları ve e-posta",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, e-posta",
     "new_whatsappHint": "Telefonuyla aynıysa boş bırakın.",
@@ -3297,7 +3317,17 @@
     "tl_paidCharge": "Bir ücreti ödedi",
     "tl_refunded": "İade",
     "tl_damage": "İadede hasar bulundu: {count, plural, one {# kalem} other {# kalem}}",
-    "tl_review": "Yorum bıraktı: {rating}/5"
+    "tl_review": "Yorum bıraktı: {rating}/5",
+    "new_phoneHint": "Aşağıya Messenger, LINE, Telegram, Instagram veya e-posta eklerseniz gerekmez.",
+    "dnr_failed": "Kaydedilmedi. Tekrar deneyin.",
+    "message": "Mesaj",
+    "dupContact": "{name} bu iletişim bilgileriyle zaten kayıtlı.",
+    "f_licenceClass": "Ehliyet sınıfı",
+    "f_idType": "Kimlik belgesi",
+    "f_idType_passport": "Pasaport",
+    "f_idType_national_id": "Nüfus cüzdanı",
+    "f_idCardNo": "Kimlik kartı numarası",
+    "f_idCardExpiry": "Kimlik kartının geçerlilik sonu"
   },
   "reportsPage": {
     "title": "Raporlar",
@@ -3539,7 +3569,12 @@
     "in_trend": "Kiralama süresi ve harcama",
     "in_avgLength": "Ortalama süre",
     "in_avgSpend": "Ortalama harcama",
-    "pillReviews": "{count, plural, one {# yorum} other {# yorum}}"
+    "pillReviews": "{count, plural, one {# yorum} other {# yorum}}",
+    "sel_needContact": "Bir ad ve bir iletişim yolu ekleyin: telefon numarası, Messenger, LINE, Telegram, Instagram veya e-posta.",
+    "sel_messengerNameOnly": "Adı veya profil bağlantısı",
+    "sel_lineIdOnly": "LINE kimliği veya telefon",
+    "sel_telegramIdOnly": "Telegram kullanıcı adı veya telefon",
+    "sel_instagram": "Instagram kullanıcı adı"
   },
   "inspectStart": {
     "titleOut": "Araç teslim et",
@@ -3643,7 +3678,7 @@
     "vs_reserved": "Rezerve",
     "vs_maintenance": "Serviste",
     "vs_available": "Müsait",
-    "vs_inactive": "Kullanımda değil",
+    "vs_inactive": "Arşivlendi",
     "vs_retired": "Kullanımda değil",
     "c_tax": "Motorlu taşıtlar vergisi",
     "c_porbor": "Zorunlu sigorta (Por Ror Bor)",
@@ -3988,7 +4023,8 @@
     "tl_out": "{name} kullanıyor",
     "tl_service": "Bakım",
     "tl_repair": "Onarım",
-    "tl_damage": "İadede hasar bulundu: {count, plural, one {# kalem} other {# kalem}}"
+    "tl_damage": "İadede hasar bulundu: {count, plural, one {# kalem} other {# kalem}}",
+    "unarchive": "Arşivden çıkar"
   },
   "inspection": {
     "fuelPercentage": "Depo ne kadar dolu?",
@@ -4250,9 +4286,15 @@
     "lateBackCharge": "Gecikme ücreti",
     "lateBackFromDeposit": "Depozitodan düş",
     "lateBackChargeRenter": "Kiracıdan tahsil et",
-    "lateBackWaive": "Vazgeç",
+    "lateBackWaive": "Vazgeç (kiracıyla anlaşıldı)",
     "lateBackOverDeposit": "Kalan depozito en fazla {amount} karşılar.",
-    "lateBackRow": "{count, plural, one {# gün gecikme} other {# gün gecikme}}"
+    "lateBackRow": "{count, plural, one {# gün gecikme} other {# gün gecikme}}",
+    "customerNotPresent": "Müşteri yok",
+    "customerNotPresentNote": "Raporu imzalaması için ona bir bağlantı gönderilecek.",
+    "waitingSignature": "Müşteri imzası bekleniyor",
+    "resendSignatureLink": "İmza bağlantısını tekrar gönder",
+    "signatureLinkSent": "Bağlantı gönderildi",
+    "signatureLinkNotSent": "Otomatik gönderilmedi. Rezervasyonun mesajlarından gönderin."
   },
   "money": {
     "sv_title": "Bakım bilgileri",
@@ -4611,7 +4653,8 @@
     "collect_extension": "Uzatma ücretini tahsil et",
     "collect_extras": "Ekstraları tahsil et",
     "job_review": "{name} kişisinden gelen yorumu kontrol et",
-    "job_review_open": "Yorumları aç"
+    "job_review_open": "Yorumları aç",
+    "job_inspection_signature": "Müşteri imzası gerekli: {ref}"
   },
   "chat": {
     "launcher": "RoveHQ ile sohbet",
@@ -4774,7 +4817,8 @@
     "deleteRecordsInspections": "Fotoğraflarıyla teslim ve iade kontrolleri: {count}",
     "deleteRecordsSigned": "İmzalı sözleşme",
     "deleteRecordsBody": "Bu işlem geri alınamaz.",
-    "deleteAnyway": "Yine de sil"
+    "deleteAnyway": "Yine de sil",
+    "emptyNone": "Henüz rezervasyon yok."
   },
   "fleetValue": {
     "back": "Raporlar",
@@ -5385,7 +5429,36 @@
     "bs_vehicleCount": "{count, plural, one {# araç} other {# araç}}",
     "bs_demoBanner": "Demo işletme, yalnızca örnek. Rezervasyonlar kapalı.",
     "bs_demoNoBooking": "Bu bir demo işletme, bu yüzden rezervasyonlar kapalı.",
-    "reason_late_return": "geç iade"
+    "reason_late_return": "geç iade",
+    "actionFailed": "Gönderilmedi. Bağlantınızı kontrol edip tekrar deneyin.",
+    "stillNeeded": "Hâlâ gerekli: {items}",
+    "need_agreeTick": "Sözleşme onay işareti",
+    "idType": "Kimlik belgesi",
+    "idType_passport": "Pasaport",
+    "idType_national_id": "Nüfus cüzdanı",
+    "idCardNumber": "Kimlik kartı numarası",
+    "passportNo": "Pasaport numarası",
+    "reportTitle_delivery": "Teslim raporu",
+    "reportTitle_return": "İade raporu",
+    "reportToSign_delivery": "Teslim raporunuzu imzalayın",
+    "reportToSign_return": "İade raporunuzu imzalayın",
+    "reportSeeAndSign": "Fotoğrafları ve bilgileri kontrol edin, sonra imzalayın.",
+    "reportOdometer": "Kilometre sayacı",
+    "reportFuel": "Yakıt",
+    "reportPhotos": "Fotoğraflar",
+    "reportDamage": "Hasar",
+    "reportNoDamage": "Hasar kaydedilmedi.",
+    "reportDeposit": "Depozito",
+    "reportDepositHeld": "Tutulan",
+    "reportDeducted": "Kesilen",
+    "reportRefunded": "Size iade edilen",
+    "reportConsent": "Aracın durumunun bu raporda kaydedildiği gibi olduğunu onaylıyorum.",
+    "reportSign": "Raporu imzala",
+    "reportSignedTitle": "Rapor imzalandı",
+    "reportSignedOn": "{name} tarafından {date} tarihinde imzalandı.",
+    "reportDownload": "Raporu indir",
+    "reportNotFoundTitle": "Rapor bulunamadı",
+    "reportNotFoundMessage": "Kiralama işletmesinden yeni bir bağlantı isteyin."
   },
   "newBooking": {
     "docsSelfie": "Müşterinin fotoğrafı",
@@ -5635,7 +5708,12 @@
     "saveRate_monthly": "Aylık {amount} tutarını bu aracın fiyatı olarak kaydet",
     "clashHeld": "Uzatma için ayrıldı: {who} uzatmak istiyor. Önce onaylayın veya ayırmayı kaldırın.",
     "clashHeldRenter": "kiracı",
-    "extraFree": "Ücretsiz"
+    "extraFree": "Ücretsiz",
+    "startMoved": "Aracın boş olduğu gün olan {date} tarihinde başlar.",
+    "endBeforeStart": "İade tarihi başlangıç tarihinden sonra olmalı.",
+    "freeQ": "Ücretsiz rezervasyon yapılsın mı?",
+    "freeYes": "Ücretsiz rezerve et",
+    "errAmountReceived": "Alınan tutarı girin."
   },
   "help": {
     "title": "Yardım",
@@ -7019,7 +7097,9 @@
     "cancelNoRefund": "İade yapılmayacak.",
     "cancelDepositBack": "{amount} depozitonuz iade ediliyor.",
     "cancelDepositPart": "{held} depozitonuzun {returned} kadarı iade ediliyor.",
-    "cancelDepositKept": "{amount} depozitonuz kesildi."
+    "cancelDepositKept": "{amount} depozitonuz kesildi.",
+    "signHandoverReport": "{vehicle} için teslim raporunuz kontrol edip imzalamanız için hazır: {link}",
+    "signReturnReport": "{vehicle} için iade raporunuz kontrol edip imzalamanız için hazır: {link}"
   },
   "auth": {
     "signInTitle": "Giriş yap",
@@ -7176,7 +7256,10 @@
     "qp_save": "Kaydet",
     "qp_cancel": "İptal",
     "qp_failed": "Fiyat kaydedilemedi. Tekrar deneyin.",
-    "assistant": "Asistan"
+    "assistant": "Asistan",
+    "bandArchived": "arşivlendi",
+    "status_Archived": "Arşivlendi",
+    "noticeArchiveLive": "Bu araçlardan bazılarının bitmemiş rezervasyonları var. Önce bunları başka bir araca taşıyın veya iptal edin."
   },
   "renters": {
     "remove": "Listeden çıkar",
@@ -7589,7 +7672,9 @@
     "nudgeBookingPage": "Rezervasyon sayfanızı Google Haritalar kaydınıza, Instagram veya Facebook sayfanıza ve WhatsApp ya da LINE profilinize ekleyin; müşteriler her an rezervasyon yapabilsin.",
     "nudgeSignature": "İmzanızı bir kez ekleyin, müşteriler kiralama sözleşmesini telefonlarından imzalayabilsin.",
     "nudgePaymentMethods": "Müşterilerin size nasıl ödeme yapabileceğini ekleyin (banka bilgileri, Wise, Revolut veya PromptPay), böylece doğrudan rezervasyon sayfalarından ödeyebilirler.",
-    "reviewReceived": "{customer} {rating} yıldızlı bir yorum bıraktı."
+    "reviewReceived": "{customer} {rating} yıldızlı bir yorum bıraktı.",
+    "handoverReportSigned": "{customer}, {vehicle} için teslim raporunu imzaladı.",
+    "returnReportSigned": "{customer}, {vehicle} için iade raporunu imzaladı."
   },
   "handoverPay": {
     "title": "Ödeme",
@@ -7856,7 +7941,8 @@
     "step3p_b_np": "{business} işletmesinden teslim alın. Ehliyetinizi ve pasaportunuzu getirin.",
     "spec_year": "Yıl",
     "spec_deposit": "Depozito",
-    "fleet_perMonth": "Aylık {amount}"
+    "fleet_perMonth": "Aylık {amount}",
+    "photo_credit": "Fotoğraf: <author>{name}</author>, <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Görünüm",
@@ -8028,7 +8114,21 @@
     "role_muted": "Soluk metin",
     "role_dark": "Koyu bölümler",
     "pal_autoSummary": "Şablon renkleri",
-    "noReviewsYet": "Henüz yorum yok"
+    "noReviewsYet": "Henüz yorum yok",
+    "img_stock": "Stok fotoğraflar",
+    "img_uploadPhoto": "Fotoğraf yükle",
+    "stock_credit": "Fotoğraf: <author>{name}</author>, <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Fotoğraflar yüklenemedi. Tekrar deneyin.",
+    "stock_loading": "Fotoğraflar yükleniyor…",
+    "stock_more": "Daha fazla fotoğraf",
+    "stock_none": "Fotoğraf bulunamadı. Başka bir arama deneyin.",
+    "stock_note": "<unsplash>Unsplash</unsplash>'tan ücretsiz fotoğraflar. Siteniz fotoğrafçıya atıf yapar.",
+    "stock_off": "Stok fotoğraflar henüz ayarlanmadı.",
+    "stock_rateLimited": "Unsplash'ın saatlik arama sınırına ulaşıldı. Biraz sonra tekrar deneyin.",
+    "stock_search": "Fotoğraf ara",
+    "stock_suggested": "Önerilen aramalar",
+    "stock_use": "Fotoğrafı kullan: {photo}",
+    "stock_useBy": "{name} adlı kişinin fotoğrafını kullan"
   },
   "roveListing": {
     "title": "Filonuzu rove.rent'te paylaşıp oradan rezervasyon almak ister misiniz?",

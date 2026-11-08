@@ -530,8 +530,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   // figure and takes it from the deposit, charges it to the renter, or waives it.
   // Already written (cash taken earlier on this form, then reopened): it is on the booking, so it isn't asked again.
   const lateBack = useMemo(
-    () => (mode === "return" && !isSwap && !context.lateChargeWritten ? lateReturnFor(context.rental, context.vehicle, businessToday()) : null),
-    [mode, isSwap, context.rental, context.vehicle, context.lateChargeWritten]
+    () => (mode === "return" && !isSwap && !context.lateChargeWritten ? lateReturnFor(context.rental, context.vehicle, businessToday(), context.lateFeePerDay) : null),
+    [mode, isSwap, context.rental, context.vehicle, context.lateChargeWritten, context.lateFeePerDay]
   );
   const lateDepositFree = Math.max(0, Number(context.rental?.deposit_held || 0) - Number(context.rental?.deposit_refunded_amount || 0) - Number(context.rental?.deposit_forfeited_amount || 0));
   // From the deposit when what is left of it (after unpaid rent) covers the charge; otherwise charged to the renter.
@@ -568,6 +568,10 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   const [damageDescription, setDamageDescription] = useState("");
   const [signature, setSignature] = useState("");
   const [signedName, setSignedName] = useState(context.customer?.full_name || "");
+  // The customer isn't there to sign: the form is finished without it and they sign the report from a link
+  // (app/actions/inspection-signing.ts). Needs a customer on the booking to send the link to.
+  const canSignLater = mode !== "condition_report" && Boolean(context.rental?.id && context.customer?.id);
+  const [customerAbsent, setCustomerAbsent] = useState(false);
   const [videoCaptured, setVideoCaptured] = useState(false);
   const [sidePhotos, setSidePhotos] = useState<Record<string, boolean>>({});
   const [fuelDeficitCharge, setFuelDeficitCharge] = useState(0);
@@ -758,7 +762,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
     if (step === 2) return fuelLevel !== null && fuelPhotoCaptured;
     if (step === 3) return videoCaptured || ["front", "rear", "driver", "passenger"].every((key) => sidePhotos[key]);
     if (step === 4) return noDamage || damageItems.length > 0;
-    if (step === steps.length - 1 && mode !== "condition_report") return Boolean(signature && signedName);
+    if (step === steps.length - 1 && mode !== "condition_report") return (canSignLater && customerAbsent) || Boolean(signature && signedName);
     return true;
   }
 
@@ -987,7 +991,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
       <input name="fuelLevel" type="hidden" value={fuelLevel ?? ""} />
       <input name="fuelLevelLabel" type="hidden" value={fuelLabel} />
       <input name="damageItems" type="hidden" value={JSON.stringify(damageItems)} />
-      <input name="customerSignature" type="hidden" value={signature} />
+      <input name="customerSignature" type="hidden" value={canSignLater && customerAbsent ? "" : signature} />
+      <input name="customerAbsent" type="hidden" value={canSignLater && customerAbsent ? "1" : ""} />
       <input name="customerSignedName" type="hidden" value={signedName} />
       <input name="depositRefundAmount" type="hidden" value={depositRefundAmount} />
       <input name="depositRefundMethod" type="hidden" value={depositRefundAmount > 0 ? refundMethod : ""} />
@@ -1671,14 +1676,30 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               <p className="mt-5 text-base font-semibold text-[var(--foreground)]">
                 {t(mode === "return" ? "receivingFrom" : "handingOverTo", { name: context.customer?.full_name || t("theCustomer") })}
               </p>
-              <p className="mt-1 text-sm text-[var(--muted)]">{t("signPrompt")}</p>
-              <div className="mt-3">
-                <SignaturePad onChange={setSignature} value={signature} />
-              </div>
-              <label className="mt-4 block">
-                <span className="text-sm font-semibold text-[var(--foreground)]">{t("customerPrintedName")}</span>
-                <input className={inputClass} onChange={(event) => setSignedName(event.target.value)} value={signedName} />
-              </label>
+              {/* Not there to sign (keys left in a box, a drop-off): finish now, and the customer signs from a link later. */}
+              {canSignLater ? (
+                <label className="mt-3 flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl bg-[var(--panel-secondary)] px-3.5 py-2.5">
+                  <input checked={customerAbsent} className="switch" onChange={(event) => {
+                      setCustomerAbsent(event.target.checked);
+                      if (event.target.checked) setSignature("");
+                    }} role="switch" type="checkbox" />
+                  <span className="min-w-0 font-semibold text-[var(--foreground)]">{t("customerNotPresent")}</span>
+                </label>
+              ) : null}
+              {customerAbsent ? (
+                <p className="mt-3 text-sm font-semibold text-[var(--foreground-secondary)]">{t("customerNotPresentNote")}</p>
+              ) : (
+                <>
+                  <p className="mt-3 text-sm text-[var(--muted)]">{t("signPrompt")}</p>
+                  <div className="mt-3">
+                    <SignaturePad onChange={setSignature} value={signature} />
+                  </div>
+                  <label className="mt-4 block">
+                    <span className="text-sm font-semibold text-[var(--foreground)]">{t("customerPrintedName")}</span>
+                    <input className={inputClass} onChange={(event) => setSignedName(event.target.value)} value={signedName} />
+                  </label>
+                </>
+              )}
             </>
           ) : (
             <label className="mt-4 block">

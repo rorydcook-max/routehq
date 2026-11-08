@@ -15,6 +15,8 @@ export type TravelPolicySettings = {
   mileage_limit: number;
   fuel_charge_per_increment: number;
   late_fee_percentage: number;
+  /** Charged per day a vehicle comes back late. Empty (null): the vehicle's day rate, else monthly x 12 / 365 (lib/late-return.ts). */
+  late_return_fee_per_day: number | null;
   cleaning_fee_minimum: number;
   smoking_fee_maximum: number;
   emergency_repair_limit: number;
@@ -127,6 +129,7 @@ export const travelPolicyDefaults: TravelPolicySettings = {
   mileage_limit: 1500,
   fuel_charge_per_increment: 150,
   late_fee_percentage: 5,
+  late_return_fee_per_day: null,
   cleaning_fee_minimum: 500,
   smoking_fee_maximum: 2000,
   emergency_repair_limit: 2000,
@@ -172,6 +175,7 @@ export function getTravelPolicySettings(settings: Record<string, any> | null | u
     mileage_limit: numberSetting(source, currency, "mileage_limit"),
     fuel_charge_per_increment: numberSetting(source, currency, "fuel_charge_per_increment"),
     late_fee_percentage: numberSetting(source, currency, "late_fee_percentage"),
+    late_return_fee_per_day: Number(source.late_return_fee_per_day) > 0 ? Math.round(Number(source.late_return_fee_per_day) * 100) / 100 : null,
     cleaning_fee_minimum: numberSetting(source, currency, "cleaning_fee_minimum"),
     smoking_fee_maximum: numberSetting(source, currency, "smoking_fee_maximum"),
     emergency_repair_limit: numberSetting(source, currency, "emergency_repair_limit"),

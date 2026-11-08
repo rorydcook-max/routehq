@@ -407,9 +407,15 @@
     "lateBackCharge": "Плата за опоздание",
     "lateBackFromDeposit": "Удержать из депозита",
     "lateBackChargeRenter": "Списать с арендатора",
-    "lateBackWaive": "Не взимать",
+    "lateBackWaive": "Не взимать (согласовано с арендатором)",
     "lateBackOverDeposit": "Оставшийся депозит покрывает до {amount}.",
-    "lateBackRow": "{count, plural, one {Опоздание # день} few {Опоздание # дня} many {Опоздание # дней} other {Опоздание # дня}}"
+    "lateBackRow": "{count, plural, one {Опоздание # день} few {Опоздание # дня} many {Опоздание # дней} other {Опоздание # дня}}",
+    "customerNotPresent": "Клиента нет на месте",
+    "customerNotPresentNote": "Клиенту придёт ссылка для подписи акта.",
+    "waitingSignature": "Ожидает подписи клиента",
+    "resendSignatureLink": "Отправить ссылку для подписи повторно",
+    "signatureLinkSent": "Ссылка отправлена",
+    "signatureLinkNotSent": "Не отправлено автоматически. Отправьте её из сообщений бронирования."
   },
   "translation": {
     "translatedFrom": "Переведено с {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {# транспорт} few {# транспорта} many {# транспорта} other {# транспорта}}",
     "bs_demoBanner": "Демо-компания, только пример. Бронирование отключено.",
     "bs_demoNoBooking": "Это демо-компания, поэтому бронирование отключено.",
-    "reason_late_return": "поздний возврат"
+    "reason_late_return": "поздний возврат",
+    "actionFailed": "Не отправлено. Проверьте подключение и попробуйте ещё раз.",
+    "stillNeeded": "Ещё нужно: {items}",
+    "need_agreeTick": "Отметка о согласии с договором",
+    "idType": "Документ, удостоверяющий личность",
+    "idType_passport": "Паспорт",
+    "idType_national_id": "Удостоверение личности",
+    "idCardNumber": "Номер удостоверения личности",
+    "passportNo": "Номер паспорта",
+    "reportTitle_delivery": "Акт передачи",
+    "reportTitle_return": "Акт возврата",
+    "reportToSign_delivery": "Подпишите акт передачи",
+    "reportToSign_return": "Подпишите акт возврата",
+    "reportSeeAndSign": "Проверьте фото и данные, затем подпишите.",
+    "reportOdometer": "Пробег",
+    "reportFuel": "Топливо",
+    "reportPhotos": "Фото",
+    "reportDamage": "Повреждения",
+    "reportNoDamage": "Повреждений не отмечено.",
+    "reportDeposit": "Залог",
+    "reportDepositHeld": "Удержано",
+    "reportDeducted": "Вычтено",
+    "reportRefunded": "Возвращено вам",
+    "reportConsent": "Подтверждаю, что состояние транспорта соответствует записанному в этом акте.",
+    "reportSign": "Подписать акт",
+    "reportSignedTitle": "Акт подписан",
+    "reportSignedOn": "Подписано: {name}, {date}.",
+    "reportDownload": "Скачать акт",
+    "reportNotFoundTitle": "Акт не найден",
+    "reportNotFoundMessage": "Попросите у прокатной компании новую ссылку."
   },
   "customerMessages": {
     "hi": "Здравствуйте, {name}!",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "Возврата нет.",
     "cancelDepositBack": "Ваш депозит {amount} возвращается.",
     "cancelDepositPart": "Возвращается {returned} из вашего депозита {held}.",
-    "cancelDepositKept": "Ваш депозит {amount} удержан."
+    "cancelDepositKept": "Ваш депозит {amount} удержан.",
+    "signHandoverReport": "ваш акт передачи для {vehicle} готов к проверке и подписи: {link}",
+    "signReturnReport": "ваш акт возврата для {vehicle} готов к проверке и подписи: {link}"
   },
   "directory": {
     "title": "Аренда авто или скутера в Таиланде",
@@ -1564,7 +1601,8 @@
     "collect_extension": "Получить оплату продления",
     "collect_extras": "Получить оплату доп. услуг",
     "job_review": "Отзыв от {name} на проверку",
-    "job_review_open": "Открыть отзывы"
+    "job_review_open": "Открыть отзывы",
+    "job_inspection_signature": "Нужна подпись клиента: {ref}"
   },
   "bookings": {
     "eyebrow": "Бронирования",
@@ -1645,7 +1683,8 @@
     "deleteRecordsInspections": "Проверки при выдаче и возврате, с фото: {count}",
     "deleteRecordsSigned": "Подписанный договор",
     "deleteRecordsBody": "Это нельзя отменить.",
-    "deleteAnyway": "Всё равно удалить"
+    "deleteAnyway": "Всё равно удалить",
+    "emptyNone": "Бронирований пока нет."
   },
   "inbox": {
     "title": "Входящие",
@@ -2825,7 +2864,18 @@
     "cn_depositTooMuch": "Депозит, который ещё удерживается: {amount}.",
     "fin_cancelledSettled": "Возвраты записаны. Больше нечего урегулировать.",
     "share_send": "Отправить ссылку на бронирование",
-    "hist_late_return": "Возвращён с опозданием"
+    "hist_late_return": "Возвращён с опозданием",
+    "cp_noteFailed": "Заметка не сохранена. Попробуйте ещё раз.",
+    "contact": "Контакт",
+    "contactOpen": "Открыть",
+    "walkInNoPayment": "Аренда без брони записана.",
+    "pc_refundBtn": "Вернуть деньги",
+    "pc_refundAmount": "Сумма возврата",
+    "pc_refundConfirm": "Записать возврат",
+    "pc_refundDone": "Возврат записан.",
+    "pc_refundEnter": "Введите сумму возврата.",
+    "pc_refundMax": "С этого платежа можно вернуть не более {amount}.",
+    "pc_refundFailed": "Возврат не сохранён. Попробуйте ещё раз."
   },
   "newBooking": {
     "docsSelfie": "Фото клиента",
@@ -3075,7 +3125,12 @@
     "saveRate_monthly": "Сохранить {amount} в месяц как цену этого автомобиля",
     "extraFree": "Бесплатно",
     "clashHeld": "Резерв на продление: {who} хочет продлить. Сначала подтвердите или снимите резерв.",
-    "clashHeldRenter": "арендатор"
+    "clashHeldRenter": "арендатор",
+    "startMoved": "Начало {date} — в этот день транспорт свободен.",
+    "endBeforeStart": "Дата возврата должна быть позже даты начала.",
+    "freeQ": "Оформить бесплатно?",
+    "freeYes": "Оформить бесплатно",
+    "errAmountReceived": "Введите полученную сумму."
   },
   "fleet": {
     "title": "Автопарк",
@@ -3151,7 +3206,10 @@
     "qp_save": "Сохранить",
     "qp_cancel": "Отмена",
     "qp_failed": "Не удалось сохранить цену. Попробуйте ещё раз.",
-    "assistant": "Помощник"
+    "assistant": "Помощник",
+    "bandArchived": "в архиве",
+    "status_Archived": "В архиве",
+    "noticeArchiveLive": "У некоторых из этих машин есть незавершённые бронирования. Сначала перенесите их на другой транспорт или отмените."
   },
   "customers": {
     "sel_nationality": "Гражданство",
@@ -3237,7 +3295,12 @@
     "in_trend": "Длительность и траты",
     "in_avgLength": "Средняя длительность",
     "in_avgSpend": "Средние траты",
-    "pillReviews": "{count, plural, one {# отзыв} few {# отзыва} many {# отзывов} other {# отзыва}}"
+    "pillReviews": "{count, plural, one {# отзыв} few {# отзыва} many {# отзывов} other {# отзыва}}",
+    "sel_needContact": "Укажите имя и один способ связи: телефон, Messenger, LINE, Telegram, Instagram или email.",
+    "sel_messengerNameOnly": "Имя или ссылка на профиль",
+    "sel_lineIdOnly": "LINE ID или телефон",
+    "sel_telegramIdOnly": "Имя пользователя Telegram или телефон",
+    "sel_instagram": "Имя пользователя Instagram"
   },
   "calendar": {
     "title": "Календарь",
@@ -3331,7 +3394,7 @@
     "vs_reserved": "Забронирован",
     "vs_maintenance": "В ремонте",
     "vs_available": "Свободен",
-    "vs_inactive": "Не используется",
+    "vs_inactive": "В архиве",
     "vs_retired": "Не используется",
     "c_tax": "Транспортный налог",
     "c_porbor": "Обязательная страховка (Por Ror Bor)",
@@ -3682,7 +3745,8 @@
     "tl_out": "У клиента {name}",
     "tl_service": "ТО",
     "tl_repair": "Ремонт",
-    "tl_damage": "Повреждения при возврате: {count, plural, one {# пункт} few {# пункта} many {# пунктов} other {# пункта}}"
+    "tl_damage": "Повреждения при возврате: {count, plural, one {# пункт} few {# пункта} many {# пунктов} other {# пункта}}",
+    "unarchive": "Вернуть из архива"
   },
   "customerPage": {
     "back": "Клиенты",
@@ -3783,7 +3847,7 @@
     "n_placeholder": "Всё, что стоит помнить: предпочтения, привычки оплаты, напоминания",
     "n_auto": "Сохраняется, когда вы нажмёте в другое место",
     "new_title": "Добавить клиента",
-    "new_subtitle": "Достаточно имени и телефона. Остальное можно добавить сейчас или позже.",
+    "new_subtitle": "Достаточно имени и одного способа связи. Остальное можно добавить сейчас или позже.",
     "new_chatTitle": "Мессенджеры и эл. почта",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, эл. почта",
     "new_whatsappHint": "Оставьте пустым, если совпадает с телефоном.",
@@ -3886,7 +3950,17 @@
     "tl_paidCharge": "Оплатил начисление",
     "tl_refunded": "Возврат денег",
     "tl_damage": "Повреждения при возврате: {count, plural, one {# пункт} few {# пункта} many {# пунктов} other {# пункта}}",
-    "tl_review": "Оставил отзыв: {rating}/5"
+    "tl_review": "Оставил отзыв: {rating}/5",
+    "new_phoneHint": "Не нужно, если ниже вы укажете Messenger, LINE, Telegram, Instagram или email.",
+    "dnr_failed": "Не сохранено. Попробуйте ещё раз.",
+    "message": "Написать",
+    "dupContact": "{name} уже сохранён с этими контактными данными.",
+    "f_licenceClass": "Категория прав",
+    "f_idType": "Документ, удостоверяющий личность",
+    "f_idType_passport": "Паспорт",
+    "f_idType_national_id": "Удостоверение личности",
+    "f_idCardNo": "Номер удостоверения личности",
+    "f_idCardExpiry": "Срок действия удостоверения личности"
   },
   "vehicleForm": {
     "addTitle": "Добавить транспорт",
@@ -4061,7 +4135,9 @@
     "quickSubtitle": "Только самое нужное. Укажите тип, марку и модель.",
     "quickLater": "Даты страховки и налога, пробег и кредит можно будет добавить позже в разделе автопарка.",
     "valueSummaryMi": "Текущий пробег, цена покупки, текущая стоимость",
-    "valueSummaryEditMi": "Цена покупки, стоимость, пробег при покупке"
+    "valueSummaryEditMi": "Цена покупки, стоимость, пробег при покупке",
+    "archivedNow": "Этот транспорт в архиве.",
+    "unarchiveBtn": "Вернуть из архива"
   },
   "bookingEdit": {
     "booking": "Бронирование",
@@ -4340,7 +4416,7 @@
     "tp_fees": "Сборы и лимиты",
     "tp_km": "Допустимый пробег в месяц (км)",
     "tp_fuel": "Топливо за каждую недостающую 1/8 бака",
-    "tp_late": "Плата за поздний возврат (% в день)",
+    "tp_late": "Пеня за просрочку оплаты (% в день)",
     "tp_cleaning": "Плата за уборку, от",
     "tp_smoking": "Штраф за курение, до",
     "tp_repairs": "Ремонт, который клиент может одобрить, до",
@@ -5071,7 +5147,14 @@
     "ba_or": "или",
     "ba_ownLabel": "Подключить свой домен",
     "bt_showName": "Показывать название рядом с логотипом",
-    "bt_showNameHint": "Если выключено, широкий логотип показывается отдельно, а рядом с квадратным появляется ваше название. Опубликуйте, чтобы изменения вступили в силу."
+    "bt_showNameHint": "Если выключено, широкий логотип показывается отдельно, а рядом с квадратным появляется ваше название. Опубликуйте, чтобы изменения вступили в силу.",
+    "reg_confirmCurrency": "Цены на транспорт будут показаны в {to}, но не пересчитаны. Существующие бронирования останутся в {from}.",
+    "reg_confirmCountry": "Также изменятся валюта на {currency}, часовой пояс на {zone}, единицы расстояния на {unit} и НДС на {vat}%.",
+    "reg_confirmChange": "Изменить",
+    "reg_confirmCancel": "Отмена",
+    "tp_lateReturnPerDay": "Штраф за поздний возврат в день",
+    "ag_n_lateReturn": "Штраф за поздний возврат",
+    "ag_n_perDay": "{amount} в день"
   },
   "accountPage": {
     "roleOwner": "Владелец",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "Добавьте свою подпись один раз, и клиенты смогут подписывать договор аренды в телефоне.",
     "nudgePaymentMethods": "Укажите, как клиенты могут вам платить (банковские реквизиты, Wise, Revolut или PromptPay), чтобы они оплачивали прямо со своей страницы бронирования.",
     "extensionHoldReturning": "{customer} не продлевает: {vehicle} нужно вернуть {date}. Следующие дни снова открыты для бронирования.",
-    "reviewReceived": "{customer} оставил отзыв: {rating} из 5."
+    "reviewReceived": "{customer} оставил отзыв: {rating} из 5.",
+    "handoverReportSigned": "{customer} подписал(а) акт передачи для {vehicle}.",
+    "returnReportSigned": "{customer} подписал(а) акт возврата для {vehicle}."
   },
   "handoverPay": {
     "title": "Оплата",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "Заберите в {business}. Возьмите права и паспорт.",
     "spec_year": "Год",
     "spec_deposit": "Депозит",
-    "fleet_perMonth": "{amount} в месяц"
+    "fleet_perMonth": "{amount} в месяц",
+    "photo_credit": "Фото: <author>{name}</author>, <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Оформление",
@@ -8097,7 +8183,21 @@
     "role_muted": "Второстепенный текст",
     "role_dark": "Тёмные разделы",
     "pal_autoSummary": "Цвета шаблона",
-    "noReviewsYet": "Отзывов пока нет"
+    "noReviewsYet": "Отзывов пока нет",
+    "img_stock": "Стоковые фото",
+    "img_uploadPhoto": "Загрузить фото",
+    "stock_credit": "Фото: <author>{name}</author>, <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Не удалось загрузить фото. Попробуйте ещё раз.",
+    "stock_loading": "Загрузка фото…",
+    "stock_more": "Ещё фото",
+    "stock_none": "Фото не найдены. Попробуйте другой запрос.",
+    "stock_note": "Бесплатные фото с <unsplash>Unsplash</unsplash>. Ваш сайт указывает автора.",
+    "stock_off": "Стоковые фото ещё не настроены.",
+    "stock_rateLimited": "Достигнут почасовой лимит поиска Unsplash. Попробуйте чуть позже.",
+    "stock_search": "Поиск фото",
+    "stock_suggested": "Популярные запросы",
+    "stock_use": "Использовать фото: {photo}",
+    "stock_useBy": "Использовать фото автора {name}"
   },
   "roveListing": {
     "title": "Показывать ваш автопарк на rove.rent и принимать там бронирования?",

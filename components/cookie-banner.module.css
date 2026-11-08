@@ -24,6 +24,10 @@
   color: var(--text);
   box-shadow: var(--frame-shadow-light);
 }
+/* Already chosen (lib/consent.ts chosenScript, run before the first paint): the notice drawn with the page stays hidden. */
+:global(html[data-consent-set]) .banner {
+  display: none;
+}
 @media (min-width: 640px) {
   .banner {
     inset-inline: 24px auto;

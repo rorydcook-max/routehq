@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import { Clock, Mail, MapPin, MessageCircle, Phone, Send } from "lucide-react";
 import { sendSiteMessage, type SiteMessageState } from "@/app/actions/sites";
@@ -56,6 +56,33 @@ function useMapQuery() {
   return config.mapQuery || data.business.address || data.business.place;
 }
 
+/**
+ * The Google map, loaded only once it is about to scroll into view (task perf, 8 Nov 2026). The browser's own
+ * loading="lazy" still fetched it (about 400 KB of Maps scripts) on a phone, because it starts far ahead of the
+ * screen. Until then an empty box of the same size holds its place, so nothing moves when it arrives.
+ */
+function NearbyFrame({ className, src, title }: { className: string; src: string; title: string }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const element = box.current;
+    if (!element || near) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setNear(true);
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        setNear(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: "400px 0px" });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [near]);
+  return near ? <iframe className={className} loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={src} title={title} /> : <div aria-hidden="true" className={className} ref={box} />;
+}
+
 function MapBlock({ tall = false, big = false }: { tall?: boolean; big?: boolean }) {
   const { t } = useSite();
   const query = useMapQuery();
@@ -63,7 +90,7 @@ function MapBlock({ tall = false, big = false }: { tall?: boolean; big?: boolean
   const links = mapLinks(query);
   return (
     <div className={`${s.image} border ${s.line} bg-[var(--s-raised)]`}>
-      <iframe className={`block w-full border-0 ${big ? "h-[380px] sm:h-[460px] lg:h-[580px]" : tall ? "h-[360px] lg:h-full lg:min-h-[420px]" : "h-[300px]"}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={links.embed} title={t("map_title")} />
+      <NearbyFrame className={`block w-full border-0 ${big ? "h-[380px] sm:h-[460px] lg:h-[580px]" : tall ? "h-[360px] lg:h-full lg:min-h-[420px]" : "h-[300px]"}`} src={links.embed} title={t("map_title")} />
       <a className={`${s.focus} flex items-center gap-2 bg-[var(--s-surface)] px-4 py-3 text-[15px] font-semibold`} href={links.open} rel="noopener noreferrer" target="_blank">
         <MapPin aria-hidden="true" className="shrink-0 text-[var(--s-accent-text)]" size={17} />
         <span className="min-w-0 flex-1 truncate">{query}</span>

@@ -29,6 +29,20 @@ export function licenceCategoriesFor(countryCode: string | null | undefined): re
   return String(countryCode || "").toUpperCase() === "TR" ? TR_LICENCE_CATEGORIES : LICENCE_CATEGORIES;
 }
 
+/** Countries whose licences print the EU/UK categories (EU, EEA, Switzerland, UK), plus Türkiye with its own. */
+const CATEGORY_COUNTRIES = new Set([
+  "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL",
+  "PL", "PT", "RO", "SK", "SI", "ES", "SE", "IS", "LI", "NO", "CH", "GB", "TR"
+]);
+
+/**
+ * Tick boxes for the categories only where licences use them; elsewhere (Thailand, the US...) a plain text field,
+ * so a Thai customer isn't shown AM/A1 boxes (real-user test, 8 Nov 2026).
+ */
+export function usesLicenceCategoryBoxes(countryCode: string | null | undefined): boolean {
+  return CATEGORY_COUNTRIES.has(String(countryCode || "").toUpperCase());
+}
+
 /** "a2, B; be" or ["A2", "B"] -> ["A2", "B", "BE"], in the usual order, unknown ones left out. */
 export function licenceCategoriesOf(value: unknown): LicenceCategory[] {
   const parts = (Array.isArray(value) ? value : String(value || "").split(/[\s,;/]+/))

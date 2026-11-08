@@ -7,6 +7,7 @@ import { TranslatedText } from "@/components/translated-text";
 import { Badge } from "@/components/ui";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { translateForReader } from "@/lib/content-translation";
+import { waitingForSignature } from "@/lib/inspection-signature";
 
 function formatDate(value: string | null | undefined, locale: string, notSet: string) {
   if (!value) {
@@ -169,6 +170,11 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
             {t("viewSignedBy", { name: inspection.customer_signed_name || t("viewCustomer"), when: formatDate(inspection.customer_signed_at, locale, t("viewNotSet")) })}
           </p>
         </div>
+      ) : waitingForSignature(inspection) ? (
+        <p className="mt-4 flex items-center gap-2 rounded-2xl bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">
+          <PenLine size={17} />
+          {t("waitingSignature")}
+        </p>
       ) : null}
 
       {notes.original ? <TranslatedText className="mt-4 rounded-lg bg-[var(--panel-secondary)] p-3 text-sm text-[var(--foreground-secondary)]" value={notes} /> : null}

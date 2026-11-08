@@ -22,6 +22,8 @@ import { Reviews } from "./sections/reviews";
 import { Hero } from "./sections/hero";
 import s from "./site.module.css";
 
+/** Switches the pairing's stylesheet on (media="all") once it has loaded: run as the served page is read. */
+const FONT_SWITCH = `(function(){var l=document.getElementById("site-fonts");if(!l)return;function on(){l.media="all";}if(l.sheet)on();else l.addEventListener("load",on);})();`;
 
 /** The words a slot shows when the owner hasn't written their own: from the business's details, in the renter's language. */
 function defaultText(template: TemplateDef, business: SiteBusiness, noun: string, t: Say): Record<TextSlot, string> {
@@ -225,9 +227,14 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
         data-template={template.id}
         id="top"
         style={{ ...(siteVars(palette, template, font) as CSSProperties), colorScheme: palette.dark ? "dark" : "light" }}>
-        {/* Only this pairing is loaded (display=swap: text shows at once in the fallback face). */}
+        {/* Only this pairing is loaded (display=swap: text shows at once in the fallback face). Without holding up the
+            page (task perf, 8 Nov 2026): a stylesheet from Google kept everything below it (the hero's headline too)
+            from showing until it had arrived, seconds on a phone. It loads as media="print" (not waited for) and
+            switches on once it has: the script below for the page as served, onLoad when the editor changes the pairing. */}
+        <link href="https://fonts.googleapis.com" rel="preconnect" />
         <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect" />
-        <link href={fontHref(font)} key={font.id} rel="stylesheet" />
+        <link href={fontHref(font)} id="site-fonts" key={font.id} media="print" onLoad={(event) => (event.currentTarget.media = "all")} rel="stylesheet" />
+        <script dangerouslySetInnerHTML={{ __html: FONT_SWITCH }} key={`switch-${font.id}`} />
 
         {data.demo ? <p className="bg-[var(--s-accent)] px-4 py-2.5 text-center text-[14px] font-semibold text-[var(--s-accent-ink)]">{t("demo_banner")}</p> : null}
 

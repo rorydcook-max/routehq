@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { textDirection } from "@/lib/i18n/locales";
 import { themeScript } from "@/lib/theme";
 import { rootMetadata, rootViewport } from "./root-metadata";
-import "@tabler/icons-webfont/dist/tabler-icons.min.css";
+// No Tabler icon font here: this page draws no icons (task perf, 8 Nov 2026).
 import "./globals.css";
 import "./theme-dark.css";
 

@@ -318,6 +318,7 @@
         <div class="info-cell"><div class="info-label">Deposit / เงินประกัน</div><div class="info-value">฿{{deposit_amount}}</div></div>
         <div class="info-cell"><div class="info-label">Return period / ระยะเวลาคืนเงิน</div><div class="info-value">{{#if deposit_return_days_enabled}}{{deposit_return_days}} business days / {{deposit_return_days}} วันทำการ{{else}}After the return check / หลังตรวจคืนรถ{{/if}}</div></div>
         {{#if cleaning_fee_enabled}}<div class="info-cell"><div class="info-label">Cleaning fee / ค่าทำความสะอาด</div><div class="info-value">from ฿{{cleaning_fee_minimum}}</div></div>{{/if}}
+        {{#if late_return_fee_enabled}}<div class="info-cell"><div class="info-label">Late return fee / ค่าปรับคืนรถล่าช้า</div><div class="info-value">฿{{late_return_fee_per_day}} per day / ต่อวัน</div></div>{{/if}}
       </div>
       <div class="bilingual-section">
         <div class="lang-en">The security deposit is held as security for unpaid rent, damage, fines, missing items, cleaning, fuel, late return and any other liability arising from this rental.</div>

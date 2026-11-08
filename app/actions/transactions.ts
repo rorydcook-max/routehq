@@ -4,7 +4,7 @@ import { guard } from "@/lib/action-error";
 
 import { englishDateLocale } from "@/lib/i18n/customer-dates";
 import { earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
-import { ensureLateReturnCharge, lateReturnAmount, lateReturnFor } from "@/lib/late-return";
+import { ensureLateReturnCharge, lateFeePerDayFor, lateReturnAmount, lateReturnFor } from "@/lib/late-return";
 import { applyLateStart } from "@/lib/late-start";
 import { tellRentalCustomer } from "@/lib/customer-messages";
 import { toInternationalPhone } from "@/lib/phone";
@@ -289,8 +289,11 @@ async function recordDeliveryCashPaymentAndReceiptOrThrow(formData: FormData) {
   const rentalPeriod = String(formData.get("rentalPeriod") || "Rental");
   const paymentMethod = String(formData.get("paymentMethod") || "cash");
 
-  if (!organizationId || !rentalId || !vehicleId || amount === null || amount <= 0) {
+  if (!organizationId || !rentalId || !vehicleId) {
     throw new Error("A positive cash payment amount is required.");
+  }
+  if (!(amount > 0)) {
+    throw new Error("Enter the amount received.");
   }
 
   enterBusinessTimeZone(await adoptBusinessClock(supabase, organizationId));
@@ -327,7 +330,7 @@ async function recordDeliveryCashPaymentAndReceiptOrThrow(formData: FormData) {
   if (String(formData.get("lateReturn") || "") === "charge") {
     const { data: booked } = await supabase.from("rentals").select("end_date, rental_rate, pricing_model, billing_interval, currency").eq("id", rentalId).eq("organization_id", organizationId).maybeSingle();
     const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
-    const late = lateReturnFor(booked, rates, today);
+    const late = lateReturnFor(booked, rates, today, await lateFeePerDayFor(supabase, organizationId).catch(() => null));
     const lateAmount = formData.has("lateReturnAmount") ? lateReturnAmount(formData.get("lateReturnAmount")) : late?.amount || 0;
     if (late && lateAmount > 0) await ensureLateReturnCharge(supabase, { organizationId, rentalId, vehicleId, customerId: customerId || rental.customer_id || null, currency: rental.currency || "THB", today, late, amount: lateAmount, choice: "charge" });
   }

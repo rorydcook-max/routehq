@@ -407,9 +407,15 @@
     "lateBackCharge": "ຄ່າປັບສົ່ງຊ້າ",
     "lateBackFromDeposit": "ຫັກຈາກເງິນມັດຈຳ",
     "lateBackChargeRenter": "ເກັບເງິນຈາກຜູ້ເຊົ່າ",
-    "lateBackWaive": "ຍົກເວັ້ນ",
+    "lateBackWaive": "ຍົກເວັ້ນ (ຕົກລົງກັບຜູ້ເຊົ່າແລ້ວ)",
     "lateBackOverDeposit": "ເງິນມັດຈຳທີ່ເຫຼືອຄອບຄຸມໄດ້ເຖິງ {amount}.",
-    "lateBackRow": "{count, plural, other {ຊ້າ # ມື້}}"
+    "lateBackRow": "{count, plural, other {ຊ້າ # ມື້}}",
+    "customerNotPresent": "ລູກຄ້າບໍ່ຢູ່",
+    "customerNotPresentNote": "ຈະສົ່ງລິ້ງໃຫ້ລູກຄ້າເຊັນລາຍງານ.",
+    "waitingSignature": "ລໍຖ້າລາຍເຊັນລູກຄ້າ",
+    "resendSignatureLink": "ສົ່ງລິ້ງເຊັນອີກຄັ້ງ",
+    "signatureLinkSent": "ສົ່ງລິ້ງແລ້ວ",
+    "signatureLinkNotSent": "ບໍ່ໄດ້ສົ່ງອັດຕະໂນມັດ. ສົ່ງຈາກຂໍ້ຄວາມຂອງການຈອງ."
   },
   "translation": {
     "translatedFrom": "ແປຈາກ {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, other {ລົດ # ຄັນ}}",
     "bs_demoBanner": "ຮ້ານຕົວຢ່າງ ໃຊ້ສາທິດເທົ່ານັ້ນ ປິດການຈອງໄວ້",
     "bs_demoNoBooking": "ນີ້ແມ່ນຮ້ານຕົວຢ່າງ ຈຶ່ງປິດການຈອງໄວ້",
-    "reason_late_return": "ການສົ່ງຄືນຊ້າ"
+    "reason_late_return": "ການສົ່ງຄືນຊ້າ",
+    "actionFailed": "ຍັງບໍ່ໄດ້ສົ່ງ. ກວດການເຊື່ອມຕໍ່ ແລ້ວລອງໃໝ່.",
+    "stillNeeded": "ຍັງຕ້ອງການ: {items}",
+    "need_agreeTick": "ຕິກຍອມຮັບຂໍ້ຕົກລົງ",
+    "idType": "ເອກະສານຢັ້ງຢືນຕົວຕົນ",
+    "idType_passport": "ໜັງສືຜ່ານແດນ",
+    "idType_national_id": "ບັດປະຈຳຕົວ",
+    "idCardNumber": "ເລກບັດປະຈຳຕົວ",
+    "passportNo": "ເລກໜັງສືຜ່ານແດນ",
+    "reportTitle_delivery": "ລາຍງານສົ່ງມອບລົດ",
+    "reportTitle_return": "ລາຍງານຮັບລົດຄືນ",
+    "reportToSign_delivery": "ເຊັນລາຍງານສົ່ງມອບລົດຂອງທ່ານ",
+    "reportToSign_return": "ເຊັນລາຍງານຮັບລົດຄືນຂອງທ່ານ",
+    "reportSeeAndSign": "ກວດເບິ່ງຮູບ ແລະ ລາຍລະອຽດ ແລ້ວເຊັນ.",
+    "reportOdometer": "ເລກໄມ",
+    "reportFuel": "ນ້ຳມັນ",
+    "reportPhotos": "ຮູບ",
+    "reportDamage": "ຄວາມເສຍຫາຍ",
+    "reportNoDamage": "ບໍ່ພົບຄວາມເສຍຫາຍ.",
+    "reportDeposit": "ເງິນມັດຈຳ",
+    "reportDepositHeld": "ຖືໄວ້",
+    "reportDeducted": "ຫັກອອກ",
+    "reportRefunded": "ຄືນໃຫ້ທ່ານ",
+    "reportConsent": "ຂ້ອຍຢືນຢັນວ່າສະພາບລົດຕົງກັບທີ່ບັນທຶກໄວ້ໃນລາຍງານນີ້.",
+    "reportSign": "ເຊັນລາຍງານ",
+    "reportSignedTitle": "ເຊັນລາຍງານແລ້ວ",
+    "reportSignedOn": "ເຊັນໂດຍ {name}, {date}.",
+    "reportDownload": "ດາວໂຫຼດລາຍງານ",
+    "reportNotFoundTitle": "ບໍ່ພົບລາຍງານ",
+    "reportNotFoundMessage": "ຂໍລິ້ງໃໝ່ຈາກຮ້ານເຊົ່າ."
   },
   "customerMessages": {
     "hi": "ສະບາຍດີ {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "ບໍ່ມີການຄືນເງິນ.",
     "cancelDepositBack": "ເງິນມັດຈຳ {amount} ຂອງທ່ານກຳລັງຖືກສົ່ງຄືນ.",
     "cancelDepositPart": "{returned} ຈາກເງິນມັດຈຳ {held} ຂອງທ່ານກຳລັງຖືກສົ່ງຄືນ.",
-    "cancelDepositKept": "ເງິນມັດຈຳ {amount} ຂອງທ່ານຖືກເກັບໄວ້."
+    "cancelDepositKept": "ເງິນມັດຈຳ {amount} ຂອງທ່ານຖືກເກັບໄວ້.",
+    "signHandoverReport": "ລາຍງານສົ່ງມອບ {vehicle} ຂອງທ່ານພ້ອມໃຫ້ກວດ ແລະ ເຊັນແລ້ວ: {link}",
+    "signReturnReport": "ລາຍງານຮັບ {vehicle} ຄືນຂອງທ່ານພ້ອມໃຫ້ກວດ ແລະ ເຊັນແລ້ວ: {link}"
   },
   "common": {
     "kinds_car": "ລົດໃຫຍ່",
@@ -1299,7 +1336,8 @@
     "collect_extension": "ເກັບຄ່າຕໍ່ສັນຍາ",
     "collect_extras": "ເກັບຄ່າບໍລິການເສີມ",
     "job_review": "ລີວິວຈາກ {name} ລໍຖ້າກວດ",
-    "job_review_open": "ເປີດລີວິວ"
+    "job_review_open": "ເປີດລີວິວ",
+    "job_inspection_signature": "ຕ້ອງການລາຍເຊັນລູກຄ້າ: {ref}"
   },
   "bookings": {
     "eyebrow": "ການຈອງ",
@@ -1380,7 +1418,8 @@
     "deleteRecordsInspections": "ການກວດລົດຕອນມອບ ແລະ ຮັບຄືນ ພ້ອມຮູບ: {count}",
     "deleteRecordsSigned": "ສັນຍາທີ່ເຊັນແລ້ວ",
     "deleteRecordsBody": "ບໍ່ສາມາດກັບຄືນໄດ້.",
-    "deleteAnyway": "ລຶບຢູ່ດີ"
+    "deleteAnyway": "ລຶບຢູ່ດີ",
+    "emptyNone": "ຍັງບໍ່ມີການຈອງ."
   },
   "inbox": {
     "title": "ກ່ອງຂໍ້ຄວາມ",
@@ -2560,7 +2599,18 @@
     "cn_depositTooMuch": "ເງິນມັດຈຳທີ່ຍັງຖືຢູ່ແມ່ນ {amount}.",
     "fin_cancelledSettled": "ບັນທຶກການຄືນເງິນແລ້ວ. ບໍ່ມີຫຍັງຕ້ອງຊຳລະເພີ່ມ.",
     "share_send": "ສົ່ງລິ້ງຈອງ",
-    "hist_late_return": "ສົ່ງຄືນຊ້າ"
+    "hist_late_return": "ສົ່ງຄືນຊ້າ",
+    "cp_noteFailed": "ຍັງບໍ່ໄດ້ບັນທຶກບັນທຶກຫຍໍ້. ລອງໃໝ່.",
+    "contact": "ຕິດຕໍ່",
+    "contactOpen": "ເປີດ",
+    "walkInNoPayment": "ບັນທຶກການເຊົ່າແບບວອລ໌ກອິນແລ້ວ.",
+    "pc_refundBtn": "ຄືນເງິນ",
+    "pc_refundAmount": "ຈຳນວນເງິນທີ່ຄືນ",
+    "pc_refundConfirm": "ບັນທຶກການຄືນເງິນ",
+    "pc_refundDone": "ບັນທຶກການຄືນເງິນແລ້ວ.",
+    "pc_refundEnter": "ໃສ່ຈຳນວນເງິນທີ່ຄືນ.",
+    "pc_refundMax": "ຄືນເງິນຈາກລາຍການຈ່າຍນີ້ໄດ້ສູງສຸດ {amount}.",
+    "pc_refundFailed": "ຍັງບໍ່ໄດ້ບັນທຶກການຄືນເງິນ. ລອງໃໝ່."
   },
   "newBooking": {
     "docsSelfie": "ຮູບລູກຄ້າ",
@@ -2810,7 +2860,12 @@
     "saveRate_monthly": "ບັນທຶກ {amount} ຕໍ່ເດືອນ ເປັນລາຄາຂອງລົດຄັນນີ້",
     "extraFree": "ຟຣີ",
     "clashHeld": "ກັນໄວ້ເຜື່ອຕໍ່ສັນຍາ: {who} ຢາກຕໍ່ສັນຍາ. ຢືນຢັນ ຫຼື ຍົກເລີກການກັນລົດກ່ອນ.",
-    "clashHeldRenter": "ຜູ້ເຊົ່າ"
+    "clashHeldRenter": "ຜູ້ເຊົ່າ",
+    "startMoved": "ເລີ່ມ {date} ເຊິ່ງເປັນວັນທີ່ລົດຄັນນີ້ວ່າງ.",
+    "endBeforeStart": "ວັນສົ່ງລົດຄືນຕ້ອງຢູ່ຫຼັງວັນເລີ່ມຕົ້ນ.",
+    "freeQ": "ຈອງຟຣີບໍ?",
+    "freeYes": "ຈອງຟຣີ",
+    "errAmountReceived": "ໃສ່ຈຳນວນເງິນທີ່ໄດ້ຮັບ."
   },
   "fleet": {
     "title": "ລົດທັງໝົດ",
@@ -2886,7 +2941,10 @@
     "qp_save": "ບັນທຶກ",
     "qp_cancel": "ຍົກເລີກ",
     "qp_failed": "ບັນທຶກລາຄາບໍ່ໄດ້. ລອງໃໝ່.",
-    "assistant": "ຜູ້ຊ່ວຍ"
+    "assistant": "ຜູ້ຊ່ວຍ",
+    "bandArchived": "ເກັບເຂົ້າຄັງ",
+    "status_Archived": "ເກັບເຂົ້າຄັງ",
+    "noticeArchiveLive": "ລົດບາງຄັນຍັງມີການຈອງທີ່ຍັງບໍ່ສິ້ນສຸດ. ຍ້າຍໄປລົດຄັນອື່ນ ຫຼື ຍົກເລີກກ່ອນ."
   },
   "customers": {
     "sel_nationality": "ສັນຊາດ",
@@ -2972,7 +3030,12 @@
     "in_trend": "ໄລຍະເຊົ່າ ແລະ ຍອດໃຊ້ຈ່າຍ",
     "in_avgLength": "ໄລຍະເຊົ່າສະເລ່ຍ",
     "in_avgSpend": "ຍອດໃຊ້ຈ່າຍສະເລ່ຍ",
-    "pillReviews": "{count, plural, other {# ລີວິວ}}"
+    "pillReviews": "{count, plural, other {# ລີວິວ}}",
+    "sel_needContact": "ໃສ່ຊື່ ແລະ ຊ່ອງທາງຕິດຕໍ່ຢ່າງໜ້ອຍໜຶ່ງຊ່ອງທາງ: ເບີໂທ, Messenger, LINE, Telegram, Instagram ຫຼື ອີເມວ.",
+    "sel_messengerNameOnly": "ຊື່ ຫຼື ລິ້ງໂປຣໄຟລ໌ຂອງເຂົາ",
+    "sel_lineIdOnly": "LINE ID ຫຼື ເບີໂທ",
+    "sel_telegramIdOnly": "ຊື່ຜູ້ໃຊ້ Telegram ຫຼື ເບີໂທ",
+    "sel_instagram": "ຊື່ຜູ້ໃຊ້ Instagram"
   },
   "calendar": {
     "title": "ປະຕິທິນ",
@@ -3066,7 +3129,7 @@
     "vs_reserved": "ຈອງແລ້ວ",
     "vs_maintenance": "ຢູ່ອູ່",
     "vs_available": "ວ່າງ",
-    "vs_inactive": "ບໍ່ໄດ້ໃຊ້ງານ",
+    "vs_inactive": "ເກັບເຂົ້າຄັງ",
     "vs_retired": "ບໍ່ໄດ້ໃຊ້ງານ",
     "c_tax": "ພາສີລົດ",
     "c_porbor": "ປະກັນໄພພາກບັງຄັບ (Por Ror Bor)",
@@ -3417,7 +3480,8 @@
     "tl_out": "ເຊົ່າໂດຍ {name}",
     "tl_service": "ເຂົ້າສູນ",
     "tl_repair": "ສ້ອມແປງ",
-    "tl_damage": "ພົບຮອຍເສຍຫາຍຕອນຄືນລົດ: {count, plural, other {# ລາຍການ}}"
+    "tl_damage": "ພົບຮອຍເສຍຫາຍຕອນຄືນລົດ: {count, plural, other {# ລາຍການ}}",
+    "unarchive": "ເອົາອອກຈາກຄັງ"
   },
   "customerPage": {
     "back": "ລູກຄ້າ",
@@ -3518,7 +3582,7 @@
     "n_placeholder": "ສິ່ງທີ່ຄວນຈື່: ຄວາມມັກ, ນິໄສການຈ່າຍເງິນ, ການແຈ້ງເຕືອນ",
     "n_auto": "ບັນທຶກອັດຕະໂນມັດເມື່ອທ່ານແຕະບ່ອນອື່ນ",
     "new_title": "ເພີ່ມລູກຄ້າ",
-    "new_subtitle": "ຊື່ ແລະ ເບີໂທພໍແລ້ວ. ເພີ່ມສ່ວນທີ່ເຫຼືອດຽວນີ້ ຫຼື ພາຍຫຼັງ.",
+    "new_subtitle": "ມີແຕ່ຊື່ ແລະ ຊ່ອງທາງຕິດຕໍ່ໜຶ່ງຊ່ອງທາງກໍພໍ. ຂໍ້ມູນອື່ນເພີ່ມຕອນນີ້ ຫຼື ພາຍຫຼັງກໍໄດ້.",
     "new_chatTitle": "ແອັບແຊັດ ແລະ ອີເມວ",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, ອີເມວ",
     "new_whatsappHint": "ປະວ່າງໄວ້ຖ້າເປັນເບີດຽວກັບເບີໂທ.",
@@ -3621,7 +3685,17 @@
     "tl_paidCharge": "ຊຳລະຄ່າໃຊ້ຈ່າຍເພີ່ມ",
     "tl_refunded": "ຄືນເງິນ",
     "tl_damage": "ພົບຮອຍເສຍຫາຍຕອນຄືນລົດ: {count, plural, other {# ລາຍການ}}",
-    "tl_review": "ໃຫ້ລີວິວ: {rating}/5"
+    "tl_review": "ໃຫ້ລີວິວ: {rating}/5",
+    "new_phoneHint": "ບໍ່ຈຳເປັນ ຖ້າທ່ານໃສ່ Messenger, LINE, Telegram, Instagram ຫຼື ອີເມວຢູ່ລຸ່ມນີ້.",
+    "dnr_failed": "ຍັງບໍ່ໄດ້ບັນທຶກ. ລອງໃໝ່.",
+    "message": "ສົ່ງຂໍ້ຄວາມ",
+    "dupContact": "{name} ຖືກບັນທຶກໄວ້ແລ້ວດ້ວຍຂໍ້ມູນຕິດຕໍ່ນີ້.",
+    "f_licenceClass": "ປະເພດໃບຂັບຂີ່",
+    "f_idType": "ເອກະສານຢັ້ງຢືນຕົວຕົນ",
+    "f_idType_passport": "ໜັງສືຜ່ານແດນ",
+    "f_idType_national_id": "ບັດປະຈຳຕົວ",
+    "f_idCardNo": "ເລກບັດປະຈຳຕົວ",
+    "f_idCardExpiry": "ບັດປະຈຳຕົວໝົດອາຍຸ"
   },
   "vehicleForm": {
     "addTitle": "ເພີ່ມລົດ",
@@ -3796,7 +3870,9 @@
     "quickSubtitle": "เฉพาะข้อมูลพื้นฐาน ต้องระบุแค่ประเภท ยี่ห้อ และรุ่นเท่านั้น",
     "quickLater": "วันที่ภาษีและประกัน ไมล์ เงินกู้ และอื่นๆ สามารถเพิ่มทีหลังได้จากส่วนรถ",
     "valueSummaryMi": "ໄລຍະທາງປັດຈຸບັນ, ລາຄາທີ່ຊື້, ມູນຄ່າປັດຈຸບັນ",
-    "valueSummaryEditMi": "ລາຄາຊື້, ມູນຄ່າ, ໄລຍະທາງຕອນຊື້"
+    "valueSummaryEditMi": "ລາຄາຊື້, ມູນຄ່າ, ໄລຍະທາງຕອນຊື້",
+    "archivedNow": "ລົດຄັນນີ້ຖືກເກັບເຂົ້າຄັງແລ້ວ.",
+    "unarchiveBtn": "ເອົາອອກຈາກຄັງ"
   },
   "bookingEdit": {
     "booking": "ການຈອງ",
@@ -4075,7 +4151,7 @@
     "tp_fees": "ຄ່າທຳນຽມ ແລະ ຂໍ້ຈຳກັດ",
     "tp_km": "ໄລຍະທາງທີ່ອະນຸຍາດຕໍ່ເດືອນ (km)",
     "tp_fuel": "ຄ່ານ້ຳມັນຕໍ່ທຸກ 1/8 ຖັງທີ່ຂາດ",
-    "tp_late": "ຄ່າປັບສົ່ງຄືນຊ້າ (% ຕໍ່ມື້)",
+    "tp_late": "ຄ່າປັບຈ່າຍຊ້າ (% ຕໍ່ມື້)",
     "tp_cleaning": "ຄ່າທຳຄວາມສະອາດ, ເລີ່ມຈາກ",
     "tp_smoking": "ຄ່າປັບສູບຢາ, ສູງສຸດ",
     "tp_repairs": "ຄ່າສ້ອມແປງທີ່ລູກຄ້າອະນຸມັດໄດ້, ສູງສຸດ",
@@ -4806,7 +4882,14 @@
     "ba_or": "ຫຼື",
     "ba_ownLabel": "ເຊື່ອມຕໍ່ໂດເມນຂອງທ່ານເອງ",
     "bt_showName": "ສະແດງຊື່ຮ້ານຂ້າງໂລໂກ້",
-    "bt_showNameHint": "ເມື່ອປິດໄວ້ ໂລໂກ້ແນວນອນຈະສະແດງດ່ຽວໆ ສ່ວນໂລໂກ້ສີ່ຫຼ່ຽມຈະມີຊື່ຮ້ານຢູ່ຂ້າງໆ. ກົດເຜີຍແຜ່ເພື່ອໃຫ້ມີຜົນ."
+    "bt_showNameHint": "ເມື່ອປິດໄວ້ ໂລໂກ້ແນວນອນຈະສະແດງດ່ຽວໆ ສ່ວນໂລໂກ້ສີ່ຫຼ່ຽມຈະມີຊື່ຮ້ານຢູ່ຂ້າງໆ. ກົດເຜີຍແຜ່ເພື່ອໃຫ້ມີຜົນ.",
+    "reg_confirmCurrency": "ລາຄາລົດຈະສະແດງເປັນ {to} ແຕ່ຈະບໍ່ຖືກແປງຄ່າ. ການຈອງທີ່ມີຢູ່ຍັງຄົງເປັນ {from}.",
+    "reg_confirmCountry": "ການປ່ຽນນີ້ຈະປ່ຽນສະກຸນເງິນເປັນ {currency}, ເຂດເວລາເປັນ {zone}, ຫົວໜ່ວຍໄລຍະທາງເປັນ {unit} ແລະ VAT ເປັນ {vat}% ນຳ.",
+    "reg_confirmChange": "ປ່ຽນ",
+    "reg_confirmCancel": "ຍົກເລີກ",
+    "tp_lateReturnPerDay": "ຄ່າປັບສົ່ງລົດຄືນຊ້າຕໍ່ມື້",
+    "ag_n_lateReturn": "ຄ່າປັບສົ່ງລົດຄືນຊ້າ",
+    "ag_n_perDay": "{amount} ຕໍ່ມື້"
   },
   "accountPage": {
     "roleOwner": "ເຈົ້າຂອງ",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "ເພີ່ມລາຍເຊັນຂອງທ່ານຄັ້ງດຽວ ແລ້ວລູກຄ້າເຊັນສັນຍາເຊົ່າໃນມືຖືໄດ້ເລີຍ.",
     "nudgePaymentMethods": "ເພີ່ມຊ່ອງທາງທີ່ລູກຄ້າຊຳລະເງິນໄດ້ (ບັນຊີທະນາຄານ, Wise, Revolut ຫຼື PromptPay) ເພື່ອໃຫ້ລູກຄ້າຊຳລະໄດ້ທັນທີຈາກໜ້າຈອງ.",
     "extensionHoldReturning": "{customer} ບໍ່ຕໍ່ສັນຍາ: {vehicle} ຈະສົ່ງຄືນວັນທີ {date}. ມື້ຫຼັງຈາກນັ້ນເປີດໃຫ້ຈອງໄດ້ອີກ.",
-    "reviewReceived": "{customer} ໃຫ້ລີວິວ {rating} ດາວ."
+    "reviewReceived": "{customer} ໃຫ້ລີວິວ {rating} ດາວ.",
+    "handoverReportSigned": "{customer} ເຊັນລາຍງານສົ່ງມອບ {vehicle} ແລ້ວ.",
+    "returnReportSigned": "{customer} ເຊັນລາຍງານຮັບ {vehicle} ຄືນແລ້ວ."
   },
   "handoverPay": {
     "title": "ຊຳລະເງິນ",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "ຮັບລົດທີ່ {business}. ຢ່າລືມນຳໃບຂັບຂີ່ ແລະ ໜັງສືຜ່ານແດນມາ.",
     "spec_year": "ປີ",
     "spec_deposit": "ເງິນມັດຈຳ",
-    "fleet_perMonth": "{amount} ຕໍ່ເດືອນ"
+    "fleet_perMonth": "{amount} ຕໍ່ເດືອນ",
+    "photo_credit": "ຮູບໂດຍ <author>{name}</author> ໃນ <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "ໜ້າຕາ",
@@ -8097,7 +8183,21 @@
     "role_muted": "ຂໍ້ຄວາມຮອງ",
     "role_dark": "ສ່ວນສີເຂັ້ມ",
     "pal_autoSummary": "ສີຂອງແມ່ແບບ",
-    "noReviewsYet": "ຍັງບໍ່ມີຣີວິວ"
+    "noReviewsYet": "ຍັງບໍ່ມີຣີວິວ",
+    "img_stock": "ຮູບສະຕັອກ",
+    "img_uploadPhoto": "ອັບໂຫຼດຮູບ",
+    "stock_credit": "ຮູບໂດຍ <author>{name}</author> ໃນ <unsplash>Unsplash</unsplash>",
+    "stock_failed": "ໂຫຼດຮູບບໍ່ໄດ້. ລອງໃໝ່.",
+    "stock_loading": "ກຳລັງໂຫຼດຮູບ…",
+    "stock_more": "ຮູບເພີ່ມເຕີມ",
+    "stock_none": "ບໍ່ພົບຮູບ. ລອງຄົ້ນຫາຄຳອື່ນ.",
+    "stock_note": "ຮູບຟຣີຈາກ <unsplash>Unsplash</unsplash>. ເວັບໄຊຂອງທ່ານຈະໃຫ້ເຄຣດິດຊ່າງພາບ.",
+    "stock_off": "ຍັງບໍ່ໄດ້ຕັ້ງຄ່າຮູບສະຕັອກ.",
+    "stock_rateLimited": "ຄົ້ນຫາໃນ Unsplash ຄົບໂຄຕາລາຍຊົ່ວໂມງແລ້ວ. ລອງໃໝ່ອີກຈັກໜ່ອຍ.",
+    "stock_search": "ຄົ້ນຫາຮູບ",
+    "stock_suggested": "ຄຳຄົ້ນຫາແນະນຳ",
+    "stock_use": "ໃຊ້ຮູບ: {photo}",
+    "stock_useBy": "ໃຊ້ຮູບຂອງ {name}"
   },
   "roveListing": {
     "title": "ສະແດງລົດຂອງທ່ານໃນ rove.rent ແລະ ຮັບການຈອງຈາກທີ່ນັ້ນບໍ?",

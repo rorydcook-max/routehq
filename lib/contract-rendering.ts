@@ -259,6 +259,7 @@ export const contractVariableKeys = [
   "mileage_limit",
   "fuel_charge_per_increment",
   "late_fee_percentage",
+  "late_return_fee_per_day",
   "cleaning_fee_minimum",
   "smoking_fee_maximum",
   "emergency_repair_limit",
@@ -667,6 +668,10 @@ export function buildContractVariables({
     deposit_return_days_enabled: feeOn(settings, "deposit_return_days"),
     fuel_charge_per_increment: formatAmount(settings.fuel_charge_per_increment),
     late_fee_percentage: formatAmount(settings.late_fee_percentage),
+    // Only in the agreement when the business set one (Settings > Rental terms); otherwise it is priced at the return.
+    late_return_fee_enabled: Boolean(settings.late_return_fee_per_day),
+    // Cents kept (€12.50 a day, not €13).
+    late_return_fee_per_day: settings.late_return_fee_per_day ? new Intl.NumberFormat("en-US", { minimumFractionDigits: Number.isInteger(settings.late_return_fee_per_day) ? 0 : 2, maximumFractionDigits: 2 }).format(settings.late_return_fee_per_day) : "",
     cleaning_fee_minimum: formatAmount(settings.cleaning_fee_minimum),
     smoking_fee_maximum: formatAmount(settings.smoking_fee_maximum),
     emergency_repair_limit: formatAmount(settings.emergency_repair_limit),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, type ReactNode } from "react";
+import { useEffect, useState, useTransition, type ReactNode } from "react";
 import { currencySymbol } from "@/components/currency-symbol";
 import { InfoTip } from "@/components/info-tip";
 import { createPortal } from "react-dom";
@@ -129,6 +129,17 @@ export function CancelBookingButton({
     setError("");
     setOpen(false);
   }
+
+  // Escape or a tap outside closes it, as other sheets do (real-user test, 8 Nov 2026). Not while it is saving.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !isPending) reset();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isPending]);
 
   function handleReasonNext() {
     if (reasons.length === 0) { setError(say("cn_pickReason")); return; }
@@ -281,7 +292,12 @@ export function CancelBookingButton({
           sheet, and the phone menu covered its buttons. It scrolls on its own and clears the menu and home bar. */}
       {open && typeof document !== "undefined" ? createPortal(
         <div className="fixed inset-0 z-[70] overflow-y-auto overscroll-contain bg-[var(--foreground)]/60" role="dialog" aria-modal="true">
-          <div className="flex min-h-full items-end justify-center p-3 pb-[calc(12px+env(safe-area-inset-bottom))] sm:items-center">
+          <div
+            className="flex min-h-full items-end justify-center p-3 pb-[calc(12px+env(safe-area-inset-bottom))] sm:items-center"
+            onClick={(event) => {
+              if (event.target === event.currentTarget && !isPending) reset();
+            }}
+          >
           <div className="w-full max-w-lg rounded-2xl border border-[var(--danger-line)] bg-white shadow-2xl">
 
             <div className="flex items-start gap-3 border-b border-[var(--danger-line)] bg-[var(--danger-light)] p-4 rounded-t-2xl">

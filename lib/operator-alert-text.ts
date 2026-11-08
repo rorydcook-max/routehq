@@ -44,6 +44,8 @@ export type AlertKey =
   | "onlineBooking"
   | "planActive"
   | "vehicleChangeSigned"
+  | "handoverReportSigned"
+  | "returnReportSigned"
   | "holdEnded"
   | "referral"
   | "setupDone"

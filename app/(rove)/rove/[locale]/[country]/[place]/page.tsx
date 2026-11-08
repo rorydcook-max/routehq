@@ -10,6 +10,7 @@ import { roveLocale, roveMoney } from "@/lib/rove/static";
 import { sizedPhoto } from "@/lib/photo-url";
 import { Breadcrumbs } from "../../_components/breadcrumbs";
 import { CountryRulesList, SourceList } from "../../_components/country-rules";
+import { Icon } from "../../_components/icon";
 import { JsonLd } from "../../_components/json-ld";
 import { PlaceArt, PlaceCredit, placePhoto } from "../../_components/place-art";
 import { SearchForm } from "../../_components/search-form";
@@ -165,7 +166,7 @@ export default async function DestinationPage({ params }: Props) {
         ) : (
           <div className={s.tellBox} style={{ marginTop: 16 }}>
             <span aria-hidden="true" className={s.emptyIcon}>
-              <i className="ti ti-building-store" />
+              <Icon name="building-store" />
             </span>
             <h3 className={s.emptyTitle}>{t("rv.tellTitle")}</h3>
             <p className={s.emptyBody}>{t("rv.tellBody", { place: destination.name })}</p>

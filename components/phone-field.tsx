@@ -22,7 +22,8 @@ export function PhoneField({
   inputClass = "",
   onCountryFound,
   followCountry,
-  onValueChange
+  onValueChange,
+  keepWords = false
 }: {
   codeName?: string;
   inputName?: string;
@@ -37,6 +38,8 @@ export function PhoneField({
   followCountry?: string;
   /** The whole number in international form ("+66812345678"), or "" when empty, as it changes. */
   onValueChange?: (international: string) => void;
+  /** Send words typed in ("call me maybe") as they are, so the save can say "Check the phone number." instead of dropping them. */
+  keepWords?: boolean;
 }) {
   const t = useTranslations("customers");
   const locale = useLocale();
@@ -95,7 +98,7 @@ export function PhoneField({
   return (
     <div className="grid grid-cols-[auto_1fr] gap-2">
       <input name={codeName} type="hidden" value={current?.phoneCode || ""} />
-      <input name={inputName} type="hidden" value={national} />
+      <input name={inputName} type="hidden" value={keepWords && /[^\d\s+\-().]/.test(text) ? text.trim() : national} />
       {/* The country: a small button showing the flag and code, with the full alphabetical list behind it. */}
       {/* Drawn like the fields next to it (their border comes from the global field style, which a div doesn't get). */}
       <div

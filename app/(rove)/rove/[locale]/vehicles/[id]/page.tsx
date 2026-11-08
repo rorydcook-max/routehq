@@ -12,6 +12,7 @@ import { roveAbsolute, roveMetadata, roveOrigin } from "@/lib/rove/seo";
 import { sizedPhoto } from "@/lib/photo-url";
 import { roveDate, roveLocale, roveMoney } from "@/lib/rove/static";
 import { Breadcrumbs } from "../../_components/breadcrumbs";
+import { Icon } from "../../_components/icon";
 import { JsonLd } from "../../_components/json-ld";
 import { bookingHref, OperatorMark, VehicleCard, vehicleFacts, VehiclePhoto } from "../../_components/vehicle-card";
 import s from "../../rove.module.css";
@@ -166,13 +167,13 @@ export default async function VehiclePage({ params, searchParams }: Props) {
           <ul className={s.vehicleMeta}>
             {facts.map((fact) => (
               <li key={fact.text}>
-                <i aria-hidden="true" className={`ti ${fact.icon}`} />
+                <Icon name={fact.icon} />
                 {fact.text}
               </li>
             ))}
             {deliveryKm > 0 ? (
               <li>
-                <i aria-hidden="true" className="ti ti-truck-delivery" />
+                <Icon name="truck-delivery" />
                 {t("rv.delivers")}
               </li>
             ) : null}
@@ -212,23 +213,23 @@ export default async function VehiclePage({ params, searchParams }: Props) {
             <ul className={s.included}>
               {deliveryKm > 0 ? (
                 <li>
-                  <i aria-hidden="true" className="ti ti-truck-delivery" />
+                  <Icon name="truck-delivery" />
                   <span>{t("rv.includedDelivery", { km: Math.round(deliveryKm), place })}</span>
                 </li>
               ) : (
                 <li>
-                  <i aria-hidden="true" className="ti ti-map-pin" />
+                  <Icon name="map-pin" />
                   <span>{t("rv.includedPickup", { place })}</span>
                 </li>
               )}
               <li>
-                <i aria-hidden="true" className="ti ti-message-circle" />
+                <Icon name="message-circle" />
                 <span>{t("rv.includedDirect", { business: business.name })}</span>
               </li>
               {/* Thailand's compulsory motor insurance: only for vehicles of a business in Thailand. */}
               {business.country.toLowerCase() === "thailand" ? (
                 <li>
-                  <i aria-hidden="true" className="ti ti-shield-check" />
+                  <Icon name="shield-check" />
                   <span>{t("rv.includedCmi", { business: business.name })}</span>
                 </li>
               ) : null}

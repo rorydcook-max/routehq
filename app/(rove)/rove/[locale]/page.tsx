@@ -3,12 +3,12 @@ import { getTranslations } from "next-intl/server";
 import { COUNTRIES, DESTINATIONS, destinationPath, type Destination } from "@/lib/rove/destinations";
 import { localizedGuides } from "@/lib/rove/guides";
 import { sizedPhoto } from "@/lib/photo-url";
-import { distanceKm } from "@/lib/place-coords";
-import { loadMarket, nextFree, quoteFor, reachFrom, roveToday, type RoveVehicle } from "@/lib/rove/market";
+import { basedIn, liveDestinations, loadMarket, nextFree, quoteFor, reachFrom, roveToday, type RoveVehicle } from "@/lib/rove/market";
 import { roveHasLocale, roveHref } from "@/lib/rove/paths";
 import { itemListLd, roveMetadata } from "@/lib/rove/seo";
 import { roveLocale, roveMoney, type RoveParams } from "@/lib/rove/static";
 import { listFleetHref } from "./_components/header";
+import { Icon } from "./_components/icon";
 import { JsonLd } from "./_components/json-ld";
 import { PlaceArt } from "./_components/place-art";
 import { SearchForm } from "./_components/search-form";
@@ -70,14 +70,10 @@ export default async function RoveHome({ params }: RoveParams) {
   const thumbVehicle = withPhotos.find((row) => row.vehicle.business.organizationId !== heroVehicle?.business.organizationId)?.vehicle || withPhotos[1]?.vehicle || null;
   const money = (vehicle: RoveVehicle, value: number) => roveMoney(value, vehicle.business.currency, locale);
 
-  // Popular destinations: places with live listings first (most first), then the curated set, five in all.
-  const near = (destination: Destination, vehicle: RoveVehicle) => Boolean(vehicle.area) && distanceKm(destination.center, vehicle.area as { lat: number; lng: number }) <= destination.radiusKm;
-  const counted = DESTINATIONS.map((destination) => {
-    const here = market.vehicles.filter((vehicle) => near(destination, vehicle));
-    return { destination, count: here.length, photo: here.find(realPhoto) || null };
-  });
-  const live = counted.filter((row) => row.count > 0).sort((a, b) => b.count - a.count);
-  const curated = CURATED.map((key) => counted.find((row) => `${row.destination.country}/${row.destination.slug}` === key)).filter((row): row is (typeof counted)[number] => Boolean(row) && !live.includes(row!));
+  // Popular destinations: places with live listings (most first). Only when fewer than five have any does the curated
+  // set fill the row; those pages have no listings yet (not indexed), so they stay out of the ItemList for search engines.
+  const live = liveDestinations(DESTINATIONS, market.vehicles).map((row) => ({ ...row, photo: market.vehicles.find((vehicle) => basedIn(row.destination, vehicle) && realPhoto(vehicle)) || null }));
+  const curated = live.length >= 5 ? [] : CURATED.map((key) => DESTINATIONS.find((destination) => `${destination.country}/${destination.slug}` === key)).filter((destination): destination is Destination => Boolean(destination) && !live.some((row) => row.destination === destination)).map((destination) => ({ destination, count: 0, photo: null }));
   const places = [...live, ...curated].slice(0, 5);
 
   // Long stays: the listed vehicle whose monthly price saves most against its day price (photos preferred).
@@ -88,7 +84,7 @@ export default async function RoveHome({ params }: RoveParams) {
 
   return (
     <>
-      <JsonLd data={itemListLd(t("rv.placesTitle"), places.map(({ destination }) => ({ name: destination.name, path: destinationPath(destination) })), "en")} />
+      {places.some((row) => row.count > 0) ? <JsonLd data={itemListLd(t("rv.placesTitle"), places.filter((row) => row.count > 0).map(({ destination }) => ({ name: destination.name, path: destinationPath(destination) })), "en")} /> : null}
 
       <section className={s.hero}>
         <div className={s.wrap}>
@@ -99,7 +95,7 @@ export default async function RoveHome({ params }: RoveParams) {
               <ul className={s.heroPoints}>
                 {(["heroPoint1", "heroPoint2", "heroPoint3"] as const).map((key) => (
                   <li key={key}>
-                    <i aria-hidden="true" className="ti ti-circle-check" />
+                    <Icon name="circle-check" />
                     {t(`rv.${key}`)}
                   </li>
                 ))}
@@ -108,7 +104,8 @@ export default async function RoveHome({ params }: RoveParams) {
             <div className={s.heroVisual}>
               <div className={s.heroPhoto}>
                 {heroVehicle ? (
-                  <VehiclePhoto eager label={vehicleTitle(heroVehicle, t)} sizes="(min-width: 900px) 560px, 92vw" vehicle={heroVehicle} />
+                  // On a phone the photo sits inside the hero panel's padding, about 82% of the screen (it said 92vw, so a size up loaded).
+                  <VehiclePhoto eager label={vehicleTitle(heroVehicle, t)} sizes="(min-width: 900px) 560px, 85vw" vehicle={heroVehicle} />
                 ) : (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img alt="Toyota Corolla" fetchPriority="high" sizes="(min-width: 900px) 560px, 92vw" src="/site/vehicles/toyota-corolla.webp" srcSet="/site/vehicles/toyota-corolla-thumb.webp 400w, /site/vehicles/toyota-corolla.webp 1200w" />
@@ -182,15 +179,15 @@ export default async function RoveHome({ params }: RoveParams) {
             <ul className={s.valueList}>
               {(
                 [
-                  ["Local", "ti-building-store"],
-                  ["Monthly", "ti-calendar-repeat"],
-                  ["Price", "ti-receipt-off"],
-                  ["Direct", "ti-message-circle"]
+                  ["Local", "building-store"],
+                  ["Monthly", "calendar-repeat"],
+                  ["Price", "receipt-off"],
+                  ["Direct", "message-circle"]
                 ] as const
               ).map(([key, icon]) => (
                 <li className={s.valueItem} key={key}>
                   <span aria-hidden="true" className={s.valueIcon}>
-                    <i className={`ti ${icon}`} />
+                    <Icon name={icon} />
                   </span>
                   <div>
                     <h3 className={s.valueTitle}>{t(`rv.value${key}Title`)}</h3>
@@ -254,7 +251,7 @@ export default async function RoveHome({ params }: RoveParams) {
             <ul className={s.checks}>
               {(["monthlyCheck1", "monthlyCheck2", "monthlyCheck3"] as const).map((key) => (
                 <li key={key}>
-                  <i aria-hidden="true" className="ti ti-circle-check" />
+                  <Icon name="circle-check" />
                   <span>{t(`rv.${key}`)}</span>
                 </li>
               ))}

@@ -22,13 +22,16 @@ export type CookieWords = {
 
 /**
  * The cookie notice (3 Nov 2026), on the website (rovehq.io) and the platform (rovehq.app, 4 Nov 2026: each domain
- * keeps its own choice). Drawn only in the browser, so the prerendered pages stay the same for everyone: hidden until
- * we know the visitor hasn't chosen yet. Accept and Reject are the same size and weight (ICO, EDPB); nothing behind it
+ * keeps its own choice). The same in every prerendered page; a visitor who has already chosen has it hidden before the
+ * first paint (consentChosenScript in each layout's <head>), and taken away once the page's scripts run. Accept and Reject are the same size and weight (ICO, EDPB); nothing behind it
  * is covered or blocked. "Cookie choices" (the website's footer, My account in the app) opens it again.
  * Never shown on customer booking pages: nothing optional runs there (components/google-tag-manager.tsx).
  */
 export function CookieBanner({ words }: { words: CookieWords }) {
-  const [open, setOpen] = useState(false);
+  // Drawn with the page (task perf, 8 Nov 2026), not after its scripts have loaded: it was the last thing to appear on
+  // a phone, seconds after everything else. The same for everyone, so cached pages still work: lib/consent.ts
+  // consentChosenScript (in the layout's <head>) hides it before the first paint for a visitor who has already chosen (html[data-consent-set], cookie-banner.module.css).
+  const [open, setOpen] = useState(true);
   const [details, setDetails] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const titleId = useId();
@@ -37,8 +40,9 @@ export function CookieBanner({ words }: { words: CookieWords }) {
   useEffect(() => {
     exposeConsentApi();
     const current = getConsent();
-    if (!current) setOpen(true);
+    if (current) setOpen(false);
     const reopen = () => {
+      document.documentElement.removeAttribute("data-consent-set");
       setAnalytics(Boolean(getConsent()?.analytics));
       setDetails(true);
       setOpen(true);
@@ -56,8 +60,9 @@ export function CookieBanner({ words }: { words: CookieWords }) {
   };
 
   return (
-    // light-island: the same light card in the app's dark mode (theme-dark.css), as on the website.
-    <section aria-labelledby={titleId} className={`light-island ${c.banner}`} role="region">
+    <>
+      {/* light-island: the same light card in the app's dark mode (theme-dark.css), as on the website. */}
+      <section aria-labelledby={titleId} className={`light-island ${c.banner}`} role="region">
       <p className={c.body} id={titleId}>
         {words.body}{" "}
         <a className={c.policy} href={words.policyHref}>
@@ -103,6 +108,7 @@ export function CookieBanner({ words }: { words: CookieWords }) {
           </button>
         </div>
       )}
-    </section>
+      </section>
+    </>
   );
 }

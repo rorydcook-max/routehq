@@ -1,28 +1,55 @@
-import { daysBetween, quoteStay, rentalRateCard } from "@/lib/rental-estimate";
+import { daysBetween, rentalRateCard, roundQuote } from "@/lib/rental-estimate";
 
 /**
  * A vehicle brought back after the booked return date, mirroring an early handover: one question on the
- * return form. The extra days are priced from this booking's rates (whole days, as rent; a monthly booking
- * pays the pro-rata day price, as an extension would), and the owner can change the figure and either
- * take it from the deposit, charge it to the renter (an amount due, payable at the return), or waive it.
- * Before this, a late return kept the old end date and was never charged.
+ * return form. The owner can change the suggested figure and either take it from the deposit, charge it to
+ * the renter (an amount due, payable at the return), or waive it (agreed with the renter beforehand).
+ *
+ * The suggested figure, per late day (Rory, 8 Nov 2026):
+ *   1. the business's "Late return fee per day" (Settings > Rental terms), when one is set;
+ *   2. otherwise the vehicle's day rate (the booking's agreed day rate on a daily booking);
+ *   3. otherwise the monthly rate x 12 / 365 (a weekly-only vehicle: the weekly rate / 7).
+ * Rounded once on the total, as quotes are: baht to the nearest 10, other currencies to their minor unit.
  */
 
 export type LateReturnChoice = "deposit" | "charge" | "waive";
 
-export type LateReturn = { days: number; amount: number; bookedEnd: string };
+export type LateReturn = { days: number; amount: number; bookedEnd: string; perDay: number; basis: "setting" | "daily" | "monthly" | "weekly" | "none" };
+
+/** The business's late return fee per day (organizations.settings.late_return_fee_per_day), or null when not set. */
+export function lateFeePerDaySetting(settings: Record<string, any> | null | undefined): number | null {
+  const value = Number(settings?.late_return_fee_per_day);
+  return Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : null;
+}
+
+/** The same, read from the business's settings. */
+export async function lateFeePerDayFor(supabase: any, organizationId: string): Promise<number | null> {
+  const { data } = await supabase.from("organizations").select("settings").eq("id", organizationId).maybeSingle();
+  return lateFeePerDaySetting(data?.settings);
+}
 
 export function lateReturnFor(
   rental: { end_date?: unknown; rental_rate?: unknown; pricing_model?: unknown; billing_interval?: unknown; currency?: unknown } | null | undefined,
   vehicle: { daily_rate?: unknown; weekly_rate?: unknown; monthly_rate?: unknown } | null | undefined,
-  today: string
+  today: string,
+  feePerDay?: number | null
 ): LateReturn | null {
   const bookedEnd = rental?.end_date ? String(rental.end_date).slice(0, 10) : "";
   if (!bookedEnd || bookedEnd >= today) return null;
   const days = daysBetween(bookedEnd, today);
-  // Rounded as the booking's currency is (baht to 10, other currencies to the cent).
-  const quote = rental?.currency ? quoteStay(rentalRateCard(vehicle, rental || {}), days, String(rental.currency)) : quoteStay(rentalRateCard(vehicle, rental || {}), days);
-  return { days, amount: quote?.amount || 0, bookedEnd };
+  const card = rentalRateCard(vehicle, rental || {});
+  const setting = Number(feePerDay) > 0 ? Number(feePerDay) : 0;
+  const [perDay, basis]: [number, LateReturn["basis"]] = setting
+    ? [setting, "setting"]
+    : card.dailyRate > 0
+      ? [card.dailyRate, "daily"]
+      : card.monthlyRate > 0
+        ? [(card.monthlyRate * 12) / 365, "monthly"]
+        : card.weeklyRate > 0
+          ? [card.weeklyRate / 7, "weekly"]
+          : [0, "none"];
+  const amount = perDay > 0 ? Math.max(0, roundQuote(perDay * days, rental?.currency ? String(rental.currency) : undefined)) : 0;
+  return { days, amount, bookedEnd, perDay, basis };
 }
 
 export function asLateReturnChoice(value: unknown): LateReturnChoice | null {

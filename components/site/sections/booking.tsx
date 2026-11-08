@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { BadgeCheck, CalendarX, CreditCard, MapPin, ShieldCheck, Truck, Wallet } from "lucide-react";
-import { Catalog } from "@/app/(app)/rent/[slug]/catalog";
+import { Catalog } from "@/app/(rent)/rent/[slug]/catalog";
 import { cardRates } from "@/lib/rental-estimate";
 import { bookingPanelVars } from "@/lib/sites/palettes";
 import { kindsOffered } from "@/lib/sites/format";

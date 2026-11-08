@@ -444,9 +444,15 @@
     "lateBackCharge": "Late charge",
     "lateBackFromDeposit": "Take from deposit",
     "lateBackChargeRenter": "Charge the renter",
-    "lateBackWaive": "Waive",
+    "lateBackWaive": "Waive (agreed with the renter)",
     "lateBackOverDeposit": "The deposit left covers up to {amount}.",
-    "lateBackRow": "{count, plural, one {# day late} other {# days late}}"
+    "lateBackRow": "{count, plural, one {# day late} other {# days late}}",
+    "customerNotPresent": "Customer not present",
+    "customerNotPresentNote": "They'll be sent a link to sign the report.",
+    "waitingSignature": "Waiting for customer signature",
+    "resendSignatureLink": "Resend signature link",
+    "signatureLinkSent": "Link sent",
+    "signatureLinkNotSent": "Not sent automatically. Send it from the booking's messages."
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -965,7 +971,35 @@
     "bs_demoBanner": "Demo business, example only. Bookings are turned off.",
     "bs_demoNoBooking": "This is a demo business, so bookings are turned off.",
     "reason_late_return": "late return",
-    "actionFailed": "That wasn't sent. Check your connection and try again."
+    "actionFailed": "That wasn't sent. Check your connection and try again.",
+    "stillNeeded": "Still needed: {items}",
+    "need_agreeTick": "Agreement tick",
+    "idType": "ID document",
+    "idType_passport": "Passport",
+    "idType_national_id": "National ID card",
+    "idCardNumber": "ID card number",
+    "passportNo": "Passport number",
+    "reportTitle_delivery": "Handover report",
+    "reportTitle_return": "Return report",
+    "reportToSign_delivery": "Sign your handover report",
+    "reportToSign_return": "Sign your return report",
+    "reportSeeAndSign": "Check the photos and details, then sign.",
+    "reportOdometer": "Odometer",
+    "reportFuel": "Fuel",
+    "reportPhotos": "Photos",
+    "reportDamage": "Damage",
+    "reportNoDamage": "No damage noted.",
+    "reportDeposit": "Deposit",
+    "reportDepositHeld": "Held",
+    "reportDeducted": "Deducted",
+    "reportRefunded": "Returned to you",
+    "reportConsent": "I confirm the vehicle's condition is as recorded in this report.",
+    "reportSign": "Sign the report",
+    "reportSignedTitle": "Report signed",
+    "reportSignedOn": "Signed by {name}, {date}.",
+    "reportDownload": "Download the report",
+    "reportNotFoundTitle": "Report not found",
+    "reportNotFoundMessage": "Ask the rental business for a new link."
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -1042,7 +1076,9 @@
     "cancelNoRefund": "There is no refund.",
     "cancelDepositBack": "Your {amount} deposit is being returned.",
     "cancelDepositPart": "{returned} of your {held} deposit is being returned.",
-    "cancelDepositKept": "Your {amount} deposit has been kept."
+    "cancelDepositKept": "Your {amount} deposit has been kept.",
+    "signHandoverReport": "your handover report for the {vehicle} is ready to check and sign: {link}",
+    "signReturnReport": "your return report for the {vehicle} is ready to check and sign: {link}"
   },
   "common": {
     "kinds_car": "Cars",
@@ -1274,7 +1310,8 @@
     "collect_extension": "Collect extension",
     "collect_extras": "Collect extras",
     "job_review": "Review from {name} to check",
-    "job_review_open": "Open reviews"
+    "job_review_open": "Open reviews",
+    "job_inspection_signature": "Customer signature needed: {ref}"
   },
   "bookings": {
     "eyebrow": "Bookings",
@@ -1355,7 +1392,8 @@
     "deleteRecordsInspections": "Handover and return checks, with photos: {count}",
     "deleteRecordsSigned": "The signed agreement",
     "deleteRecordsBody": "This can't be undone.",
-    "deleteAnyway": "Delete anyway"
+    "deleteAnyway": "Delete anyway",
+    "emptyNone": "No bookings yet."
   },
   "inbox": {
     "title": "Inbox",
@@ -2536,7 +2574,17 @@
     "fin_cancelledSettled": "Refunds recorded. Nothing left to settle.",
     "share_send": "Send booking link",
     "hist_late_return": "Returned late",
-    "cp_noteFailed": "The note wasn't saved. Try again."
+    "cp_noteFailed": "The note wasn't saved. Try again.",
+    "contact": "Contact",
+    "contactOpen": "Open",
+    "pc_refundBtn": "Refund",
+    "pc_refundAmount": "Refund amount",
+    "pc_refundConfirm": "Record refund",
+    "pc_refundDone": "Refund recorded.",
+    "pc_refundEnter": "Enter the refund amount.",
+    "pc_refundMax": "The most you can refund from this payment is {amount}.",
+    "pc_refundFailed": "The refund wasn't saved. Try again.",
+    "walkInNoPayment": "Walk-in rental recorded."
   },
   "newBooking": {
     "docsSelfie": "Photo of the customer",
@@ -2786,7 +2834,12 @@
     "saveRate_monthly": "Save {amount} a month as this vehicle's price",
     "extraFree": "Free",
     "clashHeld": "Held for extension: {who} wants to extend. Confirm or release the hold first.",
-    "clashHeldRenter": "the renter"
+    "clashHeldRenter": "the renter",
+    "startMoved": "Starts {date}, the day this vehicle is free.",
+    "endBeforeStart": "The return date must be after the start date.",
+    "freeQ": "Book for free?",
+    "freeYes": "Book for free",
+    "errAmountReceived": "Enter the amount received."
   },
   "fleet": {
     "title": "Fleet",
@@ -2862,7 +2915,10 @@
     "qp_save": "Save",
     "qp_cancel": "Cancel",
     "qp_failed": "Couldn't save the price. Try again.",
-    "assistant": "Assistant"
+    "assistant": "Assistant",
+    "bandArchived": "archived",
+    "status_Archived": "Archived",
+    "noticeArchiveLive": "Some of these vehicles have bookings that haven't finished. Move them to another vehicle or cancel them first."
   },
   "customers": {
     "sel_nationality": "Nationality",
@@ -2949,7 +3005,11 @@
     "in_avgLength": "Average length",
     "in_avgSpend": "Average spend",
     "pillReviews": "{count, plural, one {# review} other {# reviews}}",
-    "sel_needContact": "Add a name and one way to reach them: a phone number, Messenger, LINE, Telegram or email."
+    "sel_needContact": "Add a name and one way to reach them: a phone number, Messenger, LINE, Telegram, Instagram or email.",
+    "sel_messengerNameOnly": "Their name or profile link",
+    "sel_lineIdOnly": "LINE ID or phone",
+    "sel_telegramIdOnly": "Telegram username or phone",
+    "sel_instagram": "Instagram username"
   },
   "calendar": {
     "title": "Calendar",
@@ -3049,7 +3109,7 @@
     "vs_reserved": "Booked",
     "vs_maintenance": "In the shop",
     "vs_available": "Free",
-    "vs_inactive": "Not in use",
+    "vs_inactive": "Archived",
     "vs_retired": "Not in use",
     "c_tax": "Road tax",
     "c_porbor": "Compulsory insurance (Por Ror Bor)",
@@ -3394,7 +3454,8 @@
     "tl_out": "Out with {name}",
     "tl_service": "Service",
     "tl_repair": "Repair",
-    "tl_damage": "Damage found on return: {count, plural, one {# item} other {# items}}"
+    "tl_damage": "Damage found on return: {count, plural, one {# item} other {# items}}",
+    "unarchive": "Unarchive"
   },
   "customerPage": {
     "back": "Customers",
@@ -3496,7 +3557,7 @@
     "n_placeholder": "Anything worth remembering: preferences, payment habits, reminders",
     "n_auto": "Saves when you tap away",
     "new_title": "Add customer",
-    "new_subtitle": "A name and phone number are enough. Add the rest now or later.",
+    "new_subtitle": "A name and one way to reach them are enough. Add the rest now or later.",
     "new_chatTitle": "Chat apps and email",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, email",
     "new_whatsappHint": "Leave empty if it is the same as their phone.",
@@ -3601,7 +3662,14 @@
     "tl_review": "Left a review: {rating}/5",
     "new_phoneHint": "Not needed if you add Messenger, LINE, Telegram, Instagram or email below.",
     "dnr_failed": "That wasn't saved. Try again.",
-    "message": "Message"
+    "message": "Message",
+    "dupContact": "{name} is already saved with these contact details.",
+    "f_licenceClass": "License class",
+    "f_idType": "ID document",
+    "f_idType_passport": "Passport",
+    "f_idType_national_id": "National ID card",
+    "f_idCardNo": "ID card number",
+    "f_idCardExpiry": "ID card runs out"
   },
   "vehicleForm": {
     "addTitle": "Add vehicle",
@@ -3776,7 +3844,9 @@
     "qp_add": "Add",
     "backSetup": "Setup",
     "quickSubtitle": "Just the basics. Only type, make and model are needed.",
-    "quickLater": "Tax and insurance dates, mileage, loan and more can be added later from Fleet."
+    "quickLater": "Tax and insurance dates, mileage, loan and more can be added later from Fleet.",
+    "archivedNow": "This vehicle is archived.",
+    "unarchiveBtn": "Unarchive"
   },
   "bookingEdit": {
     "booking": "Booking",
@@ -4056,7 +4126,7 @@
     "tp_km": "Distance allowed per month (km)",
     "tp_kmMi": "Miles allowed per month",
     "tp_fuel": "Fuel per 1/8 tank missing",
-    "tp_late": "Late return fee (% per day)",
+    "tp_late": "Late payment fee (% per day)",
     "tp_cleaning": "Cleaning fee, from",
     "tp_smoking": "Smoking fee, up to",
     "tp_repairs": "Repairs the customer may approve, up to",
@@ -4786,7 +4856,14 @@
     "bt_showNameHint": "When this is off, a wide logo shows on its own and a square logo gets your name beside it. Publish to make it live.",
     "ba_subLabel": "Subdomain",
     "ba_or": "or",
-    "ba_ownLabel": "Connect a custom domain"
+    "ba_ownLabel": "Connect a custom domain",
+    "reg_confirmCurrency": "Vehicle prices will be shown in {to} but not converted. Existing bookings stay in {from}.",
+    "reg_confirmCountry": "This also changes the currency to {currency}, the time zone to {zone}, distances to {unit} and VAT to {vat}%.",
+    "reg_confirmChange": "Change",
+    "reg_confirmCancel": "Cancel",
+    "tp_lateReturnPerDay": "Late return fee per day",
+    "ag_n_lateReturn": "Late return fee",
+    "ag_n_perDay": "{amount} per day"
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -7592,7 +7669,9 @@
     "nudgeSignature": "Add your signature once, and customers can sign the rental agreement on their phone.",
     "nudgePaymentMethods": "Add how customers can pay you (bank details, Wise, Revolut or PromptPay) so they can pay straight from their booking page.",
     "extensionHoldReturning": "{customer} isn't extending: the {vehicle} is due back on {date}. The days after it are open for booking again.",
-    "reviewReceived": "{customer} left a {rating}-star review."
+    "reviewReceived": "{customer} left a {rating}-star review.",
+    "handoverReportSigned": "{customer} signed the handover report for the {vehicle}.",
+    "returnReportSigned": "{customer} signed the return report for the {vehicle}."
   },
   "handoverPay": {
     "title": "Payment",

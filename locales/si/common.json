@@ -407,9 +407,15 @@
     "lateBackCharge": "ප්‍රමාද ගාස්තුව",
     "lateBackFromDeposit": "තැන්පතුවෙන් අඩු කරන්න",
     "lateBackChargeRenter": "කුලියට ගත් අයගෙන් අය කරන්න",
-    "lateBackWaive": "අත්හරින්න",
+    "lateBackWaive": "අත්හරින්න (කුලියට ගත් අය සමඟ එකඟ විය)",
     "lateBackOverDeposit": "ඉතිරි තැන්පතුව {amount} දක්වා ආවරණය කරයි.",
-    "lateBackRow": "{count, plural, one {දින # ක් ප්‍රමාදයි} other {දින # ක් ප්‍රමාදයි}}"
+    "lateBackRow": "{count, plural, one {දින # ක් ප්‍රමාදයි} other {දින # ක් ප්‍රමාදයි}}",
+    "customerNotPresent": "පාරිභෝගිකයා නැත",
+    "customerNotPresentNote": "වාර්තාව අත්සන් කිරීමට ඔවුන්ට සබැඳියක් යවනු ලැබේ.",
+    "waitingSignature": "පාරිභෝගික අත්සන එනතුරු",
+    "resendSignatureLink": "අත්සන් සබැඳිය නැවත යවන්න",
+    "signatureLinkSent": "සබැඳිය යැව්වා",
+    "signatureLinkNotSent": "ස්වයංක්‍රීයව යැවුණේ නැත. වෙන්කිරීමේ පණිවිඩ වලින් යවන්න."
   },
   "translation": {
     "translatedFrom": "{language} වෙතින් පරිවර්තනය කරන ලදී",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {වාහන #} other {වාහන #}}",
     "bs_demoBanner": "ආදර්ශන ව්‍යාපාරයකි, උදාහරණයක් පමණි. බුකින් අක්‍රීයයි.",
     "bs_demoNoBooking": "මෙය ආදර්ශන ව්‍යාපාරයක් නිසා බුකින් අක්‍රීයයි.",
-    "reason_late_return": "ප්‍රමාද ආපසු භාරදීම"
+    "reason_late_return": "ප්‍රමාද ආපසු භාරදීම",
+    "actionFailed": "යැවුණේ නැත. ඔබේ සම්බන්ධතාවය පරීක්ෂා කර නැවත උත්සාහ කරන්න.",
+    "stillNeeded": "තවමත් අවශ්‍යයි: {items}",
+    "need_agreeTick": "ගිවිසුමට එකඟතා සලකුණ",
+    "idType": "හැඳුනුම් ලේඛනය",
+    "idType_passport": "ගමන් බලපත්‍රය",
+    "idType_national_id": "ජාතික හැඳුනුම්පත",
+    "idCardNumber": "හැඳුනුම්පත් අංකය",
+    "passportNo": "ගමන් බලපත්‍ර අංකය",
+    "reportTitle_delivery": "භාරදීමේ වාර්තාව",
+    "reportTitle_return": "ආපසු භාරදීමේ වාර්තාව",
+    "reportToSign_delivery": "ඔබේ භාරදීමේ වාර්තාව අත්සන් කරන්න",
+    "reportToSign_return": "ඔබේ ආපසු භාරදීමේ වාර්තාව අත්සන් කරන්න",
+    "reportSeeAndSign": "ඡායාරූප සහ විස්තර පරීක්ෂා කර, ඉන්පසු අත්සන් කරන්න.",
+    "reportOdometer": "ඕඩෝමීටරය",
+    "reportFuel": "ඉන්ධන",
+    "reportPhotos": "ඡායාරූප",
+    "reportDamage": "හානි",
+    "reportNoDamage": "හානි කිසිවක් සටහන් කර නැත.",
+    "reportDeposit": "තැන්පතුව",
+    "reportDepositHeld": "රඳවා ඇත",
+    "reportDeducted": "අඩු කළා",
+    "reportRefunded": "ඔබට ආපසු දුන්නා",
+    "reportConsent": "මෙම වාර්තාවේ සටහන් කර ඇති පරිදි වාහනයේ තත්ත්වය ඇති බව මම තහවුරු කරමි.",
+    "reportSign": "වාර්තාව අත්සන් කරන්න",
+    "reportSignedTitle": "වාර්තාව අත්සන් කළා",
+    "reportSignedOn": "{name} විසින් {date} අත්සන් කළා.",
+    "reportDownload": "වාර්තාව බාගන්න",
+    "reportNotFoundTitle": "වාර්තාව හමු නොවීය",
+    "reportNotFoundMessage": "කුලී ව්‍යාපාරයෙන් නව සබැඳියක් ඉල්ලන්න."
   },
   "customerMessages": {
     "hi": "ආයුබෝවන් {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "මුදල් ආපසු ගෙවීමක් නැත.",
     "cancelDepositBack": "ඔබේ {amount} තැන්පතුව ආපසු ලබා දෙමින් පවතී.",
     "cancelDepositPart": "ඔබේ {held} තැන්පතුවෙන් {returned} ආපසු ලබා දෙමින් පවතී.",
-    "cancelDepositKept": "ඔබේ {amount} තැන්පතුව රඳවා ගන්නා ලදී."
+    "cancelDepositKept": "ඔබේ {amount} තැන්පතුව රඳවා ගන්නා ලදී.",
+    "signHandoverReport": "{vehicle} සඳහා ඔබේ භාරදීමේ වාර්තාව පරීක්ෂා කර අත්සන් කිරීමට සූදානම්: {link}",
+    "signReturnReport": "{vehicle} සඳහා ඔබේ ආපසු භාරදීමේ වාර්තාව පරීක්ෂා කර අත්සන් කිරීමට සූදානම්: {link}"
   },
   "common": {
     "kinds_car": "කාර්",
@@ -1299,7 +1336,8 @@
     "collect_extension": "දිගු කිරීමේ මුදල එකතු කරන්න",
     "collect_extras": "අමතර දේවල මුදල එකතු කරන්න",
     "job_review": "{name} ගෙන් ලැබුණු සමාලෝචනය පරීක්ෂා කිරීමට",
-    "job_review_open": "සමාලෝචන විවෘත කරන්න"
+    "job_review_open": "සමාලෝචන විවෘත කරන්න",
+    "job_inspection_signature": "පාරිභෝගික අත්සන අවශ්‍යයි: {ref}"
   },
   "bookings": {
     "eyebrow": "බුකින්",
@@ -1380,7 +1418,8 @@
     "deleteRecordsInspections": "භාර දීමේ සහ ආපසු ලැබීමේ පරීක්ෂා, ඡායාරූප සමඟ: {count}",
     "deleteRecordsSigned": "අත්සන් කළ ගිවිසුම",
     "deleteRecordsBody": "මෙය අහෝසි කළ නොහැක.",
-    "deleteAnyway": "කෙසේ වෙතත් මකන්න"
+    "deleteAnyway": "කෙසේ වෙතත් මකන්න",
+    "emptyNone": "තවම වෙන්කිරීම් නැත."
   },
   "inbox": {
     "title": "එන පණිවිඩ",
@@ -2560,7 +2599,18 @@
     "cn_depositTooMuch": "තවම රඳවාගෙන ඇති තැන්පතුව {amount}.",
     "fin_cancelledSettled": "ආපසු ගෙවීම් සටහන් කළා. බේරුම් කිරීමට කිසිවක් ඉතිරි නැත.",
     "share_send": "වෙන්කිරීමේ සබැඳිය යවන්න",
-    "hist_late_return": "ප්‍රමාද වී ආපසු දුන්නා"
+    "hist_late_return": "ප්‍රමාද වී ආපසු දුන්නා",
+    "cp_noteFailed": "සටහන සුරැකුණේ නැත. නැවත උත්සාහ කරන්න.",
+    "contact": "සම්බන්ධතා",
+    "contactOpen": "විවෘත කරන්න",
+    "walkInNoPayment": "කලින් වෙන් නොකළ කුලිය වාර්තා කළා.",
+    "pc_refundBtn": "මුදල් ආපසු දෙන්න",
+    "pc_refundAmount": "ආපසු දෙන මුදල",
+    "pc_refundConfirm": "ආපසු ගෙවීම වාර්තා කරන්න",
+    "pc_refundDone": "ආපසු ගෙවීම වාර්තා කළා.",
+    "pc_refundEnter": "ආපසු දෙන මුදල ඇතුළත් කරන්න.",
+    "pc_refundMax": "මෙම ගෙවීමෙන් ආපසු දිය හැකි උපරිමය {amount} වේ.",
+    "pc_refundFailed": "ආපසු ගෙවීම සුරැකුණේ නැත. නැවත උත්සාහ කරන්න."
   },
   "newBooking": {
     "docsSelfie": "පාරිභෝගිකයාගේ ඡායාරූපය",
@@ -2810,7 +2860,12 @@
     "saveRate_monthly": "මාසයකට {amount} මෙම වාහනයේ මිල ලෙස සුරකින්න",
     "extraFree": "නොමිලේ",
     "clashHeld": "දිගු කිරීම සඳහා රඳවා ඇත: {who} දිගු කිරීමට කැමතියි. පළමුව තහවුරු කරන්න හෝ රඳවා තැබීම ඉවත් කරන්න.",
-    "clashHeldRenter": "කුලීකරු"
+    "clashHeldRenter": "කුලීකරු",
+    "startMoved": "මෙම වාහනය නිදහස් වන දිනය වන {date} ආරම්භ වේ.",
+    "endBeforeStart": "ආපසු දෙන දිනය ආරම්භක දිනයට පසුව විය යුතුය.",
+    "freeQ": "නොමිලේ වෙන් කරන්නද?",
+    "freeYes": "නොමිලේ වෙන් කරන්න",
+    "errAmountReceived": "ලැබුණු මුදල ඇතුළත් කරන්න."
   },
   "fleet": {
     "title": "වාහන සමූහය",
@@ -2886,7 +2941,10 @@
     "qp_save": "සුරකින්න",
     "qp_cancel": "අවලංගු කරන්න",
     "qp_failed": "මිල සුරැකිය නොහැකි විය. නැවත උත්සාහ කරන්න.",
-    "assistant": "සਹਾයක"
+    "assistant": "සਹਾයක",
+    "bandArchived": "සංරක්ෂිතයි",
+    "status_Archived": "සංරක්ෂිතයි",
+    "noticeArchiveLive": "මෙම වාහනවලින් සමහරක නිම නොවූ වෙන්කිරීම් ඇත. පළමුව ඒවා වෙනත් වාහනයකට ගෙන යන්න හෝ අවලංගු කරන්න."
   },
   "customers": {
     "sel_nationality": "ජාතිකත්වය",
@@ -2972,7 +3030,12 @@
     "in_trend": "කුලී කාලය සහ වියදම",
     "in_avgLength": "සාමාන්‍ය කාලය",
     "in_avgSpend": "සාමාන්‍ය වියදම",
-    "pillReviews": "{count, plural, one {සමාලෝචන #} other {සමාලෝචන #}}"
+    "pillReviews": "{count, plural, one {සමාලෝචන #} other {සමාලෝචන #}}",
+    "sel_needContact": "නමක් සහ සම්බන්ධ කරගත හැකි එක් ක්‍රමයක් එක් කරන්න: දුරකථන අංකය, Messenger, LINE, Telegram, Instagram හෝ ඊමේල්.",
+    "sel_messengerNameOnly": "ඔවුන්ගේ නම හෝ පැතිකඩ සබැඳිය",
+    "sel_lineIdOnly": "LINE ID හෝ දුරකථනය",
+    "sel_telegramIdOnly": "Telegram පරිශීලක නාමය හෝ දුරකථනය",
+    "sel_instagram": "Instagram පරිශීලක නාමය"
   },
   "calendar": {
     "title": "දින දර්ශනය",
@@ -3066,7 +3129,7 @@
     "vs_reserved": "බුක් කර ඇත",
     "vs_maintenance": "ගරාජයේ",
     "vs_available": "නිදහස්",
-    "vs_inactive": "භාවිතයේ නැත",
+    "vs_inactive": "සංරක්ෂිතයි",
     "vs_retired": "භාවිතයේ නැත",
     "c_tax": "ආදායම් බලපත්‍රය (Road tax)",
     "c_porbor": "අනිවාර්ය රක්ෂණය (Por Ror Bor)",
@@ -3417,7 +3480,8 @@
     "tl_out": "{name} සමඟ",
     "tl_service": "සර්විස්",
     "tl_repair": "අලුත්වැඩියාව",
-    "tl_damage": "ආපසු දීමේදී හානි: {count, plural, one {අයිතම #} other {අයිතම #}}"
+    "tl_damage": "ආපසු දීමේදී හානි: {count, plural, one {අයිතම #} other {අයිතම #}}",
+    "unarchive": "සංරක්ෂණයෙන් ඉවත් කරන්න"
   },
   "customerPage": {
     "back": "පාරිභෝගිකයින්",
@@ -3518,7 +3582,7 @@
     "n_placeholder": "මතක තබාගත යුතු ඕනෑම දෙයක්: කැමැත්තන්, ගෙවීමේ පුරුදු, මතක් කිරීම්",
     "n_auto": "ඔබ පිටතට තට්ටු කළ විට සුරැකේ",
     "new_title": "පාරිභෝගිකයෙකු එකතු කරන්න",
-    "new_subtitle": "නමක් සහ දුරකථන අංකයක් ප්‍රමාණවත්. ඉතිරිය දැන් හෝ පසුව එකතු කරන්න.",
+    "new_subtitle": "නමක් සහ සම්බන්ධ කරගත හැකි එක් ක්‍රමයක් ප්‍රමාණවත්. ඉතිරිය දැන් හෝ පසුව එක් කරන්න.",
     "new_chatTitle": "චැට් ඇප් සහ ඊමේල්",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, ඊමේල්",
     "new_whatsappHint": "එය ඔවුන්ගේ දුරකථන අංකයම නම් හිස්ව තබන්න.",
@@ -3621,7 +3685,17 @@
     "tl_paidCharge": "ගාස්තුවක් ගෙව්වා",
     "tl_refunded": "ආපසු ගෙවීම",
     "tl_damage": "ආපසු දීමේදී හානි: {count, plural, one {අයිතම #} other {අයිතම #}}",
-    "tl_review": "සමාලෝචනයක් දුන්නා: {rating}/5"
+    "tl_review": "සමාලෝචනයක් දුන්නා: {rating}/5",
+    "new_phoneHint": "පහතින් Messenger, LINE, Telegram, Instagram හෝ ඊමේල් එක් කරන්නේ නම් අවශ්‍ය නැත.",
+    "dnr_failed": "සුරැකුණේ නැත. නැවත උත්සාහ කරන්න.",
+    "message": "පණිවිඩයක් යවන්න",
+    "dupContact": "{name} මෙම සම්බන්ධතා විස්තර සමඟ දැනටමත් සුරැකී ඇත.",
+    "f_licenceClass": "බලපත්‍ර පන්තිය",
+    "f_idType": "හැඳුනුම් ලේඛනය",
+    "f_idType_passport": "ගමන් බලපත්‍රය",
+    "f_idType_national_id": "ජාතික හැඳුනුම්පත",
+    "f_idCardNo": "හැඳුනුම්පත් අංකය",
+    "f_idCardExpiry": "හැඳුනුම්පත කල් ඉකුත් වන දිනය"
   },
   "vehicleForm": {
     "addTitle": "වාහනයක් එකතු කරන්න",
@@ -3796,7 +3870,9 @@
     "quickSubtitle": "මූලික කරුණු පමණි. වර්ගය, නිෂ්පාදනය සහ ආකෘතිය පමණක් අවශ්‍ය වේ.",
     "quickLater": "බදු සහ රක්ෂණ දිනයන්, සැතපුම් ප්‍රමාණය, ණය සහ තවත් දේ පසුව Fleet වෙතින් එකතු කළ හැක.",
     "valueSummaryMi": "දැන් ධාවන දුර, ඔබ ගෙවූ මිල, එහි වටිනාකම",
-    "valueSummaryEditMi": "මිලදී ගත් මිල, වටිනාකම, මිලදී ගත් විට ධාවන දුර"
+    "valueSummaryEditMi": "මිලදී ගත් මිල, වටිනාකම, මිලදී ගත් විට ධාවන දුර",
+    "archivedNow": "මෙම වාහනය සංරක්ෂිතයි.",
+    "unarchiveBtn": "සංරක්ෂණයෙන් ඉවත් කරන්න"
   },
   "bookingEdit": {
     "booking": "බුකින් එක",
@@ -4075,7 +4151,7 @@
     "tp_fees": "ගාස්තු සහ සීමා",
     "tp_km": "මසකට අවසර ඇති දුර (km)",
     "tp_fuel": "අඩු වන සෑම ටැංකියෙන් 1/8 කටම ඉන්ධන",
-    "tp_late": "ප්‍රමාද ආපසු දීමේ ගාස්තුව (දිනකට %)",
+    "tp_late": "ප්‍රමාද ගෙවීම් ගාස්තුව (දිනකට %)",
     "tp_cleaning": "පිරිසිදු කිරීමේ ගාස්තුව, අවම",
     "tp_smoking": "දුම් පානය ගාස්තුව, උපරිම",
     "tp_repairs": "පාරිභෝගිකයාට අනුමත කළ හැකි අලුත්වැඩියා, උපරිම",
@@ -4806,7 +4882,14 @@
     "ba_or": "හෝ",
     "ba_ownLabel": "ඔබේම වසමක් සම්බන්ධ කරන්න",
     "bt_showName": "ලාංඡනය අසල ව්‍යාපාර නම පෙන්වන්න",
-    "bt_showNameHint": "මෙය අක්‍රිය විට පළල් ලාංඡනයක් තනිව පෙන්වන අතර, හතරැස් ලාංඡනයක් අසල ඔබේ නම පෙන්වයි. සජීවී කිරීමට ප්‍රකාශ කරන්න."
+    "bt_showNameHint": "මෙය අක්‍රිය විට පළල් ලාංඡනයක් තනිව පෙන්වන අතර, හතරැස් ලාංඡනයක් අසල ඔබේ නම පෙන්වයි. සජීවී කිරීමට ප්‍රකාශ කරන්න.",
+    "reg_confirmCurrency": "වාහන මිල {to} වලින් පෙන්වනු ඇති නමුත් පරිවර්තනය නොකෙරේ. පවතින වෙන්කිරීම් {from} වලින්ම පවතී.",
+    "reg_confirmCountry": "මෙය මුදල් ඒකකය {currency} ලෙසත්, වේලා කලාපය {zone} ලෙසත්, දුර ඒකකය {unit} ලෙසත්, VAT {vat}% ලෙසත් වෙනස් කරයි.",
+    "reg_confirmChange": "වෙනස් කරන්න",
+    "reg_confirmCancel": "අවලංගු කරන්න",
+    "tp_lateReturnPerDay": "දිනකට ප්‍රමාද ආපසු භාරදීමේ ගාස්තුව",
+    "ag_n_lateReturn": "ප්‍රමාද ආපසු භාරදීමේ ගාස්තුව",
+    "ag_n_perDay": "දිනකට {amount}"
   },
   "accountPage": {
     "roleOwner": "හිමිකරු",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "ඔබේ අත්සන එක් වරක් එක් කරන්න, පාරිභෝගිකයින්ට දුරකථනයෙන්ම කුලී ගිවිසුම අත්සන් කළ හැක.",
     "nudgePaymentMethods": "පාරිභෝගිකයන්ට ඔබට ගෙවිය හැකි ආකාරය (බැංකු විස්තර, Wise, Revolut හෝ PromptPay) එක් කරන්න, එවිට ඔවුන්ට වෙන්කිරීම් පිටුවෙන්ම ගෙවිය හැක.",
     "extensionHoldReturning": "{customer} දිගු නොකරයි: {vehicle} {date} දින ආපසු ලැබිය යුතුය. ඉන් පසු දින නැවත බුකින් සඳහා විවෘතයි.",
-    "reviewReceived": "{customer} තරු {rating} ක සමාලෝචනයක් දුන්නා."
+    "reviewReceived": "{customer} තරු {rating} ක සමාලෝචනයක් දුන්නා.",
+    "handoverReportSigned": "{customer} {vehicle} සඳහා භාරදීමේ වාර්තාව අත්සන් කළා.",
+    "returnReportSigned": "{customer} {vehicle} සඳහා ආපසු භාරදීමේ වාර්තාව අත්සන් කළා."
   },
   "handoverPay": {
     "title": "ගෙවීම",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "{business} වෙතින් ලබාගන්න. ඔබේ බලපත්‍රය සහ ගමන් බලපත්‍රය රැගෙන එන්න.",
     "spec_year": "වර්ෂය",
     "spec_deposit": "තැන්පතුව",
-    "fleet_perMonth": "මසකට {amount}"
+    "fleet_perMonth": "මසකට {amount}",
+    "photo_credit": "ඡායාරූපය: <author>{name}</author>, <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "පෙනුම",
@@ -8097,7 +8183,21 @@
     "role_muted": "මද පෙළ",
     "role_dark": "අඳුරු කොටස්",
     "pal_autoSummary": "සැකිලි වර්ණ",
-    "noReviewsYet": "තවම සමාලෝචන නැත"
+    "noReviewsYet": "තවම සමාලෝචන නැත",
+    "img_stock": "තොග ඡායාරූප",
+    "img_uploadPhoto": "ඡායාරූපය උඩුගත කරන්න",
+    "stock_credit": "ඡායාරූපය: <author>{name}</author>, <unsplash>Unsplash</unsplash>",
+    "stock_failed": "ඡායාරූප පූරණය කළ නොහැකි විය. නැවත උත්සාහ කරන්න.",
+    "stock_loading": "ඡායාරූප පූරණය වෙමින්…",
+    "stock_more": "තවත් ඡායාරූප",
+    "stock_none": "ඡායාරූප හමු නොවීය. වෙනත් සෙවුමක් උත්සාහ කරන්න.",
+    "stock_note": "<unsplash>Unsplash</unsplash> වෙතින් නොමිලේ ඡායාරූප. ඔබේ අඩවිය ඡායාරූප ශිල්පියාට ගෞරවය දක්වයි.",
+    "stock_off": "තොග ඡායාරූප තවම සකසා නැත.",
+    "stock_rateLimited": "Unsplash හි පැයක සෙවුම් සීමාව ඉක්මවා ඇත. ටික වේලාවකින් නැවත උත්සාහ කරන්න.",
+    "stock_search": "ඡායාරූප සොයන්න",
+    "stock_suggested": "යෝජිත සෙවුම්",
+    "stock_use": "ඡායාරූපය භාවිත කරන්න: {photo}",
+    "stock_useBy": "{name} ගේ ඡායාරූපය භාවිත කරන්න"
   },
   "roveListing": {
     "title": "ඔබේ වාහන rove.rent හි පෙන්වා එහි වෙන්කිරීම් ලබා ගන්නද?",

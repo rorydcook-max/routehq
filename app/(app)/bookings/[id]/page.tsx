@@ -34,6 +34,8 @@ import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, 
 import { CommunicationPanel } from "@/components/communication-panel";
 import { BookingDatesButton, RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
+import { SignaturePending } from "@/components/signature-pending";
+import { waitingForSignature } from "@/lib/inspection-signature";
 import { PendingButton } from "@/components/pending-button";
 import { BackLink, Badge, Card, Pane, SectionHeader } from "@/components/ui";
 import { PageTabs } from "@/components/page-tabs";
@@ -58,9 +60,13 @@ import { KabisDetails } from "@/app/(app)/bookings/[id]/kabis-details";
 import { ReviewRequestButtons } from "@/app/(app)/bookings/[id]/review-request-buttons";
 import { reviewUrl } from "@/lib/reviews";
 import { ActionForm } from "@/components/action-form";
+import { contactChannels, type ContactChannel } from "@/lib/contact-links";
 
 function money(value: unknown, currency = "THB") {
-  return currency === "THB" ? new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0)) : formatRegionalMoney(Number(value || 0), currency, "en-GB");
+  // Satang kept when an amount has them; whole baht shown without ".00".
+  const amount = Number(value || 0);
+  const whole = Math.abs(amount - Math.round(amount)) < 0.005;
+  return currency === "THB" ? new Intl.NumberFormat("th-TH", { style: "currency", currency, minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(amount) : formatRegionalMoney(amount, currency, "en-GB");
 }
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -419,6 +425,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const isCancelled = String(rental.status || "") === "cancelled";
   const isClosed = isCancelled || String(rental.status || "") === "completed";
   const paidPaymentGroup = nonVoidedPayments.filter((p: any) => p.status === "paid");
+  // Given back already from each payment, so its Refund offers only what is left.
+  const refundedByPayment = new Map<string, number>();
+  for (const transaction of activeTransactions as any[]) {
+    const of = transaction.type === "refund" ? String(transaction.metadata?.refund_of_payment || "") : "";
+    if (of) refundedByPayment.set(of, (refundedByPayment.get(of) || 0) + Math.abs(Number(transaction.amount || 0)));
+  }
   const pendingPayment = payments.find((payment: any) => !isVoidedPayment(payment) && ["pending", "overdue"].includes(String(payment.status || "pending")));
   // After a change of vehicle a rental has forms for more than one vehicle: the handover that counts is
   // the current vehicle's, and a collection form for a vehicle given up is not the end of the rental.
@@ -657,7 +669,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         ) : null}
         {resolvedSearchParams.success === "walk-in" ? (
           <div className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] px-3 py-2 text-sm font-bold text-[var(--success)]">
-            {tx.say("walkIn", { amount: money(totalPaid || rental.rental_rate, rental.currency) })}
+            {totalPaid > 0 ? tx.say("walkIn", { amount: money(totalPaid, rental.currency) }) : tx.say("walkInNoPayment")}
           </div>
         ) : null}
 
@@ -1311,7 +1323,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       {tx.say("grp_paid", { count: paidPaymentGroup.length })}
                     </summary>
                     <div className="mt-2 space-y-1">
-                      {paidPaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
+                      {paidPaymentGroup.map((payment: any) => <EditableRentalPaymentRow canRefund={isOwner} key={payment.id} payment={payment} refundable={Number(payment.amount || 0) - (refundedByPayment.get(payment.id) || 0)} />)}
                     </div>
                   </details>
                 ) : null}
@@ -1433,8 +1445,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Info icon={UserRound} label={tx.say("name")} value={customer?.full_name || tx.say("notRecorded")} />
-                    <Info icon={UserRound} label={tx.say("phone")} value={customer?.phone || tx.say("notRecorded")} />
-                    <Info icon={UserRound} label={tx.say("email")} value={customer?.email || tx.say("notRecorded")} />
+                    {/* The way they are actually reached (Messenger, LINE, Telegram...), each with its button (real-user test, 8 Nov 2026). */}
+                    {contactChannels(customer).length ? (
+                      contactChannels(customer).map((channel) => <ContactInfo channel={channel} key={channel.key} />)
+                    ) : (
+                      <Info icon={UserRound} label={tx.say("contact")} value={tx.say("notRecorded")} />
+                    )}
                     <Info icon={FileText} label={tx.say("documents")} value={documentLabel(customer?.document_status, tx)} danger={customer?.document_status !== "complete"} />
                   </div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
@@ -1587,6 +1603,30 @@ function Info({ icon: Icon, label, value, danger = false }: { icon: typeof Car; 
         <p className="font-semibold text-[var(--muted)]">{label}</p>
         <p className={`mt-0.5 font-bold ${danger ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</p>
       </div>
+    </div>
+  );
+}
+
+function ContactInfo({ channel }: { channel: ContactChannel }) {
+  const tx = useTx();
+  const label = channel.key === "phone" ? tx.say("phone") : channel.key === "email" ? tx.say("email") : channel.label;
+  return (
+    <div className="sub-info flex items-center gap-3 rounded-xl bg-[var(--panel-secondary)] px-3 py-2.5">
+      <UserRound className="shrink-0 text-[var(--primary)]" size={18} />
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold text-[var(--muted)]">{label}</p>
+        <p className="mt-0.5 break-all font-bold text-[var(--foreground)]">{channel.handle}</p>
+      </div>
+      {channel.url ? (
+        <a
+          className="pressable shrink-0 whitespace-nowrap rounded-full bg-[var(--primary)] px-3 py-1.5 text-sm font-bold text-white"
+          href={channel.url}
+          rel="noopener noreferrer"
+          target={channel.url.startsWith("http") ? "_blank" : undefined}
+        >
+          {channel.key === "phone" ? tx.say("cp_callShort") : tx.say("contactOpen")}
+        </a>
+      ) : null}
     </div>
   );
 }
@@ -1785,6 +1825,8 @@ function InspectionStatus({ label, inspection, href, available }: { label: strin
           {label}
         </div>
         <p className="mt-1 text-sm text-[var(--muted)]">{formatDateTime(inspection.submitted_at || inspection.created_at, tx)}</p>
+        {/* Finished with "Customer not present": the report waits for the customer's signature from their link. */}
+        {waitingForSignature(inspection) ? <SignaturePending inspectionId={inspection.id} /> : null}
       </div>
     );
   }

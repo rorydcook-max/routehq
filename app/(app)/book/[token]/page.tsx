@@ -51,6 +51,20 @@ async function pendingAmendmentFor(rentalId: string) {
   return data && new Date(data.expires_at).getTime() > Date.now() ? (data.token as string) : null;
 }
 
+/** Handover / return reports finished without the customer, waiting for their signature (lib/inspection-signature.ts). */
+async function reportsToSign(rentalId: string) {
+  const { data } = await (createSupabaseAdminClient() as any)
+    .from("inspections")
+    .select("id, type")
+    .eq("rental_id", rentalId)
+    .in("type", ["delivery", "return"])
+    .not("signature_requested_at", "is", null)
+    .is("customer_signature", null)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: true });
+  return (data || []) as Array<{ id: string; type: "delivery" | "return" }>;
+}
+
 function money(value: unknown, currency = "THB") {
   return currency === "THB" ? new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0)) : formatRegionalMoney(Number(value || 0), currency, "en-GB");
 }
@@ -379,6 +393,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
       ? (createSupabaseAdminClient() as any).from("customers").update({ preferred_locale: locale }).eq("id", customer.id).neq("preferred_locale", locale).then(() => null, () => null)
       : Promise.resolve(null)
   ]);
+  const toSign = rental?.id ? await reportsToSign(String(rental.id)).catch(() => []) : [];
   // Before signing, "pay now" shows one QR for what is due at the start.
   // What is due at the start: the first rent and the deposit.
   const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : firstRentCharge(rental) + Number(rental?.deposit_amount || 0) + Number(rental?.extras_total || 0);
@@ -439,6 +454,19 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">{t("review")}</span>
           </a>
         ) : null}
+        {toSign.map((report) => (
+          <a
+            className="pressable -order-2 flex items-center justify-between gap-3 rounded-2xl border border-[var(--info-line)] bg-[var(--primary-light)] p-4 shadow-sm"
+            href={`/book/${token}/report/${report.id}`}
+            key={report.id}
+          >
+            <span>
+              <span className="block text-sm font-semibold text-[var(--primary)]">{t(`reportToSign_${report.type}`)}</span>
+              <span className="block text-xs text-[var(--foreground-secondary)]">{t("reportSeeAndSign")}</span>
+            </span>
+            <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">{t("review")}</span>
+          </a>
+        ))}
         {/* The business is in the header row above; this card is the booking itself. */}
         <header className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm [&>h1+div]:mt-0">
           <h1 className="sr-only">{t("rentalBooking")}</h1>

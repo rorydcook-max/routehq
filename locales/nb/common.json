@@ -407,9 +407,15 @@
     "lateBackCharge": "Gebyr for sen levering",
     "lateBackFromDeposit": "Trekk fra depositum",
     "lateBackChargeRenter": "Belast leietakeren",
-    "lateBackWaive": "Frafall",
+    "lateBackWaive": "Frafall (avtalt med leietakeren)",
     "lateBackOverDeposit": "Gjenværende depositum dekker opptil {amount}.",
-    "lateBackRow": "{count, plural, one {# dag for sent} other {# dager for sent}}"
+    "lateBackRow": "{count, plural, one {# dag for sent} other {# dager for sent}}",
+    "customerNotPresent": "Kunden er ikke til stede",
+    "customerNotPresentNote": "Kunden får en lenke for å signere rapporten.",
+    "waitingSignature": "Venter på kundens signatur",
+    "resendSignatureLink": "Send signeringslenken på nytt",
+    "signatureLinkSent": "Lenke sendt",
+    "signatureLinkNotSent": "Ikke sendt automatisk. Send den fra bookingens meldinger."
   },
   "translation": {
     "translatedFrom": "Oversatt fra {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {# kjøretøy} other {# kjøretøy}}",
     "bs_demoBanner": "Demobedrift, bare et eksempel. Booking er slått av.",
     "bs_demoNoBooking": "Dette er en demobedrift, så booking er slått av.",
-    "reason_late_return": "sen levering"
+    "reason_late_return": "sen levering",
+    "actionFailed": "Det ble ikke sendt. Sjekk tilkoblingen og prøv igjen.",
+    "stillNeeded": "Mangler fortsatt: {items}",
+    "need_agreeTick": "Avkrysning for avtalen",
+    "idType": "ID-dokument",
+    "idType_passport": "Pass",
+    "idType_national_id": "Nasjonalt ID-kort",
+    "idCardNumber": "ID-kortnummer",
+    "passportNo": "Passnummer",
+    "reportTitle_delivery": "Overleveringsrapport",
+    "reportTitle_return": "Returrapport",
+    "reportToSign_delivery": "Signer overleveringsrapporten din",
+    "reportToSign_return": "Signer returrapporten din",
+    "reportSeeAndSign": "Sjekk bildene og opplysningene, og signer deretter.",
+    "reportOdometer": "Kilometerstand",
+    "reportFuel": "Drivstoff",
+    "reportPhotos": "Bilder",
+    "reportDamage": "Skader",
+    "reportNoDamage": "Ingen skader registrert.",
+    "reportDeposit": "Depositum",
+    "reportDepositHeld": "Holdt tilbake",
+    "reportDeducted": "Trukket fra",
+    "reportRefunded": "Tilbakebetalt til deg",
+    "reportConsent": "Jeg bekrefter at kjøretøyets tilstand er som registrert i denne rapporten.",
+    "reportSign": "Signer rapporten",
+    "reportSignedTitle": "Rapporten er signert",
+    "reportSignedOn": "Signert av {name}, {date}.",
+    "reportDownload": "Last ned rapporten",
+    "reportNotFoundTitle": "Fant ikke rapporten",
+    "reportNotFoundMessage": "Be utleiefirmaet om en ny lenke."
   },
   "customerMessages": {
     "hi": "Hei {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "Det blir ingen refusjon.",
     "cancelDepositBack": "Depositumet ditt på {amount} betales tilbake.",
     "cancelDepositPart": "{returned} av depositumet ditt på {held} betales tilbake.",
-    "cancelDepositKept": "Depositumet ditt på {amount} er beholdt."
+    "cancelDepositKept": "Depositumet ditt på {amount} er beholdt.",
+    "signHandoverReport": "overleveringsrapporten din for {vehicle} er klar til å sjekkes og signeres: {link}",
+    "signReturnReport": "returrapporten din for {vehicle} er klar til å sjekkes og signeres: {link}"
   },
   "common": {
     "kinds_car": "Biler",
@@ -1299,7 +1336,8 @@
     "collect_extension": "Ta betalt for forlengelse",
     "collect_extras": "Ta betalt for ekstrautstyr",
     "job_review": "Anmeldelse fra {name} til gjennomgang",
-    "job_review_open": "Åpne anmeldelser"
+    "job_review_open": "Åpne anmeldelser",
+    "job_inspection_signature": "Kundens signatur trengs: {ref}"
   },
   "bookings": {
     "eyebrow": "Bestillinger",
@@ -1380,7 +1418,8 @@
     "deleteRecordsInspections": "Utleverings- og innleveringskontroller, med bilder: {count}",
     "deleteRecordsSigned": "Den signerte avtalen",
     "deleteRecordsBody": "Dette kan ikke angres.",
-    "deleteAnyway": "Slett likevel"
+    "deleteAnyway": "Slett likevel",
+    "emptyNone": "Ingen bookinger ennå."
   },
   "inbox": {
     "title": "Innboks",
@@ -2560,7 +2599,18 @@
     "cn_depositTooMuch": "Depositum som fortsatt holdes er {amount}.",
     "fin_cancelledSettled": "Refusjoner registrert. Ingenting igjen å gjøre opp.",
     "share_send": "Send bookinglenke",
-    "hist_late_return": "Levert for sent"
+    "hist_late_return": "Levert for sent",
+    "cp_noteFailed": "Notatet ble ikke lagret. Prøv igjen.",
+    "contact": "Kontakt",
+    "contactOpen": "Åpne",
+    "walkInNoPayment": "Utleie uten booking registrert.",
+    "pc_refundBtn": "Refunder",
+    "pc_refundAmount": "Refusjonsbeløp",
+    "pc_refundConfirm": "Registrer refusjon",
+    "pc_refundDone": "Refusjon registrert.",
+    "pc_refundEnter": "Skriv inn refusjonsbeløpet.",
+    "pc_refundMax": "Du kan refundere maks {amount} fra denne betalingen.",
+    "pc_refundFailed": "Refusjonen ble ikke lagret. Prøv igjen."
   },
   "newBooking": {
     "docsSelfie": "Bilde av kunden",
@@ -2810,7 +2860,12 @@
     "saveRate_monthly": "Lagre {amount} per måned som dette kjøretøyets pris",
     "extraFree": "Gratis",
     "clashHeld": "Holdt av for forlengelse: {who} vil forlenge. Bekreft eller opphev avholdelsen først.",
-    "clashHeldRenter": "leietakeren"
+    "clashHeldRenter": "leietakeren",
+    "startMoved": "Starter {date}, dagen kjøretøyet er ledig.",
+    "endBeforeStart": "Returdatoen må være etter startdatoen.",
+    "freeQ": "Booke gratis?",
+    "freeYes": "Book gratis",
+    "errAmountReceived": "Skriv inn mottatt beløp."
   },
   "fleet": {
     "title": "Flåte",
@@ -2886,7 +2941,10 @@
     "qp_save": "Lagre",
     "qp_cancel": "Avbryt",
     "qp_failed": "Kunne ikke lagre prisen. Prøv igjen.",
-    "assistant": "Assistent"
+    "assistant": "Assistent",
+    "bandArchived": "arkivert",
+    "status_Archived": "Arkivert",
+    "noticeArchiveLive": "Noen av disse kjøretøyene har bookinger som ikke er ferdige. Flytt dem til et annet kjøretøy eller kanseller dem først."
   },
   "customers": {
     "sel_nationality": "Nasjonalitet",
@@ -2972,7 +3030,12 @@
     "in_trend": "Leielengde og forbruk",
     "in_avgLength": "Snittlengde",
     "in_avgSpend": "Snittforbruk",
-    "pillReviews": "{count, plural, one {# anmeldelse} other {# anmeldelser}}"
+    "pillReviews": "{count, plural, one {# anmeldelse} other {# anmeldelser}}",
+    "sel_needContact": "Legg til et navn og én måte å nå dem på: telefonnummer, Messenger, LINE, Telegram, Instagram eller e-post.",
+    "sel_messengerNameOnly": "Navn eller profillenke",
+    "sel_lineIdOnly": "LINE-ID eller telefon",
+    "sel_telegramIdOnly": "Telegram-brukernavn eller telefon",
+    "sel_instagram": "Instagram-brukernavn"
   },
   "calendar": {
     "title": "Kalender",
@@ -3066,7 +3129,7 @@
     "vs_reserved": "Reservert",
     "vs_maintenance": "På verksted",
     "vs_available": "Ledig",
-    "vs_inactive": "Ikke i bruk",
+    "vs_inactive": "Arkivert",
     "vs_retired": "Ikke i bruk",
     "c_tax": "Årsavgift",
     "c_porbor": "Lovpålagt forsikring (Por Ror Bor)",
@@ -3417,7 +3480,8 @@
     "tl_out": "Hos {name}",
     "tl_service": "Service",
     "tl_repair": "Reparasjon",
-    "tl_damage": "Skade ved retur: {count, plural, one {# punkt} other {# punkter}}"
+    "tl_damage": "Skade ved retur: {count, plural, one {# punkt} other {# punkter}}",
+    "unarchive": "Gjenopprett fra arkiv"
   },
   "customerPage": {
     "back": "Kunder",
@@ -3518,7 +3582,7 @@
     "n_placeholder": "Verdt å huske: preferanser, betalingsvaner, påminnelser",
     "n_auto": "Lagres når du klikker vekk",
     "new_title": "Legg til kunde",
-    "new_subtitle": "Navn og telefonnummer holder. Legg til resten nå eller senere.",
+    "new_subtitle": "Et navn og én måte å nå dem på er nok. Legg til resten nå eller senere.",
     "new_chatTitle": "Chat-apper og e-post",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, e-post",
     "new_whatsappHint": "La stå tomt hvis det er det samme som telefonnummeret deres.",
@@ -3621,7 +3685,17 @@
     "tl_paidCharge": "Betalte et gebyr",
     "tl_refunded": "Refusjon",
     "tl_damage": "Skade ved retur: {count, plural, one {# punkt} other {# punkter}}",
-    "tl_review": "Ga en anmeldelse: {rating}/5"
+    "tl_review": "Ga en anmeldelse: {rating}/5",
+    "new_phoneHint": "Ikke nødvendig hvis du legger til Messenger, LINE, Telegram, Instagram eller e-post nedenfor.",
+    "dnr_failed": "Det ble ikke lagret. Prøv igjen.",
+    "message": "Melding",
+    "dupContact": "{name} er allerede lagret med disse kontaktopplysningene.",
+    "f_licenceClass": "Førerkortklasse",
+    "f_idType": "ID-dokument",
+    "f_idType_passport": "Pass",
+    "f_idType_national_id": "Nasjonalt ID-kort",
+    "f_idCardNo": "ID-kortnummer",
+    "f_idCardExpiry": "ID-kortet utløper"
   },
   "vehicleForm": {
     "addTitle": "Legg til kjøretøy",
@@ -3796,7 +3870,9 @@
     "quickSubtitle": "Bare det essensielle. Kun type, merke og modell er nødvendig.",
     "quickLater": "Avgift- og forsikringsdatoer, kilometerstand, lån og mer kan legges til senere under Flåte.",
     "valueSummaryMi": "Stand nå, hva du betalte, hva den er verdt",
-    "valueSummaryEditMi": "Kjøpspris, verdi, stand ved kjøp"
+    "valueSummaryEditMi": "Kjøpspris, verdi, stand ved kjøp",
+    "archivedNow": "Dette kjøretøyet er arkivert.",
+    "unarchiveBtn": "Gjenopprett fra arkiv"
   },
   "bookingEdit": {
     "booking": "Bestilling",
@@ -4075,7 +4151,7 @@
     "tp_fees": "Gebyrer og grenser",
     "tp_km": "Tillatt kjørelengde per måned (km)",
     "tp_fuel": "Drivstoff per manglende 1/8 tank",
-    "tp_late": "Gebyr for forsinket innlevering (% per dag)",
+    "tp_late": "Gebyr for sen betaling (% per dag)",
     "tp_cleaning": "Vaskegebyr, fra",
     "tp_smoking": "Røykegebyr, opptil",
     "tp_repairs": "Reparasjoner kunden kan godkjenne, opptil",
@@ -4806,7 +4882,14 @@
     "ba_or": "eller",
     "ba_ownLabel": "Koble til eget domene",
     "bt_showName": "Vis bedriftsnavnet ved siden av logoen",
-    "bt_showNameHint": "Når dette er av, vises en bred logo alene, og en kvadratisk logo får navnet ditt ved siden av. Publiser for å gjøre det synlig."
+    "bt_showNameHint": "Når dette er av, vises en bred logo alene, og en kvadratisk logo får navnet ditt ved siden av. Publiser for å gjøre det synlig.",
+    "reg_confirmCurrency": "Kjøretøypriser vises i {to}, men regnes ikke om. Eksisterende bookinger blir værende i {from}.",
+    "reg_confirmCountry": "Dette endrer også valutaen til {currency}, tidssonen til {zone}, avstander til {unit} og mva. til {vat} %.",
+    "reg_confirmChange": "Endre",
+    "reg_confirmCancel": "Avbryt",
+    "tp_lateReturnPerDay": "Gebyr for sen retur per dag",
+    "ag_n_lateReturn": "Gebyr for sen retur",
+    "ag_n_perDay": "{amount} per dag"
   },
   "accountPage": {
     "roleOwner": "Eier",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "Legg til signaturen din én gang, så kan kundene signere leiekontrakten på mobilen.",
     "nudgePaymentMethods": "Legg til hvordan kunder kan betale deg (bankopplysninger, Wise, Revolut eller PromptPay), så de kan betale rett fra bookingsiden sin.",
     "extensionHoldReturning": "{customer} forlenger ikke: {vehicle} skal leveres tilbake {date}. Dagene etter er åpne for booking igjen.",
-    "reviewReceived": "{customer} ga en anmeldelse med {rating} stjerner."
+    "reviewReceived": "{customer} ga en anmeldelse med {rating} stjerner.",
+    "handoverReportSigned": "{customer} har signert overleveringsrapporten for {vehicle}.",
+    "returnReportSigned": "{customer} har signert returrapporten for {vehicle}."
   },
   "handoverPay": {
     "title": "Betaling",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "Hent hos {business}. Ta med førerkort og pass.",
     "spec_year": "Årsmodell",
     "spec_deposit": "Depositum",
-    "fleet_perMonth": "{amount} i måneden"
+    "fleet_perMonth": "{amount} i måneden",
+    "photo_credit": "Bilde av <author>{name}</author> på <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Utseende",
@@ -8097,7 +8183,21 @@
     "role_muted": "Dempet tekst",
     "role_dark": "Mørke seksjoner",
     "pal_autoSummary": "Malens farger",
-    "noReviewsYet": "Ingen anmeldelser ennå"
+    "noReviewsYet": "Ingen anmeldelser ennå",
+    "img_stock": "Stockbilder",
+    "img_uploadPhoto": "Last opp bilde",
+    "stock_credit": "Bilde av <author>{name}</author> på <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Kunne ikke laste inn bilder. Prøv igjen.",
+    "stock_loading": "Laster inn bilder…",
+    "stock_more": "Flere bilder",
+    "stock_none": "Fant ingen bilder. Prøv et annet søk.",
+    "stock_note": "Gratis bilder fra <unsplash>Unsplash</unsplash>. Nettstedet ditt krediterer fotografen.",
+    "stock_off": "Stockbilder er ikke satt opp ennå.",
+    "stock_rateLimited": "Unsplash sin søkegrense per time er nådd. Prøv igjen om litt.",
+    "stock_search": "Søk etter bilder",
+    "stock_suggested": "Foreslåtte søk",
+    "stock_use": "Bruk bilde: {photo}",
+    "stock_useBy": "Bruk bilde av {name}"
   },
   "roveListing": {
     "title": "Dele flåten din på rove.rent og ta imot bookinger der?",

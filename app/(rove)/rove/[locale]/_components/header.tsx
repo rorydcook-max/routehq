@@ -3,6 +3,7 @@ import { RouteHqLogo } from "@/components/brand-logo";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { roveHasLocale, roveHref } from "@/lib/rove/paths";
 import { roveHqSite } from "@/lib/rove/seo";
+import { Icon, type IconName } from "./icon";
 import { LanguagePicker } from "./language-picker";
 import s from "../rove.module.css";
 
@@ -15,10 +16,10 @@ export function listFleetHref(campaign: string) {
 export async function RoveHeader({ locale }: { locale: string }) {
   const t = await getTranslations("directory");
   const current = supportedLocaleOptions.find((option) => option.code === locale);
-  const links = [
-    { href: `${roveHref("/search", locale)}?monthly=1`, label: t("rv.navMonthly"), icon: "ti-calendar-repeat" },
-    { href: roveHref("/destinations", roveHasLocale("destinations", locale) ? locale : "en"), label: t("rv.navDestinations"), icon: "ti-map-2" },
-    { href: roveHref("/guides", locale), label: t("rv.navGuides"), icon: "ti-book-2" }
+  const links: Array<{ href: string; label: string; icon: IconName }> = [
+    { href: `${roveHref("/search", locale)}?monthly=1`, label: t("rv.navMonthly"), icon: "calendar-repeat" },
+    { href: roveHref("/destinations", roveHasLocale("destinations", locale) ? locale : "en"), label: t("rv.navDestinations"), icon: "map-2" },
+    { href: roveHref("/guides", locale), label: t("rv.navGuides"), icon: "book-2" }
   ];
   return (
     <header className={s.header}>
@@ -43,12 +44,12 @@ export async function RoveHeader({ locale }: { locale: string }) {
           </a>
           <details className={s.menu}>
             <summary aria-label={t("rv.menu")} className={s.menuButton}>
-              <i aria-hidden="true" className="ti ti-menu-2" />
+              <Icon name="menu-2" />
             </summary>
             <div className={s.menuPanel}>
               {links.map((link) => (
                 <a href={link.href} key={link.href}>
-                  <i aria-hidden="true" className={`ti ${link.icon}`} style={{ fontSize: 20, color: "var(--jade)" }} />
+                  <Icon name={link.icon} style={{ fontSize: 20, color: "var(--jade)" }} />
                   {link.label}
                 </a>
               ))}

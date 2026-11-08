@@ -13,6 +13,7 @@ const methods = [
   { value: "messenger", label: "Messenger" },
   { value: "line", label: "LINE" },
   { value: "telegram", label: "Telegram" },
+  { value: "instagram", label: "Instagram" },
   { value: "phone", label: "" },
   { value: "sms", label: "SMS" },
   { value: "email", label: "Email" }
@@ -22,12 +23,15 @@ export function ContactChoice({
   contact,
   setContact,
   say,
-  inputClass
+  inputClass,
+  phoneGiven = true
 }: {
   contact: string;
   setContact: (value: string) => void;
   say: (key: string) => string;
   inputClass: string;
+  /** No phone typed: the chosen chat is the only way to reach them, so its field isn't marked optional. */
+  phoneGiven?: boolean;
 }) {
   const extraRef = useRef<HTMLInputElement>(null);
 
@@ -42,11 +46,13 @@ export function ContactChoice({
 
   const extra =
     contact === "messenger"
-      ? { name: "messengerId", placeholder: say("sel_messengerName"), type: "text", paste: true }
+      ? { name: "messengerId", placeholder: say(phoneGiven ? "sel_messengerName" : "sel_messengerNameOnly"), type: "text", paste: true }
       : contact === "line"
-        ? { name: "lineId", placeholder: say("sel_lineId"), type: "text", paste: true }
+        ? { name: "lineId", placeholder: say(phoneGiven ? "sel_lineId" : "sel_lineIdOnly"), type: "text", paste: true }
         : contact === "telegram"
-          ? { name: "telegramUsername", placeholder: say("sel_telegramId"), type: "text", paste: true }
+          ? { name: "telegramUsername", placeholder: say(phoneGiven ? "sel_telegramId" : "sel_telegramIdOnly"), type: "text", paste: true }
+          : contact === "instagram"
+            ? { name: "instagramHandle", placeholder: say("sel_instagram"), type: "text", paste: true }
           : contact === "email"
             ? { name: "email", placeholder: say("sel_email"), type: "email", paste: false }
             : null;

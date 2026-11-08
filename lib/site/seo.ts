@@ -29,14 +29,22 @@ export function ogLocale(locale: string) {
   return locale.replace("-", "_");
 }
 
-/** Metadata shared by every website page: title, description, canonical + hreflang, Open Graph. */
-export function siteMetadata({ path, locale, title, description, available, absoluteTitle, type = "website" }: { path: string; locale: string; title: string; description: string; available?: readonly string[]; absoluteTitle?: boolean; type?: "website" | "article" }): Metadata {
+/**
+ * The website's link-preview pictures (public/site/og, made by scripts/site-og-images.mjs; task perf, 8 Nov 2026).
+ * Every page shares a large picture ("summary_large_image"), so every page names one: its own (a guide's cover, a
+ * help article's poster) where it has one, else one of these.
+ */
+export const SITE_OG = { home: "/site/og/home.png", pricing: "/site/og/pricing.png", guides: "/site/og/guides.png" } as const;
+
+/** Metadata shared by every website page: title, description, canonical + hreflang, Open Graph and its picture. */
+export function siteMetadata({ path, locale, title, description, available, absoluteTitle, type = "website", image = SITE_OG.home }: { path: string; locale: string; title: string; description: string; available?: readonly string[]; absoluteTitle?: boolean; type?: "website" | "article"; image?: string }): Metadata {
   const alternates = siteAlternates(path, locale, available);
+  const picture = { url: /^https?:\/\//.test(image) ? image : `${siteOrigin()}${image}`, width: 1200, height: 630, alt: "RoveHQ" };
   return {
     title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates,
-    openGraph: { type, url: alternates.canonical as string, siteName: "RoveHQ", title: absoluteTitle ? title : `${title} | RoveHQ`, description, locale: ogLocale(locale) },
-    twitter: { card: "summary_large_image", title, description }
+    openGraph: { type, url: alternates.canonical as string, siteName: "RoveHQ", title: absoluteTitle ? title : `${title} | RoveHQ`, description, locale: ogLocale(locale), images: [picture] },
+    twitter: { card: "summary_large_image", title, description, images: [picture.url] }
   };
 }

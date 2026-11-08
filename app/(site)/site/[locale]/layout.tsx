@@ -8,6 +8,7 @@ import { FlagFont } from "@/components/flag-font";
 import { ImageShrinker } from "@/components/image-shrinker";
 import { textDirection } from "@/lib/i18n/locales";
 import { siteLocale, siteLocaleParams } from "@/lib/site/static-page";
+import { consentChosenScript } from "@/lib/consent";
 import { themeScript } from "@/lib/theme";
 import { rootMetadata, rootViewport } from "../../../root-metadata";
 import { localizeSitePath } from "@/lib/site/locale-path";
@@ -18,16 +19,17 @@ import { GoogleTagManager } from "@/components/google-tag-manager";
 import { SiteFooter } from "./_components/site-footer";
 import { SiteHeader } from "./_components/site-header";
 import s from "./site.module.css";
-// The same stylesheets, in the same order, as the app's root layout.
-import "@tabler/icons-webfont/dist/tabler-icons.min.css";
+// The app's own stylesheets, in the same order as its root layout, without the Tabler icon font: the website's icons
+// are lucide-react SVGs, so its 212 KB stylesheet was loaded for nothing (task perf, 8 Nov 2026).
 import "../../../globals.css";
 import "../../../theme-dark.css";
 
 /* The website's two typefaces, only on the website: Geist for everything, and an italic serif for the one phrase
    a headline leans on. Non-Latin scripts fall through to Anuphan (Thai, self-hosted) and the system. */
-const geist = Geist({ subsets: ["latin", "latin-ext"], display: "swap", variable: "--font-site" });
-// latin-ext: Turkish ğ ş İ (and Polish, Croatian) in the italic heading accents, not a fallback font mid-word.
-const serif = Instrument_Serif({ subsets: ["latin", "latin-ext"], weight: "400", style: "italic", display: "swap", variable: "--font-site-serif" });
+// `subsets` is only what is preloaded (task perf, 8 Nov 2026): Latin. Latin Extended (Turkish ğ ş İ, Polish, Croatian)
+// stays in the stylesheet and loads on the pages whose words need it, so the italic accents never fall back mid-word.
+const geist = Geist({ subsets: ["latin"], display: "swap", variable: "--font-site" });
+const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: "italic", display: "swap", variable: "--font-site-serif" });
 
 export const metadata: Metadata = rootMetadata;
 export const viewport: Viewport = rootViewport;
@@ -54,6 +56,8 @@ export default async function SiteLayout({ children, params }: { children: React
     <html dir={textDirection(locale)} lang={locale} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {/* Hides the cookie notice (drawn with the page) before the first paint for a visitor who has already chosen. */}
+        <script dangerouslySetInnerHTML={{ __html: consentChosenScript() }} />
         {/* Organization and WebSite structured data, on every website page (lib/site/schema.ts). */}
         <JsonLd data={siteWideLd(locale)} />
       </head>
@@ -73,7 +77,8 @@ export default async function SiteLayout({ children, params }: { children: React
             <NextIntlClientProvider messages={{ chat: ((messages as Record<string, any>).chat ?? {}) as Record<string, string> }}>
               <ChatLauncher site />
             </NextIntlClientProvider>
-            {/* Cookie consent (GDPR / UK PECR): drawn in the browser only, so the page itself stays the same for everyone. */}
+            {/* Cookie consent (GDPR / UK PECR): the same in every cached page, hidden before the first paint for a
+                visitor who has already chosen (consentChosenScript above). */}
             <CookieBanner
               words={{
                 body: t("cookieBody"),

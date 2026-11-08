@@ -407,9 +407,15 @@
     "lateBackCharge": "Caj lewat",
     "lateBackFromDeposit": "Ambil daripada deposit",
     "lateBackChargeRenter": "Caj kepada penyewa",
-    "lateBackWaive": "Kecualikan",
+    "lateBackWaive": "Kecualikan (dipersetujui dengan penyewa)",
     "lateBackOverDeposit": "Baki deposit menampung sehingga {amount}.",
-    "lateBackRow": "{count, plural, other {Lewat # hari}}"
+    "lateBackRow": "{count, plural, other {Lewat # hari}}",
+    "customerNotPresent": "Pelanggan tiada",
+    "customerNotPresentNote": "Mereka akan dihantar pautan untuk menandatangani laporan.",
+    "waitingSignature": "Menunggu tandatangan pelanggan",
+    "resendSignatureLink": "Hantar semula pautan tandatangan",
+    "signatureLinkSent": "Pautan dihantar",
+    "signatureLinkNotSent": "Tidak dihantar secara automatik. Hantar daripada mesej tempahan."
   },
   "translation": {
     "translatedFrom": "Diterjemah dari {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, other {# kenderaan}}",
     "bs_demoBanner": "Perniagaan demo, contoh sahaja. Tempahan dimatikan.",
     "bs_demoNoBooking": "Ini perniagaan demo, jadi tempahan dimatikan.",
-    "reason_late_return": "pemulangan lewat"
+    "reason_late_return": "pemulangan lewat",
+    "actionFailed": "Tidak dihantar. Semak sambungan anda dan cuba lagi.",
+    "stillNeeded": "Masih diperlukan: {items}",
+    "need_agreeTick": "Tanda setuju perjanjian",
+    "idType": "Dokumen pengenalan",
+    "idType_passport": "Pasport",
+    "idType_national_id": "Kad pengenalan",
+    "idCardNumber": "Nombor kad pengenalan",
+    "passportNo": "Nombor pasport",
+    "reportTitle_delivery": "Laporan serahan",
+    "reportTitle_return": "Laporan pemulangan",
+    "reportToSign_delivery": "Tandatangani laporan serahan anda",
+    "reportToSign_return": "Tandatangani laporan pemulangan anda",
+    "reportSeeAndSign": "Semak foto dan butiran, kemudian tandatangan.",
+    "reportOdometer": "Odometer",
+    "reportFuel": "Minyak",
+    "reportPhotos": "Foto",
+    "reportDamage": "Kerosakan",
+    "reportNoDamage": "Tiada kerosakan dicatat.",
+    "reportDeposit": "Deposit",
+    "reportDepositHeld": "Ditahan",
+    "reportDeducted": "Ditolak",
+    "reportRefunded": "Dipulangkan kepada anda",
+    "reportConsent": "Saya mengesahkan keadaan kenderaan adalah seperti yang direkodkan dalam laporan ini.",
+    "reportSign": "Tandatangani laporan",
+    "reportSignedTitle": "Laporan ditandatangani",
+    "reportSignedOn": "Ditandatangani oleh {name}, {date}.",
+    "reportDownload": "Muat turun laporan",
+    "reportNotFoundTitle": "Laporan tidak ditemui",
+    "reportNotFoundMessage": "Minta pautan baharu daripada perniagaan sewa."
   },
   "customerMessages": {
     "hi": "Hai {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "Tiada bayaran balik.",
     "cancelDepositBack": "Deposit {amount} anda sedang dipulangkan.",
     "cancelDepositPart": "{returned} daripada deposit {held} anda sedang dipulangkan.",
-    "cancelDepositKept": "Deposit {amount} anda telah ditahan."
+    "cancelDepositKept": "Deposit {amount} anda telah ditahan.",
+    "signHandoverReport": "laporan serahan anda untuk {vehicle} sedia untuk disemak dan ditandatangani: {link}",
+    "signReturnReport": "laporan pemulangan anda untuk {vehicle} sedia untuk disemak dan ditandatangani: {link}"
   },
   "directory": {
     "title": "Sewa kereta atau motosikal di Thailand",
@@ -1564,7 +1601,8 @@
     "collect_extension": "Kutip lanjutan",
     "collect_extras": "Kutip bayaran ekstra",
     "job_review": "Ulasan daripada {name} untuk disemak",
-    "job_review_open": "Buka ulasan"
+    "job_review_open": "Buka ulasan",
+    "job_inspection_signature": "Tandatangan pelanggan diperlukan: {ref}"
   },
   "bookings": {
     "eyebrow": "Tempahan",
@@ -1645,7 +1683,8 @@
     "deleteRecordsInspections": "Pemeriksaan serahan dan pemulangan, dengan foto: {count}",
     "deleteRecordsSigned": "Perjanjian yang ditandatangani",
     "deleteRecordsBody": "Ini tidak boleh dibuat asal.",
-    "deleteAnyway": "Padam juga"
+    "deleteAnyway": "Padam juga",
+    "emptyNone": "Belum ada tempahan."
   },
   "inbox": {
     "title": "Peti masuk",
@@ -2825,7 +2864,18 @@
     "cn_depositTooMuch": "Deposit yang masih dipegang ialah {amount}.",
     "fin_cancelledSettled": "Bayaran balik direkodkan. Tiada apa lagi untuk diselesaikan.",
     "share_send": "Hantar pautan tempahan",
-    "hist_late_return": "Dipulangkan lewat"
+    "hist_late_return": "Dipulangkan lewat",
+    "cp_noteFailed": "Nota tidak disimpan. Cuba lagi.",
+    "contact": "Hubungi",
+    "contactOpen": "Buka",
+    "walkInNoPayment": "Sewaan terus di kaunter direkodkan.",
+    "pc_refundBtn": "Bayar balik",
+    "pc_refundAmount": "Jumlah bayaran balik",
+    "pc_refundConfirm": "Rekod bayaran balik",
+    "pc_refundDone": "Bayaran balik direkodkan.",
+    "pc_refundEnter": "Masukkan jumlah bayaran balik.",
+    "pc_refundMax": "Jumlah maksimum yang boleh dibayar balik daripada bayaran ini ialah {amount}.",
+    "pc_refundFailed": "Bayaran balik tidak disimpan. Cuba lagi."
   },
   "newBooking": {
     "docsSelfie": "Foto pelanggan",
@@ -3075,7 +3125,12 @@
     "saveRate_monthly": "Simpan {amount} sebulan sebagai harga kenderaan ini",
     "extraFree": "Percuma",
     "clashHeld": "Ditahan untuk lanjutan: {who} mahu melanjutkan. Sahkan atau lepaskan tahanan dahulu.",
-    "clashHeldRenter": "penyewa"
+    "clashHeldRenter": "penyewa",
+    "startMoved": "Bermula {date}, hari kenderaan ini kosong.",
+    "endBeforeStart": "Tarikh pemulangan mesti selepas tarikh mula.",
+    "freeQ": "Tempah secara percuma?",
+    "freeYes": "Tempah secara percuma",
+    "errAmountReceived": "Masukkan jumlah yang diterima."
   },
   "fleet": {
     "title": "Armada",
@@ -3151,7 +3206,10 @@
     "qp_save": "Simpan",
     "qp_cancel": "Batal",
     "qp_failed": "Harga tidak dapat disimpan. Cuba lagi.",
-    "assistant": "Pembantu"
+    "assistant": "Pembantu",
+    "bandArchived": "diarkibkan",
+    "status_Archived": "Diarkibkan",
+    "noticeArchiveLive": "Sesetengah kenderaan ini ada tempahan yang belum selesai. Pindahkan ke kenderaan lain atau batalkannya dahulu."
   },
   "customers": {
     "sel_nationality": "Kewarganegaraan",
@@ -3237,7 +3295,12 @@
     "in_trend": "Tempoh sewa dan perbelanjaan",
     "in_avgLength": "Purata tempoh",
     "in_avgSpend": "Purata perbelanjaan",
-    "pillReviews": "{count, plural, other {# ulasan}}"
+    "pillReviews": "{count, plural, other {# ulasan}}",
+    "sel_needContact": "Tambah nama dan satu cara untuk menghubungi mereka: nombor telefon, Messenger, LINE, Telegram, Instagram atau e-mel.",
+    "sel_messengerNameOnly": "Nama atau pautan profil mereka",
+    "sel_lineIdOnly": "ID LINE atau telefon",
+    "sel_telegramIdOnly": "Nama pengguna Telegram atau telefon",
+    "sel_instagram": "Nama pengguna Instagram"
   },
   "calendar": {
     "title": "Kalendar",
@@ -3331,7 +3394,7 @@
     "vs_reserved": "Ditempah",
     "vs_maintenance": "Di bengkel",
     "vs_available": "Kosong",
-    "vs_inactive": "Tidak digunakan",
+    "vs_inactive": "Diarkibkan",
     "vs_retired": "Tidak digunakan",
     "c_tax": "Cukai jalan",
     "c_porbor": "Insurans wajib (Por Ror Bor)",
@@ -3682,7 +3745,8 @@
     "tl_out": "Bersama {name}",
     "tl_service": "Servis",
     "tl_repair": "Pembaikan",
-    "tl_damage": "Kerosakan semasa pemulangan: {count, plural, other {# perkara}}"
+    "tl_damage": "Kerosakan semasa pemulangan: {count, plural, other {# perkara}}",
+    "unarchive": "Nyaharkib"
   },
   "customerPage": {
     "back": "Pelanggan",
@@ -3783,7 +3847,7 @@
     "n_placeholder": "Apa-apa yang patut diingat: pilihan, tabiat bayaran, peringatan",
     "n_auto": "Disimpan apabila anda ketik di tempat lain",
     "new_title": "Tambah pelanggan",
-    "new_subtitle": "Nama dan nombor telefon sudah memadai. Tambah yang lain sekarang atau kemudian.",
+    "new_subtitle": "Nama dan satu cara untuk menghubungi mereka sudah memadai. Tambah selebihnya sekarang atau kemudian.",
     "new_chatTitle": "Aplikasi sembang dan e-mel",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, e-mel",
     "new_whatsappHint": "Biarkan kosong jika sama dengan nombor telefon mereka.",
@@ -3886,7 +3950,17 @@
     "tl_paidCharge": "Membayar caj",
     "tl_refunded": "Bayaran balik",
     "tl_damage": "Kerosakan semasa pemulangan: {count, plural, other {# perkara}}",
-    "tl_review": "Memberi ulasan: {rating}/5"
+    "tl_review": "Memberi ulasan: {rating}/5",
+    "new_phoneHint": "Tidak perlu jika anda menambah Messenger, LINE, Telegram, Instagram atau e-mel di bawah.",
+    "dnr_failed": "Tidak disimpan. Cuba lagi.",
+    "message": "Hantar mesej",
+    "dupContact": "{name} sudah disimpan dengan butiran hubungan ini.",
+    "f_licenceClass": "Kelas lesen",
+    "f_idType": "Dokumen pengenalan",
+    "f_idType_passport": "Pasport",
+    "f_idType_national_id": "Kad pengenalan",
+    "f_idCardNo": "Nombor kad pengenalan",
+    "f_idCardExpiry": "Tarikh luput kad pengenalan"
   },
   "vehicleForm": {
     "addTitle": "Tambah kenderaan",
@@ -4061,7 +4135,9 @@
     "quickSubtitle": "Asas sahaja. Hanya jenis, jenama dan model diperlukan.",
     "quickLater": "Tarikh cukai dan insurans, perbatuan, pinjaman dan banyak lagi boleh ditambah kemudian dari Armada.",
     "valueSummaryMi": "Jarak perjalanan kini, harga dibayar, nilai semasa",
-    "valueSummaryEditMi": "Harga belian, nilai, jarak perjalanan semasa dibeli"
+    "valueSummaryEditMi": "Harga belian, nilai, jarak perjalanan semasa dibeli",
+    "archivedNow": "Kenderaan ini telah diarkibkan.",
+    "unarchiveBtn": "Nyaharkib"
   },
   "bookingEdit": {
     "booking": "Tempahan",
@@ -4340,7 +4416,7 @@
     "tp_fees": "Yuran dan had",
     "tp_km": "Jarak dibenarkan sebulan (km)",
     "tp_fuel": "Minyak bagi setiap 1/8 tangki yang kurang",
-    "tp_late": "Yuran pemulangan lewat (% sehari)",
+    "tp_late": "Caj lewat bayar (% sehari)",
     "tp_cleaning": "Caj cucian, dari",
     "tp_smoking": "Caj merokok, sehingga",
     "tp_repairs": "Pembaikan yang boleh diluluskan pelanggan, sehingga",
@@ -5071,7 +5147,14 @@
     "ba_or": "atau",
     "ba_ownLabel": "Sambungkan domain sendiri",
     "bt_showName": "Tunjukkan nama perniagaan di sebelah logo",
-    "bt_showNameHint": "Apabila dimatikan, logo lebar dipaparkan sendiri dan logo segi empat sama diberi nama anda di sebelahnya. Terbitkan untuk menyiarkannya."
+    "bt_showNameHint": "Apabila dimatikan, logo lebar dipaparkan sendiri dan logo segi empat sama diberi nama anda di sebelahnya. Terbitkan untuk menyiarkannya.",
+    "reg_confirmCurrency": "Harga kenderaan akan dipaparkan dalam {to} tetapi tidak ditukar. Tempahan sedia ada kekal dalam {from}.",
+    "reg_confirmCountry": "Ini juga menukar mata wang kepada {currency}, zon waktu kepada {zone}, jarak kepada {unit} dan cukai kepada {vat}%.",
+    "reg_confirmChange": "Tukar",
+    "reg_confirmCancel": "Batal",
+    "tp_lateReturnPerDay": "Caj pulang lewat sehari",
+    "ag_n_lateReturn": "Caj pulang lewat",
+    "ag_n_perDay": "{amount} sehari"
   },
   "accountPage": {
     "roleOwner": "Pemilik",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "Tambah tandatangan anda sekali, dan pelanggan boleh menandatangani perjanjian sewa di telefon.",
     "nudgePaymentMethods": "Tambah cara pelanggan boleh membayar anda (butiran bank, Wise, Revolut atau PromptPay) supaya mereka boleh membayar terus dari halaman tempahan.",
     "extensionHoldReturning": "{customer} tidak melanjutkan: {vehicle} dipulangkan pada {date}. Hari selepasnya dibuka semula untuk tempahan.",
-    "reviewReceived": "{customer} memberikan ulasan {rating} bintang."
+    "reviewReceived": "{customer} memberikan ulasan {rating} bintang.",
+    "handoverReportSigned": "{customer} telah menandatangani laporan serahan untuk {vehicle}.",
+    "returnReportSigned": "{customer} telah menandatangani laporan pemulangan untuk {vehicle}."
   },
   "handoverPay": {
     "title": "Bayaran",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "Ambil di {business}. Bawa lesen memandu dan pasport anda.",
     "spec_year": "Tahun",
     "spec_deposit": "Deposit",
-    "fleet_perMonth": "{amount} sebulan"
+    "fleet_perMonth": "{amount} sebulan",
+    "photo_credit": "Foto oleh <author>{name}</author> di <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Rupa",
@@ -8097,7 +8183,21 @@
     "role_muted": "Teks pudar",
     "role_dark": "Bahagian gelap",
     "pal_autoSummary": "Warna templat",
-    "noReviewsYet": "Belum ada ulasan"
+    "noReviewsYet": "Belum ada ulasan",
+    "img_stock": "Foto stok",
+    "img_uploadPhoto": "Muat naik foto",
+    "stock_credit": "Foto oleh <author>{name}</author> di <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Foto tidak dapat dimuatkan. Cuba lagi.",
+    "stock_loading": "Memuatkan foto…",
+    "stock_more": "Lagi foto",
+    "stock_none": "Tiada foto ditemui. Cuba carian lain.",
+    "stock_note": "Foto percuma daripada <unsplash>Unsplash</unsplash>. Laman anda memberi kredit kepada jurugambar.",
+    "stock_off": "Foto stok belum disediakan.",
+    "stock_rateLimited": "Had carian sejam Unsplash telah dicapai. Cuba lagi sebentar nanti.",
+    "stock_search": "Cari foto",
+    "stock_suggested": "Carian dicadangkan",
+    "stock_use": "Guna foto: {photo}",
+    "stock_useBy": "Guna foto oleh {name}"
   },
   "roveListing": {
     "title": "Kongsi armada anda di rove.rent dan terima tempahan di sana?",

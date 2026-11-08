@@ -70,10 +70,23 @@ async function sendOne(field: string, original: File, prepare: Prepare, bucket: 
 /** Start sending a photo now, in the background. A failure is quiet: it is simply sent again at submit. */
 export function startEarlyUpload(field: string, file: File, prepare: Prepare, bucket = "documents") {
   if (!field || !(file?.size > 0) || early.has(file)) return;
+  earlyUpload(field, file, prepare, bucket).catch(() => null);
+}
+
+/**
+ * Send a photo now and hand back where it went, so a page can keep the path (e.g. in sessionStorage) and still
+ * send it after the browser reloads the page, as Android can when the camera opens.
+ */
+export function earlyUpload(field: string, file: File, prepare: Prepare, bucket = "documents"): Promise<Uploaded> {
+  const running = early.get(file);
+  if (running) return running;
   const job = sendOne(field, file, prepare, bucket);
   early.set(file, job);
   job.catch(() => early.delete(file));
+  return job;
 }
+
+export type { Uploaded as EarlyUploaded };
 
 /**
  * Upload every file in `formData` straight to storage and return a copy of the

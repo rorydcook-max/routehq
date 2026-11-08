@@ -7,7 +7,8 @@
  */
 
 export const PHOTO_ROUTE = "/api/rove-photo/";
-export const PHOTO_WIDTHS = [160, 320, 480, 640, 960, 1280, 1600] as const;
+// 800 (task perf, 8 Nov 2026): a full-width photo on a phone (about 700px at its pixel density) took the 960 size.
+export const PHOTO_WIDTHS = [160, 320, 480, 640, 800, 960, 1280, 1600] as const;
 
 /**
  * The small "AI image" label on rove.rent and booking pages, shown on AI-generated (not enhanced) photos.

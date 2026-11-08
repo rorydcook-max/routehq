@@ -444,9 +444,15 @@
     "lateBackCharge": "Χρέωση καθυστέρησης",
     "lateBackFromDeposit": "Αφαίρεση από την εγγύηση",
     "lateBackChargeRenter": "Χρέωση στον ενοικιαστή",
-    "lateBackWaive": "Χάρισμα",
+    "lateBackWaive": "Χαρίζεται (κατόπιν συμφωνίας με τον ενοικιαστή)",
     "lateBackOverDeposit": "Η εγγύηση που απομένει καλύπτει έως {amount}.",
-    "lateBackRow": "{count, plural, one {# ημέρα καθυστέρηση} other {# ημέρες καθυστέρηση}}"
+    "lateBackRow": "{count, plural, one {# ημέρα καθυστέρηση} other {# ημέρες καθυστέρηση}}",
+    "customerNotPresent": "Ο πελάτης δεν είναι παρών",
+    "customerNotPresentNote": "Θα του σταλεί σύνδεσμος για να υπογράψει την αναφορά.",
+    "waitingSignature": "Αναμονή υπογραφής πελάτη",
+    "resendSignatureLink": "Επαναποστολή συνδέσμου υπογραφής",
+    "signatureLinkSent": "Ο σύνδεσμος στάλθηκε",
+    "signatureLinkNotSent": "Δεν στάλθηκε αυτόματα. Στείλτε τον από τα μηνύματα της κράτησης."
   },
   "translation": {
     "translatedFrom": "Μετάφραση από {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {# όχημα} other {# οχήματα}}",
     "bs_demoBanner": "Επιχείρηση επίδειξης, μόνο παράδειγμα. Οι κρατήσεις είναι απενεργοποιημένες.",
     "bs_demoNoBooking": "Αυτή είναι επιχείρηση επίδειξης, γι’ αυτό οι κρατήσεις είναι απενεργοποιημένες.",
-    "reason_late_return": "καθυστερημένη επιστροφή"
+    "reason_late_return": "καθυστερημένη επιστροφή",
+    "actionFailed": "Δεν στάλθηκε. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
+    "stillNeeded": "Χρειάζεται ακόμα: {items}",
+    "need_agreeTick": "Σημάδι αποδοχής συμφωνητικού",
+    "idType": "Έγγραφο ταυτότητας",
+    "idType_passport": "Διαβατήριο",
+    "idType_national_id": "Δελτίο ταυτότητας",
+    "idCardNumber": "Αριθμός δελτίου ταυτότητας",
+    "passportNo": "Αριθμός διαβατηρίου",
+    "reportTitle_delivery": "Αναφορά παράδοσης",
+    "reportTitle_return": "Αναφορά επιστροφής",
+    "reportToSign_delivery": "Υπογράψτε την αναφορά παράδοσης",
+    "reportToSign_return": "Υπογράψτε την αναφορά επιστροφής",
+    "reportSeeAndSign": "Ελέγξτε τις φωτογραφίες και τα στοιχεία και μετά υπογράψτε.",
+    "reportOdometer": "Χιλιόμετρα",
+    "reportFuel": "Καύσιμο",
+    "reportPhotos": "Φωτογραφίες",
+    "reportDamage": "Ζημιές",
+    "reportNoDamage": "Δεν καταγράφηκαν ζημιές.",
+    "reportDeposit": "Εγγύηση",
+    "reportDepositHeld": "Παρακρατείται",
+    "reportDeducted": "Αφαιρέθηκε",
+    "reportRefunded": "Επιστράφηκε σε εσάς",
+    "reportConsent": "Επιβεβαιώνω ότι η κατάσταση του οχήματος είναι όπως καταγράφεται σε αυτή την αναφορά.",
+    "reportSign": "Υπογραφή αναφοράς",
+    "reportSignedTitle": "Η αναφορά υπογράφηκε",
+    "reportSignedOn": "Υπογράφηκε από {name}, {date}.",
+    "reportDownload": "Λήψη αναφοράς",
+    "reportNotFoundTitle": "Η αναφορά δεν βρέθηκε",
+    "reportNotFoundMessage": "Ζητήστε νέο σύνδεσμο από την επιχείρηση ενοικίασης."
   },
   "customerMessages": {
     "hi": "Γεια σας {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "Δεν υπάρχει επιστροφή χρημάτων.",
     "cancelDepositBack": "Η εγγύησή σας των {amount} επιστρέφεται.",
     "cancelDepositPart": "Επιστρέφονται {returned} από την εγγύησή σας των {held}.",
-    "cancelDepositKept": "Η εγγύησή σας των {amount} παρακρατήθηκε."
+    "cancelDepositKept": "Η εγγύησή σας των {amount} παρακρατήθηκε.",
+    "signHandoverReport": "η αναφορά παράδοσης για το {vehicle} είναι έτοιμη για έλεγχο και υπογραφή: {link}",
+    "signReturnReport": "η αναφορά επιστροφής για το {vehicle} είναι έτοιμη για έλεγχο και υπογραφή: {link}"
   },
   "common": {
     "kinds_car": "Αυτοκίνητα",
@@ -1273,7 +1310,8 @@
     "collect_extension": "Είσπραξη παράτασης",
     "collect_extras": "Είσπραξη έξτρα",
     "job_review": "Κριτική από {name} για έλεγχο",
-    "job_review_open": "Άνοιγμα κριτικών"
+    "job_review_open": "Άνοιγμα κριτικών",
+    "job_inspection_signature": "Χρειάζεται υπογραφή πελάτη: {ref}"
   },
   "bookings": {
     "eyebrow": "Κρατήσεις",
@@ -1354,7 +1392,8 @@
     "deleteRecordsInspections": "Έλεγχοι παράδοσης και επιστροφής, με φωτογραφίες: {count}",
     "deleteRecordsSigned": "Η υπογεγραμμένη σύμβαση",
     "deleteRecordsBody": "Αυτό δεν αναιρείται.",
-    "deleteAnyway": "Διαγραφή ούτως ή άλλως"
+    "deleteAnyway": "Διαγραφή ούτως ή άλλως",
+    "emptyNone": "Δεν υπάρχουν ακόμα κρατήσεις."
   },
   "inbox": {
     "title": "Μηνύματα",
@@ -2534,7 +2573,18 @@
     "cn_depositTooMuch": "Η εγγύηση που κρατείται ακόμη είναι {amount}.",
     "fin_cancelledSettled": "Οι επιστροφές καταγράφηκαν. Δεν μένει κάτι να διευθετηθεί.",
     "share_send": "Αποστολή συνδέσμου κράτησης",
-    "hist_late_return": "Επιστράφηκε με καθυστέρηση"
+    "hist_late_return": "Επιστράφηκε με καθυστέρηση",
+    "cp_noteFailed": "Η σημείωση δεν αποθηκεύτηκε. Δοκιμάστε ξανά.",
+    "contact": "Επικοινωνία",
+    "contactOpen": "Άνοιγμα",
+    "walkInNoPayment": "Η ενοικίαση χωρίς κράτηση καταγράφηκε.",
+    "pc_refundBtn": "Επιστροφή χρημάτων",
+    "pc_refundAmount": "Ποσό επιστροφής",
+    "pc_refundConfirm": "Καταγραφή επιστροφής",
+    "pc_refundDone": "Η επιστροφή καταγράφηκε.",
+    "pc_refundEnter": "Εισαγάγετε το ποσό επιστροφής.",
+    "pc_refundMax": "Από αυτή την πληρωμή μπορείτε να επιστρέψετε έως {amount}.",
+    "pc_refundFailed": "Η επιστροφή δεν αποθηκεύτηκε. Δοκιμάστε ξανά."
   },
   "newBooking": {
     "docsSelfie": "Φωτογραφία του πελάτη",
@@ -2784,7 +2834,12 @@
     "saveRate_monthly": "Αποθήκευση {amount} τον μήνα ως τιμή του οχήματος",
     "extraFree": "Δωρεάν",
     "clashHeld": "Δεσμευμένο για παράταση: ο/η {who} θέλει να παρατείνει. Επιβεβαιώστε ή άρετε πρώτα τη δέσμευση.",
-    "clashHeldRenter": "ο μισθωτής"
+    "clashHeldRenter": "ο μισθωτής",
+    "startMoved": "Ξεκινά στις {date}, την ημέρα που το όχημα είναι ελεύθερο.",
+    "endBeforeStart": "Η ημερομηνία επιστροφής πρέπει να είναι μετά την ημερομηνία έναρξης.",
+    "freeQ": "Κράτηση δωρεάν;",
+    "freeYes": "Κράτηση δωρεάν",
+    "errAmountReceived": "Εισαγάγετε το ποσό που εισπράχθηκε."
   },
   "fleet": {
     "title": "Στόλος",
@@ -2860,7 +2915,10 @@
     "qp_save": "Αποθήκευση",
     "qp_cancel": "Άκυρο",
     "qp_failed": "Δεν ήταν δυνατή η αποθήκευση της τιμής. Δοκιμάστε ξανά.",
-    "assistant": "Βοηθός"
+    "assistant": "Βοηθός",
+    "bandArchived": "αρχειοθετημένα",
+    "status_Archived": "Αρχειοθετημένο",
+    "noticeArchiveLive": "Μερικά από αυτά τα οχήματα έχουν κρατήσεις που δεν έχουν ολοκληρωθεί. Μεταφέρετέ τις πρώτα σε άλλο όχημα ή ακυρώστε τις."
   },
   "customers": {
     "sel_nationality": "Υπηκοότητα",
@@ -2946,7 +3004,12 @@
     "in_trend": "Διάρκεια και έξοδα",
     "in_avgLength": "Μέση διάρκεια",
     "in_avgSpend": "Μέσα έξοδα",
-    "pillReviews": "{count, plural, one {# κριτική} other {# κριτικές}}"
+    "pillReviews": "{count, plural, one {# κριτική} other {# κριτικές}}",
+    "sel_needContact": "Προσθέστε ένα όνομα και έναν τρόπο επικοινωνίας: τηλέφωνο, Messenger, LINE, Telegram, Instagram ή email.",
+    "sel_messengerNameOnly": "Όνομα ή σύνδεσμος προφίλ",
+    "sel_lineIdOnly": "LINE ID ή τηλέφωνο",
+    "sel_telegramIdOnly": "Όνομα χρήστη Telegram ή τηλέφωνο",
+    "sel_instagram": "Όνομα χρήστη Instagram"
   },
   "calendar": {
     "title": "Ημερολόγιο",
@@ -3046,7 +3109,7 @@
     "vs_reserved": "Κλεισμένο",
     "vs_maintenance": "Στο συνεργείο",
     "vs_available": "Ελεύθερο",
-    "vs_inactive": "Εκτός χρήσης",
+    "vs_inactive": "Αρχειοθετημένο",
     "vs_retired": "Εκτός χρήσης",
     "c_tax": "Τέλη κυκλοφορίας",
     "c_porbor": "Υποχρεωτική ασφάλιση (Por Ror Bor)",
@@ -3391,7 +3454,8 @@
     "tl_out": "Στον/στην {name}",
     "tl_service": "Σέρβις",
     "tl_repair": "Επισκευή",
-    "tl_damage": "Ζημιά στην επιστροφή: {count, plural, one {# σημείο} other {# σημεία}}"
+    "tl_damage": "Ζημιά στην επιστροφή: {count, plural, one {# σημείο} other {# σημεία}}",
+    "unarchive": "Επαναφορά από το αρχείο"
   },
   "customerPage": {
     "back": "Πελάτες",
@@ -3493,7 +3557,7 @@
     "n_placeholder": "Οτιδήποτε αξίζει να θυμάστε: προτιμήσεις, συνήθειες πληρωμής, υπενθυμίσεις",
     "n_auto": "Αποθηκεύεται όταν πατήσετε αλλού",
     "new_title": "Προσθήκη πελάτη",
-    "new_subtitle": "Αρκούν ένα όνομα και ένα τηλέφωνο. Προσθέστε τα υπόλοιπα τώρα ή αργότερα.",
+    "new_subtitle": "Αρκούν ένα όνομα και ένας τρόπος επικοινωνίας. Προσθέστε τα υπόλοιπα τώρα ή αργότερα.",
     "new_chatTitle": "Εφαρμογές συνομιλίας και email",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, email",
     "new_whatsappHint": "Αφήστε κενό αν είναι ίδιο με το τηλέφωνό του.",
@@ -3595,7 +3659,17 @@
     "tl_paidCharge": "Πλήρωσε χρέωση",
     "tl_refunded": "Επιστροφή χρημάτων",
     "tl_damage": "Ζημιά στην επιστροφή: {count, plural, one {# σημείο} other {# σημεία}}",
-    "tl_review": "Άφησε κριτική: {rating}/5"
+    "tl_review": "Άφησε κριτική: {rating}/5",
+    "new_phoneHint": "Δεν χρειάζεται αν προσθέσετε Messenger, LINE, Telegram, Instagram ή email παρακάτω.",
+    "dnr_failed": "Δεν αποθηκεύτηκε. Δοκιμάστε ξανά.",
+    "message": "Μήνυμα",
+    "dupContact": "Ο/Η {name} είναι ήδη αποθηκευμένος/η με αυτά τα στοιχεία επικοινωνίας.",
+    "f_licenceClass": "Κατηγορία διπλώματος",
+    "f_idType": "Έγγραφο ταυτότητας",
+    "f_idType_passport": "Διαβατήριο",
+    "f_idType_national_id": "Δελτίο ταυτότητας",
+    "f_idCardNo": "Αριθμός δελτίου ταυτότητας",
+    "f_idCardExpiry": "Λήξη δελτίου ταυτότητας"
   },
   "vehicleForm": {
     "addTitle": "Προσθήκη οχήματος",
@@ -3770,7 +3844,9 @@
     "qp_add": "Προσθήκη",
     "backSetup": "Ρύθμιση",
     "quickSubtitle": "Μόνο τα βασικά. Χρειάζονται μόνο τύπος, μάρκα και μοντέλο.",
-    "quickLater": "Ημερομηνίες τελών και ασφάλισης, χιλιόμετρα, δάνειο και άλλα μπορούν να προστεθούν αργότερα από τον Στόλο."
+    "quickLater": "Ημερομηνίες τελών και ασφάλισης, χιλιόμετρα, δάνειο και άλλα μπορούν να προστεθούν αργότερα από τον Στόλο.",
+    "archivedNow": "Αυτό το όχημα είναι αρχειοθετημένο.",
+    "unarchiveBtn": "Επαναφορά από το αρχείο"
   },
   "bookingEdit": {
     "booking": "Κράτηση",
@@ -4050,7 +4126,7 @@
     "tp_km": "Επιτρεπόμενη απόσταση ανά μήνα (km)",
     "tp_kmMi": "Επιτρεπόμενα μίλια ανά μήνα",
     "tp_fuel": "Καύσιμο ανά 1/8 ρεζερβουάρ που λείπει",
-    "tp_late": "Χρέωση καθυστερημένης επιστροφής (% ανά ημέρα)",
+    "tp_late": "Χρέωση καθυστέρησης πληρωμής (% ανά ημέρα)",
     "tp_cleaning": "Χρέωση καθαρισμού, από",
     "tp_smoking": "Χρέωση καπνίσματος, έως",
     "tp_repairs": "Επισκευές που μπορεί να εγκρίνει ο πελάτης, έως",
@@ -4779,7 +4855,14 @@
     "ba_or": "ή",
     "ba_ownLabel": "Σύνδεση δικού σας domain",
     "bt_showName": "Εμφάνιση ονόματος επιχείρησης δίπλα στο λογότυπο",
-    "bt_showNameHint": "Όταν είναι απενεργοποιημένο, ένα φαρδύ λογότυπο εμφανίζεται μόνο του και ένα τετράγωνο έχει το όνομά σας δίπλα. Δημοσιεύστε για να ενεργοποιηθεί."
+    "bt_showNameHint": "Όταν είναι απενεργοποιημένο, ένα φαρδύ λογότυπο εμφανίζεται μόνο του και ένα τετράγωνο έχει το όνομά σας δίπλα. Δημοσιεύστε για να ενεργοποιηθεί.",
+    "reg_confirmCurrency": "Οι τιμές των οχημάτων θα εμφανίζονται σε {to} αλλά δεν θα μετατραπούν. Οι υπάρχουσες κρατήσεις μένουν σε {from}.",
+    "reg_confirmCountry": "Αυτό αλλάζει επίσης το νόμισμα σε {currency}, τη ζώνη ώρας σε {zone}, τις αποστάσεις σε {unit} και τον ΦΠΑ σε {vat}%.",
+    "reg_confirmChange": "Αλλαγή",
+    "reg_confirmCancel": "Ακύρωση",
+    "tp_lateReturnPerDay": "Χρέωση καθυστερημένης επιστροφής ανά ημέρα",
+    "ag_n_lateReturn": "Χρέωση καθυστερημένης επιστροφής",
+    "ag_n_perDay": "{amount} ανά ημέρα"
   },
   "accountPage": {
     "roleOwner": "Ιδιοκτήτης",
@@ -7585,7 +7668,9 @@
     "nudgeSignature": "Προσθέστε την υπογραφή σας μία φορά και οι πελάτες υπογράφουν τη σύμβαση ενοικίασης στο κινητό τους.",
     "nudgePaymentMethods": "Προσθέστε πώς μπορούν να σας πληρώσουν οι πελάτες (τραπεζικά στοιχεία, Wise, Revolut ή PromptPay), ώστε να πληρώνουν απευθείας από τη σελίδα κράτησής τους.",
     "extensionHoldReturning": "Ο/Η {customer} δεν παρατείνει: το {vehicle} επιστρέφεται στις {date}. Οι επόμενες ημέρες είναι ξανά διαθέσιμες για κράτηση.",
-    "reviewReceived": "Ο/Η {customer} άφησε κριτική {rating} αστεριών."
+    "reviewReceived": "Ο/Η {customer} άφησε κριτική {rating} αστεριών.",
+    "handoverReportSigned": "Ο/Η {customer} υπέγραψε την αναφορά παράδοσης για το {vehicle}.",
+    "returnReportSigned": "Ο/Η {customer} υπέγραψε την αναφορά επιστροφής για το {vehicle}."
   },
   "handoverPay": {
     "title": "Πληρωμή",
@@ -7852,7 +7937,8 @@
     "step3p_b_np": "Παραλάβετέ το από {business}. Φέρτε δίπλωμα και διαβατήριο.",
     "spec_year": "Έτος",
     "spec_deposit": "Εγγύηση",
-    "fleet_perMonth": "{amount} τον μήνα"
+    "fleet_perMonth": "{amount} τον μήνα",
+    "photo_credit": "Φωτογραφία: <author>{name}</author>, <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Εμφάνιση",
@@ -8024,7 +8110,21 @@
     "role_muted": "Δευτερεύον κείμενο",
     "role_dark": "Σκούρες ενότητες",
     "pal_autoSummary": "Χρώματα προτύπου",
-    "noReviewsYet": "Καμία κριτική ακόμη"
+    "noReviewsYet": "Καμία κριτική ακόμη",
+    "img_stock": "Φωτογραφίες stock",
+    "img_uploadPhoto": "Ανέβασμα φωτογραφίας",
+    "stock_credit": "Φωτογραφία: <author>{name}</author>, <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Δεν ήταν δυνατή η φόρτωση φωτογραφιών. Δοκιμάστε ξανά.",
+    "stock_loading": "Φόρτωση φωτογραφιών…",
+    "stock_more": "Περισσότερες φωτογραφίες",
+    "stock_none": "Δεν βρέθηκαν φωτογραφίες. Δοκιμάστε άλλη αναζήτηση.",
+    "stock_note": "Δωρεάν φωτογραφίες από το <unsplash>Unsplash</unsplash>. Ο ιστότοπός σας αναφέρει τον φωτογράφο.",
+    "stock_off": "Οι φωτογραφίες stock δεν έχουν ρυθμιστεί ακόμα.",
+    "stock_rateLimited": "Συμπληρώθηκε το ωριαίο όριο αναζητήσεων του Unsplash. Δοκιμάστε ξανά σε λίγο.",
+    "stock_search": "Αναζήτηση φωτογραφιών",
+    "stock_suggested": "Προτεινόμενες αναζητήσεις",
+    "stock_use": "Χρήση φωτογραφίας: {photo}",
+    "stock_useBy": "Χρήση φωτογραφίας από {name}"
   },
   "roveListing": {
     "title": "Να μοιραστείτε τον στόλο σας στο rove.rent και να δέχεστε κρατήσεις εκεί;",

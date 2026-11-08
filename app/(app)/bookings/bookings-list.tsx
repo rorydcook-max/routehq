@@ -335,10 +335,20 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
       {deleteError && !deleteErrorId ? (
         <p className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-sm font-semibold text-[var(--danger)]">{deleteError}</p>
       ) : null}
-      {filtered.length === 0 ? (
+      {filtered.length === 0 && bookings.length === 0 && !search.trim() ? (
+        // A new business: nothing to filter yet, just the way to make the first one.
+        <EmptyState
+          title={tx.say("emptyNone")}
+          action={
+            <Link className="primary-action pressable" href="/bookings/new">
+              {tx.say("create")}
+            </Link>
+          }
+        />
+      ) : filtered.length === 0 ? (
         <EmptyState
           title={tx.say("emptyTitle")}
-          description={tx.say("emptyBody")}
+          description={filter !== "all" ? tx.say("emptyBody") : undefined}
         />
       ) : (
         <div className="space-y-6">

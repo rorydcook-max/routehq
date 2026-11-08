@@ -18,6 +18,10 @@ function fullPhone(formData: FormData, codeKey: string, localKey: string) {
   if (!raw) {
     return null;
   }
+  // Words ("call me maybe") or a number too short to dial are not saved as a phone (real-user test, 8 Nov 2026).
+  if (!/^\+?\d+$/.test(raw) || raw.replace(/\D/g, "").length < (raw.startsWith("+") ? 8 : 6)) {
+    throw new Error("Check the phone number.");
+  }
   if (raw.startsWith("+")) {
     return raw;
   }
@@ -261,6 +265,48 @@ export async function customerWithPhone(organizationId: string, code: string, lo
   return data ? { id: String(data.id), name: String(data.full_name || "") } : null;
 }
 
+/**
+ * Someone already saved with this phone, email, Messenger, LINE, Telegram or Instagram (real-user test, 8 Nov 2026:
+ * only the phone was checked). Handles are compared without "@" and ignoring case.
+ */
+export async function customerWithContact(
+  organizationId: string,
+  fields: { code?: string; phone?: string; whatsapp?: string; email?: string; messenger?: string; line?: string; telegram?: string; instagram?: string }
+) {
+  if (!organizationId) return null;
+  const byPhone = fields.phone ? await customerWithPhone(organizationId, fields.code || "", fields.phone) : null;
+  if (byPhone) return byPhone;
+  const byWhatsapp = fields.whatsapp ? await customerWithPhone(organizationId, fields.code || "", fields.whatsapp) : null;
+  if (byWhatsapp) return byWhatsapp;
+  // A value inside PostgREST's or(): quoted, with LIKE wildcards taken literally.
+  const quoted = (value: string) => `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/[%_]/g, (match) => `\\${match}`)}"`;
+  const conditions: string[] = [];
+  const email = String(fields.email || "").trim();
+  if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) conditions.push(`email.ilike.${quoted(email)}`);
+  const handles: Array<[string, string | undefined]> = [
+    ["messenger_id", fields.messenger],
+    ["line_id", fields.line],
+    ["telegram_username", fields.telegram],
+    ["instagram_handle", fields.instagram]
+  ];
+  for (const [column, raw] of handles) {
+    const handle = String(raw || "").trim().replace(/^@/, "");
+    if (handle.length < 3) continue;
+    conditions.push(`${column}.ilike.${quoted(handle)}`, `${column}.ilike.${quoted(`@${handle}`)}`);
+  }
+  if (!conditions.length) return null;
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data } = await supabase
+    .from("customers")
+    .select("id, full_name")
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .or(conditions.join(","))
+    .limit(1)
+    .maybeSingle();
+  return data ? { id: String(data.id), name: String(data.full_name || "") } : null;
+}
+
 /** "Add a new customer" inside the booking form. A reason it can't be saved comes back as `{ actionError }`. */
 export async function createInlineCustomer(formData: FormData) {
   return guard(() => createInlineCustomerOrThrow(formData), "Couldn't add the customer. Nothing was saved.");
@@ -379,6 +425,8 @@ async function updateCustomerOrThrow(formData: FormData) {
   if (formData.has("driverLicenseCountry")) updates.driver_license_country = optionalString(formData, "driverLicenseCountry");
   // EU licence categories (AM, A1, A2, A, B, BE...) and, for UK businesses, the DVLA check code.
   if (formData.has("licenceCategoriesShown")) updates.license_type = licenceCategoriesText(formData.getAll("licenceCategories")) || null;
+  // Countries without EU-style categories: the class as written on their licence.
+  if (formData.has("licenceClassText")) updates.license_type = optionalString(formData, "licenceClassText");
   if (formData.has("dvlaCheckCode")) updates.dvla_check_code = cleanDvlaCode(formData.get("dvlaCheckCode")) || null;
   // Türkiye: the KABİS details (lib/kabis.ts). A T.C. Kimlik No that fails its checksum is not saved, so the
   // KABİS block shows it as missing rather than copying a typo into the police system.
@@ -389,6 +437,16 @@ async function updateCustomerOrThrow(formData: FormData) {
   if (formData.has("emergencyContactName")) updates.emergency_contact_name = optionalString(formData, "emergencyContactName");
   if (formData.has("emergencyContactPhone")) updates.emergency_contact_phone = fullPhone(formData, "emergencyPhoneCountryCode", "emergencyContactPhone");
   if (notes !== undefined) updates.notes = notes;
+  // Phone removed: the WhatsApp copy of that same number goes too, or messages keep going to a number that was taken off.
+  if (formData.has("phone") && !updates.phone) {
+    const { data: before } = await supabase.from("customers").select("phone, whatsapp_number").eq("id", customerId).eq("organization_id", organizationId).maybeSingle();
+    const digits = (value: unknown) => String(value || "").replace(/\D/g, "");
+    const oldPhone = digits(before?.phone);
+    if (oldPhone && digits(before?.whatsapp_number) === oldPhone && (!formData.has("whatsappNumber") || !updates.whatsapp_number || digits(updates.whatsapp_number) === oldPhone)) {
+      updates.whatsapp_number = null;
+      updates.whatsapp = null;
+    }
+  }
   // "Don't rent to them again": a warning whenever they are picked for a booking, with the reason.
   if (formData.has("doNotRent")) {
     const on = String(formData.get("doNotRent")) === "true";
@@ -400,6 +458,11 @@ async function updateCustomerOrThrow(formData: FormData) {
   const { error } = await supabase.from("customers").update(updates).eq("id", customerId).eq("organization_id", organizationId);
   if (error) {
     throw new Error(error.message);
+  }
+  // Passport or national ID card: saved on its own so a database without the column yet (migration 0142) still saves the rest.
+  const idDocumentType = optionalString(formData, "idDocumentType");
+  if (idDocumentType === "passport" || idDocumentType === "national_id") {
+    await supabase.from("customers").update({ id_document_type: idDocumentType }).eq("id", customerId).eq("organization_id", organizationId).then(() => null, () => null);
   }
 
   await recordActivityEvent(supabase, {

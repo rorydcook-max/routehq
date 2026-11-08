@@ -407,9 +407,15 @@
     "lateBackCharge": "Förseningsavgift",
     "lateBackFromDeposit": "Dra från depositionen",
     "lateBackChargeRenter": "Debitera hyrestagaren",
-    "lateBackWaive": "Efterskänk",
+    "lateBackWaive": "Efterskänk (överenskommet med hyrestagaren)",
     "lateBackOverDeposit": "Återstående deposition täcker upp till {amount}.",
-    "lateBackRow": "{count, plural, one {# dag för sent} other {# dagar för sent}}"
+    "lateBackRow": "{count, plural, one {# dag för sent} other {# dagar för sent}}",
+    "customerNotPresent": "Kunden är inte på plats",
+    "customerNotPresentNote": "Kunden får en länk för att signera rapporten.",
+    "waitingSignature": "Väntar på kundens signatur",
+    "resendSignatureLink": "Skicka signeringslänken igen",
+    "signatureLinkSent": "Länk skickad",
+    "signatureLinkNotSent": "Inte skickad automatiskt. Skicka den från bokningens meddelanden."
   },
   "translation": {
     "translatedFrom": "Översatt från {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {# fordon} other {# fordon}}",
     "bs_demoBanner": "Demoföretag, bara ett exempel. Bokning är avstängd.",
     "bs_demoNoBooking": "Det här är ett demoföretag, så bokning är avstängd.",
-    "reason_late_return": "sen återlämning"
+    "reason_late_return": "sen återlämning",
+    "actionFailed": "Det skickades inte. Kontrollera anslutningen och försök igen.",
+    "stillNeeded": "Behövs fortfarande: {items}",
+    "need_agreeTick": "Bock för godkännande av avtalet",
+    "idType": "ID-handling",
+    "idType_passport": "Pass",
+    "idType_national_id": "Nationellt ID-kort",
+    "idCardNumber": "ID-kortsnummer",
+    "passportNo": "Passnummer",
+    "reportTitle_delivery": "Överlämningsrapport",
+    "reportTitle_return": "Återlämningsrapport",
+    "reportToSign_delivery": "Signera din överlämningsrapport",
+    "reportToSign_return": "Signera din återlämningsrapport",
+    "reportSeeAndSign": "Kontrollera bilderna och uppgifterna och signera sedan.",
+    "reportOdometer": "Mätarställning",
+    "reportFuel": "Bränsle",
+    "reportPhotos": "Bilder",
+    "reportDamage": "Skador",
+    "reportNoDamage": "Inga skador noterade.",
+    "reportDeposit": "Deposition",
+    "reportDepositHeld": "Innehållen",
+    "reportDeducted": "Avdraget",
+    "reportRefunded": "Återbetalt till dig",
+    "reportConsent": "Jag bekräftar att fordonets skick är som det registrerats i den här rapporten.",
+    "reportSign": "Signera rapporten",
+    "reportSignedTitle": "Rapporten är signerad",
+    "reportSignedOn": "Signerad av {name}, {date}.",
+    "reportDownload": "Ladda ner rapporten",
+    "reportNotFoundTitle": "Rapporten hittades inte",
+    "reportNotFoundMessage": "Be uthyrningsföretaget om en ny länk."
   },
   "customerMessages": {
     "hi": "Hej {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "Ingen återbetalning görs.",
     "cancelDepositBack": "Din deposition på {amount} betalas tillbaka.",
     "cancelDepositPart": "{returned} av din deposition på {held} betalas tillbaka.",
-    "cancelDepositKept": "Din deposition på {amount} har behållits."
+    "cancelDepositKept": "Din deposition på {amount} har behållits.",
+    "signHandoverReport": "din överlämningsrapport för {vehicle} är klar att kontrollera och signera: {link}",
+    "signReturnReport": "din återlämningsrapport för {vehicle} är klar att kontrollera och signera: {link}"
   },
   "common": {
     "kinds_car": "Bilar",
@@ -1299,7 +1336,8 @@
     "collect_extension": "Ta betalt för förlängning",
     "collect_extras": "Ta betalt för tillval",
     "job_review": "Omdöme från {name} att granska",
-    "job_review_open": "Öppna omdömen"
+    "job_review_open": "Öppna omdömen",
+    "job_inspection_signature": "Kundens signatur behövs: {ref}"
   },
   "bookings": {
     "eyebrow": "Bokningar",
@@ -1380,7 +1418,8 @@
     "deleteRecordsInspections": "Utlämnings- och återlämningskontroller, med foton: {count}",
     "deleteRecordsSigned": "Det signerade avtalet",
     "deleteRecordsBody": "Det går inte att ångra.",
-    "deleteAnyway": "Radera ändå"
+    "deleteAnyway": "Radera ändå",
+    "emptyNone": "Inga bokningar än."
   },
   "inbox": {
     "title": "Inkorg",
@@ -2560,7 +2599,18 @@
     "cn_depositTooMuch": "Depositionen som fortfarande hålls är {amount}.",
     "fin_cancelledSettled": "Återbetalningar registrerade. Inget kvar att reglera.",
     "share_send": "Skicka bokningslänk",
-    "hist_late_return": "Återlämnad för sent"
+    "hist_late_return": "Återlämnad för sent",
+    "cp_noteFailed": "Anteckningen sparades inte. Försök igen.",
+    "contact": "Kontakt",
+    "contactOpen": "Öppna",
+    "walkInNoPayment": "Uthyrning utan bokning registrerad.",
+    "pc_refundBtn": "Återbetala",
+    "pc_refundAmount": "Återbetalningsbelopp",
+    "pc_refundConfirm": "Registrera återbetalning",
+    "pc_refundDone": "Återbetalning registrerad.",
+    "pc_refundEnter": "Ange återbetalningsbeloppet.",
+    "pc_refundMax": "Du kan återbetala högst {amount} från den här betalningen.",
+    "pc_refundFailed": "Återbetalningen sparades inte. Försök igen."
   },
   "newBooking": {
     "docsSelfie": "Foto på kunden",
@@ -2810,7 +2860,12 @@
     "saveRate_monthly": "Spara {amount} per månad som fordonets pris",
     "extraFree": "Gratis",
     "clashHeld": "Reserverad för förlängning: {who} vill förlänga. Bekräfta eller släpp reservationen först.",
-    "clashHeldRenter": "hyrestagaren"
+    "clashHeldRenter": "hyrestagaren",
+    "startMoved": "Börjar {date}, den dag fordonet är ledigt.",
+    "endBeforeStart": "Återlämningsdatumet måste vara efter startdatumet.",
+    "freeQ": "Boka gratis?",
+    "freeYes": "Boka gratis",
+    "errAmountReceived": "Ange mottaget belopp."
   },
   "fleet": {
     "title": "Fordonsflotta",
@@ -2886,7 +2941,10 @@
     "qp_save": "Spara",
     "qp_cancel": "Avbryt",
     "qp_failed": "Det gick inte att spara priset. Försök igen.",
-    "assistant": "Assistent"
+    "assistant": "Assistent",
+    "bandArchived": "arkiverad",
+    "status_Archived": "Arkiverad",
+    "noticeArchiveLive": "Några av fordonen har bokningar som inte är avslutade. Flytta dem till ett annat fordon eller avboka dem först."
   },
   "customers": {
     "sel_nationality": "Nationalitet",
@@ -2972,7 +3030,12 @@
     "in_trend": "Hyrlängd och utgifter",
     "in_avgLength": "Snittlängd",
     "in_avgSpend": "Snittutgift",
-    "pillReviews": "{count, plural, one {# omdöme} other {# omdömen}}"
+    "pillReviews": "{count, plural, one {# omdöme} other {# omdömen}}",
+    "sel_needContact": "Lägg till ett namn och ett sätt att nå dem: telefonnummer, Messenger, LINE, Telegram, Instagram eller e-post.",
+    "sel_messengerNameOnly": "Namn eller profillänk",
+    "sel_lineIdOnly": "LINE-ID eller telefon",
+    "sel_telegramIdOnly": "Telegram-användarnamn eller telefon",
+    "sel_instagram": "Instagram-användarnamn"
   },
   "calendar": {
     "title": "Kalender",
@@ -3066,7 +3129,7 @@
     "vs_reserved": "Bokad",
     "vs_maintenance": "På verkstad",
     "vs_available": "Ledig",
-    "vs_inactive": "Används inte",
+    "vs_inactive": "Arkiverad",
     "vs_retired": "Används inte",
     "c_tax": "Fordonsskatt",
     "c_porbor": "Obligatorisk försäkring (Por Ror Bor)",
@@ -3417,7 +3480,8 @@
     "tl_out": "Hos {name}",
     "tl_service": "Service",
     "tl_repair": "Reparation",
-    "tl_damage": "Skada vid återlämning: {count, plural, one {# punkt} other {# punkter}}"
+    "tl_damage": "Skada vid återlämning: {count, plural, one {# punkt} other {# punkter}}",
+    "unarchive": "Återställ från arkiv"
   },
   "customerPage": {
     "back": "Kunder",
@@ -3518,7 +3582,7 @@
     "n_placeholder": "Allt värt att komma ihåg: önskemål, betalningsvanor, påminnelser",
     "n_auto": "Sparas när du trycker utanför",
     "new_title": "Lägg till kund",
-    "new_subtitle": "Namn och telefonnummer räcker. Lägg till resten nu eller senare.",
+    "new_subtitle": "Ett namn och ett sätt att nå dem räcker. Lägg till resten nu eller senare.",
     "new_chatTitle": "Chattappar och e-post",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, e-post",
     "new_whatsappHint": "Lämna tomt om det är samma som telefonnumret.",
@@ -3621,7 +3685,17 @@
     "tl_paidCharge": "Betalade en avgift",
     "tl_refunded": "Återbetalning",
     "tl_damage": "Skada vid återlämning: {count, plural, one {# punkt} other {# punkter}}",
-    "tl_review": "Lämnade ett omdöme: {rating}/5"
+    "tl_review": "Lämnade ett omdöme: {rating}/5",
+    "new_phoneHint": "Behövs inte om du lägger till Messenger, LINE, Telegram, Instagram eller e-post nedan.",
+    "dnr_failed": "Det sparades inte. Försök igen.",
+    "message": "Meddelande",
+    "dupContact": "{name} är redan sparad med de här kontaktuppgifterna.",
+    "f_licenceClass": "Körkortsbehörighet",
+    "f_idType": "ID-handling",
+    "f_idType_passport": "Pass",
+    "f_idType_national_id": "Nationellt ID-kort",
+    "f_idCardNo": "ID-kortsnummer",
+    "f_idCardExpiry": "ID-kortet går ut"
   },
   "vehicleForm": {
     "addTitle": "Lägg till fordon",
@@ -3796,7 +3870,9 @@
     "quickSubtitle": "Bara det grundläggande. Endast typ, märke och modell behövs.",
     "quickLater": "Skatte- och försäkringsdatum, mätarställning, lån med mera kan läggas till senare under Flotta.",
     "valueSummaryMi": "Mätarställning nu, vad du betalade, vad den är värd",
-    "valueSummaryEditMi": "Inköpspris, värde, mätarställning vid köp"
+    "valueSummaryEditMi": "Inköpspris, värde, mätarställning vid köp",
+    "archivedNow": "Fordonet är arkiverat.",
+    "unarchiveBtn": "Återställ från arkiv"
   },
   "bookingEdit": {
     "booking": "Bokning",
@@ -4075,7 +4151,7 @@
     "tp_fees": "Avgifter och gränser",
     "tp_km": "Tillåten körsträcka per månad (km)",
     "tp_fuel": "Bränsle per saknad 1/8 tank",
-    "tp_late": "Avgift för sen återlämning (% per dag)",
+    "tp_late": "Avgift för sen betalning (% per dag)",
     "tp_cleaning": "Städavgift, från",
     "tp_smoking": "Rökavgift, upp till",
     "tp_repairs": "Reparationer kunden får godkänna, upp till",
@@ -4806,7 +4882,14 @@
     "ba_or": "eller",
     "ba_ownLabel": "Koppla en egen domän",
     "bt_showName": "Visa företagsnamnet bredvid logotypen",
-    "bt_showNameHint": "När det är av visas en bred logotyp ensam och en kvadratisk logotyp får ditt namn bredvid. Publicera för att det ska synas."
+    "bt_showNameHint": "När det är av visas en bred logotyp ensam och en kvadratisk logotyp får ditt namn bredvid. Publicera för att det ska synas.",
+    "reg_confirmCurrency": "Fordonspriser visas i {to} men räknas inte om. Befintliga bokningar stannar i {from}.",
+    "reg_confirmCountry": "Det ändrar också valutan till {currency}, tidszonen till {zone}, avstånd till {unit} och moms till {vat} %.",
+    "reg_confirmChange": "Ändra",
+    "reg_confirmCancel": "Avbryt",
+    "tp_lateReturnPerDay": "Avgift för sen återlämning per dag",
+    "ag_n_lateReturn": "Avgift för sen återlämning",
+    "ag_n_perDay": "{amount} per dag"
   },
   "accountPage": {
     "roleOwner": "Ägare",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "Lägg till din signatur en gång så kan kunderna signera hyresavtalet i mobilen.",
     "nudgePaymentMethods": "Lägg till hur kunder kan betala dig (bankuppgifter, Wise, Revolut eller PromptPay) så att de kan betala direkt från sin bokningssida.",
     "extensionHoldReturning": "{customer} förlänger inte: {vehicle} ska lämnas tillbaka den {date}. Dagarna efter går att boka igen.",
-    "reviewReceived": "{customer} lämnade ett omdöme med {rating} stjärnor."
+    "reviewReceived": "{customer} lämnade ett omdöme med {rating} stjärnor.",
+    "handoverReportSigned": "{customer} har signerat överlämningsrapporten för {vehicle}.",
+    "returnReportSigned": "{customer} har signerat återlämningsrapporten för {vehicle}."
   },
   "handoverPay": {
     "title": "Betalning",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "Hämta hos {business}. Ta med körkort och pass.",
     "spec_year": "Årsmodell",
     "spec_deposit": "Deposition",
-    "fleet_perMonth": "{amount} i månaden"
+    "fleet_perMonth": "{amount} i månaden",
+    "photo_credit": "Foto av <author>{name}</author> på <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Utseende",
@@ -8097,7 +8183,21 @@
     "role_muted": "Dämpad text",
     "role_dark": "Mörka avsnitt",
     "pal_autoSummary": "Mallens färger",
-    "noReviewsYet": "Inga omdömen än"
+    "noReviewsYet": "Inga omdömen än",
+    "img_stock": "Stockfoton",
+    "img_uploadPhoto": "Ladda upp foto",
+    "stock_credit": "Foto av <author>{name}</author> på <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Det gick inte att läsa in foton. Försök igen.",
+    "stock_loading": "Läser in foton…",
+    "stock_more": "Fler foton",
+    "stock_none": "Inga foton hittades. Prova en annan sökning.",
+    "stock_note": "Gratis foton från <unsplash>Unsplash</unsplash>. Din webbplats anger fotografen.",
+    "stock_off": "Stockfoton är inte konfigurerade än.",
+    "stock_rateLimited": "Unsplash sökgräns per timme är nådd. Försök igen om en stund.",
+    "stock_search": "Sök foton",
+    "stock_suggested": "Föreslagna sökningar",
+    "stock_use": "Använd foto: {photo}",
+    "stock_useBy": "Använd foto av {name}"
   },
   "roveListing": {
     "title": "Dela din fordonsflotta på rove.rent och ta emot bokningar där?",

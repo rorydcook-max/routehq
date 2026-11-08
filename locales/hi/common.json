@@ -407,9 +407,15 @@
     "lateBackCharge": "देरी शुल्क",
     "lateBackFromDeposit": "डिपॉज़िट से लें",
     "lateBackChargeRenter": "किरायेदार से वसूलें",
-    "lateBackWaive": "माफ़ करें",
+    "lateBackWaive": "माफ़ करें (किरायेदार से सहमति)",
     "lateBackOverDeposit": "बचा हुआ डिपॉज़िट {amount} तक कवर करता है।",
-    "lateBackRow": "{count, plural, one {# दिन देर} other {# दिन देर}}"
+    "lateBackRow": "{count, plural, one {# दिन देर} other {# दिन देर}}",
+    "customerNotPresent": "ग्राहक मौजूद नहीं",
+    "customerNotPresentNote": "उन्हें रिपोर्ट पर साइन करने के लिए लिंक भेजा जाएगा।",
+    "waitingSignature": "ग्राहक के साइन का इंतज़ार",
+    "resendSignatureLink": "साइन लिंक फिर से भेजें",
+    "signatureLinkSent": "लिंक भेजा गया",
+    "signatureLinkNotSent": "अपने आप नहीं भेजा गया। बुकिंग के मैसेज से भेजें।"
   },
   "translation": {
     "translatedFrom": "{language} से अनुवादित",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {# वाहन} other {# वाहन}}",
     "bs_demoBanner": "डेमो बिज़नेस, सिर्फ़ उदाहरण। बुकिंग बंद है।",
     "bs_demoNoBooking": "यह डेमो बिज़नेस है, इसलिए बुकिंग बंद है।",
-    "reason_late_return": "देर से वापसी"
+    "reason_late_return": "देर से वापसी",
+    "actionFailed": "भेजा नहीं गया। अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
+    "stillNeeded": "अभी चाहिए: {items}",
+    "need_agreeTick": "एग्रीमेंट पर सहमति का टिक",
+    "idType": "पहचान दस्तावेज़",
+    "idType_passport": "पासपोर्ट",
+    "idType_national_id": "राष्ट्रीय पहचान पत्र",
+    "idCardNumber": "पहचान पत्र नंबर",
+    "passportNo": "पासपोर्ट नंबर",
+    "reportTitle_delivery": "हैंडओवर रिपोर्ट",
+    "reportTitle_return": "वापसी रिपोर्ट",
+    "reportToSign_delivery": "अपनी हैंडओवर रिपोर्ट पर साइन करें",
+    "reportToSign_return": "अपनी वापसी रिपोर्ट पर साइन करें",
+    "reportSeeAndSign": "फ़ोटो और विवरण जाँचें, फिर साइन करें।",
+    "reportOdometer": "ओडोमीटर",
+    "reportFuel": "ईंधन",
+    "reportPhotos": "फ़ोटो",
+    "reportDamage": "नुकसान",
+    "reportNoDamage": "कोई नुकसान दर्ज नहीं।",
+    "reportDeposit": "डिपॉज़िट",
+    "reportDepositHeld": "रखा गया",
+    "reportDeducted": "काटा गया",
+    "reportRefunded": "आपको लौटाया गया",
+    "reportConsent": "मैं पुष्टि करता/करती हूँ कि वाहन की स्थिति इस रिपोर्ट में दर्ज के अनुसार है।",
+    "reportSign": "रिपोर्ट पर साइन करें",
+    "reportSignedTitle": "रिपोर्ट पर साइन हो गया",
+    "reportSignedOn": "{name} ने {date} को साइन किया।",
+    "reportDownload": "रिपोर्ट डाउनलोड करें",
+    "reportNotFoundTitle": "रिपोर्ट नहीं मिली",
+    "reportNotFoundMessage": "रेंटल बिज़नेस से नया लिंक माँगें।"
   },
   "customerMessages": {
     "hi": "नमस्ते {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "कोई रिफ़ंड नहीं।",
     "cancelDepositBack": "आपका {amount} का डिपॉज़िट लौटाया जा रहा है।",
     "cancelDepositPart": "आपके {held} के डिपॉज़िट में से {returned} लौटाया जा रहा है।",
-    "cancelDepositKept": "आपका {amount} का डिपॉज़िट रख लिया गया है।"
+    "cancelDepositKept": "आपका {amount} का डिपॉज़िट रख लिया गया है।",
+    "signHandoverReport": "{vehicle} की आपकी हैंडओवर रिपोर्ट जाँचने और साइन करने के लिए तैयार है: {link}",
+    "signReturnReport": "{vehicle} की आपकी वापसी रिपोर्ट जाँचने और साइन करने के लिए तैयार है: {link}"
   },
   "common": {
     "kinds_car": "कारें",
@@ -1299,7 +1336,8 @@
     "collect_extension": "एक्सटेंशन का पैसा लें",
     "collect_extras": "एक्स्ट्रा का पैसा लें",
     "job_review": "{name} का रिव्यू जाँचें",
-    "job_review_open": "रिव्यू खोलें"
+    "job_review_open": "रिव्यू खोलें",
+    "job_inspection_signature": "ग्राहक का साइन चाहिए: {ref}"
   },
   "bookings": {
     "eyebrow": "बुकिंग",
@@ -1380,7 +1418,8 @@
     "deleteRecordsInspections": "सौंपने और वापसी की जाँच, फ़ोटो सहित: {count}",
     "deleteRecordsSigned": "हस्ताक्षरित अनुबंध",
     "deleteRecordsBody": "इसे वापस नहीं किया जा सकता।",
-    "deleteAnyway": "फिर भी हटाएँ"
+    "deleteAnyway": "फिर भी हटाएँ",
+    "emptyNone": "अभी कोई बुकिंग नहीं।"
   },
   "inbox": {
     "title": "इनबॉक्स",
@@ -2560,7 +2599,18 @@
     "cn_depositTooMuch": "अभी रखी गई जमा राशि {amount} है।",
     "fin_cancelledSettled": "रिफ़ंड दर्ज हो गए। निपटाने को कुछ नहीं बचा।",
     "share_send": "बुकिंग लिंक भेजें",
-    "hist_late_return": "देर से लौटाई गई"
+    "hist_late_return": "देर से लौटाई गई",
+    "cp_noteFailed": "नोट सहेजा नहीं गया। फिर से कोशिश करें।",
+    "contact": "संपर्क",
+    "contactOpen": "खोलें",
+    "walkInNoPayment": "वॉक-इन किराया दर्ज किया गया।",
+    "pc_refundBtn": "रिफ़ंड करें",
+    "pc_refundAmount": "रिफ़ंड राशि",
+    "pc_refundConfirm": "रिफ़ंड दर्ज करें",
+    "pc_refundDone": "रिफ़ंड दर्ज हो गया।",
+    "pc_refundEnter": "रिफ़ंड राशि डालें।",
+    "pc_refundMax": "इस भुगतान से आप अधिकतम {amount} रिफ़ंड कर सकते हैं।",
+    "pc_refundFailed": "रिफ़ंड सहेजा नहीं गया। फिर से कोशिश करें।"
   },
   "newBooking": {
     "docsSelfie": "ग्राहक की फ़ोटो",
@@ -2810,7 +2860,12 @@
     "saveRate_monthly": "{amount} प्रति माह को इस वाहन की कीमत के रूप में सेव करें",
     "extraFree": "मुफ़्त",
     "clashHeld": "एक्सटेंशन के लिए होल्ड: {who} अवधि बढ़ाना चाहते हैं। पहले कन्फ़र्म करें या होल्ड हटाएँ।",
-    "clashHeldRenter": "किराएदार"
+    "clashHeldRenter": "किराएदार",
+    "startMoved": "{date} से शुरू, जिस दिन यह वाहन खाली है।",
+    "endBeforeStart": "वापसी की तारीख शुरू होने की तारीख के बाद होनी चाहिए।",
+    "freeQ": "मुफ़्त में बुक करें?",
+    "freeYes": "मुफ़्त में बुक करें",
+    "errAmountReceived": "मिली हुई राशि डालें।"
   },
   "fleet": {
     "title": "फ़्लीट",
@@ -2886,7 +2941,10 @@
     "qp_save": "सहेजें",
     "qp_cancel": "रद्द करें",
     "qp_failed": "कीमत सहेजी नहीं जा सकी। फिर से कोशिश करें।",
-    "assistant": "असिस्टेंट"
+    "assistant": "असिस्टेंट",
+    "bandArchived": "आर्काइव किया गया",
+    "status_Archived": "आर्काइव किया गया",
+    "noticeArchiveLive": "इनमें से कुछ वाहनों की बुकिंग अभी खत्म नहीं हुई है। पहले उन्हें दूसरे वाहन पर ले जाएँ या रद्द करें।"
   },
   "customers": {
     "sel_nationality": "राष्ट्रीयता",
@@ -2972,7 +3030,12 @@
     "in_trend": "रेंटल अवधि और खर्च",
     "in_avgLength": "औसत अवधि",
     "in_avgSpend": "औसत खर्च",
-    "pillReviews": "{count, plural, one {# रिव्यू} other {# रिव्यू}}"
+    "pillReviews": "{count, plural, one {# रिव्यू} other {# रिव्यू}}",
+    "sel_needContact": "एक नाम और संपर्क का एक तरीका जोड़ें: फ़ोन नंबर, Messenger, LINE, Telegram, Instagram या ईमेल।",
+    "sel_messengerNameOnly": "उनका नाम या प्रोफ़ाइल लिंक",
+    "sel_lineIdOnly": "LINE ID या फ़ोन",
+    "sel_telegramIdOnly": "Telegram यूज़रनेम या फ़ोन",
+    "sel_instagram": "Instagram यूज़रनेम"
   },
   "calendar": {
     "title": "कैलेंडर",
@@ -3066,7 +3129,7 @@
     "vs_reserved": "बुक",
     "vs_maintenance": "गैराज में",
     "vs_available": "खाली",
-    "vs_inactive": "इस्तेमाल में नहीं",
+    "vs_inactive": "आर्काइव किया गया",
     "vs_retired": "इस्तेमाल में नहीं",
     "c_tax": "रोड टैक्स",
     "c_porbor": "अनिवार्य बीमा (Por Ror Bor)",
@@ -3417,7 +3480,8 @@
     "tl_out": "{name} के पास",
     "tl_service": "सर्विस",
     "tl_repair": "रिपेयर",
-    "tl_damage": "वापसी पर डैमेज मिला: {count, plural, one {# चीज़} other {# चीज़ें}}"
+    "tl_damage": "वापसी पर डैमेज मिला: {count, plural, one {# चीज़} other {# चीज़ें}}",
+    "unarchive": "आर्काइव से निकालें"
   },
   "customerPage": {
     "back": "ग्राहक",
@@ -3518,7 +3582,7 @@
     "n_placeholder": "याद रखने लायक कुछ भी: पसंद, भुगतान की आदतें, रिमाइंडर",
     "n_auto": "बाहर टैप करने पर सेव हो जाता है",
     "new_title": "ग्राहक जोड़ें",
-    "new_subtitle": "नाम और फ़ोन नंबर काफ़ी है। बाकी अभी या बाद में जोड़ें।",
+    "new_subtitle": "एक नाम और संपर्क का एक तरीका काफ़ी है। बाकी अभी या बाद में जोड़ें।",
     "new_chatTitle": "चैट ऐप्स और ईमेल",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, ईमेल",
     "new_whatsappHint": "अगर यह उनके फ़ोन नंबर जैसा ही है तो खाली छोड़ें।",
@@ -3621,7 +3685,17 @@
     "tl_paidCharge": "चार्ज चुकाया",
     "tl_refunded": "रिफ़ंड",
     "tl_damage": "वापसी पर डैमेज मिला: {count, plural, one {# चीज़} other {# चीज़ें}}",
-    "tl_review": "रिव्यू दिया: {rating}/5"
+    "tl_review": "रिव्यू दिया: {rating}/5",
+    "new_phoneHint": "अगर आप नीचे Messenger, LINE, Telegram, Instagram या ईमेल जोड़ते हैं, तो इसकी ज़रूरत नहीं।",
+    "dnr_failed": "सहेजा नहीं गया। फिर से कोशिश करें।",
+    "message": "मैसेज करें",
+    "dupContact": "{name} इन संपर्क विवरणों के साथ पहले से सहेजा गया है।",
+    "f_licenceClass": "लाइसेंस श्रेणी",
+    "f_idType": "पहचान दस्तावेज़",
+    "f_idType_passport": "पासपोर्ट",
+    "f_idType_national_id": "राष्ट्रीय पहचान पत्र",
+    "f_idCardNo": "पहचान पत्र नंबर",
+    "f_idCardExpiry": "पहचान पत्र की समाप्ति"
   },
   "vehicleForm": {
     "addTitle": "वाहन जोड़ें",
@@ -3796,7 +3870,9 @@
     "quickSubtitle": "बस बुनियादी बातें। केवल प्रकार, कंपनी और मॉडल की आवश्यकता है।",
     "quickLater": "टैक्स और बीमा की तारीखें, माइलेज, लोन और अन्य चीजें बाद में फ्लीट से जोड़ी जा सकती हैं।",
     "valueSummaryMi": "अभी का माइलेज, आपने कितना दिया, अभी कितने की है",
-    "valueSummaryEditMi": "खरीद मूल्य, कीमत, खरीदते समय माइलेज"
+    "valueSummaryEditMi": "खरीद मूल्य, कीमत, खरीदते समय माइलेज",
+    "archivedNow": "यह वाहन आर्काइव किया गया है।",
+    "unarchiveBtn": "आर्काइव से निकालें"
   },
   "bookingEdit": {
     "booking": "बुकिंग",
@@ -4075,7 +4151,7 @@
     "tp_fees": "शुल्क और सीमाएँ",
     "tp_km": "प्रति माह अनुमत दूरी (km)",
     "tp_fuel": "हर 1/8 टैंक कम फ़्यूल पर",
-    "tp_late": "देर से वापसी शुल्क (% प्रति दिन)",
+    "tp_late": "देर से भुगतान का शुल्क (% प्रति दिन)",
     "tp_cleaning": "सफ़ाई फ़ीस, कम से कम",
     "tp_smoking": "धूम्रपान फ़ीस, ज़्यादा से ज़्यादा",
     "tp_repairs": "मरम्मत जिसे ग्राहक मंज़ूर कर सकता है, ज़्यादा से ज़्यादा",
@@ -4806,7 +4882,14 @@
     "ba_or": "या",
     "ba_ownLabel": "अपना डोमेन जोड़ें",
     "bt_showName": "लोगो के बगल में बिज़नेस का नाम दिखाएँ",
-    "bt_showNameHint": "बंद होने पर चौड़ा लोगो अकेले दिखता है और चौकोर लोगो के बगल में आपका नाम आता है। लाइव करने के लिए प्रकाशित करें।"
+    "bt_showNameHint": "बंद होने पर चौड़ा लोगो अकेले दिखता है और चौकोर लोगो के बगल में आपका नाम आता है। लाइव करने के लिए प्रकाशित करें।",
+    "reg_confirmCurrency": "वाहन की कीमतें {to} में दिखेंगी, लेकिन बदली नहीं जाएँगी। मौजूदा बुकिंग {from} में ही रहेंगी।",
+    "reg_confirmCountry": "इससे मुद्रा {currency}, टाइम ज़ोन {zone}, दूरी की इकाई {unit} और VAT {vat}% भी हो जाएगा।",
+    "reg_confirmChange": "बदलें",
+    "reg_confirmCancel": "रद्द करें",
+    "tp_lateReturnPerDay": "देर से वापसी का प्रति दिन शुल्क",
+    "ag_n_lateReturn": "देर से वापसी का शुल्क",
+    "ag_n_perDay": "{amount} प्रति दिन"
   },
   "accountPage": {
     "roleOwner": "मालिक",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "अपना हस्ताक्षर एक बार जोड़ें, फिर ग्राहक फ़ोन पर रेंटल एग्रीमेंट पर हस्ताक्षर कर सकते हैं।",
     "nudgePaymentMethods": "जोड़ें कि ग्राहक आपको कैसे भुगतान कर सकते हैं (बैंक विवरण, Wise, Revolut या PromptPay), ताकि वे सीधे अपने बुकिंग पेज से भुगतान कर सकें।",
     "extensionHoldReturning": "{customer} अवधि नहीं बढ़ा रहे: {vehicle} {date} को वापस आना है। उसके बाद के दिन फिर से बुकिंग के लिए खुले हैं।",
-    "reviewReceived": "{customer} ने {rating}-स्टार रिव्यू दिया।"
+    "reviewReceived": "{customer} ने {rating}-स्टार रिव्यू दिया।",
+    "handoverReportSigned": "{customer} ने {vehicle} की हैंडओवर रिपोर्ट पर साइन किया।",
+    "returnReportSigned": "{customer} ने {vehicle} की वापसी रिपोर्ट पर साइन किया।"
   },
   "handoverPay": {
     "title": "पेमेंट",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "{business} से पिकअप करें। अपना लाइसेंस और पासपोर्ट साथ लाएँ।",
     "spec_year": "साल",
     "spec_deposit": "जमा राशि",
-    "fleet_perMonth": "{amount} प्रति माह"
+    "fleet_perMonth": "{amount} प्रति माह",
+    "photo_credit": "फ़ोटो: <author>{name}</author>, <unsplash>Unsplash</unsplash> पर"
   },
   "siteEditor": {
     "look": "लुक",
@@ -8097,7 +8183,21 @@
     "role_muted": "हल्का टेक्स्ट",
     "role_dark": "गहरे सेक्शन",
     "pal_autoSummary": "टेम्पलेट के रंग",
-    "noReviewsYet": "अभी कोई समीक्षा नहीं"
+    "noReviewsYet": "अभी कोई समीक्षा नहीं",
+    "img_stock": "स्टॉक फ़ोटो",
+    "img_uploadPhoto": "फ़ोटो अपलोड करें",
+    "stock_credit": "फ़ोटो: <author>{name}</author>, <unsplash>Unsplash</unsplash> पर",
+    "stock_failed": "फ़ोटो लोड नहीं हो सकीं। फिर से कोशिश करें।",
+    "stock_loading": "फ़ोटो लोड हो रही हैं…",
+    "stock_more": "और फ़ोटो",
+    "stock_none": "कोई फ़ोटो नहीं मिली। कुछ और खोजें।",
+    "stock_note": "<unsplash>Unsplash</unsplash> की मुफ़्त फ़ोटो। आपकी साइट फ़ोटोग्राफ़र को क्रेडिट देती है।",
+    "stock_off": "स्टॉक फ़ोटो अभी सेट नहीं हैं।",
+    "stock_rateLimited": "Unsplash की प्रति घंटा खोज सीमा पूरी हो गई। थोड़ी देर बाद फिर कोशिश करें।",
+    "stock_search": "फ़ोटो खोजें",
+    "stock_suggested": "सुझाई गई खोजें",
+    "stock_use": "फ़ोटो इस्तेमाल करें: {photo}",
+    "stock_useBy": "{name} की फ़ोटो इस्तेमाल करें"
   },
   "roveListing": {
     "title": "अपना फ़्लीट rove.rent पर दिखाएँ और वहाँ से बुकिंग लें?",

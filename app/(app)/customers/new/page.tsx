@@ -62,7 +62,7 @@ export default async function NewCustomerPage() {
               </label>
               <label className="block">
                 <span className={labelClass}>{say("f_phone")}</span>
-                <PhoneField defaultCountry={(organization as any).country_code || ""} inputClass={inputClass} />
+                <PhoneField defaultCountry={(organization as any).country_code || ""} inputClass={inputClass} keepWords />
                 <span className="mt-1 block font-medium text-[var(--muted)]">{say("new_phoneHint")}</span>
               </label>
               <DuplicatePhoneHint organizationId={organization.id} />

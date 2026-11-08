@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowRight, Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, MapPin, PenLine, ReceiptText, ShieldCheck, Wrench } from "lucide-react";
 import { createVehicleTask } from "@/app/actions/tasks";
-import { logVehicleMaintenance, setVehicleInShop } from "@/app/actions/vehicles";
+import { logVehicleMaintenance, setVehicleInShop, unarchiveVehicle } from "@/app/actions/vehicles";
 import { OpenFoldsOnHash } from "@/components/open-folds-on-hash";
 import { ShowMoreList } from "@/components/show-more-list";
 import { serviceKmLeft } from "@/lib/vehicle-service";
@@ -1307,6 +1307,15 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
                     ) : (
                       <Badge tone={statusTone}>{tx.has(`vs_${status}`) ? tx.say(`vs_${status}`) : vehicle.status}</Badge>
                     )}
+                    {/* Archived: one tap puts it back in the fleet (real-user test, 8 Nov 2026). */}
+                    {status === "inactive" ? (
+                      <ActionForm action={unarchiveVehicle}>
+                        <input name="vehicleId" type="hidden" value={vehicle.id} />
+                        <PendingButton className="pressable inline-flex min-h-9 items-center gap-1.5 rounded-full bg-[var(--primary)] px-3.5 text-sm font-bold text-white" pendingLabel={tx.say("saving")} type="submit">
+                          {tx.say("unarchive")}
+                        </PendingButton>
+                      </ActionForm>
+                    ) : null}
                     {/* In the shop: one tap puts it back on the road (Rory, 1 Nov 2026). */}
                     {status === "maintenance" ? (
                       <ActionForm action={setVehicleInShop}>

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { businessTimeZone } from "@/lib/business-time";
+import { lateFeePerDayFor } from "@/lib/late-return";
 
 export type InspectionMode = "delivery" | "return" | "condition_report";
 
@@ -15,6 +16,8 @@ export type InspectionContext = {
   earlyChargeWritten?: boolean;
   /** The charge for days after the booked return date is already on the booking (cash taken earlier on this return form). */
   lateChargeWritten?: boolean;
+  /** The business's late return fee per day (Settings > Rental terms), or null: priced from the vehicle's rates. */
+  lateFeePerDay?: number | null;
   vehicle: any;
   customer: any | null;
   gpsDevice: any | null;
@@ -210,12 +213,14 @@ export async function getInspectionContextByRental(
           ).data?.length
         )
       : false;
+  const lateFeePerDay = mode === "return" ? await lateFeePerDayFor(supabase, organizationId).catch(() => null) : null;
 
   return {
     mode,
     organizationId,
     rental: rentalForForm,
     lateChargeWritten,
+    lateFeePerDay,
     unpaidPayments: Array.isArray(unpaidPaymentsResult.data) ? unpaidPaymentsResult.data : unpaidPaymentsResult.data ? [unpaidPaymentsResult.data] : [],
     hasPaymentSchedule: Number(scheduleCountResult.count || 0) > 0,
     earlyChargeWritten,

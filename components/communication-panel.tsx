@@ -1,6 +1,7 @@
 "use client";
 
 import { englishDateLocale } from "@/lib/i18n/customer-dates";
+import { contactUrl } from "@/lib/contact-links";
 import { daysFromToday } from "@/lib/business-time";
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -325,39 +326,8 @@ function buildChannels(customer: Customer): Channel[] {
 }
 
 function channelUrl(channel: Channel) {
-  if (channel.key === "messenger") return messengerUrl(channel.handle);
-  if (channel.key === "telegram") return `https://t.me/${cleanHandle(channel.handle)}`;
-  if (channel.key === "phone") return `tel:${channel.handle}`;
-  if (channel.key === "email") return `mailto:${channel.handle}`;
-  if (channel.key === "instagram") return `https://instagram.com/${cleanHandle(channel.handle)}`;
-  if (channel.key === "line") return `https://line.me/ti/p/${encodeURIComponent(channel.handle)}`;
-  return null;
-}
-
-/**
- * Messenger may be saved as a pasted link (facebook.com/name, facebook.com/profile.php?id=…, messenger.com/t/…,
- * m.me/…) or just as the person's name. A link or username opens the chat; a plain name (with spaces) opens
- * Messenger, where the operator finds them by that name.
- */
-function messengerUrl(value: string) {
-  const text = value.trim();
-  const id = text.match(/[?&]id=(\d+)/)?.[1];
-  if (id) return `https://m.me/${id}`;
-  // A chat link copied from Messenger (facebook.com/messages/t/1000…, messenger.com/t/name): the person is after /t/.
-  // It used to open m.me/messages, which is nobody (real-user-test, 8 Nov 2026).
-  const chat = text.match(/(?:facebook\.com|fb\.com|messenger\.com)\/(?:messages\/)?t\/([^/?#\s]+)/i)?.[1];
-  if (chat) return `https://m.me/${chat}`;
-  // facebook.com/people/Their-Name/1000…: the number at the end is the person.
-  const person = text.match(/facebook\.com\/people\/[^/?#\s]+\/(\d+)/i)?.[1];
-  if (person) return `https://m.me/${person}`;
-  const path = text.match(/(?:facebook\.com|fb\.com|m\.me)\/([^/?#\s]+)/i)?.[1];
-  if (path && !["profile.php", "messages", "people"].includes(path.toLowerCase())) return `https://m.me/${path}`;
-  if (/^[A-Za-z0-9.]{3,}$/.test(text)) return `https://m.me/${text}`;
-  return "https://www.messenger.com/";
-}
-
-function cleanHandle(value: string) {
-  return value.replace(/^https?:\/\/(www\.)?/i, "").replace(/^m\.me\//i, "").replace(/^t\.me\//i, "").replace(/^instagram\.com\//i, "").replace(/^@/, "").trim();
+  // WhatsApp opens with a message typed in (whatsappUrl), not from here.
+  return channel.key === "whatsapp" ? null : contactUrl(channel.key, channel.handle);
 }
 
 function whatsappUrl(phone: string, text: string) {

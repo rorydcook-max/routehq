@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { PlaceField, type PickedPlace } from "@/components/place-field";
+import { tiCalendarEvent, tiCalendarRepeat, tiMapPin, tiSearch } from "./icon-paths";
+import { PathIcon } from "./path-icon";
 import s from "../rove.module.css";
 
 export type SearchWords = {
@@ -54,14 +56,14 @@ export function SearchForm({
         <label className={s.modeOption}>
           <input checked={!monthly} name="mode" onChange={() => setMonthly(false)} type="radio" value="dates" />
           <span>
-            <i aria-hidden="true" className="ti ti-calendar-event" />
+            <PathIcon d={tiCalendarEvent} />
             {words.modeDates}
           </span>
         </label>
         <label className={s.modeOption}>
           <input checked={monthly} name="mode" onChange={() => setMonthly(true)} type="radio" value="monthly" />
           <span>
-            <i aria-hidden="true" className="ti ti-calendar-repeat" />
+            <PathIcon d={tiCalendarRepeat} />
             {words.modeMonthly}
           </span>
         </label>
@@ -72,7 +74,7 @@ export function SearchForm({
         <label className={`${s.cell} ${s.cellWhere}`}>
           <span className={s.cellLabel}>{words.where}</span>
           <span className={s.cellControl}>
-            <i aria-hidden="true" className={`ti ti-map-pin ${s.cellIcon}`} />
+            <PathIcon className={s.cellIcon} d={tiMapPin} />
             <PlaceField
               ariaLabel={words.where}
               className={s.cellInput}
@@ -117,7 +119,7 @@ export function SearchForm({
           <input key={name} name={name} type="hidden" value={value} />
         ))}
         <button className={s.searchSubmit} type="submit">
-          <i aria-hidden="true" className="ti ti-search" />
+          <PathIcon d={tiSearch} />
           <span>{words.search}</span>
         </button>
       </div>

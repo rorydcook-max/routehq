@@ -1222,6 +1222,52 @@ async function archiveVehicleOrThrow(formData: FormData) {
   redirect("/fleet");
 }
 
+/** Puts an archived vehicle back in the fleet, free to rent (real-user test, 8 Nov 2026: there was no way back). */
+export async function unarchiveVehicle(...args: Parameters<typeof unarchiveVehicleOrThrow>) {
+  return guard(() => unarchiveVehicleOrThrow(...args));
+}
+
+async function unarchiveVehicleOrThrow(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const membership = await getCurrentMembership();
+  if (!membership) throw new Error("You must be signed in.");
+  const vehicleId = String(formData.get("vehicleId") || "");
+  if (!vehicleId) throw new Error("Vehicle is required.");
+  const { data: vehicle } = await supabase
+    .from("vehicles")
+    .select("id, status, make, model, registration_number")
+    .eq("id", vehicleId)
+    .eq("organization_id", membership.organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (!vehicle) throw new Error("Vehicle not found.");
+  if (vehicle.status === "inactive") {
+    const { error } = await supabase
+      .from("vehicles")
+      .update({ status: "available", availability_status: "available_now" })
+      .eq("id", vehicleId)
+      .eq("organization_id", membership.organizationId);
+    if (error) throw new Error(error.message);
+    await recordActivityEvent(supabase, {
+      organization_id: membership.organizationId,
+      actor_id: user.id,
+      entity_type: "vehicle",
+      entity_id: vehicleId,
+      vehicle_id: vehicleId,
+      event_type: "vehicle_unarchived",
+      title: "Vehicle back in the fleet",
+      detail: [vehicle.make, vehicle.model, vehicle.registration_number].filter(Boolean).join(" ")
+    });
+  }
+  revalidatePath("/");
+  revalidatePath("/fleet");
+  revalidatePath(`/fleet/${vehicleId}`);
+}
+
 /**
  * Delete vehicles and everything about them (owner only; Rory, 31 Oct 2026): every booking they have had, with its
  * payments, checks, photos and agreement, and their own costs, papers and photos. Archive is how an owner keeps
@@ -1302,6 +1348,19 @@ export async function bulkArchiveVehicles(formData: FormData) {
   const membership = await getCurrentMembership();
   if (!membership || membership.organizationId !== organizationId || membership.role !== "owner") {
     redirect("/fleet?notice=vehicle-owner-only");
+  }
+
+  // The same check as archiving one vehicle: none with bookings still to come or on the road.
+  const { data: liveBookings } = await supabase
+    .from("rentals")
+    .select("id")
+    .eq("organization_id", organizationId)
+    .in("vehicle_id", vehicleIds)
+    .is("deleted_at", null)
+    .not("status", "in", "(draft,completed,cancelled)")
+    .limit(1);
+  if (liveBookings?.length) {
+    redirect("/fleet?notice=archive-live-bookings");
   }
 
   const { error } = await supabase

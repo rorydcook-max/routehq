@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { CUSTOMER_LOCALE_COOKIE } from "@/lib/i18n/customer-locale";
 import { parseRovePath, roveHasLocale, roveHref } from "@/lib/rove/paths";
+import { tiWorld } from "./icon-paths";
+import { PathIcon } from "./path-icon";
 import s from "../rove.module.css";
 
 /**
@@ -26,7 +28,7 @@ export function LanguagePicker({ current, label, short, options, placement = "do
   return (
     <details className={placement === "up" ? `${s.lang} ${s.langUp}` : s.lang}>
       <summary aria-label={label} className={placement === "up" ? s.footerLang : s.navLink}>
-        <i aria-hidden="true" className="ti ti-world" style={{ marginInlineEnd: 6, fontSize: 18 }} />
+        <PathIcon d={tiWorld} style={{ marginInlineEnd: 6, fontSize: 18 }} />
         {short}
       </summary>
       <div className={s.langMenu} role="list">

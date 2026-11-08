@@ -23,6 +23,10 @@ export function jobNameFor(todo: Todo, action: string | null | undefined, title:
     // "Review from Anna M. to check" (lib/reviews.ts)
     return todo(key, { name: String(title || "").match(/^Review from (.+) to check$/)?.[1] || "" });
   }
+  if (action === "inspection_signature") {
+    // "Customer signature needed: VR-0012" (lib/inspection-signature.ts)
+    return todo(key, { ref: String(title || "").match(/: (.+)$/)?.[1] || "" });
+  }
   // Other names that need a figure are only built where the figure is known (To do).
   if (action === "extension" || action === "handover_collect") return null;
   return todo(key);

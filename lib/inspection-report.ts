@@ -59,6 +59,10 @@ export type InspectionReportInput = {
   swap?: boolean;
   /** Inspection photos as saved on the inspection: { type, url } with url a storage path. */
   photos?: Array<{ type?: string; url?: string }>;
+  /** Signed later by the customer from their booking link (no signed-in user: finalised by the service role). */
+  remote?: boolean;
+  /** When the customer signed, when that was after the form (shown on the report as the date signed). */
+  signedAt?: string | null;
 };
 
 const PHOTO_LABELS: Record<string, string> = {
@@ -184,6 +188,8 @@ export function renderInspectionReportHtml(input: {
   notes: string | null;
   signerName: string;
   signatureDataUrl: string;
+  /** Signed after the form was completed (from the customer's link). */
+  signedAt?: string | null;
   swap?: boolean;
   translations?: ReportTranslations;
   depositSettlement?: DepositSettlement | null;
@@ -255,7 +261,7 @@ ${translationNote}
 <h2>Customer acknowledgment</h2>
 <p>I confirm that I ${handover} in the condition recorded above${depositSection ? " and that I have been shown the deposit settlement above" : ""}.</p>
 <img class="sig" alt="Customer signature" src="${escapeHtml(input.signatureDataUrl)}">
-<p>${escapeHtml(input.signerName)}<br><span class="muted">Signed ${escapeHtml(inspectedAt)}</span></p>
+<p>${escapeHtml(input.signerName)}<br><span class="muted">Signed ${escapeHtml(input.signedAt ? formatReportTime(input.signedAt) : inspectedAt)}</span></p>
 </body></html>`;
 }
 
@@ -328,7 +334,8 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
       damageItems: input.damageItems,
       notes: input.notes,
       signerName,
-      signatureDataUrl: input.customerSignature
+      signatureDataUrl: input.customerSignature,
+      signedAt: input.signedAt || null
     };
     const html = renderInspectionReportHtml({
       ...reportFields,
@@ -355,7 +362,8 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
     if (signatureUpload.error) throw new Error(signatureUpload.error.message);
     uploaded.push(signaturePath);
 
-    const { error } = await input.supabase.rpc("finalise_inspection_report", {
+    // Signed from the customer's link: nobody is signed in, so the service-role-only twin of the RPC records it.
+    const { error } = await (input.remote ? admin : input.supabase).rpc(input.remote ? "finalise_inspection_report_remote" : "finalise_inspection_report", {
       p_organization_id: input.organizationId,
       p_inspection_id: input.inspectionId,
       p_document_id: documentId,

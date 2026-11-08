@@ -31,6 +31,8 @@ export type Vehicle = {
   complianceNext?: { label: string; date: string; daysLeft: number } | null;
   /** How many compliance dates are expired or due within 30 days. */
   complianceAttentionCount?: number;
+  /** Archived (taken out of the fleet); kept apart from the working fleet on the Fleet page. */
+  archived?: boolean;
   /** Every recorded compliance date, soonest first. */
   compliance?: Array<{ key: string; label: string; date: string; daysLeft: number; kmLeft?: number }>;
 };

@@ -9,7 +9,7 @@ import { CheckCircle2, ChevronDown, CreditCard, FileText, IdCard, ImageIcon, Mes
 import { checkReturningCustomer, completePublicBooking as completePublicBookingAction, reportPublicBookingPayment as reportPublicBookingPaymentAction, setPartnerOffers as setPartnerOffersAction } from "@/app/actions/public-booking";
 import { preparePublicBookingUploads } from "@/app/actions/uploads";
 import { readIdentityDocument } from "@/app/actions/identity-ocr";
-import { uploadFormFiles } from "@/lib/direct-upload-client";
+import { earlyUpload, uploadFormFiles, type EarlyUploaded } from "@/lib/direct-upload-client";
 import { extractBodyHtml } from "@/lib/contract-rendering";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime, businessToday } from "@/lib/business-time";
@@ -17,7 +17,7 @@ import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places"
 import { displayNamesLocale } from "@/lib/i18n/dates";
 import { legalUrl } from "@/lib/site/legal-slugs";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
-import { allCountries, countryLabel } from "@/lib/customer-options";
+import { allCountries, countryLabel, readPhone } from "@/lib/customer-options";
 import { dialCodeFor, phonePlaceholderFor } from "@/lib/phone";
 import { unwrap } from "@/lib/action-result";
 
@@ -132,6 +132,25 @@ const inputClass = "mt-2 focus:ring-2 focus:ring-[var(--primary)]/15";
 type DocKind = "passport" | "driver_license";
 type DocReadState = "reading" | "read" | "unreadable" | "manual" | null;
 const ID_FIELDS = ["passportNumber", "driverLicenseNumber", "driverLicenseExpiry", "driverLicenseCountry"] as const;
+
+type UploadKind = "passport" | "driver_license" | "selfie";
+const uploadKindOf = (field: string): UploadKind | null =>
+  field.startsWith("passport") ? "passport" : field.startsWith("driverLicense") ? "driver_license" : field.startsWith("selfie") ? "selfie" : null;
+// What the renter typed is kept for this tab only, so a refresh (or Android reloading the page when the camera
+// opens) doesn't lose it. Not kept: files, the agreement ticks and the signature.
+const DRAFT_SKIP = new Set(["token", "preferredLocale", "contactChannelsSubmitted", "agreeAll", "signedName", "uploadedFiles"]);
+// Fields whose value React holds: put back through their state, not straight into the page.
+const DRAFT_STATE_FIELDS = new Set(["idDocumentType", "preferredContactMethod", "whatsappNumber", "phoneCountryCode", "emergencyPhoneCountryCode", "address", "preferredDeliveryLocation", "nationality"]);
+type Draft = { values?: Record<string, string>; uploads?: Partial<Record<UploadKind, EarlyUploaded>> };
+
+/** A whole number pasted with its code ("+44 7700 900123", "0044…"): the country and the number without it. */
+function phoneWithCountry(value: string): { code: string; national: string } | null {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("+") && !trimmed.startsWith("00")) return null;
+  const read = readPhone(trimmed, "");
+  if (!read.detected || !read.phoneCode || !read.national) return null;
+  return { code: read.phoneCode, national: read.national };
+}
 
 /** Phone photos are several megabytes; a copy this size reads just as well and sends in a moment. */
 async function shrinkImage(file: File, maxSide = 1600): Promise<File> {
@@ -563,12 +582,114 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   // Photos first: the passport and licence are read and the form fills itself in.
   const [docRead, setDocRead] = useState<Record<DocKind, DocReadState>>({ passport: null, driver_license: null });
   const [photoNationality, setPhotoNationality] = useState("");
+  // Passport or national ID card (Rory, 8 Nov 2026): either is accepted for signing online.
+  const [idType, setIdType] = useState<"passport" | "national_id">(() => ((detail.customer as any)?.id_document_type === "national_id" ? "national_id" : "passport"));
+  const idLabel = idType === "national_id" ? t("idType_national_id") : t("idType_passport");
+  const idNumberLabel = idType === "national_id" ? t("idCardNumber") : t("passportNo");
   const [idOpen, setIdOpen] = useState(false);
   // A returning customer's documents already on file (found by phone number and date of birth).
   const [onFile, setOnFile] = useState<{ passport?: boolean; driver_license?: boolean; selfie?: boolean; numbers?: boolean } | null>(null);
   const haveDoc = (kind: "passport" | "driver_license" | "selfie") => Boolean(detail.documentStatus[kind] || onFile?.[kind]);
   const filledByPhoto = useRef<Record<string, string>>({});
   const readQueue = useRef<Promise<void>>(Promise.resolve());
+  // Photos go up the moment they are picked; where each went is kept with the draft (real-user test, 8 Nov 2026).
+  const [savedUploads, setSavedUploads] = useState<Partial<Record<UploadKind, EarlyUploaded>>>({});
+  const savedUploadsRef = useRef(savedUploads);
+  savedUploadsRef.current = savedUploads;
+  const draftKey = `rove-booking-draft:${detail.token}`;
+  const draftReady = useRef(false);
+
+  function writeDraft(patch: Draft) {
+    try {
+      const previous = JSON.parse(window.sessionStorage.getItem(draftKey) || "{}") as Draft;
+      window.sessionStorage.setItem(draftKey, JSON.stringify({ ...previous, ...patch }));
+    } catch {
+      // Private mode or storage full: the page still works, it just won't remember.
+    }
+  }
+
+  function saveDraft(form: HTMLFormElement | null = formRef.current) {
+    if (!form || !draftReady.current) return;
+    const values: Record<string, string> = {};
+    for (const [name, value] of new FormData(form).entries()) {
+      if (typeof value !== "string" || DRAFT_SKIP.has(name) || name.startsWith("ack_") || name.startsWith("returning")) continue;
+      values[name] = value;
+    }
+    writeDraft({ values });
+  }
+
+  function forgetUploads() {
+    setSavedUploads({});
+    writeDraft({ uploads: {} });
+  }
+
+  function uploadNow(field: string, file: File) {
+    const kind = uploadKindOf(field);
+    if (!kind || !(file?.size > 0)) return;
+    earlyUpload(field, file, (files) => preparePublicBookingUploads(detail.token, files))
+      .then((uploaded) => {
+        const next = { ...savedUploadsRef.current, [kind]: uploaded };
+        setSavedUploads(next);
+        writeDraft({ uploads: next });
+      })
+      // Not sent now (a weak connection): it goes with the form when they finish.
+      .catch(() => null);
+  }
+
+  // Back after a refresh: put back what they had typed and the photos already sent.
+  useEffect(() => {
+    let draft: Draft | null = null;
+    try {
+      draft = JSON.parse(window.sessionStorage.getItem(draftKey) || "null") as Draft | null;
+    } catch {
+      draft = null;
+    }
+    const values = draft?.values || {};
+    const form = formRef.current;
+    if (form) {
+      for (const [name, value] of Object.entries(values)) {
+        if (!value || DRAFT_STATE_FIELDS.has(name)) continue;
+        const field = form.querySelector<HTMLInputElement | HTMLTextAreaElement>(`input[name="${name}"], textarea[name="${name}"]`);
+        if (!field || (field instanceof HTMLInputElement && ["hidden", "file", "checkbox", "radio"].includes(field.type))) continue;
+        const prototype = field instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+        Object.getOwnPropertyDescriptor(prototype, "value")?.set?.call(field, value);
+      }
+    }
+    if (values.idDocumentType === "passport" || values.idDocumentType === "national_id") setIdType(values.idDocumentType);
+    if (values.preferredContactMethod) setPreferredContactMethod(values.preferredContactMethod);
+    if (values.whatsappNumber) setWhatsappNumber(values.whatsappNumber);
+    if (values.phoneCountryCode) setPhoneCountryCode(values.phoneCountryCode);
+    if (values.emergencyPhoneCountryCode) setEmergencyPhoneCountryCode(values.emergencyPhoneCountryCode);
+    if (values.address) setCurrentAddress(values.address);
+    if (values.preferredDeliveryLocation) setPreferredDeliveryLocation(values.preferredDeliveryLocation);
+    if (values.nationality) setPhotoNationality(values.nationality);
+    if (draft?.uploads && Object.keys(draft.uploads).length) setSavedUploads(draft.uploads);
+    // Saving starts once the restored values are on screen, so the first save can't write over the draft.
+    const ready = window.setTimeout(() => {
+      draftReady.current = true;
+      updateLiveStatus();
+    }, 400);
+    // Leaving the page (the camera opening, switching apps) saves it once more.
+    const onHide = () => {
+      if (document.visibilityState === "hidden") saveDraft();
+    };
+    const onPageHide = () => saveDraft();
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", onPageHide);
+    return () => {
+      window.clearTimeout(ready);
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", onPageHide);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Values React holds (the contact choice, phone codes, addresses) are saved as they change.
+  useEffect(() => {
+    saveDraft();
+    updateLiveStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idType, preferredContactMethod, whatsappNumber, phoneCountryCode, emergencyPhoneCountryCode, currentAddress, preferredDeliveryLocation, savedUploads]);
 
   function fieldValue(name: string) {
     return formRef.current?.querySelector<HTMLInputElement>(`input[name="${name}"]`)?.value.trim() || "";
@@ -697,7 +818,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     const formData = new FormData(form);
     const filled = (name: string) => String(formData.get(name) || "").trim().length > 0;
     const uploaded = (...names: string[]) =>
-      names.some((name) => formData.getAll(name).some((value) => value instanceof File && value.size > 0));
+      names.some((name) => Boolean(savedUploadsRef.current[uploadKindOf(name) as UploadKind]) || formData.getAll(name).some((value) => value instanceof File && value.size > 0));
     const acceptedAgreement = typeof nextAgreed === "boolean" ? nextAgreed : (publicAgreement?.requiredAcknowledgements || []).length === 0 || formData.get("agreeAll") === "on";
     setLivePhone(String(formData.get("phone") || "").trim());
     setLiveEmail(String(formData.get("email") || "").trim());
@@ -790,62 +911,57 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     const form = event.currentTarget;
     const fd = new FormData(form);
 
-    if (!preferredContactMethod) {
-      setContactChannelError(t("chooseContactMethod"));
-      return;
+    // Everything still missing, listed at once: it used to be one item per tap (real-user test, 8 Nov 2026).
+    const missing: string[] = [];
+    const text = (name: string) => String(fd.get(name) || "").trim();
+    const hasFile = (...names: string[]) => names.some((name) => fd.getAll(name).some((value) => value instanceof File && value.size > 0));
+    if (!detail.completion.documents) {
+      const photos: Array<[UploadKind, string, string[]]> = [
+        ["passport", idLabel, ["passportFile", "passportCameraFile"]],
+        ["driver_license", t("drivingLicence"), ["driverLicenseFile", "driverLicenseCameraFile"]],
+        ["selfie", t("selfiePhoto"), ["selfieFile", "selfieCameraFile"]]
+      ];
+      for (const [kind, label, names] of photos) if (!haveDoc(kind) && !savedUploads[kind] && !hasFile(...names)) missing.push(label);
     }
-    if (preferredContactMethod === "phone" && !livePhone) {
-      setContactChannelError(t("addPhoneAbove"));
-      setFocusField("phone");
-      return;
-    }
-    if (preferredContactMethod === "email" && !liveEmail) {
-      setContactChannelError(t("addEmailAbove"));
-      setFocusField("email");
-      return;
-    }
-    if (preferredContactMethod === "whatsapp" && !whatsappNumber.trim()) {
-      setContactChannelError(t("enterWhatsApp"));
-      return;
-    }
-    if (preferredContactMethod === "messenger" && !String(fd.get("messengerId") || "").trim()) {
-      setContactChannelError(t("enterMessenger"));
-      return;
-    }
-    if (preferredContactMethod === "line" && !String(fd.get("lineId") || "").trim()) {
-      setContactChannelError(t("enterLine"));
-      return;
-    }
-    if (preferredContactMethod === "telegram" && !String(fd.get("telegramUsername") || "").trim()) {
-      setContactChannelError(t("enterTelegram"));
-      return;
-    }
+    const idLabels: Record<(typeof ID_FIELDS)[number], string> = {
+      passportNumber: idNumberLabel,
+      driverLicenseNumber: t("licenceNumber"),
+      driverLicenseExpiry: t("licenceExpiry"),
+      driverLicenseCountry: t("licenceCountry")
+    };
+    const missingIds = onFile?.numbers ? [] : ID_FIELDS.filter((name) => !text(name));
+    for (const name of missingIds) missing.push(idLabels[name]);
+    const details: Array<[string, string]> = [
+      ["fullName", t("fullName")],
+      ["nationality", t("nationality")],
+      ["phone", t("phone")],
+      ["dateOfBirth", t("dateOfBirth")]
+    ];
+    for (const [name, label] of details) if (!text(name)) missing.push(label);
+    const channelField: Record<string, [string, string]> = {
+      email: ["email", t("email")],
+      whatsapp: ["whatsappNumber", "WhatsApp"],
+      messenger: ["messengerId", "Facebook Messenger"],
+      line: ["lineId", "LINE"],
+      telegram: ["telegramUsername", "Telegram"]
+    };
+    const channel = channelField[preferredContactMethod];
+    if (!preferredContactMethod) missing.push(t("preferredContact"));
+    else if (channel && !text(channel[0])) missing.push(channel[1]);
 
-    const missingId = onFile?.numbers ? undefined : ID_FIELDS.find((name) => !String(fd.get(name) || "").trim());
-    if (missingId) {
-      setIdOpen(true);
-      const filledSome = ID_FIELDS.some((name) => String(fd.get(name) || "").trim());
-      const photosIn = ["passportFile", "passportCameraFile", "driverLicenseFile", "driverLicenseCameraFile"].some((name) => fd.getAll(name).some((value) => value instanceof File && value.size > 0));
-      setError(filledSome ? t(`missing_${missingId}`) : photosIn ? t("typeNumbersPhotoUnread") : t("addDocumentDetails"));
-      window.setTimeout(() => {
-        const field = document.querySelector<HTMLInputElement>(`input[name="${missingId}"]`);
-        (field || document.getElementById("document-numbers"))?.scrollIntoView({ behavior: "smooth", block: "center" });
-        field?.focus();
-      }, 50);
+    if (readyToSign) {
+      const requiredAcknowledgements = publicAgreement?.requiredAcknowledgements || [];
+      if (!requiredAcknowledgements.every((ack) => fd.get(`ack_${ack.type}`) === "on")) missing.push(t("need_agreeTick"));
+      if (!text("signedName")) missing.push(t("yourFullName"));
+      if (!signature) missing.push(t("yourSignature"));
+    }
+    if (missing.length) {
+      if (missingIds.length) setIdOpen(true);
+      setError(t("stillNeeded", { items: missing.join(", ") }));
       return;
     }
 
     if (readyToSign) {
-      const requiredAcknowledgements = publicAgreement?.requiredAcknowledgements || [];
-      const accepted = requiredAcknowledgements.every((ack) => fd.get(`ack_${ack.type}`) === "on");
-      if (!accepted) {
-        setError(t("tickEachBox"));
-        return;
-      }
-      if (!signature) {
-        setError(t("pleaseSign"));
-        return;
-      }
       const bookedName = String(fd.get("fullName") || detail.customer?.full_name || "").trim();
       const signedAs = String(fd.get("signedName") || "").trim().toLowerCase();
       const firstName = bookedName.split(/\s+/)[0]?.toLowerCase() || "";
@@ -861,6 +977,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         // Document photos go straight to storage; the form carries only their
         // paths (Vercel refuses request bodies over 4.5 MB).
         const formData = await uploadFormFiles(new FormData(form), (files) => preparePublicBookingUploads(detail.token, files));
+        // Photos sent when they were picked (also before a reload) go with the form, unless a newer one replaced them.
+        const sent = JSON.parse(String(formData.get("uploadedFiles") || "[]")) as EarlyUploaded[];
+        const sentKinds = new Set(sent.map((file) => uploadKindOf(file.field)));
+        const earlier = (Object.entries(savedUploads) as Array<[UploadKind, EarlyUploaded]>).filter(([kind]) => !sentKinds.has(kind)).map(([, file]) => file);
+        if (earlier.length) formData.set("uploadedFiles", JSON.stringify([...sent, ...earlier]));
         formData.set("intent", readyToSign ? "sign" : "review");
         if (readyToSign) {
           formData.set("signature", signature);
@@ -873,6 +994,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           form.querySelectorAll<HTMLInputElement>('input[type="file"]').forEach((input) => {
             input.value = "";
           });
+          forgetUploads();
           setError(String(result.error));
           router.refresh();
           return;
@@ -882,6 +1004,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           form.querySelectorAll<HTMLInputElement>('input[type="file"]').forEach((input) => {
             input.value = "";
           });
+          forgetUploads();
           clearSignature();
           setNotice(
             result.changed
@@ -897,6 +1020,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         setExecutionCertificateUrl((result as any).executionCertificateUrl || null);
         // Their choice about partner offers is saved once the booking is signed; a failure here never undoes the booking.
         if (offersTicked) await saveOffers(true, "booking_form");
+        try {
+          window.sessionStorage.removeItem(draftKey);
+        } catch {
+          // Nothing kept to clear.
+        }
         setCompleted(true);
         setJustCompleted(true);
         // The payments for this booking exist now; show them without a reload.
@@ -967,7 +1095,23 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   }
 
   return (
-    <form className="space-y-5" encType="multipart/form-data" method="post" onChange={(event) => updateLiveStatus(event.currentTarget)} onInput={(event) => updateLiveStatus(event.currentTarget)} onSubmit={handleSubmit} ref={formRef}>
+    <form
+      className="space-y-5"
+      encType="multipart/form-data"
+      method="post"
+      // Everything still needed is listed at once by the page, not one browser bubble per tap.
+      noValidate
+      onChange={(event) => {
+        updateLiveStatus(event.currentTarget);
+        saveDraft(event.currentTarget);
+      }}
+      onInput={(event) => {
+        updateLiveStatus(event.currentTarget);
+        saveDraft(event.currentTarget);
+      }}
+      onSubmit={handleSubmit}
+      ref={formRef}
+    >
       <input name="token" type="hidden" value={detail.token} />
       {/* The language they are reading this in is the language their messages and agreement use. */}
       <input name="preferredLocale" type="hidden" value={locale} />
@@ -996,10 +1140,26 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             token={detail.token}
           />
         ) : null}
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <UploadCard cameraName="passportCameraFile" complete={haveDoc("passport")} icon={IdCard} label={t("passportOrId")} name="passportFile" note={readNote("passport")} noteTone={docRead.passport} onPicked={(picked) => readDocument("passport", picked)} />
-          <UploadCard cameraName="driverLicenseCameraFile" complete={haveDoc("driver_license")} icon={FileText} label={t("drivingLicence")} name="driverLicenseFile" note={readNote("driver_license")} noteTone={docRead.driver_license} onPicked={(picked) => readDocument("driver_license", picked)} />
-          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={haveDoc("selfie")} icon={ImageIcon} label={t("selfiePhoto")} name="selfieFile" />
+        {/* Which document they are using: a passport, or a national ID card instead. */}
+        <input name="idDocumentType" type="hidden" value={idType} />
+        <div aria-label={t("idType")} className="mt-4 grid grid-cols-2 gap-2" role="radiogroup">
+          {(["passport", "national_id"] as const).map((value) => (
+            <button
+              aria-checked={idType === value}
+              className={`pressable min-h-11 rounded-full border px-3 text-sm font-semibold ${idType === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+              key={value}
+              onClick={() => setIdType(value)}
+              role="radio"
+              type="button"
+            >
+              {t(`idType_${value}`)}
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <UploadCard cameraName="passportCameraFile" complete={haveDoc("passport")} onUpload={uploadNow} saved={Boolean(savedUploads.passport)} icon={IdCard} label={idLabel} name="passportFile" note={readNote("passport")} noteTone={docRead.passport} onPicked={(picked) => readDocument("passport", picked)} />
+          <UploadCard cameraName="driverLicenseCameraFile" complete={haveDoc("driver_license")} onUpload={uploadNow} saved={Boolean(savedUploads.driver_license)} icon={FileText} label={t("drivingLicence")} name="driverLicenseFile" note={readNote("driver_license")} noteTone={docRead.driver_license} onPicked={(picked) => readDocument("driver_license", picked)} />
+          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={haveDoc("selfie")} onUpload={uploadNow} saved={Boolean(savedUploads.selfie)} icon={ImageIcon} label={t("selfiePhoto")} name="selfieFile" />
         </div>
         {/* The numbers stay folded away: the photos fill them in. They open by themselves when something is missing. */}
         <details className="mt-2" id="document-numbers" onToggle={(event) => setIdOpen(event.currentTarget.open)} open={idOpen}>
@@ -1008,7 +1168,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </summary>
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <label>
-              <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("passportNumber")}</span>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">{idNumberLabel}</span>
               <input className={inputClass} defaultValue={detail.customer?.passport_number || ""} name="passportNumber" style={fieldStyle} />
             </label>
             <label>
@@ -1048,7 +1208,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("phone")}</span>
             <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
               <PhoneCountrySelect country={detail.businessCountry} name="phoneCountryCode" onChange={setPhoneCountryCode} value={phoneCountryCode} />
-              <input defaultValue={savedPhone.local} name="phone" onClick={(e) => e.stopPropagation()} required style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
+              <input defaultValue={savedPhone.local} name="phone" onChange={(event) => { const found = phoneWithCountry(event.target.value); if (found) { setPhoneCountryCode(found.code); event.target.value = found.national; } }} onClick={(e) => e.stopPropagation()} required style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
             </div>
           </label>
           <label>
@@ -1080,7 +1240,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             </span>
             <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
               <PhoneCountrySelect country={detail.businessCountry} name="emergencyPhoneCountryCode" onChange={setEmergencyPhoneCountryCode} value={emergencyPhoneCountryCode} />
-              <input defaultValue={savedEmergencyPhone.local} name="emergencyContactPhone" onClick={(e) => e.stopPropagation()} style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
+              <input defaultValue={savedEmergencyPhone.local} name="emergencyContactPhone" onChange={(event) => { const found = phoneWithCountry(event.target.value); if (found) { setEmergencyPhoneCountryCode(found.code); event.target.value = found.national; } }} onClick={(e) => e.stopPropagation()} style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
             </div>
           </label>
             </div>
@@ -2117,7 +2277,9 @@ function UploadCard({
   name,
   note,
   noteTone,
-  onPicked
+  onPicked,
+  onUpload,
+  saved = false
 }: {
   accept?: string;
   cameraCapture?: "user" | "environment";
@@ -2129,6 +2291,10 @@ function UploadCard({
   note?: string | null;
   noteTone?: DocReadState;
   onPicked?: (file: File) => void;
+  /** Told the field and file the moment one is picked, so it can be sent straight away. */
+  onUpload?: (field: string, file: File) => void;
+  /** Already sent (also before the page was reloaded). */
+  saved?: boolean;
 }) {
   const t = useTranslations("customer");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -2147,10 +2313,10 @@ function UploadCard({
           <Icon size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", lineHeight: 1.3 }}>{label}</span>
         </div>
-        {complete || selectedFile ? (
+        {complete || selectedFile || saved ? (
           <span style={{ fontSize: 14, color: "var(--success)", fontWeight: 500, flexShrink: 0 }}>
             {"✓ "}
-            {selectedFile ? t("added") : t("received")}
+            {selectedFile || saved ? t("added") : t("received")}
           </span>
         ) : (
           <span style={{ fontSize: 14, color: "var(--warning)", flexShrink: 0 }}>{t("needed")}</span>
@@ -2193,6 +2359,7 @@ function UploadCard({
                   if (event.target.files?.[0]) {
                     setCameraFile(null);
                     onPicked?.(event.target.files[0]);
+                    onUpload?.(name, event.target.files[0]);
                   }
                 }}
                 type="file"
@@ -2232,6 +2399,7 @@ function UploadCard({
                   if (event.target.files?.[0]) {
                     setUploadFile(null);
                     onPicked?.(event.target.files[0]);
+                    onUpload?.(cameraName, event.target.files[0]);
                   }
                 }}
                 type="file"
@@ -2268,7 +2436,10 @@ function UploadCard({
             name={name}
             onChange={(event) => {
               setUploadFile(event.target.files?.[0] ?? null);
-              if (event.target.files?.[0]) onPicked?.(event.target.files[0]);
+              if (event.target.files?.[0]) {
+                onPicked?.(event.target.files[0]);
+                onUpload?.(name, event.target.files[0]);
+              }
             }}
             type="file"
           />

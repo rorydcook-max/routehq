@@ -3,7 +3,7 @@ import { orgCountry } from "@/lib/regional";
 import { notFound } from "next/navigation";
 import { niceMoney } from "@/lib/nice-money";
 import { getTranslations } from "next-intl/server";
-import { archiveVehicle, deleteVehicle, updateVehicle } from "@/app/actions/vehicles";
+import { archiveVehicle, deleteVehicle, unarchiveVehicle, updateVehicle } from "@/app/actions/vehicles";
 import { ConfirmDeleteVehicleButton } from "@/app/(app)/fleet/fleet-actions";
 import { LoanFields } from "@/app/(app)/fleet/new/loan-fields";
 import { AppShell } from "@/components/app-shell";
@@ -306,6 +306,15 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
           <h2 className="card-subtitle mb-2 text-[var(--danger)]">{say("dangerZone")}</h2>
           <Fold summary={say("goneSummary")} title={say("goneTitle")}>
             <div className="space-y-4">
+              {vehicle.status === "inactive" ? (
+                <ActionForm action={unarchiveVehicle} className="flex flex-wrap items-center justify-between gap-3">
+                  <input name="vehicleId" type="hidden" value={vehicle.id} />
+                  <p className="min-w-0 flex-1 basis-60 font-bold text-[var(--foreground)]">{say("archivedNow")}</p>
+                  <PendingButton className="secondary-action pressable" pendingLabel={say("saving")} type="submit">
+                    {say("unarchiveBtn")}
+                  </PendingButton>
+                </ActionForm>
+              ) : (
               <ActionForm action={archiveVehicle} className="flex flex-wrap items-center justify-between gap-3">
                 <input name="vehicleId" type="hidden" value={vehicle.id} />
                 <input name="organizationId" type="hidden" value={organization.id} />
@@ -316,6 +325,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                   {say("archiveBtn")}
                 </PendingButton>
               </ActionForm>
+              )}
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-4">
                 <p className="min-w-0 flex-1 basis-60 font-medium text-[var(--foreground-secondary)]">
                   <span className="font-bold text-[var(--foreground)]">{say("deleteLead")}</span>: {say("deleteBody")}

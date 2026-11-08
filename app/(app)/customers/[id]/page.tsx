@@ -27,7 +27,7 @@ import { countriesSorted, customerLanguages, flagForNationality } from "@/lib/cu
 import { customerStatsByCustomer, getCustomerDetail, getCustomerDocumentCompleteness, type CustomerDetail, refundsOf } from "@/lib/customer-detail";
 import { longDate } from "@/lib/i18n/dates";
 import { getDefaultOrganization } from "@/lib/organization";
-import { licenceCategoriesFor, licenceCategoriesOf } from "@/lib/licence";
+import { licenceCategoriesFor, licenceCategoriesOf, usesLicenceCategoryBoxes } from "@/lib/licence";
 import { orgCountry } from "@/lib/regional";
 import { phonePlaceholderFor } from "@/lib/phone";
 import { amountDueNowByRental } from "@/lib/rental-balances";
@@ -267,12 +267,20 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
           ))}
         </select>
       </label>
+      {/* A passport, or a national ID card in its place (Rory, 8 Nov 2026); the number and expiry below are that document's. */}
+      <label className="block sm:col-span-2">
+        <span className={labelClass}>{cx.say("f_idType")}</span>
+        <select className={inputClass} defaultValue={(customer as any).id_document_type === "national_id" ? "national_id" : "passport"} name="idDocumentType">
+          <option value="passport">{cx.say("f_idType_passport")}</option>
+          <option value="national_id">{cx.say("f_idType_national_id")}</option>
+        </select>
+      </label>
       <label className="block">
-        <span className={labelClass}>{cx.say("f_passportNo")}</span>
+        <span className={labelClass}>{cx.say((customer as any).id_document_type === "national_id" ? "f_idCardNo" : "f_passportNo")}</span>
         <input className={inputClass} defaultValue={customer.passport_number || ""} name="passportNumber" />
       </label>
       <label className="block">
-        <span className={labelClass}>{cx.say("f_passportExpiry")}</span>
+        <span className={labelClass}>{cx.say((customer as any).id_document_type === "national_id" ? "f_idCardExpiry" : "f_passportExpiry")}</span>
         <input className={inputClass} defaultValue={day(customer.passport_expiry)} name="passportExpiry" type="date" />
       </label>
       <label className="block">
@@ -309,7 +317,14 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
           </label>
         </>
       ) : null}
-      {/* EU licence categories (field 9 on the card), or Türkiye's (M, B1...): what they may drive, saved in customers.license_type. */}
+      {/* EU licence categories (field 9 on the card), or Türkiye's (M, B1...): what they may drive, saved in customers.license_type.
+          Elsewhere licences use other classes, so it is a plain text field. */}
+      {!usesLicenceCategoryBoxes(country) ? (
+        <label className="block sm:col-span-2">
+          <span className={labelClass}>{cx.say("f_licenceClass")}</span>
+          <input className={inputClass} defaultValue={customer.license_type || ""} maxLength={60} name="licenceClassText" />
+        </label>
+      ) : (
       <fieldset className="block sm:col-span-2">
         <legend className={labelClass}>{cx.say("f_licenceCategories")}</legend>
         <input name="licenceCategoriesShown" type="hidden" value="1" />
@@ -322,6 +337,7 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
           ))}
         </div>
       </fieldset>
+      )}
       {uk ? (
         <label className="block sm:col-span-2">
           <span className={labelClass}>{cx.say("f_dvlaCode")}</span>

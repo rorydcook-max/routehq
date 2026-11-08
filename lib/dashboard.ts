@@ -255,6 +255,7 @@ function mapVehicle(row: any, figures?: VehicleFigures): Vehicle {
     year: row.year || 0,
     color: row.color || "",
     status: vehicleStatusMap[row.status] || "Available",
+    archived: row.status === "inactive",
     dailyRate: Number(row.daily_rate || 0),
     weeklyRate: Number(row.weekly_rate || 0),
     monthlyRate: Number(row.monthly_rate || 0),
@@ -357,6 +358,15 @@ function mapTimelineEvent(row: any, vehicleById: Map<string, Vehicle>): Timeline
 }
 
 /** Whole amounts in the business's own currency: baht as before, pounds and euros as £1,250 / €1,250. */
+/** A price as set, cents and satang kept (real-user test, 8 Nov 2026: 1,250.50 showed as 1,251). */
+export const priceMoney = (value: number) => {
+  const currency = businessCurrency();
+  const amount = Number(value) || 0;
+  if (currency !== "THB") return formatMoney(amount, currency, "en-GB");
+  const whole = Math.abs(amount - Math.round(amount)) < 0.005;
+  return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(amount);
+};
+
 export const money = (value: number) => {
   const currency = businessCurrency();
   return currency === "THB"

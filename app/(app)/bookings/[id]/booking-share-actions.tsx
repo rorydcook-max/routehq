@@ -80,6 +80,7 @@ export function BookingShareActions({
         formData.set("organizationId", organizationId);
         formData.set("rentalId", rentalId);
         formData.set("baseUrl", defaultAppUrl || window.location.origin);
+        formData.set("channel", channel);
         const result = await resendBookingLink(formData);
         setLink(result.bookingUrl);
         if (channel === "share") setSent(true);

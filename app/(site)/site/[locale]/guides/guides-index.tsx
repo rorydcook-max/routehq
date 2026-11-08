@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { GUIDE_CATEGORIES, listGuides, listGuidesFor, type GuideCategory } from "@/lib/site/content";
 import type { SiteRegion } from "@/lib/site/region";
-import { siteMetadata } from "@/lib/site/seo";
+import { SITE_OG, siteMetadata } from "@/lib/site/seo";
 import { breadcrumbLd } from "@/lib/site/schema";
 import { CATEGORY_KEY, GuideCard, JsonLd } from "../_components/content-ui";
 import { FinalCta } from "../_components/final-cta";
@@ -15,7 +15,7 @@ const categoryPath = (category: GuideCategory | null) => (category ? `/guides/ca
 export async function guidesMetadata(category: GuideCategory | null): Promise<Metadata> {
   const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
   const title = category ? `${m(CATEGORY_KEY[category])} · ${m("metaGuidesTitle")}` : m("metaGuidesTitle");
-  return siteMetadata({ path: categoryPath(category), locale, title, description: m("metaGuidesDescription") });
+  return siteMetadata({ path: categoryPath(category), locale, title, description: m("metaGuidesDescription"), image: SITE_OG.guides });
 }
 
 /**

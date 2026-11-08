@@ -9,6 +9,7 @@ import { ArrowRight, BookOpen, Check, Copy, FileText, History, LifeBuoy, Papercl
 import { confirmAssistantAction } from "@/app/actions/ask";
 import { chatContext, chatHandoff, chatLoad, chatMarkProposal, chatPoll, chatSend, chatSetEmail, chatThreads, prepareChatUploads } from "@/app/actions/chat";
 import { ChatFleetCards } from "@/components/chat/chat-fleet-cards";
+import { storedThread, THREAD_KEY } from "@/components/chat/chat-thread";
 import { handFiles } from "@/components/chat/chat-handoff";
 import { setPendingReceipt } from "@/components/receipt-handoff";
 import type { ChatAttachment, ChatMessage, ChatMeta, ChatThreadInfo } from "@/lib/chat";
@@ -21,15 +22,8 @@ type Shown = ChatMessage & { pending?: boolean };
 type Earlier = Awaited<ReturnType<typeof chatThreads>>;
 export type ChatRequest = { prompt?: string; action?: ChatActionChip; nonce: number };
 
-/** The chat's thread id is kept in this browser, so the conversation is still there on the next page or visit. */
-const THREAD_KEY = "rove-chat-thread";
-export function storedThread() {
-  try {
-    return window.localStorage.getItem(THREAD_KEY) || "";
-  } catch {
-    return "";
-  }
-}
+/** The chat's thread id is kept in this browser (chat-thread.ts), so the conversation is still there on the next page or visit. */
+export { storedThread };
 function storeThread(id: string) {
   try {
     if (id) window.localStorage.setItem(THREAD_KEY, id);

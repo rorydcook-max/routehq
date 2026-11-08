@@ -12,7 +12,7 @@ import { Dot, Ring, TileHead } from "@/components/glance";
 import { CalendarClock } from "lucide-react";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getCurrentMembership } from "@/lib/auth/roles";
-import { getDashboardData, money } from "@/lib/dashboard";
+import { getDashboardData, money, priceMoney } from "@/lib/dashboard";
 import { FleetBulkActions } from "@/app/(app)/fleet/fleet-actions";
 import { QuickPrice } from "@/app/(app)/fleet/quick-price";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
@@ -77,23 +77,26 @@ const primaryButton = "primary-action pressable";
 // "3 on rent · 6 free" may wrap at the dot, never inside a phrase.
 const glue = (text: string) => text.split(" · ").map((part) => part.replace(/ /g, "\u00a0")).join(" · ");
 
-type FleetFilter = "out" | "free" | "attention";
+type FleetFilter = "out" | "free" | "attention" | "archived";
 
 export default async function FleetPage({ searchParams }: { searchParams: Promise<{ notice?: string; show?: string }> }) {
   const { notice, show } = await searchParams;
-  const filter: FleetFilter | null = show === "out" || show === "free" || show === "attention" ? show : null;
+  const filter: FleetFilter | null = show === "out" || show === "free" || show === "attention" || show === "archived" ? show : null;
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
   // Profit, importing and the bulk archive/delete are the owner's; teammates see the fleet without them.
   const membership = await getCurrentMembership();
   const isOwner = membership?.role === "owner";
-  const [{ vehicles }, categories, customPlan, parkedResult] = await Promise.all([
+  const [{ vehicles: everyVehicle }, categories, customPlan, parkedResult] = await Promise.all([
     getDashboardData(),
     getVehicleCategories(organization.id),
     getCustomPlan(organization.id),
     // Parked (over the plan's vehicle limit after a downgrade): shown, marked, and not counted towards the plan.
     createSupabaseServerClient().then((supabase: any) => supabase.from("vehicles").select("id").eq("organization_id", organization.id).not("parked_at", "is", null))
   ]);
+  // Archived vehicles leave the list and the counts; they sit under their own "Archived" filter (real-user test, 8 Nov 2026).
+  const vehicles = everyVehicle.filter((vehicle) => !vehicle.archived);
+  const archivedVehicles = everyVehicle.filter((vehicle) => vehicle.archived);
   const parked = new Set(((parkedResult?.data || []) as Array<{ id: string }>).map((row) => row.id));
   // The counts at the top are filters: tap "4 out earning" to see just those.
   const matches = (vehicle: (typeof vehicles)[number]) =>
@@ -105,10 +108,10 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
           ? (vehicle.complianceAttentionCount || 0) > 0
           : true;
   const allGroups = groupVehiclesByKind(vehicles, categories);
-  const groups = filter ? groupVehiclesByKind(vehicles.filter(matches), categories) : allGroups;
+  const groups = filter === "archived" ? groupVehiclesByKind(archivedVehicles, categories) : filter ? groupVehiclesByKind(vehicles.filter(matches), categories) : allGroups;
   // Over the plan's vehicle limit: a nudge, never a block (Rory, 11 Oct).
   const plan = effectiveLimits({ subscription_tier: organization.subscription_tier, custom_limits: customPlan.custom_limits });
-  const fleet = fleetMix(vehicles.filter((vehicle) => !parked.has(vehicle.id)), categories);
+  const fleet = fleetMix(everyVehicle.filter((vehicle) => !parked.has(vehicle.id)), categories);
   const over = vehiclesOverLimit(plan, fleet, organization.subscription_status);
   const isOver = over.cars + over.motorbikes > 0;
   const fitting = planForFleet(fleet);
@@ -117,7 +120,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const totalFree = vehicles.filter((vehicle) => vehicle.status === "Available" || Boolean(vehicle.freeUntil)).length;
   /** The longest period a vehicle is priced for: "฿18,000/mo", else per week, else per day. */
   const priceOf = (vehicle: { monthlyRate: number; weeklyRate: number; dailyRate: number }) =>
-    vehicle.monthlyRate > 0 ? t("perMo", { amount: money(vehicle.monthlyRate) }) : vehicle.weeklyRate > 0 ? t("perWk", { amount: money(vehicle.weeklyRate) }) : vehicle.dailyRate > 0 ? t("perDay", { amount: money(vehicle.dailyRate) }) : "";
+    vehicle.monthlyRate > 0 ? t("perMo", { amount: priceMoney(vehicle.monthlyRate) }) : vehicle.weeklyRate > 0 ? t("perWk", { amount: priceMoney(vehicle.weeklyRate) }) : vehicle.dailyRate > 0 ? t("perDay", { amount: priceMoney(vehicle.dailyRate) }) : "";
   // "overdue since 1 Dec" a year back would read as a date still to come, so far-off dates keep the year.
   // The year only when the date is far enough off to be ambiguous: "Free until 9 Feb" in October needs no
   // "2027" (which pushed the status pill into the price column).
@@ -169,7 +172,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                 { key: "out", count: totalOut, label: t("bandOut"), dot: "var(--band-dot)" },
                 // Free is green everywhere else (the list legend, the dashboard); orange means going out.
                 { key: "free", count: totalFree, label: t("bandFree"), dot: "#7ee2a8" },
-                ...(attention > 0 ? [{ key: "attention", count: attention, label: t("bandAttention"), dot: "var(--band-alert)" }] : [])
+                ...(attention > 0 ? [{ key: "attention", count: attention, label: t("bandAttention"), dot: "var(--band-alert)" }] : []),
+                ...(archivedVehicles.length > 0 ? [{ key: "archived", count: archivedVehicles.length, label: t("bandArchived"), dot: null }] : [])
               ] as Array<{ key: FleetFilter | null; count: number; label: string; dot: string | null }>
             ).map((pill) => {
               const active = pill.key === filter;
@@ -256,13 +260,18 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
           </Link>
         </p>
       ) : null}
+      {notice === "archive-live-bookings" ? (
+        <p className="mb-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-medium text-[var(--warning)]" role="alert">
+          {t("noticeArchiveLive")}
+        </p>
+      ) : null}
       {notice === "vehicle-owner-only" ? (
         <p className="mb-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-medium text-[var(--warning)]" role="alert">
           {t("noticeOwnerOnly")}
         </p>
       ) : null}
 
-      {vehicles.length === 0 ? (
+      {vehicles.length === 0 && filter !== "archived" ? (
         <div className="rounded-xl border border-[var(--border)] bg-white p-6 shadow-[var(--shadow-sm)]">
           <EmptyState
             title={t("emptyTitle")}
@@ -360,7 +369,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         </td>
                         <td className="px-3 py-3">
                           <span className="inline-flex flex-wrap gap-1 whitespace-nowrap">
-                            {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <StatusPill label={t(`status_${vehicle.status}`)} status={vehicle.status} />}
+                            {vehicle.archived ? <Badge tone="neutral">{t("status_Archived")}</Badge> : vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <StatusPill label={t(`status_${vehicle.status}`)} status={vehicle.status} />}
                             {parked.has(vehicle.id) ? <Badge tone="neutral">{plansSay("kv_parked")}</Badge> : null}
                           </span>
                         </td>
@@ -407,7 +416,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                           {vehicle.make} {vehicle.model}
                         </p>
                         <span className="flex shrink-0 flex-col items-end gap-1 whitespace-nowrap">
-                          {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <StatusPill label={t(`status_${vehicle.status}`)} status={vehicle.status} />}
+                          {vehicle.archived ? <Badge tone="neutral">{t("status_Archived")}</Badge> : vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <StatusPill label={t(`status_${vehicle.status}`)} status={vehicle.status} />}
                           {parked.has(vehicle.id) ? <Badge tone="neutral">{plansSay("kv_parked")}</Badge> : null}
                         </span>
                       </div>

@@ -444,9 +444,15 @@
     "lateBackCharge": "Naknada za kašnjenje",
     "lateBackFromDeposit": "Odbij od depozita",
     "lateBackChargeRenter": "Naplati najmoprimcu",
-    "lateBackWaive": "Otpiši",
+    "lateBackWaive": "Otpiši (dogovoreno s najmoprimcem)",
     "lateBackOverDeposit": "Preostali depozit pokriva do {amount}.",
-    "lateBackRow": "{count, plural, one {# dan kašnjenja} few {# dana kašnjenja} other {# dana kašnjenja}}"
+    "lateBackRow": "{count, plural, one {# dan kašnjenja} few {# dana kašnjenja} other {# dana kašnjenja}}",
+    "customerNotPresent": "Kupac nije prisutan",
+    "customerNotPresentNote": "Dobit će poveznicu za potpisivanje zapisnika.",
+    "waitingSignature": "Čeka se potpis kupca",
+    "resendSignatureLink": "Ponovno pošalji poveznicu za potpis",
+    "signatureLinkSent": "Poveznica poslana",
+    "signatureLinkNotSent": "Nije poslano automatski. Pošaljite je iz poruka rezervacije."
   },
   "translation": {
     "translatedFrom": "Prevedeno s jezika: {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {# vozilo} few {# vozila} other {# vozila}}",
     "bs_demoBanner": "Demo tvrtka, samo primjer. Rezervacije su isključene.",
     "bs_demoNoBooking": "Ovo je demo tvrtka, pa su rezervacije isključene.",
-    "reason_late_return": "kasni povrat"
+    "reason_late_return": "kasni povrat",
+    "actionFailed": "Nije poslano. Provjerite vezu i pokušajte ponovno.",
+    "stillNeeded": "Još je potrebno: {items}",
+    "need_agreeTick": "Oznaka prihvaćanja ugovora",
+    "idType": "Identifikacijski dokument",
+    "idType_passport": "Putovnica",
+    "idType_national_id": "Osobna iskaznica",
+    "idCardNumber": "Broj osobne iskaznice",
+    "passportNo": "Broj putovnice",
+    "reportTitle_delivery": "Zapisnik o primopredaji",
+    "reportTitle_return": "Zapisnik o povratu",
+    "reportToSign_delivery": "Potpišite zapisnik o primopredaji",
+    "reportToSign_return": "Potpišite zapisnik o povratu",
+    "reportSeeAndSign": "Provjerite fotografije i podatke, zatim potpišite.",
+    "reportOdometer": "Stanje kilometara",
+    "reportFuel": "Gorivo",
+    "reportPhotos": "Fotografije",
+    "reportDamage": "Oštećenja",
+    "reportNoDamage": "Nisu zabilježena oštećenja.",
+    "reportDeposit": "Polog",
+    "reportDepositHeld": "Zadržano",
+    "reportDeducted": "Odbijeno",
+    "reportRefunded": "Vraćeno vama",
+    "reportConsent": "Potvrđujem da je stanje vozila kao što je zabilježeno u ovom zapisniku.",
+    "reportSign": "Potpiši zapisnik",
+    "reportSignedTitle": "Zapisnik potpisan",
+    "reportSignedOn": "Potpisao/la {name}, {date}.",
+    "reportDownload": "Preuzmi zapisnik",
+    "reportNotFoundTitle": "Zapisnik nije pronađen",
+    "reportNotFoundMessage": "Zatražite novu poveznicu od tvrtke za najam."
   },
   "customerMessages": {
     "hi": "Pozdrav {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "Nema povrata novca.",
     "cancelDepositBack": "Vaš depozit od {amount} se vraća.",
     "cancelDepositPart": "Vraća se {returned} od vašeg depozita od {held}.",
-    "cancelDepositKept": "Vaš depozit od {amount} je zadržan."
+    "cancelDepositKept": "Vaš depozit od {amount} je zadržan.",
+    "signHandoverReport": "vaš zapisnik o primopredaji za {vehicle} spreman je za provjeru i potpis: {link}",
+    "signReturnReport": "vaš zapisnik o povratu za {vehicle} spreman je za provjeru i potpis: {link}"
   },
   "common": {
     "kinds_car": "Automobili",
@@ -1273,7 +1310,8 @@
     "collect_extension": "Naplati produljenje",
     "collect_extras": "Naplati dodatke",
     "job_review": "Recenzija od {name} za provjeru",
-    "job_review_open": "Otvori recenzije"
+    "job_review_open": "Otvori recenzije",
+    "job_inspection_signature": "Potreban potpis kupca: {ref}"
   },
   "bookings": {
     "eyebrow": "Rezervacije",
@@ -1354,7 +1392,8 @@
     "deleteRecordsInspections": "Provjere pri predaji i povratu, s fotografijama: {count}",
     "deleteRecordsSigned": "Potpisani ugovor",
     "deleteRecordsBody": "Ovo se ne može poništiti.",
-    "deleteAnyway": "Svejedno izbriši"
+    "deleteAnyway": "Svejedno izbriši",
+    "emptyNone": "Još nema rezervacija."
   },
   "inbox": {
     "title": "Poruke",
@@ -2534,7 +2573,18 @@
     "cn_depositTooMuch": "Depozit koji se još drži iznosi {amount}.",
     "fin_cancelledSettled": "Povrati zabilježeni. Nema više ništa za podmiriti.",
     "share_send": "Pošalji poveznicu za rezervaciju",
-    "hist_late_return": "Vraćeno s kašnjenjem"
+    "hist_late_return": "Vraćeno s kašnjenjem",
+    "cp_noteFailed": "Bilješka nije spremljena. Pokušajte ponovno.",
+    "contact": "Kontakt",
+    "contactOpen": "Otvori",
+    "walkInNoPayment": "Najam bez rezervacije zabilježen.",
+    "pc_refundBtn": "Vrati novac",
+    "pc_refundAmount": "Iznos povrata",
+    "pc_refundConfirm": "Zabilježi povrat",
+    "pc_refundDone": "Povrat zabilježen.",
+    "pc_refundEnter": "Unesite iznos povrata.",
+    "pc_refundMax": "Iz ove uplate možete vratiti najviše {amount}.",
+    "pc_refundFailed": "Povrat nije spremljen. Pokušajte ponovno."
   },
   "newBooking": {
     "docsSelfie": "Fotografija klijenta",
@@ -2784,7 +2834,12 @@
     "saveRate_monthly": "Spremi {amount} mjesečno kao cijenu ovog vozila",
     "extraFree": "Besplatno",
     "clashHeld": "Zadržano za produljenje: {who} želi produljiti. Najprije potvrdite ili uklonite zadržavanje.",
-    "clashHeldRenter": "najmoprimac"
+    "clashHeldRenter": "najmoprimac",
+    "startMoved": "Počinje {date}, na dan kad je ovo vozilo slobodno.",
+    "endBeforeStart": "Datum povrata mora biti nakon datuma početka.",
+    "freeQ": "Rezervirati besplatno?",
+    "freeYes": "Rezerviraj besplatno",
+    "errAmountReceived": "Unesite primljeni iznos."
   },
   "fleet": {
     "title": "Vozni park",
@@ -2860,7 +2915,10 @@
     "qp_save": "Spremi",
     "qp_cancel": "Odustani",
     "qp_failed": "Cijenu nije bilo moguće spremiti. Pokušajte ponovno.",
-    "assistant": "Pomoćnik"
+    "assistant": "Pomoćnik",
+    "bandArchived": "arhivirano",
+    "status_Archived": "Arhivirano",
+    "noticeArchiveLive": "Neka od ovih vozila imaju rezervacije koje nisu završene. Najprije ih premjestite na drugo vozilo ili ih otkažite."
   },
   "customers": {
     "sel_nationality": "Državljanstvo",
@@ -2946,7 +3004,12 @@
     "in_trend": "Trajanje najma i potrošnja",
     "in_avgLength": "Prosječno trajanje",
     "in_avgSpend": "Prosječna potrošnja",
-    "pillReviews": "{count, plural, one {# recenzija} few {# recenzije} other {# recenzija}}"
+    "pillReviews": "{count, plural, one {# recenzija} few {# recenzije} other {# recenzija}}",
+    "sel_needContact": "Dodajte ime i jedan način kontakta: broj telefona, Messenger, LINE, Telegram, Instagram ili e-poštu.",
+    "sel_messengerNameOnly": "Ime ili poveznica na profil",
+    "sel_lineIdOnly": "LINE ID ili telefon",
+    "sel_telegramIdOnly": "Telegram korisničko ime ili telefon",
+    "sel_instagram": "Instagram korisničko ime"
   },
   "calendar": {
     "title": "Kalendar",
@@ -3046,7 +3109,7 @@
     "vs_reserved": "Rezervirano",
     "vs_maintenance": "Na servisu",
     "vs_available": "Slobodno",
-    "vs_inactive": "Nije u upotrebi",
+    "vs_inactive": "Arhivirano",
     "vs_retired": "Nije u upotrebi",
     "c_tax": "Cestarina / porez",
     "c_porbor": "Obvezno osiguranje (Por Ror Bor)",
@@ -3391,7 +3454,8 @@
     "tl_out": "Kod klijenta {name}",
     "tl_service": "Servis",
     "tl_repair": "Popravak",
-    "tl_damage": "Šteta pri povratu: {count, plural, one {# stavka} few {# stavke} other {# stavki}}"
+    "tl_damage": "Šteta pri povratu: {count, plural, one {# stavka} few {# stavke} other {# stavki}}",
+    "unarchive": "Vrati iz arhive"
   },
   "customerPage": {
     "back": "Klijenti",
@@ -3493,7 +3557,7 @@
     "n_placeholder": "Sve što vrijedi zapamtiti: želje, navike plaćanja, podsjetnici",
     "n_auto": "Sprema se kada dodirnete drugdje",
     "new_title": "Dodaj klijenta",
-    "new_subtitle": "Dovoljni su ime i broj telefona. Ostalo dodajte sada ili kasnije.",
+    "new_subtitle": "Dovoljni su ime i jedan način kontakta. Ostalo dodajte sada ili kasnije.",
     "new_chatTitle": "Aplikacije za chat i e-pošta",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, e-pošta",
     "new_whatsappHint": "Ostavite prazno ako je isti kao telefon.",
@@ -3595,7 +3659,17 @@
     "tl_paidCharge": "Platio naknadu",
     "tl_refunded": "Povrat novca",
     "tl_damage": "Šteta pri povratu: {count, plural, one {# stavka} few {# stavke} other {# stavki}}",
-    "tl_review": "Ostavio recenziju: {rating}/5"
+    "tl_review": "Ostavio recenziju: {rating}/5",
+    "new_phoneHint": "Nije potrebno ako ispod dodate Messenger, LINE, Telegram, Instagram ili e-poštu.",
+    "dnr_failed": "Nije spremljeno. Pokušajte ponovno.",
+    "message": "Poruka",
+    "dupContact": "{name} je već spremljen s ovim kontakt podacima.",
+    "f_licenceClass": "Kategorija vozačke dozvole",
+    "f_idType": "Identifikacijski dokument",
+    "f_idType_passport": "Putovnica",
+    "f_idType_national_id": "Osobna iskaznica",
+    "f_idCardNo": "Broj osobne iskaznice",
+    "f_idCardExpiry": "Osobna iskaznica vrijedi do"
   },
   "vehicleForm": {
     "addTitle": "Dodaj vozilo",
@@ -3770,7 +3844,9 @@
     "qp_add": "Dodaj",
     "backSetup": "Postavljanje",
     "quickSubtitle": "Samo osnovno. Potrebni su samo vrsta, marka i model.",
-    "quickLater": "Datume poreza i osiguranja, kilometražu, kredit i ostalo možete dodati kasnije u Voznom parku."
+    "quickLater": "Datume poreza i osiguranja, kilometražu, kredit i ostalo možete dodati kasnije u Voznom parku.",
+    "archivedNow": "Ovo vozilo je arhivirano.",
+    "unarchiveBtn": "Vrati iz arhive"
   },
   "bookingEdit": {
     "booking": "Rezervacija",
@@ -4050,7 +4126,7 @@
     "tp_km": "Dopuštena udaljenost mjesečno (km)",
     "tp_kmMi": "Dopuštene milje mjesečno",
     "tp_fuel": "Gorivo po 1/8 spremnika koja nedostaje",
-    "tp_late": "Naknada za kasni povrat (% po danu)",
+    "tp_late": "Naknada za kašnjenje plaćanja (% po danu)",
     "tp_cleaning": "Naknada za čišćenje, od",
     "tp_smoking": "Naknada za pušenje, do",
     "tp_repairs": "Popravci koje klijent smije odobriti, do",
@@ -4779,7 +4855,14 @@
     "ba_or": "ili",
     "ba_ownLabel": "Povežite vlastitu domenu",
     "bt_showName": "Prikaži naziv tvrtke uz logotip",
-    "bt_showNameHint": "Kad je isključeno, široki logotip prikazuje se sam, a uz kvadratni stoji vaš naziv. Objavite da bi bilo vidljivo."
+    "bt_showNameHint": "Kad je isključeno, široki logotip prikazuje se sam, a uz kvadratni stoji vaš naziv. Objavite da bi bilo vidljivo.",
+    "reg_confirmCurrency": "Cijene vozila prikazivat će se u {to}, ali neće biti preračunate. Postojeće rezervacije ostaju u {from}.",
+    "reg_confirmCountry": "Time se mijenjaju i valuta u {currency}, vremenska zona u {zone}, udaljenosti u {unit} i PDV na {vat} %.",
+    "reg_confirmChange": "Promijeni",
+    "reg_confirmCancel": "Odustani",
+    "tp_lateReturnPerDay": "Naknada za kasni povrat po danu",
+    "ag_n_lateReturn": "Naknada za kasni povrat",
+    "ag_n_perDay": "{amount} po danu"
   },
   "accountPage": {
     "roleOwner": "Vlasnik",
@@ -7585,7 +7668,9 @@
     "nudgeSignature": "Dodajte svoj potpis jednom i klijenti mogu potpisati ugovor o najmu na mobitelu.",
     "nudgePaymentMethods": "Dodajte kako vam klijenti mogu platiti (bankovni podaci, Wise, Revolut ili PromptPay) kako bi platili izravno sa svoje stranice rezervacije.",
     "extensionHoldReturning": "{customer} ne produljuje: vozilo {vehicle} vraća se {date}. Dani nakon toga ponovno su slobodni za rezervaciju.",
-    "reviewReceived": "{customer} je ostavio recenziju s {rating} zvjezdica."
+    "reviewReceived": "{customer} je ostavio recenziju s {rating} zvjezdica.",
+    "handoverReportSigned": "{customer} je potpisao/la zapisnik o primopredaji za {vehicle}.",
+    "returnReportSigned": "{customer} je potpisao/la zapisnik o povratu za {vehicle}."
   },
   "handoverPay": {
     "title": "Plaćanje",
@@ -7852,7 +7937,8 @@
     "step3p_b_np": "Preuzmite kod {business}. Ponesite vozačku dozvolu i putovnicu.",
     "spec_year": "Godina",
     "spec_deposit": "Depozit",
-    "fleet_perMonth": "{amount} mjesečno"
+    "fleet_perMonth": "{amount} mjesečno",
+    "photo_credit": "Fotografija: <author>{name}</author>, <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Izgled",
@@ -8024,7 +8110,21 @@
     "role_muted": "Prigušeni tekst",
     "role_dark": "Tamni odjeljci",
     "pal_autoSummary": "Boje predloška",
-    "noReviewsYet": "Još nema recenzija"
+    "noReviewsYet": "Još nema recenzija",
+    "img_stock": "Stock fotografije",
+    "img_uploadPhoto": "Prenesi fotografiju",
+    "stock_credit": "Fotografija: <author>{name}</author>, <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Fotografije se nisu mogle učitati. Pokušajte ponovno.",
+    "stock_loading": "Učitavanje fotografija…",
+    "stock_more": "Više fotografija",
+    "stock_none": "Nema fotografija. Pokušajte s drugom pretragom.",
+    "stock_note": "Besplatne fotografije s <unsplash>Unsplash</unsplash>. Vaša stranica navodi fotografa.",
+    "stock_off": "Stock fotografije još nisu postavljene.",
+    "stock_rateLimited": "Dosegnuto je ograničenje pretraživanja Unsplasha po satu. Pokušajte ponovno malo kasnije.",
+    "stock_search": "Pretraži fotografije",
+    "stock_suggested": "Predložene pretrage",
+    "stock_use": "Upotrijebi fotografiju: {photo}",
+    "stock_useBy": "Upotrijebi fotografiju autora {name}"
   },
   "roveListing": {
     "title": "Podijeliti svoja vozila na rove.rent i primati rezervacije ondje?",

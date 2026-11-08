@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
 import { monthPeriod } from "@/lib/i18n/period";
-import { addRentalPayment as addRentalPaymentAction, deleteRentalPayment as deleteRentalPaymentAction, recordPaymentReceivedFromScreen, setupExistingRentalPayments as setupExistingRentalPaymentsAction, updateRentalEndDate as updateRentalEndDateAction, updateRentalPayment as updateRentalPaymentAction } from "@/app/actions/bookings";
+import { addRentalPayment as addRentalPaymentAction, deleteRentalPayment as deleteRentalPaymentAction, recordPaymentReceivedFromScreen, recordPaymentRefund as recordPaymentRefundAction, setupExistingRentalPayments as setupExistingRentalPaymentsAction, updateRentalEndDate as updateRentalEndDateAction, updateRentalPayment as updateRentalPaymentAction } from "@/app/actions/bookings";
 import { deleteTransaction as deleteTransactionAction, updateTransaction as updateTransactionAction } from "@/app/actions/transactions";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 import { unwrap } from "@/lib/action-result";
@@ -21,6 +21,7 @@ const deleteRentalPayment = (...args: Parameters<typeof deleteRentalPaymentActio
 const setupExistingRentalPayments = (...args: Parameters<typeof setupExistingRentalPaymentsAction>) => unwrap(setupExistingRentalPaymentsAction(...args));
 const updateRentalEndDate = (...args: Parameters<typeof updateRentalEndDateAction>) => unwrap(updateRentalEndDateAction(...args));
 const updateRentalPayment = (...args: Parameters<typeof updateRentalPaymentAction>) => unwrap(updateRentalPaymentAction(...args));
+const recordPaymentRefund = (...args: Parameters<typeof recordPaymentRefundAction>) => unwrap(recordPaymentRefundAction(...args));
 const deleteTransaction = (...args: Parameters<typeof deleteTransactionAction>) => unwrap(deleteTransactionAction(...args));
 const updateTransaction = (...args: Parameters<typeof updateTransactionAction>) => unwrap(updateTransactionAction(...args));
 const recordPaymentReceived = (...args: Parameters<typeof recordPaymentReceivedFromScreen>) => unwrap(recordPaymentReceivedFromScreen(...args));
@@ -89,7 +90,10 @@ function useCtl(): Ctl {
 
 function money(value: unknown, currency = "THB") {
   if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(Number(value || 0), currency, "en-GB");
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
+  // Satang kept when an amount has them; whole baht shown without ".00".
+  const amount = Number(value || 0);
+  const whole = Math.abs(amount - Math.round(amount)) < 0.005;
+  return new Intl.NumberFormat("th-TH", { style: "currency", currency, minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(amount);
 }
 
 function dateInput(value: string | null | undefined) {
@@ -517,7 +521,19 @@ export function EditableEndDate({ rentalId, currentEndDate, iconOnly = false }: 
 }
 
 /** atHandover: the vehicle hasn't gone out yet, so a payment due by now is taken at the handover, not overdue. */
-export function EditableRentalPaymentRow({ payment, atHandover = false }: { payment: RentalPayment; atHandover?: boolean }) {
+export function EditableRentalPaymentRow({
+  payment,
+  atHandover = false,
+  canRefund = false,
+  refundable
+}: {
+  payment: RentalPayment;
+  atHandover?: boolean;
+  /** The owner or a manager: a received payment can be partly or fully refunded from its row. */
+  canRefund?: boolean;
+  /** What can still be given back from this payment (its amount less earlier refunds of it). */
+  refundable?: number;
+}) {
   const tx = useCtl();
   const metadata = payment.metadata || {};
   const isExtension = metadata.type === "extension" || metadata.adjustment_type === "extension";
@@ -536,6 +552,14 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [refunding, setRefunding] = useState(false);
+  const leftToRefund = Math.max(0, Math.round(Number(refundable ?? payment.amount ?? 0) * 100) / 100);
+  const [refundAmount, setRefundAmount] = useState(amountInput(leftToRefund));
+  const [refundMethod, setRefundMethod] = useState("cash");
+  const [refundNote, setRefundNote] = useState("");
+  const [refundDone, setRefundDone] = useState(false);
+  const isDepositRow = metadata.type === "deposit" || metadata.is_deposit === true;
+  const showRefund = canRefund && !voided && String(payment.status || "") === "paid" && !isDepositRow && leftToRefund > 0;
   // Saved, and the refreshed page is still on its way: the form stays on "Recording…" until the payment
   // shows as paid, so it never closes onto the old amounts.
   const [awaitingRefresh, setAwaitingRefresh] = useState(false);
@@ -603,6 +627,29 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
         });
       } catch (error) {
         setMessage(shownError(error, tx.say("pc_updateFailed")));
+      }
+    });
+  }
+
+  function saveRefund() {
+    setMessage(null);
+    const value = Number(refundAmount || 0);
+    if (!(value > 0)) return setMessage(tx.say("pc_refundEnter"));
+    if (value > leftToRefund + 0.005) return setMessage(tx.say("pc_refundMax", { amount: money(leftToRefund, payment.currency || "THB") }));
+    startTransition(async () => {
+      try {
+        const formData = new FormData();
+        formData.set("organizationId", String((payment as any).organization_id || ""));
+        formData.set("rentalId", String((payment as any).rental_id || ""));
+        formData.set("paymentId", payment.id);
+        formData.set("amount", String(value));
+        formData.set("paymentMethod", refundMethod);
+        formData.set("notes", refundNote);
+        await recordPaymentRefund(formData);
+        setRefunding(false);
+        setRefundDone(true);
+      } catch (error) {
+        setMessage(shownError(error, tx.say("pc_refundFailed")));
       }
     });
   }
@@ -680,6 +727,20 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
               {tx.say("pc_record")}
             </button>
           ) : null}
+          {showRefund ? (
+            <button
+              className="pressable inline-flex min-h-9 items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 text-sm font-semibold text-[var(--foreground-secondary)]"
+              disabled={isPending}
+              onClick={() => {
+                setRefundAmount(amountInput(leftToRefund));
+                setRefunding((open) => !open);
+                setMessage(null);
+              }}
+              type="button"
+            >
+              {tx.say("pc_refundBtn")}
+            </button>
+          ) : null}
           {canRecordPayment && payment.metadata?.type === "charge" ? (
             <button className="pressable inline-flex min-h-9 items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 text-sm font-semibold text-[var(--foreground-secondary)]" disabled={isPending} onClick={waiveCharge} type="button">
               {tx.say("pc_wontPay")}
@@ -692,6 +753,35 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
           ) : null}
         </div>
       </div>
+
+      {refundDone ? <p className="mt-2 text-sm font-semibold text-[var(--success)]">{tx.say("pc_refundDone")}</p> : null}
+      {refunding ? (
+        <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label>
+              {tx.say("pc_refundAmount")}
+              <input className="font-mono-data mt-1 h-9 w-full" inputMode="decimal" max={leftToRefund} min="0" step="0.01" type="number" value={refundAmount} onChange={(event) => setRefundAmount(event.target.value)} />
+            </label>
+            <label>
+              {tx.say("pc_method")}
+              <select className="mt-1 w-full" value={refundMethod} onChange={(event) => setRefundMethod(event.target.value)}>
+                {["cash", "bank_transfer", ...(methodsFor(paymentMethodOptions, undefined, refundMethod).includes("promptpay") ? ["promptpay"] : [])].map((option) => (
+                  <option key={option} value={option}>{tx.optionName(option)}</option>
+                ))}
+              </select>
+            </label>
+            <label className="sm:col-span-2">
+              {tx.say("pc_note")}
+              <input className="mt-1 w-full" type="text" value={refundNote} onChange={(event) => setRefundNote(event.target.value)} />
+            </label>
+          </div>
+          {message ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-2 text-xs font-semibold text-[var(--danger)]">{message}</p> : null}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <ActionButton disabled={isPending} onClick={saveRefund} tone="primary">{isPending ? tx.say("saving") : tx.say("pc_refundConfirm")}</ActionButton>
+            <ActionButton disabled={isPending} onClick={() => setRefunding(false)}>{tx.say("cancelBtn")}</ActionButton>
+          </div>
+        </div>
+      ) : null}
 
       {recordingPayment ? (
         <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">

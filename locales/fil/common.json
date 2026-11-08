@@ -407,9 +407,15 @@
     "lateBackCharge": "Multa sa pagkahuli",
     "lateBackFromDeposit": "Kunin sa deposit",
     "lateBackChargeRenter": "Singilin ang renter",
-    "lateBackWaive": "Palampasin",
+    "lateBackWaive": "Palampasin (napagkasunduan ng renter)",
     "lateBackOverDeposit": "Ang natitirang deposit ay sapat hanggang {amount}.",
-    "lateBackRow": "{count, plural, one {# araw na huli} other {# araw na huli}}"
+    "lateBackRow": "{count, plural, one {# araw na huli} other {# araw na huli}}",
+    "customerNotPresent": "Wala ang customer",
+    "customerNotPresentNote": "Padadalhan sila ng link para pirmahan ang report.",
+    "waitingSignature": "Hinihintay ang pirma ng customer",
+    "resendSignatureLink": "Ipadala ulit ang signature link",
+    "signatureLinkSent": "Naipadala ang link",
+    "signatureLinkNotSent": "Hindi kusang naipadala. Ipadala mula sa mga mensahe ng booking."
   },
   "translation": {
     "translatedFrom": "Isinalin mula sa {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, one {# sasakyan} other {# sasakyan}}",
     "bs_demoBanner": "Demo business, halimbawa lang. Naka-off ang booking.",
     "bs_demoNoBooking": "Demo business ito, kaya naka-off ang booking.",
-    "reason_late_return": "huling pagbalik"
+    "reason_late_return": "huling pagbalik",
+    "actionFailed": "Hindi naipadala. Tingnan ang koneksyon mo at subukan ulit.",
+    "stillNeeded": "Kailangan pa: {items}",
+    "need_agreeTick": "Tsek ng pagsang-ayon sa kasunduan",
+    "idType": "ID document",
+    "idType_passport": "Passport",
+    "idType_national_id": "National ID card",
+    "idCardNumber": "Numero ng ID card",
+    "passportNo": "Numero ng passport",
+    "reportTitle_delivery": "Handover report",
+    "reportTitle_return": "Return report",
+    "reportToSign_delivery": "Pirmahan ang handover report mo",
+    "reportToSign_return": "Pirmahan ang return report mo",
+    "reportSeeAndSign": "Tingnan ang mga litrato at detalye, saka pumirma.",
+    "reportOdometer": "Odometer",
+    "reportFuel": "Gasolina",
+    "reportPhotos": "Mga litrato",
+    "reportDamage": "Sira",
+    "reportNoDamage": "Walang naitalang sira.",
+    "reportDeposit": "Deposit",
+    "reportDepositHeld": "Hawak",
+    "reportDeducted": "Ibinawas",
+    "reportRefunded": "Ibinalik sa iyo",
+    "reportConsent": "Kinukumpirma ko na ang kondisyon ng sasakyan ay gaya ng nakatala sa report na ito.",
+    "reportSign": "Pirmahan ang report",
+    "reportSignedTitle": "Napirmahan ang report",
+    "reportSignedOn": "Pinirmahan ni {name}, {date}.",
+    "reportDownload": "I-download ang report",
+    "reportNotFoundTitle": "Hindi nahanap ang report",
+    "reportNotFoundMessage": "Humingi ng bagong link sa rental business."
   },
   "customerMessages": {
     "hi": "Kumusta {name},",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "Walang refund.",
     "cancelDepositBack": "Ibinabalik na ang {amount} mong deposit.",
     "cancelDepositPart": "Ibinabalik na ang {returned} mula sa {held} mong deposit.",
-    "cancelDepositKept": "Kinuha ang {amount} mong deposit."
+    "cancelDepositKept": "Kinuha ang {amount} mong deposit.",
+    "signHandoverReport": "handa nang tingnan at pirmahan ang handover report mo para sa {vehicle}: {link}",
+    "signReturnReport": "handa nang tingnan at pirmahan ang return report mo para sa {vehicle}: {link}"
   },
   "common": {
     "kinds_car": "Mga Kotse",
@@ -1273,7 +1310,8 @@
     "collect_extension": "Singilin ang extension",
     "collect_extras": "Singilin ang extras",
     "job_review": "Review mula kay {name} na susuriin",
-    "job_review_open": "Buksan ang mga review"
+    "job_review_open": "Buksan ang mga review",
+    "job_inspection_signature": "Kailangan ang pirma ng customer: {ref}"
   },
   "bookings": {
     "eyebrow": "Mga Booking",
@@ -1354,7 +1392,8 @@
     "deleteRecordsInspections": "Mga check sa handover at pagbalik, may litrato: {count}",
     "deleteRecordsSigned": "Ang pinirmahang kasunduan",
     "deleteRecordsBody": "Hindi na ito maibabalik.",
-    "deleteAnyway": "Burahin pa rin"
+    "deleteAnyway": "Burahin pa rin",
+    "emptyNone": "Wala pang booking."
   },
   "inbox": {
     "title": "Inbox",
@@ -2534,7 +2573,18 @@
     "cn_depositTooMuch": "Ang deposit na hawak pa ay {amount}.",
     "fin_cancelledSettled": "Naitala na ang refund. Wala nang kailangang ayusin.",
     "share_send": "Ipadala ang booking link",
-    "hist_late_return": "Naibalik nang huli"
+    "hist_late_return": "Naibalik nang huli",
+    "cp_noteFailed": "Hindi na-save ang note. Subukan ulit.",
+    "contact": "Contact",
+    "contactOpen": "Buksan",
+    "walkInNoPayment": "Naitala ang walk-in na rental.",
+    "pc_refundBtn": "I-refund",
+    "pc_refundAmount": "Halaga ng refund",
+    "pc_refundConfirm": "Itala ang refund",
+    "pc_refundDone": "Naitala ang refund.",
+    "pc_refundEnter": "Ilagay ang halaga ng refund.",
+    "pc_refundMax": "Pinakamalaking pwedeng i-refund mula sa bayad na ito ay {amount}.",
+    "pc_refundFailed": "Hindi na-save ang refund. Subukan ulit."
   },
   "newBooking": {
     "docsSelfie": "Litrato ng customer",
@@ -2784,7 +2834,12 @@
     "saveRate_monthly": "I-save ang {amount} kada buwan bilang presyo ng sasakyang ito",
     "extraFree": "Libre",
     "clashHeld": "Naka-hold para sa extension: {who} ay gustong mag-extend. Kumpirmahin o alisin muna ang hold.",
-    "clashHeldRenter": "ang umuupa"
+    "clashHeldRenter": "ang umuupa",
+    "startMoved": "Magsisimula sa {date}, ang araw na libre ang sasakyang ito.",
+    "endBeforeStart": "Dapat mas huli ang petsa ng pagbalik kaysa sa start date.",
+    "freeQ": "I-book nang libre?",
+    "freeYes": "I-book nang libre",
+    "errAmountReceived": "Ilagay ang halagang natanggap."
   },
   "fleet": {
     "title": "Fleet",
@@ -2860,7 +2915,10 @@
     "qp_save": "I-save",
     "qp_cancel": "Kanselahin",
     "qp_failed": "Hindi na-save ang presyo. Subukan ulit.",
-    "assistant": "Katulong"
+    "assistant": "Katulong",
+    "bandArchived": "naka-archive",
+    "status_Archived": "Naka-archive",
+    "noticeArchiveLive": "May mga booking na hindi pa tapos ang ilan sa mga sasakyang ito. Ilipat muna sila sa ibang sasakyan o i-cancel."
   },
   "customers": {
     "sel_nationality": "Nasyonalidad",
@@ -2946,7 +3004,12 @@
     "in_trend": "Haba ng upa at gastos",
     "in_avgLength": "Average na haba",
     "in_avgSpend": "Average na gastos",
-    "pillReviews": "{count, plural, one {# review} other {# review}}"
+    "pillReviews": "{count, plural, one {# review} other {# review}}",
+    "sel_needContact": "Maglagay ng pangalan at isang paraan para makontak sila: phone number, Messenger, LINE, Telegram, Instagram o email.",
+    "sel_messengerNameOnly": "Pangalan o profile link nila",
+    "sel_lineIdOnly": "LINE ID o phone",
+    "sel_telegramIdOnly": "Telegram username o phone",
+    "sel_instagram": "Instagram username"
   },
   "calendar": {
     "title": "Kalendaryo",
@@ -3040,7 +3103,7 @@
     "vs_reserved": "Naka-book",
     "vs_maintenance": "Nasa talyer",
     "vs_available": "Bakante",
-    "vs_inactive": "Hindi ginagamit",
+    "vs_inactive": "Naka-archive",
     "vs_retired": "Hindi ginagamit",
     "c_tax": "Buwis sa daan",
     "c_porbor": "Compulsory insurance (Por Ror Bor)",
@@ -3391,7 +3454,8 @@
     "tl_out": "Nasa {name}",
     "tl_service": "Service",
     "tl_repair": "Repair",
-    "tl_damage": "Sira na nakita sa pagsauli: {count, plural, one {# item} other {# item}}"
+    "tl_damage": "Sira na nakita sa pagsauli: {count, plural, one {# item} other {# item}}",
+    "unarchive": "I-unarchive"
   },
   "customerPage": {
     "back": "Mga customer",
@@ -3492,7 +3556,7 @@
     "n_placeholder": "Anumang dapat tandaan: gusto nila, ugali sa pagbabayad, paalala",
     "n_auto": "Nase-save kapag nag-tap ka sa labas",
     "new_title": "Magdagdag ng customer",
-    "new_subtitle": "Sapat na ang pangalan at numero ng telepono. Idagdag ang iba ngayon o mamaya.",
+    "new_subtitle": "Sapat na ang pangalan at isang paraan para makontak sila. Idagdag ang iba ngayon o mamaya.",
     "new_chatTitle": "Mga chat app at email",
     "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, email",
     "new_whatsappHint": "Iwanang blangko kung pareho sa kanilang telepono.",
@@ -3595,7 +3659,17 @@
     "tl_paidCharge": "Nagbayad ng singil",
     "tl_refunded": "Refund",
     "tl_damage": "Sira na nakita sa pagsauli: {count, plural, one {# item} other {# item}}",
-    "tl_review": "Nag-iwan ng review: {rating}/5"
+    "tl_review": "Nag-iwan ng review: {rating}/5",
+    "new_phoneHint": "Hindi kailangan kung maglalagay ka ng Messenger, LINE, Telegram, Instagram o email sa ibaba.",
+    "dnr_failed": "Hindi na-save. Subukan ulit.",
+    "message": "Mag-message",
+    "dupContact": "Naka-save na si {name} gamit ang contact details na ito.",
+    "f_licenceClass": "Klase ng lisensya",
+    "f_idType": "ID document",
+    "f_idType_passport": "Passport",
+    "f_idType_national_id": "National ID card",
+    "f_idCardNo": "Numero ng ID card",
+    "f_idCardExpiry": "Expiry ng ID card"
   },
   "vehicleForm": {
     "addTitle": "Magdagdag ng sasakyan",
@@ -3770,7 +3844,9 @@
     "quickSubtitle": "Mga pangunahing detalye lang. Uri, tatak at modelo lang ang kailangan.",
     "quickLater": "Ang mga petsa ng buwis at insurance, mileage, utang at iba pa ay puwedeng idagdag mamaya mula sa Fleet.",
     "valueSummaryMi": "Mileage ngayon, ibinayad mo, halaga nito ngayon",
-    "valueSummaryEditMi": "Presyo ng bili, halaga, mileage noong binili"
+    "valueSummaryEditMi": "Presyo ng bili, halaga, mileage noong binili",
+    "archivedNow": "Naka-archive ang sasakyang ito.",
+    "unarchiveBtn": "I-unarchive"
   },
   "bookingEdit": {
     "booking": "Booking",
@@ -4049,7 +4125,7 @@
     "tp_fees": "Mga singil at limitasyon",
     "tp_km": "Distansyang pinapayagan bawat buwan (km)",
     "tp_fuel": "Gasolina kada 1/8 tangke na kulang",
-    "tp_late": "Multa sa late na pagbalik (% bawat araw)",
+    "tp_late": "Multa sa huling bayad (% kada araw)",
     "tp_cleaning": "Cleaning fee, mula",
     "tp_smoking": "Smoking fee, hanggang",
     "tp_repairs": "Ayos na puwedeng aprubahan ng customer, hanggang",
@@ -4780,7 +4856,14 @@
     "ba_or": "o",
     "ba_ownLabel": "Ikonekta ang sariling domain",
     "bt_showName": "Ipakita ang pangalan ng negosyo sa tabi ng logo",
-    "bt_showNameHint": "Kapag naka-off, mag-isang lalabas ang malapad na logo at may pangalan mo sa tabi ang square na logo. I-publish para maging live."
+    "bt_showNameHint": "Kapag naka-off, mag-isang lalabas ang malapad na logo at may pangalan mo sa tabi ang square na logo. I-publish para maging live.",
+    "reg_confirmCurrency": "Ipapakita ang presyo ng sasakyan sa {to} pero hindi iko-convert. Mananatili sa {from} ang mga kasalukuyang booking.",
+    "reg_confirmCountry": "Papalitan din nito ang currency sa {currency}, time zone sa {zone}, distansya sa {unit} at VAT sa {vat}%.",
+    "reg_confirmChange": "Palitan",
+    "reg_confirmCancel": "Kanselahin",
+    "tp_lateReturnPerDay": "Multa sa huling pagbalik kada araw",
+    "ag_n_lateReturn": "Multa sa huling pagbalik",
+    "ag_n_perDay": "{amount} kada araw"
   },
   "accountPage": {
     "roleOwner": "May-ari",
@@ -7590,7 +7673,9 @@
     "nudgeSignature": "Idagdag ang iyong pirma nang isang beses, at makakapirma ang mga customer sa kasunduan sa pagrenta sa kanilang phone.",
     "nudgePaymentMethods": "Idagdag kung paano ka mababayaran ng customer (bank details, Wise, Revolut o PromptPay) para direkta silang makabayad mula sa booking page nila.",
     "extensionHoldReturning": "Hindi mag-e-extend si {customer}: dapat maisauli ang {vehicle} sa {date}. Bukas na ulit para sa booking ang mga susunod na araw.",
-    "reviewReceived": "Nag-iwan si {customer} ng {rating}-star na review."
+    "reviewReceived": "Nag-iwan si {customer} ng {rating}-star na review.",
+    "handoverReportSigned": "Pinirmahan ni {customer} ang handover report para sa {vehicle}.",
+    "returnReportSigned": "Pinirmahan ni {customer} ang return report para sa {vehicle}."
   },
   "handoverPay": {
     "title": "Bayad",
@@ -7857,7 +7942,8 @@
     "step3p_b_np": "Kunin sa {business}. Dalhin ang lisensya at passport mo.",
     "spec_year": "Taon",
     "spec_deposit": "Deposit",
-    "fleet_perMonth": "{amount} kada buwan"
+    "fleet_perMonth": "{amount} kada buwan",
+    "photo_credit": "Litrato ni <author>{name}</author> sa <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "Itsura",
@@ -8029,7 +8115,21 @@
     "role_muted": "Mahinang teksto",
     "role_dark": "Madidilim na seksyon",
     "pal_autoSummary": "Mga kulay ng template",
-    "noReviewsYet": "Wala pang review"
+    "noReviewsYet": "Wala pang review",
+    "img_stock": "Mga stock photo",
+    "img_uploadPhoto": "Mag-upload ng litrato",
+    "stock_credit": "Litrato ni <author>{name}</author> sa <unsplash>Unsplash</unsplash>",
+    "stock_failed": "Hindi ma-load ang mga litrato. Subukan ulit.",
+    "stock_loading": "Nilo-load ang mga litrato…",
+    "stock_more": "Higit pang litrato",
+    "stock_none": "Walang nakitang litrato. Sumubok ng ibang search.",
+    "stock_note": "Libreng litrato mula sa <unsplash>Unsplash</unsplash>. Binibigyan ng credit ng site mo ang photographer.",
+    "stock_off": "Hindi pa naka-set up ang mga stock photo.",
+    "stock_rateLimited": "Naabot na ang oras-oras na search limit ng Unsplash. Subukan ulit mamaya.",
+    "stock_search": "Maghanap ng litrato",
+    "stock_suggested": "Mga mungkahing search",
+    "stock_use": "Gamitin ang litrato: {photo}",
+    "stock_useBy": "Gamitin ang litrato ni {name}"
   },
   "roveListing": {
     "title": "I-share ang fleet mo sa rove.rent at tumanggap ng booking doon?",

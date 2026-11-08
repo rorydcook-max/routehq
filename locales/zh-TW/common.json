@@ -407,9 +407,15 @@
     "lateBackCharge": "逾時費用",
     "lateBackFromDeposit": "從押金扣除",
     "lateBackChargeRenter": "向租客收取",
-    "lateBackWaive": "免除",
+    "lateBackWaive": "免除（已與租客協議）",
     "lateBackOverDeposit": "剩餘押金最多可抵扣 {amount}。",
-    "lateBackRow": "{count, plural, other {逾期 # 天}}"
+    "lateBackRow": "{count, plural, other {逾期 # 天}}",
+    "customerNotPresent": "顧客不在場",
+    "customerNotPresentNote": "將傳送簽署報告的連結給對方。",
+    "waitingSignature": "等待顧客簽名",
+    "resendSignatureLink": "重新傳送簽名連結",
+    "signatureLinkSent": "連結已傳送",
+    "signatureLinkNotSent": "未自動傳送。請從預訂訊息中傳送。"
   },
   "translation": {
     "translatedFrom": "翻譯自 {language}",
@@ -964,7 +970,36 @@
     "bs_vehicleCount": "{count, plural, other {# 輛車}}",
     "bs_demoBanner": "示範店家，僅供參考。預訂已關閉。",
     "bs_demoNoBooking": "這是示範店家，因此預訂已關閉。",
-    "reason_late_return": "逾期還車"
+    "reason_late_return": "逾期還車",
+    "actionFailed": "未傳送。請檢查網路連線後再試一次。",
+    "stillNeeded": "仍需：{items}",
+    "need_agreeTick": "同意條款勾選",
+    "idType": "身分證件",
+    "idType_passport": "護照",
+    "idType_national_id": "身分證",
+    "idCardNumber": "身分證號碼",
+    "passportNo": "護照號碼",
+    "reportTitle_delivery": "交車報告",
+    "reportTitle_return": "還車報告",
+    "reportToSign_delivery": "簽署您的交車報告",
+    "reportToSign_return": "簽署您的還車報告",
+    "reportSeeAndSign": "請檢查照片和詳細資料，然後簽名。",
+    "reportOdometer": "里程表",
+    "reportFuel": "油量",
+    "reportPhotos": "照片",
+    "reportDamage": "損傷",
+    "reportNoDamage": "未記錄損傷。",
+    "reportDeposit": "押金",
+    "reportDepositHeld": "保留中",
+    "reportDeducted": "已扣除",
+    "reportRefunded": "已退還給您",
+    "reportConsent": "我確認車輛狀況與本報告記錄相符。",
+    "reportSign": "簽署報告",
+    "reportSignedTitle": "報告已簽署",
+    "reportSignedOn": "由 {name} 於 {date} 簽署。",
+    "reportDownload": "下載報告",
+    "reportNotFoundTitle": "找不到報告",
+    "reportNotFoundMessage": "請向租車業者索取新連結。"
   },
   "customerMessages": {
     "hi": "{name} 您好，",
@@ -1041,7 +1076,9 @@
     "cancelNoRefund": "不予退款。",
     "cancelDepositBack": "你的 {amount} 押金正在退還。",
     "cancelDepositPart": "你的 {held} 押金中有 {returned} 正在退還。",
-    "cancelDepositKept": "你的 {amount} 押金已被扣留。"
+    "cancelDepositKept": "你的 {amount} 押金已被扣留。",
+    "signHandoverReport": "您的 {vehicle} 交車報告已可查看並簽署：{link}",
+    "signReturnReport": "您的 {vehicle} 還車報告已可查看並簽署：{link}"
   },
   "common": {
     "kinds_car": "汽車",
@@ -1299,7 +1336,8 @@
     "collect_extension": "收取續租費",
     "collect_extras": "收取加購費用",
     "job_review": "待審核：{name} 的評價",
-    "job_review_open": "開啟評價"
+    "job_review_open": "開啟評價",
+    "job_inspection_signature": "需要顧客簽名：{ref}"
   },
   "bookings": {
     "eyebrow": "預訂",
@@ -1380,7 +1418,8 @@
     "deleteRecordsInspections": "交車和還車檢查（含照片）：{count}",
     "deleteRecordsSigned": "已簽署的合約",
     "deleteRecordsBody": "此操作無法復原。",
-    "deleteAnyway": "仍然刪除"
+    "deleteAnyway": "仍然刪除",
+    "emptyNone": "還沒有預訂。"
   },
   "inbox": {
     "title": "收件匣",
@@ -2560,7 +2599,18 @@
     "cn_depositTooMuch": "仍在保留的押金為 {amount}。",
     "fin_cancelledSettled": "退款已記錄，沒有需要結算的款項了。",
     "share_send": "傳送預訂連結",
-    "hist_late_return": "逾期還車"
+    "hist_late_return": "逾期還車",
+    "cp_noteFailed": "備註未儲存。請再試一次。",
+    "contact": "聯絡方式",
+    "contactOpen": "開啟",
+    "walkInNoPayment": "已記錄現場租車。",
+    "pc_refundBtn": "退款",
+    "pc_refundAmount": "退款金額",
+    "pc_refundConfirm": "記錄退款",
+    "pc_refundDone": "已記錄退款。",
+    "pc_refundEnter": "請輸入退款金額。",
+    "pc_refundMax": "此筆付款最多可退款 {amount}。",
+    "pc_refundFailed": "退款未儲存。請再試一次。"
   },
   "newBooking": {
     "docsSelfie": "客戶照片",
@@ -2810,7 +2860,12 @@
     "saveRate_monthly": "將每月 {amount} 儲存為此車價格",
     "extraFree": "免費",
     "clashHeld": "為續租保留中：{who}想續租。請先確認或解除保留。",
-    "clashHeldRenter": "租客"
+    "clashHeldRenter": "租客",
+    "startMoved": "從 {date} 開始，也就是這輛車空出來的那天。",
+    "endBeforeStart": "還車日期必須晚於開始日期。",
+    "freeQ": "免費預訂？",
+    "freeYes": "免費預訂",
+    "errAmountReceived": "請輸入收到的金額。"
   },
   "fleet": {
     "title": "車隊",
@@ -2886,7 +2941,10 @@
     "qp_save": "儲存",
     "qp_cancel": "取消",
     "qp_failed": "價格儲存失敗，請再試一次。",
-    "assistant": "助理"
+    "assistant": "助理",
+    "bandArchived": "已封存",
+    "status_Archived": "已封存",
+    "noticeArchiveLive": "其中部分車輛有尚未結束的預訂。請先移到其他車輛或取消。"
   },
   "customers": {
     "sel_nationality": "國籍",
@@ -2972,7 +3030,12 @@
     "in_trend": "租期和消費",
     "in_avgLength": "平均租期",
     "in_avgSpend": "平均消費",
-    "pillReviews": "{count, plural, other {# 則評價}}"
+    "pillReviews": "{count, plural, other {# 則評價}}",
+    "sel_needContact": "請新增姓名和一種聯絡方式：電話、Messenger、LINE、Telegram、Instagram 或電子郵件。",
+    "sel_messengerNameOnly": "姓名或個人檔案連結",
+    "sel_lineIdOnly": "LINE ID 或電話",
+    "sel_telegramIdOnly": "Telegram 使用者名稱或電話",
+    "sel_instagram": "Instagram 使用者名稱"
   },
   "calendar": {
     "title": "行事曆",
@@ -3066,7 +3129,7 @@
     "vs_reserved": "已預訂",
     "vs_maintenance": "維修中",
     "vs_available": "可租",
-    "vs_inactive": "未使用",
+    "vs_inactive": "已封存",
     "vs_retired": "未使用",
     "c_tax": "牌照稅",
     "c_porbor": "強制險（Por Ror Bor）",
@@ -3417,7 +3480,8 @@
     "tl_out": "{name} 使用中",
     "tl_service": "保養",
     "tl_repair": "維修",
-    "tl_damage": "還車時發現車損：{count, plural, other {# 處}}"
+    "tl_damage": "還車時發現車損：{count, plural, other {# 處}}",
+    "unarchive": "取消封存"
   },
   "customerPage": {
     "back": "客人",
@@ -3518,7 +3582,7 @@
     "n_placeholder": "值得記下的事：偏好、付款習慣、提醒事項",
     "n_auto": "點選其他地方即自動儲存",
     "new_title": "新增客人",
-    "new_subtitle": "只需姓名和電話即可，其餘資料可現在或稍後填寫。",
+    "new_subtitle": "有姓名和一種聯絡方式就夠了。其餘資料可以現在或之後新增。",
     "new_chatTitle": "聊天 App 與電子郵件",
     "new_chatSummary": "WhatsApp、LINE、Messenger、Telegram、Instagram、電子郵件",
     "new_whatsappHint": "若與電話號碼相同，請留空。",
@@ -3621,7 +3685,17 @@
     "tl_paidCharge": "支付了費用",
     "tl_refunded": "退款",
     "tl_damage": "還車時發現車損：{count, plural, other {# 處}}",
-    "tl_review": "留下評價：{rating}/5"
+    "tl_review": "留下評價：{rating}/5",
+    "new_phoneHint": "如果在下方新增了 Messenger、LINE、Telegram、Instagram 或電子郵件，就不需要填寫。",
+    "dnr_failed": "未儲存。請再試一次。",
+    "message": "傳訊息",
+    "dupContact": "{name} 已使用這些聯絡資料儲存。",
+    "f_licenceClass": "駕照類別",
+    "f_idType": "身分證件",
+    "f_idType_passport": "護照",
+    "f_idType_national_id": "身分證",
+    "f_idCardNo": "身分證號碼",
+    "f_idCardExpiry": "身分證到期日"
   },
   "vehicleForm": {
     "addTitle": "新增車輛",
@@ -3796,7 +3870,9 @@
     "quickSubtitle": "只需基本資料。只需要車型、廠牌和型號。",
     "quickLater": "稅金與保險日期、里程數、貸款等資訊之後可從車隊中新增。",
     "valueSummaryMi": "目前里程、購買價格、目前價值",
-    "valueSummaryEditMi": "購買價格、價值、購入時里程"
+    "valueSummaryEditMi": "購買價格、價值、購入時里程",
+    "archivedNow": "此車輛已封存。",
+    "unarchiveBtn": "取消封存"
   },
   "bookingEdit": {
     "booking": "預約",
@@ -4075,7 +4151,7 @@
     "tp_fees": "費用與限制",
     "tp_km": "每月允許里程（km）",
     "tp_fuel": "每少 1/8 油箱的油資",
-    "tp_late": "逾期還車費（每天 %）",
+    "tp_late": "逾期付款費（每天 %）",
     "tp_cleaning": "清潔費，起價",
     "tp_smoking": "吸菸罰款，最高",
     "tp_repairs": "客戶可自行核准的維修費，最高",
@@ -4806,7 +4882,14 @@
     "ba_or": "或",
     "ba_ownLabel": "連結自己的網域",
     "bt_showName": "在標誌旁顯示店名",
-    "bt_showNameHint": "關閉時，寬版標誌會單獨顯示，方形標誌旁則會顯示你的店名。發布後生效。"
+    "bt_showNameHint": "關閉時，寬版標誌會單獨顯示，方形標誌旁則會顯示你的店名。發布後生效。",
+    "reg_confirmCurrency": "車輛價格將以 {to} 顯示，但不會換算。現有預訂仍為 {from}。",
+    "reg_confirmCountry": "這也會將貨幣改為 {currency}、時區改為 {zone}、距離單位改為 {unit}、營業稅改為 {vat}%。",
+    "reg_confirmChange": "變更",
+    "reg_confirmCancel": "取消",
+    "tp_lateReturnPerDay": "每天逾期還車費",
+    "ag_n_lateReturn": "逾期還車費",
+    "ag_n_perDay": "每天 {amount}"
   },
   "accountPage": {
     "roleOwner": "負責人",
@@ -7658,7 +7741,9 @@
     "nudgeSignature": "加入一次簽名，顧客就能在手機上簽署租賃合約。",
     "nudgePaymentMethods": "新增客人的付款方式（銀行帳戶、Wise、Revolut 或 PromptPay），讓他們直接在預訂頁付款。",
     "extensionHoldReturning": "{customer} 不續租：{vehicle}將於 {date} 歸還。之後的日期已重新開放預訂。",
-    "reviewReceived": "{customer} 給了 {rating} 顆星評價。"
+    "reviewReceived": "{customer} 給了 {rating} 顆星評價。",
+    "handoverReportSigned": "{customer} 已簽署 {vehicle} 的交車報告。",
+    "returnReportSigned": "{customer} 已簽署 {vehicle} 的還車報告。"
   },
   "handoverPay": {
     "title": "付款",
@@ -7925,7 +8010,8 @@
     "step3p_b_np": "在 {business} 取車。請攜帶駕照和護照。",
     "spec_year": "年份",
     "spec_deposit": "押金",
-    "fleet_perMonth": "每月 {amount}"
+    "fleet_perMonth": "每月 {amount}",
+    "photo_credit": "照片：<author>{name}</author>，來自 <unsplash>Unsplash</unsplash>"
   },
   "siteEditor": {
     "look": "外觀",
@@ -8097,7 +8183,21 @@
     "role_muted": "次要文字",
     "role_dark": "深色區塊",
     "pal_autoSummary": "範本配色",
-    "noReviewsYet": "尚無評價"
+    "noReviewsYet": "尚無評價",
+    "img_stock": "圖庫照片",
+    "img_uploadPhoto": "上傳照片",
+    "stock_credit": "照片：<author>{name}</author>，來自 <unsplash>Unsplash</unsplash>",
+    "stock_failed": "無法載入照片。請再試一次。",
+    "stock_loading": "正在載入照片…",
+    "stock_more": "更多照片",
+    "stock_none": "找不到照片。請換個關鍵字搜尋。",
+    "stock_note": "來自 <unsplash>Unsplash</unsplash> 的免費照片。您的網站會標註攝影師。",
+    "stock_off": "圖庫照片尚未設定。",
+    "stock_rateLimited": "已達 Unsplash 每小時搜尋上限。請稍後再試。",
+    "stock_search": "搜尋照片",
+    "stock_suggested": "推薦搜尋",
+    "stock_use": "使用照片：{photo}",
+    "stock_useBy": "使用 {name} 的照片"
   },
   "roveListing": {
     "title": "要在 rove.rent 上分享你的車輛並在那裡接受預訂嗎？",

@@ -294,6 +294,11 @@ export function TravelPolicyForm({
               step={fee.step}
             />
           ))}
+          {/* Empty: a late return is priced from the vehicle's day rate, else its monthly rate x 12 / 365 (lib/late-return.ts). */}
+          <div className="flex min-h-[60px] items-center justify-between gap-3 rounded-xl bg-[var(--panel-secondary)] px-3.5 py-2.5">
+            <span className="min-w-0 font-semibold leading-6 text-[var(--foreground)]">{say("tp_lateReturnPerDay")}</span>
+            <MoneyInput className="w-32 shrink-0" currency={currencyCode} defaultValue={settings.late_return_fee_per_day ?? ""} label={say("tp_lateReturnPerDay")} name="lateReturnFeePerDay" />
+          </div>
         </div>
       </section>
 

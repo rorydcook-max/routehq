@@ -127,6 +127,11 @@ async function originalConversation(admin: any, organizationId: string, customer
   return (conversations || [])[0] || null;
 }
 
+/** True when the customer has a connected chat with the business: their usual channel (lib/customer-copies.ts). */
+export async function hasCustomerChat(admin: any, organizationId: string, customerId: string) {
+  return Boolean(await originalConversation(admin, organizationId, customerId).catch(() => null));
+}
+
 const digitsOf = (value: unknown) => String(value || "").replace(/\D/g, "");
 
 /**

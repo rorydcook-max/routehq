@@ -12,6 +12,8 @@ export function About() {
   const { template, config, images } = useSite();
   const highlights = config.highlights;
   const layout = template.layout.about;
+  // No photo to show and none chosen: no picture, rather than drawn art that reads as an empty placeholder.
+  const picture = images.about.type === "art" && !config.images.about ? null : images.about;
 
   if (layout === "stacked") {
     // Moto: a big statement, then the highlights as bold tiles.
@@ -48,9 +50,9 @@ export function About() {
           <div className={`${s.card} grid gap-8 p-6 sm:p-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:p-14`}>
             <div>
               <Txt as="h2" className={`${s.display} text-[34px] sm:text-[44px]`} id="about-title" slot="about.title" />
-              {images.about ? (
+              {picture ? (
                 <div className={`${s.image} mt-8 hidden aspect-[4/3] lg:block`}>
-                  <SiteImage image={images.about} />
+                  <SiteImage image={picture} />
                 </div>
               ) : null}
             </div>
@@ -83,11 +85,13 @@ export function About() {
   const treat = imageTreatment(template);
   return (
     <section aria-labelledby="about-title" className={s.section} id="about">
-      <div className={`${s.wrap} grid items-center gap-10 lg:grid-cols-[5fr_7fr] lg:gap-20`}>
-        <div className={`${s.image} aspect-[4/5] max-lg:order-2 max-lg:aspect-[16/11]${treat ? ` ${treat}` : ""}`}>
-          <SiteImage image={images.about} />
-        </div>
-        <div>
+      <div className={`${s.wrap} grid items-center gap-10 ${picture ? "lg:grid-cols-[5fr_7fr]" : ""} lg:gap-20`}>
+        {picture ? (
+          <div className={`${s.image} aspect-[4/5] max-lg:order-2 max-lg:aspect-[16/11]${treat ? ` ${treat}` : ""}`}>
+            <SiteImage image={picture} />
+          </div>
+        ) : null}
+        <div className={picture ? "" : "max-w-3xl"}>
           <Txt as="h2" className={`${s.display} text-[38px] sm:text-[52px]`} id="about-title" slot="about.title" />
           <Txt as="p" className={`${s.soft} mt-6 whitespace-pre-line text-[19px] leading-[1.75] sm:text-[21px]`} slot="about.body" />
           {highlights.length ? (

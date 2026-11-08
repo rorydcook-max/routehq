@@ -186,7 +186,8 @@ export default async function VehiclePage({ params, searchParams }: Props) {
                 <div className={rate.unit === "MON" && longStay ? s.rateBest : s.rate} key={rate.unit}>
                   <span className={s.rateLabel}>{rate.label}</span>
                   <span className={s.rateValue}>{money(rate.amount)}</span>
-                  <span className={s.rateSub}>{rate.unit === "DAY" ? perOf(rate.unit) : t("rv.aboutPerDay", { amount: money(perDayOf(rate)) })}</span>
+                  {/* The day rate's label already says "Per day": no second "a day" under it (final pre-release test, 8 Nov 2026). */}
+                  {rate.unit === "DAY" ? null : <span className={s.rateSub}>{t("rv.aboutPerDay", { amount: money(perDayOf(rate)) })}</span>}
                 </div>
               ))}
             </div>
@@ -331,6 +332,21 @@ export default async function VehiclePage({ params, searchParams }: Props) {
             </div>
           </dl>
           <p className={s.bookNote}>{t("rv.bookNote", { business: business.name })}</p>
+          {/* What is true of every booking on Rove (rove-design-2), next to the button that books. */}
+          <ul className={s.bookTrust}>
+            <li>
+              <Icon name="building-store" />
+              {t("rv.trustDirect")}
+            </li>
+            <li>
+              <Icon name="signature" />
+              {t("rv.trustAgreement")}
+            </li>
+            <li>
+              <Icon name="lock" />
+              {t("rv.trustSecure")}
+            </li>
+          </ul>
         </aside>
       </div>
 

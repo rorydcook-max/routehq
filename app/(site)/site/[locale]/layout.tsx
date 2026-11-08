@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Geist, Instrument_Serif } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
-import { ChatLauncher } from "@/components/chat/chat-launcher";
+import { PublicSpeedInsights } from "@/components/public-speed-insights";
 import { FlagFont } from "@/components/flag-font";
 import { ImageShrinker } from "@/components/image-shrinker";
 import { textDirection } from "@/lib/i18n/locales";
@@ -18,6 +17,7 @@ import { CookieBanner } from "@/components/cookie-banner";
 import { GoogleTagManager } from "@/components/google-tag-manager";
 import { SiteFooter } from "./_components/site-footer";
 import { SiteHeader } from "./_components/site-header";
+import { SiteChat } from "./_components/site-chat";
 import s from "./site.module.css";
 // The app's own stylesheets, in the same order as its root layout, without the Tabler icon font: the website's icons
 // are lucide-react SVGs, so its 212 KB stylesheet was loaded for nothing (task perf, 8 Nov 2026).
@@ -50,6 +50,7 @@ export function generateStaticParams() {
 export default async function SiteLayout({ children, params }: { children: ReactNode; params: Promise<{ locale: string }> }) {
   const locale = await siteLocale(params);
   const [t, messages] = await Promise.all([getTranslations("site"), getMessages()]);
+  const chatWords = ((messages as Record<string, any>).chat ?? {}) as Record<string, string>;
   return (
     // Light or dark is settled in the browser before the first paint (themeScript reads the choice there), so the
     // page can be the same for everyone; the website itself keeps its own fixed look (light-island below).
@@ -62,8 +63,9 @@ export default async function SiteLayout({ children, params }: { children: React
         <JsonLd data={siteWideLd(locale)} />
       </head>
       <body>
-        {/* The website is drawn on the server: its few client parts need the language, not the words. */}
-        <NextIntlClientProvider locale={locale} messages={{}}>
+        {/* The website is drawn on the server, and its few client parts are handed the language and words they show
+            (task perf2, 8 Nov 2026): no next-intl provider, so next-intl's browser code isn't loaded with every page. */}
+        <>
           {/* light-island: the website has its own fixed look, so the app's dark mode (theme-dark.css) leaves it as drawn. */}
           <div className={`light-island ${s.site} ${geist.variable} ${serif.variable}`}>
             <a className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-3 focus:z-50 focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:font-semibold focus:text-[#06162b]" href="#main">
@@ -72,11 +74,9 @@ export default async function SiteLayout({ children, params }: { children: React
             <SiteHeader />
             <main id="main">{children}</main>
             <SiteFooter />
-            {/* The live chat for visitors (help-centre answers and the RoveHQ team, never anyone's records). The website's
-                client parts get no words by default, so the chat's own words come with it. */}
-            <NextIntlClientProvider messages={{ chat: ((messages as Record<string, any>).chat ?? {}) as Record<string, string> }}>
-              <ChatLauncher site />
-            </NextIntlClientProvider>
+            {/* The live chat for visitors (help-centre answers and the RoveHQ team, never anyone's records), with its own
+                words. Drawn as its button; the chat itself loads when the visitor first interacts (site-chat.tsx). */}
+            <SiteChat label={chatWords.launcher || "Chat"} locale={locale} words={chatWords} />
             {/* Cookie consent (GDPR / UK PECR): the same in every cached page, hidden before the first paint for a
                 visitor who has already chosen (consentChosenScript above). */}
             <CookieBanner
@@ -99,7 +99,9 @@ export default async function SiteLayout({ children, params }: { children: React
           </div>
           {/* Google Tag Manager (GA4), loaded in the browser only after the visitor accepts analytics cookies. */}
           <GoogleTagManager />
-        </NextIntlClientProvider>
+          {/* Real visitors' loading speed (Vercel Speed Insights): no cookies, nothing stored on the device. */}
+          <PublicSpeedInsights />
+        </>
         <ImageShrinker />
         <FlagFont />
       </body>

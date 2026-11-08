@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { businessToday, toWallTime } from "@/lib/business-time";
 import { shownError } from "@/lib/error-text";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
@@ -252,7 +253,8 @@ function FileCapture({
           <span className="mt-3 flex items-center justify-between gap-3">
             <span className="flex items-center gap-2 text-sm font-semibold text-[var(--success)]">
               <CheckCircle2 size={18} />
-              {t("photoTaken")}
+              {/* The walkaround video says "Video added", not "Photo added" (final pre-release test, 8 Nov 2026). */}
+              {t(isVideo ? "videoTaken" : "photoTaken")}
             </span>
             <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-semibold text-[var(--primary)]">
               <Icon size={16} />
@@ -284,7 +286,6 @@ function FuelGauge({
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-[var(--foreground)]">{t("fuelPercentage")}</p>
-          <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{t("fuelHint")}</p>
         </div>
         <span className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 font-semibold ${value === null ? "bg-[var(--panel-secondary)] text-base text-[var(--muted)]" : "bg-[var(--primary-light)] text-lg text-[var(--primary)]"}`}>
           {value === null ? t("notSet") : `${value}%`}
@@ -372,20 +373,20 @@ function VehicleDiagram({ onSelect, selected, marked, bike }: { onSelect: (locat
       <div className="relative mx-auto aspect-[180/260] w-full max-w-[300px]">
         {bike ? (
           <svg aria-label={t("vehicleDiagram")} className="absolute inset-0 h-full w-full text-[var(--primary)]" role="img" viewBox="0 0 180 260">
-            <rect fill="#1b2430" height="48" rx="9" width="18" x="81" y="8" />
-            <rect fill="#1b2430" height="48" rx="10" width="22" x="79" y="204" />
-            <rect fill="#d8eeea" height="150" rx="22" stroke="currentColor" strokeWidth="3" width="44" x="68" y="56" />
+            <rect className="dg-wheel" fill="#1b2430" height="48" rx="9" width="18" x="81" y="8" />
+            <rect className="dg-wheel" fill="#1b2430" height="48" rx="10" width="22" x="79" y="204" />
+            <rect className="dg-body" fill="#d8eeea" height="150" rx="22" stroke="currentColor" strokeWidth="3" width="44" x="68" y="56" />
             <rect fill="currentColor" height="9" rx="4.5" width="92" x="44" y="54" />
           </svg>
         ) : (
           <svg aria-label={t("vehicleDiagram")} className="absolute inset-0 h-full w-full text-[var(--primary)]" role="img" viewBox="0 0 180 260">
-            <circle cx="54" cy="72" fill="#1b2430" r="10" />
-            <circle cx="126" cy="72" fill="#1b2430" r="10" />
-            <circle cx="54" cy="190" fill="#1b2430" r="10" />
-            <circle cx="126" cy="190" fill="#1b2430" r="10" />
-            <rect fill="#d8eeea" height="232" rx="28" stroke="currentColor" strokeWidth="3" width="64" x="58" y="14" />
-            <path d="M68 62 Q90 54 112 62 L110 92 Q90 88 70 92 Z" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
-            <path d="M70 188 Q90 184 110 188 L112 208 Q90 214 68 208 Z" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
+            <circle cx="54" cy="72" className="dg-wheel" fill="#1b2430" r="10" />
+            <circle cx="126" cy="72" className="dg-wheel" fill="#1b2430" r="10" />
+            <circle cx="54" cy="190" className="dg-wheel" fill="#1b2430" r="10" />
+            <circle cx="126" cy="190" className="dg-wheel" fill="#1b2430" r="10" />
+            <rect className="dg-body" fill="#d8eeea" height="232" rx="28" stroke="currentColor" strokeWidth="3" width="64" x="58" y="14" />
+            <path d="M68 62 Q90 54 112 62 L110 92 Q90 88 70 92 Z" className="dg-glass" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
+            <path d="M70 188 Q90 184 110 188 L112 208 Q90 214 68 208 Z" className="dg-glass" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
           </svg>
         )}
         {areas.map((area) => (
@@ -539,7 +540,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
     const unpaidRent = (context.unpaidPayments || []).filter((payment: any) => payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true).reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
     return lateBack && context.rental?.deposit_status !== "fully_returned" && lateDepositFree - unpaidRent >= lateBack.amount && lateDepositFree - unpaidRent > 0 ? "deposit" : "charge";
   });
-  const [lateBackInput, setLateBackInput] = useState(() => (lateBack && lateBack.amount > 0 ? String(lateBack.amount) : ""));
+  // An amount with pence or satang starts with both decimals (£118.50, not "118.5"); a whole amount stays whole.
+  const [lateBackInput, setLateBackInput] = useState(() => (lateBack && lateBack.amount > 0 ? (Number.isInteger(lateBack.amount) ? String(lateBack.amount) : lateBack.amount.toFixed(2)) : ""));
   const lateBackAmount = lateBack && lateBackChoice !== "waive" ? lateReturnAmount(lateBackInput) : 0;
   const lateFromDeposit = lateBackChoice === "deposit" ? lateBackAmount : 0;
   const lateToCharge = lateBackChoice === "charge" ? lateBackAmount : 0;
@@ -1215,9 +1217,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
                 {t(distanceKey("drivenDuringRental"), { km: Math.max(0, Number(odometer || 0) - handoverKm).toLocaleString("en-US") })}
               </span>
             </p>
-          ) : (
-            <p className="mt-3 text-sm text-[var(--muted)]">{t("odometerUpdatesMileage")}</p>
-          )}
+          ) : null}
           {odometer && Number(context.vehicle?.mileage || 0) > Number(odometer) ? (
             <p className="mt-3 flex items-start gap-2 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]" role="alert">
               <AlertTriangle className="mt-0.5 shrink-0" size={16} />
@@ -1446,8 +1446,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               <label className="flex items-start gap-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-3 text-sm font-semibold text-[var(--foreground)]">
                 <input checked={billUncovered} className="mt-0.5 h-5 w-5 flex-shrink-0" onChange={(event) => setBillUncovered(event.target.checked)} type="checkbox" />
                 <span>
-                  {t("billRemainder", { amount: money(uncoveredCharges) })}
-                  <span className="mt-1 block text-xs font-medium text-[var(--muted)]">{billUncovered ? t("billRemainderYes") : t("billRemainderNo")}</span>
+                  {t("billRemainder", { amount: money(uncoveredCharges) })}{" "}
+                  <InfoTip label={t("billRemainder", { amount: money(uncoveredCharges) })} text={t("billRemainderYes")} />
                 </span>
               </label>
             ) : requestedDeductions > availableToReconcile ? (
@@ -1482,8 +1482,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               <label className="flex items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-3 text-sm font-semibold text-[var(--foreground)]">
                 <input checked={holdForDamage} className="mt-0.5 h-5 w-5 flex-shrink-0" onChange={(event) => setHoldForDamage(event.target.checked)} type="checkbox" />
                 <span>
-                  {t("holdForDamage")}
-                  <span className="mt-1 block text-xs font-medium text-[var(--muted)]">{t("holdForDamageHint")}</span>
+                  {t("holdForDamage")}{" "}
+                  <InfoTip label={t("holdForDamage")} text={t("holdForDamageHint")} />
                 </span>
               </label>
             ) : null}
@@ -1560,7 +1560,6 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-4">
               <div className="min-w-0">
                 <p className="text-sm font-bold text-[var(--danger)]">{t("stillOwed", { amount: money(owedAtReturn) })}</p>
-                <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{t("stillOwedHint")}</p>
               </div>
               {/* The same cash boxes as the handover, so what is owed can be taken here and receipted. */}
               {!collectOpen && context.rental?.id ? (
@@ -1581,7 +1580,6 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold text-[var(--foreground)]">{t("cashPayment")}</p>
-                  <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{t(mode === "return" ? "cashPaymentReturnHint" : "cashPaymentHint")}</p>
                 </div>
                 {receiptResult ? (
                   <span className="rounded-full bg-[var(--success-light)] px-3 py-1 text-xs font-semibold uppercase text-[var(--success)]">

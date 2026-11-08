@@ -80,7 +80,6 @@ export function SeasonsPanel({ initial }: { initial: Season[] }) {
   };
   return (
     <div className="space-y-3">
-      <p className="font-medium text-[var(--foreground-secondary)]">{say("season_body")}</p>
       {rows.map((row) => (
         <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3" key={row.id}>
           <div className="grid gap-3 sm:grid-cols-[1.2fr_1fr_1fr_0.6fr_auto] sm:items-end">
@@ -158,9 +157,6 @@ export function ExtrasPanel({ initial, currencySymbol, vehicles = [] }: { initia
 
   return (
     <div className="space-y-4">
-      <p className="font-medium text-[var(--foreground-secondary)]">
-        {say("extra_body")} <InfoTip label={say("extra_title")} text={say("extra_bodyTip")} />
-      </p>
       {rows.length ? (
         <ul className="flex flex-wrap gap-2">
           {rows.map((row) => (
@@ -323,7 +319,6 @@ function ExtraSheet({
                 value={priceTyped}
               />
             </span>
-            <span className="mt-1 block text-[13px] font-medium text-[var(--muted)]">{say("extra_priceHint")}</span>
           </label>
           <div>
             <span className={small}>{say("extra_per")}</span>

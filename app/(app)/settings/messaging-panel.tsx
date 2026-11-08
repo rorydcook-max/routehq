@@ -53,7 +53,6 @@ function ConnectForm({ provider, publicUrl, replacing = false }: { provider: Pro
       <button aria-expanded={open} className="flex w-full items-center justify-between gap-3 p-3.5 text-left" onClick={() => setOpen((value) => !value)} type="button">
         <span>
           <span className="card-subtitle block">{replacing ? say("mp_replaceTitle") : say("mp_connect", { name: say(guide.name) })}</span>
-          <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{replacing ? say("mp_replaceBlurb") : say(guide.blurb)}</span>
         </span>
         <ChevronDown className={`flex-shrink-0 text-[var(--muted)] transition ${open ? "rotate-180" : ""}`} size={20} />
       </button>
@@ -189,14 +188,11 @@ export function MessagingPanel({ channels, publicUrl }: { channels: Channel[]; p
       {/* Not built yet: shown so operators know they're on the way (Rory, 7 Nov 2026). Alphabetical by name. */}
       <ul className="space-y-2.5">
         {(["mp_soonEmail", "mp_soonMessenger", "mp_soonInstagram", "mp_soonWhatsapp"] as const)
-          .map((key) => ({ key, name: say(key), body: say(`${key}Body`) }))
+          .map((key) => ({ key, name: say(key) }))
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((row) => (
-            <li className="flex items-start justify-between gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5" key={row.key}>
-              <span className="min-w-0">
-                <span className="card-subtitle block">{row.name}</span>
-                <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{row.body}</span>
-              </span>
+            <li className="flex items-center justify-between gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5" key={row.key}>
+              <span className="card-subtitle block min-w-0">{row.name}</span>
               <span className="shrink-0 rounded-full bg-[var(--panel-tertiary)] px-2.5 py-0.5 text-[13px] font-bold text-[var(--muted)]">{say("ig_soon")}</span>
             </li>
           ))}

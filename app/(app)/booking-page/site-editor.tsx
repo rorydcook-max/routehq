@@ -183,7 +183,6 @@ function TemplateGallery({ current, onPick, onClose }: { current: TemplateId; on
                 </div>
                 <div className="flex flex-1 flex-col px-1.5 pb-1">
                   <p className="mt-3 text-[19px] font-bold text-[var(--foreground)]">{say(`t_${id}`)}</p>
-                  <p className="text-[15px] font-semibold text-[var(--foreground-secondary)]">{say(`td_${id}`)}</p>
                   <div className="mt-auto flex flex-wrap gap-2 pt-4">
                     <button
                       className={`${on ? "secondary-action" : "primary-action"} pressable flex-1`}
@@ -275,7 +274,8 @@ function ImagePicker({ site, slot, label, vehicles, vars, stock }: { site: SiteD
           ) : null}
         </div>
       </div>
-      <div className="mt-3 inline-flex max-w-full flex-wrap gap-1 rounded-[22px] bg-[var(--panel-secondary)] p-1" role="tablist">
+      {/* Two even rows of two on a phone (four tabs wrapped as 2 + 2 of different widths and looked ragged), one row wider up. */}
+      <div className="mt-3 grid max-w-full grid-cols-2 gap-1 rounded-[22px] bg-[var(--panel-secondary)] p-1 sm:inline-flex sm:flex-wrap" role="tablist">
         {IMAGE_TABS.map((value) => (
           <button aria-selected={tab === value} className={`min-h-9 shrink-0 rounded-full px-3.5 text-sm font-bold ${tab === value ? "bg-[var(--panel)] text-[var(--foreground)] shadow-[var(--shadow-card)]" : "text-[var(--foreground-secondary)]"}`} key={value} onClick={() => setTab(value)} role="tab" type="button">
             {say(IMAGE_TAB_LABEL[value])}
@@ -366,9 +366,10 @@ function SectionList({ site, vehicles, reviewsShown }: { site: SiteDraft; vehicl
                 onChange={() => toggle(section.id)}
                 type="checkbox"
               />
-              <span className={`min-w-0 flex-1 font-semibold ${section.on && !waiting ? "text-[var(--foreground)]" : "text-[var(--muted)]"}`}>
+              {/* Wraps, so "No reviews yet" drops under the name on a phone instead of running over the Edit button. */}
+              <span className={`flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 font-semibold ${section.on && !waiting ? "text-[var(--foreground)]" : "text-[var(--muted)]"}`}>
                 {say(`s_${section.id}`)}
-                {waiting ? <span className="ms-2 whitespace-nowrap rounded-full bg-[var(--panel-secondary)] px-2 py-0.5 text-xs font-bold text-[var(--foreground-secondary)]">{say("noReviewsYet")}</span> : null}
+                {waiting ? <span className="whitespace-nowrap rounded-full bg-[var(--panel-secondary)] px-2 py-0.5 text-xs font-bold text-[var(--foreground-secondary)]">{say("noReviewsYet")}</span> : null}
               </span>
               <button className="min-h-10 rounded-full px-3 text-sm font-bold text-[var(--primary)]" onClick={() => setOpen(isOpen ? null : section.id)} type="button">
                 {isOpen ? say("done") : say("edit")}

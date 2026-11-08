@@ -315,10 +315,14 @@ export async function saveBookingRules(input: BookingRules): Promise<Result> {
   const { data: organization } = await admin.from("organizations").select("settings, slug").eq("id", membership.organizationId).maybeSingle();
   if (!organization) return { ok: false, error: await said("Business not found.") };
   const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
+  // The hold counts as the owner's choice once they pick one other than what was shown (lib/booking-rules.ts), so a
+  // business saving another rule keeps following the default hold.
+  const holdChosen = settings.booking_rules?.hold_hours_set === true || Number(input.holdHours) !== bookingRules(settings).holdHours;
   // Run the values through the same reader the rest of the app uses, so only allowed options are stored.
   const clean = bookingRules({
     booking_rules: {
       hold_hours: input.holdHours,
+      hold_hours_set: holdChosen,
       lead_hours: input.leadHours,
       end_notice_days: input.endNoticeDays,
       extend_notice_days: input.extendNoticeDays,
@@ -335,6 +339,7 @@ export async function saveBookingRules(input: BookingRules): Promise<Result> {
         // Changing the extension hold re-works every booking's hold in the database (0125_extension_hold.sql).
         booking_rules: {
           hold_hours: clean.holdHours,
+          ...(holdChosen ? { hold_hours_set: true } : {}),
           lead_hours: clean.leadHours,
           end_notice_days: clean.endNoticeDays,
           extend_notice_days: clean.extendNoticeDays,

@@ -5,7 +5,7 @@ import { buildContractVariables } from "@/lib/contract-rendering";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createRentalDocumentSignedUrl } from "@/lib/rental-document-storage";
 import { recordActivityEventOnce } from "@/lib/supabase/activity";
-import { emailExecutedDocumentToCustomer } from "@/lib/rental-document-email";
+import { sendSignedAgreementCopy } from "@/lib/customer-copies";
 
 export const CUSTOMER_SIGNING_ACKNOWLEDGEMENTS = [
   {
@@ -124,6 +124,23 @@ function materialChangeIssues({ organization, rental, customer, vehicle, booking
   return Array.from(new Set(issues));
 }
 
+/**
+ * A signal that opts one read out of request memoization. During a page render, identical GET
+ * fetches are answered once and reused (React/Next), so a read made after a write in the same
+ * render could get the answer from before the write. Abortable requests are never memoized.
+ */
+export function freshRead() {
+  return new AbortController().signal;
+}
+
+/** Thrown when the customer tries to sign a version other than the one they were shown. */
+export class AgreementVersionChangedError extends Error {
+  constructor() {
+    super("The agreement was updated. Please review it again before signing.");
+    this.name = "AgreementVersionChangedError";
+  }
+}
+
 async function loadByToken(token: string) {
   const supabase = createSupabaseAdminClient() as any;
   const { data: bookingLink, error: bookingError } = await supabase
@@ -144,6 +161,9 @@ async function loadByToken(token: string) {
       : Promise.resolve({ data: [] })
   ]);
 
+  // Read fresh, never from this request's memo of an identical query: on the booking page the
+  // agreement is drawn up again just before this, and a memoized read returned the document as it
+  // was before that, so the first view after a settings change showed (and offered) the old version.
   const { data: document } = rental?.id
     ? await supabase
         .from("rental_documents")
@@ -154,6 +174,7 @@ async function loadByToken(token: string) {
         .not("status", "in", "(voided,superseded)")
         .order("created_at", { ascending: false })
         .limit(1)
+        .abortSignal(freshRead())
         .maybeSingle()
     : { data: null };
 
@@ -164,6 +185,7 @@ async function loadByToken(token: string) {
         .eq("organization_id", bookingLink.organization_id)
         .eq("id", document.current_version_id)
         .eq("document_id", document.id)
+        .abortSignal(freshRead())
         .maybeSingle()
     : { data: null };
 
@@ -419,8 +441,8 @@ export async function completeRentalDocumentCustomerSigning({
   if (ctx.state !== "found" || !ctx.document || !ctx.version || !ctx.rental) {
     throw new Error("This booking link could not be found.");
   }
-  if (ctx.version.id !== reviewedVersionId) {
-    throw new Error("The agreement has changed since you opened it. Please reload the page, read the updated agreement and sign again.");
+  if (!reviewedVersionId || ctx.version.id !== reviewedVersionId) {
+    throw new AgreementVersionChangedError();
   }
   const eligibility = await eligibilityFor(ctx);
   if (!eligibility.eligible) {
@@ -489,6 +511,14 @@ export async function completeRentalDocumentCustomerSigning({
     throw new Error(error.message);
   }
   const row = Array.isArray(data) ? data[0] : data;
+  // The database signs the version that is current when it locks the agreement. That is the one checked
+  // above unless a new version was finalised in the moment between; record it if that ever happens.
+  if (row?.document_version_id && row.document_version_id !== reviewedVersionId) {
+    console.error("[signing] renter signature bound to a different version than the one reviewed", {
+      reviewedVersionId,
+      signedVersionId: row.document_version_id
+    });
+  }
 
   const executedVersion = ctx.version;
   after(() => recordActivityEventOnce(ctx.supabase, {
@@ -504,30 +534,24 @@ export async function completeRentalDocumentCustomerSigning({
     metadata: { document_id: ctx.document.id, version_id: executedVersion.id, verification_reference: verificationReference }
   }, `rental_document_fully_executed:${executedVersion.id}`).catch(() => undefined));
 
-  const businessSnapshot = settingsObject(ctx.version.business_snapshot);
-  // The emailed copy goes out after the customer sees "You're all set": they don't wait for the mail server.
+  // The customer's copy (signed agreement and the booking's details, in their language: lib/customer-copies.ts) goes
+  // out after they see "You're all set": they don't wait for the mail server. Once per agreement version.
   const version = ctx.version;
-  after(() => emailExecutedDocumentToCustomer({
-    supabase: ctx.supabase,
-    organizationId: ctx.bookingLink.organization_id,
-    rentalId: ctx.rental.id,
-    vehicleId: ctx.rental.vehicle_id,
-    customerId: ctx.rental.customer_id,
-    documentId: ctx.document.id,
-    versionId: ctx.version.id,
-    documentLabel: "Rental agreement",
-    recipientEmail: ctx.customer?.email,
-    recipientName: stringValue(ctx.customer?.full_name),
-    businessName: stringValue(businessSnapshot.trading_name || businessSnapshot.legal_name),
-    files: [
-      {
+  const rentalId = ctx.rental.id;
+  const documentId = ctx.document.id;
+  after(() =>
+    sendSignedAgreementCopy(createSupabaseAdminClient() as any, {
+      rentalId,
+      documentId,
+      versionId: version.id,
+      agreement: {
         bucket: version.final_pdf_storage_bucket || version.pdf_storage_bucket,
         path: version.final_pdf_storage_path || version.pdf_storage_path,
         filename: "rental-agreement.pdf"
       },
-      { bucket: "documents", path: certPath, filename: "execution-certificate.pdf" }
-    ]
-  }).catch((error: unknown) => console.error("[signing] emailing the signed agreement failed", error)));
+      certificate: { bucket: "documents", path: certPath, filename: "execution-certificate.pdf" }
+    }).catch((error: unknown) => console.error("[signing] sending the signed agreement failed", error))
+  );
 
   // The customer's two download links, made here from what is already known (looking the booking up again
   // to make them took over a second).

@@ -792,6 +792,10 @@ input[type="time"] {
 .input-with-leading-symbol {
   padding-left: 29px !important;
 }
+/* A hint too long for a narrow box ends in "…" instead of being cut mid-word ("Phone, or paste the full numb"). */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+  text-overflow: ellipsis;
+}
 
 select {
   border-radius: 7px;
@@ -1079,6 +1083,20 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   --primary-blue: #0e5e6f;
   --primary-blue-hover: #0a4653;
   --primary-blue-light: #d8eeea;
+  /* Words and icons in the brand colour (inline styles, SVGs). The same teal here; a lighter teal on a dark page (theme-dark.css). */
+  --primary-ink: var(--primary);
+  /* Solid status fills behind white words: the same colours here; deeper ones on a dark page, where the status colours turn light. */
+  --success-solid: var(--success);
+  --warning-solid: var(--warning);
+  --danger-solid: var(--danger);
+  --purple-solid: var(--purple);
+  /* A field's outline. */
+  --field-border: var(--border-strong);
+  /* An outlined (secondary) button's edge. */
+  --button-border: var(--border);
+  /* A field or pop-up's surface. Several boxes asked for --surface and, with nothing defined, fell back to white,
+     which stayed white on a dark page (phone number country box, search drop-downs). */
+  --surface: var(--panel);
 
   /* The one thing to do next. Text on it is dark, never white (white on mango fails contrast). */
   --accent: #f2a541;
@@ -1349,10 +1367,13 @@ a[class*="rounded-lg"][class*="px-"]:active {
 .content-section .card {
   background: var(--panel-secondary);
 }
-.card .card > summary:hover,
-.form-section .card > summary:hover,
-.content-section .card > summary:hover {
-  background: var(--panel-tertiary);
+/* Mouse only: on an iPhone a tapped fold kept the hover tint, an inset grey slab across its open header. */
+@media (hover: hover) {
+  .card .card > summary:hover,
+  .form-section .card > summary:hover,
+  .content-section .card > summary:hover {
+    background: var(--panel-tertiary);
+  }
 }
 /* Nothing here yet: the band's sun and rings, small, above the words. The same picture as the top of each page. */
 .empty-state {

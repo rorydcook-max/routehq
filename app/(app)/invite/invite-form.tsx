@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useActionState, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { inviteUser, type AuthActionState } from "@/app/actions/auth";
@@ -33,9 +34,9 @@ export function InviteForm() {
           {[...APP_ROLES].sort((a, b) => ["teammate", "manager", "owner"].indexOf(a.value) - ["teammate", "manager", "owner"].indexOf(b.value)).map((role) => (
             <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5 has-[:checked]:bg-[var(--primary-light)] has-[:checked]:ring-2 has-[:checked]:ring-[var(--primary)]" key={role.value}>
               <input className="mt-0.5 h-5 w-5 shrink-0" defaultChecked={role.value === "teammate"} name="role" type="radio" value={role.value} />
-              <span>
-                <span className="block font-bold text-[var(--foreground)]">{say(`iv_${role.value}`)}</span>
-                <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{say(`iv_${role.value}Body`)}</span>
+              <span className="flex items-center gap-1.5 font-bold text-[var(--foreground)]">
+                {say(`iv_${role.value}`)}
+                <InfoTip label={say(`iv_${role.value}`)} text={say(`iv_${role.value}Body`)} />
               </span>
             </label>
           ))}

@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "အစီရင်ခံစာကို လက်မှတ်ထိုးရန် ပို့နိုင်စေရန် ဖောက်သည်ကို ဘိုကင်တွင် အရင်ထည့်ပါ။",
   "Enter the amount received.": "ရရှိသော ပမာဏကို ထည့်ပါ။",
   "Check the phone number.": "ဖုန်းနံပါတ်ကို စစ်ပါ။",
-  "This report has already been signed.": "ဤအစီရင်ခံစာကို လက်မှတ်ထိုးပြီးဖြစ်သည်။"
+  "This report has already been signed.": "ဤအစီရင်ခံစာကို လက်မှတ်ထိုးပြီးဖြစ်သည်။",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "ယာဉ်၏ နံပါတ်ပြားကို အရင်ထည့်ပါ။ ၎င်းမပါဘဲ သဘောတူစာချုပ်ကို လက်မှတ်ထိုး၍ မရပါ။",
+  "This booking is already underway. Contact {} if anything needs changing.": "ဤဘိုကင် စတင်ပြီးဖြစ်သည်။ တစ်ခုခု ပြောင်းရန်လိုပါက {} ကို ဆက်သွယ်ပါ။",
+  "This booking can't be completed online yet. Contact {} to finish it.": "ဤဘိုကင်ကို အွန်လိုင်းတွင် မပြီးဆုံးနိုင်သေးပါ။ ပြီးဆုံးရန် {} ကို ဆက်သွယ်ပါ။",
+  "The agreement was updated. Please review it again before signing.": "သဘောတူစာချုပ်ကို အပ်ဒိတ်လုပ်ထားသည်။ လက်မှတ်မထိုးမီ ထပ်မံ စစ်ဆေးပါ။"
 }

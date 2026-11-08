@@ -152,7 +152,6 @@ export function SlipMatcher({
           </span>
           <div className="min-w-[10rem] flex-1">
             <p className="text-base font-semibold text-[var(--foreground)]">{stage === "reading" ? say("slipReading") : say("slipTitle")}</p>
-            <p className="text-sm text-[var(--muted)]">{stage === "reading" ? say("slipReadingHint") : say("slipHint")}</p>
           </div>
           <button className="pressable min-h-11 w-full rounded-full bg-[var(--primary)] px-5 text-sm font-semibold text-white disabled:opacity-60 sm:w-auto" disabled={stage === "reading"} onClick={() => input.current?.click()} type="button">
             {say("slipSend")}

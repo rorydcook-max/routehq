@@ -64,7 +64,7 @@ export async function GuidesIndex({ category, region = null }: { category: Guide
           {shown.length ? (
             <div className={c.grid}>
               {shown.map((guide) => (
-                <GuideCard guide={guide} key={guide.slug} linkLocale={fallback ? "en" : undefined} locale={fallback ? "en" : locale} m={say} />
+                <GuideCard guide={guide} key={guide.slug} linkLocale={fallback ? "en" : undefined} locale={locale} m={say} />
               ))}
             </div>
           ) : (

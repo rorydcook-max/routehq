@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -79,7 +80,10 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
   return (
     <div className="space-y-4">
       <section className="card p-5">
-        <p className="text-sm font-semibold text-[var(--muted)]">{t("worthNow")}</p>
+        <p className="flex items-center gap-1.5 text-sm font-semibold text-[var(--muted)]">
+          {t("worthNow")}
+          <InfoTip label={t("worthNow")} text={t("footnote")} />
+        </p>
         {/* Nothing valued yet is not "worth ฿0": say so plainly instead of a zero headline. */}
         {valued > 0 ? (
           <p className="num mt-1 text-4xl leading-tight">{money(worth)}</p>
@@ -102,7 +106,6 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
                   <div className="h-full rounded-full bg-[var(--primary)] transition-all duration-700" style={{ width: `${Math.max(6, Math.round((100 * working.done) / working.total))}%` }} />
                 </div>
                 <p className="mt-2 text-sm font-semibold">{say("checking", { n: working.done + 1, total: working.total, name: working.name })}</p>
-                <p className="mt-1 text-xs text-[var(--muted)]">{t("checkingHint")}</p>
               </div>
             ) : toCheck.length ? (
               <button className="btn-primary w-full justify-center sm:w-auto sm:px-6" onClick={() => estimate(toCheck)} type="button">
@@ -148,13 +151,13 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
                       count: row.valuation.count,
                       date: longDate(row.valuation.checked_at.slice(0, 10), locale)
                     })}
+                    {!row.hasYear ? <> <InfoTip text={t("addYear")} /></> : null}
                   </p>
                 ) : null}
                 <p>
                   {row.condition ? say("conditionIs", { condition: t(`cond_${row.condition}`) }) : t("conditionNotSet")}
                   {row.conditionByDamage ? <span className="text-[var(--muted)]"> {say("conditionByDamage", { date: longDate(row.conditionByDamage, locale) })}</span> : null}
                 </p>
-                {!row.hasYear ? <p className="text-[var(--muted)]">{t("addYear")}</p> : null}
                 {row.paid ? (
                   <p>
                     {say(row.boughtOn ? "boughtOn" : "bought", { amount: money(row.paid), date: row.boughtOn ? longDate(row.boughtOn, locale) : "" })}
@@ -180,7 +183,6 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
           );
         })}
       </ul>
-      <p className="measure text-xs text-[var(--muted)]">{t("footnote")}</p>
     </div>
   );
 }

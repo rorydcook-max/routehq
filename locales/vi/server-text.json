@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Hãy thêm khách vào lượt đặt trước để có thể gửi biên bản cho họ ký.",
   "Enter the amount received.": "Nhập số tiền đã nhận.",
   "Check the phone number.": "Kiểm tra số điện thoại.",
-  "This report has already been signed.": "Biên bản này đã được ký."
+  "This report has already been signed.": "Biên bản này đã được ký.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Hãy thêm biển số xe trước. Không có biển số thì không thể ký hợp đồng.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Lượt đặt này đã bắt đầu. Hãy liên hệ {} nếu cần thay đổi gì.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Lượt đặt này chưa thể hoàn tất online. Hãy liên hệ {} để hoàn tất.",
+  "The agreement was updated. Please review it again before signing.": "Hợp đồng đã được cập nhật. Vui lòng xem lại trước khi ký."
 }

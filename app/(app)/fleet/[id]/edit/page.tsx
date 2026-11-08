@@ -1,3 +1,4 @@
+import { InfoTip } from "@/components/info-tip";
 import Link from "next/link";
 import { orgCountry } from "@/lib/regional";
 import { notFound } from "next/navigation";
@@ -148,11 +149,13 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             </div>
             {/* The field keeps a third of the row; its hint uses the full width instead of wrapping over three lines. */}
             <label className="mt-4 block">
-              <span className={labelClass}>{say("deposit")}</span>
+              <span className={`${labelClass} inline-flex items-center gap-1.5`}>
+                {say("deposit")}
+                <InfoTip label={say("deposit")} text={usualDeposit > 0 ? say("depositHintUsual", { amount: niceMoney(usualDeposit, currency) }) : say("depositHintNone")} />
+              </span>
               <span className="block sm:max-w-[calc((100%-2rem)/3)]">
                 <MoneyInput currency={currency} defaultValue={valueOrEmpty((vehicle as any).deposit_amount)} name="depositAmount" />
               </span>
-              <span className="measure mt-1 block font-medium text-[var(--muted)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: niceMoney(usualDeposit, currency) }) : say("depositHintNone")}</span>
             </label>
           </Fold>
           <Fold summary={[`${vehicle.make} ${vehicle.model}`, vehicle.registration_number].filter(Boolean).join(" · ")} title={say("identTitle")}>
@@ -177,7 +180,10 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               {textField("colour", "color", vehicle.color)}
               {textField("mileage", "mileage", vehicle.mileage, { type: "number" })}
               <label className="block sm:col-span-2">
-                <span className={labelClass}>{say("condition")}</span>
+                <span className={`${labelClass} inline-flex items-center gap-1.5`}>
+                  {say("condition")}
+                  {vehicle.metadata?.condition?.by === "damage" ? null : <InfoTip label={say("condition")} text={say("conditionHint")} />}
+                </span>
                 <select className={inputClass} defaultValue={valueOrEmpty(vehicle.metadata?.condition?.value)} name="condition">
                   <option value="">{say("choose")}</option>
                   {CONDITIONS.map((value) => (
@@ -188,9 +194,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                 </select>
                 {vehicle.metadata?.condition?.by === "damage" ? (
                   <span className="mt-1 block font-medium text-[var(--muted)]">{say("conditionByDamage", { date: longDate(String(vehicle.metadata.condition.damage_on || ""), preferredLocale) })}</span>
-                ) : (
-                  <span className="mt-1 block font-medium text-[var(--muted)]">{say("conditionHint")}</span>
-                )}
+                ) : null}
               </label>
             </div>
           </Fold>
@@ -229,18 +233,17 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             </div>
           </Fold>
           {isOwner ? (
-          <Fold summary={say(distanceKey("valueSummaryEdit"))} title={say("valueTitleEdit")}>
+          <Fold title={say("valueTitleEdit")}>
             <div className="grid gap-4 sm:grid-cols-2">
               {moneyField("purchasePrice", "purchasePrice", vehicle.purchase_price)}
               {dateField("purchaseDate", "purchaseDate", vehicle.purchase_date)}
               {textField("purchaseMileage", "purchaseMileage", acquisition.purchase_mileage, { type: "number" })}
               {moneyField("estimatedValue", "estimatedValue", vehicle.estimated_value)}
             </div>
-            <p className="mt-3 text-sm text-[var(--muted)]">{say("valueHintEdit")}</p>
           </Fold>
           ) : null}
           {branches.length > 1 ? (
-            <Fold summary={say("locSummary")} title={say("locTitle")}>
+            <Fold title={say("locTitle")}>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className={labelClass}>{say("homeBranch")}</span>
@@ -269,8 +272,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             </>
           )}
           {isOwner ? (
-            <Fold summary={vehicle.metadata?.partner?.name ? say("partnerSummary", { name: String(vehicle.metadata.partner.name), pct: Number(vehicle.metadata.partner.pct || 0) }) : say("partnerNone")} title={say("partnerTitle")}>
-              <p className="mb-3 font-medium text-[var(--muted)]">{say("partnerHint")}</p>
+            <Fold summary={vehicle.metadata?.partner?.name ? say("partnerSummary", { name: String(vehicle.metadata.partner.name), pct: Number(vehicle.metadata.partner.pct || 0) }) : say("partnerNone")} tip={say("partnerHint")} title={say("partnerTitle")}>
               <div className="grid gap-4 sm:grid-cols-2">
                 {textField("partnerName", "partnerName", vehicle.metadata?.partner?.name)}
                 {textField("partnerPhone", "partnerPhone", vehicle.metadata?.partner?.phone)}
@@ -286,7 +288,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             </Fold>
           ) : null}
           {isOwner ? (
-          <Fold summary={say("loanSummary")} title={say("loanTitle")}>
+          <Fold title={say("loanTitle")}>
             <LoanFields currency={currency} loan={finance} />
           </Fold>
           ) : null}
@@ -304,7 +306,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
         {/* Archiving and deleting live here, one step away from the list, so neither happens by a slip of the thumb. */}
         <div className="mt-8">
           <h2 className="card-subtitle mb-2 text-[var(--danger)]">{say("dangerZone")}</h2>
-          <Fold summary={say("goneSummary")} title={say("goneTitle")}>
+          <Fold title={say("goneTitle")}>
             <div className="space-y-4">
               {vehicle.status === "inactive" ? (
                 <ActionForm action={unarchiveVehicle} className="flex flex-wrap items-center justify-between gap-3">

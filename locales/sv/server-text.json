@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Lägg först till kunden i bokningen, så att rapporten kan skickas för signering.",
   "Enter the amount received.": "Ange mottaget belopp.",
   "Check the phone number.": "Kontrollera telefonnumret.",
-  "This report has already been signed.": "Rapporten har redan signerats."
+  "This report has already been signed.": "Rapporten har redan signerats.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Lägg först till fordonets registreringsnummer. Utan det kan avtalet inte skrivas under.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Bokningen har redan börjat. Kontakta {} om något behöver ändras.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Bokningen kan inte slutföras online än. Kontakta {} för att slutföra den.",
+  "The agreement was updated. Please review it again before signing.": "Avtalet har uppdaterats. Läs igenom det igen innan du skriver under."
 }

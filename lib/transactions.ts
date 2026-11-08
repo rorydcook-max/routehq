@@ -54,6 +54,8 @@ export type TransactionListItem = {
   receiptDocumentId: string | null;
   /** Paid once for a stretch (a year's insurance): counted a share per month it covers. */
   spread?: { from: string; to: string } | null;
+  /** Rental income that is the charge for coming back late: shown as "Late return", not rent. */
+  lateReturn?: boolean;
   /** Set on a month's share of a spread payment (made by the list): the real entry it comes from. */
   shareOf?: { id: string; amount: number; date: string; index: number; count: number; original: TransactionListItem };
 };
@@ -75,6 +77,16 @@ export type TransactionFormPrefill = {
   rentalPaymentId: string;
   taskId: string;
 };
+
+/**
+ * Money received for a late return (lib/late-return.ts): tagged `late_return` since 8 Nov 2026; older entries are
+ * known by the words the schedule gave them ("Returned 2 days late").
+ */
+export function isLateReturnIncome(row: { type?: string | null; metadata?: any; notes?: string | null }) {
+  if (String(row.type || "") !== "rental_income") return false;
+  if (row.metadata?.late_return) return true;
+  return /^(Remaining balance - )?Returned \d+ days? late\b/.test(String(row.metadata?.payment_description || row.notes || ""));
+}
 
 export async function getTransactionList(organizationId: string): Promise<TransactionListItem[]> {
   const supabase = (await createSupabaseServerClient()) as any;
@@ -115,7 +127,8 @@ export async function getTransactionList(organizationId: string): Promise<Transa
     extrasAmount: Number(row.metadata?.extras_amount || 0),
     extrasRefund: row.metadata?.refund_of === "extras",
     receiptDocumentId: row.receipt_document_id || null,
-    spread: row.metadata?.spread || null
+    spread: row.metadata?.spread || null,
+    lateReturn: isLateReturnIncome(row)
   }));
 }
 

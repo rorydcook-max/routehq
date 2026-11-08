@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { fetchVehicleMakesForCategory, fetchVehicleModels, fetchVehicleTrims } from "@/lib/vehicle-catalog-db";
@@ -63,10 +64,17 @@ const VERDICT_TONE: Record<Verdict, string> = {
   no: "bg-[var(--danger)] text-white"
 };
 
-function Num({ label, value, onChange, hint, suffix, prefix }: { label: string; value: number; onChange: (value: number) => void; hint?: string; suffix?: string; prefix?: string }) {
+function Num({ label, value, onChange, hint, tip, suffix, prefix }: { label: string; value: number; onChange: (value: number) => void; hint?: string; /** Shown in an (i) beside the label. */ tip?: string; suffix?: string; prefix?: string }) {
   return (
     <label className={labelCls}>
-      {label}
+      {tip ? (
+        <span className="inline-flex items-center gap-1.5">
+          {label}
+          <InfoTip label={label} text={tip} />
+        </span>
+      ) : (
+        label
+      )}
       <span className="relative block">
         {/* Money shows its sign in front, as amounts are written everywhere else. */}
         {prefix ? <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 pt-1 font-semibold text-[var(--foreground-secondary)]">{prefix}</span> : null}
@@ -100,9 +108,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="rounded-xl bg-[var(--panel-secondary)] p-3">
-      <dt className="text-[var(--muted)]">{label}</dt>
+      <dt className="flex items-center gap-1.5 text-[var(--muted)]">
+        {label}
+        {hint ? <InfoTip label={label} text={hint} /> : null}
+      </dt>
       <dd className="mt-1 text-lg font-bold">{value}</dd>
-      {hint ? <dd className="mt-0.5 text-xs text-[var(--muted)]">{hint}</dd> : null}
     </div>
   );
 }
@@ -169,7 +179,6 @@ function ResearchProgress({ elapsed, say }: { elapsed: number; say: Say }) {
           );
         })}
       </ul>
-      <p className="mt-3 text-xs text-[var(--muted)]">{say("workingHint")}</p>
     </div>
   );
 }
@@ -888,8 +897,10 @@ export function CalculatorClient({
 
             {/* 7. When to sell */}
             <Section title={t("b_sellTitle")}>
-              <p className="font-bold">{say(best.year === 1 ? "sellAfterOne" : "sellAfter", { years: best.year, value: about(best.value), profit: about(best.profit) })}</p>
-              <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{t("b_sellWhy")}</p>
+              <p className="font-bold">
+                {say(best.year === 1 ? "sellAfterOne" : "sellAfter", { years: best.year, value: about(best.value), profit: about(best.profit) })}{" "}
+                <InfoTip label={t("b_sellTitle")} text={t("b_sellWhy")} />
+              </p>
               <dl className="mt-3 grid grid-cols-3 gap-2 text-sm">
                 {worthAfter.map((row) => (
                   <Stat key={row.year} label={say("b_worthAfter", { years: row.year })} value={about(row.value)} />
@@ -914,13 +925,11 @@ export function CalculatorClient({
                 {searching ? t("searching") : t("findOthers")}
               </button>
             </div>
-            {searching ? <p className="mt-2 text-center text-sm text-[var(--muted)]">{t("searchingHint")}</p> : null}
           </Card>
 
           {listings ? (
             <Card className="p-4">
               <h2 className="text-base font-bold">{say("othersTitle", { amount: money(assumptions.price) })}</h2>
-              {ranked.length > 0 ? <p className="mt-1 text-xs text-[var(--muted)]">{t("othersNote")}</p> : null}
               {ranked.length === 0 ? (
                 <p className="mt-2 text-sm text-[var(--foreground-secondary)]">{searchFailed === "offline" ? t("othersOffline") : searchFailed ? t("othersFailed") : t("othersNone")}</p>
               ) : (
@@ -963,14 +972,19 @@ export function CalculatorClient({
             </Card>
           ) : null}
 
-          <Fold title={t("yearByYear")} summary={say("yearSummary", { years: outcome.expected.rows.length })}>
+          <Fold title={t("yearByYear")}>
             <table className="w-full text-right text-sm">
               <thead>
                 <tr className="text-xs text-[var(--muted)]">
                   <th className="py-2 text-left font-medium">{t("colSell")}</th>
                   <th className="py-2 font-medium">{t("colEarned")}</th>
                   <th className="py-2 font-medium">{t("colWorth")}</th>
-                  <th className="py-2 font-medium">{t("colProfit")}</th>
+                  <th className="py-2 font-medium">
+                    <span className="inline-flex items-center gap-1">
+                      {t("colProfit")}
+                      <InfoTip label={t("colProfit")} text={t("yearNote")} />
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -984,13 +998,12 @@ export function CalculatorClient({
                 ))}
               </tbody>
             </table>
-            <p className="mt-3 text-xs text-[var(--muted)]">{t("yearNote")}</p>
           </Fold>
 
           <Fold title={t("figures")} summary={research ? (liveData ? say("figuresFrom", { place: place || "-" }) : t("figuresRough")) : t("figuresUsual")}>
             <div className="grid grid-cols-2 gap-3">
-              <Num hint={t("rentHint")} label={t("rent")} onChange={setRent} value={assumptions.rentMonthly} />
-              <Num hint={t("occupancyHint")} label={t("occupancy")} onChange={(value) => change({ occupancy: Math.min(100, value) })} suffix="%" value={assumptions.occupancy} />
+              <Num label={t("rent")} tip={t("rentHint")} onChange={setRent} value={assumptions.rentMonthly} />
+              <Num label={t("occupancy")} onChange={(value) => change({ occupancy: Math.min(100, value) })} suffix="%" value={assumptions.occupancy} />
               <Num label={t("insurance")} onChange={(value) => change({ insurance: value })} value={assumptions.insurance} />
               <Num label={t("taxes")} onChange={(value) => change({ tax: value, compulsory: 0 })} value={assumptions.tax + assumptions.compulsory} />
               <Num label={t("maintenance")} onChange={(value) => change({ maintenance: value })} value={assumptions.maintenance} />

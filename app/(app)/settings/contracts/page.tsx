@@ -62,6 +62,8 @@ export default async function ContractSettingsPage({ searchParams }: { searchPar
     { label: say("ag_n_cleaning"), value: feeOn(policy, "cleaning_fee_minimum") ? amount(policy.cleaning_fee_minimum) : off },
     { label: say("ag_n_smoking"), value: feeOn(policy, "smoking_fee_maximum") ? amount(policy.smoking_fee_maximum) : off },
     { label: say("ag_n_repair"), value: feeOn(policy, "emergency_repair_limit") ? amount(policy.emergency_repair_limit) : say("tp_off_emergency_repair_limit") },
+    // Ride-hailing and delivery work: banned in the agreement, or allowed on its conditions (section 10).
+    { label: say("ag_n_commercial"), value: say(policy.commercial_use_allowed ? "tp_commercialAllowed" : "tp_commercialNotAllowed") },
     // The main location's travel area and law (each location has its own: Settings › Travel area and limits).
     { label: say("ag_n_area"), value: territoryText(mainTravel, travelCountryCode(organization), distanceUnitFor(organization)) },
     { label: say("ag_n_law"), value: mainTravel.law || policy.jurisdiction }

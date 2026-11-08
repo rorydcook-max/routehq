@@ -93,7 +93,6 @@ export function DoNotRent({
         <span className="font-semibold text-[var(--foreground-secondary)]">{say("dnr_reason")}</span>
         <input autoFocus className="mt-1 w-full" maxLength={200} onChange={(event) => setText(event.target.value)} placeholder={say("dnr_placeholder")} value={text} />
       </label>
-      <p className="mt-2 text-sm text-[var(--muted)]">{say("dnr_hint")}</p>
       <div className="mt-3 flex gap-2">
         <button className="pressable min-h-11 flex-1 rounded-full bg-[var(--danger)] px-3 font-bold text-white disabled:opacity-60" disabled={pending} onClick={() => save(true)} type="button">
           {say("dnr_save")}

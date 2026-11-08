@@ -8,7 +8,7 @@ import { businessToday, toWallTime } from "@/lib/business-time";
 import { businessOffersPromptPay } from "@/lib/payment-methods";
 import { businessCountry } from "@/lib/business-units";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate, shortDate } from "@/lib/i18n/dates";
@@ -436,6 +436,11 @@ export function BookingForm({
   const [isPending, startTransition] = useTransition();
 
   const selectedVehicle = vehicles.find((vehicle) => vehicle.id === vehicleId) || null;
+  // A vehicle with no number plate can't have its agreement signed: the plate is asked for on the last step and saved to the vehicle.
+  const [vehiclePlate, setVehiclePlate] = useState("");
+  const needsPlate = Boolean(selectedVehicle) && !String(selectedVehicle?.registration_number || "").trim();
+  // A rental already under way (not a walk-in) is recorded without an agreement, so the plate can wait there.
+  const plateRequired = needsPlate && !(bookingMode === "existing_rental" && !walkInFastTrack);
   // Picking a vehicle brings its usual inclusions with it.
   useEffect(() => {
     const saved = vehicles.find((vehicle) => vehicle.id === vehicleId)?.included_items;
@@ -735,9 +740,6 @@ export function BookingForm({
             <div className="flex items-start justify-between gap-3 p-3 pb-3">
               <div>
                 <h2 className="text-xl font-semibold text-[var(--foreground)]">{say("addCustomerQ")}</h2>
-                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                  {say("addCustomerBody")}
-                </p>
               </div>
               <button
                 aria-label={say("close")}
@@ -766,7 +768,6 @@ export function BookingForm({
                       <p className="font-semibold text-[var(--foreground)]">{say("skip")}</p>
                       <Badge tone="green">{say("recommended")}</Badge>
                     </div>
-                    <p className="mt-1 text-sm text-[var(--muted)]">{say("skipBody")}</p>
                   </div>
                 </div>
                 </button>
@@ -788,7 +789,6 @@ export function BookingForm({
                   </span>
                   <div className="min-w-0">
                     <p className="font-semibold text-[var(--foreground)]">{say("addNow")}</p>
-                    <p className="mt-1 text-sm text-[var(--muted)]">{say("addNowBody")}</p>
                   </div>
                 </div>
               </button>
@@ -905,7 +905,8 @@ export function BookingForm({
                       {vehicle.daily_rate > 0 || vehicle.monthly_rate > 0 ? (
                         <span className="block text-[14px] font-semibold text-[var(--foreground-secondary)]">
                           {[vehicle.daily_rate > 0 ? say("per_daily", { amount: money(vehicle.daily_rate, currency) }) : null, vehicle.monthly_rate > 0 ? say("perMonth", { amount: money(vehicle.monthly_rate, currency) }) : null].filter(Boolean).map((price, index) => (
-                            <span className="whitespace-nowrap" key={price as string}>{index > 0 ? " · " : ""}{price}</span>
+                            // The dot sits outside the no-wrap part, so a long second price drops to the next line instead of running past the card.
+                            <Fragment key={price as string}>{index > 0 ? " · " : ""}<span className="whitespace-nowrap">{price}</span></Fragment>
                           ))}
                         </span>
                       ) : Number(vehicle.weekly_rate || 0) > 0 ? null : (
@@ -997,7 +998,7 @@ export function BookingForm({
           ) : null}
           {bookingMode === "booking_link" ? (
             <p className="mt-2 text-sm text-[var(--muted)]">
-              {selectedCustomer && !customerSkipped ? say("forCustomer", { name: selectedCustomer.full_name }) : say("fillsOwn")}{" "}
+              {selectedCustomer && !customerSkipped ? <>{say("forCustomer", { name: selectedCustomer.full_name })}{" "}</> : null}
               <button className="font-semibold text-[var(--primary)] underline" onClick={handleAddCustomer} type="button">
                 {selectedCustomer && !customerSkipped ? say("changeCustomer") : say("chooseReturning")}
               </button>
@@ -1294,7 +1295,6 @@ export function BookingForm({
                     onValueChange={setUpfrontRate}
                     value={upfrontRate}
                   />
-                  <p className="mt-1 text-[11px] text-[var(--muted)]">{say("adjustDiscount")}</p>
                 </label>
                 <label className="block">
                   <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("totalUpfront")}</span>
@@ -1345,12 +1345,7 @@ export function BookingForm({
               </button>
             ))}
           </div>
-          {deliveryMethod === "tbd" ? (
-            <div className="mt-3 flex items-start gap-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm leading-6 text-[var(--warning)]">
-              <Info aria-hidden="true" className="mt-1 shrink-0" size={16} />
-              <p>{say("tbdBody")}</p>
-            </div>
-          ) : deliveryMethod === "delivery" ? (
+          {deliveryMethod === "tbd" ? null : deliveryMethod === "delivery" ? (
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <GooglePlaceInput
                 label={say("deliveryLocation")}
@@ -1415,9 +1410,6 @@ export function BookingForm({
           {isSameDayHandover && !shareResult ? (
             <div className="mt-3 rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)] p-3">
               <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--primary)]">{say("fastTrack")}</p>
-              <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
-                {say("fastTrackBody")}
-              </p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 <button
                   className="pressable min-h-11 rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
@@ -1494,7 +1486,7 @@ export function BookingForm({
             </div>
           ) : null}
           <div className="mt-3 grid gap-3">
-            <SummaryRow label={say("s_vehicle")} value={selectedVehicle ? `${vehicleTitle(selectedVehicle)} · ${selectedVehicle.registration_number}` : say("notSelected")} />
+            <SummaryRow label={say("s_vehicle")} value={selectedVehicle ? [vehicleTitle(selectedVehicle), selectedVehicle.registration_number || vehiclePlate.trim().toUpperCase()].filter(Boolean).join(" · ") : say("notSelected")} />
             <SummaryRow
               label={say("s_customer")}
               value={
@@ -1565,8 +1557,10 @@ export function BookingForm({
                   <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${existingPaid === value ? "border-[var(--primary)] bg-white" : "border-[var(--border)] bg-white"}`} key={value}>
                     <input checked={existingPaid === value} className="mt-1 accent-[var(--primary)]" onChange={() => setExistingPaid(value)} type="radio" />
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-[var(--foreground)]">{say(`paid_${value}`)}</span>
-                      <span className="block text-xs text-[var(--muted)]">{say(`paid_${value}_d`)}</span>
+                      <span className="flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground)]">
+                        {say(`paid_${value}`)}
+                        {value === "until" ? <InfoTip label={say(`paid_${value}`)} text={say("paid_until_d")} /> : null}
+                      </span>
                       {value === "until" && existingPaid === "until" ? (
                         <input className={`${inputClass} mt-2 max-w-[200px]`} min={startDate} onChange={(event) => setExistingPaidUntil(event.target.value)} type="date" value={existingPaidUntil} />
                       ) : null}
@@ -1581,6 +1575,22 @@ export function BookingForm({
                 </label>
               ) : null}
             </div>
+          ) : null}
+          {/* The agreement can't be signed without the plate (final pre-release test, 8 Nov 2026): asked here and saved to the vehicle. */}
+          {needsPlate && !shareResult ? (
+            <label className="mt-3 block rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
+              <span className="block text-sm font-bold text-[var(--foreground)]">{say("plateLabel")}</span>
+              <span className="mt-0.5 block text-sm font-semibold text-[var(--foreground-secondary)]">{say("plateHint")}</span>
+              <input
+                autoCapitalize="characters"
+                className={`${inputClass} mt-2 max-w-[260px] font-mono-data uppercase`}
+                maxLength={20}
+                name="vehiclePlate"
+                onChange={(event) => setVehiclePlate(event.target.value)}
+                required={plateRequired}
+                value={vehiclePlate}
+              />
+            </label>
           ) : null}
           {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
         </section>
@@ -2054,7 +2064,6 @@ function GooglePinModal({
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-lg font-semibold text-[var(--foreground)]">{say("dropPin")}</h3>
-            <p className="mt-1 text-sm text-[var(--muted)]">{say("pinBody")}</p>
           </div>
           <button aria-label={say("close")} className="pressable rounded-full p-2 text-[var(--muted)] hover:bg-[var(--panel-secondary)]" onClick={onClose} type="button">
             <X size={20} />

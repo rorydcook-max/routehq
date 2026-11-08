@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Προσθέστε πρώτα τον πελάτη στην κράτηση, ώστε να του σταλεί η αναφορά για υπογραφή.",
   "Enter the amount received.": "Εισαγάγετε το ποσό που εισπράχθηκε.",
   "Check the phone number.": "Ελέγξτε τον αριθμό τηλεφώνου.",
-  "This report has already been signed.": "Αυτή η αναφορά έχει ήδη υπογραφεί."
+  "This report has already been signed.": "Αυτή η αναφορά έχει ήδη υπογραφεί.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Προσθέστε πρώτα την πινακίδα του οχήματος. Χωρίς αυτήν το συμφωνητικό δεν μπορεί να υπογραφεί.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Αυτή η κράτηση έχει ήδη ξεκινήσει. Επικοινωνήστε με {} αν χρειάζεται κάποια αλλαγή.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Αυτή η κράτηση δεν μπορεί ακόμα να ολοκληρωθεί online. Επικοινωνήστε με {} για να την ολοκληρώσετε.",
+  "The agreement was updated. Please review it again before signing.": "Το συμφωνητικό ενημερώθηκε. Ελέγξτε το ξανά πριν υπογράψετε."
 }

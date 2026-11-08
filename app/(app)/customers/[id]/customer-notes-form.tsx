@@ -46,7 +46,7 @@ export function CustomerNotesForm({
           {error}
         </p>
       ) : null}
-      <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{isPending ? say("saving") : say("n_auto")}</p>
+      {isPending ? <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("saving")}</p> : null}
     </form>
   );
 }

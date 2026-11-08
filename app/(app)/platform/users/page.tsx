@@ -34,7 +34,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform/users" subtitle="Every RoveHQ account. Search by email to find someone, see their businesses and help them sign in." title="Users" />
+      <AdminHeader active="/platform/users" title="Users" />
 
       <form className="mb-4 flex flex-wrap items-end gap-2" role="search">
         <label className="!mb-0 min-w-[240px] flex-1">

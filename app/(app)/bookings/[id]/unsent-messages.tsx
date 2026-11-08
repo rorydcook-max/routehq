@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Copy, Send } from "lucide-react";
@@ -53,8 +54,10 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
     <div className={bare ? "" : "scroll-mt-4 rounded-[24px] bg-[var(--messages-light)] p-4 shadow-[var(--shadow-card)]"} id={bare ? undefined : "unsent-messages"}>
       {bare ? null : (
         <>
-          <p className="text-sm font-semibold text-[var(--warning)]">{say("unsentTitle", { count: open.length, name: customerName })}</p>
-          <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{say("unsentWhy")}</p>
+          <p className="flex items-center gap-1.5 text-sm font-semibold text-[var(--warning)]">
+            {say("unsentTitle", { count: open.length, name: customerName })}
+            <InfoTip label={say("unsentTitle", { count: open.length, name: customerName })} text={say("unsentWhy")} />
+          </p>
         </>
       )}
       <div className={bare ? "space-y-3" : "mt-3 space-y-3"}>
@@ -90,7 +93,6 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
               <span>{say("unsentEarlier", { count: earlier.length })}</span>
               <span aria-hidden="true" className="ti ti-chevron-down transition group-open:rotate-180" />
             </summary>
-            <p className="mt-1 text-[14px] text-[var(--muted)]">{say("unsentEarlierHint")}</p>
             <div className="mt-2 space-y-2">
               {earlier.map((message) => (
                 <p className="line-clamp-3 whitespace-pre-line rounded-xl bg-white p-3 text-[14px] leading-6 text-[var(--foreground-secondary)] [overflow-wrap:anywhere]" key={message.id}>

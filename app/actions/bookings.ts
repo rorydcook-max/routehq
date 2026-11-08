@@ -33,6 +33,7 @@ import { adoptBusinessClock } from "@/lib/auth/active-organization-server";
 import { enterBusinessTimeZone } from "@/lib/business-time-scope";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
 import { bookingRules } from "@/lib/booking-rules";
+import { bookingLinkMessage } from "@/lib/booking-link-message";
 import { removeStoredFiles } from "@/lib/supabase/remove-stored-files";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -385,6 +386,20 @@ async function createBookingOrThrow(formData: FormData) {
     throw new Error(conflict);
   }
 
+  // The agreement can't be signed without a number plate (final pre-release test, 8 Nov 2026): the form asks for it
+  // on its last step and it is saved to the vehicle here. A rental already under way (not a walk-in) has no agreement to sign.
+  if (!String(vehicle.registration_number || "").trim()) {
+    const plate = String(formData.get("vehiclePlate") || "").trim().toUpperCase().slice(0, 20);
+    if (plate) {
+      const { error: plateError } = await supabase.from("vehicles").update({ registration_number: plate }).eq("id", vehicleId).eq("organization_id", organizationId);
+      if (plateError) throw new Error(plateError.message);
+      vehicle.registration_number = plate;
+      revalidatePath(`/fleet/${vehicleId}`);
+    } else if (bookingMode === "booking_link" || walkInFastTrack) {
+      throw new Error("Add the vehicle's number plate first. The agreement can't be signed without it.");
+    }
+  }
+
   // A price typed for a car that had none is kept on the car, so the next booking starts from it.
   // Never overwrites a saved price; a failure here (a role that can't edit vehicles) doesn't stop the booking.
   if (String(formData.get("saveVehicleRate") || "") === "true" && rentalRate > 0 && ["daily", "weekly", "monthly"].includes(pricingModel)) {
@@ -397,11 +412,11 @@ async function createBookingOrThrow(formData: FormData) {
   }
 
   // Optional customer lookup
-  let customer: { full_name: string; phone: string | null; nationality: string | null; document_status: string | null } | null = null;
+  let customer: { full_name: string; phone: string | null; nationality: string | null; document_status: string | null; preferred_locale?: string | null } | null = null;
   if (customerId) {
     const { data: customerData, error: customerError } = await supabase
       .from("customers")
-      .select("full_name, phone, nationality, document_status")
+      .select("full_name, phone, nationality, document_status, preferred_locale")
       .eq("id", customerId)
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
@@ -667,6 +682,8 @@ async function createBookingOrThrow(formData: FormData) {
   const rentalContractPending: Promise<{ error: { message: string } | null }> = Promise.resolve(
     supabase.from("rentals").update({ contract_id: contract.id }).eq("id", rental.id).eq("organization_id", organizationId)
   );
+  const holdUntil = holdDeadline(bookingRules(organization.settings).holdHours);
+  const linkExpiresAt = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
   const { data: bookingLink, error: linkError } = await supabase
     .from("booking_links")
     .insert({
@@ -683,8 +700,8 @@ async function createBookingOrThrow(formData: FormData) {
       special_conditions: bookingData.special_conditions,
       share_channels: [shareChannel],
       // The vehicle is held for the customer for a limited time; the link itself lasts much longer.
-      hold_until: holdDeadline(bookingRules(organization.settings).holdHours),
-      expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
+      hold_until: holdUntil,
+      expires_at: linkExpiresAt,
       created_by: user.id
     })
     .select("id, token")
@@ -719,9 +736,16 @@ async function createBookingOrThrow(formData: FormData) {
   await syncVehicleStatusFromBookings(supabase, organizationId, vehicleId);
 
   const vehicleLabel = [vehicle.make, vehicle.model].filter(Boolean).join(" ");
-  const message = customer
-    ? `Hello ${customer.full_name},\n\nHere is your booking link for your ${vehicleLabel} rental:\n${bookingUrl}\n\nPlease complete your details and sign the rental agreement through the link.\n\n${organization.name}`
-    : `Here is the booking link for the ${vehicleLabel} rental:\n${bookingUrl}\n\nPlease complete your details and sign the rental agreement through the link.\n\n${organization.name}`;
+  // In the customer's language, with the time the vehicle is held until (lib/booking-link-message.ts).
+  const message = await bookingLinkMessage({
+    customerName: customer?.full_name,
+    vehicle: vehicleLabel,
+    url: bookingUrl,
+    business: organization.name,
+    locale: customer?.preferred_locale,
+    holdUntil,
+    expiresAt: linkExpiresAt
+  });
   const urls = shareUrls({ message, phone: customer?.phone, organizationName: organization.name });
 
   // The history line and the setup checklist are written just after the reply, so "Booking created" shows at once.
@@ -929,11 +953,13 @@ async function resendBookingLinkOrThrow(formData: FormData) {
   const organizationId = requiredString(formData, "organizationId");
   const rentalId = requiredString(formData, "rentalId");
   const baseUrl = String(formData.get("baseUrl") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
+  // The link's deadline in the message is written on this business's clock.
+  enterBusinessTimeZone(await ensureMembership(supabase, organizationId, user.id));
 
   const [{ data: rental, error: rentalError }, { data: organization, error: organizationError }] = await Promise.all([
     supabase
       .from("rentals")
-      .select("*, vehicles!rentals_vehicle_id_fkey(make, model, registration_number), customers!rentals_customer_id_fkey(full_name, phone)")
+      .select("*, vehicles!rentals_vehicle_id_fkey(make, model, registration_number), customers!rentals_customer_id_fkey(full_name, phone, preferred_locale)")
       .eq("id", rentalId)
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
@@ -950,7 +976,7 @@ async function resendBookingLinkOrThrow(formData: FormData) {
 
   const { data: existingLink, error: linkError } = await supabase
     .from("booking_links")
-    .select("id, token, public_url")
+    .select("id, token, public_url, hold_until, hold_released_at, contract_signed_at, expires_at")
     .eq("organization_id", organizationId)
     .eq("rental_id", rentalId)
     .is("deleted_at", null)
@@ -968,12 +994,16 @@ async function resendBookingLinkOrThrow(formData: FormData) {
   const bookingUrl = bookingLink.public_url || `${baseUrl}/book/${bookingLink.token}`;
   // Copying the link isn't sending it: only a real send marks it sent (real-user test, 8 Nov 2026).
   const copyOnly = String(formData.get("channel") || "") === "copy";
+  // At least a week from now, and never shorter than the link already had (a new booking's link lasts 60 days).
+  const weekAhead = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  const currentExpiry = (bookingLink as { expires_at?: string | null }).expires_at || null;
+  const linkExpiresAt = currentExpiry && currentExpiry > weekAhead ? currentExpiry : weekAhead;
   const { error: updateError } = await supabase
     .from("booking_links")
     .update({
       public_url: bookingUrl,
       ...(copyOnly ? {} : { status: "sent", sent_at: new Date().toISOString() }),
-      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      expires_at: linkExpiresAt
     })
     .eq("id", bookingLink.id)
     .eq("organization_id", organizationId);
@@ -983,8 +1013,17 @@ async function resendBookingLinkOrThrow(formData: FormData) {
   }
 
   const vehicleLabel = [rental.vehicles?.make, rental.vehicles?.model].filter(Boolean).join(" ");
-  const customerName = rental.customers?.full_name || "there";
-  const message = `Hello ${customerName},\n\nHere is your booking link for your ${vehicleLabel} rental:\n${bookingUrl}\n\nPlease complete your details and sign the rental agreement through the link.\n\n${organization.name}`;
+  // The vehicle's hold while it runs (unsigned, not released), otherwise how long the link works.
+  const held = bookingLink as { hold_until?: string | null; hold_released_at?: string | null; contract_signed_at?: string | null };
+  const message = await bookingLinkMessage({
+    customerName: rental.customers?.full_name,
+    vehicle: vehicleLabel,
+    url: bookingUrl,
+    business: organization.name,
+    locale: rental.customers?.preferred_locale,
+    holdUntil: held.hold_until && !held.hold_released_at && !held.contract_signed_at ? held.hold_until : null,
+    expiresAt: held.contract_signed_at ? null : linkExpiresAt
+  });
   const urls = shareUrls({ message, phone: rental.customers?.phone, organizationName: organization.name });
 
   await recordActivityEvent(supabase, {
@@ -2839,6 +2878,8 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
       note,
       // Extras are rental income, tagged so what was paid for them can be seen and refunded.
       ...extrasIncomeTag(payment.metadata, amount),
+      // The charge for coming back late: rental income, but shown and counted as "Late return", not rent.
+      ...(payment.metadata?.late_return ? { late_return: true } : {}),
       // The customer's receipt, when they sent one, stays with the money it proves.
       ...(payment.metadata?.receipt?.path ? { receipt_path: payment.metadata.receipt.path } : {})
     },
@@ -2900,6 +2941,7 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
             period_label: payment.metadata?.period_label || null,
             description: `Remaining balance - ${description}`,
             remainder_of: payment.id,
+            ...(payment.metadata?.late_return ? { late_return: payment.metadata.late_return } : {}),
             // Extras keep their names; extras inside rent count as paid first, the rest stays with the remainder.
             ...(Array.isArray(payment.metadata?.extras) ? { extras: payment.metadata.extras } : {}),
             ...(Number(payment.metadata?.includes_extras?.amount || 0) > amount

@@ -34,7 +34,6 @@ export function EmailAlertsCard({ configured, emailTo, ownerEmail }: { configure
   const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
   return (
     <IntegrationCard
-      body={say("ig_emailBody")}
       icon={<Mail size={20} />}
       status={configured ? { label: say("ig_ready"), tone: "on" } : { label: say("ig_soon"), tone: "soon" }}
       title={say("ig_emailTitle")}
@@ -71,14 +70,11 @@ export function TelegramCard({ configured, connected }: { configured: boolean; c
   const [error, setError] = useState<string | null>(null);
   return (
     <IntegrationCard
-      body={say("ig_telegramBody")}
       icon={<Send size={20} />}
       status={!configured ? { label: say("ig_soon"), tone: "soon" } : connected ? { label: say("ig_connected"), tone: "on" } : { label: say("ig_notConnected"), tone: "off" }}
       title="Telegram"
     >
-      {!configured ? (
-        <p className="text-[14px] font-medium text-[var(--muted)]">{say("ig_telegramSoon")}</p>
-      ) : connected ? (
+      {!configured ? null : connected ? (
         <button className="secondary-action pressable" disabled={pending} onClick={() => start(async () => { await disconnectTelegram(); router.refresh(); })} type="button">
           {say("ig_disconnect")}
         </button>

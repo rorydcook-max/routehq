@@ -47,7 +47,7 @@ export default async function AdminOverviewPage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform" subtitle="Every business on RoveHQ, their plans and trials. Only RoveHQ admins can see this." title="Overview" />
+      <AdminHeader active="/platform" title="Overview" />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {stats.map(([label, value, note, href]) => {

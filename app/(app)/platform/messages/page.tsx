@@ -34,7 +34,7 @@ export default async function AdminMessagesPage({ searchParams }: { searchParams
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform/messages" subtitle="Sent from the contact form on the website. Reply by email, then mark them handled." title="Messages" />
+      <AdminHeader active="/platform/messages" title="Messages" />
       <nav aria-label="Filter messages" className="mb-4 flex flex-wrap gap-2">
         {tabs.map((tab) => (
           <Link

@@ -108,10 +108,10 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
 
           {/* Everything below can wait: one tap away, filled in any time. The short form leaves it out altogether. */}
           {quick ? null : (<>
-          <Fold summary={say("datesSummary")} title={say("datesTitle")}>
+          <Fold title={say("datesTitle")}>
             <ComplianceFields calendar={preferredCalendar} inputClass={inputClass} preferredLocale={preferredLocale} thai={orgCountry(organization) === "TH"} />
           </Fold>
-          <Fold summary={say(distanceKey("valueSummary"))} title={say("valueTitle")}>
+          <Fold title={say("valueTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className={labelClass}>{say("mileage")}</span>
@@ -132,7 +132,7 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
             </div>
           </Fold>
           {branches.length > 1 ? (
-            <Fold summary={defaultBranch?.name || say("locSummary")} title={say("locTitle")}>
+            <Fold summary={defaultBranch?.name} title={say("locTitle")}>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className={labelClass}>{say("homeBranch")}</span>
@@ -159,7 +159,7 @@ export default async function NewVehiclePage({ searchParams }: { searchParams?: 
               <input name="serviceArea" type="hidden" value="home_branch" />
             </>
           )}
-          <Fold summary={say("loanSummary")} title={say("loanTitle")}>
+          <Fold title={say("loanTitle")}>
             <LoanFields currency={currency} />
           </Fold>
           </>)}

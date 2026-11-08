@@ -1,4 +1,4 @@
-import { toWallTime } from "@/lib/business-time";
+import { businessTimeZone, toWallTime } from "@/lib/business-time";
 import { businessCountry } from "@/lib/business-units";
 
 /** Countries that write the month first ("Nov 16, 2026"): the US and its territories, the Philippines, Canada. */
@@ -50,4 +50,27 @@ export function customerDate(iso: string, locale: string, withYear = true): stri
     ...(withYear ? { year: "numeric" as const } : {}),
     timeZone: "UTC",
   }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+/**
+ * A moment for a customer, on the business's clock: "Tue 10 Nov, 6:00 PM" in English, the reader's own way in their
+ * language (e.g. a booking link's deadline). Languages whose month names are kept above get "10 ພ.ຈ., 18:00".
+ */
+export function customerDateTime(iso: string, locale: string, timeZone: string = businessTimeZone()): string {
+  const instant = new Date(String(iso || ""));
+  if (Number.isNaN(instant.getTime())) return String(iso || "");
+  if (OWN_MONTHS[locale]) {
+    const wall = toWallTime(instant.toISOString(), timeZone);
+    return `${customerDate(wall.slice(0, 10), locale, false)}, ${wall.slice(11, 16)}`;
+  }
+  const english = locale === "en";
+  return new Intl.DateTimeFormat(english ? englishDateLocale() : `${locale}-u-ca-gregory-nu-latn`, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    hour: "numeric",
+    minute: "2-digit",
+    ...(english ? { hour12: true } : {}),
+    timeZone
+  }).format(instant);
 }

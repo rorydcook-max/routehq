@@ -337,7 +337,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
       <AppShell userEmail={userEmail}>
         <Card>
           <SectionHeader eyebrow={tx.say("nf_eyebrow")} title={tx.say("nf_title")} />
-          <p className="mt-3 text-sm text-[var(--muted)]">{tx.say("nf_body")}</p>
           <Link className="primary-action pressable mt-3" href="/bookings">
             {tx.say("backToBookings")}
           </Link>
@@ -497,7 +496,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         return {
           label: tx.say("fin_toGiveBack"),
           // Capitalised: with only unused rent to give back the line began "up to £330 ...".
-          detail: `${parts.join(" · ").replace(/^\p{Ll}/u, (letter) => letter.toLocaleUpperCase())}. ${tx.say("fin_toGiveBackHow")}`,
+          detail: `${parts.join(" · ").replace(/^\p{Ll}/u, (letter) => letter.toLocaleUpperCase())}.`,
           amount: null as number | null,
           tone: "amber" as const
         };
@@ -518,7 +517,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     if (needsExistingRentalPaymentSetup) {
       return {
         label: tx.say("fin_setup"),
-        detail: tx.say("fin_setupDetail"),
+        detail: "",
         amount: null as number | null,
         tone: "amber" as const
       };
@@ -542,7 +541,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     if (pendingPayment && paymentTiming === "now" && !activeRentalStatus) {
       return {
         label: tx.say("fin_due"),
-        detail: tx.say("fin_dueDetail"),
+        detail: "",
         amount: pendingPaymentAmount || outstandingBalance,
         tone: "amber" as const
       };
@@ -551,15 +550,15 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     // (an extension due at the end of the month, say) is not owed yet.
     if (activeRentalStatus && pendingPaymentAmount > 0) {
       return anyPastDue
-        ? { label: tx.say("fin_outstanding"), detail: tx.say("fin_outstandingActive"), amount: pendingPaymentAmount, tone: "red" as const }
-        : { label: tx.say("fin_dueNow"), detail: tx.say("fin_dueNowDetail"), amount: pendingPaymentAmount, tone: "amber" as const };
+        ? { label: tx.say("fin_outstanding"), detail: "", amount: pendingPaymentAmount, tone: "red" as const }
+        : { label: tx.say("fin_dueNow"), detail: "", amount: pendingPaymentAmount, tone: "amber" as const };
     }
     // Booked and payments have fallen due (rent and deposit on the first day, say). Nothing is owed until the
     // vehicle goes out: it is what the handover collects. Same total as the payment list and the bookings list.
     if (!activeRentalStatus && pendingPaymentAmount > 0) {
       return {
         label: notHandedOver ? tx.say("fin_collectAtHandover") : tx.say("fin_dueNow"),
-        detail: notHandedOver ? tx.say("fin_collectAtHandoverDetail") : tx.say("fin_dueNowDetail"),
+        detail: "",
         amount: pendingPaymentAmount,
         tone: notHandedOver ? ("blue" as const) : ("amber" as const)
       };
@@ -612,7 +611,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     }
     return {
       label: outstandingBalance > 0 ? tx.say("fin_outstanding") : tx.say("fin_noSchedule"),
-      detail: outstandingBalance > 0 ? tx.say("fin_remains") : tx.say("fin_addRow"),
+      detail: outstandingBalance > 0 ? tx.say("fin_remains") : "",
       amount: outstandingBalance > 0 ? outstandingBalance : null,
       tone: outstandingBalance > 0 ? ("red" as const) : ("neutral" as const)
     };
@@ -914,6 +913,27 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             {customer.do_not_rent_reason ? <span className="block font-semibold">{customer.do_not_rent_reason}</span> : null}
           </div>
         ) : null}
+        {/* No plate on the vehicle: the agreement can't be signed until one is added (final pre-release test, 8 Nov 2026). */}
+        {vehicle && !isClosed && !String(vehicle.registration_number || "").trim() ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3" role="alert">
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-[var(--foreground)]">{tx.say("noPlateTitle")}</p>
+              <p className="mt-0.5 text-sm font-semibold text-[var(--foreground-secondary)]">{tx.say("noPlateBody")}</p>
+            </div>
+            <Link className="pressable inline-flex min-h-11 items-center rounded-full bg-[var(--primary)] px-4 text-sm font-bold text-white" href={`/fleet/${vehicle.id}/edit` as Route}>
+              {tx.say("noPlateAdd")}
+            </Link>
+          </div>
+        ) : null}
+        {/* The vehicle was archived with this booking still on it: put it back or move the booking. */}
+        {vehicle && !isClosed && String(vehicle.status || "") === "inactive" ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3" role="alert">
+            <p className="min-w-0 flex-1 text-sm font-bold text-[var(--foreground)]">{tx.say("vehicleArchived")}</p>
+            <Link className="pressable inline-flex min-h-11 items-center rounded-full border border-[var(--border)] bg-[var(--panel)] px-4 text-sm font-bold text-[var(--foreground)]" href={`/fleet/${vehicle.id}` as Route}>
+              {tx.say("openVehicle")}
+            </Link>
+          </div>
+        ) : null}
         {historySignals.length ? <SharedHistory reports={historySignals} /> : null}
         {/* Türkiye: the KABİS entry for this rental, ready to copy into the police portal (lib/kabis.ts). */}
         {isKabisBusiness(organization) && !isCancelled ? (
@@ -1016,9 +1036,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       <AlertTriangle className="text-[var(--warning)]" size={18} />
                       {tx.say("handoverForm")}
                     </div>
-                    <p className="text-sm text-[var(--muted)]">
-                      {tx.say("noFormOptional", { ago: startedAgoLabel(rental.start_date, tx) })}
-                    </p>
                     {/* The form itself opens from "Start handover" at the top of the page. */}
                     <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} needsName={!rental.customer_id} rentalId={rental.id} />
                   </div>
@@ -1048,7 +1065,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       <Clock className="text-[var(--muted)]" size={18} />
                       {tx.say("handoverForm")}
                     </div>
-                    <p className="text-sm text-[var(--foreground-secondary)]">{tx.say("handoverNotYet")}</p>
                     <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} needsName={!rental.customer_id} rentalId={rental.id} />
                   </div>
                 ) : rental.status === "completed" ? (
@@ -1063,7 +1079,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : isCancelled ? (
                   <div className="sub-surface p-3">
                     <p className="font-semibold text-[var(--foreground)]">{tx.say("neverHandedOver")}</p>
-                    <p className="mt-1 text-sm text-[var(--muted)]">{tx.say("cancelledBefore")}</p>
                   </div>
                 ) : (
                   // Active, not retrospective, no inspection
@@ -1074,8 +1089,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     </div>
                     {startDay === businessToday() ? (
                       <>
-                        {/* A walk-in that went out today: the customer is probably still here. */}
-                        <p className="mt-1 text-sm text-[var(--warning)]">{tx.say("handoverNowHint")}</p>
                         <Link className="primary-action pressable mt-2 block w-full px-3 py-2 text-center" href={`/inspections/delivery/${rental.id}` as Route}>
                           {tx.say("startHandover")}
                         </Link>
@@ -1245,9 +1258,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     startDate={rental.start_date}
                   />
                 ) : null}
-                {awaitingSignature && payments.length === 0 ? (
-                  <p className="text-sm text-[var(--muted)]">{tx.say("autoSetup")}</p>
-                ) : null}
                 {!isClosed && !awaitingSignature && !needsExistingRentalPaymentSetup && payments.length === 0 && outstandingBalance === 0 && totalPaid === 0 ? (
                   <div className="space-y-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">
                     <p>{tx.say("noSchedule")}</p>
@@ -1364,7 +1374,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     rental.mileage_at_delivery == null && rental.mileage_at_return != null
                       ? tx.say(distanceKey("kmAtReturn"), { km: Number(rental.mileage_at_return).toLocaleString("en-US") })
                       : rental.mileage_at_delivery == null
-                        ? isCancelled ? tx.say("neverHandedOver") : isClosed ? tx.say("notRecorded") : tx.say("recordedAtHandover")
+                        ? isCancelled ? tx.say("neverHandedOver") : isClosed || deliveryInspection || rental.actual_start_date || ["active", "due_soon", "extended", "overdue"].includes(String(rental.status || "")) ? tx.say("notRecorded") : tx.say("recordedAtHandover")
                         : rental.mileage_at_return == null
                           ? tx.say(distanceKey("kmAtHandover"), { km: Number(rental.mileage_at_delivery).toLocaleString("en-US") })
                           : `${tx.say(distanceKey("kmDriven"), { km: Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString("en-US") })} · ${Number(rental.mileage_at_delivery).toLocaleString()} → ${Number(rental.mileage_at_return).toLocaleString("en-US")}`
@@ -1457,7 +1467,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     {["passport", "driver_license", "selfie"].map((category) => {
                       const found = customerDocuments.some((document: any) => document.category === category);
                       return (
-                        <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white p-3" key={category}>
+                        <div className="flex items-center gap-2 rounded-xl bg-[var(--panel-secondary)] p-3" key={category}>
                           {found ? <CheckCircle2 className="text-[var(--success)]" size={18} /> : <AlertTriangle className="text-[var(--warning)]" size={18} />}
                           <span className="text-sm font-bold text-[var(--foreground)]">{tx.say(`doc_${category}`)}</span>
                         </div>
@@ -1485,10 +1495,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               title={tx.say("linkTitle")}
               tone={bookingLink && String(bookingLink.status || "") !== "completed" && !isClosed ? "amber" : "neutral"}
             >
-              {!bookingLink ? (
-                <p className="text-sm text-[var(--muted)]">
-                  {tx.say("link_teamBody")}
-                </p>
+              {/* How long the customer has, beside the link's status: the hold while it runs, else how long the link works. */}
+              {bookingLink && !isClosed && !bookingLink.contract_signed_at && String(bookingLink.status || "") !== "completed" ? (
+                holdUntil && new Date(holdUntil).getTime() > Date.now() ? (
+                  <p className="mt-2 text-sm font-semibold text-[var(--warning)]">{tx.say("heldUntil", { when: formatDateTime(holdUntil, tx) })}</p>
+                ) : bookingLink.expires_at && new Date(bookingLink.expires_at).getTime() > Date.now() ? (
+                  <p className="mt-2 text-sm text-[var(--muted)]">{tx.say("linkWorksUntil", { when: formatDateTime(String(bookingLink.expires_at), tx) })}</p>
+                ) : null
               ) : null}
               {(() => {
                 const steps = bookingLink ? timelineSteps(bookingLink, rentalDocuments) : [];
@@ -1634,15 +1647,16 @@ function ContactInfo({ channel }: { channel: ContactChannel }) {
 function DeliveryInfo({ delivery }: { delivery: { method: unknown; title: string; detail: string } }) {
   const tx = useTx();
   return (
-    <div className="sub-surface flex items-start gap-3 p-3">
+    // The same tinted tile as the rows around it (it was the one bare row in the list, with a smaller label).
+    <div className="sub-info flex items-start gap-3 rounded-xl bg-[var(--panel-secondary)] px-3 py-2.5">
       <MapPin className="mt-0.5 shrink-0 text-[var(--primary)]" size={18} />
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-xs font-bold uppercase text-[var(--muted)]">{tx.say("delivery")}</p>
+          <p className="font-semibold text-[var(--muted)]">{tx.say("delivery")}</p>
           {delivery.method === "tbd" ? <Badge tone="amber">{tx.say("toBeConfirmed")}</Badge> : null}
         </div>
-        <p className="mt-1 font-semibold text-[var(--foreground)]">{delivery.title}</p>
-        <p className="mt-1 text-sm font-semibold text-[var(--muted)]">{delivery.detail}</p>
+        <p className="mt-0.5 font-bold text-[var(--foreground)]">{delivery.title}</p>
+        <p className="mt-0.5 text-sm font-semibold text-[var(--muted)]">{delivery.detail}</p>
       </div>
     </div>
   );

@@ -168,7 +168,6 @@ export function ContentRequestCard({ data }: { data: ContentCardData }) {
         </div>
       ) : null}
 
-      {data.status === "suggested" && !writable ? <p className="mt-3 text-sm font-medium text-[var(--muted)]">{say("contentNoDraftNeeded")}</p> : null}
       {data.status === "published" && data.article?.slug ? (
         <a className="mt-3 inline-block font-semibold underline" href={`/docs/${data.article.slug}`} rel="noreferrer" target="_blank">
           {say("contentView")}

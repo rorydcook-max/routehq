@@ -492,5 +492,9 @@
   "That didn't go through. Try again.": "ไม่สำเร็จ ลองอีกครั้ง",
   "Add the customer to the booking first, so they can be sent the report to sign.": "เพิ่มลูกค้าในการจองก่อน เพื่อส่งรายงานให้ลงนามได้",
   "Check the phone number.": "ตรวจสอบเบอร์โทร",
-  "This report has already been signed.": "รายงานนี้ลงนามแล้ว"
+  "This report has already been signed.": "รายงานนี้ลงนามแล้ว",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "เพิ่มทะเบียนรถก่อน หากไม่มีทะเบียนจะลงนามในสัญญาไม่ได้",
+  "This booking is already underway. Contact {} if anything needs changing.": "การจองนี้เริ่มไปแล้ว ติดต่อ {} หากต้องการเปลี่ยนแปลงอะไร",
+  "This booking can't be completed online yet. Contact {} to finish it.": "การจองนี้ยังทำให้เสร็จทางออนไลน์ไม่ได้ ติดต่อ {} เพื่อดำเนินการให้เสร็จ",
+  "The agreement was updated. Please review it again before signing.": "สัญญามีการแก้ไข กรุณาตรวจสอบอีกครั้งก่อนลงนาม"
 }

@@ -284,7 +284,6 @@ export function PartnersView({
                 );
               })}
             </div>
-            {!endDate ? <p className="mt-2 text-sm text-[var(--muted)]">{t("endDateHint")}</p> : null}
             {/* What kind of vehicle, and the budget: all applied by the search itself. */}
             <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto]">
               <label className={labelClass}>
@@ -376,7 +375,6 @@ export function PartnersView({
                   </label>
                 ) : null}
               </div>
-              {!results.length ? <p className="mt-1 text-sm text-[var(--muted)]">{t("noResultsBody")}</p> : null}
               {overBudget > 0 ? <p className="mt-1 text-sm text-[var(--muted)]">{t("budgetHidden", { count: overBudget })}</p> : null}
               <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {shown.map((vehicle) => {

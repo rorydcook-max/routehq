@@ -1,3 +1,4 @@
+import { InfoTip } from "@/components/info-tip";
 import { clsx } from "clsx";
 import { ChevronDown, ChevronLeft } from "lucide-react";
 import Link from "next/link";
@@ -36,6 +37,7 @@ export function Card({
  */
 export function Fold({
   title,
+  tip,
   summary,
   tone = "neutral",
   open = false,
@@ -43,6 +45,8 @@ export function Fold({
   children
 }: {
   title: string;
+  /** A short explanation in an (i) beside the title. */
+  tip?: string;
   summary?: ReactNode;
   tone?: "neutral" | "red" | "green" | "amber";
   open?: boolean;
@@ -59,7 +63,10 @@ export function Fold({
     <details className="card group scroll-mt-4 overflow-hidden" id={id} open={open}>
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
         <span className="min-w-0">
-          <span className="card-title block !text-[17px]">{title}</span>
+          <span className="card-title flex items-center gap-1.5 !text-[17px]">
+            {title}
+            {tip ? <InfoTip label={title} text={tip} /> : null}
+          </span>
           {summary ? <span className={clsx("mt-0.5 line-clamp-2 block", tones[tone])}>{summary}</span> : null}
         </span>
         <ChevronDown className="shrink-0 text-[var(--foreground-secondary)] transition-transform group-open:rotate-180" size={22} strokeWidth={2.2} />

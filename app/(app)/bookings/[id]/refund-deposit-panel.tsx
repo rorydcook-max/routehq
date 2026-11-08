@@ -243,7 +243,7 @@ export function RefundDepositPanel({
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 {say("ref_notes")}
-                <textarea className="mt-1 w-full" name="notes" placeholder={say("ref_optionalNotes")} />
+                <textarea className="mt-1 w-full" name="notes" />
               </label>
               <FormActions isPending={isPending} label={say("ref_confirmReturn")} onCancel={() => setActiveForm(null)} />
             </form>
@@ -267,7 +267,7 @@ export function RefundDepositPanel({
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 {say("ref_notes")}
-                <textarea className="mt-1 w-full" name="notes" placeholder={say("ref_optionalNotes")} />
+                <textarea className="mt-1 w-full" name="notes" />
               </label>
               <FormActions isPending={isPending} label={say("ref_confirmDeduction")} onCancel={() => setActiveForm(null)} />
             </form>
@@ -303,7 +303,7 @@ export function RefundDepositPanel({
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 {say("ref_reasonNotes")}
-                <textarea className="mt-1 w-full" defaultValue={earlyReturn ? say("ref_unusedNote", { unused: earlyReturn.unusedDays, period: earlyReturn.periodDays }) : ""} name="notes" placeholder={say("ref_refundReason")} />
+                <textarea className="mt-1 w-full" defaultValue={earlyReturn ? say("ref_unusedNote", { unused: earlyReturn.unusedDays, period: earlyReturn.periodDays }) : ""} name="notes" />
               </label>
               <FormActions isPending={isPending} label={say("ref_confirmRefund")} onCancel={() => setActiveForm(null)} />
             </form>

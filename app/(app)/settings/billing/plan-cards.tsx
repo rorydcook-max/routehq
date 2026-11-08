@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { Check } from "lucide-react";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -175,7 +176,9 @@ export function PlanCards({
               key={plan.id}
             >
               {/* Badge above the name (always the same height), so names, prices and lists line up across cards. */}
-              <div className="flex min-h-6 items-center">
+              {/* On a phone the cards are stacked, so nothing needs lining up: a card with no badge starts at its name
+                  (final pre-release test, 8 Nov 2026: an empty band at the top of Free and Business). */}
+              <div className={`flex min-h-6 items-center ${current || suggested || popular ? "" : "max-md:hidden"}`}>
                 {current ? (
                   <Badge tone="blue">{say("bl_currentBadge")}</Badge>
                 ) : suggested ? (
@@ -184,7 +187,7 @@ export function PlanCards({
                   <Badge tone="neutral">{say("pl_popular")}</Badge>
                 ) : null}
               </div>
-              <p className="mt-2 text-[18px] font-semibold leading-tight text-[var(--foreground)]">{say(`bl_${plan.id}`)}</p>
+              <p className={`${current || suggested || popular ? "mt-2" : "md:mt-2"} text-[18px] font-semibold leading-tight text-[var(--foreground)]`}>{say(`bl_${plan.id}`)}</p>
               <p className="mt-0.5 min-h-10 text-sm font-semibold text-[var(--foreground-secondary)]">
                 {business ? say("pl_anySize") : say("pl_upTo", { fleet: fleetText({ cars: plan.cars!, motorbikes: plan.motorbikes! }, say) })}
               </p>
@@ -261,7 +264,7 @@ export function PlanCards({
       ) : null}
       {!canChange ? <p className="mt-3 text-sm font-semibold text-[var(--muted)]">{say("pl_ownerOnly")}</p> : null}
       <p className="mt-3 text-sm font-medium text-[var(--foreground-secondary)]">
-        {say("pl_bikesNote")}
+        <InfoTip text={say("pl_bikesNote")} />
         {currency !== "THB" ? ` ${say("pl_currencyNote", { currency })}` : ""}
       </p>
       {keepFor ? (

@@ -509,7 +509,9 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                 <X size={18} strokeWidth={2.4} />
               </button>
             </div>
-            <div className="max-h-[70vh] space-y-3 overflow-y-auto">
+            {/* A little inner padding so the tiles' borders and the active ring aren't clipped by the scroll box
+                (Rory, 8 Nov 2026: tile edges were cut off on a phone). */}
+            <div className="-mx-1 max-h-[70vh] space-y-3 overflow-y-auto overflow-x-hidden px-1 py-0.5">
               {[
                 ...groups.map((group) => ({ heading: group.heading, items: group.items.filter((item) => !mobileBarKeys.includes(item.key)) })),
                 { heading: null, items: visibleFootItems }
@@ -518,7 +520,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                 .map((group, groupIndex) => (
                   <div key={group.heading || `plain-${groupIndex}`}>
                     {group.heading ? <p className="mb-1.5 font-bold text-[var(--muted)]">{t(group.heading)}</p> : null}
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-[repeat(3,minmax(0,1fr))] gap-2">
                       {group.items.map((item) => {
                         const Icon = item.icon;
                         return (

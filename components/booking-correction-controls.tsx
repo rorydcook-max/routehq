@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { methodsFor } from "@/lib/payment-methods";
 import { businessToday, businessTimeZone } from "@/lib/business-time";
 import { shownError } from "@/lib/error-text";
@@ -14,6 +15,7 @@ import { addRentalPayment as addRentalPaymentAction, deleteRentalPayment as dele
 import { deleteTransaction as deleteTransactionAction, updateTransaction as updateTransactionAction } from "@/app/actions/transactions";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
 import { unwrap } from "@/lib/action-result";
+import { currencySymbol } from "@/components/currency-symbol";
 
 // A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
 const addRentalPayment = (...args: Parameters<typeof addRentalPaymentAction>) => unwrap(addRentalPaymentAction(...args));
@@ -132,6 +134,8 @@ function basePaymentDescription(payment: RentalPayment, tx: Ctl) {
   if (metadata.type === "extras") return tx.say("pc_extras", { names: (Array.isArray(metadata.extras) ? metadata.extras : []).join(", ") || "-" });
   // The early-days charge is saved with English words; name it from its day count instead.
   if (Number(metadata.early_start?.days) > 0) return tx.say("pc_earlyDays", { days: Number(metadata.early_start.days) });
+  // The charge for coming back late is saved as rent with English words: it is named "Late return" (final pre-release test, 8 Nov 2026).
+  if (metadata.late_return) return tx.say("pc_lateReturn");
   if (metadata.description && !appWritten) return metadata.type === "charge" ? tx.say("pc_chargeFor", { reasons: String(metadata.description) }) : String(metadata.description);
   const isExtension = metadata.type === "extension" || metadata.adjustment_type === "extension";
   if (isExtension) return tx.say("pc_extensionDesc", { from: dateLabel(metadata.previous_end_date, tx.locale), to: dateLabel(metadata.new_end_date, tx.locale) });
@@ -214,10 +218,8 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
   return (
     <div className="sub-surface p-3" id="add-payment-row">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="font-semibold text-[var(--foreground)]">{tx.say("pc_addCharge")}</p>
-          <p className="text-sm text-[var(--muted)]">{tx.say("pc_addChargeHint")}</p>
-        </div>
+        {/* Closed, the button says it all; open, the heading names the form. */}
+        {open ? <p className="font-semibold text-[var(--foreground)]">{tx.say("pc_addCharge")}</p> : null}
         <ActionButton onClick={() => setOpen((current) => !current)}>{open ? tx.say("pc_close") : tx.say("pc_addCharge")}</ActionButton>
       </div>
       {open ? (
@@ -235,7 +237,10 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
               <input className="mt-1 w-full" type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} />
             </label>
             <label>
-              {tx.say("pc_status")}
+              <span className="inline-flex items-center gap-1.5">
+                {tx.say("pc_status")}
+                <InfoTip label={tx.say("pc_status")} text={tx.say("pc_statusHint")} />
+              </span>
               <select className="mt-1 w-full" value={status} onChange={(event) => setStatus(event.target.value)}>
                 {editablePaymentStatuses.map((option) => (
                   <option key={option} value={option}>{tx.optionName(option)}</option>
@@ -309,9 +314,6 @@ export function ExistingRentalPaymentSetupCard({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="font-semibold text-[var(--warning)]">{tx.say("pc_setupTitle")}</p>
-          <p className="mt-1 text-sm leading-5 text-[var(--warning)]">
-            {tx.say("pc_setupBody")}
-          </p>
         </div>
         <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-full border border-[var(--warning-line)] bg-white px-3 text-xs font-semibold text-[var(--warning)]" href={`/bookings/${rentalId}/edit#payments`}>
           {tx.say("pc_setupManual")}
@@ -788,9 +790,10 @@ export function EditableRentalPaymentRow({
           <div className="grid gap-3 sm:grid-cols-2">
             <label>
               {tx.say("pc_amountReceived")}
-              <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
-                <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">฿</span>
-                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={recordAmount} onChange={(event) => setRecordAmount(event.target.value)} />
+              {/* One box with the business's own symbol inside (it was always "฿", and showed a box inside a box in light mode). */}
+              <div className="relative mt-1">
+                <span className="font-mono-data pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[var(--muted)]">{currencySymbol(String(payment.currency || "THB"))}</span>
+                <input className="input-with-leading-symbol font-mono-data w-full" inputMode="decimal" min="0" step="0.01" type="number" value={recordAmount} onChange={(event) => setRecordAmount(event.target.value)} />
               </div>
             </label>
             <label>
@@ -837,15 +840,15 @@ export function EditableRentalPaymentRow({
               <input className="mt-1 w-full" type="text" value={description} onChange={(event) => setDescription(event.target.value)} />
             </label>
             <label>
-              {tx.say("pc_status")}
+              <span className="inline-flex items-center gap-1.5">
+                {tx.say("pc_status")}
+                <InfoTip label={tx.say("pc_status")} text={tx.say("pc_statusHint")} />
+              </span>
               <select className="mt-1 w-full" value={status} onChange={(event) => setStatus(event.target.value)}>
                 {editablePaymentStatuses.map((option) => (
                   <option key={option} value={option}>{tx.optionName(option)}</option>
                 ))}
               </select>
-              <p className="mt-1 text-xs text-[var(--muted)]">
-                {tx.say("pc_statusHint")}
-              </p>
             </label>
             {status === "paid" ? (
               <label>
@@ -885,7 +888,7 @@ export function EditableRentalPaymentRow({
                   onClick={() => setShowDeleteConfirm(false)}
                   style={{
                     fontSize: 14, padding: "4px 10px", borderRadius: 5,
-                    border: "0.5px solid var(--border)", background: "#fff",
+                    border: "0.5px solid var(--button-border)", background: "var(--panel)",
                     color: "var(--muted)", cursor: "pointer"
                   }}
                 >
@@ -905,7 +908,7 @@ export function EditableRentalPaymentRow({
                   }}
                   style={{
                     fontSize: 14, padding: "4px 10px", borderRadius: 5,
-                    border: "none", background: "var(--danger)",
+                    border: "none", background: "var(--danger-solid)",
                     color: "#fff", cursor: "pointer", fontWeight: 500
                   }}
                 >
@@ -1036,7 +1039,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                   onClick={() => setShowDeleteConfirm(false)}
                   style={{
                     fontSize: 14, padding: "4px 10px", borderRadius: 5,
-                    border: "0.5px solid var(--border)", background: "#fff",
+                    border: "0.5px solid var(--button-border)", background: "var(--panel)",
                     color: "var(--muted)", cursor: "pointer"
                   }}
                 >
@@ -1056,7 +1059,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                   }}
                   style={{
                     fontSize: 14, padding: "4px 10px", borderRadius: 5,
-                    border: "none", background: "var(--danger)",
+                    border: "none", background: "var(--danger-solid)",
                     color: "#fff", cursor: "pointer", fontWeight: 500
                   }}
                 >

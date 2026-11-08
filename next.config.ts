@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
   },
   // Headless Chrome for PDFs: loaded from node_modules at runtime, not bundled.
   serverExternalPackages: ["puppeteer-core", "@sparticuz/chromium"],
+  async headers() {
+    return [
+      // Booking-page template fonts, self-hosted (task perf2, 8 Nov 2026; scripts/site-fonts.mjs): kept by browsers
+      // and the CDN for 30 days like Google's were, then refreshed in the background.
+      { source: "/fonts/sites/:file*", headers: [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=31536000" }] }
+    ];
+  },
   async redirects() {
     // The "For owners" page was dropped (28 Oct 2026): the website speaks only to rental businesses for now.
     // Rentle is now TWICE Commerce (Nov 2026): its switching page stays at /switch/rentle.

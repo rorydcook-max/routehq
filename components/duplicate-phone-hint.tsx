@@ -52,7 +52,9 @@ export function DuplicatePhoneHint({ organizationId, codeName = "phoneCountryCod
   return (
     <span className="contents" ref={marker}>
       {match ? (
-        <span className="tile-sky flex items-center gap-3 rounded-xl p-3 sm:col-span-2" role="status">
+        // Its own space above and below: inside display:contents the form's spacing doesn't reach it, so it sat against the
+        // "Add customer" button (final pre-release test, 8 Nov 2026).
+        <span className="tile-sky my-2 flex items-center gap-3 rounded-xl p-3 sm:col-span-2" role="status">
           <UserRound className="shrink-0" size={20} />
           <span className="min-w-0 flex-1 font-semibold">{say(match.byPhone ? "dupPhone" : "dupContact", { name: match.name })}</span>
           <Link className="shrink-0 whitespace-nowrap font-bold text-[var(--primary)] underline" href={`/customers/${match.id}`}>

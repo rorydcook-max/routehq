@@ -1,3 +1,4 @@
+import { InfoTip } from "@/components/info-tip";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -140,7 +141,10 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
                       <div className="rounded-2xl bg-[var(--panel-secondary)] p-3.5" key={item.vehicleId}>
                         <VehicleTitle name={item.name} plate={item.plate} />
                         <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-4">
-                          <dt className="text-[var(--muted)]">{say("moneyIn")}</dt>
+                          <dt className="flex items-center gap-1 text-[var(--muted)]">
+                            {say("moneyIn")}
+                            {item.extrasLeftOut > 0 ? <InfoTip label={say("moneyIn")} text={say("extrasLeftOut", { amount: baht(item.extrasLeftOut) })} /> : null}
+                          </dt>
                           <dd className="text-right font-semibold sm:text-left">{baht(item.income)}</dd>
                           <dt className="text-[var(--muted)]">{say("costs")}</dt>
                           <dd className="text-right font-semibold sm:text-left">{baht(item.costs)}</dd>
@@ -149,7 +153,6 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
                           <dt className="text-[var(--muted)]">{say(item.partner.basis === "profit" ? "shareOfProfit" : "shareOfIncome", { pct: item.partner.pct })}</dt>
                           <dd className="text-right font-bold sm:text-left">{baht(item.share)}</dd>
                         </dl>
-                        {item.extrasLeftOut > 0 ? <p className="mt-2 text-sm text-[var(--muted)]">{say("extrasLeftOut", { amount: baht(item.extrasLeftOut) })}</p> : null}
                         {item.lines.length ? (
                           <table className="mt-3 w-full text-sm">
                             <tbody>

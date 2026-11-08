@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Primero añade el cliente a la reserva para poder enviarle el informe a firmar.",
   "Enter the amount received.": "Ingresa el importe recibido.",
   "Check the phone number.": "Revisa el número de teléfono.",
-  "This report has already been signed.": "Este informe ya está firmado."
+  "This report has already been signed.": "Este informe ya está firmado.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Primero añade la matrícula del vehículo. Sin ella no se puede firmar el contrato.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Esta reserva ya está en curso. Contacta con {} si hay que cambiar algo.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Esta reserva aún no se puede completar online. Contacta con {} para terminarla.",
+  "The agreement was updated. Please review it again before signing.": "El contrato se ha actualizado. Revísalo de nuevo antes de firmar."
 }

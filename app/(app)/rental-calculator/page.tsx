@@ -51,7 +51,7 @@ export default async function RentalCalculatorPage() {
   const defaultStyle: RentStyle = offer === "dates" || offer === "both_dates" ? "daily" : "monthly";
 
   return (
-    <AppShell hero={<PageBand keepSubtitle subtitle={t("subtitle")} title={t("title")} />} userEmail={userEmail}>
+    <AppShell hero={<PageBand title={t("title")} />} userEmail={userEmail}>
       <CalculatorClient
         checks={checks}
         country={(organization as any).country_code || null}

@@ -60,7 +60,6 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
     return (
       <div className="empty-state">
         <p className="text-lg font-semibold text-[var(--foreground)]">{t("noVehicles")}</p>
-        <p className="mt-2 text-sm text-[var(--muted)]">{t("noVehiclesBody")}</p>
       </div>
     );
   }
@@ -171,7 +170,6 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
           ))}
         </div>
       </div>
-      <p className="mt-2 text-xs text-[var(--muted)]">{t("tapHint")}</p>
     </div>
   );
 }

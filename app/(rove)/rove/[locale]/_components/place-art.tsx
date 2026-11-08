@@ -40,6 +40,17 @@ function placePhotoProps(slug: string, file: string, sizes: string) {
   return { src: file, srcSet: [...widths.map((width) => `/rove/destinations/${slug}-${width}.webp ${width}w`), `${file} 1600w`].join(", "), sizes };
 }
 
+/**
+ * The same sizes as AVIF (scripts/rove-destination-sizes.mjs; task perf2, 8 Nov 2026), offered first in a <picture>:
+ * about a quarter smaller at the same look. Null until the copies have been made.
+ */
+function placeAvifSrcSet(slug: string): string | null {
+  const has = (name: string) => existsSync(join(process.cwd(), "public", "rove", "destinations", name));
+  if (!has(`${slug}.avif`)) return null;
+  const widths = [480, 800, 1200].filter((width) => has(`${slug}-${width}.avif`));
+  return [...widths.map((width) => `/rove/destinations/${slug}-${width}.avif ${width}w`), `/rove/destinations/${slug}.avif 1600w`].join(", ");
+}
+
 type Credit = { photographer: string; photographer_url: string; source_url: string; license: string };
 let credits: Record<string, Credit> | null = null;
 
@@ -99,16 +110,23 @@ export function PlaceArt({ destination, vehiclePhoto, eager = false, sizes = "(m
   const seed = hash(destination.slug);
   const own = placePhoto(destination.slug);
   const style = { "--art": TONES[seed % TONES.length] } as CSSProperties;
+  const avif = own ? placeAvifSrcSet(destination.slug) : null;
   // The hero's picture is the page's largest paint: asked for from the <head>, before the stylesheets and fonts.
+  // With AVIF copies, the AVIF set is the one asked for (type: a browser without AVIF skips the hint, and loads the
+  // WebP <img> as usual), so a browser never fetches both.
   if (eager) {
     const picture = own ? placePhotoProps(destination.slug, own, sizes) : vehiclePhoto ? photoProps(vehiclePhoto, sizes) : null;
-    if (picture) preload(picture.src, { as: "image", fetchPriority: "high", ...("srcSet" in picture && picture.srcSet ? { imageSrcSet: picture.srcSet, imageSizes: sizes } : {}) });
+    if (avif) preload(`/rove/destinations/${destination.slug}.avif`, { as: "image", type: "image/avif", fetchPriority: "high", imageSrcSet: avif, imageSizes: sizes });
+    else if (picture) preload(picture.src, { as: "image", fetchPriority: "high", ...("srcSet" in picture && picture.srcSet ? { imageSrcSet: picture.srcSet, imageSizes: sizes } : {}) });
   }
   return (
     <span aria-hidden="true" className={s.placeArt} style={style}>
       {own ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img alt="" decoding="async" fetchPriority={eager ? "high" : undefined} loading={eager ? "eager" : "lazy"} {...placePhotoProps(destination.slug, own, sizes)} />
+        <picture>
+          {avif ? <source sizes={sizes} srcSet={avif} type="image/avif" /> : null}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img alt="" decoding="async" fetchPriority={eager ? "high" : undefined} loading={eager ? "eager" : "lazy"} {...placePhotoProps(destination.slug, own, sizes)} />
+        </picture>
       ) : vehiclePhoto ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img alt="" decoding="async" fetchPriority={eager ? "high" : undefined} loading={eager ? "eager" : "lazy"} {...photoProps(vehiclePhoto, sizes)} />

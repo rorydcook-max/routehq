@@ -83,7 +83,8 @@ export function HelpCompose({
       {mode === "new" ? (
         <div>
           <p className="font-semibold text-[var(--foreground)]">{say("aboutLabel")}</p>
-          <div className="chip-row mt-2 flex flex-wrap gap-2">
+          {/* Three choices: they wrap, so the third one never hides past the card's edge on a phone. */}
+          <div className="mt-2 flex flex-wrap gap-2">
             {PICKABLE_TOPICS.map((value) => (
               <button
                 aria-pressed={topic === value}
@@ -137,7 +138,6 @@ export function HelpCompose({
           {busy ? progress || say("sending") : mode === "new" ? say("send") : say("sendReply")}
         </button>
       </div>
-      {mode === "new" ? <p className="text-[14px] font-medium text-[var(--muted)]">{say("filesHint", { max: SUPPORT_MAX_FILES })}</p> : null}
       {error ? <p className="font-bold text-[var(--danger)]">{error}</p> : null}
     </div>
   );

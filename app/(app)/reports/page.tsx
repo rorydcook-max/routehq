@@ -25,7 +25,7 @@ export default async function ReportsPage({
   const say = (await getTranslations("reportsPage")) as unknown as (key: string) => string;
 
   return (
-    <AppShell userEmail={userEmail} hero={<PageBand keepSubtitle subtitle={say("subtitle")} title={say("title")} />}>
+    <AppShell userEmail={userEmail} hero={<PageBand title={say("title")} />}>
       {/* Money in is what customers paid (VAT included); with VAT on, the VAT inside it is shown under it. */}
       <ReportsView data={data} vatRate={vatSettings(organization).on ? vatSettings(organization).rate : 0} />
     </AppShell>

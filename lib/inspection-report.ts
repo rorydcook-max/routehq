@@ -4,7 +4,8 @@ import { htmlToPdf } from "@/lib/html-to-pdf";
 import { businessTimeZone } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { recordActivityEventOnce } from "@/lib/supabase/activity";
-import { emailExecutedDocumentToCustomer } from "@/lib/rental-document-email";
+import { sendReportCopy } from "@/lib/customer-copies";
+import { distanceUnitFor } from "@/lib/regional";
 import { translateForReader } from "@/lib/content-translation";
 
 /**
@@ -279,7 +280,7 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
 
   try {
     const [{ data: organization }, { data: vehicle }, { data: customer }, { data: rental }] = await Promise.all([
-      admin.from("organizations").select("name").eq("id", input.organizationId).maybeSingle(),
+      admin.from("organizations").select("name, country_code, settings").eq("id", input.organizationId).maybeSingle(),
       admin.from("vehicles").select("make, model, registration_number").eq("id", input.vehicleId).eq("organization_id", input.organizationId).maybeSingle(),
       input.customerId
         ? admin.from("customers").select("full_name, email").eq("id", input.customerId).eq("organization_id", input.organizationId).maybeSingle()
@@ -409,19 +410,23 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
       `${input.mode}_report_finalised:${input.inspectionId}`
     );
 
-    await emailExecutedDocumentToCustomer({
-      supabase: admin,
-      organizationId: input.organizationId,
+    // The customer's copy: what was recorded, the walkaround video and the PDF, in their language and on their usual
+    // channel (lib/customer-copies.ts). Once per inspection, whether signed on the spot or later from the link.
+    await sendReportCopy(admin, {
       rentalId: input.rentalId,
-      vehicleId: input.vehicleId,
-      customerId: input.customerId,
+      inspectionId: input.inspectionId,
       documentId,
       versionId,
-      documentLabel: label,
-      recipientEmail: customer?.email,
-      recipientName: customer?.full_name,
-      businessName: organization?.name,
-      files: [{ bucket: "documents", path: pdfPath, filename: `${input.mode}-report.pdf` }]
+      mode: input.mode,
+      label,
+      inspectedAt: input.inspectedAt,
+      odometer: input.odometerReading,
+      distanceUnit: distanceUnitFor(organization || {}),
+      fuel: reportFields.fuelLabel,
+      damage: input.damageItems.map(describeDamage).map((item) => ({ where: item.where, what: item.what, severity: item.severity })),
+      notes: input.notes,
+      photoCount: photoPaths.length,
+      pdf: { bucket: "documents", path: pdfPath, filename: `${input.mode}-report.pdf` }
     });
 
     return { status: "finalised" as const, documentId };

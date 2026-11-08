@@ -1,3 +1,4 @@
+import { InfoTip } from "@/components/info-tip";
 import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
@@ -107,14 +108,15 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
           <div>
             <BackLink href="/bookings" label={t("pageBack")} />
             <h1 className="page-title">{t("pageTitle")}</h1>
-            <p className="page-subtitle mt-2 hidden sm:block">{t("pageSubtitle")}</p>
           </div>
         </div>
 
         {signingGaps.length ? (
           <div className="mb-4 rounded-[var(--radius)] bg-[var(--warning-light)] p-4" role="alert">
-            <p className="text-[17px] font-bold text-[var(--foreground)]">{t("signTitle")}</p>
-            <p className="mt-1 font-medium text-[var(--foreground)]">{t("signBody")}</p>
+            <p className="flex items-center gap-1.5 text-[17px] font-bold text-[var(--foreground)]">
+              {t("signTitle")}
+              <InfoTip label={t("signTitle")} text={t("signBody")} />
+            </p>
             <Link className="primary-action pressable mt-3 w-full sm:w-auto" href="/settings/signature?back=/bookings/new">
               {t("goSettings")}
             </Link>

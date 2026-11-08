@@ -145,7 +145,7 @@ export function ExtrasPanel({ rentalId, organizationId, currency, lines, removed
               </label>
             ))}
           </div>
-          <p className="mt-2 text-[var(--muted)]">{paid > 0 ? say("ex_removeTextPaid") : say("ex_removeText")}</p>
+          {paid > 0 ? <p className="mt-2 text-[var(--muted)]">{say("ex_removeTextPaid")}</p> : null}
           <Actions
             disabled={!picked.length}
             isPending={isPending}

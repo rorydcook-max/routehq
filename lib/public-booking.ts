@@ -123,10 +123,16 @@ export async function getPublicBookingDetail(token: string) {
         const { data: takenOrg } = await supabase.from("organizations").select("name, slug, settings").eq("id", bookingLink.organization_id).maybeSingle();
         return { state: "taken" as PublicBookingState, bookingLink, organization: takenOrg };
       }
+      // Held again: the page shows the new deadline.
+      const { data: freshHold } = await supabase.from("booking_links").select("hold_until, hold_released_at").eq("id", bookingLink.id).maybeSingle();
+      if (freshHold) Object.assign(bookingLink, freshHold);
     } else if (bookingLink.hold_until && new Date(bookingLink.hold_until).getTime() < Date.now()) {
       // Out of time but nobody has released it yet: they are here now, so give them a fresh hold.
       const { data: holdOrg } = await supabase.from("organizations").select("settings").eq("id", bookingLink.organization_id).maybeSingle();
-      await supabase.from("booking_links").update({ hold_until: holdDeadline(bookingRules(holdOrg?.settings).holdHours) }).eq("id", bookingLink.id);
+      const freshHold = holdDeadline(bookingRules(holdOrg?.settings).holdHours);
+      await supabase.from("booking_links").update({ hold_until: freshHold }).eq("id", bookingLink.id);
+      // The page shows the new deadline, not the one that just ran out.
+      bookingLink.hold_until = freshHold;
     }
   }
 

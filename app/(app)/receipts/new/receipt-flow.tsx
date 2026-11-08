@@ -105,10 +105,10 @@ export function ReceiptFlow({ entries, payments }: { entries: ReceiptEntry[]; pa
   }
 
   const typeName = (type: string) => (t.has(`type_${type}`) ? say(`type_${type}`) : type.replace(/_/g, " "));
-  const options: Array<{ key: Choice; icon: typeof Camera; title: string; hint: string; disabled?: boolean }> = [
-    { key: "new", icon: FilePlus2, title: say("rc_new"), hint: say("rc_newHint") },
-    { key: "entry", icon: Link2, title: say("rc_entry"), hint: entries.length ? say("rc_entryHint") : say("rc_entryNone"), disabled: !entries.length },
-    { key: "payment", icon: Wallet, title: say("rc_payment"), hint: payments.length ? say("rc_paymentHint") : say("rc_paymentNone"), disabled: !payments.length }
+  const options: Array<{ key: Choice; icon: typeof Camera; title: string; hint?: string; disabled?: boolean }> = [
+    { key: "new", icon: FilePlus2, title: say("rc_new") },
+    { key: "entry", icon: Link2, title: say("rc_entry"), hint: entries.length ? undefined : say("rc_entryNone"), disabled: !entries.length },
+    { key: "payment", icon: Wallet, title: say("rc_payment"), hint: payments.length ? undefined : say("rc_paymentNone"), disabled: !payments.length }
   ];
   const ready = Boolean(file) && (choice === "new" || Boolean(picked)) && !busy;
 
@@ -138,7 +138,7 @@ export function ReceiptFlow({ entries, payments }: { entries: ReceiptEntry[]; pa
           )}
           <div className="min-w-0 flex-1">
             <p className="text-[16px] font-bold text-[var(--foreground)]">{file ? (reading ? say("rc_reading") : readAmount ? say("rc_readAmount", { amount: baht(readAmount) }) : say("rc_chosen")) : say("rc_pick")}</p>
-            <p className="mt-0.5 text-[14px] text-[var(--muted)]">{file ? say("rc_pickAnother") : say("rc_pickHint")}</p>
+            {file ? <p className="mt-0.5 text-[14px] text-[var(--muted)]">{say("rc_pickAnother")}</p> : null}
           </div>
         </div>
         <button className={`${file ? "secondary-action" : "primary-action"} pressable mt-3 w-full justify-center`} onClick={() => input.current?.click()} type="button">
@@ -172,7 +172,7 @@ export function ReceiptFlow({ entries, payments }: { entries: ReceiptEntry[]; pa
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-semibold text-[var(--foreground)]">{option.title}</span>
-                    <span className="block text-sm text-[var(--muted)]">{option.hint}</span>
+                    {option.hint ? <span className="block text-sm text-[var(--muted)]">{option.hint}</span> : null}
                   </span>
                 </button>
               );

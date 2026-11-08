@@ -123,13 +123,16 @@ export async function searchDirectory(input: DirectorySearch): Promise<Directory
 
   const { data: vehicles } = await admin
     .from("vehicles")
-    .select("id, organization_id, make, model, year, color, status, daily_rate, weekly_rate, monthly_rate, deposit_amount, specifications, vehicle_categories(code)")
+    .select("id, organization_id, make, model, year, color, status, registration_number, daily_rate, weekly_rate, monthly_rate, deposit_amount, specifications, vehicle_categories(code)")
     .in("organization_id", listed.map((organization) => organization.id))
     .is("deleted_at", null)
     // Parked (over the plan's vehicle limit): not listed.
     .is("parked_at", null)
     .not("status", "in", "(maintenance,inactive,retired)");
-  const priced = ((vehicles || []) as any[]).filter((vehicle) => Number(vehicle.daily_rate) > 0 || Number(vehicle.weekly_rate) > 0 || Number(vehicle.monthly_rate) > 0);
+  // No number plate: not bookable online until one is added (its agreement couldn't be signed).
+  const priced = ((vehicles || []) as any[]).filter(
+    (vehicle) => String(vehicle.registration_number || "").trim() && (Number(vehicle.daily_rate) > 0 || Number(vehicle.weekly_rate) > 0 || Number(vehicle.monthly_rate) > 0)
+  );
   const wanted = input.kind && input.kind !== "any" ? priced.filter((vehicle) => String(vehicle.vehicle_categories?.code || "") === input.kind) : priced;
   if (!wanted.length) return [];
 

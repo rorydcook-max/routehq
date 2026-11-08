@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Raporu imzaya gönderebilmek için önce müşteriyi rezervasyona ekleyin.",
   "Enter the amount received.": "Alınan tutarı girin.",
   "Check the phone number.": "Telefon numarasını kontrol edin.",
-  "This report has already been signed.": "Bu rapor zaten imzalandı."
+  "This report has already been signed.": "Bu rapor zaten imzalandı.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Önce aracın plakasını ekleyin. Plaka olmadan sözleşme imzalanamaz.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Bu rezervasyon zaten başladı. Bir şeyin değişmesi gerekirse {} ile iletişime geçin.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Bu rezervasyon henüz online tamamlanamıyor. Tamamlamak için {} ile iletişime geçin.",
+  "The agreement was updated. Please review it again before signing.": "Sözleşme güncellendi. Lütfen imzalamadan önce tekrar gözden geçirin."
 }

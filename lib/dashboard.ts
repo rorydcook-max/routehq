@@ -367,9 +367,8 @@ export const priceMoney = (value: number) => {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(amount);
 };
 
+/** Money exact, as everywhere else (lib/regional.ts formatMoney): whole amounts without decimals, others with two (final pre-release test, 8 Nov 2026). */
 export const money = (value: number) => {
   const currency = businessCurrency();
-  return currency === "THB"
-    ? new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(value)
-    : formatMoney(Math.round(Number(value) || 0), currency, "en-GB");
+  return formatMoney(Number(value) || 0, currency, currency === "THB" ? "th-TH" : "en-GB");
 };

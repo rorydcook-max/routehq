@@ -17,8 +17,8 @@ import { vehiclePhotoRefs } from "@/lib/vehicle-photos";
  * is on (the website, rove.rent and the partner network all show that page's vehicles); a website image named in
  * the business's site. Anything else is "not found".
  *
- * ?w= resizes (to the next width up in PHOTO_WIDTHS, never larger than the original) and sends WebP; &f=jpg sends
- * JPEG for share previews (some apps don't show WebP).
+ * ?w= resizes (to the next width up in PHOTO_WIDTHS, never larger than the original) and sends AVIF to browsers that
+ * accept it, else WebP; &f=jpg sends JPEG for share previews (some apps don't show WebP).
  */
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // s-maxage so Vercel's CDN keeps each size too (it ignores max-age), and only the first request for a size is resized.
@@ -75,17 +75,23 @@ export async function GET(request: Request, { params }: { params: Promise<{ part
   const wanted = Number(url.searchParams.get("w"));
   const width = Number.isFinite(wanted) && wanted > 0 ? PHOTO_WIDTHS.find((size) => size >= wanted) || PHOTO_WIDTHS[PHOTO_WIDTHS.length - 1] : PHOTO_WIDTHS[PHOTO_WIDTHS.length - 1];
   const jpeg = url.searchParams.get("f") === "jpg";
+  // AVIF for browsers that say they take it (task perf2, 8 Nov 2026): about a quarter smaller than WebP at the same
+  // look (quality 55 against WebP's 72, compared side by side). Everyone else keeps WebP. The answer varies with the
+  // Accept header (Vary below), so the CDN keeps each format apart. Share previews (&f=jpg) stay JPEG.
+  const avif = !jpeg && /image\/avif/.test(request.headers.get("accept") || "");
 
   let body: Buffer = original;
   let type = blob.type || "image/jpeg";
   try {
     const sharp = (await import("sharp")).default;
     const image = sharp(original, { failOn: "none" }).rotate().resize({ width, withoutEnlargement: true });
-    body = jpeg ? await image.jpeg({ quality: 80, mozjpeg: true }).toBuffer() : await image.webp({ quality: 72 }).toBuffer();
-    type = jpeg ? "image/jpeg" : "image/webp";
+    body = jpeg ? await image.jpeg({ quality: 80, mozjpeg: true }).toBuffer() : avif ? await image.avif({ quality: 55, effort: 4 }).toBuffer() : await image.webp({ quality: 72 }).toBuffer();
+    type = jpeg ? "image/jpeg" : avif ? "image/avif" : "image/webp";
   } catch (problem) {
     // No image library on this server: the original file, still at the stable address.
     console.error("[rove-photo] resize:", problem instanceof Error ? problem.message : problem);
   }
-  return new NextResponse(new Uint8Array(body), { status: 200, headers: { "content-type": type, "cache-control": cache, "content-length": String(body.length) } });
+  const headers: Record<string, string> = { "content-type": type, "cache-control": cache, "content-length": String(body.length) };
+  if (!jpeg) headers.vary = "Accept";
+  return new NextResponse(new Uint8Array(body), { status: 200, headers });
 }

@@ -20,7 +20,6 @@ export default async function EditBookingPage({ params }: { params: Promise<{ id
         <div className="page-form">
           <Card className="p-5">
             <h1 className="text-[22px] font-bold text-[var(--foreground)]">{say("nf_title")}</h1>
-            <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("nf_body")}</p>
             <Link className="primary-action pressable mt-4" href="/bookings">
               {say("nf_back")}
             </Link>

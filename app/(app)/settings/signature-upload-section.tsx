@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -167,8 +168,10 @@ export function SignatureUploadSection({
       <div className="flex flex-col-reverse items-start gap-3 sm:flex-row sm:items-center">
         {preview}
         <div className="min-w-0">
-          <h2 className="card-title">{say("sg_title")}</h2>
-          <p className="mt-0.5 text-sm font-medium text-[var(--foreground-secondary)]">{say("sg_body")}</p>
+          <h2 className="card-title flex items-center gap-1.5">
+            {say("sg_title")}
+            <InfoTip label={say("sg_title")} text={say("sg_body")} />
+          </h2>
         </div>
       </div>
       {signatoryReady ? (

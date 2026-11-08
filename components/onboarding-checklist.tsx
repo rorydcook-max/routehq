@@ -159,7 +159,7 @@ export function OnboardingChecklist({
                   <span className="min-w-0 flex-1">
                     {label(item)}
                     <span className="block text-[14px] font-medium text-[var(--foreground-secondary)]">
-                      {emailSent === "sent" ? t("setupEmailSent") : emailSent === "failed" ? t("setupEmailFailed") : t("setupEmailHint")}
+                      {emailSent === "sent" ? t("setupEmailSent") : emailSent === "failed" ? t("setupEmailFailed") : null}
                     </span>
                   </span>
                   {sending ? <Loader2 className="shrink-0 animate-spin" size={18} /> : <Mail className="shrink-0" size={18} />}

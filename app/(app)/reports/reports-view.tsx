@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -23,6 +24,7 @@ import { ArrowDownRight, ArrowLeftRight, ArrowUpRight, Check, CheckCircle2, Chev
 import { dateFormat, longDate, sinceDate } from "@/lib/i18n/dates";
 import { currencySymbol } from "@/components/currency-symbol";
 import { businessCurrency } from "@/lib/business-units";
+import { formatMoney } from "@/lib/regional";
 import { Dot, InOutBars, Ring } from "@/components/glance";
 import { VehicleArt } from "@/components/vehicle-art";
 import { VehicleTitle } from "@/components/vehicle-identity";
@@ -35,10 +37,10 @@ const PRESETS: DatePreset[] = ["this_month", "last_month", "last_3_months", "las
 const CHART_COLORS = ["#008fa3", "#c9711c", "#2f6fb8", "#a0522d", "#6b4c8a", "#c0457a", "#5f8a1e"];
 /** The same seven, warm first, for where money went. Also checked with the validator. */
 const OUT_COLORS = ["#c9711c", "#6b4c8a", "#a0522d", "#2f6fb8", "#c0457a", "#008fa3", "#5f8a1e"];
-/** Whole amounts in the business's own currency (฿, £, €), as the rest of the reports write them. */
+/** Money exact in the business's own currency (฿, £, €): the shared formatMoney, decimals kept when there are any. */
 export function money(value: number) {
-  const rounded = Math.round(Number(value) || 0);
-  return `${rounded < 0 ? "-" : ""}${currencySymbol(businessCurrency())}${Math.abs(rounded).toLocaleString("en-US")}`;
+  const currency = businessCurrency();
+  return formatMoney(Number(value) || 0, currency, currency === "THB" ? "th-TH" : "en-GB");
 }
 
 const h2 = "card-title";
@@ -350,14 +352,15 @@ function ComparisonPanel({ vehicles, say }: { vehicles: VehicleMetrics[]; say: S
         <div className="mt-2 h-56">
           <ResponsiveContainer height="100%" width="100%">
             <BarChart data={barData}>
-              <CartesianGrid stroke="#dce3eb" strokeDasharray="3 3" />
-              <XAxis dataKey="name" tick={{ fontSize: 14 }} />
-              <YAxis tick={{ fontSize: 14 }} tickFormatter={(value) => `${currencySymbol(businessCurrency())}${(value / 1000).toFixed(0)}k`} width={48} />
-              <Tooltip formatter={(value) => money(Number(value))} />
+              {/* Colours through tokens with the light values as fallbacks, so the chart reads on a dark page too (theme-dark.css). */}
+              <CartesianGrid stroke="var(--report-grid, #dce3eb)" strokeDasharray="3 3" />
+              <XAxis dataKey="name" tick={{ fontSize: 14, fill: "var(--report-tick, #666)" }} />
+              <YAxis tick={{ fontSize: 14, fill: "var(--report-tick, #666)" }} tickFormatter={(value) => `${currencySymbol(businessCurrency())}${(value / 1000).toFixed(0)}k`} width={48} />
+              <Tooltip contentStyle={{ background: "var(--panel)", borderColor: "var(--report-tip-line, #ccc)", color: "var(--foreground)" }} cursor={{ fill: "var(--report-cursor, #ccc)" }} formatter={(value) => money(Number(value))} />
               <Legend />
-              <Bar isAnimationActive={false} dataKey={inKey} fill="#0e5e6f" radius={[2, 2, 0, 0]} />
-              <Bar isAnimationActive={false} dataKey={outKey} fill="#ebc8bc" radius={[2, 2, 0, 0]} />
-              <Bar isAnimationActive={false} dataKey={profitKey} fill="#2f6b45" radius={[2, 2, 0, 0]} />
+              <Bar isAnimationActive={false} dataKey={inKey} fill="var(--report-in, #0e5e6f)" radius={[2, 2, 0, 0]} />
+              <Bar isAnimationActive={false} dataKey={outKey} fill="var(--report-out, #ebc8bc)" radius={[2, 2, 0, 0]} />
+              <Bar isAnimationActive={false} dataKey={profitKey} fill="var(--report-profit, #2f6b45)" radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -367,8 +370,8 @@ function ComparisonPanel({ vehicles, say }: { vehicles: VehicleMetrics[]; say: S
         <div className="mt-2 h-60">
           <ResponsiveContainer height="100%" width="100%">
             <RadarChart data={radarData}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="metric" tick={{ fontSize: 14 }} />
+              <PolarGrid stroke="var(--report-grid, #ccc)" />
+              <PolarAngleAxis dataKey="metric" tick={{ fontSize: 14, fill: "var(--report-tick, #666)" }} />
               <PolarRadiusAxis domain={[0, 100]} tick={false} />
               {vehicles.map((vehicle, index) => (
                 <Radar isAnimationActive={false} dataKey={nameOf(vehicle)} fill={CHART_COLORS[index % CHART_COLORS.length]} fillOpacity={0.15} key={vehicle.id} name={nameOf(vehicle)} stroke={CHART_COLORS[index % CHART_COLORS.length]} />
@@ -439,8 +442,7 @@ function InsightsPanel({ data, say, locale }: { data: ReportsData; say: Say; loc
         <p className={`mt-1 ${soft}`}>{say("insightsNone")}</p>
       ) : (
         <>
-          <p className={`mt-1 ${soft}`}>{say("insightsBody")}</p>
-          <button className="secondary-action pressable mt-3 w-full sm:w-auto" onClick={fetchInsights} type="button">
+          <button className="secondary-action pressable mt-1 w-full sm:w-auto" onClick={fetchInsights} type="button">
             {say("insightsButton")}
           </button>
         </>
@@ -613,9 +615,7 @@ export function ReportsView({ data, vatRate = 0 }: { data: ReportsData; vatRate?
               </div>
             );
           })()
-        ) : (
-          <p className={`mt-3 ${soft}`}>{say("profitNote")}</p>
-        )}
+        ) : null}
       </section>
 
       {/* Who owes money */}
@@ -661,7 +661,6 @@ export function ReportsView({ data, vatRate = 0 }: { data: ReportsData; vatRate?
       {nothingAtAll ? (
         <section className="card p-4">
           <h2 className={h2}>{say("emptyTitle")}</h2>
-          <p className={`mt-1 ${soft}`}>{say("emptyBody")}</p>
           <Link className="primary-action pressable mt-3 w-full sm:w-auto" href="/transactions/new">
             {say("emptyButton")}
           </Link>
@@ -672,8 +671,10 @@ export function ReportsView({ data, vatRate = 0 }: { data: ReportsData; vatRate?
 
       {/* Deposits: held for customers, never income until kept. The standard inset tile, no colour of its own. */}
       <section className="card p-4">
-        <h2 className={h2}>{say("depositsTitle")}</h2>
-        <p className={`measure mt-1 ${soft}`}>{say("depositsBody")}</p>
+        <h2 className={`${h2} flex items-center gap-1.5`}>
+          {say("depositsTitle")}
+          <InfoTip label={say("depositsTitle")} text={say("depositsBody")} />
+        </h2>
         <div className="mt-3 grid grid-cols-2 gap-2">
           <div className={`${tile} col-span-2`}>
             <p className={soft}>{say("depositsHolding")}</p>
@@ -707,8 +708,10 @@ export function ReportsView({ data, vatRate = 0 }: { data: ReportsData; vatRate?
               data.refunds > 0 ? (
                 <div className="mt-3 flex items-start justify-between gap-3 border-t border-[var(--border)] pt-3">
                   <div className="min-w-0">
-                    <p className="font-bold text-[var(--foreground)]">{say("refundsTitle")}</p>
-                    <p className={soft}>{data.refundExtras > 0 ? say("refundsHintExtras", { amount: money(data.refundExtras) }) : say("refundsHint")}</p>
+                    <p className="flex items-center gap-1.5 font-bold text-[var(--foreground)]">
+                      {say("refundsTitle")}
+                      <InfoTip label={say("refundsTitle")} text={data.refundExtras > 0 ? say("refundsHintExtras", { amount: money(data.refundExtras) }) : say("refundsHint")} />
+                    </p>
                   </div>
                   <p className="flex-shrink-0 font-bold tabular-nums text-[var(--foreground)]">-{money(data.refunds)}</p>
                 </div>
@@ -727,7 +730,7 @@ export function ReportsView({ data, vatRate = 0 }: { data: ReportsData; vatRate?
       {sortedVehicles.length > 0 ? (
         <section className="card p-4 lg:col-span-2">
           <h2 className={h2}>{say("vehiclesTitle")}</h2>
-          <p className={`mt-1 ${soft}`}>{compareMode ? say("compareHelp", { count: selected.size }) : say("vehiclesBody")}</p>
+          {compareMode ? <p className={`mt-1 ${soft}`}>{say("compareHelp", { count: selected.size })}</p> : null}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {/* The sort sits on the left at its own width; Compare and the view switch on the right. */}
             <label className="min-w-0 basis-full sm:basis-auto sm:flex-none">
@@ -785,8 +788,10 @@ export function ReportsView({ data, vatRate = 0 }: { data: ReportsData; vatRate?
           {data.businessCosts > 0 ? (
             <div className="mt-2 flex items-center justify-between gap-3 rounded-2xl bg-[var(--panel-secondary)] px-3 py-2.5">
               <div className="min-w-0">
-                <p className="font-bold text-[var(--foreground)]">{say("businessCostsTitle")}</p>
-                <p className={soft}>{say("businessCostsHint")}</p>
+                <p className="flex items-center gap-1.5 font-bold text-[var(--foreground)]">
+                  {say("businessCostsTitle")}
+                  <InfoTip label={say("businessCostsTitle")} text={say("businessCostsHint")} />
+                </p>
               </div>
               <p className="flex-shrink-0 font-bold tabular-nums text-[var(--foreground)]">−{money(data.businessCosts)}</p>
             </div>
@@ -798,9 +803,9 @@ export function ReportsView({ data, vatRate = 0 }: { data: ReportsData; vatRate?
       {/* The way on to the other reports: one compact row, every icon on the same neutral tile. */}
       <div className="grid gap-3 lg:col-span-2 lg:grid-cols-3 [&>*]:min-w-0">
         {[
-          { href: "/reports/fleet-value", icon: TrendingUp, title: say("fleetValueLink"), hint: say("fleetValueLinkHint") },
-          { href: "/reports/owners", icon: Handshake, title: say("ownersLink"), hint: say("ownersLinkHint") },
-          { href: "/transactions", icon: ArrowLeftRight, title: say("allMoney"), hint: say("allMoneyHint", { count: data.recentTransactions.length }) }
+          { href: "/reports/fleet-value", icon: TrendingUp, title: say("fleetValueLink") },
+          { href: "/reports/owners", icon: Handshake, title: say("ownersLink") },
+          { href: "/transactions", icon: ArrowLeftRight, title: say("allMoney") }
         ].map((link) => {
           const Icon = link.icon;
           return (
@@ -808,7 +813,6 @@ export function ReportsView({ data, vatRate = 0 }: { data: ReportsData; vatRate?
               <span aria-hidden="true" className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-[var(--panel-secondary)] text-[var(--primary)]"><Icon size={21} /></span>
               <span className="min-w-0 flex-1">
                 <span className="block font-semibold text-[var(--foreground)]">{link.title}</span>
-                <span className={`block text-[14px] ${soft}`}>{link.hint}</span>
               </span>
               <ChevronRight aria-hidden="true" className="shrink-0 text-[var(--muted)]" size={18} />
             </Link>
@@ -819,7 +823,6 @@ export function ReportsView({ data, vatRate = 0 }: { data: ReportsData; vatRate?
       <section className="card flex flex-col gap-3 p-4 lg:col-span-2 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <h2 className={h2}>{say("exportTitle")}</h2>
-          <p className={`mt-1 ${soft}`}>{say("exportBody")}</p>
         </div>
         <div className="flex shrink-0 gap-2 [&>*]:flex-1 lg:[&>*]:flex-none">
           <a className="secondary-action pressable" download href={exportHref("pdf")}>

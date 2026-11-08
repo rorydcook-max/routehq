@@ -7,6 +7,7 @@ import type { Quote, RoveVehicle, Stay } from "@/lib/rove/market";
 import { roveHref } from "@/lib/rove/paths";
 import { roveDate, roveMoney } from "@/lib/rove/static";
 import { Icon, type IconName } from "./icon";
+import { OperatorMark } from "./operator-mark";
 import s from "../rove.module.css";
 
 /** The query a vehicle's own page and its booking link carry: the dates asked for. */
@@ -88,19 +89,8 @@ export async function vehicleFacts(vehicle: RoveVehicle) {
   ].filter(Boolean) as Array<{ icon: IconName; text: string }>;
 }
 
-/** The business as a small mark: its logo, else its initial. */
-export function OperatorMark({ name, logoUrl }: { name: string; logoUrl: string | null }) {
-  return (
-    <span aria-hidden="true" className={s.opMark}>
-      {logoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img alt="" loading="lazy" src={logoUrl} />
-      ) : (
-        name.trim().charAt(0).toUpperCase()
-      )}
-    </span>
-  );
-}
+/** The business as a small mark: its logo, else its initial (./operator-mark.tsx). */
+export { OperatorMark };
 
 export async function VehicleCard({
   vehicle,
@@ -155,6 +145,8 @@ export async function VehicleCard({
             </span>
           ) : null}
           {vehicle.monthlyRate > 0 ? <span className={s.tagMonthly}>{t("rv.monthlyTag")}</span> : null}
+          {/* The business allows ride-hailing and delivery work (Settings › Rentals). */}
+          {vehicle.commercialUse ? <span className={s.tagMonthly}>{t("rv.commercialTag")}</span> : null}
         </span>
       </a>
       <div className={s.cardBody}>

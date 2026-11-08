@@ -34,7 +34,7 @@ export default async function AdminSetupRequestsPage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform/setup" subtitle="Businesses that sent their records for us to bring in. View as the business, use Fleet › Import a list with these files (the AI reads them; check every card before bringing it in), then mark it done: the owner is notified." title="Set it up for me" />
+      <AdminHeader active="/platform/setup" tip="Businesses that sent their records for us to bring in. View as the business, use Fleet › Import a list with these files (the AI reads them; check every card before bringing it in), then mark it done: the owner is notified." title="Set it up for me" />
       {requests.length === 0 ? (
         <p className="card p-5 font-medium text-[var(--muted)]">No requests yet.</p>
       ) : (

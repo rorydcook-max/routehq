@@ -43,7 +43,7 @@ export type TaskListItem = {
   /** Short name for a payment, e.g. "Rent · October 2026" or "Deposit". */
   paymentLabel: string | null;
   /** What kind of payment this is, so the screen can name it in the reader's language. */
-  pay?: { kind: "deposit" | "top_up" | "extension" | "rent" | "charge" | "extras"; period: string | null } | null;
+  pay?: { kind: "deposit" | "top_up" | "extension" | "rent" | "charge" | "extras" | "late_return"; period: string | null } | null;
   /** Several payments of one kind due the same day on one booking, shown as one job (the others are covered by it). */
   bundle?: { ids: string[]; total: number } | null;
   /** What kind of request a customer made. */
@@ -58,6 +58,7 @@ function paymentTitle(metadata: any) {
   if (type === "deposit_top_up") return "Collect deposit top-up";
   if (type === "charge") return `Collect charge${metadata?.description ? ` · ${metadata.description}` : ""}`;
   if (type === "extras") return "Collect extras";
+  if (metadata?.late_return) return "Collect late return";
   const period = metadata?.period_label ? ` · ${metadata.period_label}` : "";
   return `Collect rent${period}`;
 }
@@ -70,6 +71,8 @@ function payKind(metadata: any): NonNullable<TaskListItem["pay"]> {
   // For a bill, "period" carries what it is for: the owner's words, or the return form's reasons.
   if (type === "charge") return { kind: "charge", period: metadata?.description ? String(metadata.description) : Array.isArray(metadata?.charge_reasons) ? metadata.charge_reasons.map((reason: string) => `#${reason}`).join(",") : null };
   if (type === "extras") return { kind: "extras", period: Array.isArray(metadata?.extras) ? metadata.extras.join(", ") : null };
+  // The late-return charge is saved as rent due on the return day (lib/late-return.ts) but named "Late return".
+  if (metadata?.late_return) return { kind: "late_return", period: null };
   return { kind: "rent", period: metadata?.period_label ? String(metadata.period_label) : null };
 }
 
@@ -101,7 +104,7 @@ export async function getTaskList(
     .is("deleted_at", null)
     .neq("task_type", "payment_reminder");
   if (openOnly) tasksQuery = tasksQuery.is("completed_at", null);
-  const [tasksResult, paymentsResult, requestsResult, handoversResult] = await Promise.all([
+  const [tasksResult, paymentsResult, requestsResult, handoversResult, noPlateResult] = await Promise.all([
     tasksQuery.order("due_at", { ascending: true, nullsFirst: false }),
     supabase
       .from("rental_payments")
@@ -126,8 +129,18 @@ export async function getTaskList(
       .eq("organization_id", organizationId)
       .eq("status", "booked")
       .is("deleted_at", null)
-      .lte("start_date", businessToday())
+      .lte("start_date", businessToday()),
+    // Vehicles with no number plate: their agreement can't be signed and they aren't offered online until one is added.
+    supabase
+      .from("vehicles")
+      .select("id, make, model, created_at")
+      .eq("organization_id", organizationId)
+      .is("deleted_at", null)
+      .is("parked_at", null)
+      .not("status", "in", "(inactive,retired)")
+      .or("registration_number.is.null,registration_number.eq.")
   ]);
+  const noPlate = ((noPlateResult?.data || []) as any[]).filter((row) => row?.id);
   const handoversDue = (handoversResult.data || []) as any[];
 
   if (tasksResult.error) throw new Error(tasksResult.error.message);
@@ -336,7 +349,29 @@ export async function getTaskList(
     paymentLabel: null
   }));
 
-  return [...requestItems, ...taskItems, ...handoverItems, ...paymentItems].sort((a, b) => {
+  // A vehicle with no number plate: add it, so its agreements can be signed and it can be booked online again.
+  const plateItems: TaskListItem[] = noPlate.map((row) => ({
+    id: `plate-${row.id}`,
+    kind: "task",
+    title: "Add the number plate",
+    taskType: "admin",
+    dueAt: null,
+    dueDate: today,
+    completedAt: null,
+    vehicleId: row.id,
+    rentalId: null,
+    action: "add_plate",
+    rentalPaymentId: null,
+    vehicleLabel: [row.make, row.model].filter(Boolean).join(" ") || null,
+    rentalLabel: null,
+    customerName: null,
+    amount: null,
+    receipt: null,
+    coveredBy: null,
+    paymentLabel: null
+  }));
+
+  return [...requestItems, ...taskItems, ...handoverItems, ...plateItems, ...paymentItems].sort((a, b) => {
     const left = a.dueDate || "9999-12-31";
     const right = b.dueDate || "9999-12-31";
     if (left !== right) return left < right ? -1 : 1;

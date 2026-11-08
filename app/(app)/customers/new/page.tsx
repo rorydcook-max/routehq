@@ -63,7 +63,6 @@ export default async function NewCustomerPage() {
               <label className="block">
                 <span className={labelClass}>{say("f_phone")}</span>
                 <PhoneField defaultCountry={(organization as any).country_code || ""} inputClass={inputClass} keepWords />
-                <span className="mt-1 block font-medium text-[var(--muted)]">{say("new_phoneHint")}</span>
               </label>
               <DuplicatePhoneHint organizationId={organization.id} />
               <label className="block">
@@ -83,12 +82,11 @@ export default async function NewCustomerPage() {
             </div>
           </div>
 
-          <Fold summary={say("new_chatSummary")} title={say("new_chatTitle")}>
+          <Fold title={say("new_chatTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className={labelClass}>{say("ch_whatsapp")}</span>
                 <input className={inputClass} name="whatsappNumber" placeholder={phonePlaceholderFor((organization as any).country_code)} type="tel" />
-                <span className="mt-1 block font-medium text-[var(--muted)]">{say("new_whatsappHint")}</span>
               </label>
               <label className="block">
                 <span className={labelClass}>{say("ch_line")}</span>
@@ -123,7 +121,7 @@ export default async function NewCustomerPage() {
             </div>
           </Fold>
 
-          <Fold summary={say("new_docsSummary")} title={say("new_docsTitle")}>
+          <Fold title={say("new_docsTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className={labelClass}>{say("f_passportNo")}</span>
@@ -160,7 +158,7 @@ export default async function NewCustomerPage() {
             </div>
           </Fold>
 
-          <Fold summary={say("new_emSummary")} title={say("new_emTitle")}>
+          <Fold title={say("new_emTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className={labelClass}>{say("new_emName")}</span>
@@ -173,7 +171,7 @@ export default async function NewCustomerPage() {
             </div>
           </Fold>
 
-          <Fold summary={say("new_notesSummary")} title={say("n_title")}>
+          <Fold tip={say("new_notesSummary")} title={say("n_title")}>
             <textarea aria-label={say("n_title")} className="min-h-28 w-full" name="notes" />
           </Fold>
 

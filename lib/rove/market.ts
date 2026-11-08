@@ -65,6 +65,8 @@ export type RoveVehicle = {
   weeklyRate: number;
   monthlyRate: number;
   deposit: number;
+  /** The business allows ride-hailing and delivery work with it (Settings › Rentals; its agreement says on what terms). */
+  commercialUse: boolean;
   busy: CatalogVehicle["busy"];
   /** Where it is based (its branch, else the business's main location) and that branch's delivery radius. */
   area: ServiceArea | null;
@@ -156,6 +158,7 @@ async function loadMarketUncached(): Promise<{ businesses: RoveBusiness[]; vehic
         weeklyRate: vehicle.weeklyRate,
         monthlyRate: vehicle.monthlyRate,
         deposit: vehicle.deposit,
+        commercialUse: Boolean(vehicle.commercialUse),
         busy: vehicle.busy,
         area,
         specs
@@ -245,6 +248,8 @@ export type MarketSearch = {
   /** Most per day, in the vehicle's own currency; null for no limit. */
   maxPerDay: number | null;
   deliveryOnly: boolean;
+  /** Only vehicles whose business allows ride-hailing and delivery work (?commercial=1). */
+  commercialOnly?: boolean;
   sort: SearchSort;
 };
 
@@ -255,6 +260,7 @@ export async function searchMarket(input: MarketSearch): Promise<SearchResult[]>
   const results: SearchResult[] = [];
   for (const vehicle of vehicles) {
     if (!passesVehicleFilter(input.filter, vehicle.kind, vehicle.specs)) continue;
+    if (input.commercialOnly && !vehicle.commercialUse) continue;
     const inside = input.within && vehicle.area ? distanceKm(input.within.center, vehicle.area) <= input.within.radiusKm : false;
     const reach = reachFrom(vehicle, input.point) || (inside ? { km: null, delivers: publicDeliveryKm(vehicle.area) > 0 } : null);
     if (!reach) continue;

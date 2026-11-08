@@ -58,6 +58,7 @@ export function TravelPolicyForm({
   const [rulesById, setRulesById] = useState<Record<string, LocationTravelRules>>(() => Object.fromEntries(locations.map((location) => [location.id, location.rules])));
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [otherLaw, setOtherLaw] = useState<Record<string, boolean>>({});
+  const [commercialUse, setCommercialUse] = useState(settings.commercial_use_allowed);
   const active = locations.find((location) => location.id === activeId) || locations[0];
   const rules = active ? rulesById[active.id] : null;
   const islands = useMemo(() => islandsOf(country), [country]);
@@ -116,7 +117,7 @@ export function TravelPolicyForm({
       {locations.length > 1 ? (
         <div>
           <p className={labelClass}>
-            {say("tr_location")} <InfoTip label={say("tr_location")} text={say("tr_locationsHelp")} />
+            {say("tr_location")}
           </p>
           <div className="mt-1.5 flex flex-wrap gap-2" role="tablist">
             {locations.map((location) => (
@@ -149,7 +150,6 @@ export function TravelPolicyForm({
               <label className={choiceClass(rules.limit === "none")}>
                 <input checked={rules.limit === "none"} className="sr-only" name={`limit_${active.id}`} onChange={() => change({ limit: "none" })} type="radio" />
                 <span className="block font-bold text-[var(--foreground)]">{say("tr_noLimit")}</span>
-                <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{say("tr_noLimitBody")}</span>
               </label>
               <label className={choiceClass(rules.limit === "radius")}>
                 <input checked={rules.limit === "radius"} className="sr-only" name={`limit_${active.id}`} onChange={() => change({ limit: "radius", radius: rules.radius || 50 })} type="radio" />
@@ -265,19 +265,40 @@ export function TravelPolicyForm({
       ) : null}
 
       <section>
-        {locations.length > 1 ? <p className="mb-2 font-medium text-[var(--muted)]">{say("tr_allLocations")}</p> : null}
         <SwitchField
           defaultChecked={settings.geofence_monitoring_enabled}
-          description={say("tp_gpsHelp")}
           label={say("tp_gps")}
           labelClassName="font-bold text-[var(--foreground)]"
           name="geofenceMonitoringEnabled"
         />
       </section>
 
+      {/* Ride-hailing and delivery work (Rory, 8 Nov 2026): the agreement bans it, or allows it on conditions. */}
+      <section className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-xl bg-[var(--panel-secondary)] px-3.5 py-2.5">
+        <input name="commercialUse" type="hidden" value={commercialUse ? "allowed" : "not_allowed"} />
+        <span className="min-w-0 flex-1 basis-56 font-bold leading-6 text-[var(--foreground)]">
+          {say("tp_commercialUse")} <InfoTip label={say("tp_commercialUse")} text={say("tp_commercialUseTip")} />
+        </span>
+        <span aria-label={say("tp_commercialUse")} className="inline-flex shrink-0 rounded-full bg-[var(--panel)] p-1" role="radiogroup">
+          {[false, true].map((value) => (
+            <button
+              aria-checked={commercialUse === value}
+              className={`min-h-[36px] whitespace-nowrap rounded-full px-3 font-semibold ${
+                commercialUse === value ? (value ? "bg-[var(--primary)] text-white" : "bg-[var(--foreground)] text-[var(--background)]") : "text-[var(--foreground-secondary)]"
+              }`}
+              key={String(value)}
+              onClick={() => setCommercialUse(value)}
+              role="radio"
+              type="button"
+            >
+              {say(value ? "tp_commercialAllowed" : "tp_commercialNotAllowed")}
+            </button>
+          ))}
+        </span>
+      </section>
+
       <section>
         <p className={headingClass}>{say("tp_fees")}</p>
-        <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("tp_feesHelp")}</p>
         {/* One row per fee: switch and name on the left, amount on the right, so every box lines up
             however long the name is in each language (Rory, 27 Oct). Off = left out of the agreement. */}
         <div className="mt-2.5 grid gap-2">
@@ -340,7 +361,7 @@ function FeeRow({ currencyCode, defaultValue, label, name, on: initialOn, onName
       ) : on ? (
         <input
           aria-label={label}
-          className="w-28 shrink-0 text-end"
+          className="w-20 shrink-0 text-end"
           inputMode="decimal"
           min="0"
           name={name}

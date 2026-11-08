@@ -12,6 +12,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { SitePage } from "@/components/site/site-page";
+import { SiteFontFaces, siteFontFaces } from "@/components/site/site-fonts";
 import { PageCountry } from "@/components/page-country";
 import { loadSiteData, loadSiteRow, uploadUrls } from "@/lib/sites/data";
 import { ldScript, siteJsonLd } from "@/lib/sites/seo";
@@ -179,13 +180,16 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
   const data = await loadSiteData({ catalog, slug, config, catalogProps, t: (await getTranslations("bsite")) as any });
   const meta = await siteMeta(config, { name: data.business.name, place: data.business.place, kinds });
   const ld = owner ? null : siteJsonLd(data, config, { url: catalog.canonicalUrl, description: meta.description, image: null });
+  // The template's fonts, self-hosted and written into the page (no stylesheet from Google to wait for).
+  const fonts = siteFontFaces(config);
 
   return (
     <>
       <BrandStyle colour={catalog.brandColour} />
+      <SiteFontFaces css={fonts.css} />
       {ld ? <script dangerouslySetInnerHTML={{ __html: ldScript(ld) }} type="application/ld+json" /> : null}
       <PageCountry country={catalog.country}>
-        <SitePage config={config} data={data} edit={owner && query.edit === "1"} />
+        <SitePage config={config} data={data} edit={owner && query.edit === "1"} inlineFont={fonts.css ? fonts.id : null} />
       </PageCountry>
     </>
   );

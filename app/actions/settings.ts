@@ -779,6 +779,8 @@ async function updateTravelPolicySettingsOrThrow(formData: FormData) {
     deposit_return_days: requiredNumberFromForm(formData, "depositReturnDays", 5),
     // Each fee has a switch; a switched-off one keeps its amount for when it's switched back on.
     fees_off: FEE_KEYS.filter((key) => formData.get(`feeOn_${key}`) !== "on"),
+    // Ride-hailing and delivery work: anything but an explicit "allowed" keeps the agreement's ban.
+    commercial_use_allowed: formData.get("commercialUse") === "allowed",
     // One place for contact details: Business (LINE, WhatsApp) and payment methods (PromptPay).
     owner_line_id: String(organization.line_id || ""),
     owner_whatsapp: String(organization.whatsapp || ""),

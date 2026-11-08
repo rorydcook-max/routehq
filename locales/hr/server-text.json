@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Najprije dodajte kupca u rezervaciju kako bi mu se zapisnik mogao poslati na potpis.",
   "Enter the amount received.": "Unesite primljeni iznos.",
   "Check the phone number.": "Provjerite broj telefona.",
-  "This report has already been signed.": "Ovaj zapisnik je već potpisan."
+  "This report has already been signed.": "Ovaj zapisnik je već potpisan.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Najprije dodajte registarsku oznaku vozila. Bez nje se ugovor ne može potpisati.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Ova rezervacija je već u tijeku. Javite se {} ako nešto treba promijeniti.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Ova se rezervacija još ne može dovršiti online. Javite se {} da je dovršite.",
+  "The agreement was updated. Please review it again before signing.": "Ugovor je ažuriran. Molimo ga ponovno pregledajte prije potpisivanja."
 }

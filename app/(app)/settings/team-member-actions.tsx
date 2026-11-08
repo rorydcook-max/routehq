@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useActionState, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -48,12 +49,14 @@ export function TeamMemberActions({ memberId, email, role, waiting }: { memberId
     <div className="w-full">
       {role !== "owner" ? (
         <label className="mb-2 block">
-          <span className="font-semibold text-[var(--foreground-secondary)]">{say("team_level")}</span>
+          <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]">
+            {say("team_level")}
+            <InfoTip label={say("team_level")} text={say(level === "manager" ? "iv_managerBody" : "iv_teammateBody")} />
+          </span>
           <select className="app-select mt-1 w-full" disabled={saving} onChange={(event) => changeLevel(event.target.value as AppRole)} value={level}>
             <option value="manager">{say("iv_manager")}</option>
             <option value="teammate">{say("iv_teammate")}</option>
           </select>
-          <span className="mt-1 block text-sm font-medium text-[var(--foreground-secondary)]">{say(level === "manager" ? "iv_managerBody" : "iv_teammateBody")}</span>
         </label>
       ) : null}
       <div className="flex flex-wrap items-center gap-2">

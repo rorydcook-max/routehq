@@ -80,6 +80,7 @@ function brandDarkCss(colour: string) {
   const primary = rgb(palette.primary);
   const surface = [22, 36, 39] as const;
   const white = [255, 255, 255] as const;
+  const black = [0, 0, 0] as const;
   const tint = hex(mix(primary, surface, 0.72));
   let ink = mix(rgb(isBrandColour(colour) ? colour : ROUTEHQ_BRAND), white, 0.35);
   let guard = 0;
@@ -88,5 +89,19 @@ function brandDarkCss(colour: string) {
     guard += 1;
   }
   const band = hex(mix(primary, [14, 26, 28] as const, 0.45));
-  return `html:root[data-theme="dark"]{--primary-light:${tint};--primary-blue-light:${tint};--info-light:${tint};--kind-move-bg:${tint};--primary-ink-dark:${hex(ink)};--info:${hex(ink)};--kind-move:${hex(ink)};--sidebar-active:${hex(ink)};--sidebar-text-active:${hex(ink)};--on-rent:${hex(ink)};--band:${band};--analytics-panel:${band};}`;
+  // Buttons in the business colour on a dark page: the theme's own teal must not replace it. White words on the fill
+  // need 4.5:1 (luminance at most 0.18), and a very dark colour (navy, black) is lifted so the button shows on the dark panel.
+  let fill: readonly [number, number, number] = primary;
+  guard = 0;
+  while (luminance(fill) > 0.18 && guard < 12) {
+    fill = mix(fill, black, 0.08);
+    guard += 1;
+  }
+  guard = 0;
+  while (luminance(fill) < 0.14 && guard < 30) {
+    fill = mix(fill, white, 0.05);
+    guard += 1;
+  }
+  const fillHover = hex(mix(fill, black, 0.12));
+  return `html:root[data-theme="dark"]{--primary:${hex(fill)};--primary-hover:${fillHover};--primary-blue:${hex(fill)};--primary-blue-hover:${fillHover};--gradient-brand:${hex(fill)};--gradient-teal:${hex(fill)};--primary-light:${tint};--primary-blue-light:${tint};--info-light:${tint};--kind-move-bg:${tint};--primary-ink-dark:${hex(ink)};--info:${hex(ink)};--kind-move:${hex(ink)};--sidebar-active:${hex(ink)};--sidebar-text-active:${hex(ink)};--on-rent:${hex(ink)};--band:${band};--analytics-panel:${band};}`;
 }

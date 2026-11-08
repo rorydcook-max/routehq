@@ -4,6 +4,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { recordActivityEventOnce } from "@/lib/supabase/activity";
 import { renderRentalAgreementDraftTemplate } from "@/lib/rental-document-template-adapter";
 import { createDraftDocumentVersion, createRentalDocument } from "@/lib/rental-documents";
+import { freshRead } from "@/lib/rental-document-customer-signing";
 import { getDocumentFinalisationEligibility } from "@/lib/rental-document-finalisation";
 import { calculateFinalRentalDocumentContentHash, finaliseDocumentVersionWithRpc } from "@/lib/rental-document-finalisation-service";
 import {
@@ -94,6 +95,7 @@ async function latestAgreement(admin: any, organizationId: string, rentalId: str
     .not("status", "in", "(voided,superseded)")
     .order("created_at", { ascending: false })
     .limit(1)
+    .abortSignal(freshRead())
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!document?.current_version_id) return { document: document || null, version: null };
@@ -102,9 +104,24 @@ async function latestAgreement(admin: any, organizationId: string, rentalId: str
     .select("*")
     .eq("id", document.current_version_id)
     .eq("organization_id", organizationId)
+    .abortSignal(freshRead())
     .maybeSingle();
   if (versionError) throw new Error(versionError.message);
   return { document, version: version || null };
+}
+
+async function renterHasSigned(admin: any, organizationId: string, versionId: string) {
+  const { data, error } = await admin
+    .from("rental_document_signatures")
+    .select("id")
+    .eq("organization_id", organizationId)
+    .eq("document_version_id", versionId)
+    .eq("signer_role", "renter")
+    .limit(1)
+    .abortSignal(freshRead());
+  // Unsure counts as signed: never replace what may be a signed agreement.
+  if (error) return true;
+  return (data || []).length > 0;
 }
 
 /**
@@ -176,7 +193,15 @@ export async function ensureRentalAgreementDraft({ organizationId, rentalId }: {
         (stamp) => stamp && Date.parse(String(stamp)) > draftedAt
       );
       const otherVehicle = (version.rendered_data_snapshot?.vehicle_id || null) !== (context.rental?.vehicle_id || null);
-      if (version.status === "draft" && (otherVehicle || changedSince)) {
+      // A version the business has countersigned (after the customer's review step) but the customer
+      // hasn't signed is drawn up again too: otherwise a settings change (commercial use, late fee,
+      // deposit) showed the old terms until the customer tried to sign. The database refuses a new
+      // draft once the agreement is signed, and the customer's signing step re-checks the version.
+      const redrawable =
+        (otherVehicle || changedSince) &&
+        (version.status === "draft" ||
+          (["finalised", "signed"].includes(String(version.status)) && !(await renterHasSigned(context.admin, organizationId, version.id))));
+      if (redrawable) {
         const fresh = await render(context);
         if (fresh.renderedHtml !== version.rendered_html_snapshot) {
           await newDraftVersion(context, existing.document.id, fresh);

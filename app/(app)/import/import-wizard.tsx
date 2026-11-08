@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { AlertTriangle, Camera, CheckCircle2, ExternalLink, FileSpreadsheet, Loader2, MessageSquareText, RotateCcw, Undo2, X } from "lucide-react";
 import { compressImage } from "@/lib/direct-upload-client";
 import Link from "next/link";
@@ -356,9 +357,8 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
         <h2 className="card-title flex items-center gap-2">
           <FileSpreadsheet aria-hidden="true" className="shrink-0 text-[var(--primary)]" size={20} />
           {t("s1")}
+          <InfoTip label={t("s1")} text={t("whatWorks")} />
         </h2>
-        <p className="measure mt-1 text-sm text-[var(--foreground-secondary)]">{t("s1Body")}</p>
-        <p className="measure mt-1 text-sm text-[var(--muted)]">{chatText.trim() ? t("chatWorks") : photos.length ? t("photosWork") : t("whatWorks")}</p>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <label className="block min-w-0">
             <span className="secondary-action pressable w-full cursor-pointer">
@@ -493,7 +493,6 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             {t("foundLine", { vehicles: counts.vehicles, rentals: counts.rentals, rentedNow: counts.rentedNow, customers: counts.customers, transactions: counts.transactions })}
             {counts.needsLook ? <span className="text-[var(--warning)]"> {t("foundLook", { count: counts.needsLook })}</span> : null}
           </p>
-          <p className="mt-1 text-sm text-[var(--muted)]">{t("foundBody")}</p>
           {recognised ? (
             <p className="mt-3 flex items-start gap-2 rounded-lg bg-[var(--success-light)] px-3 py-2 text-sm font-semibold text-[var(--foreground)]">
               <CheckCircle2 aria-hidden="true" className="mt-0.5 shrink-0 text-[var(--success)]" size={16} />
@@ -584,7 +583,6 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
           {/* The column mapping, for the rare case the reading was wrong. */}
           <details className="mt-5 rounded-lg border border-[var(--border)] bg-white p-3" onToggle={(event) => setMappingOpen((event.target as HTMLDetailsElement).open)} open={mappingOpen}>
             <summary className="cursor-pointer font-bold text-[var(--foreground)]">{t("s2")}</summary>
-            <p className="mt-2 text-sm text-[var(--muted)]">{t("s2Body")}</p>
             <div className="mt-3 space-y-4">
               {mappings.map((sheet, sheetIndex) => (
                 <div className="rounded-lg border border-[var(--border)] p-3" key={sheet.sheet_name}>
@@ -661,12 +659,14 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
               <RotateCcw size={17} />
               {t("again")}
             </button>
-            <button className="primary-action pressable" disabled={status === "importing" || hasClashes} onClick={executeImport} type="button">
-              {status === "importing" ? <Loader2 className="animate-spin" size={18} /> : null}
-              {status === "importing" ? t("importing") : t("bringItIn")}
-            </button>
+            <span className="flex items-center gap-2 [&>button]:flex-1">
+              <button className="primary-action pressable" disabled={status === "importing" || hasClashes} onClick={executeImport} type="button">
+                {status === "importing" ? <Loader2 className="animate-spin" size={18} /> : null}
+                {status === "importing" ? t("importing") : t("bringItIn")}
+              </button>
+              <InfoTip label={t("bringItIn")} text={t("undoNote")} />
+            </span>
           </div>
-          <p className="mt-2 text-right text-xs text-[var(--muted)]">{t("undoNote")}</p>
         </section>
       ) : null}
 
@@ -677,7 +677,6 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             <CheckCircle2 className="text-[var(--success)]" size={28} />
             <div>
               <h2 className="text-xl font-semibold text-[var(--foreground)]">{t("done")}</h2>
-              <p className="mt-1 text-sm text-[var(--muted)]">{t("doneBody")}</p>
             </div>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -803,10 +802,7 @@ function SourcePicker({ source, onPick, t }: { source: string | null; onPick: (s
                 <ExternalLink aria-hidden="true" size={14} />
               </a>
             ) : null}
-            <p className="measure mt-2 text-sm text-[var(--muted)]">{software.preset ? t("presetReady", { name: software.name }) : t("freeImport")}</p>
           </>
-        ) : source === "other" ? (
-          <p className="measure mt-2 text-sm text-[var(--foreground-secondary)]">{t("otherBody")}</p>
         ) : null}
       </section>
     );
@@ -816,7 +812,6 @@ function SourcePicker({ source, onPick, t }: { source: string | null; onPick: (s
   return (
     <section className="card p-4">
       <h2 className="card-title">{t("whereTitle")}</h2>
-      <p className="measure mt-1 text-sm text-[var(--foreground-secondary)]">{t("whereBody")}</p>
       <p className="mt-4 text-sm font-semibold text-[var(--foreground)]">{t("whereSoftware")}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         {names.map((item) => (

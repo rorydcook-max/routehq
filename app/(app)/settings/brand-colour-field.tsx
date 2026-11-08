@@ -21,7 +21,7 @@ export function BrandColourField({
   initial: string;
   label: string;
   customLabel: string;
-  hint: string;
+  hint?: string;
   /** The name of the small sample row under the swatches, so it doesn't read as stray buttons. */
   previewLabel?: string;
   /** The id of the form the colour is saved with, when the field sits outside it. */
@@ -50,7 +50,7 @@ export function BrandColourField({
     <div>
       <span className="block font-semibold text-[var(--foreground-secondary)]">{label}</span>
       <input form={form} name="contract_accent_colour" type="hidden" value={colour} />
-      <span className="mt-0.5 block text-sm text-[var(--muted)]">{hint}</span>
+      {hint ? <span className="mt-0.5 block text-sm text-[var(--muted)]">{hint}</span> : null}
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {PRESETS.map((preset) => {
           const on = preset === colour;

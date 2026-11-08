@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Сначала добавьте клиента в бронирование, чтобы ему можно было отправить акт на подпись.",
   "Enter the amount received.": "Введите полученную сумму.",
   "Check the phone number.": "Проверьте номер телефона.",
-  "This report has already been signed.": "Этот акт уже подписан."
+  "This report has already been signed.": "Этот акт уже подписан.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Сначала добавьте госномер транспорта. Без него договор нельзя подписать.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Это бронирование уже началось. Свяжитесь с {}, если нужно что-то изменить.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Это бронирование пока нельзя завершить онлайн. Свяжитесь с {}, чтобы его завершить.",
+  "The agreement was updated. Please review it again before signing.": "Договор обновлён. Пожалуйста, просмотрите его ещё раз перед подписанием."
 }

@@ -3,6 +3,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { BrandStyle } from "@/components/brand-style";
 import { SitePage } from "@/components/site/site-page";
+import { SiteFontFaces, siteFontFaces } from "@/components/site/site-fonts";
 import { demoSiteData, siteDemo } from "@/lib/sites/demos";
 import { ratesFrom, visitorCurrency } from "@/lib/visitor-currency";
 
@@ -27,10 +28,12 @@ export default async function BookingDemoPage({ params }: { params: Promise<{ de
   if (!demo) notFound();
   const [rates, visitor, t] = await Promise.all([ratesFrom(demo.currency), visitorCurrency(await getLocale()), getTranslations("bsite")]);
   const data = demoSiteData(demo, { t: t as any, rates, visitorCurrency: visitor, today: new Date().toISOString().slice(0, 10) });
+  const fonts = siteFontFaces(demo.config);
   return (
     <>
       <BrandStyle colour={demo.brandColour} />
-      <SitePage config={demo.config} data={data} />
+      <SiteFontFaces css={fonts.css} />
+      <SitePage config={demo.config} data={data} inlineFont={fonts.css ? fonts.id : null} />
     </>
   );
 }

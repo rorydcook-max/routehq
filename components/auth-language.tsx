@@ -2,28 +2,10 @@
 
 import { useLocale } from "next-intl";
 import { Globe } from "lucide-react";
-import { operatorLocaleOptions } from "@/lib/i18n/locales";
-import { STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
-import { isSitePath, localizeSitePath, splitSiteLocale } from "@/lib/site/locale-path";
+import { chooseSignedOutLanguage, signedOutLanguages } from "@/lib/i18n/signed-out-language";
 
-/**
- * Keeps a signed-out language choice on this device and redraws the page in it (also the website header's picker).
- * On RoveHQ's website each language has its own address, so there it opens that language's address (/th/pricing);
- * the cookie still carries the choice to sign-in and the app.
- */
-export function chooseSignedOutLanguage(code: string) {
-  document.cookie = `${STAFF_LOCALE_COOKIE}=${code}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
-  const { locale, rest } = splitSiteLocale(window.location.pathname);
-  if (locale || isSitePath(rest)) {
-    // No #hash: after "Features" (#how) every language change used to land back on that section.
-    window.location.assign(`${localizeSitePath(rest, code)}${window.location.search}`);
-    return;
-  }
-  window.location.reload();
-}
-
-/** The languages offered, by their own names without the "(…)" note. */
-export const signedOutLanguages = operatorLocaleOptions.map((option) => ({ code: option.code, label: option.label.replace(/ \(.*\)$/, "") }));
+// The choice itself lives in lib/i18n/signed-out-language.ts (task perf2), shared with the website's pickers.
+export { chooseSignedOutLanguage, signedOutLanguages };
 
 /**
  * Language choice on the sign-in pages, every language the app is written in. Kept on this device until the person signs in.

@@ -54,7 +54,6 @@ export function FastActionSheet({ open, onClose, canImport = false }: { open: bo
         </span>
         <span className="min-w-0">
           <span className="block font-semibold text-[var(--foreground)]">{t(`quick_${action.key}`)}</span>
-          <span className="block text-sm text-[var(--muted)]">{t(`quick_${action.key}_hint`)}</span>
         </span>
       </>
     );

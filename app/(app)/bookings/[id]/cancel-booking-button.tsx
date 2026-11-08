@@ -238,19 +238,16 @@ export function CancelBookingButton({
     {
       value: "full_refund_deposit_retained",
       label: say("cn_o2"),
-      detail: say("cn_o2_d", { paid: money(totalPaid, currency), deposit: money(depositHeld, currency) }),
       show: hasPayment && hasDeposit
     },
     {
       value: "partial_refund_deposit_returned",
       label: say("cn_o3"),
-      detail: say("cn_o3_d"),
       show: hasPayment || hasDeposit
     },
     {
       value: "partial_refund_deposit_retained",
       label: say("cn_o4"),
-      detail: say("cn_o4_d"),
       show: hasPayment && hasDeposit
     },
     {
@@ -268,10 +265,9 @@ export function CancelBookingButton({
     {
       value: "no_refund_deposit_returned",
       label: say("cn_o7"),
-      detail: say("cn_o7_d"),
       show: !hasPayment && !hasDeposit
     },
-  ] as { value: RefundOption; label: string; detail: string; show: boolean }[]).filter((o, i, arr) => o.show && arr.findIndex(x => x.value === o.value && x.label === o.label) === i);
+  ] as { value: RefundOption; label: string; detail?: string; show: boolean }[]).filter((o, i, arr) => o.show && arr.findIndex(x => x.value === o.value && x.label === o.label) === i);
 
   return (
     <>
@@ -352,7 +348,6 @@ export function CancelBookingButton({
                           type="button"
                         >
                           <span className="block text-sm font-bold text-[var(--foreground)]">{say(`cn_r_${r.value}`)}</span>
-                          <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{say(`cn_r_${r.value}_d`)}</span>
                         </button>
                       ))}
                     </div>
@@ -415,7 +410,7 @@ export function CancelBookingButton({
                           type="button"
                         >
                           <span className="block text-sm font-bold text-[var(--foreground)]">{opt.label}</span>
-                          <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{opt.detail}</span>
+                          {opt.detail ? <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{opt.detail}</span> : null}
                         </button>
                         {refundOption === opt.value && opt.value.startsWith("partial_refund") ? (
                           <div className="grid gap-2 border-t border-[var(--danger-line)] px-3 pb-3 pt-3 sm:grid-cols-2">
@@ -461,24 +456,20 @@ export function CancelBookingButton({
 
               {step === "vehicle" && (
                 <div>
-                  <p className="mb-1 text-sm font-semibold text-[var(--foreground)]">{say("cn_vehQ")}</p>
-                  
+                  <p className="mb-3 text-sm font-semibold text-[var(--foreground)]">{say("cn_vehQ")}</p>
                   <div className="space-y-2">
                     {([
                       {
                         value: "available" as const,
-                        label: say("cn_v_available"),
-                        detail: say("cn_v_available_d")
+                        label: say("cn_v_available")
                       },
                       {
                         value: "repair" as const,
-                        label: say("cn_v_repair"),
-                        detail: say("cn_v_repair_d")
+                        label: say("cn_v_repair")
                       },
                       {
                         value: "keep_assigned" as const,
-                        label: say("cn_v_keep_assigned"),
-                        detail: say("cn_v_keep_assigned_d")
+                        label: say("cn_v_keep_assigned")
                       }
                     ]).map((option) => (
                       <div
@@ -496,7 +487,6 @@ export function CancelBookingButton({
                           type="button"
                         >
                           <span className="block text-sm font-bold text-[var(--foreground)]">{option.label}</span>
-                          <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{option.detail}</span>
                         </button>
 
                         {vehicleDisposition === "repair" && option.value === "repair" ? (

@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Legg først til kunden i bookingen, så rapporten kan sendes til signering.",
   "Enter the amount received.": "Skriv inn mottatt beløp.",
   "Check the phone number.": "Sjekk telefonnummeret.",
-  "This report has already been signed.": "Denne rapporten er allerede signert."
+  "This report has already been signed.": "Denne rapporten er allerede signert.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Legg først til kjøretøyets registreringsnummer. Uten det kan avtalen ikke signeres.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Denne bookingen er allerede i gang. Kontakt {} hvis noe må endres.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Denne bookingen kan ikke fullføres på nett ennå. Kontakt {} for å fullføre den.",
+  "The agreement was updated. Please review it again before signing.": "Avtalen er oppdatert. Les gjennom den igjen før du signerer."
 }

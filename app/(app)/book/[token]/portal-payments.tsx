@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { customerDate } from "@/lib/i18n/customer-dates";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -236,12 +237,14 @@ function PaymentRow({
         <div className="mt-4 space-y-4">
           {payment.qrSvg ? (
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-center">
-              <p className="text-sm font-semibold text-[var(--foreground)]">{t("scanWithBankingApp")}</p>
+              <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-[var(--foreground)]">
+                {t("scanWithBankingApp")}
+                <InfoTip label={t("scanWithBankingApp")} text={t("onThisPhone")} />
+              </p>
               <div aria-label="PromptPay QR code" className="mx-auto mt-3 w-52 max-w-full rounded-xl bg-white p-2 [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: payment.qrSvg }} role="img" />
               <p className="mt-3 text-sm text-[var(--foreground-secondary)]">
                 {t.rich("promptPayFilledIn", { amount: money(payment.amount, payment.currency), b: (chunks) => <span className="font-semibold text-[var(--foreground)]">{chunks}</span> })}
               </p>
-              <p className="mt-1 text-xs text-[var(--muted)]">{t("onThisPhone")}</p>
             </div>
           ) : null}
 

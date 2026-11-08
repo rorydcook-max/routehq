@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "පාරිභෝගිකයාට අත්සන් කිරීමට වාර්තාව යැවිය හැකි වන පරිදි පළමුව ඔවුන්ව වෙන්කිරීමට එක් කරන්න.",
   "Enter the amount received.": "ලැබුණු මුදල ඇතුළත් කරන්න.",
   "Check the phone number.": "දුරකථන අංකය පරීක්ෂා කරන්න.",
-  "This report has already been signed.": "මෙම වාර්තාව දැනටමත් අත්සන් කර ඇත."
+  "This report has already been signed.": "මෙම වාර්තාව දැනටමත් අත්සන් කර ඇත.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "පළමුව වාහනයේ අංක තහඩුව එක් කරන්න. එය නැතිව ගිවිසුම අත්සන් කළ නොහැක.",
+  "This booking is already underway. Contact {} if anything needs changing.": "මෙම වෙන්කිරීම දැනටමත් ආරම්භ වී ඇත. යමක් වෙනස් කළ යුතු නම් {} අමතන්න.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "මෙම වෙන්කිරීම තවම මාර්ගගතව සම්පූර්ණ කළ නොහැක. එය අවසන් කිරීමට {} අමතන්න.",
+  "The agreement was updated. Please review it again before signing.": "ගිවිසුම යාවත්කාලීන කළා. අත්සන් කිරීමට පෙර කරුණාකර නැවත බලන්න."
 }

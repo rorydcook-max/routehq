@@ -72,6 +72,31 @@ function createResendProvider(): EmailProvider {
   };
 }
 
+/**
+ * Local development only: EMAIL_PROVIDER=outbox writes each email (email.json, email.html and its attachments) to a
+ * new folder under EMAIL_OUTBOX_DIR instead of sending it, so customer emails can be checked without a provider.
+ */
+function createOutboxProvider(): EmailProvider {
+  if (process.env.NODE_ENV === "production") throw new Error("EMAIL_PROVIDER=outbox is for local development only.");
+  const dir = process.env.EMAIL_OUTBOX_DIR;
+  if (!dir) throw new Error("EMAIL_PROVIDER is outbox but EMAIL_OUTBOX_DIR is missing.");
+  return {
+    name: "outbox",
+    async send(message) {
+      const { mkdir, writeFile } = await import("node:fs/promises");
+      const { join } = await import("node:path");
+      const id = `${new Date().toISOString().replace(/[:.]/g, "-")}-${Math.random().toString(36).slice(2, 8)}`;
+      const folder = join(dir, id);
+      await mkdir(folder, { recursive: true });
+      const attachments = (message.attachments || []).map((file) => ({ filename: file.filename, contentType: file.contentType, bytes: file.content.length }));
+      await writeFile(join(folder, "email.json"), JSON.stringify({ ...message, html: undefined, attachments }, null, 2));
+      if (message.html) await writeFile(join(folder, "email.html"), message.html);
+      for (const file of message.attachments || []) await writeFile(join(folder, file.filename.replace(/[\\/]/g, "_")), file.content);
+      return { messageId: id };
+    }
+  };
+}
+
 function configuredProviderName() {
   return String(process.env.EMAIL_PROVIDER || "").trim().toLowerCase();
 }
@@ -81,6 +106,7 @@ function resolveProvider(): EmailProvider | null {
   if (!name) return null;
 
   if (name === "resend") return createResendProvider();
+  if (name === "outbox") return createOutboxProvider();
 
   throw new Error(`EMAIL_PROVIDER is set to "${name}" but no adapter is implemented for it.`);
 }

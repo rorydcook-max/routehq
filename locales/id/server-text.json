@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Tambahkan pelanggan ke pemesanan dulu agar laporan bisa dikirim untuk ditandatangani.",
   "Enter the amount received.": "Masukkan jumlah yang diterima.",
   "Check the phone number.": "Periksa nomor telepon.",
-  "This report has already been signed.": "Laporan ini sudah ditandatangani."
+  "This report has already been signed.": "Laporan ini sudah ditandatangani.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Tambahkan nomor pelat kendaraan dulu. Tanpa itu perjanjian tidak bisa ditandatangani.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Pemesanan ini sudah berjalan. Hubungi {} jika ada yang perlu diubah.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Pemesanan ini belum bisa diselesaikan online. Hubungi {} untuk menyelesaikannya.",
+  "The agreement was updated. Please review it again before signing.": "Perjanjian sudah diperbarui. Mohon periksa lagi sebelum menandatangani."
 }

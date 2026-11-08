@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { customerDate } from "@/lib/i18n/customer-dates";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -250,11 +251,12 @@ export function Catalog({
             {t("setDates")}
           </button>
         </div>
-        <p className="measure mt-2 text-sm leading-5 text-[var(--muted)]">
-          {longTerm
-            ? t("monthlyExplain")
-            : t("setDatesExplain")}
-        </p>
+        {longTerm ? (
+          <p className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground-secondary)]">
+            {t("monthly")}
+            <InfoTip label={t("monthly")} text={t("monthlyExplain")} />
+          </p>
+        ) : null}
         {/* Two columns either way, so a lone start date isn't stretched across the whole card. */}
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
@@ -383,6 +385,12 @@ export function Catalog({
                   <h3 className={`font-bold leading-tight text-[var(--foreground)] ${tiles && !isOpen ? "text-[15px]" : list && !isOpen ? "text-base" : "text-[17px]"}`}>{vehicle.name}</h3>
                   {/* Every card has the same lines in the same places (a dash where something is missing), so prices and buttons line up across a row. */}
                   <p className={`mt-1 min-h-5 text-[var(--muted)] ${(list || tiles) && !isOpen ? "truncate text-xs leading-5" : "text-sm"}`}>{[vehicle.year, vehicle.color, ...vehicle.details].filter(Boolean).join(" · ") || "—"}</p>
+                  {/* Settings › Rentals: the business allows ride-hailing and delivery work (its agreement says on what terms). */}
+                  {vehicle.commercialUse ? (
+                    <p className="mt-1.5">
+                      <span className="inline-flex max-w-full items-center rounded-full bg-[var(--primary-light)] px-2.5 py-0.5 text-xs font-bold text-[var(--primary)]">{t("commercialUseAllowed")}</span>
+                    </p>
+                  ) : null}
                   {headline ? (
                     <p className={`flex flex-wrap items-baseline gap-x-1.5 ${(list || tiles) && !isOpen ? "mt-2" : "mt-3"}`}>
                       <span className={`font-bold leading-none text-[var(--foreground)] ${tiles && !isOpen ? "text-[19px]" : "text-[22px]"}`}>{money(headline.amount)}</span>

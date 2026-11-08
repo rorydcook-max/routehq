@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "கையொப்பமிட அறிக்கையை அனுப்ப, முதலில் வாடிக்கையாளரை முன்பதிவில் சேர்க்கவும்.",
   "Enter the amount received.": "பெற்ற தொகையை உள்ளிடவும்.",
   "Check the phone number.": "தொலைபேசி எண்ணைச் சரிபார்க்கவும்.",
-  "This report has already been signed.": "இந்த அறிக்கையில் ஏற்கனவே கையொப்பமிடப்பட்டுள்ளது."
+  "This report has already been signed.": "இந்த அறிக்கையில் ஏற்கனவே கையொப்பமிடப்பட்டுள்ளது.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "முதலில் வாகனத்தின் நம்பர் பிளேட்டைச் சேர்க்கவும். அது இல்லாமல் ஒப்பந்தத்தில் கையொப்பமிட முடியாது.",
+  "This booking is already underway. Contact {} if anything needs changing.": "இந்த முன்பதிவு ஏற்கனவே தொடங்கிவிட்டது. ஏதாவது மாற்ற வேண்டுமானால் {}-ஐத் தொடர்புகொள்ளுங்கள்.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "இந்த முன்பதிவை இன்னும் ஆன்லைனில் முடிக்க முடியாது. முடிக்க {}-ஐத் தொடர்புகொள்ளுங்கள்.",
+  "The agreement was updated. Please review it again before signing.": "ஒப்பந்தம் புதுப்பிக்கப்பட்டது. கையொப்பமிடும் முன் மீண்டும் பார்க்கவும்."
 }

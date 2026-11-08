@@ -23,6 +23,8 @@ export type TravelPolicySettings = {
   deposit_return_days: number;
   /** Fees and limits the business has switched off (Rory, 27 Oct): left out of the agreement; distance off = unlimited. */
   fees_off: FeeKey[];
+  /** Ride-hailing and delivery work with the vehicles (Rory, 8 Nov 2026). Off by default: the agreement bans it; on, it allows it on conditions. */
+  commercial_use_allowed: boolean;
   owner_line_id: string;
   owner_whatsapp: string;
   promptpay_id: string;
@@ -135,6 +137,7 @@ export const travelPolicyDefaults: TravelPolicySettings = {
   emergency_repair_limit: 2000,
   deposit_return_days: 5,
   fees_off: [],
+  commercial_use_allowed: false,
   owner_line_id: "",
   owner_whatsapp: "",
   promptpay_id: ""
@@ -181,10 +184,16 @@ export function getTravelPolicySettings(settings: Record<string, any> | null | u
     emergency_repair_limit: numberSetting(source, currency, "emergency_repair_limit"),
     deposit_return_days: numberSetting(source, currency, "deposit_return_days"),
     fees_off: Array.isArray(source.fees_off) ? (source.fees_off as string[]).filter((key): key is FeeKey => (FEE_KEYS as readonly string[]).includes(key)) : [],
+    commercial_use_allowed: source.commercial_use_allowed === true,
     owner_line_id: String(source.owner_line_id || source.line_id || ""),
     owner_whatsapp: String(source.owner_whatsapp || source.whatsapp || ""),
     promptpay_id: String(source.promptpay_id || "")
   };
+}
+
+/** Whether the business lets renters use its vehicles for ride-hailing or deliveries (booking sites and rove.rent show a badge). */
+export function commercialUseAllowed(settings: Record<string, any> | null | undefined) {
+  return Boolean(settings && settings.commercial_use_allowed === true);
 }
 
 export function mergeTravelPolicySettings(settings: Record<string, any> | null | undefined, updates: Partial<TravelPolicySettings>) {

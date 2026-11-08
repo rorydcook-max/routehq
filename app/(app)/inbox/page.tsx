@@ -112,7 +112,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
 
   return (
     // "Chats from all your messaging apps" only once an app is connected; before that it promises something that isn't there.
-    <AppShell userEmail={userEmail} hero={<PageBand subtitle={hasChannel ? t("subtitle") : undefined} title={t("title")} />}>
+    <AppShell userEmail={userEmail} hero={<PageBand title={t("title")} />}>
 
       {toSendGroups.length ? <MessagesToSend groups={toSendGroups} /> : null}
 
@@ -122,9 +122,6 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
             <MessagesSquare size={22} />
           </span>
           <h2 className="card-title mt-4">{t("emptyTitle")}</h2>
-          <p className="mx-auto mt-1 max-w-md font-medium text-[var(--foreground-secondary)]">
-            {t(lineFirst((organization as any)?.country_code) ? "emptyBody" : "emptyBodyGlobal")}
-          </p>
           {membership?.role === "owner" ? (
             <Link className="primary-action pressable mt-5 inline-flex" href={"/settings?tab=messaging" as Route}>
               {t("connect")}

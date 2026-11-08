@@ -38,7 +38,6 @@ export function DirectoryPanel({ enabled, allowed, bookingPageOn }: { enabled: b
       <SwitchField
         checked={on && usable}
         className={usable ? "" : "opacity-70"}
-        description={say("dir_body")}
         disabled={isPending || !usable}
         label={say("dir_switch")}
         onChange={(event) => change(event.target.checked)}

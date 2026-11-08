@@ -86,10 +86,10 @@ export function ActiveRentalPortal({
   const actionCards = useMemo(
     () => [
       // A rental with no end date has nothing to extend.
-      ...(endDate ? [{ type: "extension_request" as const, title: t("keepItLonger"), icon: CalendarPlus, description: t(openEndedOffer ? "keepItLongerHint" : "keepItLongerDateOnly") }] : []),
-      { type: "return_confirmation" as const, title: t("confirmReturn"), icon: CalendarCheck, description: t("confirmReturnHint") },
-      { type: "problem_report" as const, title: t("reportProblem"), icon: AlertTriangle, description: t("reportProblemHint") },
-      { type: "question" as const, title: t("askQuestion"), icon: MessageCircle, description: t("askQuestionHint") }
+      ...(endDate ? [{ type: "extension_request" as const, title: t("keepItLonger"), icon: CalendarPlus }] : []),
+      { type: "return_confirmation" as const, title: t("confirmReturn"), icon: CalendarCheck },
+      { type: "problem_report" as const, title: t("reportProblem"), icon: AlertTriangle },
+      { type: "question" as const, title: t("askQuestion"), icon: MessageCircle }
     ],
     [endDate, t]
   );
@@ -169,14 +169,11 @@ export function ActiveRentalPortal({
           const Icon = card.icon;
           return (
             <div className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm" key={card.type}>
-              <button className="flex w-full items-start gap-3 text-left" onClick={() => setOpenAction(openAction === card.type ? null : card.type)} type="button">
+              <button className="flex w-full items-center gap-3 text-left" onClick={() => setOpenAction(openAction === card.type ? null : card.type)} type="button">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
                   <Icon size={22} />
                 </span>
-                <span>
-                  <span className="block text-base font-semibold text-[var(--foreground)]">{card.title}</span>
-                  <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{card.description}</span>
-                </span>
+                <span className="block text-base font-semibold text-[var(--foreground)]">{card.title}</span>
               </button>
               {openAction === card.type ? (
                 <ActionForm
@@ -226,7 +223,6 @@ export function ActiveRentalPortal({
               {t("receiptNumbered", { number: receipt.number })}
             </a>
           ))}
-          {!signedContractUrl && deliveryPhotoUrls.length === 0 ? <p className="text-sm text-[var(--muted)]">{t("documentsWillAppear")}</p> : null}
         </div>
         {deliveryPhotoUrls.length ? (
           <div className="mt-4">

@@ -1,8 +1,9 @@
+import { InfoTip } from "@/components/info-tip";
 import { includedItemKey } from "@/lib/included-items";
 import { billingPeriodAmounts } from "@/lib/payment-schedule";
 import { firstRentCharge } from "@/lib/payment-schedule";
 import type { ReactNode } from "react";
-import { customerDate } from "@/lib/i18n/customer-dates";
+import { customerDate, customerDateTime } from "@/lib/i18n/customer-dates";
 import { AlertTriangle, CalendarDays, Clock, CreditCard, MapPin, ReceiptText, ShieldCheck } from "lucide-react";
 import { VehicleArt } from "@/components/vehicle-art";
 import { kindFromCategory } from "@/lib/vehicle-groups";
@@ -402,8 +403,25 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
       ? await promptPayQrSvg(detail.org_payment.promptpay_id, firstPaymentAmount)
       : null;
 
+  // Until it is signed, one short line says how long the customer has (Rory, 8 Nov 2026): the vehicle's hold while it
+  // runs, otherwise how long the link works. On the business's clock, in the reader's language.
+  const linkDeadline = (() => {
+    if (handedOver || detail.completion?.agreement || detail.bookingLink?.contract_signed_at) return null;
+    const ahead = (iso: unknown) => Boolean(iso) && new Date(String(iso)).getTime() > Date.now();
+    const link = detail.bookingLink as { hold_until?: string | null; hold_released_at?: string | null; expires_at?: string | null };
+    if (!link.hold_released_at && ahead(link.hold_until)) return t("holdLine", { time: customerDateTime(String(link.hold_until), locale) });
+    if (ahead(link.expires_at)) return t("linkValidLine", { time: customerDateTime(String(link.expires_at), locale) });
+    return null;
+  })();
+
   const bookingSummary = (
     <>
+          {linkDeadline ? (
+            <p className="flex items-center gap-1.5 text-sm font-semibold text-[var(--warning)]">
+              <Clock aria-hidden="true" size={15} />
+              {linkDeadline}
+            </p>
+          ) : null}
           {/* One white surface: the vehicle, then the facts as tinted tiles (no grey card nested inside the white one). */}
           <div className="mt-4 flex items-start gap-3">
             <span className="shrink-0">
@@ -449,7 +467,6 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           >
             <span>
               <span className="block text-sm font-semibold text-[var(--primary)]">{t("changeNeedsSignature")}</span>
-              <span className="block text-xs text-[var(--foreground-secondary)]">{t("changeSeeAndSign")}</span>
             </span>
             <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">{t("review")}</span>
           </a>
@@ -483,9 +500,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 
         {invites.length > 0 && detail.state !== "completed" ? (
           <section className="rounded-2xl border border-[var(--info-line)] bg-[var(--primary-light)] p-4 shadow-sm">
-            <p className="text-sm font-semibold text-[var(--foreground)]">{t("updatesTitle")}</p>
-            <p className="mt-1 text-sm leading-6 text-[var(--foreground-secondary)]">
-              {t("updatesBody", { business: businessName })}
+            <p className="flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground)]">
+              {t("updatesTitle")}
+              <InfoTip label={t("updatesTitle")} text={t("updatesBody", { business: businessName })} />
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {invites.map((invite) => (
@@ -585,6 +602,24 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             ) : null}
           </section>
           </>
+        ) : handedOver && (() => {
+            const link = detail.bookingLink as { rental_id?: string | null; vehicle_id?: string | null; contract_id?: string | null };
+            return !link?.rental_id || !link?.vehicle_id || !link?.contract_id;
+          })() ? (
+          // A rental already under way whose link has no agreement to sign (it was recorded by the business): nothing to
+          // fill in here, so no form that could only fail (final pre-release test, 8 Nov 2026).
+          <section className="rounded-2xl border border-[var(--border)] bg-white p-5 text-center shadow-sm">
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--success-light)] text-[var(--success)]">
+              <ShieldCheck size={28} />
+            </span>
+            <h2 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">{t("underwayTitle")}</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{t("underwayBody", { business: businessName })}</p>
+            {contact ? (
+              <a className="pressable mt-5 inline-flex rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={contact}>
+                {t("contactNamed", { business: businessName })}
+              </a>
+            ) : null}
+          </section>
         ) : (
           // "contents": these join the page's own column, so the signed confirmation (order -1) rises above the booking card.
           <div className="contents">

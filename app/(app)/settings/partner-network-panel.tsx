@@ -32,11 +32,10 @@ export function PartnerNetworkPanel({ initial, pct, canEdit = true }: { initial:
     <div>
       <SwitchField
         checked={enabled}
-        description={say("pn_shareBody", { pct })}
         disabled={isPending || !canEdit}
         label={
           <>
-            {say("pn_share")} <InfoTip label={say("pn_share")} text={say("pn_bodyTip")} />
+            {say("pn_share")} <InfoTip label={say("pn_share")} text={say("pn_shareBody", { pct })} />
           </>
         }
         onChange={(event) => {

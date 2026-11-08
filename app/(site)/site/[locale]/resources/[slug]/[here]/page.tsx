@@ -49,7 +49,7 @@ const BUILDER_KEYS = [
   "cb_excess_km_fee", "cb_mileage_limit_mi", "cb_excess_km_fee_mi", "cb_late_hour_fee", "cb_late_grace_minutes", "cb_late_full_day_hours", "cb_cancel_free_hours",
   "cb_cancel_fee_percent", "cb_early_return", "cb_early_return_none", "cb_early_return_prorata", "cb_early_return_fee",
   "cb_notice_days", "cb_cleaning_fee", "cb_smoking", "cb_smoking_no", "cb_smoking_yes", "cb_smoking_fee", "cb_pets", "cb_pets_no",
-  "cb_pets_fee", "cb_pet_fee", "cb_loss_of_use_fee", "cb_emergency_repair_limit", "cb_fine_admin_fee", "cb_special_terms",
+  "cb_pets_fee", "cb_pet_fee", "cb_commercial_use", "cb_commercial_use_no", "cb_commercial_use_yes", "cb_loss_of_use_fee", "cb_emergency_repair_limit", "cb_fine_admin_fee", "cb_special_terms",
   "contractReadyTitle", "contractLinkNotice", "contractLinkNoticeNoEmail", "contractPitchTitle", "contractPitchBody",
   "contractPitch1", "contractPitch2", "contractPitch3", "contractPitch4", "contractPitchCta"
 ];

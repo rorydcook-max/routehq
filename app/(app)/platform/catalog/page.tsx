@@ -142,7 +142,7 @@ export default async function AdminCatalogPage({ searchParams }: { searchParams:
     <AppShell userEmail={userEmail}>
       <AdminHeader
         active="/platform/catalog"
-        subtitle={waiting > 0 ? `${waiting} suggestion${waiting === 1 ? "" : "s"} from operators waiting for review. The makes, models and trims every business picks from.` : "The makes, models and trims every business picks from, and operators' suggestions."}
+        subtitle={waiting > 0 ? `${waiting} suggestion${waiting === 1 ? "" : "s"} waiting for review` : undefined}
         title="Vehicle catalog"
       />
       <div className="card p-4">

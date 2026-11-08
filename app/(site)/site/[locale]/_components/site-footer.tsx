@@ -1,14 +1,14 @@
-import { getTranslations } from "next-intl/server";
-import { AuthLanguage } from "@/components/auth-language";
+import { getLocale, getTranslations } from "next-intl/server";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { CookieChoicesLink } from "@/components/cookie-choices-link";
+import { FooterLanguage } from "./site-language";
 import { Container, SITE_LINKS, SiteLink } from "./site-ui";
 import s from "../site.module.css";
 import l from "../legal/legal.module.css";
 
 /** The website's footer: where to go next, the language (the same choice the sign-in pages keep), and the name. */
 export async function SiteFooter() {
-  const m = await getTranslations("marketing");
+  const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
   const columns = [
     {
       title: m("footerProduct"),
@@ -87,7 +87,7 @@ export async function SiteFooter() {
           <p>{m("footerCopyright", { year: String(new Date().getFullYear()) })}</p>
           <div className="[&_label]:min-h-11">
             <span className="sr-only">{m("footerLanguage")}</span>
-            <AuthLanguage />
+            <FooterLanguage locale={locale} />
           </div>
         </div>
       </Container>

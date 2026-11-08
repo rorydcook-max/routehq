@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AlertTriangle, CheckCircle2, FileText, Fuel, Gauge } from "lucide-react";
+import { AlertTriangle, CheckCircle2, FileText, Fuel, Gauge, Video } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { BrandStyle } from "@/components/brand-style";
 import { PublicBrand, PublicShell } from "@/components/public-shell";
@@ -129,6 +129,11 @@ export default async function ReportSignPage({ params }: { params: Promise<{ tok
               <p className="font-mono-data font-semibold">{inspection.fuel_level_label || `${Number(inspection.fuel_level || 0)}%`}</p>
             </div>
           </div>
+          {inspection.video_url ? (
+            <a className="pressable mt-3 inline-flex items-center gap-2 text-sm font-semibold text-[var(--primary)] underline" href={`/book/${token}/report/${inspection.id}/video`} rel="noreferrer" target="_blank">
+              <Video aria-hidden="true" size={16} /> {t("reportVideo")}
+            </a>
+          ) : null}
         </header>
 
         {photos.length ? (

@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "보고서를 서명용으로 보낼 수 있도록 먼저 고객을 예약에 추가하세요.",
   "Enter the amount received.": "받은 금액을 입력하세요.",
   "Check the phone number.": "전화번호를 확인하세요.",
-  "This report has already been signed.": "이 보고서는 이미 서명되었습니다."
+  "This report has already been signed.": "이 보고서는 이미 서명되었습니다.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "먼저 차량 번호판을 추가하세요. 번호판이 없으면 계약서에 서명할 수 없습니다.",
+  "This booking is already underway. Contact {} if anything needs changing.": "이 예약은 이미 진행 중입니다. 변경할 사항이 있으면 {}에 연락하세요.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "이 예약은 아직 온라인으로 완료할 수 없습니다. 완료하려면 {}에 연락하세요.",
+  "The agreement was updated. Please review it again before signing.": "계약서가 업데이트되었습니다. 서명하기 전에 다시 확인해 주세요."
 }

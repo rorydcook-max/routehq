@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useEffect, useRef, useState, useTransition, type ReactNode, type RefObject } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -150,8 +151,10 @@ export function BookingPageTool({
           {/* Online bookings stop at "the agreement isn't ready to sign" until the owner's signature is saved. */}
           {booking.enabled && !signingReady ? (
             <div className="rounded-[var(--radius)] bg-[var(--warning-light)] p-4" role="alert">
-              <p className="text-[17px] font-bold text-[var(--foreground)]">{signSay("signTitle")}</p>
-              <p className="mt-1 font-medium text-[var(--foreground)]">{signSay("signBody")}</p>
+              <p className="flex items-center gap-1.5 text-[17px] font-bold text-[var(--foreground)]">
+                {signSay("signTitle")}
+                <InfoTip label={signSay("signTitle")} text={signSay("signBody")} />
+              </p>
               <a className="primary-action pressable mt-3 w-full sm:w-auto" href="/settings/signature?back=/booking-page">
                 {signSay("goSettings")}
               </a>

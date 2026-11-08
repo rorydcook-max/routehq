@@ -148,7 +148,6 @@ export function ContractImportCard({
             {say("panelTitle")}
             <InfoTip label={say("panelTitle")} text={say("hint", { count: IMPORT_MAX_PAGES })} />
           </h2>
-          <p className={`mt-1 ${soft}`}>{say("panelBody")}</p>
         </>
       )}
 

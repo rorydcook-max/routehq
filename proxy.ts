@@ -11,7 +11,7 @@ import { SITE_INTERNAL_PREFIX, siteInternalPath } from "@/lib/site/internal-path
 import { LEGAL_SLUGS } from "@/lib/site/legal-slugs";
 import { CUSTOMER_LOCALE_COOKIE, pickLocale } from "@/lib/i18n/customer-locale";
 import { COUNTRY_SLUGS } from "@/lib/rove/guide-slugs";
-import { parseRovePath, ROVE_DEFAULT_LOCALE, ROVE_INTERNAL_PREFIX, roveHasLocale, roveHref, roveInternalPath } from "@/lib/rove/paths";
+import { parseRovePath, ROVE_DEFAULT_LOCALE, ROVE_INTERNAL_PREFIX, ROVE_LOCALES, roveHasLocale, roveHref, roveInternalPath } from "@/lib/rove/paths";
 
 // custom_limits: an admin-set custom plan (returned by resolve_booking_host_v2, migration 0108).
 type BookingSite = { slug: string; tier: string | null; status: string | null; has_domain: boolean; custom_limits: unknown };
@@ -168,7 +168,10 @@ export async function proxy(request: NextRequest) {
     // Under one of Rove's sections but not a page (an unknown guide, vehicle or place): Rove's "not found".
     if (ROVE_SECTION_MISS.test(pathname)) {
       const url = request.nextUrl.clone();
-      url.pathname = `${ROVE_INTERNAL_PREFIX}/${ROVE_DEFAULT_LOCALE}/guides/not-a-page`;
+      // Through the vehicle page, which is drawn per visit and so reaches Rove's own not-found.tsx, in the address's
+      // language (final-web test, 8 Nov 2026: guides/not-a-page isn't a listed guide, so it showed the app's page).
+      const missLocale = pathname.match(/^\/([a-z]{2,3}(?:-[A-Z]{2})?)\//)?.[1];
+      url.pathname = `${ROVE_INTERNAL_PREFIX}/${missLocale && ROVE_LOCALES.includes(missLocale) ? missLocale : ROVE_DEFAULT_LOCALE}/vehicles/not-a-page`;
       return NextResponse.rewrite(url, { status: 404 });
     }
     // The old search address (rove.rent/rent?place=…): the new search page, same question.
@@ -599,6 +602,9 @@ async function readGate(value: string | undefined, userId: string, organizationC
   return role;
 }
 
+// _vercel/: Vercel's own endpoints (Speed Insights' script and reports, task perf2), never a page to send elsewhere.
+// avif: rove.rent's destination photos have AVIF copies (public/rove/destinations, task perf2), served as files like the WebP ones.
+// css: the booking-page font stylesheets (public/fonts/sites/<pairing>.css, task perf2), which signed-out renters load too.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw\\.js|embed\\.js|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?|ttf|otf)$).*)"]
+  matcher: ["/((?!_next/static|_next/image|_vercel/|favicon.ico|sw\\.js|embed\\.js|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|css|ico|woff2?|ttf|otf)$).*)"]
 };

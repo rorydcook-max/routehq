@@ -41,7 +41,6 @@ export function ContactChannels({ values, inputClass, form }: { values: Record<s
   return (
     <div className="sm:col-span-2">
       <p className="font-semibold text-[var(--foreground-secondary)]">{say("cc_title")}</p>
-      <p className="text-sm text-[var(--muted)]">{say("cc_hint")}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         {CHANNELS.map((channel) => (
           <button

@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "報告書を署名用に送れるよう、先にお客様を予約に追加してください。",
   "Enter the amount received.": "受け取った金額を入力してください。",
   "Check the phone number.": "電話番号を確認してください。",
-  "This report has already been signed.": "この報告書はすでに署名されています。"
+  "This report has already been signed.": "この報告書はすでに署名されています。",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "先に車両のナンバープレートを追加してください。ナンバーがないと契約書に署名できません。",
+  "This booking is already underway. Contact {} if anything needs changing.": "この予約はすでに始まっています。変更が必要な場合は{}にご連絡ください。",
+  "This booking can't be completed online yet. Contact {} to finish it.": "この予約はまだオンラインで完了できません。手続きを終えるには{}にご連絡ください。",
+  "The agreement was updated. Please review it again before signing.": "契約書が更新されました。署名する前にもう一度ご確認ください。"
 }

@@ -93,11 +93,11 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
       <input name="promptpay_qr_remove" type="hidden" value={removePromptPayQr ? "true" : "false"} />
 
       <div className="grid gap-2.5 md:grid-cols-2">
-        <MethodCard checked description={say("pm_cashBody")} disabled label={say("pay_cash")} name="cash" />
+        <MethodCard checked disabled label={say("pay_cash")} name="cash" />
         {/* PromptPay only for businesses in Thailand (lib/payment-methods.ts). Elsewhere its saved number is sent back unchanged. */}
         {promptPay ? null : <input name="promptpay_id" type="hidden" value={settings.promptpay_id || ""} />}
         {promptPay ? (
-        <MethodCard checked={enabledMethods.includes("promptpay")} description={say("pm_promptpayBody")} label={say("pm_promptpayName")} name="promptpay" onToggle={toggleMethod}>
+        <MethodCard checked={enabledMethods.includes("promptpay")} label={say("pm_promptpayName")} name="promptpay" onToggle={toggleMethod}>
           <div className="mt-3 grid gap-3">
             <label className="block">
               <span className={labelClass}>
@@ -106,8 +106,9 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
               <input className="mt-1 w-full" defaultValue={settings.promptpay_id || ""} inputMode="numeric" name="promptpay_id" placeholder={say("pm_ppIdPh")} />
             </label>
             <div>
-              <p className={labelClass}>{say("pm_qr")}</p>
-              <p className={helpClass}>{say("pm_qrHelp")}</p>
+              <p className={labelClass}>
+                {say("pm_qr")} <InfoTip label={say("pm_qr")} text={say("pm_qrHelp")} />
+              </p>
               {promptPayQrUrl && !removePromptPayQr ? (
                 <div className="mt-3 flex flex-wrap items-center gap-3">
                   <img alt={say("pm_qrAlt")} className="h-28 w-28 rounded-xl bg-white object-contain p-1" src={promptPayQrUrl} />
@@ -140,7 +141,7 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
           </div>
         </MethodCard>
         ) : null}
-        <MethodCard checked={enabledMethods.includes("bank_transfer")} description={say("pm_bankBody")} label={say("pm_bankName")} name="bank_transfer" onToggle={toggleMethod}>
+        <MethodCard checked={enabledMethods.includes("bank_transfer")} label={say("pm_bankName")} name="bank_transfer" onToggle={toggleMethod}>
           <div className="mt-3 grid gap-3">
             <label className="block">
               <span className={labelClass}>{say("pm_bank")}</span>
@@ -156,13 +157,13 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
             </label>
           </div>
         </MethodCard>
-        <MethodCard checked={enabledMethods.includes("wise")} description={say("pm_wiseBody")} label={say("pay_wise")} name="wise" onToggle={toggleMethod}>
+        <MethodCard checked={enabledMethods.includes("wise")} label={say("pay_wise")} name="wise" onToggle={toggleMethod}>
           <label className="mt-3 block">
             <span className={labelClass}>{say("pm_wiseLink")}</span>
             <input className="mt-1 w-full" defaultValue={settings.wise_link || ""} name="wise_link" placeholder="wise.com/pay/me/yourname" />
           </label>
         </MethodCard>
-        <MethodCard checked={enabledMethods.includes("revolut")} description={say("pm_revolutBody")} label={say("pay_revolut")} name="revolut" onToggle={toggleMethod}>
+        <MethodCard checked={enabledMethods.includes("revolut")} label={say("pay_revolut")} name="revolut" onToggle={toggleMethod}>
           <label className="mt-3 block">
             <span className={labelClass}>{say("pm_revolutLink")}</span>
             <input className="mt-1 w-full" defaultValue={settings.revolut_link || ""} name="revolut_link" placeholder="revolut.me/yourname" />
@@ -221,7 +222,7 @@ function MethodCard({
 }: {
   checked: boolean;
   children?: ReactNode;
-  description: string;
+  description?: string;
   disabled?: boolean;
   label: string;
   name: string;

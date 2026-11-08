@@ -27,7 +27,6 @@ export default async function HelpConversationPage({ params }: { params: Promise
         </div>
         <section className="card p-4 sm:p-5">
           <HelpThread businessName={organization.name} locale={locale} messages={loaded.messages} side="business" />
-          {loaded.thread.status === "open" ? <p className="mt-4 font-medium text-[var(--muted)]">{t("waitingNote")}</p> : null}
         </section>
         <section className="card p-5">
           <h2 className="card-title">{closed ? t("writeAgain") : t("replyTitle")}</h2>

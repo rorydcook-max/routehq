@@ -229,7 +229,7 @@ export function InboxView({
       {/* Thread */}
       <section className={`min-h-0 flex-col lg:flex ${selected && !autoSelected ? "flex h-[calc(100vh-230px)] min-h-[420px] lg:h-auto" : "hidden"}`}>
         {!selected ? (
-          <p className="m-auto p-8 text-center text-sm text-[var(--muted)]">{say("chooseChat")}</p>
+          <div aria-hidden="true" className="m-auto" />
         ) : (
           <>
             <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--border)] px-3 py-2.5">

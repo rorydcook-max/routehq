@@ -28,7 +28,7 @@ export default async function SupportInboxPage({ searchParams }: { searchParams:
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform/support" subtitle="Chats handed over by the assistant and messages from the Help page. Replies reach the customer in RoveHQ." title="Support" />
+      <AdminHeader active="/platform/support" title="Support" />
       {/* What the assistant couldn't answer and the guides people asked for: still its own page, linked from here. */}
       <Link className="card pressable mb-4 flex items-center gap-3 px-4 py-3" href={"/help/team/content" as Route}>
         <span className="min-w-0 flex-1">

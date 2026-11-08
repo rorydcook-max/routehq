@@ -77,7 +77,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform/businesses" subtitle={`${all.filter((b) => !b.deletedAt).length} businesses. Open one to change its plan, extend its trial or help its team, or tick several to act on them together.`} title="Businesses" />
+      <AdminHeader active="/platform/businesses" subtitle={`${all.filter((b) => !b.deletedAt).length} businesses`} title="Businesses" />
 
       <form className="card mb-3 grid gap-2 p-3 md:grid-cols-[minmax(0,1fr)_170px_170px_auto] md:items-center" method="get">
         <input aria-label="Search" className="w-full" defaultValue={query.q || ""} name="q" placeholder="Business name, owner email or tag" type="search" />

@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Idagdag muna ang customer sa booking para maipadala sa kanila ang report na pipirmahan.",
   "Enter the amount received.": "Ilagay ang halagang natanggap.",
   "Check the phone number.": "Tingnan ang phone number.",
-  "This report has already been signed.": "Napirmahan na ang report na ito."
+  "This report has already been signed.": "Napirmahan na ang report na ito.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Ilagay muna ang plaka ng sasakyan. Hindi mapipirmahan ang kasunduan kung wala ito.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Nagsimula na ang booking na ito. Kontakin ang {} kung may kailangang baguhin.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Hindi pa matatapos online ang booking na ito. Kontakin ang {} para tapusin ito.",
+  "The agreement was updated. Please review it again before signing.": "Na-update ang kasunduan. Pakisuring muli bago pumirma."
 }

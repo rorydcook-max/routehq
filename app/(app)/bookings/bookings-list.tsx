@@ -89,7 +89,8 @@ function linkLabel(status: string | null | undefined, tx: Tx) {
 }
 
 function isDueSoon(booking: any) {
-  if (!booking.end_date || !["active", "booked", "extended", "due_soon"].includes(booking.status)) return false;
+  // Only a vehicle that is out can be due back: a booking not yet handed over isn't (final pre-release test, 8 Nov 2026).
+  if (!booking.end_date || !["active", "extended", "due_soon"].includes(booking.status)) return false;
   const days = businessDaysFromToday(booking.end_date);
   return days !== null && days >= 0 && days <= 3;
 }
@@ -348,7 +349,6 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
       ) : filtered.length === 0 ? (
         <EmptyState
           title={tx.say("emptyTitle")}
-          description={filter !== "all" ? tx.say("emptyBody") : undefined}
         />
       ) : (
         <div className="space-y-6">

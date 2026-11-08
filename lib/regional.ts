@@ -258,11 +258,12 @@ export function moneyLocale(language: string | null | undefined, country?: unkno
   }
 }
 
-/** 1234.5 -> "£1,234.50" / "1234,50 €" / "฿1,235": whole amounts without decimals, others with two. */
+/** 1234.5 -> "£1,234.50" / "1234,50 €" / "฿1,234.50"; 1200 -> "฿1,200": whole amounts without decimals, others with two. */
 export function formatMoney(amount: unknown, currency: string | null | undefined, locale = "en-GB"): string {
   const value = Number(amount) || 0;
   const code = String(currency || "THB").toUpperCase();
-  const whole = Math.abs(value - Math.round(value)) < 0.005 || code === "THB" || code === "IDR" || code === "VND" || code === "LAK";
+  // Whole amounts show no decimals; an amount with satang, cents or pence keeps them, so money is never rounded away.
+  const whole = Math.abs(value - Math.round(value)) < 0.005;
   try {
     return new Intl.NumberFormat(locale, { style: "currency", currency: code, currencyDisplay: "narrowSymbol", minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(whole ? Math.round(value) : value);
   } catch {

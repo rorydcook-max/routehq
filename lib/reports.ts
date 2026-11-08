@@ -3,6 +3,7 @@ import { isRawDepositTransaction, isRefundTransaction, isRevenueTransaction } fr
 import { businessToday, businessNow } from "@/lib/business-time";
 import { isHandedOver } from "@/lib/rental-balances";
 import { inRangeWithShares } from "@/lib/cost-spread";
+import { isLateReturnIncome } from "@/lib/transactions";
 
 export type DatePreset = "this_month" | "last_month" | "last_3_months" | "last_6_months" | "this_year" | "last_year" | "custom";
 
@@ -199,6 +200,7 @@ export interface ReportsData {
 
 const typeLabels: Record<string, string> = {
   rental_income: "Rental Income",
+  late_return: "Late return",
   deposit: "Deposit",
   deposit_received: "Deposit received",
   deposit_refunded: "Deposit refunded",
@@ -583,7 +585,9 @@ export async function getReportsData(
 
     if (isIncomeTx(tx)) {
       totalRevenue += amount;
-      revenueByTypeMap.set(type, (revenueByTypeMap.get(type) || 0) + amount);
+      // Money for a late return is counted on its own line, not as rent (final pre-release test, 8 Nov 2026).
+      const revenueKey = isLateReturnIncome(tx) ? "late_return" : type;
+      revenueByTypeMap.set(revenueKey, (revenueByTypeMap.get(revenueKey) || 0) + amount);
     } else if (isRefundTx(tx)) {
       totalRevenue -= amount;
       refunds += amount;

@@ -13,7 +13,10 @@
   --panel-secondary: #1c2d31;
   --panel-tertiary: #24383c;
   --border: #2a3e42;
-  --border-strong: #3c5559;
+  /* Dark mode pass (8 Nov 2026): lines a little stronger, and fields get an outline that meets 3:1 against the page. */
+  --border-strong: #4a6468;
+  --field-border: #627c80;
+  --button-border: #627c80;
   --line: var(--border);
 
   --foreground: #e7f1ef;
@@ -30,14 +33,22 @@
   --sidebar-active: #7fd3c8;
 
   /* Buttons keep white text, so the teal stays deep enough for it; text in teal uses --primary-text-on-dark. */
-  --primary: #238a7f;
-  --primary-hover: #2a9d91;
+  /* #1f8075: white words on it 4.8:1 (AA), and it stands 3.3:1 off the panel. The old #238a7f gave white words 4.2:1. */
+  --primary: #1f8075;
+  --primary-hover: #1b7368;
   --primary-light: #193a3b;
-  --primary-blue: #238a7f;
-  --primary-blue-hover: #2a9d91;
+  --primary-blue: #1f8075;
+  --primary-blue-hover: #1b7368;
   --primary-blue-light: #193a3b;
   --primary-strong: #2a9d91;
   --primary-ink-dark: #72cdc1;
+  /* Words in the brand colour written as inline styles: the lighter teal (6.6:1 on --primary-light, 8.5:1 on the panel). */
+  --primary-ink: var(--primary-ink-dark);
+  /* Solid status fills behind white words (the status colours themselves are light here): each 5:1+ with white, 3:1 off the panel. */
+  --success-solid: #2e7d50;
+  --warning-solid: #94600f;
+  --danger-solid: #b5492e;
+  --purple-solid: #7a5aa0;
 
   --accent: #f2a541;
   --accent-hover: #f5b45c;
@@ -108,7 +119,28 @@
   --band-alert: #f6b7a3;
   --logo-ink: #e7f1ef;
   --field-bg: var(--panel-secondary);
+  /* A vehicle picture without a known paint colour sits on a pale aqua tile, as the coloured ones do: its dark wheels need a light ground. */
+  --vehicle-art-bg: #cfe3df;
+  /* A read-only value box (Settings, time zone) asked for --surface-muted and fell back to a pale grey under light words. */
+  --surface-muted: var(--panel-secondary);
+  /* Reports chart (app/(app)/reports/reports-view.tsx): grid, axis words and bars that read on the dark panel. */
+  --report-grid: #2a3e42;
+  --report-tick: #9aaeab;
+  --report-tip-line: #3c5559;
+  --report-cursor: #3c5559;
+  --report-in: #34b3c4;
+  --report-out: #d98a62;
+  --report-profit: #4fb07a;
 }
+
+/* Pieces in globals.css written in the deep teal or the text colour. */
+:root[data-theme="dark"] .badge-teal { color: var(--primary-ink); }
+:root[data-theme="dark"] .card-gradient-dark { background: #34494d; }
+
+/* The inspection diagram: a mid-tone body, dark glass and light wheels, so the car's outline and wheels show on the dark panel. */
+:root[data-theme="dark"] .dg-body { fill: #24383c; }
+:root[data-theme="dark"] .dg-glass { fill: #0e1a1c; }
+:root[data-theme="dark"] .dg-wheel { fill: #9aaeab; }
 
 /* The overrides sit in the earliest layer: an !important there beats Tailwind's own !important utilities (cascade layers reverse for !important). */
 @layer theme {
@@ -118,7 +150,16 @@
 :root[data-theme="dark"] .plate-chip.bg-white { background-color: #fff !important; color: #1a1d21 !important; border-color: #1a1d21 !important; }
 :root[data-theme="dark"] :is(.bg-white\/95, .bg-white\/90, .bg-white\/85, .bg-white\/80) { background-color: color-mix(in srgb, var(--panel) 90%, transparent) !important; }
 :root[data-theme="dark"] :is(.bg-white\/70, .bg-white\/60, .bg-white\/50) { background-color: color-mix(in srgb, var(--panel) 70%, transparent) !important; }
-:root[data-theme="dark"] :is(.text-black, .text-\[\#13262b\]) { color: var(--foreground) !important; }
+:root[data-theme="dark"] :is(.text-black, .text-\[\#13262b\], .text-\[\#1a1d21\]) { color: var(--foreground) !important; }
+/* Dark words on a fill that stays light (the mango "booked" day, a plate) stay dark. */
+:root[data-theme="dark"] :is(.bg-\[var\(--going-out\)\], .bg-\[var\(--accent\)\]).text-\[\#13262b\] { color: #13262b !important; }
+/* Chip words written as fixed dark-ish colours (calendar icon chip, Messenger and Instagram tags). */
+:root[data-theme="dark"] .text-\[\#8a5a12\] { color: var(--warning) !important; }
+:root[data-theme="dark"] .text-\[\#4252d6\] { color: #a9b3f5 !important; }
+:root[data-theme="dark"] .bg-\[\#fbeaf3\] { background-color: #3a1f2e !important; }
+:root[data-theme="dark"] .text-\[\#b02a73\] { color: #f0a6cc !important; }
+/* A thin white divider between two bar segments: the panel colour instead. */
+:root[data-theme="dark"] .border-l-2.border-white { border-color: var(--panel) !important; }
 :root[data-theme="dark"] :is(.border-white) { border-color: var(--border) !important; }
 
 /* Words in the brand teal (links, "See all", active tabs) use a lighter teal that reads on the dark surface.
@@ -130,9 +171,31 @@
 :root[data-theme="dark"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), select, textarea) {
   background-color: var(--panel-secondary) !important;
   color: var(--foreground) !important;
-  border-color: var(--border-strong) !important;
+  border-color: var(--field-border) !important;
 }
-:root[data-theme="dark"] :is(input, textarea)::placeholder { color: #7d9390 !important; }
+/* A field drawn borderless inside its own box (an amount after a "฿" prefix) stays borderless and see-through:
+   the rule above drew a second box inside the first. */
+:root[data-theme="dark"] input:is(.bg-transparent, .border-0, .border-none):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]) { background-color: transparent !important; border-color: transparent !important; }
+/* The rule above pinned every field's edge, so a focused field no longer changed colour: it lights up in the brand ink. */
+:root[data-theme="dark"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), select, textarea):focus:not(.bg-transparent):not(.border-0):not(.light-island *) { border-color: var(--primary-ink-dark) !important; }
+/* 4.9:1 on the field (the old #7d9390 was 4.4:1). */
+:root[data-theme="dark"] :is(input, textarea)::placeholder { color: #869c99 !important; }
+/* A field that can't be changed reads as such: the page colour behind it, words a step quieter. */
+:root[data-theme="dark"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), select, textarea):disabled:not(.bg-transparent):not(.light-island *) { background-color: var(--background) !important; color: var(--muted) !important; border-color: var(--border-strong) !important; -webkit-text-fill-color: var(--muted); }
+/* Drop-down chevrons drawn in the light grey of secondary words, not the light theme's dark grey (dim on the dark
+   field, final pre-release test, 8 Nov 2026). Phones draw our chevron on every select; computers on .app-select. */
+@media (max-width: 1023px) {
+  :root[data-theme="dark"] select:not([multiple]):not([size]):not(.light-island *) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c4d4d1' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  }
+}
+:root[data-theme="dark"] select.app-select:not([multiple]):not([size]):not(.light-island *) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c4d4d1' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+/* Chevrons set in the muted grey (fold-open rows, the segmented controls' arrows) a step brighter in the dark. */
+:root[data-theme="dark"] :is(.lucide-chevron-down, .lucide-chevron-up, .lucide-chevron-left, .lucide-chevron-right):is(.text-\[var\(--muted\)\], .text-\[var\(--foreground-secondary\)\]) {
+  color: var(--foreground) !important;
+}
 :root[data-theme="dark"] input[type="file"]:not(.hidden):not(.sr-only) { background: color-mix(in srgb, var(--primary-light) 70%, var(--panel)) !important; }
 
 /* Chips and pieces written in white in globals.css. */
@@ -141,7 +204,19 @@
   :root[data-theme="dark"] .band-chip-on:hover { background: var(--panel) !important; color: var(--foreground) !important; }
 }
 :root[data-theme="dark"] .spark-dot { background: var(--panel) !important; }
+/* Outlined buttons ("Add charge", "Done", "Edit"): their thin edge in the line colour all but vanished on the dark
+   card (1.4:1). Buttons and button-like links get the 3:1 button edge; plain dividers and boxes keep theirs. */
+:root[data-theme="dark"] :is(button, a, label, summary):is([class*="border-[var(--border)]"], [class*="border-[var(--border-strong)]"]):not(.light-island *) { border-color: var(--button-border) !important; }
+/* The floating tab bar, Save bars and sheets were edged in white glass: on a dark page that drew a bright ring. */
+:root[data-theme="dark"] :is(.glass-bar, .sticky-actions) { border-color: var(--border-strong) !important; box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.7) !important; }
+@media (max-width: 1023px) {
+  :root[data-theme="dark"] .phone-sheet { box-shadow: 0 -12px 40px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 var(--border-strong) !important; }
+  :root[data-theme="dark"] .phone-sheet .grid > a[class*="bg-[var(--panel-secondary)]"] { box-shadow: 0 0 0 1px var(--border-strong) !important; }
+}
+:root[data-theme="dark"] .phone-bar-plus > span { background: var(--primary) !important; box-shadow: 0 10px 22px -8px rgba(0, 0, 0, 0.7) !important; }
 :root[data-theme="dark"] .app-sidebar nav a[class*="bg-[var(--primary-light)]"] { background: var(--panel-secondary) !important; }
+/* The same for the chosen link at the foot of the side menu (Settings, Help, My account): it was a white pill under light words. */
+:root[data-theme="dark"] .app-sidebar a[class*="bg-[var(--primary-light)]"] { background: var(--panel-secondary) !important; box-shadow: 0 0 0 1px var(--border-strong) !important; }
 :root[data-theme="dark"] .app-sidebar nav a:not([class*="bg-[var(--primary-light)]"]):hover { background: rgba(255, 255, 255, 0.05) !important; }
 @media (min-width: 1024px) {
   :root[data-theme="dark"] .hero-band { --band-soft: var(--panel) !important; }
@@ -152,6 +227,22 @@
 :root[data-theme="dark"] [class*="bg-[var(--foreground)]/"] { background-color: rgba(0, 0, 0, 0.6) !important; }
 /* Solid dark pieces (tooltips, toasts, the dark chip) stay dark with white text. */
 :root[data-theme="dark"] :is(.bg-\[var\(--foreground\)\], .bg-\[var\(--foreground-secondary\)\]) { background-color: #34494d !important; }
+/* Words written in the page colour on such a piece (the chosen "Yes / No" pill) were dark on dark: they go white. */
+:root[data-theme="dark"] :is(.bg-\[var\(--foreground\)\], .bg-\[var\(--foreground-secondary\)\]):is(.text-\[var\(--background\)\], .text-\[var\(--panel\)\]),
+:root[data-theme="dark"] :is(.bg-\[var\(--foreground\)\], .bg-\[var\(--foreground-secondary\)\]) :is(.text-\[var\(--background\)\], .text-\[var\(--panel\)\]) { color: #fff !important; }
+/* ...but an empty dot or bar in that colour (the calendar's "Payment" dot) is a mark, not a surface: it stays light so it shows. */
+:root[data-theme="dark"] :is(.bg-\[var\(--foreground\)\], .bg-\[var\(--foreground-secondary\)\]):empty { background-color: var(--muted) !important; }
+/* ...except a tooltip's little pointer, which is part of the dark bubble (it showed as a pale diamond beside it). */
+:root[data-theme="dark"] [role="tooltip"] > .bg-\[var\(--foreground\)\]:empty { background-color: #34494d !important; }
+/* Solid status fills (a "Paid" button, a red count badge, a green Confirm): the status colours are light pastels here,
+   so white words on them vanished (1.8:1). They take a deeper shade that keeps white words at 5:1. */
+:root[data-theme="dark"] :is(.bg-\[var\(--success\)\], .bg-\[var\(--urgent-green\)\], .bg-\[var\(--kind-money\)\]) { background-color: var(--success-solid) !important; }
+:root[data-theme="dark"] :is(.bg-\[var\(--danger\)\], .bg-\[var\(--urgent-red\)\], .bg-\[var\(--kind-refund\)\]) { background-color: var(--danger-solid) !important; }
+:root[data-theme="dark"] :is(.bg-\[var\(--warning\)\], .bg-\[var\(--urgent-amber\)\], .bg-\[var\(--urgent-orange\)\], .bg-\[var\(--kind-form\)\]) { background-color: var(--warning-solid) !important; }
+:root[data-theme="dark"] :is(.bg-\[var\(--purple\)\], .bg-\[var\(--kind-message\)\], .bg-\[var\(--messages\)\]) { background-color: var(--purple-solid) !important; }
+:root[data-theme="dark"] :is(.bg-\[var\(--info\)\], .bg-\[var\(--kind-move\)\], .bg-\[var\(--on-rent\)\]) { background-color: var(--primary) !important; }
+:root[data-theme="dark"] .hover\:bg-\[var\(--success\)\]:hover { background-color: var(--success-solid) !important; }
+:root[data-theme="dark"] .hover\:bg-\[var\(--danger\)\]:hover { background-color: var(--danger-solid) !important; }
 
 /* Pictures of documents and signatures stay on white paper. */
 :root[data-theme="dark"] :is(canvas, .paper, .stay-light) { background-color: #fff !important; color: #13262b !important; color-scheme: light !important; }

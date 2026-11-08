@@ -167,7 +167,6 @@ export function CustomerList({ customers, months = [], initialFilter = "all" }: 
       {filteredCustomers.length === 0 ? (
         <EmptyState
           title={say("emptyTitle")}
-          description={say("emptyBody")}
           action={
             customers.length === 0 ? (
               <Link className="primary-action pressable" href="/customers/new">

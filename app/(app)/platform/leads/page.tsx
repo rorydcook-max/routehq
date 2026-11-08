@@ -34,7 +34,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: P
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform/leads" subtitle="People who downloaded a free resource from the website. Only email those who ticked “tips”." title="Leads" />
+      <AdminHeader active="/platform/leads" title="Leads" />
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <nav aria-label="Filter by resource" className="flex flex-wrap gap-2">
           {tabs.map((tab) => (

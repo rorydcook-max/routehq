@@ -94,7 +94,8 @@ export function VehicleArt({
   const pale = known ? isPale(known) : false;
   const dark = known ? !pale && parseInt(known.slice(1, 3), 16) < 70 : false;
   // White and black vehicles sit on the neutral aqua; coloured ones on a tint of their own paint.
-  const backdrop = !known ? "var(--primary-light)" : pale || dark || known === "#a7b0b8" || known === "#7d8790" ? "#e3eeec" : mixWithWhite(known, 0.82);
+  // --vehicle-art-bg is the brand tint, kept pale on a dark page too, where the dark wheels would vanish into a dark tint.
+  const backdrop = !known ? "var(--vehicle-art-bg, var(--primary-light))" : pale || dark || known === "#a7b0b8" || known === "#7d8790" ? "#e3eeec" : mixWithWhite(known, 0.82);
   const glass = pale ? "#9fb3bb" : "#e8f1f2";
   const outline = pale ? "#9fb3bb" : "none";
   const shape: Shape = shapeOf(kind, String(model || ""));

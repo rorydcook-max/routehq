@@ -1,6 +1,6 @@
 import { businessNow } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { loadFleetFigures } from "@/lib/fleet-metrics";
+import { fleetAverageUtilization, loadFleetFigures } from "@/lib/fleet-metrics";
 import { getTaskList, type TaskListItem } from "@/lib/tasks";
 import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
 import { withShares } from "@/lib/cost-spread";
@@ -213,9 +213,10 @@ function calculateUtilization(vehicle: any, rentals: any[], transactions: any[],
   );
   const totalRentalDays = rentalWindows.reduce((sum, item) => sum + Math.max(1, daysBetween(item.start, item.end) + 1), 0);
   const maintenanceThisYear = vehicle.status === "maintenance" ? 1 : 0;
+  // The same figure as the fleet page's "How busy" (lib/fleet-metrics.ts): archived vehicles left out.
   const fleetAverage =
     fleetVehicles.length > 0
-      ? fleetVehicles.reduce((sum, item) => sum + toNumber(item.utilization_12_month), 0) / fleetVehicles.length
+      ? fleetAverageUtilization(fleetVehicles.map((item) => ({ utilization: toNumber(item.utilization_12_month), archived: Boolean(item.archived) })))
       : toNumber(vehicle.utilization_12_month);
 
   // The fleet list and this page must agree, so both use the fleet figures:
@@ -417,7 +418,7 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
     // Fleet average utilisation, worked out from rentals (the stored column was never updated).
     loadFleetFigures(supabase, organizationId)
       .then((figures) => ({
-        data: Array.from(figures.entries()).map(([id, item]) => ({ id, utilization_12_month: item.utilization12, utilization_lifecycle: item.utilizationLifetime })),
+        data: Array.from(figures.entries()).map(([id, item]) => ({ id, utilization_12_month: item.utilization12, utilization_lifecycle: item.utilizationLifetime, archived: Boolean(item.archived) })),
         error: null
       }))
       .catch((error: Error) => ({ data: [], error }))

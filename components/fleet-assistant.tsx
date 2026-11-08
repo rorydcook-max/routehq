@@ -353,7 +353,6 @@ export function FleetAssistant({
         </span>
         <div className="min-w-0">
           <p className="font-bold leading-tight text-[var(--foreground)]">{t("title")}</p>
-          <p className="text-[13px] text-[var(--muted)]">{t("subtitle")}</p>
         </div>
       </div>
 

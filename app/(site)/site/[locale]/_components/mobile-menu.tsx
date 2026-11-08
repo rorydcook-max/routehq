@@ -1,15 +1,16 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import { Menu, X } from "lucide-react";
-import { SiteLink } from "./site-ui";
 import s from "../site.module.css";
 
-type Item = { href: string; label: string };
-
-/** The website menu on phones: a button that opens a full-screen ink panel, closed again on every page change. */
-export function MobileMenu({ items, signIn, start, logo, language, openLabel, closeLabel }: { items: Item[]; signIn: Item; start: Item; logo: ReactNode; language: ReactNode; openLabel: string; closeLabel: string }) {
+/**
+ * The website menu on phones: a button that opens a full-screen ink panel, closed again on every page change.
+ * Its links arrive drawn by the server (site-header.tsx; task perf2, 8 Nov 2026), so the website's link code and
+ * next-intl stay out of the browser bundle; a tap on any of them closes the panel.
+ */
+export function MobileMenu({ links, actions, logo, openLabel, closeLabel }: { links: ReactNode; actions: ReactNode; logo: ReactNode; openLabel: string; closeLabel: string }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -26,6 +27,10 @@ export function MobileMenu({ items, signIn, start, logo, language, openLabel, cl
     };
   }, [open]);
 
+  const closeOnLink = (event: MouseEvent<HTMLElement>) => {
+    if ((event.target as Element).closest("a")) setOpen(false);
+  };
+
   const button = (
     <button aria-controls="site-menu" aria-expanded={open} aria-label={open ? closeLabel : openLabel} className={`no-press ${s.menuButton}`} onClick={() => setOpen((value) => !value)} type="button">
       {open ? <X aria-hidden="true" size={22} /> : <Menu aria-hidden="true" size={22} />}
@@ -41,22 +46,8 @@ export function MobileMenu({ items, signIn, start, logo, language, openLabel, cl
             {logo}
             {button}
           </div>
-          <nav>
-            {items.map((item) => (
-              <SiteLink className={s.menuLink} href={item.href} key={item.href} onClick={() => setOpen(false)}>
-                {item.label}
-              </SiteLink>
-            ))}
-          </nav>
-          <div className={s.menuActions}>
-            {language}
-            <SiteLink className={`${s.btn} ${s.btnOutline}`} href={signIn.href}>
-              {signIn.label}
-            </SiteLink>
-            <SiteLink className={`${s.btn} ${s.btnLight}`} href={start.href}>
-              {start.label}
-            </SiteLink>
-          </div>
+          <nav onClick={closeOnLink}>{links}</nav>
+          <div className={s.menuActions}>{actions}</div>
         </div>
       ) : null}
     </>

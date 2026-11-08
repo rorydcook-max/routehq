@@ -1,10 +1,10 @@
 import { getTranslations } from "next-intl/server";
-import { RouteHqLogo } from "@/components/brand-logo";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { roveHasLocale, roveHref } from "@/lib/rove/paths";
 import { roveHqSite } from "@/lib/rove/seo";
 import { Icon, type IconName } from "./icon";
 import { LanguagePicker } from "./language-picker";
+import { RoveLogo } from "./rove-logo";
 import s from "../rove.module.css";
 
 /** Where "List your fleet" goes: RoveHQ's website, tagged so RoveHQ knows the visit came from rove.rent. */
@@ -25,7 +25,7 @@ export async function RoveHeader({ locale }: { locale: string }) {
     <header className={s.header}>
       <div className={`${s.wrap} ${s.headerRow}`}>
         <a aria-label={t("rv.homeLabel")} className={s.brand} href={roveHref("/", locale)}>
-          <RouteHqLogo product="keys" showDescriptor={false} />
+          <RoveLogo tone="dark" />
         </a>
         <nav aria-label={t("rv.navLabel")} className={s.nav}>
           {links.map((link) => (
@@ -49,7 +49,7 @@ export async function RoveHeader({ locale }: { locale: string }) {
             <div className={s.menuPanel}>
               {links.map((link) => (
                 <a href={link.href} key={link.href}>
-                  <Icon name={link.icon} style={{ fontSize: 20, color: "var(--jade)" }} />
+                  <Icon name={link.icon} style={{ fontSize: 20, color: "var(--cobalt)" }} />
                   {link.label}
                 </a>
               ))}

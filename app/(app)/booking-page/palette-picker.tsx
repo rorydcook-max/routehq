@@ -38,7 +38,9 @@ export function PalettePicker({ site, brandColour }: { site: SiteDraft; brandCol
   return (
     <fieldset>
       <legend className="font-semibold text-[var(--foreground)]">{say("palette")}</legend>
-      <div className="-mx-1.5 mt-1 max-h-[19.5rem] overflow-y-auto overscroll-contain px-1.5 pb-1.5 pt-2.5">
+      {/* Three full rows and half of the next row's swatches: the cut falls across colors, never through the names
+          (19.5rem cut the fourth row's names in half on a phone, which read as broken rather than "scroll for more"). */}
+      <div className="-mx-1.5 mt-1 max-h-[17.25rem] overflow-y-auto overscroll-contain px-1.5 pb-1.5 pt-2.5">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(84px,1fr))] gap-x-2.5 gap-y-3" role="radiogroup" aria-label={say("palette")}>
           {choices.map(({ id, colors }) => (
             <Chip colors={colors} key={id} label={say(`pal_${id}`)} on={draft.palette === id} onPick={() => update({ palette: id })} />

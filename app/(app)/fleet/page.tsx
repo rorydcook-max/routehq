@@ -22,6 +22,7 @@ import { groupVehiclesByKind, kindLabel } from "@/lib/vehicle-groups";
 import { dateFormat } from "@/lib/i18n/dates";
 import { businessDistanceUnit } from "@/lib/business-units";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { fleetAverageUtilization } from "@/lib/fleet-metrics";
 import { directorySettings } from "@/lib/directory";
 import { RoveListingPrompt } from "@/components/rove-listing-prompt";
 
@@ -133,7 +134,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
     }).format(new Date(`${value}T00:00:00Z`));
   const [t, c, locale] = await Promise.all([getTranslations("fleet"), getTranslations("common"), getLocale()]);
   // At a glance (Look G): how busy the fleet is, and the next piece of paperwork or service due.
-  const busy = vehicles.length > 0 ? Math.round(vehicles.reduce((sum, vehicle) => sum + Number(vehicle.utilization || 0), 0) / vehicles.length) : 0;
+  // One calculation with the vehicle page's "Fleet average" (lib/fleet-metrics.ts).
+  const busy = fleetAverageUtilization(vehicles);
   const attention = vehicles.filter((vehicle) => (vehicle.complianceAttentionCount || 0) > 0).length;
   const nextPaper = vehicles
     .filter((vehicle) => vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30)
@@ -376,7 +378,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         <td className="px-3 py-3">
                           {/* No price yet: the cell is the way to set one. */}
                           {priceOf(vehicle) ? (
-                            <Link className="font-mono-data block" href={href}>{priceOf(vehicle)}</Link>
+                            // A long price wraps inside its column instead of running under the "Rented" bar beside it.
+                            <Link className="font-mono-data block [overflow-wrap:anywhere]" href={href}>{priceOf(vehicle)}</Link>
                           ) : (
                             <QuickPrice currency={organization.currency || "THB"} saveAction={setVehicleRate} vehicleId={vehicle.id} />
                           )}
@@ -424,7 +427,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                       <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 font-medium text-[var(--foreground-secondary)]">
                         <PlateChip plate={vehicle.plate} />
                         {vehicle.year ? <span className="whitespace-nowrap text-[var(--muted)]">{vehicle.year}</span> : null}
-                        {priceOf(vehicle) ? <span className="whitespace-nowrap tabular-nums">· {priceOf(vehicle)}</span> : null}
+                        {/* The dot only separates: a vehicle with no plate or year shows the price on its own. */}
+                        {priceOf(vehicle) ? <span className="whitespace-nowrap tabular-nums">{vehicle.plate || vehicle.year ? "· " : ""}{priceOf(vehicle)}</span> : null}
                       </p>
                       {vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30 ? (
                         <div className="mt-1.5 flex flex-wrap gap-1.5">

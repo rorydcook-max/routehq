@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { shownError } from "@/lib/error-text";
 import { useEffect, useMemo, useState, useTransition, useRef } from "react";
@@ -189,7 +190,7 @@ function OptionCard({
 }: {
   selected: boolean;
   title: string;
-  description: string;
+  description?: string;
   icon: string;
   tone: "teal" | "amber";
   onClick: () => void;
@@ -198,7 +199,7 @@ function OptionCard({
 
   return (
     <button
-      className={`pressable flex min-h-12 flex-1 items-center gap-3 rounded-xl border px-3 py-2 text-left transition sm:min-h-24 sm:items-start sm:py-3 ${selected ? activeClass : "border-[var(--border)] bg-white hover:border-[var(--border-strong)]"}`}
+      className={`pressable flex min-h-12 flex-1 items-center gap-3 rounded-xl border px-3 py-2 text-left transition sm:py-3 ${selected ? activeClass : "border-[var(--border)] bg-white hover:border-[var(--border-strong)]"}`}
       onClick={onClick}
       type="button"
     >
@@ -207,7 +208,7 @@ function OptionCard({
       </span>
       <span>
         <span className="block text-[13px] font-bold text-[var(--foreground)]">{title}</span>
-        <span className={`mt-0.5 text-[11px] leading-4 text-[var(--muted)] sm:mt-1 sm:block sm:leading-5 ${selected ? "block" : "hidden"}`}>{description}</span>
+        {description ? <span className={`mt-0.5 text-[11px] leading-4 text-[var(--muted)] sm:mt-1 sm:block sm:leading-5 ${selected ? "block" : "hidden"}`}>{description}</span> : null}
       </span>
     </button>
   );
@@ -465,7 +466,6 @@ export function RentalAdjustmentModal({
         <div className={`mt-4 grid gap-2 sm:gap-3 ${agreementSigned && !openEnded ? "sm:grid-cols-3" : agreementSigned || !openEnded ? "sm:grid-cols-2" : ""}`}>
           {openEnded ? null : (
             <OptionCard
-              description={notStarted ? say("adj_moveDesc") : say("adj_extendDesc")}
               icon="ti-calendar-plus"
               onClick={() => setAdjustmentType("extension")}
               selected={isExtension}
@@ -474,7 +474,6 @@ export function RentalAdjustmentModal({
             />
           )}
           <OptionCard
-            description={openEnded ? say("adj_setDesc") : say("adj_earlyDesc")}
             icon="ti-calendar-minus"
             onClick={() => setAdjustmentType("early_return")}
             selected={adjustmentType === "early_return"}
@@ -483,7 +482,6 @@ export function RentalAdjustmentModal({
           />
           {agreementSigned ? (
             <OptionCard
-              description={say("adj_termsDesc")}
               icon="ti-file-pencil"
               onClick={() => setAdjustmentType("terms")}
               selected={isTerms}
@@ -534,9 +532,6 @@ export function RentalAdjustmentModal({
                 {say("adj_extraTerms")}
                 <textarea className="mt-1 min-h-16 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-[13px]" maxLength={2000} onChange={(event) => setAdditionalTerms(event.target.value)} value={additionalTerms} />
               </label>
-              <p className="rounded-xl border border-[var(--info-line)] bg-[var(--primary-light)] p-3 text-[12px] font-bold text-[var(--primary)]">
-                {say("adj_linkNote")}
-              </p>
             </>
           ) : isExtension ? (
             <>
@@ -581,7 +576,10 @@ export function RentalAdjustmentModal({
               </div>
 
               <label className="block">
-                {notStarted ? say("adj_agreedBooked") : say("adj_agreed")}
+                <span className="inline-flex items-center gap-1.5">
+                  {notStarted ? say("adj_agreedBooked") : say("adj_agreed")}
+                  <InfoTip label={notStarted ? say("adj_agreedBooked") : say("adj_agreed")} text={say("adj_onePrice")} />
+                </span>
                 <CurrencyInput
                   onChange={(value) => {
                     amountTypedByHand.current = true;
@@ -600,22 +598,21 @@ export function RentalAdjustmentModal({
                     </button>
                   </span>
                 ) : null}
-                <span className="mt-1 block text-[11px] text-[var(--muted)]">{say("adj_onePrice")}</span>
               </label>
 
               <label className="block">
                 {say("adj_paymentDue")}
                 <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setExtensionDueDate(event.target.value)} type="date" value={extensionDueDate} />
-                <span className="mt-1 block text-[14px] text-[var(--muted)]">{notStarted ? say("adj_dueBooked") : say("adj_typically")}</span>
+                {notStarted ? <span className="mt-1 block text-[14px] text-[var(--muted)]">{say("adj_dueBooked")}</span> : null}
               </label>
 
               {agreementSigned ? (
                 <label className="flex items-start gap-3 rounded-lg border border-[var(--border)] p-3 text-[13px]">
                   <input checked={needsSignature} className="mt-0.5 h-4 w-4" onChange={(event) => setNeedsSignature(event.target.checked)} type="checkbox" />
                   <span>
-                    <span className="block font-bold">{say("adj_signs")}</span>
-                    <span className="block text-[11px] text-[var(--muted)]">
-                      {say("adj_signsHint")}
+                    <span className="flex items-center gap-1.5 font-bold">
+                      {say("adj_signs")}
+                      <InfoTip label={say("adj_signs")} text={say("adj_signsHint")} />
                     </span>
                   </span>
                 </label>
@@ -629,7 +626,7 @@ export function RentalAdjustmentModal({
               ) : (
                 <label className="block">
                   {say("adj_internalNote")}
-                  <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder={say("adj_optional")} type="text" value={note} />
+                  <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} type="text" value={note} />
                 </label>
               )}
 
@@ -656,14 +653,11 @@ export function RentalAdjustmentModal({
                 {openEnded
                   ? say("adj_endsOn", { date: earlyReturnDate ? niceDate(earlyReturnDate) : say("adj_dateYouChoose") })
                   : say("adj_sooner", { days: earlyReturnDays, from: niceDate(originalEndDate), to: earlyReturnDate ? niceDate(earlyReturnDate) : say("adj_dateYouChoose") })}
-                <span className="mt-1 block text-[12px]">
-                  {say("adj_unused")}
-                </span>
               </div>
 
               <label className="block">
                 {say("adj_internalNote")}
-                <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder={say("adj_optional")} type="text" value={note} />
+                <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} type="text" value={note} />
               </label>
             </>
           )}
@@ -786,7 +780,6 @@ function RescheduleSheet({ rentalId, currentStartDate, currentEndDate, currentRa
       <div className="w-full max-w-md rounded-3xl bg-white p-5 shadow-[0_24px_80px_rgba(15,23,42,0.22)]" onClick={(event) => event.stopPropagation()}>
         <p className="text-[19px] font-bold text-[var(--foreground)]">{say("rs_title")}</p>
         <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{[customerName, vehicleLabel].filter(Boolean).join(" · ")}</p>
-        <p className="mt-3 text-[14px] text-[var(--foreground-secondary)]">{say("rs_desc")}</p>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <label className="block font-semibold text-[var(--foreground-secondary)]">
             {say("rs_start")}

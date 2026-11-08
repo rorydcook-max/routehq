@@ -83,9 +83,7 @@ export function ScreenHelp({ variant = "sidebar" }: { variant?: "sidebar" | "ico
                     {article.description ? <p className="text-[17px] font-medium text-[var(--foreground)]">{article.description}</p> : null}
                     <div className={articleBody} dangerouslySetInnerHTML={{ __html: article.html }} />
                   </>
-                ) : (
-                  <p className="font-medium text-[var(--foreground-secondary)]">{t("helpNoArticleBody")}</p>
-                )}
+                ) : null}
               </div>
               <div className="border-t border-[var(--border)] px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
                 <a className="secondary-action pressable w-full justify-center" href={article && article !== "loading" ? article.href : "/docs"} rel="noreferrer" target="_blank">

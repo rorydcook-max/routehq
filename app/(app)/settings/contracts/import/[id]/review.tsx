@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -157,7 +158,6 @@ export function ImportReview({
       <section className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="font-bold">{isActive ? say("statusActive") : say("statusDraft")}</p>
-          <p className={`text-sm ${soft}`}>{say("signedNeverChange")}</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <button className="secondary-action pressable" disabled={pending || !dirty} onClick={() => run(async () => { if (await save()) setMessage({ tone: "ok", text: say("saved") }); router.refresh(); })} type="button">
@@ -224,7 +224,6 @@ export function ImportReview({
 
         <section className="card p-4">
           <h2 className="card-title">{say("previewTitle")}</h2>
-          <p className={`mt-1 text-sm ${soft}`}>{say("previewBody")}</p>
           <div className="mt-3 h-[684px] overflow-hidden rounded-xl bg-white ring-1 ring-[var(--border)]">
             <iframe className="h-full w-full" sandbox="allow-same-origin" srcDoc={preview} style={{ border: 0 }} title={say("previewTitle")} />
           </div>
@@ -232,8 +231,10 @@ export function ImportReview({
       </div>
 
       <section className="card p-4">
-        <h2 className="card-title">{say("fieldsTitle")}</h2>
-        <p className={`mt-1 ${soft}`}>{say("fieldsBody")}</p>
+        <h2 className="card-title flex items-center gap-1.5">
+          {say("fieldsTitle")}
+          <InfoTip label={say("fieldsTitle")} text={say("fieldsBody")} />
+        </h2>
         {fields.length ? (
           <ul className="mt-3 flex flex-wrap gap-2">
             {fields.map((field) => (
@@ -252,7 +253,10 @@ export function ImportReview({
       {isThai ? (
         <section className="card p-4">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="card-title">{say("thTitle")}</h2>
+            <h2 className="card-title flex items-center gap-1.5">
+              {say("thTitle")}
+              <InfoTip label={say("thTitle")} text={say("thBody")} />
+            </h2>
             <button
               className="pressable flex min-h-11 items-center gap-1 px-2 font-bold text-[var(--primary)]"
               disabled={pending}
@@ -272,7 +276,6 @@ export function ImportReview({
               {say("thRecheck")}
             </button>
           </div>
-          <p className={`mt-1 ${soft}`}>{say("thBody")}</p>
           {check ? (
             <ul className="mt-3 divide-y divide-[var(--border)] border-y border-[var(--border)]">
               {THAI_CHECKS.map((item) => {

@@ -45,6 +45,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
       filter: { kind: parsed.kind || null, size: parsed.size, engine: null, gearbox: parsed.gearbox },
       maxPerDay: parsed.max,
       deliveryOnly: parsed.delivery,
+      commercialOnly: parsed.commercial,
       sort: parsed.sort
     }),
     searchWords(),
@@ -74,7 +75,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
     ...(parsed.size ? { size: parsed.size } : {}),
     ...(parsed.gearbox ? { gearbox: parsed.gearbox } : {}),
     ...(parsed.max ? { max: String(parsed.max) } : {}),
-    ...(parsed.delivery ? { delivery: "1" } : {})
+    ...(parsed.delivery ? { delivery: "1" } : {}),
+    ...(parsed.commercial ? { commercial: "1" } : {})
   };
   const sortHidden: Record<string, string> = parsed.sort !== "price" ? { sort: parsed.sort } : {};
   const action = roveHref("/search", locale);
@@ -165,6 +167,14 @@ export default async function SearchPage({ params, searchParams }: Props) {
               <label className={s.check}>
                 <input defaultChecked={parsed.delivery} name="delivery" type="checkbox" value="1" />
                 {parsed.point ? t("rv.deliveryHereOnly") : t("rv.deliveryOnly")}
+              </label>
+            </fieldset>
+            {/* Ride-hailing and delivery work allowed by the business (lib/rove/market.ts commercialOnly). */}
+            <fieldset className={s.filterGroup}>
+              <legend>{t("rv.commercialTitle")}</legend>
+              <label className={s.check}>
+                <input defaultChecked={parsed.commercial} name="commercial" type="checkbox" value="1" />
+                {t("rv.commercialOnly")}
               </label>
             </fieldset>
             <div className={s.filterGroup} style={{ display: "grid", gap: 10 }}>

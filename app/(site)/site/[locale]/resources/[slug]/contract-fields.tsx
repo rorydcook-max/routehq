@@ -127,6 +127,7 @@ export function ContractFields({ words, country }: { words: Words; country: stri
           {money("smoking_fee")}
           {select("pets", ["no", "fee"])}
           {money("pet_fee")}
+          {select("commercial_use", ["no", "yes"])}
           {money("loss_of_use_fee")}
           {money("emergency_repair_limit")}
           {money("fine_admin_fee")}

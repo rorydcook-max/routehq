@@ -152,6 +152,8 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   // Jobs the app raised are saved as English sentences; the ones it knows are said again in the reader's language.
   // The customer and vehicle in the saved title are already on the context line.
   if (item.action === "settle_deposit") return { title: tx.say("job_settle_deposit"), detail: null };
+  // A vehicle with no number plate (lib/tasks.ts): its agreement can't be signed and it is hidden from online booking.
+  if (item.action === "add_plate") return { title: tx.say("job_add_plate"), detail: tx.say("job_add_plate_detail") };
   // A booking whose day has come and the vehicle hasn't gone out. Nothing is owed yet: what's due is taken at the handover.
   if (item.action === "handover") {
     return { title: tx.say("job_handover"), detail: item.amount ? tx.say("job_handover_collect", { amount: money(item.amount) }) : null };
@@ -638,7 +640,12 @@ function TaskRow({
             {tx.say("openForm")}
           </Link>
         ) : null}
-        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") && !item.id.startsWith("handover-") && !waitsForDecider && !((item.action === "waive_early" || item.action === "owed_early") && canDecide) ? (
+        {item.kind === "task" && !item.completedAt && item.vehicleId && item.action === "add_plate" ? (
+          <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/fleet/${item.vehicleId}/edit` as Route}>
+            {tx.say("addPlate")}
+          </Link>
+        ) : null}
+        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") && !item.id.startsWith("handover-") && !item.id.startsWith("plate-") && !waitsForDecider && !((item.action === "waive_early" || item.action === "owed_early") && canDecide) ? (
           <>
             {/* One main button per row. A job with its own next step keeps "mark done" and notes behind the dots. */}
             {(!item.action && !asksAnswer) || item.action === "refund" || showMore ? (
@@ -723,7 +730,7 @@ export function TasksList({
   );
 
   function openView() {
-    if (open.length === 0) return <EmptyState description={tx.say("emptyBody")} title={tx.say("emptyTitle")} />;
+    if (open.length === 0) return <EmptyState title={tx.say("emptyTitle")} />;
 
     // A pill on the band chosen: just those jobs, as cards side by side on a computer.
     if (show) {

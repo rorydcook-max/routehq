@@ -1,3 +1,4 @@
+import { InfoTip } from "@/components/info-tip";
 import Link from "next/link";
 import { VehicleArt } from "@/components/vehicle-art";
 import { kindFromCategory } from "@/lib/vehicle-groups";
@@ -136,6 +137,8 @@ function preferredContactMethod(customer: any) {
   if (customer.messenger_id) return "messenger";
   if (customer.line_id) return "line";
   if (customer.telegram_username) return "telegram";
+  // An Instagram-only customer showed "They prefer: WhatsApp" (final pre-release test, 8 Nov 2026).
+  if (customer.instagram_handle) return "instagram";
   if (customer.email) return "email";
   if (customer.phone) return "phone";
   return "whatsapp";
@@ -247,7 +250,6 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
       <label className="block">
         <span className={labelClass}>{cx.say("f_phone")}</span>
         <input className={inputClass} defaultValue={customer.phone || ""} inputMode="tel" name="phone" placeholder={phonePlaceholderFor(country)} type="tel" />
-        <span className="mt-1 block font-medium text-[var(--muted)]">{cx.say("f_phoneHint")}</span>
       </label>
       <label className="block">
         <span className={labelClass}>{cx.say("f_email")}</span>
@@ -340,9 +342,11 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
       )}
       {uk ? (
         <label className="block sm:col-span-2">
-          <span className={labelClass}>{cx.say("f_dvlaCode")}</span>
+          <span className={`${labelClass} inline-flex items-center gap-1.5`}>
+            {cx.say("f_dvlaCode")}
+            <InfoTip label={cx.say("f_dvlaCode")} text={cx.say("f_dvlaCodeHint")} />
+          </span>
           <input autoCapitalize="characters" className={inputClass} defaultValue={customer.dvla_check_code || ""} maxLength={12} name="dvlaCheckCode" />
-          <span className="mt-1 block font-medium text-[var(--muted)]">{cx.say("f_dvlaCodeHint")}</span>
         </label>
       ) : null}
       <label className="block">
@@ -362,7 +366,9 @@ function DetailsForm({ customer, organizationId, country = "" }: { customer: any
 
 function ContactChannelsForm({ customer, organizationId, country }: { customer: any; organizationId: string; country?: string | null }) {
   const cx = useCx();
-  const methods = ["whatsapp", "messenger", "line", "telegram", "sms", "email", "phone"];
+  // Instagram is offered when they have a handle: it is never saved as the preference (the column doesn't take it), so
+  // it stays shown because it is worked out from the handle.
+  const methods = ["whatsapp", "messenger", "line", "telegram", ...(customer.instagram_handle ? ["instagram"] : []), "sms", "email", "phone"];
   return (
     <ActionForm action={updateCustomer} className="grid gap-3 sm:grid-cols-2">
       <input name="customerId" type="hidden" value={customer.id} />
@@ -838,7 +844,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               id: "messages",
               label: cx.say("tab_messages"),
               content: (
-            <Pane summary={cx.say("msg_summary")} title={cx.say("msg_title")}>
+            <Pane title={cx.say("msg_title")}>
               <CommunicationPanel
                 booking={{
                   vehicle_id: activeRental?.vehicle_id || activeRental?.vehicles?.id || null,
@@ -879,7 +885,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               <DetailsForm customer={customer} organizationId={organization.id} country={orgCountry(organization)} />
             </Pane>
                   <div className="grid gap-3">
-            <Pane summary={cx.say("ch_summary")} title={cx.say("ch_title")}>
+            <Pane title={cx.say("ch_title")}>
               <ContactChannelsForm country={(organization as any).country_code} customer={customer} organizationId={organization.id} />
             </Pane>
             <Pane id="notes" open={Boolean(customer.notes)} summary={customer.notes ? undefined : cx.say("n_none")} title={cx.say("n_title")}>

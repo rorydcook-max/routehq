@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "@/components/toast";
@@ -43,8 +44,8 @@ type TransactionKind = "income" | "refund" | "expense" | "deposit_received" | "d
 // Totals are not told a currency: they are in the business's own (a UK business saw "฿0").
 function money(value: number, currency: string | null | undefined = businessCurrency()) {
   currency = currency || businessCurrency();
-  if (String(currency).toUpperCase() !== "THB") return formatRegionalMoney(Math.abs(value), currency, "en-GB");
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Math.abs(value));
+  // Every currency, baht included, keeps its decimals when there are any: a ฿3,601.50 payment was listed as ฿3,602.
+  return formatRegionalMoney(Math.abs(value), currency, "en-GB");
 }
 
 function inputDate(value: string) {
@@ -177,14 +178,16 @@ function TransactionEditForm({
         {coverShown ? (
           <>
             <label>
-              {tx.say("coverFrom")}
+              <span className="inline-flex items-center gap-1.5">
+                {tx.say("coverFrom")}
+                <InfoTip label={tx.say("coverFrom")} text={tx.say("coverHint")} />
+              </span>
               <input className="mt-1 w-full" onChange={(event) => setCoverFrom(event.target.value)} type="date" value={coverFrom} />
             </label>
             <label>
               {tx.say("coverTo")}
               <input className="mt-1 w-full" onChange={(event) => setCoverTo(event.target.value)} type="date" value={coverTo} />
             </label>
-            <p className="self-end pb-2 text-[13px] font-medium text-[var(--muted)]">{tx.say("coverHint")}</p>
           </>
         ) : null}
       </div>
@@ -501,7 +504,7 @@ export function TransactionsList({
             }}
           >
             <p className="truncate text-[16px] font-bold text-[var(--foreground)]">
-              {tx.typeName(transaction.type, transaction.typeLabel)}
+              {transaction.lateReturn ? tx.say("lateReturn") : tx.typeName(transaction.type, transaction.typeLabel)}
               {kind.startsWith("deposit") ? <span className="ml-2 font-medium text-[var(--muted)]">{kind === "deposit_refunded" ? tx.say("returned") : tx.say("held")}</span> : null}
               {transaction.extrasRefund ? <span className="ml-2 font-medium text-[var(--muted)]">{tx.say("extrasTag")}</span> : null}
               {!transaction.extrasRefund && transaction.extrasAmount > 0 ? (
@@ -682,7 +685,8 @@ export function TransactionsList({
 
       {/* Totals for the period */}
       <section className="card p-4">
-        <div className={`grid gap-3 ${showProfit ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"}`}>
+        {/* Money in takes the room it needs and money out sits beside it: two equal halves ran "฿12,350,680.80฿0" together on a phone. */}
+        <div className={`grid gap-3 ${showProfit ? "grid-cols-[minmax(0,1fr)_auto] sm:grid-cols-3" : "grid-cols-[minmax(0,1fr)_auto]"}`}>
           <div>
             <p className="flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]"><Dot color="var(--chart-in)" />{tx.say("moneyIn")}</p>
             {/* One headline figure per card in the display face (profit, when shown); the others in tabular semibold. */}
@@ -777,8 +781,10 @@ export function TransactionsList({
           {/* On a phone the two amounts sit under the words (beside them they broke into four short lines). */}
           <summary className="flex cursor-pointer list-none flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 [&::-webkit-details-marker]:hidden">
             <div className="min-w-0">
-              <h2 className="card-title">{tx.say("deposits", { count: deposits.length })}</h2>
-              <p className="text-[13px] text-[var(--muted)]">{tx.say("depositsHint")}</p>
+              <h2 className="card-title flex items-center gap-1.5">
+                {tx.say("deposits", { count: deposits.length })}
+                <InfoTip label={tx.say("deposits", { count: deposits.length })} text={tx.say("depositsHint")} />
+              </h2>
             </div>
             <p className="flex gap-3 text-[13px] font-semibold text-[var(--foreground-secondary)] sm:ms-auto sm:flex-col sm:gap-0 sm:text-right">
               <span className="whitespace-nowrap tabular-nums">{tx.say("taken", { amount: money(depositsIn) })}</span>

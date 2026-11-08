@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { CheckCircle2, FileText, Loader2, Paperclip, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -61,8 +62,10 @@ export function SetupRequestPanel() {
   const uploading = items.some((item) => item.state === "uploading");
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-4">
-      <p className="font-bold text-[var(--foreground)]">{t("title")}</p>
-      <p className="mt-0.5 text-[14px] font-medium text-[var(--foreground-secondary)]">{t("body")}</p>
+      <p className="flex items-center gap-1.5 font-bold text-[var(--foreground)]">
+        {t("title")}
+        <InfoTip label={t("title")} text={t("body")} />
+      </p>
       <input
         accept="image/*,application/pdf,.xlsx,.xls,.csv,.txt,.ics,.numbers"
         className="hidden"

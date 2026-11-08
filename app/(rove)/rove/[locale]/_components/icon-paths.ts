@@ -24,6 +24,14 @@ export const tiShieldCheck = "M11.46 20.846a12 12 0 0 1 -7.96 -14.846a12 12 0 0 
 export const tiTruckDelivery = "M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5 M3 9l4 0";
 export const tiUsers = "M5 7a4 4 0 1 0 8 0a4 4 0 1 0 -8 0 M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2 M16 3.13a4 4 0 0 1 0 7.75 M21 21v-2a4 4 0 0 0 -3 -3.85";
 export const tiWorld = "M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0 M3.6 9h16.8 M3.6 15h16.8 M11.5 3a17 17 0 0 0 0 18 M12.5 3a17 17 0 0 1 0 18";
+export const tiArrowRight = "M5 12l14 0 M13 18l6 -6 M13 6l6 6";
+export const tiDiscount = "M9 15l6 -6 M9 9.5a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0 M14 14.5a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0 M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0";
+export const tiFileText = "M14 3v4a1 1 0 0 0 1 1h4 M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2 M9 9l1 0 M9 13l6 0 M9 17l6 0";
+export const tiKey = "M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0 M15 9h.01";
+export const tiLock = "M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6 M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M8 11v-4a4 4 0 1 1 8 0v4";
+export const tiPhoto = "M15 8h.01 M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12 M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5 M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3";
+export const tiSignature = "M3 17c3.333 -3.333 5 -6 5 -8c0 -3 -1 -3 -2 -3s-2.032 1.085 -2 3c.034 2.048 1.658 4.877 2.5 6c1.5 2 2.5 2.5 3.5 1l2 -3c.333 2.667 1.333 4 3 4c.53 0 2.639 -2 3 -2c.517 0 1.517 .667 3 2";
+export const tiStar = "M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873l-6.158 -3.245";
 
 export const ICON_PATHS = {
   "adjustments-horizontal": tiAdjustmentsHorizontal,
@@ -49,7 +57,15 @@ export const ICON_PATHS = {
   "shield-check": tiShieldCheck,
   "truck-delivery": tiTruckDelivery,
   "users": tiUsers,
-  "world": tiWorld
+  "world": tiWorld,
+  "arrow-right": tiArrowRight,
+  "discount": tiDiscount,
+  "file-text": tiFileText,
+  "key": tiKey,
+  "lock": tiLock,
+  "photo": tiPhoto,
+  "signature": tiSignature,
+  "star": tiStar
 } as const;
 
 export type IconName = keyof typeof ICON_PATHS;

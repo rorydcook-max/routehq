@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { countUnreadForTeam } from "@/lib/helpdesk";
+import { InfoTip } from "@/components/info-tip";
 
 /** Tabs across the top of the RoveHQ admin console. */
 const TABS = [
@@ -27,11 +28,14 @@ async function SupportUnread({ active }: { active: boolean }) {
   );
 }
 
-export function AdminHeader({ active, title, subtitle }: { active: string; title: string; subtitle?: string }) {
+export function AdminHeader({ active, title, subtitle, tip }: { active: string; title: string; subtitle?: string; /** A short how-to shown in an (i) beside the title. */ tip?: string }) {
   return (
     <header className="mb-6">
       <p className="text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--primary)]">RoveHQ admin</p>
-      <h1 className="page-title mt-1">{title}</h1>
+      <h1 className="page-title mt-1 flex items-center gap-2">
+        {title}
+        {tip ? <InfoTip label={`About ${title}`} text={tip} /> : null}
+      </h1>
       {subtitle ? <p className="measure mt-1.5 font-medium text-[var(--foreground-secondary)]">{subtitle}</p> : null}
       <nav aria-label="Admin sections" className="chip-row mt-5 flex flex-wrap gap-2">
         {TABS.map((tab) => (

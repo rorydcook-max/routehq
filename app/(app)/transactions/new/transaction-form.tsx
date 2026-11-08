@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import Link from "next/link";
 import { ArrowDownLeft, ArrowUpRight, Camera, Loader2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useTransition, type InputHTMLAttributes } from "react";
@@ -371,7 +372,6 @@ export function TransactionForm({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="card-title">{matches.length === 1 ? say("matchOne") : say("matchMany")}</p>
-              <p className="mt-0.5 text-[14px] text-[var(--foreground-secondary)]">{say("matchHint")}</p>
             </div>
             {isMatching ? <span className="text-xs font-semibold text-[var(--muted)]">{say("checking")}</span> : null}
           </div>
@@ -444,9 +444,6 @@ export function TransactionForm({
             )}
             <div className="min-w-[11rem] flex-1">
               <p className="text-[15px] font-bold text-[var(--foreground)]">{reading ? say("receiptReading") : read ? say("receiptFilled") : say("receiptSnapTitle")}</p>
-              <p className="mt-0.5 text-[13px] font-medium text-[var(--muted)]">
-                {reading ? say("receiptReadingHint") : read ? say("receiptFilledHint") : say("receiptSnapHint")}
-              </p>
             </div>
             <button className="secondary-action pressable w-full justify-center sm:w-auto" disabled={reading} onClick={() => snapInput.current?.click()} type="button">
               {reading ? <Loader2 aria-hidden="true" className="animate-spin" size={17} /> : <Camera aria-hidden="true" size={17} />}
@@ -479,7 +476,10 @@ export function TransactionForm({
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("vehicle")}</span>
+            <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--foreground-secondary)]">
+              {say("vehicle")}
+              {noVehicle && canSkipVehicle ? <InfoTip label={say("noVehicle")} text={say("noVehicleHint")} /> : null}
+            </span>
             <select
               className={inputClass}
               name="vehicleId"
@@ -498,7 +498,6 @@ export function TransactionForm({
                 </option>
               ))}
             </select>
-            {noVehicle && canSkipVehicle ? <span className="mt-1 block text-[14px] text-[var(--muted)]">{say("noVehicleHint")}</span> : null}
           </label>
 
           {/* A repair or a tank of fuel belongs to the vehicle, not to a booking or a customer: those two are only asked for money in and refunds. */}
@@ -543,7 +542,7 @@ export function TransactionForm({
 
           {isMoneyIn ? null : (
             <details className="sm:col-span-2" onToggle={(event) => setMoreOpen((event.currentTarget as HTMLDetailsElement).open)} open={moreOpen}>
-              <summary className="cursor-pointer py-1 text-[14px] font-semibold text-[var(--primary)]">{t.has("moreDetails") ? say("moreDetails") : "Who you paid and the mileage (optional)"}</summary>
+              <summary className="cursor-pointer py-1 text-[14px] font-semibold text-[var(--primary)]">{t.has("moreDetails") ? say("moreDetails") : "Who you paid and the mileage"}</summary>
               <div className="mt-2 grid gap-3 sm:grid-cols-2">
               <label className="block">
                 <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("paidTo")}</span>
@@ -576,7 +575,6 @@ export function TransactionForm({
                 <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say(distanceKey("sv_nextKm"))}</span>
                 <input className={inputClass} inputMode="numeric" min="0" name="serviceNextKm" type="number" />
               </label>
-              <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{say(distanceKey("sv_hint"))}</p>
             </div>
           ) : null}
 
@@ -607,7 +605,10 @@ export function TransactionForm({
                 ) : null}
                 <input name="paperKind" type="hidden" value={onCar && kind ? kind.key : ""} />
                 <label className="block">
-                  <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("coverFrom")}</span>
+                  <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--foreground-secondary)]">
+                    {say("coverFrom")}
+                    <InfoTip label={say("coverFrom")} text={say("coverHint")} />
+                  </span>
                   <input className={inputClass} name="coverFrom" onChange={(event) => setCoverFrom(event.target.value)} type="date" value={coverFrom} />
                 </label>
                 <label className="block">
@@ -616,9 +617,7 @@ export function TransactionForm({
                 </label>
                 {months >= 2 && total > 0 ? (
                   <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{paperWords("f_spreadHint", { amount: moneyText(total / months), months })}</p>
-                ) : (
-                  <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{say("coverHint")}</p>
-                )}
+                ) : null}
                 {onCar && kind && coverTo ? (
                   <label className="flex items-start gap-3 text-[14px] font-semibold text-[var(--foreground)] sm:col-span-2">
                     <input checked={updatePaperwork} className="mt-0.5 h-5 w-5 shrink-0" name="updatePaperwork" onChange={(event) => setUpdatePaperwork(event.target.checked)} type="checkbox" value="true" />
@@ -647,7 +646,6 @@ export function TransactionForm({
                 />
                 <span>
                   {say("billTitle")}
-                  <span className="mt-0.5 block text-[13px] font-medium text-[var(--muted)]">{say("billHint")}</span>
                 </span>
               </label>
               {billCustomer ? (
@@ -689,15 +687,13 @@ export function TransactionForm({
                           <label className="flex items-start gap-3 text-[14px] font-semibold text-[var(--foreground)]">
                             <input checked={billRemainder} className="mt-0.5 h-5 w-5 flex-shrink-0" onChange={(event) => setBillRemainder(event.target.checked)} type="checkbox" />
                             <span>
-                              {say(fromDeposit > 0 ? "billRest" : "billAll", { amount: baht(rest) })}
-                              <span className="mt-0.5 block text-[13px] font-medium text-[var(--muted)]">{say("billRestHint")}</span>
+                              {say(fromDeposit > 0 ? "billRest" : "billAll", { amount: baht(rest) })}{" "}
+                              <InfoTip label={say(fromDeposit > 0 ? "billRest" : "billAll", { amount: baht(rest) })} text={say("billWhatHappens")} />
                             </span>
                           </label>
                         ) : null}
                         <input name="billRemainder" type="hidden" value={billRemainder ? "true" : ""} />
-                        {rest > 0 && billRemainder ? (
-                          <p className="text-[13px] text-[var(--muted)]">{say("billWhatHappens")}</p>
-                        ) : fromDeposit > 0 && held > fromDeposit ? (
+                        {rest > 0 && billRemainder ? null : fromDeposit > 0 && held > fromDeposit ? (
                           <p className="text-[13px] text-[var(--muted)]">{say("depositLeftAfter", { amount: baht(held - fromDeposit) })}</p>
                         ) : null}
                       </div>

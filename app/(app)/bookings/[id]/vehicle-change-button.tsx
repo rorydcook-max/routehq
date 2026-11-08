@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -193,7 +194,6 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                           <li key={booking.rentalId}>{say("vc_moveLine", { name: booking.customerName || say("vc_noCustomerYet"), dates: range(booking.startDate, booking.endDate) })}</li>
                         ))}
                       </ul>
-                      <p className="mt-1 text-[var(--foreground-secondary)]">{say("vc_moveNote")}</p>
                       {disposition === "repair" ? <p className="mt-1 font-semibold text-[var(--danger)]">{say("vc_moveRepair", { vehicle: options.currentVehicleLabel })}</p> : null}
                     </div>
                   ) : null}
@@ -248,23 +248,18 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                       {options.handedOver && !swap ? (
                         <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
                           <input checked={signLater} className="mt-1 accent-[var(--primary)]" onChange={(event) => setSignLater(event.target.checked)} type="checkbox" />
-                          <span className="text-sm text-[var(--foreground-secondary)]">
-                            <span className="block font-semibold text-[var(--foreground)]">{say("vc_cantSign")}</span>
-                            {say("vc_cantSignBody")}
+                          <span className="text-sm font-semibold text-[var(--foreground)]">
+                            {say("vc_cantSign")} <InfoTip label={say("vc_cantSign")} text={say("vc_cantSignBody")} />
                           </span>
                         </label>
                       ) : null}
-                      <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
-                        {signLater && !swap
-                          ? say("vc_noteLater")
-                          : options.handedOver
-                          ? say("vc_noteHanded")
-                          : say("vc_noteBooked")}
-                      </p>
+                      {signLater && !swap ? null : (
+                        <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
+                          {options.handedOver ? say("vc_noteHanded") : say("vc_noteBooked")}
+                        </p>
+                      )}
                     </>
-                  ) : (
-                    <p className="mt-3 text-xs leading-5 text-[var(--muted)]">{say("vc_noteUnsigned")}</p>
-                  )}
+                  ) : null}
 
                   <button className="primary-action pressable mt-4 w-full justify-center px-3 py-2 disabled:opacity-60" disabled={pending || (!swap && !free)} onClick={submit} type="button">
                     {pending ? say("vc_working") : options.needsSignature ? (swap ? say("vc_prepareTwo") : signLater ? say("vc_changeNow") : say("vc_prepare")) : say("vc_move")}

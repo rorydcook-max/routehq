@@ -43,7 +43,7 @@ export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, of
 
   return (
     <div>
-      <SwitchField checked={on} description={<span className="measure block">{say("cm_body")}</span>} disabled={isPending} label={<>{say("cm_title")} <InfoTip label={say("cm_title")} text={say("cm_bodyTip")} /></>} onChange={(event) => change(event.target.checked)} />
+      <SwitchField checked={on} disabled={isPending} label={<>{say("cm_title")} <InfoTip label={say("cm_title")} text={say("cm_bodyTip")} /></>} onChange={(event) => change(event.target.checked)} />
       {/* Lined up with the switch's label and description, with the way to fix it right there. */}
       {on && !hasChannel ? (
         <div className="mt-3 rounded-2xl bg-[var(--warning-light)] px-4 py-3 sm:ms-[54px]">
@@ -53,11 +53,12 @@ export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, of
           </a>
         </div>
       ) : null}
-      {on && hasChannel ? <p className="measure mt-3 font-medium text-[var(--foreground-secondary)] sm:ms-[54px]">{say("cm_firstMessage")}</p> : null}
       {on ? (
         <div className="mt-4 rounded-2xl bg-[var(--panel-secondary)] p-3.5 sm:ms-[54px]">
-          <p className="card-subtitle">{say("rem_title")}</p>
-          <p className="mt-1 text-sm text-[var(--muted)]">{say("rem_body")}</p>
+          <p className="card-subtitle flex items-center gap-1.5">
+            {say("rem_title")}
+            {hasChannel ? <InfoTip label={say("rem_title")} text={say("cm_firstMessage")} /> : null}
+          </p>
           <div className="mt-2 grid gap-x-6 gap-y-1 lg:grid-cols-2">
             {KINDS.map((kind) => (
               <label className="flex min-h-10 cursor-pointer items-center gap-3 text-[15px] font-medium text-[var(--foreground)]" key={kind}>

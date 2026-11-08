@@ -32,7 +32,25 @@ export const EXTEND_NOTICE_OPTIONS = [0, 1, 2, 3, 7];
 export const GAP_DAY_OPTIONS = [0, 1, 2, 3];
 export const EXTENSION_HOLD_DAY_OPTIONS = [3, 5, 7, 10, 14];
 
-export const DEFAULT_BOOKING_RULES: BookingRules = { holdHours: 24, leadHours: 0, endNoticeDays: 0, extendNoticeDays: 0, gapDays: 0, extensionHold: false, extensionHoldDays: 7 };
+// The hold is 48 hours unless the owner picks another length (Rory, 8 Nov 2026; it was 24).
+export const DEFAULT_BOOKING_RULES: BookingRules = { holdHours: 48, leadHours: 0, endNoticeDays: 0, extendNoticeDays: 0, gapDays: 0, extensionHold: false, extensionHoldDays: 7 };
+
+/**
+ * The old default hold. Saving any booking rule, the booking page or the usual deposit wrote the hold shown on screen
+ * along with it, so a stored 24 is usually that default and not a choice (every stored value was 24 on 8 Nov 2026).
+ * It counts as chosen only with hold_hours_set, which Settings › Booking rules writes once the owner picks a hold.
+ */
+const OLD_DEFAULT_HOLD_HOURS = 24;
+
+function holdHoursFrom(all: Record<string, any>, raw: Record<string, any>) {
+  const valid = (value: unknown) => (HOLD_HOUR_OPTIONS.includes(Number(value)) ? Number(value) : null);
+  const rules = valid(raw.hold_hours);
+  if (rules !== null && (raw.hold_hours_set === true || rules !== OLD_DEFAULT_HOLD_HOURS)) return rules;
+  // The hold length used to live with the public booking page settings.
+  const page = valid(all.public_booking?.hold_hours);
+  if (page !== null && page !== OLD_DEFAULT_HOLD_HOURS) return page;
+  return DEFAULT_BOOKING_RULES.holdHours;
+}
 
 /** The renter is asked "Are you extending?" this many days before a held rental ends; no answer lifts the hold this many days before. */
 export const EXTENSION_ASK_DAYS = 7;
@@ -47,8 +65,7 @@ export function bookingRules(settings: unknown): BookingRules {
   const all = settings && typeof settings === "object" ? (settings as Record<string, any>) : {};
   const raw = all.booking_rules && typeof all.booking_rules === "object" ? all.booking_rules : {};
   return {
-    // The hold length used to live with the public booking page settings.
-    holdHours: pick(raw.hold_hours ?? all.public_booking?.hold_hours, HOLD_HOUR_OPTIONS, DEFAULT_BOOKING_RULES.holdHours),
+    holdHours: holdHoursFrom(all, raw),
     leadHours: pick(raw.lead_hours, LEAD_HOUR_OPTIONS, DEFAULT_BOOKING_RULES.leadHours),
     endNoticeDays: pick(raw.end_notice_days, END_NOTICE_OPTIONS, DEFAULT_BOOKING_RULES.endNoticeDays),
     extendNoticeDays: pick(raw.extend_notice_days, EXTEND_NOTICE_OPTIONS, DEFAULT_BOOKING_RULES.extendNoticeDays),

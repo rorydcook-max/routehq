@@ -9,29 +9,48 @@
  * The one loud thing on each page is the photograph (a real listed vehicle wherever there is one); everything around
  * it stays quiet and exact.
  */
+/*
+ * rove-design-2 (8 Nov 2026): "sea and sunset". The palette is taken from the places people rent in: a deep night-sea
+ * navy for ink, the header, footer and dark bands; cobalt for every action (5.6:1 with white); coral, the sunset, as the
+ * one warm accent (the logo's wedge, monthly value, the hero's chips), always with ink type on it. The older token
+ * names (--jade, --amber, --petrol) are kept as aliases so every page moves to the new palette together.
+ */
 .rove {
-  --ink: #0f2e33;
-  --ink-soft: #46616a;
-  --ink-faint: #6f878e;
-  --petrol: #0c3a3f;
-  --petrol-2: #124a50;
-  --jade: #0a7d5f;
-  --jade-deep: #07634b;
-  --jade-tint: #e2f2ec;
-  --amber: #f7b32b;
-  --amber-tint: #fff3d6;
-  --amber-ink: #6a4700;
-  --paper: #f4f7f6;
+  --ink: #0b1733;
+  --ink-soft: #4a5672;
+  --ink-faint: #626d87;
+  --night: #0a1a33;
+  --night-2: #13284d;
+  --night-3: #1d3766;
+  --cobalt: #2d55f5;
+  --cobalt-deep: #1d3fd4;
+  --cobalt-tint: #e9eeff;
+  --coral: #ff7452;
+  --coral-soft: #ff9a80;
+  --coral-tint: #ffebe5;
+  --coral-ink: #a8361a;
+  --star: #f5a524;
+  --paper: #f4f6fb;
   --card: #ffffff;
-  --line: #dfe6e4;
-  --line-strong: #c6d2cf;
+  --line: #e1e6f0;
+  --line-strong: #c8d0df;
+  --focus: var(--cobalt);
+  /* Aliases (build-rove names). */
+  --petrol: var(--night);
+  --petrol-2: var(--night-2);
+  --jade: var(--cobalt);
+  --jade-deep: var(--cobalt-deep);
+  --jade-tint: var(--cobalt-tint);
+  --amber: var(--coral);
+  --amber-tint: var(--coral-tint);
+  --amber-ink: var(--coral-ink);
   --r-xl: 28px;
-  --r-lg: 18px;
+  --r-lg: 20px;
   --r-md: 12px;
   --r-sm: 8px;
-  --shadow-card: 0 1px 2px rgba(15, 46, 51, 0.05), 0 4px 14px -6px rgba(15, 46, 51, 0.1);
-  --shadow-lift: 0 2px 4px rgba(15, 46, 51, 0.06), 0 18px 40px -18px rgba(15, 46, 51, 0.28);
-  --shadow-float: 0 30px 70px -28px rgba(6, 28, 32, 0.55), 0 10px 24px -10px rgba(6, 28, 32, 0.25);
+  --shadow-card: 0 1px 2px rgba(11, 23, 51, 0.05), 0 6px 18px -8px rgba(11, 23, 51, 0.12);
+  --shadow-lift: 0 2px 6px rgba(11, 23, 51, 0.06), 0 24px 48px -20px rgba(11, 23, 51, 0.3);
+  --shadow-float: 0 40px 80px -30px rgba(5, 12, 30, 0.6), 0 12px 28px -12px rgba(5, 12, 30, 0.3);
   min-height: 100vh;
   background: var(--paper);
   color: var(--ink);
@@ -45,16 +64,53 @@
   color: inherit;
 }
 /* Links drawn as panels set their own colour (the rule above would otherwise win). */
-.rove a.heroCaption {
+.rove a.heroListing {
   color: var(--ink);
 }
-.rove a.rateCard {
-  color: #fff;
-}
 .rove :focus-visible {
-  outline: 3px solid var(--amber);
+  outline: 3px solid var(--focus);
   outline-offset: 2px;
   border-radius: 6px;
+}
+/* On the night surfaces (header, dark bands, footer) the focus ring is coral, which reads there. */
+.header,
+.sectionNight,
+.footer,
+.operators,
+.heroFull {
+  --focus: var(--coral);
+}
+
+/* ── Logo (_components/rove-logo.tsx) ── */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--ink);
+  --logo-r: var(--ink);
+}
+.logoOnDark {
+  color: #fff;
+  --logo-r: #fff;
+}
+.logoMark {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+.logoR {
+  fill: var(--logo-r);
+}
+.logoWedge {
+  fill: var(--coral);
+}
+.logoWord {
+  font-family: var(--rv-display), system-ui, sans-serif;
+  font-variation-settings: "wdth" 88;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.035em;
 }
 .rove img {
   max-width: 100%;
@@ -142,10 +198,14 @@
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset, 0 6px 16px -8px rgba(45, 85, 245, 0.7);
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 .btn:hover {
   background: var(--jade-deep);
+}
+.btn:active {
+  transform: translateY(1px);
 }
 .btnLarge {
   composes: btn;
@@ -170,15 +230,26 @@
   color: var(--ink) !important;
 }
 .btnAmber:hover {
-  background: #ffc54d;
+  background: var(--coral-soft);
+}
+/* The warm call to action: coral with ink type (6.6:1), for monthly rentals and "List your fleet". */
+.btnCoral {
+  composes: btn btnLarge;
+  background: var(--coral);
+  color: var(--ink) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 8px 20px -10px rgba(255, 116, 82, 0.9);
+}
+.btnCoral:hover {
+  background: var(--coral-soft);
 }
 .btnOnDark {
   composes: btn btnLarge;
   background: transparent;
-  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.4);
 }
 .btnOnDark:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1.5px #fff;
 }
 /* Kept for the guide pages: the older names. */
 .button {
@@ -201,14 +272,28 @@
 }
 
 /* ── Header ── */
+/* Night glass on every page (rove-design-2): the white logo always has contrast, and on the home page the bar runs
+   straight into the full-bleed hero. */
 .header {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: rgba(244, 247, 246, 0.88);
-  backdrop-filter: saturate(1.4) blur(12px);
-  -webkit-backdrop-filter: saturate(1.4) blur(12px);
-  border-bottom: 1px solid transparent;
+  background: rgba(10, 26, 51, 0.92);
+  backdrop-filter: saturate(1.5) blur(14px);
+  -webkit-backdrop-filter: saturate(1.5) blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.header .navLink {
+  color: rgba(255, 255, 255, 0.88);
+}
+.header .navLink:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.header .menuPanel,
+.header .langMenu {
+  color: var(--ink);
 }
 .headerOnDark {
   composes: header;
@@ -245,7 +330,7 @@
   cursor: pointer;
 }
 .navLink:hover {
-  background: rgba(15, 46, 51, 0.06);
+  background: rgba(11, 23, 51, 0.06);
 }
 .navWide {
   display: none;
@@ -260,10 +345,12 @@
   min-height: 40px;
   padding: 0 16px;
   margin-inline-start: 6px;
-  background: var(--ink);
+  background: #fff;
+  color: var(--ink) !important;
+  box-shadow: none;
 }
 .navCta:hover {
-  background: var(--petrol-2);
+  background: var(--coral);
 }
 @media (max-width: 899px) {
   .navCta {
@@ -323,11 +410,12 @@
 .menuPanel .menuCta {
   margin-top: 6px;
   justify-content: center;
-  background: var(--ink);
-  color: #fff;
+  background: var(--coral);
+  color: var(--ink);
+  font-weight: 650;
 }
 .menuPanel .menuCta:hover {
-  background: var(--petrol-2);
+  background: var(--coral-soft);
 }
 
 /* Language picker */
@@ -369,42 +457,59 @@
   font-weight: 650;
 }
 
-/* ── Home hero ── */
-.hero {
-  padding: 12px 0 0;
-}
-@media (min-width: 640px) {
-  .hero {
-    padding-top: 20px;
-  }
-}
-.heroPanel {
+/* ── Home hero (rove-design-2) ── */
+/* A real destination full-bleed (the busiest place with its own photo), shaded so white type always reads; the
+   promise in one line; the search ready to use. On a phone all of it fits the first screen. */
+.heroFull {
   position: relative;
-  display: grid;
-  gap: 28px;
-  overflow: hidden;
-  border-radius: var(--r-xl);
-  background: var(--petrol);
-  color: #fff;
-  padding: 32px 20px 96px;
   isolation: isolate;
+  overflow: hidden;
+  background: var(--night);
+  color: #fff;
 }
-/* A faint road grid in the panel's corner: the only ornament on the page. */
-.heroPanel::before {
+.heroFull::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(120% 90% at 100% 0%, rgba(10, 125, 95, 0.45), transparent 60%),
-    radial-gradient(80% 70% at 0% 100%, rgba(18, 74, 80, 0.9), transparent 70%);
+    linear-gradient(180deg, rgba(10, 26, 51, 0.9) 0%, rgba(10, 26, 51, 0.5) 30%, rgba(10, 26, 51, 0.2) 50%, rgba(10, 26, 51, 0.5) 72%, rgba(10, 26, 51, 0.95) 100%);
+}
+/* On the home page the night header runs straight into the hero, with no seam. */
+.rove:has(.heroFull) .header {
+  border-bottom-color: transparent;
 }
 @media (min-width: 900px) {
-  .heroPanel {
-    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
-    align-items: center;
-    gap: 48px;
-    padding: 64px 56px 124px;
+  .heroFull::after {
+    background:
+      linear-gradient(90deg, rgba(10, 26, 51, 0.88) 0%, rgba(10, 26, 51, 0.55) 42%, rgba(10, 26, 51, 0.1) 75%),
+      linear-gradient(180deg, rgba(10, 26, 51, 0.35) 0%, transparent 30%, transparent 55%, rgba(10, 26, 51, 0.85) 100%);
+  }
+}
+.heroFull .placeArt img {
+  transition: none;
+}
+.heroFull .placeCredit {
+  top: auto;
+  bottom: 8px;
+  color: rgba(255, 255, 255, 0.6);
+}
+.heroInner {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  padding-top: 28px;
+  padding-bottom: 34px;
+}
+@media (min-width: 900px) {
+  .heroInner {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: end;
+    gap: 40px 56px;
+    min-height: min(760px, calc(100vh - 64px));
+    padding-top: 96px;
+    padding-bottom: 56px;
+    align-content: end;
   }
 }
 .heroCopy {
@@ -413,184 +518,201 @@
 .heroTitle {
   composes: display;
   margin: 0;
-  font-size: clamp(2.55rem, 6.2vw, 5.1rem);
-  line-height: 0.96;
-  font-weight: 700;
-  font-variation-settings: "wdth" 76;
-  letter-spacing: -0.03em;
-  max-width: 13ch;
+  font-size: clamp(2.65rem, 11vw, 5.9rem);
+  line-height: 0.93;
+  font-weight: 750;
+  font-variation-settings: "wdth" 75;
+  letter-spacing: -0.032em;
+  max-width: 12ch;
   text-wrap: balance;
+  text-shadow: 0 2px 24px rgba(5, 12, 30, 0.35);
 }
-.heroLede {
-  margin: 20px 0 0;
-  max-width: 50ch;
-  font-size: 18px;
-  line-height: 1.55;
-  color: rgba(255, 255, 255, 0.82);
+.heroUsp {
+  margin: 14px 0 0;
+  max-width: 44ch;
+  font-size: 17px;
+  line-height: 1.45;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
 }
 @media (min-width: 900px) {
-  .heroLede {
-    font-size: 19px;
+  .heroUsp {
+    margin-top: 22px;
+    font-size: 20px;
   }
 }
-.heroPoints {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
-  margin: 26px 0 0;
-  padding: 0;
-  list-style: none;
-  font-size: 15px;
-  font-weight: 550;
-  color: rgba(255, 255, 255, 0.92);
-}
-.heroPoints li {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.heroPoints i {
-  color: var(--amber);
-  font-size: 18px;
-}
-.heroVisual {
-  position: relative;
-  min-width: 0;
-}
-.heroPhoto {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  border-radius: 20px;
+/* A real listing, live, beside the headline: wide screens only. */
+.heroListing {
+  display: none;
   overflow: hidden;
-  background: var(--petrol-2);
-  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+  border-radius: var(--r-lg);
+  background: #fff;
+  text-decoration: none;
+  box-shadow: var(--shadow-float);
+  transition: transform 0.2s ease;
 }
-@media (min-width: 900px) {
-  .heroPhoto {
-    aspect-ratio: 5 / 4;
+@media (min-width: 1100px) {
+  .heroListing {
+    display: block;
   }
 }
-.heroPhoto img {
+.heroListing:hover {
+  transform: translateY(-3px);
+}
+.heroListingPhoto {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  background: var(--paper);
+}
+.heroListingPhoto img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-/* A real listing, captioned with its owner and price: the proposition in one picture. */
-.heroCaption {
-  position: absolute;
-  inset-inline-start: 14px;
-  bottom: 14px;
+.heroListingBody {
   display: flex;
   align-items: center;
   gap: 12px;
-  max-width: calc(100% - 28px);
-  padding: 10px 14px 10px 10px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.96);
-  color: var(--ink);
-  text-decoration: none;
-  box-shadow: var(--shadow-lift);
+  padding: 14px 16px;
 }
-.heroCaption:hover .heroCaptionName {
-  text-decoration: underline;
-}
-.heroCaptionText {
+.heroListingText {
   display: grid;
   min-width: 0;
   line-height: 1.25;
 }
-.heroCaptionName {
+.heroListingName {
   font-weight: 650;
   font-size: 15px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.heroCaptionMeta {
+.heroListingMeta {
   font-size: 13px;
   color: var(--ink-soft);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.heroCaptionPrice {
+.heroListingPrice {
   margin-inline-start: auto;
-  padding-inline-start: 10px;
   text-align: end;
-  font-weight: 700;
-  font-size: 15px;
+  font-weight: 750;
+  font-size: 16px;
   white-space: nowrap;
-  line-height: 1.2;
+  line-height: 1.15;
 }
-.heroCaptionPrice small {
+.heroListingPrice small {
   display: block;
   font-size: 12px;
   font-weight: 500;
   color: var(--ink-soft);
 }
-.heroThumb {
-  position: absolute;
-  top: -18px;
-  inset-inline-end: -10px;
-  width: 38%;
-  aspect-ratio: 1;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 4px solid var(--petrol);
-  background: var(--petrol-2);
-  display: none;
-}
-@media (min-width: 900px) {
-  .heroThumb {
-    display: block;
-  }
-}
-.heroThumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 .heroSearch {
   position: relative;
   z-index: 2;
-  margin: -68px 8px 0;
+  min-width: 0;
 }
 @media (min-width: 900px) {
+  .heroSearch,
+  .heroChips {
+    grid-column: 1 / -1;
+  }
+}
+.heroChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.heroChips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 13px 0 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+}
+.heroChips li i {
+  font-size: 17px;
+  color: var(--coral);
+}
+@media (min-width: 900px) {
+  .heroChips {
+    gap: 10px;
+  }
+  .heroChips li {
+    min-height: 38px;
+    font-size: 14.5px;
+  }
+}
+/* One entrance, on load only: the search card settles into place. */
+@keyframes roveRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
   .heroSearch {
-    margin: -84px 32px 0;
+    animation: roveRise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.05s both;
   }
 }
 
 /* ── Search (hero panel and the compact bar) ── */
 .searchHero,
 .searchBar {
+  --focus: var(--cobalt);
   position: relative;
   display: grid;
   gap: 12px;
   background: #fff;
   border-radius: 22px;
-  padding: 14px;
+  padding: 12px;
   color: var(--ink);
 }
 .searchHero {
-  box-shadow: var(--shadow-float);
+  box-shadow: var(--shadow-float), 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 .searchBar {
   border: 1px solid var(--line);
   box-shadow: var(--shadow-card);
 }
 @media (min-width: 900px) {
+  .searchHero,
+  .searchBar {
+    padding: 14px;
+  }
   .searchHero {
-    padding: 18px 18px 20px;
+    padding: 16px 16px 16px;
+    border-radius: 24px;
   }
 }
+/* Set dates or Monthly: a segmented control. */
 .modeSwitch {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+}
+.modeSwitch > label:first-child {
+  margin-inline-start: 0;
 }
 .modeOption {
   position: relative;
@@ -610,29 +732,35 @@
   padding: 0 14px;
   border-radius: 999px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 650;
   color: var(--ink-soft);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 .modeOption span i {
   font-size: 17px;
 }
 .modeOption input:checked + span {
-  background: var(--ink);
+  background: var(--night);
+  box-shadow: none;
   color: #fff;
 }
+.modeOption input:checked + span i {
+  color: var(--coral);
+}
 .modeOption input:not(:checked):hover + span {
-  background: var(--paper);
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
   color: var(--ink);
 }
 .modeOption input:focus-visible + span {
-  outline: 3px solid var(--amber);
+  outline: 3px solid var(--cobalt);
   outline-offset: 2px;
 }
 .modeNote {
   font-size: 13px;
-  font-weight: 550;
-  color: var(--amber-ink);
-  background: var(--amber-tint);
+  font-weight: 600;
+  color: var(--coral-ink);
+  background: var(--coral-tint);
   padding: 5px 10px;
   border-radius: 999px;
 }
@@ -647,23 +775,27 @@
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  min-height: 60px;
+  min-height: 58px;
   padding: 8px 14px;
   border: 1.5px solid var(--line);
   border-radius: var(--r-md);
   background: #fff;
   cursor: text;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.cell:hover {
+  border-color: var(--line-strong);
 }
 .cell:focus-within {
-  border-color: var(--jade);
-  box-shadow: 0 0 0 3px var(--jade-tint);
+  border-color: var(--cobalt);
+  box-shadow: 0 0 0 3px var(--cobalt-tint);
 }
 .cellWhere {
   grid-column: 1 / -1;
 }
 .cellLabel {
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 650;
   color: var(--ink-soft);
   line-height: 1.2;
 }
@@ -679,7 +811,7 @@
 }
 .cellIcon {
   font-size: 18px;
-  color: var(--jade);
+  color: var(--cobalt);
 }
 .rove .cellInput,
 .rove .cellInput:focus {
@@ -704,27 +836,37 @@
   font-weight: 450;
 }
 .searchSubmit {
-  grid-column: 1 / -1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 56px;
-  padding: 0 28px;
+  min-height: 58px;
+  padding: 0 24px;
   border: 0;
   border-radius: 14px;
-  background: var(--jade);
+  background: var(--cobalt);
   color: #fff;
   font: inherit;
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 10px 22px -10px rgba(45, 85, 245, 0.85);
+  transition: background-color 0.15s ease, transform 0.15s ease;
 }
 .searchSubmit:hover {
-  background: var(--jade-deep);
+  background: var(--cobalt-deep);
+}
+.searchSubmit:active {
+  transform: translateY(1px);
 }
 .searchSubmit i {
   font-size: 20px;
+}
+/* Phones: the type of vehicle and Search share the last row (with set dates), so the whole form fits the first screen. */
+@media (max-width: 899px) {
+  .searchFieldsMonthly .searchSubmit {
+    grid-column: 1 / -1;
+  }
 }
 @media (min-width: 900px) {
   .searchFields {
@@ -742,37 +884,37 @@
     border-radius: 12px;
     min-height: 62px;
   }
+  .cell:hover {
+    background: var(--paper);
+  }
   .cell + input + .cell,
   .cell + .cell,
   .cell ~ .cell {
     box-shadow: inset 1px 0 0 var(--line);
   }
   .cell:focus-within {
-    box-shadow: inset 0 0 0 2px var(--jade);
+    background: #fff;
+    box-shadow: inset 0 0 0 2px var(--cobalt);
   }
   .searchSubmit {
-    grid-column: auto;
     min-height: 62px;
     border-radius: 12px;
+    padding: 0 28px;
   }
   /* Monthly has no return date: the place takes the room. */
   .searchFieldsMonthly {
     grid-template-columns: minmax(0, 2.6fr) repeat(2, minmax(0, 1fr)) auto;
   }
 }
-@media (max-width: 899px) {
-  .searchFields:not(.searchFieldsMonthly) > label:last-of-type {
-    grid-column: 1 / -1;
-  }
-}
 
 /* ── Sections ── */
+/* Rhythm (rove-design-2): paper, white and one night band alternate; 72 / 112px of air between sections. */
 .section {
   padding: 72px 0;
 }
 @media (min-width: 900px) {
   .section {
-    padding: 104px 0;
+    padding: 112px 0;
   }
 }
 .sectionTight {
@@ -780,6 +922,28 @@
 }
 .sectionWhite {
   background: #fff;
+}
+.sectionNight {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--night);
+  color: #fff;
+}
+.sectionNight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(60% 80% at 100% 0%, rgba(45, 85, 245, 0.35), transparent 65%),
+    radial-gradient(50% 70% at 0% 100%, rgba(255, 116, 82, 0.16), transparent 70%);
+}
+.sectionNight .sectionTitle {
+  color: #fff;
+}
+.sectionNight .sectionLede {
+  color: rgba(255, 255, 255, 0.75);
 }
 .sectionHead {
   display: flex;
@@ -789,18 +953,25 @@
   gap: 16px 32px;
   margin-bottom: 32px;
 }
+@media (min-width: 900px) {
+  .sectionHead {
+    margin-bottom: 44px;
+  }
+}
 .sectionTitle {
   composes: display;
   margin: 0;
-  font-size: clamp(1.9rem, 3.8vw, 3rem);
-  line-height: 1.02;
-  font-weight: 700;
-  max-width: 22ch;
+  font-size: clamp(2rem, 4.4vw, 3.5rem);
+  line-height: 0.98;
+  font-weight: 750;
+  font-variation-settings: "wdth" 78;
+  letter-spacing: -0.028em;
+  max-width: 20ch;
   text-wrap: balance;
 }
 .sectionLede {
-  margin: 12px 0 0;
-  max-width: 60ch;
+  margin: 14px 0 0;
+  max-width: 56ch;
   font-size: 17px;
   color: var(--ink-soft);
 }
@@ -812,29 +983,40 @@
   font-weight: 700;
 }
 
-/* Browse by vehicle type: four photographs, straight into a search. */
+/* Browse by vehicle type: four photographs, straight into a search, right under the hero. */
+.sectionKinds {
+  padding: 20px 0 0;
+}
+@media (min-width: 900px) {
+  .sectionKinds {
+    padding-top: 32px;
+  }
+}
 .kinds {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  margin-top: 40px;
+}
+@media (min-width: 640px) {
+  .kinds {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 @media (min-width: 900px) {
   .kinds {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
-    margin-top: 56px;
   }
 }
 .kind {
   position: relative;
   display: block;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 2;
   border-radius: var(--r-lg);
   overflow: hidden;
   background: var(--line);
   color: #fff !important;
   text-decoration: none;
+  box-shadow: var(--shadow-card);
 }
 .kind img {
   position: absolute;
@@ -842,123 +1024,364 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.5s ease;
 }
 .kind::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 45%, rgba(6, 28, 32, 0.72));
+  background: linear-gradient(180deg, transparent 40%, rgba(10, 26, 51, 0.82));
 }
 .kind:hover img {
-  transform: scale(1.03);
+  transform: scale(1.04);
 }
 .kindLabel {
   position: absolute;
   z-index: 1;
-  inset-inline-start: 14px;
-  bottom: 12px;
+  inset-inline: 14px;
+  bottom: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   font-weight: 650;
-  font-size: 16px;
+  font-size: 15.5px;
+}
+.kindLabel i {
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+.kind:hover .kindLabel i {
+  transform: translateX(3px);
 }
 @media (min-width: 900px) {
   .kindLabel {
-    inset-inline-start: 18px;
-    bottom: 16px;
+    inset-inline: 18px;
+    bottom: 15px;
     font-size: 18px;
   }
 }
 
-/* The proposition: one statement and three plain reasons. */
-.valueGrid {
+/* Why Rove: a bento of promises. Long stays get the big tile, with a real listing's two prices. */
+.bento {
   display: grid;
-  gap: 40px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
-@media (min-width: 960px) {
-  .valueGrid {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
-    gap: 80px;
-    align-items: start;
+@media (min-width: 720px) {
+  .bento {
+    gap: 12px;
   }
 }
-.valueList {
+@media (min-width: 1040px) {
+  .bento {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+.bentoMonthly {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  gap: 24px;
+  padding: 26px 22px 22px;
+  border-radius: var(--r-xl);
+  background: var(--night);
+  color: #fff;
+  --focus: var(--coral);
 }
-.valueItem {
+.bentoMonthly::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(70% 90% at 0% 0%, rgba(255, 116, 82, 0.28), transparent 60%),
+    radial-gradient(60% 80% at 100% 100%, rgba(45, 85, 245, 0.4), transparent 65%);
+}
+.bentoMonthly {
+  grid-column: 1 / -1;
+}
+@media (min-width: 1040px) {
+  .bentoMonthly {
+    grid-column: span 2;
+    grid-row: span 2;
+    padding: 34px 30px 30px;
+  }
+}
+.bentoMonthlyCopy {
   display: grid;
-  grid-template-columns: 48px 1fr;
-  gap: 18px;
-  padding: 26px 0;
-  border-top: 1px solid var(--line);
+  justify-items: start;
+  gap: 12px;
 }
-.valueItem:last-child {
-  border-bottom: 1px solid var(--line);
+.bentoMonthly .featIcon {
+  background: var(--coral);
+  color: var(--ink);
 }
-.valueIcon {
+.bentoTitle {
+  composes: display;
+  margin: 6px 0 0;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  line-height: 1;
+  font-weight: 750;
+  font-variation-settings: "wdth" 80;
+  letter-spacing: -0.025em;
+}
+.bentoBody {
+  margin: 0 0 8px;
+  max-width: 40ch;
+  color: rgba(255, 255, 255, 0.8);
+}
+.feat {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+@media (min-width: 720px) {
+  .feat {
+    gap: 8px;
+    padding: 22px;
+  }
+}
+@media (min-width: 1040px) {
+  .feat {
+    padding: 26px 24px;
+  }
+}
+.featIcon {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 8px;
   border-radius: 14px;
-  background: var(--jade-tint);
-  color: var(--jade);
-  font-size: 24px;
+  background: var(--cobalt);
+  color: #fff;
+  font-size: 23px;
+  box-shadow: 0 8px 18px -10px rgba(45, 85, 245, 0.9);
 }
-.valueTitle {
+.featTitle {
   margin: 0;
-  font-size: 19px;
-  font-weight: 650;
-  line-height: 1.3;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
-.valueBody {
-  margin: 6px 0 0;
+.featBody {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
   color: var(--ink-soft);
-  max-width: 56ch;
+}
+@media (min-width: 720px) {
+  .featTitle {
+    font-size: 18px;
+  }
+  .featBody {
+    font-size: 15px;
+  }
 }
 
-/* How it works: a real sequence, so numbered. */
+/* How it works: a real sequence, so numbered; each step has its own picture, joined by the road between them. */
 .steps {
+  position: relative;
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 12px;
-  counter-reset: step;
+  gap: 28px;
 }
 @media (min-width: 900px) {
   .steps {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    gap: 40px;
+  }
+  .steps::before {
+    content: "";
+    position: absolute;
+    top: 36px;
+    inset-inline: 16.6% 16.6%;
+    border-top: 2px dashed rgba(255, 255, 255, 0.22);
   }
 }
 .step {
   position: relative;
-  padding: 24px;
-  border-radius: var(--r-lg);
-  background: var(--paper);
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  column-gap: 18px;
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .step {
+    grid-template-columns: none;
+    justify-items: center;
+    text-align: center;
+  }
+}
+.stepVisual {
+  position: relative;
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, var(--night-3), var(--night-2));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 30px;
+  box-shadow: 0 18px 36px -18px rgba(0, 0, 0, 0.7);
+}
+@media (min-width: 900px) {
+  .stepVisual {
+    grid-row: auto;
+    margin-bottom: 22px;
+  }
 }
 .stepNum {
-  composes: display;
-  display: block;
-  font-size: 44px;
+  position: absolute;
+  top: -8px;
+  inset-inline-end: -8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--coral);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
   line-height: 1;
-  font-weight: 700;
-  color: var(--jade);
 }
 .stepTitle {
   display: block;
-  margin-top: 18px;
-  font-weight: 650;
-  font-size: 18px;
+  margin-top: 6px;
+  font-weight: 700;
+  font-size: 19px;
 }
 .stepBody {
   display: block;
   margin-top: 6px;
+  max-width: 34ch;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+/* Trust: real renters' reviews (only when published), then what is true of every booking. */
+.reviewsBlock {
+  margin-bottom: 72px;
+}
+.reviewsScore {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 14px 0 0;
+  font-weight: 650;
   color: var(--ink-soft);
+}
+.starRow {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 18px;
+}
+.starOn {
+  color: var(--star);
+}
+.starOn svg {
+  fill: currentColor;
+}
+.starOff {
+  color: var(--line-strong);
+}
+.reviewRail {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reviewCard {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 24px;
+  border-radius: var(--r-lg);
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
+}
+.reviewText {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.55;
+}
+.reviewWho {
+  display: grid;
+  gap: 2px;
+  margin: auto 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.reviewName {
+  font-weight: 650;
+}
+.reviewMeta {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+.trust {
+  display: grid;
+  gap: 28px;
+}
+@media (min-width: 960px) {
+  .trust {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+    gap: 72px;
+    align-items: center;
+  }
+}
+.trustList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 640px) {
+  .trustList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+.trustList li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 60px;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  background: #fff;
+  border: 1px solid var(--line);
+  font-weight: 600;
+  line-height: 1.35;
+}
+.trustIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--cobalt-tint);
+  color: var(--cobalt);
+  font-size: 21px;
 }
 
 /* Featured vehicles */
@@ -988,6 +1411,22 @@
     scroll-snap-align: start;
   }
 }
+/* The home page's row: swipe through eight on a phone; one tidy row of four on wider screens. */
+@media (min-width: 640px) and (max-width: 1039px) {
+  .tilesHome {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1040px) {
+  .tilesHome {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 640px) {
+  .tilesHome > :nth-child(n + 5) {
+    display: none;
+  }
+}
 
 /* ── Vehicle cards: list (results) and tile (home) ── */
 .card,
@@ -999,12 +1438,26 @@
   border-radius: var(--r-lg);
   overflow: hidden;
   box-shadow: var(--shadow-card);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 .card:hover,
 .cardTile:hover {
   border-color: var(--line-strong);
   box-shadow: var(--shadow-lift);
+}
+.cardPhoto::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 26, 51, 0.28), transparent 32%);
+  pointer-events: none;
+}
+.cardPhoto img {
+  transition: transform 0.5s ease;
+}
+.card:hover .cardPhoto img,
+.cardTile:hover .cardPhoto img {
+  transform: scale(1.03);
 }
 @media (min-width: 680px) {
   .card {
@@ -1033,6 +1486,7 @@
 }
 .cardTags {
   position: absolute;
+  z-index: 1;
   top: 10px;
   inset-inline-start: 10px;
   inset-inline-end: 10px;
@@ -1132,8 +1586,8 @@
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   overflow: hidden;
   background: var(--jade-tint);
@@ -1145,7 +1599,14 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+/* A logo sits on its own white tile with a little room around it and a hairline edge, so it reads at 36px in both themes. */
+.opMarkLogo {
+  width: 36px;
+  height: 36px;
+  padding: 4px;
   background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.12);
 }
 .operator > span:last-child {
   display: grid;
@@ -1298,7 +1759,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(180deg, rgba(6, 28, 32, 0) 35%, rgba(6, 28, 32, 0.78));
+  background: linear-gradient(180deg, rgba(10, 26, 51, 0) 35%, rgba(10, 26, 51, 0.78));
 }
 .placeName {
   composes: display;
@@ -1404,20 +1865,28 @@
 .checks i {
   margin-top: 2px;
   font-size: 20px;
-  color: var(--jade);
+  color: var(--cobalt);
 }
-/* A real vehicle's two prices, side by side. */
+/* A real vehicle's two prices, side by side: a white card in the monthly tile. */
 .rateCard {
   position: relative;
-  border-radius: var(--r-xl);
-  background: var(--petrol);
-  color: #fff;
+  display: grid;
+  align-self: end;
+  border-radius: var(--r-lg);
+  background: #fff;
+  color: var(--ink);
   overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+}
+.rove a.rateCard {
+  color: var(--ink);
 }
 .rateCardPhoto {
   position: relative;
+  display: block;
   aspect-ratio: 16 / 9;
-  background: var(--petrol-2);
+  background: var(--paper);
 }
 .rateCardPhoto img {
   position: absolute;
@@ -1427,59 +1896,80 @@
   object-fit: cover;
 }
 .rateCardBody {
-  padding: 22px 24px 26px;
+  display: block;
+  padding: 16px 18px 18px;
 }
 .rateCardName {
+  display: block;
   margin: 0;
-  font-weight: 650;
-  font-size: 17px;
+  font-weight: 700;
+  font-size: 16.5px;
 }
 .rateCardOp {
+  display: block;
   margin: 2px 0 0;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+.rateCard:hover .rateCardName {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .rateRows {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 18px;
+  gap: 8px;
+  margin-top: 14px;
 }
 .rateCell {
-  padding: 14px 16px;
+  display: block;
+  padding: 12px 14px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--paper);
 }
 .rateCellBest {
   composes: rateCell;
-  background: var(--amber);
+  background: var(--coral);
   color: var(--ink);
 }
 .rateCellLabel {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 650;
   opacity: 0.8;
 }
 .rateCellValue {
   composes: display;
   display: block;
   margin-top: 4px;
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 750;
   line-height: 1;
 }
 .rateCellSub {
   display: block;
   margin-top: 6px;
-  font-size: 13px;
-  font-weight: 550;
+  font-size: 12.5px;
+  font-weight: 600;
   opacity: 0.85;
 }
 .rateCardNote {
-  margin: 14px 0 0;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.66);
+  display: block;
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+}
+@media (min-width: 1040px) {
+  .bentoMonthly {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: space-between;
+  }
+}
+@media (min-width: 560px) and (max-width: 1039px) {
+  .bentoMonthly {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+  }
 }
 
 /* ── For fleet owners ── */
@@ -1487,9 +1977,10 @@
   position: relative;
   display: grid;
   gap: 28px;
+  margin-top: 96px;
   padding: 40px 24px;
   border-radius: var(--r-xl);
-  background: var(--ink);
+  background: var(--night);
   color: #fff;
   overflow: hidden;
   isolation: isolate;
@@ -1499,13 +1990,28 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(70% 120% at 100% 100%, rgba(247, 179, 43, 0.22), transparent 60%);
+  background:
+    radial-gradient(70% 120% at 100% 100%, rgba(255, 116, 82, 0.32), transparent 60%),
+    radial-gradient(60% 100% at 0% 0%, rgba(45, 85, 245, 0.35), transparent 65%);
+}
+/* RoveHQ's R, large and faint, as the band's one ornament. */
+.operators::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset-inline-end: -40px;
+  bottom: -60px;
+  width: 300px;
+  height: 300px;
+  opacity: 0.08;
+  background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23fff' d='M8 15.5h35.5c7.8 0 12.8 4.6 12.8 11.3 0 6.1-4 10.4-10.3 11.1L57.5 50H41.6L29.4 36.8h10.9c3.5 0 5.8-1.8 5.8-4.9 0-3-2.3-4.8-5.8-4.8H19.6L8 15.5Z'/%3E%3C/svg%3E");
 }
 @media (min-width: 900px) {
   .operators {
     grid-template-columns: minmax(0, 1.4fr) auto;
     align-items: end;
-    padding: 64px 64px;
+    margin-top: 112px;
+    padding: 64px;
   }
 }
 .operators .sectionTitle {
@@ -1588,18 +2094,34 @@
   box-shadow: var(--shadow-lift);
 }
 
+.guideItemIcon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 14px;
+  border-radius: 11px;
+  background: var(--coral-tint);
+  color: var(--coral-ink);
+  font-size: 20px;
+}
+
 /* ── Footer ── */
+/* Night, like the header: the page closes on the brand (rove-design-2). */
 .footer {
   margin-top: 96px;
-  background: #fff;
-  border-top: 1px solid var(--line);
-  padding: 56px 0 32px;
+  background: var(--night);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 64px 0 32px;
   font-size: 14.5px;
-  color: var(--ink-soft);
+}
+/* The home page ends on a full-width section: the footer follows it directly. */
+.rove main:has(.heroFull) + .footer {
+  margin-top: 0;
 }
 .footerTop {
   display: grid;
-  gap: 36px;
+  gap: 40px;
 }
 @media (min-width: 900px) {
   .footerTop {
@@ -1619,13 +2141,14 @@
 }
 .footerAbout {
   max-width: 38ch;
-  margin: 14px 0 0;
+  margin: 18px 0 0;
+  line-height: 1.6;
 }
 .footerHead {
   margin: 0;
   font-size: 14px;
   font-weight: 650;
-  color: var(--ink);
+  color: #fff;
 }
 .footerList {
   list-style: none;
@@ -1636,11 +2159,12 @@
 }
 .footerList a,
 .footerList button {
+  color: inherit;
   text-decoration: none;
 }
 .footerList a:hover,
 .footerList button:hover {
-  color: var(--ink);
+  color: #fff;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -1650,15 +2174,24 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 48px;
+  margin-top: 56px;
   padding-top: 24px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 13.5px;
 }
 .footerLang {
   composes: navLink;
-  box-shadow: inset 0 0 0 1.5px var(--line);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.22);
   font-size: 14px;
+}
+.footer .footerLang {
+  color: #fff;
+}
+.footer .footerLang:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.footer .langMenu {
+  color: var(--ink);
 }
 
 /* ── Breadcrumbs and page heads ── */
@@ -1732,7 +2265,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(180deg, rgba(6, 28, 32, 0.05) 20%, rgba(6, 28, 32, 0.82));
+  background: linear-gradient(180deg, rgba(10, 26, 51, 0.6) 0%, rgba(10, 26, 51, 0.3) 38%, rgba(10, 26, 51, 0.88) 100%);
 }
 .placeHero .pageTitle {
   color: #fff;
@@ -2316,7 +2849,7 @@
   border-bottom: 1px solid var(--line);
 }
 .stars {
-  color: #b7850f;
+  color: var(--star);
   letter-spacing: 1px;
 }
 .bookBox {
@@ -2410,6 +2943,26 @@
   font-size: 13px;
   color: var(--ink-soft);
 }
+.bookTrust {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 14px 0 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+  font-weight: 550;
+}
+.bookTrust li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bookTrust i {
+  flex-shrink: 0;
+  font-size: 17px;
+  color: var(--cobalt);
+}
 /* Phones: the price and "Book" stay in reach at the bottom of the screen. */
 .mobileBar {
   position: fixed;
@@ -2424,7 +2977,7 @@
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
   background: #fff;
   border-top: 1px solid var(--line);
-  box-shadow: 0 -8px 24px -12px rgba(15, 46, 51, 0.25);
+  box-shadow: 0 -8px 24px -12px rgba(11, 23, 51, 0.25);
 }
 .mobileBar .price {
   font-size: 22px;

@@ -113,6 +113,8 @@ export const CONTRACT_FIELDS: readonly ContractField[] = [
   { key: "smoking_fee", kind: "number", group: "rules" },
   { key: "pets", kind: "select", options: ["no", "fee"], group: "rules" },
   { key: "pet_fee", kind: "number", group: "rules" },
+  // Ride-hailing and delivery work: "no" keeps use.4's ban, "yes" shows use.10 (allowed on conditions).
+  { key: "commercial_use", kind: "select", options: ["no", "yes"], group: "rules" },
   { key: "loss_of_use_fee", kind: "number", group: "rules" },
   { key: "loss_of_use_max_days", kind: "number", group: "rules" },
   { key: "emergency_repair_limit", kind: "number", group: "rules" },
@@ -133,6 +135,7 @@ export const CONTRACT_DEFAULTS: Record<string, string> = {
   notice_days: "30",
   smoking: "no",
   pets: "no",
+  commercial_use: "no",
   loss_of_use_max_days: "14"
 };
 

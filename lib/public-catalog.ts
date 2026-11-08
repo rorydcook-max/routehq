@@ -11,6 +11,7 @@ import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { vatSettings, withVat } from "@/lib/regional";
 import { publicVehiclePhotos, vehiclePhotoUrls } from "@/lib/vehicle-photos";
 import { bookingAddress } from "@/lib/booking-address";
+import { commercialUseAllowed } from "@/lib/travel-policy";
 
 /**
  * The public booking page: anyone with the link sees a business's vehicles,
@@ -41,18 +42,20 @@ export type CatalogVehicle = {
   monthlyRate: number;
   /** The deposit for this vehicle: its own, or the business's usual one. */
   deposit: number;
+  /** The business lets renters use it for ride-hailing or deliveries (Settings › Rentals; the agreement follows). */
+  commercialUse?: boolean;
   /** Dates the vehicle is taken (end is exclusive; null = no end date yet). */
   busy: Array<{ startDate: string; endDate: string | null }>;
 };
 
 export function publicBookingSettings(settings: any): PublicBookingSettings {
   const raw = settings && typeof settings === "object" ? settings.public_booking : null;
-  const hours = Number(raw?.hold_hours);
   const deposit = Number(raw?.deposit);
   return {
     // On by default (26 Oct 2026): the online booking page is how the RoveHQ booking site books a business.
     enabled: raw?.enabled !== false,
-    holdHours: Number.isFinite(hours) && hours > 0 ? Math.min(hours, 168) : 24,
+    // The same hold the rest of the app uses (lib/booking-rules.ts: 48 hours unless the owner chose another).
+    holdHours: bookingRules(settings).holdHours,
     deposit: Number.isFinite(deposit) && deposit > 0 ? deposit : 0,
     offer: BOOKING_OFFERS.includes(raw?.offer) ? raw.offer : "both_monthly"
   };
@@ -84,7 +87,7 @@ export async function getPublicCatalog(slug: string, options: { includeOff?: boo
   const [vehiclesResult, rentalsResult, branding] = await Promise.all([
     admin
       .from("vehicles")
-      .select("id, make, model, trim, year, color, status, daily_rate, weekly_rate, monthly_rate, deposit_amount, specifications, vehicle_categories(code, name)")
+      .select("id, make, model, trim, year, color, status, registration_number, daily_rate, weekly_rate, monthly_rate, deposit_amount, specifications, vehicle_categories(code, name)")
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
       // Parked (over the plan's vehicle limit): not offered on the booking page, rove.rent or the partner network.
@@ -123,8 +126,11 @@ export async function getPublicCatalog(slug: string, options: { includeOff?: boo
     for (const [vehicleId, urls] of await vehiclePhotoUrls(admin, organization.id, 12).catch(() => new Map<string, string[]>())) photosByVehicle.set(vehicleId, urls);
   }
 
+  const commercialUse = commercialUseAllowed(organization.settings);
   const vehicles: CatalogVehicle[] = ((vehiclesResult.data || []) as any[])
     .filter((vehicle) => !HIDDEN_STATUS.test(String(vehicle.status || "")))
+    // No number plate: its agreement couldn't be signed, so it isn't offered online until one is added (To do says so).
+    .filter((vehicle) => Boolean(String(vehicle.registration_number || "").trim()))
     .map((vehicle) => {
       const specs = vehicle.specifications && typeof vehicle.specifications === "object" ? vehicle.specifications : {};
       const seats = Number(specs.seating_capacity || 0);
@@ -142,6 +148,7 @@ export async function getPublicCatalog(slug: string, options: { includeOff?: boo
         weeklyRate: gross(vehicle.weekly_rate),
         monthlyRate: gross(vehicle.monthly_rate),
         deposit: vehicle.deposit_amount === null || vehicle.deposit_amount === undefined ? settings.deposit : Math.max(0, Number(vehicle.deposit_amount) || 0),
+        commercialUse,
         busy: busy.get(vehicle.id) || []
       };
     })

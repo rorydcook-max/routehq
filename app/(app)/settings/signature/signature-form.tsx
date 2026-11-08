@@ -118,7 +118,7 @@ export function SignatureForm({
     <section className="card space-y-4 p-4">
       <label className="block">
         <span className={labelClass}>
-          {say("sig_name")} <InfoTip label={say("sig_name")} text={say("sig_nameHelp")} />
+          {say("sig_name")}
         </span>
         <input autoComplete="name" className="mt-1 w-full" maxLength={160} onChange={(event) => setName(event.target.value)} value={name} />
       </label>

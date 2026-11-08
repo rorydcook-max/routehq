@@ -284,7 +284,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           aside={
             <section className="card p-4">
               <h2 className="card-title">{say("terms_title")}</h2>
-              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("terms_body")}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link className="primary-action pressable" href="/settings/contracts">
                   {say("terms_btn")}
@@ -344,16 +343,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       {tab === "messaging" ? (
         <Card className="scroll-mt-4 p-4">
           <div className="scroll-mt-4" id="chat-accounts" />
-          <h2 className="card-title">{say("msg_title")}</h2>
-          <p className="measure mb-4 mt-1 font-medium text-[var(--foreground-secondary)]">
-            {t.rich("msg_body", {
-              link: (chunks) => (
-                <Link className="font-bold text-[var(--primary)]" href="/inbox">
-                  {chunks}
-                </Link>
-              )
-            })}
-          </p>
+          <h2 className="card-title mb-4">{say("msg_title")}</h2>
           <MessagingPanel
             channels={((messagingChannels || []) as any[]).map((channel: any) => ({
               id: channel.id,
@@ -400,7 +390,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <div className="space-y-3">
               <h2 className={groupHeading}>{say("grp_paid")}</h2>
             <Fold id="payment-methods" summary={paymentSummary} title={say("pay_title")}>
-              <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("pay_body")}</p>
               <PaymentMethodsForm
               businessName={organization.name}
               promptPay={offersPromptPay}
@@ -421,6 +410,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </Fold>
             <Fold
               id="usual-deposit"
+              tip={say("ud_body")}
               summary={publicBookingSettings(organization.settings).deposit > 0 ? say("ud_summary", { amount: `${money}${publicBookingSettings(organization.settings).deposit.toLocaleString("en-US")}` }) : say("ud_none")}
               title={say("ud_title")}
             >
@@ -498,6 +488,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 const names = saved.slice(0, 2).map((extra) => extra.name).join(", ") + (saved.length > 2 ? "…" : "");
                 return say("extra_summary", { count: saved.length, names });
               })()}
+              tip={say("extra_bodyTip")}
               title={say("extra_title")}
             >
               <ExtrasPanel
@@ -507,7 +498,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               />
             </Fold>
             <Fold id="travel" summary={travelSummary} title={say("travel_title")}>
-              <p className="font-medium text-[var(--foreground-secondary)]">{say("travel_body")}</p>
               <TravelPolicyForm
                 country={travelCountry}
                 currency={money}
@@ -572,7 +562,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <h2 className="card-title">{say("nt_lineTitle")}</h2>
-              <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("nt_lineBody")}</p>
             </div>
             <Badge tone={lineUserId ? "green" : "amber"}>{lineUserId ? say("line_connected") : say("line_notConnected")}</Badge>
           </div>
@@ -588,9 +577,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 </PendingButton>
               </form>
             </div>
-          ) : (
-            <p className="mt-3 font-medium text-[var(--foreground-secondary)]">{say("line_follow")}</p>
-          )}
+          ) : null}
 
           {/* Not connected: add the RoveHQ LINE account, then send a one-time code. */}
           {!lineUserId && <LineConnectPanel lineOaId={lineOaId} organizationId={organization.id} />}
@@ -638,7 +625,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           {lineUserId && (
             <div className="mt-4 rounded-2xl bg-[var(--panel-secondary)] p-3.5">
               <p className="card-subtitle">{say("line_test")}</p>
-              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("line_testBody")}</p>
               <div className="mt-3">
                 <LineTestButton />
               </div>
@@ -780,7 +766,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
                   <h2 className="card-title">{say("export_title")}</h2>
-                  <p className="mt-1 text-[15px] text-[var(--muted)]">{say("export_body")}</p>
                 </div>
                 <a className="secondary-action pressable" download href="/api/export/account">
                   {say("export_btn")}
@@ -842,7 +827,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
         <Card className="p-5">
           <h2 className="card-title">{say("inv_title")}</h2>
-          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("inv_body")}</p>
           <div className="mt-3">
             <InviteForm />
           </div>

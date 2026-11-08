@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { PublicSpeedInsights } from "@/components/public-speed-insights";
 import { PlatformRoot } from "../platform-root";
 import { rootMetadata, rootViewport } from "../root-metadata";
 
@@ -13,5 +14,12 @@ export const metadata: Metadata = rootMetadata;
 export const viewport: Viewport = rootViewport;
 
 export default function RentLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <PlatformRoot>{children}</PlatformRoot>;
+  return (
+    // fixedLight: the booking site keeps the business's own palette whatever the visitor's light/dark setting.
+    <PlatformRoot fixedLight>
+      {children}
+      {/* Real visitors' loading speed (Vercel Speed Insights; task perf2): no cookies, nothing stored, no query strings. */}
+      <PublicSpeedInsights />
+    </PlatformRoot>
+  );
 }

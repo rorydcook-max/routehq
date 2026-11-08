@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "पहले ग्राहक को बुकिंग में जोड़ें, ताकि उन्हें साइन के लिए रिपोर्ट भेजी जा सके।",
   "Enter the amount received.": "मिली हुई राशि डालें।",
   "Check the phone number.": "फ़ोन नंबर जाँचें।",
-  "This report has already been signed.": "इस रिपोर्ट पर पहले ही साइन हो चुका है।"
+  "This report has already been signed.": "इस रिपोर्ट पर पहले ही साइन हो चुका है।",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "पहले वाहन की नंबर प्लेट जोड़ें। इसके बिना एग्रीमेंट साइन नहीं हो सकता।",
+  "This booking is already underway. Contact {} if anything needs changing.": "यह बुकिंग पहले ही शुरू हो चुकी है। कुछ बदलना हो तो {} से संपर्क करें।",
+  "This booking can't be completed online yet. Contact {} to finish it.": "यह बुकिंग अभी ऑनलाइन पूरी नहीं हो सकती। इसे पूरा करने के लिए {} से संपर्क करें।",
+  "The agreement was updated. Please review it again before signing.": "एग्रीमेंट अपडेट हुआ है। कृपया साइन करने से पहले इसे फिर से देखें।"
 }

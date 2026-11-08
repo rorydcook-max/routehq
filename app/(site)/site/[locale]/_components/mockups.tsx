@@ -569,23 +569,24 @@ export async function PaymentPhoneMock({ className = "" }: { className?: string 
         ) : (
           // Outside Asia: the booking's payment request with the business's transfer details and its Wise and Revolut
           // links, as the customer's booking page shows them (the account number is made up and masked).
-          <div className="mx-[0.9em] mt-[2em] rounded-[1.4em] bg-white p-[1.1em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
+          <div className="mx-[0.9em] mt-[2em] min-w-0 rounded-[1.4em] bg-white p-[1.1em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
             <p className="text-center font-semibold text-[#5f6b7a]">{t("mockPayByTransfer")}</p>
             <p className="mt-[0.1em] text-center text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
               {pajeroTotal}
             </p>
+            {/* Label over value, so neither is cut off at the phone's edge (final pre-release test, 8 Nov 2026: "HR-1…"). */}
             <div className="mt-[0.8em] overflow-hidden rounded-[0.9em] bg-[#f3f6f8]">
               {[
                 [t("mockAccount"), "Harbor Rentals · •••• 4821"],
                 [t("mockReference"), "HR-1042"]
               ].map(([label, value], index) => (
-                <div className={`flex items-center justify-between gap-[0.6em] px-[0.9em] py-[0.6em] ${index ? "border-t border-[#e6eaef]" : ""}`} key={label}>
-                  <span className="text-[#5f6b7a]">{label}</span>
-                  <span className="truncate font-semibold tabular-nums">{value}</span>
+                <div className={`min-w-0 px-[0.9em] py-[0.5em] ${index ? "border-t border-[#e6eaef]" : ""}`} key={label}>
+                  <span className="block text-[0.85em] text-[#5f6b7a]">{label}</span>
+                  <span className="block break-words font-semibold tabular-nums">{value}</span>
                 </div>
               ))}
             </div>
-            <div className="mt-[0.8em] grid grid-cols-2 gap-[0.5em]">
+            <div className="mt-[0.8em] grid min-w-0 grid-cols-2 gap-[0.5em] [&>span]:min-w-0 [&>span]:px-[0.4em]">
               <Pill>Wise</Pill>
               <Pill>Revolut</Pill>
             </div>

@@ -71,7 +71,7 @@ export default async function StartInspectionPage({ params }: { params: Promise<
   const out = type === "delivery";
 
   return (
-    <AppShell hero={<PageBand subtitle={say(out ? "introOut" : "introBack")} keepSubtitle title={say(out ? "titleOut" : "titleBack")} />} userEmail={userEmail}>
+    <AppShell hero={<PageBand title={say(out ? "titleOut" : "titleBack")} />} userEmail={userEmail}>
       <div className="page-form">
         {ready.length === 0 ? (
           <div className="card p-6 text-center">

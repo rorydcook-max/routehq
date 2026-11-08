@@ -1,3 +1,4 @@
+import { InfoTip } from "@/components/info-tip";
 import Link from "next/link";
 import { typedNote } from "@/lib/transaction-notes";
 import type { Route } from "next";
@@ -63,7 +64,8 @@ const expenseTypes = new Set(["repair", "servicing", "maintenance", "fuel", "ins
 
 // In the business's own currency (was always baht).
 function money(value: unknown) {
-  return formatMoney(Math.round(Number(value || 0)), businessCurrency(), "en-US");
+  // Not rounded first: a ฿1,200.50 day rate read "฿1,201 a day" here and "฿1,200.50" on the edit page.
+  return formatMoney(Number(value || 0), businessCurrency(), "en-US");
 }
 
 function percent(value: unknown) {
@@ -335,7 +337,7 @@ function RatesPane({ detail }: { detail: VehicleDetail }) {
       </div>
       <p className="mt-2 font-medium text-[var(--foreground-secondary)]">
         {deposit === null || deposit === undefined ? tx.say("r_depositUsual") : tx.say("r_deposit", { amount: money(Number(deposit)) })}
-        {ratesSet > 0 && ratesSet < 3 ? ` · ${tx.say("r_hint")}` : ""}
+        {ratesSet > 0 && ratesSet < 3 ? <> <InfoTip text={tx.say("r_hint")} /></> : null}
       </p>
       <Link className="mt-2 inline-flex font-bold text-[var(--primary)]" href={`/fleet/${detail.vehicle.id}/edit` as Route}>
         {ratesSet === 3 ? tx.say("r_edit") : ratesSet === 0 ? tx.say("r_add") : tx.say("r_addMissing")}
@@ -867,7 +869,6 @@ function MaintenanceSection({ detail, organizationId, currency }: { detail: Vehi
             <span className={labelClass}>{tx.say(distanceKey("m_nextKm"))}</span>
             <input className={inputClass} inputMode="numeric" min="0" name="nextDueMileage" type="number" />
           </label>
-          <p className="text-[14px] text-[var(--muted)] sm:col-span-2">{tx.say(distanceKey("m_hintBoth"))}</p>
           <label className="block sm:col-span-2">
             <span className={labelClass}>{tx.say("m_receipt")}</span>
             <input className="mt-1 w-full" name="receiptFile" type="file" />
@@ -1198,6 +1199,14 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
   const { vehicle } = detail;
   const status = String(vehicle.status || "").toLowerCase();
   const statusTone = status === "rented" ? "blue" : status === "available" ? "green" : status === "reserved" || status === "maintenance" ? "amber" : "neutral";
+  // Bookings still to come (or under way) on an archived vehicle.
+  const todayIso = businessToday();
+  const archivedBookings =
+    status === "inactive"
+      ? (detail.rentals || []).filter(
+          (rental: any) => ["booked", "active", "due_soon", "overdue", "extended"].includes(String(rental.status || "")) && !rental.deleted_at && (!rental.end_date || String(rental.end_date).slice(0, 10) >= todayIso)
+        )
+      : [];
   // Only what has fallen due, the same figure the booking page shows.
   const dueNow = detail.activeRental ? (await amountDueNowByRental(await createSupabaseServerClient(), [detail.activeRental.id])).get(detail.activeRental.id) || 0 : 0;
   const rateLine = (
@@ -1356,6 +1365,46 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
             </div>
           </div>
         </Card>
+
+        {/* No plate: the agreement can't be signed and the vehicle isn't offered online until one is added (final pre-release test, 8 Nov 2026). */}
+        {!String(vehicle.registration_number || "").trim() ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3" role="alert">
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-[var(--foreground)]">{tx.say("noPlateTitle")}</p>
+              <p className="mt-0.5 text-sm font-semibold text-[var(--foreground-secondary)]">{tx.say("noPlateBody")}</p>
+            </div>
+            <Link className="pressable inline-flex min-h-11 items-center rounded-full bg-[var(--primary)] px-4 text-sm font-bold text-white" href={`/fleet/${vehicle.id}/edit` as Route}>
+              {tx.say("noPlateAdd")}
+            </Link>
+          </div>
+        ) : null}
+        {/* Archived before archiving was blocked for vehicles with bookings: those bookings still need a car. */}
+        {status === "inactive" && archivedBookings.length ? (
+          <div className="rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3" role="alert">
+            <p className="font-bold text-[var(--foreground)]">{tx.say("archivedBookingsTitle", { count: archivedBookings.length })}</p>
+            <p className="mt-0.5 text-sm font-semibold text-[var(--foreground-secondary)]">{tx.say("archivedBookingsBody")}</p>
+            <ul className="mt-2 space-y-1">
+              {archivedBookings.map((rental: any) => (
+                <li key={rental.id}>
+                  <Link className="text-sm font-bold text-[var(--primary)] underline" href={`/bookings/${rental.id}` as Route}>
+                    {[rental.customers?.full_name, `${longDate(String(rental.start_date).slice(0, 10), tx.locale)}${rental.end_date ? ` – ${longDate(String(rental.end_date).slice(0, 10), tx.locale)}` : ""}`].filter(Boolean).join(" · ")}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <ActionForm action={unarchiveVehicle}>
+                <input name="vehicleId" type="hidden" value={vehicle.id} />
+                <PendingButton className="pressable inline-flex min-h-11 items-center rounded-full bg-[var(--primary)] px-4 text-sm font-bold text-white" pendingLabel={tx.say("saving")} type="submit">
+                  {tx.say("unarchive")}
+                </PendingButton>
+              </ActionForm>
+              <Link className="pressable inline-flex min-h-11 items-center rounded-full border border-[var(--border)] bg-[var(--panel)] px-4 text-sm font-bold text-[var(--foreground)]" href={`/bookings/${archivedBookings[0].id}` as Route}>
+                {tx.say("archivedMove")}
+              </Link>
+            </div>
+          </div>
+        ) : null}
 
         <ActiveRentalCard detail={detail} dueNow={dueNow} />
         <Glance detail={detail} isOwner={isOwner} />

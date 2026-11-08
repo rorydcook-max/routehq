@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useState, useTransition } from "react";
 import { quoteExplainIn } from "@/lib/i18n/quote-text";
 import Link from "next/link";
@@ -58,18 +59,18 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
 
       {!blocked ? (
         <div className="mt-3">
-          {openEnded ? (
-            <p className="text-sm text-[var(--foreground-secondary)]">{say("ext_openEndedNote")}</p>
-          ) : (
+          {openEnded ? null : (
             <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
               {say("ext_newReturn")}
               <input className="mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" min={picture?.currentEnd || undefined} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
-              <span className="mt-1 block text-xs font-normal text-[var(--muted)]">{say("ext_priced")}</span>
             </label>
           )}
-          <button className={`${primary} mt-3`} disabled={pending || (!openEnded && !endDate)} onClick={() => answer("approve", openEnded ? { openEnded: true } : { newEndDate: endDate })} type="button">
-            {busy === "approve" ? say("ext_approving") : openEnded ? say("ext_approveOpen") : say("ext_approve")}
-          </button>
+          <div className={`flex items-center gap-2 ${openEnded ? "" : "mt-3"}`}>
+            <button className={primary} disabled={pending || (!openEnded && !endDate)} onClick={() => answer("approve", openEnded ? { openEnded: true } : { newEndDate: endDate })} type="button">
+              {busy === "approve" ? say("ext_approving") : openEnded ? say("ext_approveOpen") : say("ext_approve")}
+            </button>
+            {openEnded ? <InfoTip label={say("ext_approveOpen")} text={say("ext_openEndedNote")} /> : null}
+          </div>
         </div>
       ) : (
         <div className="mt-3 space-y-3">
@@ -115,9 +116,6 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
                     </option>
                   ))}
                 </select>
-                <span className="mt-1 block text-xs font-normal text-[var(--muted)]">
-                  {blocker.customerName ? say("ext_freeAllKeep") : say("ext_freeAllBooking")}
-                </span>
               </label>
               <button
                 className={`${primary} mt-3`}

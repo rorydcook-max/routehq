@@ -1,3 +1,4 @@
+import { InfoTip } from "@/components/info-tip";
 import Link from "next/link";
 import { bookingAddress } from "@/lib/booking-address";
 import { getRequestUser } from "@/lib/supabase/server";
@@ -351,7 +352,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       tone: "neutral",
       icon: <MessageCircle size={17} />,
       title: t("messagesToSend", { count: unsent.count, who: unsent.who || t("aCustomer") }),
-      detail: t("messagesToSendDetail"),
+      detail: "",
       href: `/bookings/${rentalId}#unsent-messages`,
       action: t("send")
     });
@@ -555,7 +556,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     return <VehicleArt colour={vehicle.color} kind={kindFromCategory(category as any)} model={vehicle.model} photoUrl={lotPhotos.get(vehicle.id)?.[0]} size="md" vehicleId={vehicle.id} />;
   };
 
-  const lot: LotVehicle[] = vehicles.map((v) => {
+  // Archived vehicles are left out, as on the Fleet page (it said "3 vehicles", this panel showed 4), unless one
+  // still has a booking here: a vehicle going out today stays in view.
+  const lot: LotVehicle[] = vehicles.filter((v) => !(v as { archived?: boolean }).archived || rentals.some((r) => r.vehicleId === v.id)).map((v) => {
     const current = rentals.find((r) => r.vehicleId === v.id && r.status !== "Booked") || null;
     const next = rentals.filter((r) => r.vehicleId === v.id && r.status === "Booked").sort((a, b) => String(a.start).localeCompare(String(b.start)))[0] || null;
     const who = (r: (typeof rentals)[number]) => r.customer || t("walkIn");
@@ -695,8 +698,10 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         <Link className="card pressable tile p-4 tile-sky" href="/bookings">
           <TileHead icon={<Lock size={22} />} title={t("depositsHeld")} />
           <span>
-            <span className="num block text-[26px] leading-tight">{money(depositsHeld)}</span>
-            <span className="font-semibold">{t("depositsNote")}</span>
+            <span className="flex items-center gap-1.5">
+              <span className="num block text-[26px] leading-tight">{money(depositsHeld)}</span>
+              <InfoTip label={t("depositsHeld")} text={t("depositsNote")} />
+            </span>
           </span>
         </Link>
       )

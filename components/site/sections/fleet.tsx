@@ -36,16 +36,25 @@ function usePrice() {
 /** `sizes`: how wide the picture's box is, so the browser fetches that width (lib/photo-url.ts), not the full photo. */
 function Picture({ vehicle, className = "", sizes = "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" }: { vehicle: CatalogVehicle; className?: string; sizes?: string }) {
   const gallery = useTranslations("gallery");
+  const { t } = useSite();
+  // Settings › Rentals: ride-hailing and delivery work allowed. On the picture, so every fleet layout shows it.
+  const badge = vehicle.commercialUse ? (
+    <span className="pointer-events-none absolute left-2 top-2 z-[1] max-w-[calc(100%-1rem)] truncate rounded-full bg-white/95 px-2.5 py-1 text-[12px] font-bold leading-none text-[#14202b] shadow-sm">{t("fleet_commercialUse")}</span>
+  ) : null;
   return vehicle.photoUrl ? (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img alt={vehicle.name} className={`absolute inset-0 h-full w-full object-cover ${className}`} decoding="async" height={900} loading="lazy" {...photoProps(vehicle.photoUrl, sizes, 640)} width={1200} />
       <AiImageLabel label={gallery("aiImage")} show={vehicle.photoAi?.[0]} />
+      {badge}
     </>
   ) : (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <VehicleArt className="!h-full !w-full !rounded-none !bg-transparent" colour={vehicle.color} kind={vehicle.kind} model={vehicle.name} size="xl" />
-    </div>
+    <>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <VehicleArt className="!h-full !w-full !rounded-none !bg-transparent" colour={vehicle.color} kind={vehicle.kind} model={vehicle.name} size="xl" />
+      </div>
+      {badge}
+    </>
   );
 }
 

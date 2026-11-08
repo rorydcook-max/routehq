@@ -6,7 +6,7 @@ import { MessageCircle } from "lucide-react";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 import { isSectionOn, SITE_MESSAGE, siteConfigFrom, type SectionId, type SiteConfig, type TextSlot } from "@/lib/sites/config";
-import { fontHref, fontPairing } from "@/lib/sites/fonts";
+import { fontPairing } from "@/lib/sites/fonts";
 import { fleetNoun, sitePrice, socialHref } from "@/lib/sites/format";
 import { resolveImage, UNSPLASH_HOME, unsplashLink, type ResolvedImage } from "@/lib/sites/images";
 import { sitePalette, siteVars } from "@/lib/sites/palettes";
@@ -129,7 +129,7 @@ function Brand({ business, showName }: { business: SiteBusiness; showName: boole
  * template's layouts, palette and fonts. In the editor's preview (`edit`) the config arrives from the editor as the
  * owner changes it, and text can be clicked and edited.
  */
-export function SitePage({ data, config: initial, edit = false }: { data: SiteData; config: SiteConfig; edit?: boolean }) {
+export function SitePage({ data, config: initial, edit = false, inlineFont = null }: { data: SiteData; config: SiteConfig; edit?: boolean; /** The pairing whose @font-face rules the server wrote into the page (components/site/site-fonts.tsx). */ inlineFont?: string | null }) {
   const t = useTranslations("bsite") as unknown as Say;
   const [config, setConfig] = useState<SiteConfig>(initial);
   const [uploads, setUploads] = useState<Record<string, string>>(data.uploads);
@@ -170,9 +170,17 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
   const vehiclePhotos = useMemo(() => Object.fromEntries(data.vehicles.filter((vehicle) => vehicle.photoUrl).map((vehicle) => [vehicle.id, vehicle.photoUrl as string])), [data.vehicles]);
   const firstPhoto = data.vehicles.find((vehicle) => vehicle.photoUrl);
   const heroFallback: ResolvedImage = { type: "art", id: template.art };
-  const aboutFallback: ResolvedImage = firstPhoto ? { type: "url", url: firstPhoto.photoUrl as string, alt: firstPhoto.name } : { type: "art", id: template.art === "tide" ? "dunes" : "bloom" };
+  const hero = resolveImage(config.images.hero, { uploads, vehiclePhotos }, heroFallback);
+  // With no About picture chosen: a fleet photo, else the hero's own photo (an upload or stock photo). Art drawn as a
+  // stand-in read as an empty placeholder (final pre-release test, 8 Nov 2026), so with no photo at all the About
+  // section goes without a picture (components/site/sections/about.tsx).
+  const aboutFallback: ResolvedImage = firstPhoto
+    ? { type: "url", url: firstPhoto.photoUrl as string, alt: firstPhoto.name }
+    : hero.type === "url"
+      ? hero
+      : { type: "art", id: template.art === "tide" ? "dunes" : "bloom" };
   const images = {
-    hero: resolveImage(config.images.hero, { uploads, vehiclePhotos }, heroFallback),
+    hero,
     about: resolveImage(config.images.about, { uploads, vehiclePhotos }, aboutFallback)
   };
 
@@ -227,14 +235,18 @@ export function SitePage({ data, config: initial, edit = false }: { data: SiteDa
         data-template={template.id}
         id="top"
         style={{ ...(siteVars(palette, template, font) as CSSProperties), colorScheme: palette.dark ? "dark" : "light" }}>
-        {/* Only this pairing is loaded (display=swap: text shows at once in the fallback face). Without holding up the
-            page (task perf, 8 Nov 2026): a stylesheet from Google kept everything below it (the hero's headline too)
-            from showing until it had arrived, seconds on a phone. It loads as media="print" (not waited for) and
-            switches on once it has: the script below for the page as served, onLoad when the editor changes the pairing. */}
-        <link href="https://fonts.googleapis.com" rel="preconnect" />
-        <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect" />
-        <link href={fontHref(font)} id="site-fonts" key={font.id} media="print" onLoad={(event) => (event.currentTarget.media = "all")} rel="stylesheet" />
-        <script dangerouslySetInnerHTML={{ __html: FONT_SWITCH }} key={`switch-${font.id}`} />
+        {/* Only this pairing is loaded (display=swap: text shows at once in the fallback face), self-hosted (task perf2,
+            8 Nov 2026: public/fonts/sites/). A served page has the pairing's @font-face rules written into it by the
+            server (components/site/site-fonts.tsx, `inlineFont`), so nothing is linked. Otherwise (the editor changing
+            the pairing, or the Japanese pairing, whose rules are too large to inline) its same-origin stylesheet loads
+            as media="print" (not waited for) and switches on once it has: the script below for the page as served,
+            onLoad when the editor changes the pairing. */}
+        {font.id === inlineFont ? null : (
+          <>
+            <link href={`/fonts/sites/${font.id}.css`} id="site-fonts" key={font.id} media="print" onLoad={(event) => (event.currentTarget.media = "all")} rel="stylesheet" />
+            <script dangerouslySetInnerHTML={{ __html: FONT_SWITCH }} key={`switch-${font.id}`} />
+          </>
+        )}
 
         {data.demo ? <p className="bg-[var(--s-accent)] px-4 py-2.5 text-center text-[14px] font-semibold text-[var(--s-accent-ink)]">{t("demo_banner")}</p> : null}
 

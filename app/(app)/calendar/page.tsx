@@ -60,7 +60,7 @@ export default async function CalendarPage({
     <AppShell
       userEmail={userEmail}
       hero={
-        <PageBand subtitle={byVehicle ? t("subVehicle") : t("subDay")} title={t("title")}>
+        <PageBand title={t("title")}>
           <div className="flex gap-2">
             <Link className={bandTab(!byVehicle)} href={`/calendar?month=${month}` as Route}>
               {t("byDay")}

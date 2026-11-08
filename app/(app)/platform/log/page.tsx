@@ -32,7 +32,7 @@ export default async function AdminLogPage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform/log" subtitle="Every change made from the admin console. It can't be edited or deleted, and each business can see the entries about it." title="Admin log" />
+      <AdminHeader active="/platform/log" title="Admin log" />
       <section className="card overflow-hidden p-0">
         {(log || []).length === 0 ? (
           <p className="p-5 font-medium text-[var(--muted)]">Nothing yet.</p>

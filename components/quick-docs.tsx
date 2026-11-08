@@ -56,13 +56,14 @@ export function QuickDocs({
     <div className="grid grid-cols-2 gap-2 [&>label:nth-child(3)]:col-span-2">
       {buttons.map((button) => (
         <label
-          className={`pressable inline-flex h-11 cursor-pointer items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-full border-2 px-3 text-[15px] font-bold ${
+          // The words wrap onto a second line rather than being cut ("Driver's licen…" on a phone, final pre-release test, 8 Nov 2026).
+          className={`pressable inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[22px] border-2 px-3 py-1.5 text-center text-[15px] font-bold leading-tight ${
             done[button.category] ? "border-[var(--success)] text-[var(--success)]" : "border-[var(--primary)] bg-white text-[var(--primary)]"
           }`}
           key={button.category}
         >
           {busy === button.category ? <Loader2 className="shrink-0 animate-spin" size={18} /> : done[button.category] ? <CheckCircle2 className="shrink-0" size={18} /> : <Camera className="shrink-0" size={18} />}
-          <span className="truncate">{button.label}</span>
+          <span className="min-w-0">{button.label}</span>
           <input
             accept="image/*,application/pdf"
             className="sr-only"

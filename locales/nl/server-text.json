@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "Voeg eerst de klant aan de boeking toe, zodat het rapport ter ondertekening kan worden gestuurd.",
   "Enter the amount received.": "Voer het ontvangen bedrag in.",
   "Check the phone number.": "Controleer het telefoonnummer.",
-  "This report has already been signed.": "Dit rapport is al ondertekend."
+  "This report has already been signed.": "Dit rapport is al ondertekend.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "Voeg eerst het kenteken van het voertuig toe. Zonder kenteken kan de overeenkomst niet worden ondertekend.",
+  "This booking is already underway. Contact {} if anything needs changing.": "Deze boeking is al bezig. Neem contact op met {} als er iets moet veranderen.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "Deze boeking kan nog niet online worden afgerond. Neem contact op met {} om hem af te ronden.",
+  "The agreement was updated. Please review it again before signing.": "De overeenkomst is bijgewerkt. Bekijk hem opnieuw voordat je tekent."
 }

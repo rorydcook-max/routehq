@@ -16,6 +16,8 @@ export type RoveQuery = {
   gearbox?: string;
   max?: string;
   delivery?: string;
+  /** "1": only businesses that allow ride-hailing and delivery work (Settings › Rentals). */
+  commercial?: string;
   sort?: string;
 };
 
@@ -36,6 +38,7 @@ export type ParsedQuery = {
   gearbox: Gearbox | null;
   max: number | null;
   delivery: boolean;
+  commercial: boolean;
   sort: SearchSort;
 };
 
@@ -74,6 +77,7 @@ export function parseRoveQuery(query: RoveQuery, today: string): ParsedQuery {
     gearbox: GEARBOXES.includes(query.gearbox as Gearbox) ? (query.gearbox as Gearbox) : null,
     max: Number.isFinite(max) && max > 0 ? max : null,
     delivery: query.delivery === "1",
+    commercial: query.commercial === "1",
     sort: sort === "nearest" && !point ? "price" : sort
   };
 }

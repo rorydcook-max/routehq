@@ -152,7 +152,6 @@ export function OnboardingWizard({
         {step === 1 ? (
           <section className="card p-4 sm:p-7">
             <h2 className="text-[26px] font-bold leading-tight">{t("welcome", { name: organization.name })}</h2>
-            <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("welcomeBody")}</p>
             <div className="mt-5 grid gap-4">
               <label className="block">
                 <span className={labelClass}>{t("language")}</span>
@@ -232,7 +231,6 @@ export function OnboardingWizard({
               {vehicleCount ? <CheckCircle2 size={24} /> : <Car size={24} />}
             </span>
             <h2 className="mt-3 text-[26px] font-bold leading-tight">{vehicleCount ? t("vehiclesAdded", { count: vehicleCount }) : t("vehiclesTitle")}</h2>
-            <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{vehicleCount ? t("vehiclesAddedBody") : t("vehiclesBody")}</p>
             {vehicles.length ? (
               <ul className="mt-3 flex flex-wrap gap-1.5">
                 {vehicles.slice(0, 12).map((name, index) => (
@@ -253,7 +251,6 @@ export function OnboardingWizard({
                   <Sparkles className="mt-0.5 shrink-0" size={24} />
                   <span className="min-w-0 flex-1">
                     <span className="block text-[17px] font-bold">{t("optAssistant")}</span>
-                    <span className="block font-medium text-white/90">{t("optAssistantBody")}</span>
                   </span>
                   <ChevronRight className="mt-1 shrink-0" size={20} />
                 </button>
@@ -262,7 +259,6 @@ export function OnboardingWizard({
                 <PenLine className="mt-0.5 shrink-0 text-[var(--primary)]" size={24} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-[17px] font-bold text-[var(--foreground)]">{t("optForm")}</span>
-                  <span className="block font-medium text-[var(--foreground-secondary)]">{t("optFormBody")}</span>
                 </span>
                 <ChevronRight className="mt-1 shrink-0 text-[var(--muted)]" size={20} />
               </Link>
@@ -270,7 +266,6 @@ export function OnboardingWizard({
                 <FileSpreadsheet className="mt-0.5 shrink-0 text-[var(--primary)]" size={24} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-[17px] font-bold text-[var(--foreground)]">{t("optList")}</span>
-                  <span className="block font-medium text-[var(--foreground-secondary)]">{t("optListBody")}</span>
                 </span>
                 <ChevronRight className="mt-1 shrink-0 text-[var(--muted)]" size={20} />
               </Link>

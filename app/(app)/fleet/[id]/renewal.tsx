@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useEffect, useRef, useState } from "react";
 import { MoneyInput } from "@/components/money-input";
 import { createPortal } from "react-dom";
@@ -118,10 +119,10 @@ export function RenewalForm({
           ref={fileInput}
           type="file"
         />
-        {readable ? (
+        {readable && reading ? (
           <span className="mt-1 flex items-start gap-1.5 text-[14px] font-medium text-[var(--muted)]">
-            {reading ? <Loader2 aria-hidden="true" className="mt-0.5 shrink-0 animate-spin" size={16} /> : <Camera aria-hidden="true" className="mt-0.5 shrink-0" size={16} />}
-            {reading ? say("rn_reading") : say("rn_photoHint")}
+            <Loader2 aria-hidden="true" className="mt-0.5 shrink-0 animate-spin" size={16} />
+            {say("rn_reading")}
           </span>
         ) : null}
         {message ? <span className={`mt-1 block text-[14px] font-semibold ${message.tone === "ok" ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>{message.text}</span> : null}
@@ -171,9 +172,11 @@ export function RenewalForm({
       </label>
       {inspection ? (
         <label className="block sm:col-span-2">
-          <span className={labelClass}>{say("f_inspectionCost", { name: inspection })}</span>
+          <span className={`${labelClass} inline-flex items-center gap-1.5`}>
+            {say("f_inspectionCost", { name: inspection })}
+            <InfoTip label={say("f_inspectionCost", { name: inspection })} text={say("f_inspectionHint")} />
+          </span>
           <MoneyInput currency={currency} name="inspectionCost" />
-          <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{say("f_inspectionHint")}</span>
         </label>
       ) : null}
       <label className="block sm:col-span-2">
@@ -251,7 +254,6 @@ export function RenewalHelp({
         <ShieldCheck aria-hidden="true" className="shrink-0 text-[var(--primary)]" size={22} />
         <div className="min-w-[10rem] flex-1">
           <p className="font-bold text-[var(--foreground)]">{say(kind === "porbor" ? "pq_titlePorbor" : "pq_title", { partner: partner.name })}</p>
-          <p className="text-[14px] font-medium text-[var(--foreground-secondary)]">{say("pq_hint")}</p>
         </div>
         {partner.embed ? (
           <button className="primary-action pressable w-full justify-center sm:w-auto" onClick={() => setQuoteOpen(true)} type="button">

@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "請先將顧客新增到預訂中，以便傳送報告給對方簽署。",
   "Enter the amount received.": "請輸入收到的金額。",
   "Check the phone number.": "請檢查電話號碼。",
-  "This report has already been signed.": "此報告已簽署。"
+  "This report has already been signed.": "此報告已簽署。",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "請先新增車輛的車牌號碼。沒有車牌號碼無法簽署合約。",
+  "This booking is already underway. Contact {} if anything needs changing.": "此預訂已經開始。如需變更，請聯絡 {}。",
+  "This booking can't be completed online yet. Contact {} to finish it.": "此預訂還無法線上完成。請聯絡 {} 完成。",
+  "The agreement was updated. Please review it again before signing.": "合約已更新。簽署前請再次查看。"
 }

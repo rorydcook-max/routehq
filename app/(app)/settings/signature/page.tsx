@@ -37,7 +37,6 @@ export default async function SignaturePage({ searchParams }: { searchParams: Pr
           {/* Named after where it goes back to: Settings (the usual way in), or simply "Back" from a booking flow. */}
           <BackLink href={backHref} label={backHref.startsWith("/settings") ? say("title") : say("sig_back")} />
           <h1 className="page-title">{say("sig_pageTitle")}</h1>
-          <p className="page-subtitle page-subtitle-keep mt-1">{say("sig_pageBody")}</p>
         </div>
         <SignatureForm
           signatureUrl={signatureUrl}

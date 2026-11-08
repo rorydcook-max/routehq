@@ -49,7 +49,6 @@ export default async function ImportReviewPage({ params }: { params: Promise<{ i
         <div className="page-hero mb-4">
           <BackLink href="/settings/contracts" label={say("backLabel")} />
           <h1 className="page-title">{say("reviewTitle")}</h1>
-          <p className="page-subtitle page-subtitle-keep mt-1">{say("reviewSubtitle")}</p>
         </div>
         <ImportReview
           extractedText={meta.extracted_text || ""}

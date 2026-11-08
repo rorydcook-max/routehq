@@ -65,7 +65,6 @@ export function LogoUploadSection({ logoUrl, orgName, onDone }: { logoUrl: strin
         )}
         <div className="min-w-0">
           <h3 className="card-subtitle">{logoUrl ? say("lg_title") : say("lg_uploadTitle")}</h3>
-          <p className="mt-0.5 text-sm font-medium text-[var(--foreground-secondary)]">{logoUrl ? say("lg_body") : say("lg_uploadBody")}</p>
         </div>
       </div>
       <input accept="image/png,image/jpeg,image/webp" className="hidden" data-keep-original onChange={uploadChosen} ref={fileRef} type="file" />

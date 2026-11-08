@@ -391,5 +391,9 @@
   "Add the customer to the booking first, so they can be sent the report to sign.": "ເພີ່ມລູກຄ້າໃນການຈອງກ່ອນ ເພື່ອສົ່ງລາຍງານໃຫ້ເຊັນໄດ້.",
   "Enter the amount received.": "ໃສ່ຈຳນວນເງິນທີ່ໄດ້ຮັບ.",
   "Check the phone number.": "ກວດເບີໂທ.",
-  "This report has already been signed.": "ລາຍງານນີ້ເຊັນແລ້ວ."
+  "This report has already been signed.": "ລາຍງານນີ້ເຊັນແລ້ວ.",
+  "Add the vehicle's number plate first. The agreement can't be signed without it.": "ເພີ່ມປ້າຍທະບຽນລົດກ່ອນ. ຖ້າບໍ່ມີປ້າຍທະບຽນຈະເຊັນສັນຍາບໍ່ໄດ້.",
+  "This booking is already underway. Contact {} if anything needs changing.": "ການຈອງນີ້ເລີ່ມແລ້ວ. ຕິດຕໍ່ {} ຖ້າຕ້ອງການປ່ຽນແປງຫຍັງ.",
+  "This booking can't be completed online yet. Contact {} to finish it.": "ການຈອງນີ້ຍັງເຮັດໃຫ້ແລ້ວທາງອອນລາຍບໍ່ໄດ້. ຕິດຕໍ່ {} ເພື່ອດຳເນີນການໃຫ້ແລ້ວ.",
+  "The agreement was updated. Please review it again before signing.": "ສັນຍາມີການແກ້ໄຂ. ກະລຸນາກວດເບິ່ງອີກຄັ້ງກ່ອນເຊັນ."
 }

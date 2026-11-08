@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Bricolage_Grotesque, Geist } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { CookieBanner } from "@/components/cookie-banner";
 import { FlagFont } from "@/components/flag-font";
 import { GoogleTagManager } from "@/components/google-tag-manager";
+import { PublicSpeedInsights } from "@/components/public-speed-insights";
 import { textDirection } from "@/lib/i18n/locales";
 import { roveHqSite, roveOrigin, roveSiteWideLd } from "@/lib/rove/seo";
 import { roveLocale, roveLocaleParams } from "@/lib/rove/static";
@@ -31,7 +31,13 @@ const display = Bricolage_Grotesque({ subsets: ["latin"], axes: ["wdth"], displa
 // Geist for reading and tapping (task build-rove, 8 Nov 2026): neutral, exact, made for interfaces.
 const body = Geist({ subsets: ["latin"], display: "swap", variable: "--rv-body" });
 
-export const metadata: Metadata = { ...rootMetadata, metadataBase: new URL(roveOrigin()), applicationName: "Rove", title: { default: "Rove", template: "%s | Rove" } };
+// Rove's own description as the default (final-web test, 8 Nov 2026): a page without one (the not-found page) showed
+// the operator app's "command center for vehicle rental operations".
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  await roveLocale(params);
+  const d = await getTranslations("directory");
+  return { ...rootMetadata, metadataBase: new URL(roveOrigin()), applicationName: "Rove", title: { default: "Rove", template: "%s | Rove" }, description: d("rv.homeDescription2") };
+}
 export const viewport: Viewport = rootViewport;
 
 // One copy per language. Pages below that are English-only say so with their own generateStaticParams.
@@ -60,7 +66,9 @@ export default async function RoveLayout({ children, params }: { children: React
         <JsonLd data={roveSiteWideLd(locale)} />
       </head>
       <body>
-        <NextIntlClientProvider locale={locale} messages={{}}>
+        {/* No next-intl provider (task perf2, 8 Nov 2026): Rove's few client parts are handed what they show, so
+            next-intl's browser code isn't loaded with every page. */}
+        <>
           {/* light-island: Rove keeps its own fixed look in the app's dark mode, as the website does. */}
           <div className={`light-island ${s.rove} ${display.variable} ${body.variable}`}>
             <a className={s.skip} href="#main">
@@ -91,7 +99,9 @@ export default async function RoveLayout({ children, params }: { children: React
             />
           </div>
           <GoogleTagManager />
-        </NextIntlClientProvider>
+          {/* Real visitors' loading speed (Vercel Speed Insights): no cookies, nothing stored on the device. */}
+          <PublicSpeedInsights />
+        </>
         <FlagFont />
       </body>
     </html>

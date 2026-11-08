@@ -81,6 +81,8 @@ function money(value: string | undefined, currency: string) {
 /** Every value a clause can name, in both languages: the form's, the country's, and the sentences built from them. */
 function valueTable(raw: RawContract, input: ContractValues) {
   const v: ContractValues = { ...CONTRACT_DEFAULTS, ...input };
+  // use.4 names ride-hailing and delivery work as forbidden only while commercial use isn't allowed (use.10).
+  v.commercial_use_banned = v.commercial_use === "yes" ? "" : "yes";
   const currency = v.currency || raw.currency || "";
   const w = (key: string) => bi(raw.words?.[key], key);
   const both = (en: string, local = en): Bi => ({ en, local });

@@ -120,7 +120,7 @@ export function FilesList({ documents }: { documents: DocumentListItem[] }) {
       </div>
 
       {groups.length === 0 ? (
-        <EmptyState description={documents.length === 0 ? say("emptyBody") : say("noMatchBody")} title={documents.length === 0 ? say("emptyTitle") : say("noMatchTitle")} />
+        <EmptyState title={documents.length === 0 ? say("emptyTitle") : say("noMatchTitle")} />
       ) : (
         <ul className="card divide-y divide-[var(--border)] overflow-hidden !p-0">
           {shown.map((group) => {

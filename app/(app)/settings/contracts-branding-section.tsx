@@ -88,7 +88,7 @@ export function ContractsBrandingSection({
   return (
     <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <div className="grid gap-3">
-        <Pane summary={say("b_body")} title={say("b_title")}>
+        <Pane title={say("b_title")}>
           <ActionForm action={updateContractBrandingSettings} className="space-y-4" id={FORM_ID}>
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block sm:col-span-2">
@@ -120,7 +120,7 @@ export function ContractsBrandingSection({
             </div>
 
             {/* Set once, rarely touched: kept one tap away so the everyday details stay a short screen. */}
-            <Fold summary={say("b_moreSummary")} title={say("b_moreTitle")}>
+            <Fold title={say("b_moreTitle")}>
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="block">
                   <span className={labelClass}>{say("b_legal")}</span>
@@ -164,15 +164,13 @@ export function ContractsBrandingSection({
           <h2 className="card-title">
             {say("b_brandTitle")} <InfoTip label={say("b_brandTitle")} text={say("b_brandTip")} />
           </h2>
-          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{whiteLabel ? say("b_brandBodyApp") : say("b_brandBody")}</p>
           <div className="mt-3 space-y-4">
             <LogoUploadSection logoUrl={logoDisplayUrl} orgName={tradingName} />
-            <BrandColourField customLabel={say("b_colourCustom")} form={FORM_ID} hint={say("b_colourHint")} initial={accentColour} key={accentColour} label={say("b_colour")} previewLabel={say("b_colourPreview")} />
+            <BrandColourField customLabel={say("b_colourCustom")} form={FORM_ID} initial={accentColour} key={accentColour} label={say("b_colour")} previewLabel={say("b_colourPreview")} />
             <label className={`flex cursor-pointer items-start gap-3 font-medium text-[var(--foreground)] ${whiteLabel ? "" : "opacity-60"}`}>
               <input className="mt-0.5 h-5 w-5 shrink-0" defaultChecked={poweredByRouteHq || !whiteLabel} disabled={!whiteLabel} form={FORM_ID} name="powered_by_routehq_enabled" type="checkbox" value="true" />
               <span>
                 {say("b_powered")}
-                {!whiteLabel ? <span className="block text-sm text-[var(--muted)]">{say("b_poweredPlan")}</span> : null}
               </span>
             </label>
           </div>

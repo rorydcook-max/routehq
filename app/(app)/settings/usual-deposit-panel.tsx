@@ -34,7 +34,6 @@ export function UsualDepositPanel({ currency = "", currencyCode = businessCurren
 
   return (
     <div className="space-y-2">
-      <p className="font-medium text-[var(--foreground-secondary)]">{say("ud_body")}</p>
       {/* The business's currency symbol sits inside the box (7 Nov 2026); saved when you leave the box or press Enter. */}
       <label
         className="block sm:max-w-xs"

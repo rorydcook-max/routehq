@@ -87,11 +87,16 @@ async function themeChoice(): Promise<ThemeChoice> {
  * drawn ahead of time with no per-visitor reads, so it can be served from the CDN; they all share their metadata.
  */
 export async function PlatformRoot({
-  children
+  children,
+  fixedLight = false
 }: Readonly<{
   children: React.ReactNode;
+  /** Businesses' booking sites have their own palette (light or dark, chosen by the business), so they never follow
+   * the visitor's light/dark setting: the app's dark theme only half-repainted them (dark mode pass, 8 Nov 2026). */
+  fixedLight?: boolean;
 }>) {
-  const [locale, brand, customerPage, directoryPage, theme, timeZone] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage(), isDirectoryPage(), themeChoice(), getTimeZone().catch(() => null)]);
+  const [locale, brand, customerPage, directoryPage, chosenTheme, timeZone] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage(), isDirectoryPage(), themeChoice(), getTimeZone().catch(() => null)]);
+  const theme: ThemeChoice = fixedLight ? "light" : chosenTheme;
   // Customer pages (booking pages, booking links, the directory, embedded checkouts) get no cookie notice and no
   // analytics: renters' data is the business's, not ours. Everything else on rovehq.app gets both.
   // rove.rent's directory search is the exception: Rove's own page, with its own notice and analytics.
@@ -106,7 +111,7 @@ export async function PlatformRoot({
     // "System" is resolved in the browser before the first paint, so the attribute can differ from the server's: expected.
     <html data-theme={theme === "system" ? undefined : theme} dir={textDirection(locale)} lang={locale} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {fixedLight ? null : <script dangerouslySetInnerHTML={{ __html: themeScript }} />}
         {/* Hides the cookie notice (drawn with the page) before the first paint for a visitor who has already chosen. */}
         {words ? <script dangerouslySetInnerHTML={{ __html: consentChosenScript() }} /> : null}
       </head>

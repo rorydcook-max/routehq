@@ -86,7 +86,6 @@ export function AgreementTerms({
       <section className="card p-4">
         <h2 className={`${h2} flex items-center gap-1.5`}>
           {say("ag_numbersTitle")}
-          <InfoTip label={say("ag_numbersTitle")} text={say("ag_numbersBody")} />
         </h2>
         {/* Label and value side by side on one row each, with dividers so they're easy to match up. */}
         <dl className="mt-3 divide-y divide-[var(--border)] border-y border-[var(--border)]">
@@ -104,8 +103,10 @@ export function AgreementTerms({
       ) : null}
 
       <section className="card p-4">
-        <h2 className={h2}>{say("ag_ownTitle")}</h2>
-        <p className={`mt-1 ${soft}`}>{say("ag_ownBody")}</p>
+        <h2 className={`${h2} flex items-center gap-1.5`}>
+          {say("ag_ownTitle")}
+          <InfoTip label={say("ag_ownTitle")} text={say("ag_ownBody")} />
+        </h2>
         <ActionForm action={saveAgreementTerms} className="mt-3 space-y-3">
           <input name="organizationId" type="hidden" value={organizationId} />
           {terms.map((term, index) => (

@@ -62,7 +62,6 @@ export default async function HelpContentPage() {
           {/* The conversations queue now lives in the admin console's helpdesk; this page is linked from there. */}
           <BackLink href="/platform/support" label="Support" />
           <h1 className="page-title">{t("contentTitle")}</h1>
-          <p className="page-subtitle mt-2">{t("contentSubtitle")}</p>
         </div>
         <section className="card p-4 sm:p-5">
           <CollateButton />

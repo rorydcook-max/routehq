@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
@@ -24,8 +25,10 @@ export function BusinessPrivacy({ businessName, months, autoDelete }: { business
     <div className="mt-4 space-y-3">
       {/* "Download all your data" lives on Settings › Plan only (build-s, 8 Nov 2026): it was here as well. */}
       <form action={saveRetention} className="rounded-2xl bg-[var(--panel-secondary)] p-3.5">
-        <p className="text-[16px] font-bold text-[var(--foreground)]">{say("retentionTitle")}</p>
-        <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("retentionBody")}</p>
+        <p className="flex items-center gap-1.5 text-[16px] font-bold text-[var(--foreground)]">
+          {say("retentionTitle")}
+          <InfoTip label={say("retentionTitle")} text={say("retentionBody")} />
+        </p>
         <label className="mt-3 flex items-center gap-2 font-semibold text-[var(--foreground)]">
           <input defaultChecked={autoDelete} name="enabled" type="checkbox" />
           {say("retentionOn")}

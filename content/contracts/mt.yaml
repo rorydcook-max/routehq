@@ -419,13 +419,19 @@ sections:
         local: ""
         country: true
       - id: use.4
-        en: "It is forbidden to: drive with alcohol above the legal limit (as set by Maltese law, with a lower limit for new and professional drivers) or under the influence of drugs; use a hand-held phone while driving; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        en: "It is forbidden to: drive with alcohol above the legal limit (as set by Maltese law, with a lower limit for new and professional drivers) or under the influence of drugs; use a hand-held phone while driving; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry {{#if commercial_use_banned}}goods for payment, {{/if}}illegal goods or dangerous loads; use the vehicle for {{#if commercial_use_banned}}ride-hailing, delivery work, {{/if}}driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
         local: ""
         country: true
       - id: use.8_mt
         en: In Malta vehicles drive on the left. Driving into Valletta may incur the Controlled Vehicular Access (CVA) charge, which the Renter pays.
         local: ""
         country: true
+      - id: use.9
+        en: "No subletting or lending: the Renter must not sublet, rent out, lend or hand over the vehicle to anyone else, or let anyone not named in section 2 drive or ride it. Breaking this rule is a serious breach of this agreement."
+        local: ""
+      - id: use.10
+        when: { commercial_use: "yes" }
+        en: "Paid rides and deliveries. The Renter may use the vehicle to carry passengers or deliver food or goods for payment, including through ride-hailing or delivery apps, on these conditions: (a) the Renter holds, and keeps valid, every license, permit and registration the law requires for that work, such as a ride-hailing or commercial driver permit where one applies; (b) the vehicle's standard insurance may not cover paid passenger or delivery use, so the Renter must have insurance suitable for that use, or use the app's own cover where it applies; (c) the Renter follows the app's rules and the law; (d) the Renter is responsible for any fines, damage and wear arising from that use; (e) subletting, lending and drivers not named in this agreement remain forbidden; (f) the vehicle's insurance terms and any extra deposit, mileage limit or other terms in this agreement still apply."
       - id: use.5
         when:
           smoking: no

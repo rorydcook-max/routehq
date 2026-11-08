@@ -20,7 +20,6 @@ export function CustomerPrivacy({ customerId }: { customerId: string }) {
 
   return (
     <div className="space-y-3">
-      <p className="font-medium text-[var(--foreground-secondary)]">{say("customerBody")}</p>
       <a className="secondary-action pressable whitespace-nowrap" download href={`/customers/${customerId}/export`}>
         <Download size={17} />
         {say("customerExport")}

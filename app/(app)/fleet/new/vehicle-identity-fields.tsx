@@ -500,7 +500,6 @@ export function VehicleIdentityFields({
           <h2 className="card-title">{say("bookTitle", { doc: regDoc })}</h2>
           <span className="badge inline-flex items-center bg-white text-[var(--primary)]">{say("bookFastest")}</span>
         </div>
-        <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("bookBody", { doc: regDoc })}</p>
         {/* A proper button, in the reader's language. No forced camera: the phone offers the camera or an existing photo or PDF. */}
         <label className="secondary-action pressable mt-3 inline-flex w-full cursor-pointer bg-white sm:w-auto">
           <Camera aria-hidden="true" className="shrink-0" size={18} />
@@ -719,7 +718,6 @@ export function VehicleIdentityFields({
             {manualTrim && visibleTrims.length > 0 ? (
               <input className={inputClass} onChange={(event) => setTrim(event.target.value)} placeholder={say("trimCustom")} value={trim} />
             ) : null}
-            <span className="mt-1 block font-medium text-[var(--muted)]">{say("trimHint")}</span>
           </label>
         </div>
 
@@ -735,7 +733,7 @@ export function VehicleIdentityFields({
         </div>
         {/* Nice to have, never needed to rent the vehicle out. Opens by itself when the blue book filled it in, so it gets checked. */}
       </div>
-          <Fold open={ocrStatus === "done"} summary={say("moreSummary")} title={say("moreTitle")}>
+          <Fold open={ocrStatus === "done"} title={say("moreTitle")}>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className={labelClass}>{say("vin")}</span>

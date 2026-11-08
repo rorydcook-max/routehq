@@ -39,9 +39,11 @@ export function RatesFields({ currency, usualDeposit = 0 }: { currency: string; 
         </label>
       </div>
       <label className="mt-4 block sm:max-w-xs">
-        <span className={labelClass}>{say("deposit")}</span>
+        <span className={`${labelClass} inline-flex items-center gap-1.5`}>
+          {say("deposit")}
+          <InfoTip label={say("deposit")} text={usualDeposit > 0 ? say("depositHintUsual", { amount: formatMoney(usualDeposit, currency, "en-US") }) : say("depositHintNone")} />
+        </span>
         <MoneyInput currency={currency} name="depositAmount" />
-        <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: formatMoney(usualDeposit, currency, "en-US") }) : say("depositHintNone")}</span>
       </label>
     </div>
   );

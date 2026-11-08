@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { MobileMenu } from "./mobile-menu";
 import { SiteLanguage } from "./site-language";
@@ -7,7 +7,7 @@ import s from "../site.module.css";
 
 /** The website's header: logo, the few places worth going, sign in and the trial. Sticky, ink, 64px. */
 export async function SiteHeader() {
-  const [t, m] = await Promise.all([getTranslations("site"), getTranslations("marketing")]);
+  const [t, m, locale] = await Promise.all([getTranslations("site"), getTranslations("marketing"), getLocale()]);
   const items = [
     { href: SITE_LINKS.features, label: m("navFeatures") },
     { href: SITE_LINKS.pricing, label: m("navPricing") },
@@ -35,7 +35,7 @@ export async function SiteHeader() {
           ))}
         </nav>
         <div className={s.headerActions}>
-          <SiteLanguage label={m("footerLanguage")} variant="compact" />
+          <SiteLanguage label={m("footerLanguage")} locale={locale} variant="compact" />
           <SiteLink className={s.navLink} href={SITE_LINKS.signIn}>
             {m("navSignIn")}
           </SiteLink>
@@ -44,13 +44,25 @@ export async function SiteHeader() {
           </SiteLink>
         </div>
         <MobileMenu
+          actions={
+            <>
+              <SiteLanguage label={m("footerLanguage")} locale={locale} variant="row" />
+              <SiteLink className={`${s.btn} ${s.btnOutline}`} href={SITE_LINKS.signIn}>
+                {m("navSignIn")}
+              </SiteLink>
+              <SiteLink className={`${s.btn} ${s.btnLight}`} href={SITE_LINKS.signUp}>
+                {m("navStart")}
+              </SiteLink>
+            </>
+          }
           closeLabel={t("navMenuClose")}
-          items={items}
-          language={<SiteLanguage label={m("footerLanguage")} variant="row" />}
+          links={items.map((item) => (
+            <SiteLink className={s.menuLink} href={item.href} key={item.href}>
+              {item.label}
+            </SiteLink>
+          ))}
           logo={logo}
           openLabel={t("navMenu")}
-          signIn={{ href: SITE_LINKS.signIn, label: m("navSignIn") }}
-          start={{ href: SITE_LINKS.signUp, label: m("navStart") }}
         />
       </Container>
     </header>

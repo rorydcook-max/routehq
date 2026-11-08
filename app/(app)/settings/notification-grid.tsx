@@ -34,9 +34,9 @@ export async function NotificationGrid({ settings }: { settings: Record<string, 
   return (
     <ActionForm action={saveNotificationMatrix}>
       <section className="card overflow-hidden p-0">
-        <div className="px-5 pt-5">
+        {/* 12px: the global td/th padding wins over the cells' own classes, so the title lines up with the rows. */}
+        <div className="px-3 pt-5">
           <h2 className="card-title">{say("nt_gridTitle")}</h2>
-          <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("nt_gridBody")}</p>
         </div>
         <div className="mt-2 overflow-x-auto">
           <table className="w-full text-left">
@@ -56,7 +56,6 @@ export async function NotificationGrid({ settings }: { settings: Record<string, 
                 <tr key={event}>
                   <td className="px-5 py-3">
                     <span className="block font-semibold text-[var(--foreground)]">{say(`ig_ev_${event}`)}</span>
-                    <span className="hidden text-[14px] font-medium text-[var(--muted)] sm:block">{say(`ig_ev_${event}Body`)}</span>
                   </td>
                   {ALERT_CHANNELS.map((channel) => cell(event, channel, wantsAlert(settings, event, channel as AlertChannel)))}
                 </tr>
@@ -64,7 +63,6 @@ export async function NotificationGrid({ settings }: { settings: Record<string, 
               <tr>
                 <td className="px-5 py-3">
                   <span className="block font-semibold text-[var(--foreground)]">{say("ig_ev_summary")}</span>
-                  <span className="hidden text-[14px] font-medium text-[var(--muted)] sm:block">{say("ig_ev_summaryBody")}</span>
                 </td>
                 {ALERT_CHANNELS.map((channel) => cell("summary", channel, wantsSummary(settings, channel as AlertChannel)))}
               </tr>
@@ -76,7 +74,6 @@ export async function NotificationGrid({ settings }: { settings: Record<string, 
         <PendingButton className="primary-action" pendingLabel={say("saving")} savedLabel={say("saved")}>
           {say("save")}
         </PendingButton>
-        <p className="text-[14px] font-medium text-[var(--muted)]">{say("ig_notifFoot")}</p>
       </div>
     </ActionForm>
   );

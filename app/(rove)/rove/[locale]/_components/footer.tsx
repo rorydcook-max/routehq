@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { RouteHqLogo } from "@/components/brand-logo";
 import { CookieChoicesLink } from "@/components/cookie-choices-link";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { roveHasLocale, roveHref } from "@/lib/rove/paths";
@@ -8,6 +7,7 @@ import { legalUrl } from "@/lib/site/legal-slugs";
 import { localizeSitePath } from "@/lib/site/locale-path";
 import { listFleetHref } from "./header";
 import { LanguagePicker } from "./language-picker";
+import { RoveLogo } from "./rove-logo";
 import s from "../rove.module.css";
 
 /**
@@ -51,7 +51,7 @@ export async function RoveFooter({ locale }: { locale: string }) {
         <div className={s.footerTop}>
           <div>
             <a aria-label={t("rv.homeLabel")} className={s.brand} href={roveHref("/", locale)}>
-              <RouteHqLogo product="keys" showDescriptor={false} />
+              <RoveLogo tone="dark" />
             </a>
             <p className={s.footerAbout}>{t("rv.footerAbout")}</p>
           </div>

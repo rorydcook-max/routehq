@@ -1,0 +1,91 @@
+// Self-hosts the booking-page templates' font pairings (lib/sites/fonts.ts; task perf2, 8 Nov 2026).
+//
+//   node scripts/site-fonts.mjs
+//
+// For each pairing it asks Google Fonts for the same stylesheet the pages used to link (both faces, display=swap),
+// downloads every woff2 file into public/fonts/sites/ and writes:
+//   - public/fonts/sites/<pairing>.css   the pairing's @font-face rules, pointing at those files (the editor's preview);
+//   - lib/sites/font-faces.ts            the same rules as strings, inlined in a served booking page (no stylesheet to
+//                                        wait for, no restyle when one arrives, no trip to another domain).
+// Each file keeps Google's unicode-range, so a browser downloads only the alphabets a page's words use (Latin, Latin
+// Extended, Vietnamese, Cyrillic, Greek). The Japanese faces' many numbered CJK slices stay on fonts.gstatic.com (they
+// would add tens of MB here) and load, as before, only when Japanese characters are on the page.
+// Run again whenever FONT_PAIRINGS changes.
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import path from "node:path";
+
+const root = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
+const outDir = path.join(root, "public", "fonts", "sites");
+// A current Chrome: Google answers it with woff2 and unicode-range subsets.
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
+
+// FONT_PAIRINGS, read from the TypeScript source (ids, families and axis specs).
+const source = await readFile(path.join(root, "lib", "sites", "fonts.ts"), "utf8");
+const pairings = [];
+for (const block of source.split(/\n  \{\n/).slice(1)) {
+  const id = /id: "([^"]+)"/.exec(block)?.[1];
+  const faces = [...block.matchAll(/(display|body): \{ family: "([^"]+)", spec: "([^"]*)"/g)].map((m) => ({ family: m[2], spec: m[3] }));
+  if (id && faces.length === 2) pairings.push({ id, faces });
+}
+if (pairings.length < 10) throw new Error(`Only ${pairings.length} pairings found in lib/sites/fonts.ts`);
+
+const familyParam = (face) => `family=${face.family.replace(/ /g, "+")}${face.spec ? `:${face.spec}` : ""}`;
+const slug = (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+await mkdir(outDir, { recursive: true });
+const downloaded = new Map();
+const generated = {};
+let bytes = 0;
+
+for (const pairing of pairings) {
+  const href = `https://fonts.googleapis.com/css2?${familyParam(pairing.faces[0])}&${familyParam(pairing.faces[1])}&display=swap`;
+  const response = await fetch(href, { headers: { "user-agent": UA } });
+  if (!response.ok) throw new Error(`${pairing.id}: ${response.status} ${href}`);
+  const css = await response.text();
+  const rules = [];
+  for (const match of css.matchAll(/(?:\/\* ([^*]+) \*\/\s*)?@font-face \{([^}]+)\}/g)) {
+    // Google names each alphabet's file in a comment (/* latin */); the CJK slices come without one.
+    const subset = (match[1] || "").trim();
+    const body = match[2];
+    const family = /font-family: '([^']+)'/.exec(body)[1];
+    const style = /font-style: (\w+)/.exec(body)[1];
+    const weight = /font-weight: ([\d ]+)/.exec(body)[1].trim();
+    const range = /unicode-range: ([^;]+);/.exec(body)[1].trim();
+    const url = /url\((https:[^)]+)\) format\('woff2'\)/.exec(body)?.[1];
+    if (!url) throw new Error(`${pairing.id}: no woff2 in ${body}`);
+    let src = url;
+    // CJK slices (no name, or numbered [0], [1], ...): left on Google's font server.
+    if (subset && !/^\[\d+\]$/.test(subset)) {
+      if (!downloaded.has(url)) {
+        const name = `${slug(family)}-${style === "italic" ? "italic-" : ""}${slug(weight)}-${slug(subset)}.woff2`;
+        const file = path.join(outDir, name);
+        if (!existsSync(file)) {
+          const font = await fetch(url, { headers: { "user-agent": UA } });
+          if (!font.ok) throw new Error(`${pairing.id}: ${font.status} ${url}`);
+          const data = Buffer.from(await font.arrayBuffer());
+          await writeFile(file, data);
+          bytes += data.length;
+        }
+        downloaded.set(url, `/fonts/sites/${name}`);
+      }
+      src = downloaded.get(url);
+    }
+    rules.push(`@font-face{font-family:'${family}';font-style:${style};font-weight:${weight};font-display:swap;src:url(${src}) format('woff2');unicode-range:${range}}`);
+  }
+  if (!rules.length) throw new Error(`${pairing.id}: no @font-face rules`);
+  // Inlined only when small (a few KB). The Japanese pairing's rules are over 500 KB (hundreds of CJK slices): that
+  // one keeps its stylesheet, same-origin, loaded without holding up the page (components/site/site-fonts.tsx).
+  if (rules.join("").length < 30_000) generated[pairing.id] = rules.join("");
+  await writeFile(path.join(outDir, `${pairing.id}.css`), `/* ${pairing.faces.map((face) => face.family).join(" & ")}: generated by scripts/site-fonts.mjs */\n${rules.join("\n")}\n`);
+  console.log(`${pairing.id}: ${rules.length} faces`);
+}
+
+const ts = `// Generated by scripts/site-fonts.mjs: do not edit. Each booking-page font pairing's @font-face rules, pointing at the
+// self-hosted files in public/fonts/sites/ (lib/sites/fonts.ts has the pairings). Server-only: inlined in a served page
+// (components/site/site-fonts.tsx), so the browser never downloads the rules for the other pairings. A pairing missing
+// here (rules too large to inline) is linked from public/fonts/sites/<id>.css instead.
+export const SITE_FONT_FACES: Record<string, string> = ${JSON.stringify(generated, null, 2)};
+`;
+await writeFile(path.join(root, "lib", "sites", "font-faces.ts"), ts);
+console.log(`${downloaded.size} font files (${Math.round(bytes / 1024)} KB downloaded this run)`);

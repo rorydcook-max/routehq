@@ -42,7 +42,7 @@ export default async function RentersPage({ searchParams }: { searchParams: Prom
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform/renters" subtitle={t("subtitle")} title={t("title")} />
+      <AdminHeader active="/platform/renters" title={t("title")} />
       <div className="space-y-4">
         <div className="flex justify-end">
           <a className="secondary-action pressable shrink-0" href={`/platform/renters/export${exportQuery ? `?${exportQuery}` : ""}`}>

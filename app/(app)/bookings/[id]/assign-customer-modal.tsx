@@ -71,9 +71,6 @@ export function AssignCustomerModal({
             <div className="flex items-start justify-between gap-3 p-6 pb-3">
               <div>
                 <h2 className="text-xl font-semibold text-[var(--foreground)]">{say("assign_title")}</h2>
-                <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-                  {say("assign_body")}
-                </p>
               </div>
               <button aria-label={say("closeLabel")}
                 className="pressable flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border)] text-[var(--muted)]"

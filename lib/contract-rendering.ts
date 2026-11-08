@@ -90,7 +90,10 @@ function numberValue(value: unknown, fallback = 0) {
 }
 
 function formatAmount(value: unknown) {
-  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(numberValue(value));
+  // Money exact: whole amounts without decimals, others with two (never rounded away).
+  const amount = numberValue(value);
+  const whole = Math.abs(amount - Math.round(amount)) < 0.005;
+  return new Intl.NumberFormat("en-US", { minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(amount);
 }
 
 export function formatContractDate(value: string | null | undefined, locale = "en") {
@@ -108,7 +111,16 @@ export function formatContractDate(value: string | null | undefined, locale = "e
   // One date sits in both the English and the Thai lines of the agreement. "13/10/2569" alone read as a
   // wrong year in the English line, so a Thai agreement gives the Western year with the Buddhist one beside it.
   const western = `${match[3]}/${match[2]}/${match[1]}`;
-  return locale === "th" ? `${western} (พ.ศ. ${Number(match[1]) + 543})` : western;
+  if (locale === "th") return `${western} (พ.ศ. ${Number(match[1]) + 543})`;
+  if (!locale || locale === "en" || locale.startsWith("en-")) return western;
+  // Other languages write the date their own way: 08.11.2026 in German, 2026/11/08 in Japanese (final pre-release test, 8 Nov 2026).
+  try {
+    return new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" }).format(
+      new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])))
+    );
+  } catch {
+    return western;
+  }
 }
 
 function formatContractTime(value: string | null | undefined) {
@@ -260,6 +272,7 @@ export const contractVariableKeys = [
   "fuel_charge_per_increment",
   "late_fee_percentage",
   "late_return_fee_per_day",
+  "commercial_use_allowed",
   "cleaning_fee_minimum",
   "smoking_fee_maximum",
   "emergency_repair_limit",
@@ -473,7 +486,9 @@ export function buildContractVariables({
   const fullName = optionalText(customer?.full_name, "Customer");
   const name = splitName(fullName);
   // The Buddhist-era year beside the date is for Thai agreements only.
-  const locale = thai ? customer?.preferred_locale || bookingLink?.locale || organization?.default_locale || "en" : "en";
+  // Elsewhere the dates are written the way the agreement's second language writes them (08.11.2026 in a German one,
+  // final pre-release test, 8 Nov 2026); English-only agreements keep 08/11/2026.
+  const locale = thai ? customer?.preferred_locale || bookingLink?.locale || organization?.default_locale || "en" : agreementLanguage;
   const deliveryDateTime =
     bookingData.delivery_datetime ||
     bookingData.deliveryDateTime ||
@@ -699,6 +714,8 @@ export function buildContractVariables({
     island_travel_clause_enabled: islandClauseEnabled,
     secondary_deposit_enabled: secondaryDepositEnabled,
     geofence_monitoring_enabled: settings.geofence_monitoring_enabled,
+    // Settings › Rentals: ride-hailing and delivery work banned (section 10, 18.7) or allowed on conditions.
+    commercial_use_allowed: settings.commercial_use_allowed,
     is_rolling_monthly: isRollingMonthly,
     customer_name: fullName,
     customer_passport: optionalText(customer?.passport_number),

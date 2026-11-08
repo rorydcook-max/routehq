@@ -6,7 +6,9 @@ import { readFileSync, writeFileSync } from "node:fs";
 const NAMES = [
   "adjustments-horizontal", "book-2", "building-store", "calendar", "calendar-event", "calendar-repeat", "car", "car-off",
   "chevron-up", "circle-check", "engine", "info-circle", "manual-gearbox", "map-2", "map-pin", "menu-2", "message-circle",
-  "motorbike", "receipt-off", "search", "shield-check", "truck-delivery", "users", "world"
+  "motorbike", "receipt-off", "search", "shield-check", "truck-delivery", "users", "world",
+  // rove-design-2 (8 Nov 2026): features, trust signals and links.
+  "arrow-right", "discount", "file-text", "key", "lock", "photo", "signature", "star"
 ];
 
 const { version } = JSON.parse(readFileSync(new URL("../node_modules/@tabler/icons-webfont/package.json", import.meta.url), "utf8"));

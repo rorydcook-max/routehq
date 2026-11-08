@@ -356,10 +356,21 @@
   <section class="section">
     <div class="section-title">10. Exclusions and prohibited use / ข้อห้ามในการใช้งาน</div>
     <div class="section-body">
+      {{#if commercial_use_allowed}}
+      <div class="bilingual-section">
+        <div class="lang-en">The vehicle must not be used for illegal activity, racing, towing, off-road driving unless agreed, driving under the influence, carrying unlawful goods, or any use outside the agreed territory.</div>
+        <div class="lang-th">ห้ามใช้ยานพาหนะเพื่อกิจกรรมผิดกฎหมาย แข่งขัน ลากจูง ขับออฟโรดเว้นแต่ตกลงไว้ ขับขี่ขณะมึนเมา ขนส่งสิ่งผิดกฎหมาย หรือใช้งานนอกพื้นที่ที่ตกลงกัน</div>
+      </div>
+      <div class="bilingual-section">
+        <div class="lang-en"><strong>Paid rides and deliveries.</strong> The Renter may use the vehicle to carry passengers or deliver food or goods for payment, including through ride-hailing or delivery apps, on these conditions: (a) the Renter holds, and keeps valid, every license, permit and registration the law requires for that work, such as a ride-hailing or commercial driver permit where one applies; (b) the vehicle's standard insurance may not cover paid passenger or delivery use, so the Renter must have insurance suitable for that use, or use the app's own cover where it applies; (c) the Renter follows the app's rules and the law; (d) the Renter is responsible for any fines, damage and wear arising from that use; (e) subletting, lending and drivers not named in this agreement remain forbidden; (f) the vehicle's insurance terms and any extra deposit, mileage limit or other terms in this agreement still apply.</div>
+        <div class="lang-th"><strong>การรับส่งผู้โดยสารและส่งสินค้าเพื่อรับค่าตอบแทน.</strong> ผู้เช่าสามารถใช้ยานพาหนะรับส่งผู้โดยสารหรือส่งอาหารหรือสินค้าเพื่อรับค่าตอบแทน รวมถึงผ่านแอปพลิเคชันเรียกรถหรือส่งสินค้า ได้ภายใต้เงื่อนไขดังนี้ (ก) ผู้เช่าต้องมีและรักษาให้มีผลอยู่เสมอซึ่งใบอนุญาตขับขี่ ใบอนุญาต และการจดทะเบียนทุกอย่างที่กฎหมายกำหนดสำหรับงานนั้น เช่น ใบอนุญาตสำหรับรถรับจ้างผ่านแอปพลิเคชันหรือใบอนุญาตขับรถสาธารณะ หากกฎหมายกำหนด (ข) ประกันภัยปกติของยานพาหนะอาจไม่คุ้มครองการรับส่งผู้โดยสารหรือส่งสินค้าเพื่อรับค่าตอบแทน ผู้เช่าจึงต้องมีประกันภัยที่เหมาะสมกับการใช้งานดังกล่าว หรือใช้ความคุ้มครองของแอปพลิเคชันในกรณีที่มี (ค) ผู้เช่าต้องปฏิบัติตามกฎของแอปพลิเคชันและกฎหมาย (ง) ผู้เช่าต้องรับผิดชอบค่าปรับ ความเสียหาย และการสึกหรอที่เกิดจากการใช้งานดังกล่าว (จ) ยังคงห้ามให้เช่าช่วง ให้ยืม และให้ผู้ที่ไม่ได้ระบุชื่อในสัญญานี้ขับขี่ (ฉ) เงื่อนไขประกันภัยของยานพาหนะ และเงินประกันเพิ่มเติม ข้อจำกัดระยะทาง หรือเงื่อนไขอื่นใดในสัญญานี้ยังคงใช้บังคับ</div>
+      </div>
+      {{else}}
       <div class="bilingual-section">
         <div class="lang-en">The vehicle must not be used for illegal activity, racing, towing, off-road driving unless agreed, commercial hire, driving under the influence, carrying unlawful goods, or any use outside the agreed territory.</div>
         <div class="lang-th">ห้ามใช้ยานพาหนะเพื่อกิจกรรมผิดกฎหมาย แข่งขัน ลากจูง ขับออฟโรดเว้นแต่ตกลงไว้ ให้เช่าต่อเชิงพาณิชย์ ขับขี่ขณะมึนเมา ขนส่งสิ่งผิดกฎหมาย หรือใช้งานนอกพื้นที่ที่ตกลงกัน</div>
       </div>
+      {{/if}}
     </div>
   </section>
 
@@ -492,10 +503,17 @@
         </div>
       </div>
       <div class="clause">
+        {{#if commercial_use_allowed}}
         <div class="bilingual-section">
-          <div class="lang-en"><span class="clause-num">18.7 No Sub-Leasing or Assignment.</span> The Renter may not sub-let, sub-lease, hire out, or otherwise transfer the vehicle or any rights under this agreement to any third party, whether for payment or otherwise, without the prior written consent of the Owner. Any such arrangement made without consent will constitute a material breach of this agreement and entitle the Owner to immediately repossess the vehicle and to deduct from the security deposit the losses and costs this causes.</div>
-          <div class="lang-th"><span class="clause-num">18.7 ห้ามให้เช่าช่วงหรือโอนสิทธิ.</span> ผู้เช่าห้ามให้เช่าช่วง ให้เช่าต่อ จ้างใช้ หรือโอนยานพาหนะหรือสิทธิใด ๆ ภายใต้สัญญานี้ให้แก่บุคคลภายนอก ไม่ว่าจะมีค่าตอบแทนหรือไม่ เว้นแต่ได้รับความยินยอมเป็นลายลักษณ์อักษรล่วงหน้าจากผู้ให้เช่า การกระทำดังกล่าวโดยไม่ได้รับความยินยอมถือเป็นการผิดสัญญาอย่างมีนัยสำคัญ และให้สิทธิผู้ให้เช่านำยานพาหนะคืนได้ทันที และหักค่าเสียหายและค่าใช้จ่ายที่เกิดจากการกระทำดังกล่าวจากเงินประกัน</div>
+          <div class="lang-en"><span class="clause-num">18.7 No subletting, lending or other drivers.</span> The Renter may not sublet, rent out, lend or hand over the vehicle to anyone, transfer any rights under this agreement, or let anyone who is not named in this agreement drive or ride it. Paid rides and deliveries are allowed only on the conditions in section 10. A breach of this clause is a material breach of this agreement and entitles the Owner to end the rental and take the vehicle back immediately, and to recover the losses and costs it causes, including from the security deposit.</div>
+          <div class="lang-th"><span class="clause-num">18.7 ห้ามให้เช่าช่วง ให้ยืม หรือให้ผู้อื่นขับขี่.</span> ผู้เช่าห้ามให้เช่าช่วง ให้เช่าต่อ ให้ยืม หรือส่งมอบยานพาหนะให้แก่บุคคลใด โอนสิทธิใด ๆ ตามสัญญานี้ หรือยินยอมให้บุคคลที่ไม่ได้ระบุชื่อในสัญญานี้ขับขี่ยานพาหนะ การรับส่งผู้โดยสารและส่งสินค้าเพื่อรับค่าตอบแทนทำได้เฉพาะตามเงื่อนไขในข้อ 10 เท่านั้น การฝ่าฝืนข้อนี้ถือเป็นการผิดสัญญาอย่างมีนัยสำคัญ และให้สิทธิผู้ให้เช่าเลิกการเช่าและนำยานพาหนะคืนได้ทันที และเรียกค่าเสียหายและค่าใช้จ่ายที่เกิดจากการฝ่าฝืนนั้น รวมถึงหักจากเงินประกัน</div>
         </div>
+        {{else}}
+        <div class="bilingual-section">
+          <div class="lang-en"><span class="clause-num">18.7 No subletting, lending or other drivers.</span> The Renter may not sublet, rent out, lend or hand over the vehicle to anyone, transfer any rights under this agreement, or let anyone who is not named in this agreement drive or ride it. The vehicle may not be used to carry passengers or deliver goods for payment, including through ride-hailing or delivery apps. A breach of this clause is a material breach of this agreement and entitles the Owner to end the rental and take the vehicle back immediately, and to recover the losses and costs it causes, including from the security deposit.</div>
+          <div class="lang-th"><span class="clause-num">18.7 ห้ามให้เช่าช่วง ให้ยืม หรือให้ผู้อื่นขับขี่.</span> ผู้เช่าห้ามให้เช่าช่วง ให้เช่าต่อ ให้ยืม หรือส่งมอบยานพาหนะให้แก่บุคคลใด โอนสิทธิใด ๆ ตามสัญญานี้ หรือยินยอมให้บุคคลที่ไม่ได้ระบุชื่อในสัญญานี้ขับขี่ยานพาหนะ ห้ามใช้ยานพาหนะรับส่งผู้โดยสารหรือส่งสินค้าเพื่อรับค่าตอบแทน รวมถึงผ่านแอปพลิเคชันเรียกรถหรือส่งสินค้า การฝ่าฝืนข้อนี้ถือเป็นการผิดสัญญาอย่างมีนัยสำคัญ และให้สิทธิผู้ให้เช่าเลิกการเช่าและนำยานพาหนะคืนได้ทันที และเรียกค่าเสียหายและค่าใช้จ่ายที่เกิดจากการฝ่าฝืนนั้น รวมถึงหักจากเงินประกัน</div>
+        </div>
+        {{/if}}
       </div>
       {{#if special_conditions}}
       <div class="clause">

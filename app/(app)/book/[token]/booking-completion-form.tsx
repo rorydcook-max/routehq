@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
+import { InfoTip } from "@/components/info-tip";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -168,11 +169,13 @@ async function shrinkImage(file: File, maxSide = 1600): Promise<File> {
   }
 }
 
-function buildContractPreviewDocument(contractHtml: string) {
+function buildContractPreviewDocument(contractHtml: string, lang = "en") {
   const bodyHtml = extractBodyHtml(contractHtml);
 
+  // `lang` lets the browser hyphenate long words at real syllables (final-web test, 8 Nov 2026: German titles broke
+  // as "FAHRZEUGMIETVERTRA / G" on a phone); a word that still can't fit then breaks anywhere, as before.
   return `<!doctype html>
-<html>
+<html lang="${lang.replace(/[^A-Za-z-]/g, "") || "en"}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -216,6 +219,14 @@ function buildContractPreviewDocument(contractHtml: string) {
       body * {
         min-width: 0;
         overflow-wrap: anywhere;
+        -webkit-hyphens: auto;
+        hyphens: auto;
+      }
+
+      /* Spaced capitals fit a phone-width box without splitting a long word ("STAATSANGEHÖRIGKEIT"). */
+      @media (max-width: 520px) {
+        .title-band h1 { font-size: 16px !important; letter-spacing: 0.02em !important; }
+        .section-title, .info-label, .lbl { letter-spacing: 0.02em !important; }
       }
     </style>
   </head>
@@ -691,6 +702,16 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idType, preferredContactMethod, whatsappNumber, phoneCountryCode, emergencyPhoneCountryCode, currentAddress, preferredDeliveryLocation, savedUploads]);
 
+  // After saving, the page reloads its data: what the server now has on file ticks the progress list too
+  // (final-web test, 8 Nov 2026: "Documents" stayed unticked on the signing step with all three photos saved).
+  useEffect(() => {
+    setLiveStatus((previous) => ({
+      details: previous.details || detail.completion.details,
+      documents: previous.documents || detail.completion.documents,
+      agreement: previous.agreement || detail.completion.agreement
+    }));
+  }, [detail.completion.details, detail.completion.documents, detail.completion.agreement]);
+
   function fieldValue(name: string) {
     return formRef.current?.querySelector<HTMLInputElement>(`input[name="${name}"]`)?.value.trim() || "";
   }
@@ -763,13 +784,38 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           : null;
   const drawing = useRef(false);
   const isRentalDocumentEngine = true;
-  const publicAgreement = detail.rentalDocumentAgreement?.agreement || null;
-  const customerSigningEligibility = detail.rentalDocumentAgreement?.eligibility || null;
+  // The agreement prepared by "Save details and go to signing" comes back with the save, so it shows at once; the page's
+  // own copy takes over again when the refresh arrives (final pre-release test, 8 Nov 2026: it sometimes took 20 s).
+  const [preparedAgreement, setPreparedAgreement] = useState<PublicBookingDetail["rentalDocumentAgreement"] | null>(null);
+  useEffect(() => {
+    // Kept until the page's own copy is the same version or a newer one, so a late refresh carrying the version the
+    // customer was just told had changed can't bring it back (they'd sign the old one and be sent round again).
+    const fromPage = detail.rentalDocumentAgreement?.agreement;
+    setPreparedAgreement((current) => {
+      const prepared = current?.agreement;
+      if (!prepared || !fromPage) return current;
+      return fromPage.versionId === prepared.versionId || Number(fromPage.versionNumber) > Number(prepared.versionNumber) ? null : current;
+    });
+  }, [detail.rentalDocumentAgreement]);
+  // Details saved but the agreement didn't come back with the save: a loading state, not an empty section, until it does.
+  const [awaitingAgreement, setAwaitingAgreement] = useState(false);
+  const agreementSource = preparedAgreement || detail.rentalDocumentAgreement;
+  const publicAgreement = agreementSource?.agreement || null;
+  const customerSigningEligibility = agreementSource?.eligibility || null;
   const agreementHtml = publicAgreement?.renderedHtmlSnapshot || detail.contractHtml;
   const [draftOpen, setDraftOpen] = useState(false);
   // The customer signs only the final agreement: prepared with their details
   // and already signed by the business. Until then the text is a preview.
   const readyToSign = publicAgreement?.businessSignatureStatus === "signed";
+  useEffect(() => {
+    if (readyToSign) setAwaitingAgreement(false);
+  }, [readyToSign]);
+  // If even the refresh doesn't bring it, the button comes back after 30 seconds so they can try again.
+  useEffect(() => {
+    if (!awaitingAgreement) return;
+    const timer = window.setTimeout(() => setAwaitingAgreement(false), 30_000);
+    return () => window.clearTimeout(timer);
+  }, [awaitingAgreement]);
   const [notice, setNotice] = useState("");
   const [submittedName, setSubmittedName] = useState("");
   const agreementRef = useRef<HTMLElement>(null);
@@ -1011,8 +1057,13 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               ? t("agreementUpdated")
               : t("detailsSavedReadAgreement")
           );
+          // Shown straight from the save; the refresh brings the rest of the page up to date.
+          const prepared = (result as { rentalDocumentAgreement?: PublicBookingDetail["rentalDocumentAgreement"] }).rentalDocumentAgreement;
+          if (prepared?.agreement) setPreparedAgreement(prepared);
+          else setAwaitingAgreement(true);
           router.refresh();
-          agreementRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          // After the agreement has rendered, so the scroll lands on it rather than on the space it will fill.
+          window.setTimeout(() => agreementRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
           return;
         }
         setSignedContractUrl(result.signedContractUrl || null);
@@ -1047,7 +1098,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
           {t("everythingReceived")}{" "}
           {detail.vehicleWithCustomer
-            ? t("businessToldContact", { business: detail.organizationName })
+            ? null
             : operatorDeliveryDateTime && String(detail.bookingData.delivery_location || "").trim() && t.has("handoverAgreed" as never)
                 ? t("handoverAgreed" as never)
                 : t("businessWillContact", { business: detail.organizationName })}
@@ -1121,9 +1172,6 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       <SavedDetails folded={readyToSign}>
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <SectionTitle icon={Upload} label={t("yourDocuments")} />
-        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-          {t("documentsIntro")}
-        </p>
         {!detail.customer?.id && !(detail.documentStatus.passport && detail.documentStatus.driver_license && detail.documentStatus.selfie) ? (
           <ReturningCustomerCheck
             defaultCode={phoneCountryCode}
@@ -1212,7 +1260,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             </div>
           </label>
           <label>
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("email")} <span className="font-normal text-[var(--muted)]">{t("optionalBrackets")}</span></span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("email")}</span>
             <input className={inputClass} defaultValue={detail.customer?.email || ""} name="email" style={fieldStyle} type="email" />
           </label>
           <label>
@@ -1221,7 +1269,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </label>
           <label>
             <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
-              {t("whereStaying")} <span className="font-normal text-[var(--muted)]">{t("optionalBrackets")}</span>
+              {t("whereStaying")}
             </span>
             <GoogleAddressInput near={businessCountryName} onChange={setCurrentAddress} value={currentAddress} />
           </label>
@@ -1327,7 +1375,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             {livePhone && !whatsappNumber ? (
               <button
                 onClick={() => setWhatsappNumber(livePhone)}
-                style={{ fontSize: 14, color: "var(--primary)", background: "none", border: "none", cursor: "pointer", marginTop: 4, padding: 0 }}
+                style={{ fontSize: 14, color: "var(--primary-ink)", background: "none", border: "none", cursor: "pointer", marginTop: 4, padding: 0 }}
                 type="button"
               >
                 {t("sameAsPhone", { phone: livePhone })}
@@ -1359,7 +1407,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         {/* Secondary channels — collapsible */}
         <details style={{ marginTop: 16 }}>
-          <summary style={{ fontSize: 14, color: "var(--primary)", cursor: "pointer", fontWeight: 500, listStyle: "none", userSelect: "none" }}>
+          <summary style={{ fontSize: 14, color: "var(--primary-ink)", cursor: "pointer", fontWeight: 500, listStyle: "none", userSelect: "none" }}>
             {t("moreWaysToContact")}
           </summary>
           <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -1403,7 +1451,6 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       <HandoverWishes
         agreed={Boolean((customerCollects || String(detail.bookingData.delivery_location || "").trim()) && operatorDeliveryDateTime)}
         changeLabel={customerCollects ? t("collectChange") : t("handoverChange")}
-        intro={customerCollects ? t("collectWhenIntro") : t("handoverPreferencesIntro")}
         title={customerCollects ? t("collectWhen") : t("handoverPreferences")}
       >
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -1443,12 +1490,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           vehicle" — so not shown to someone who already has it). */}
       {acceptedMethods.length === 1 && acceptedMethods[0] === "cash" ? (detail.vehicleWithCustomer ? null : (
         <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-          <SectionTitle icon={CreditCard} label={t("method_cash")} />
-          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{t("method_cash_hint")}</p>
+          <SectionTitle icon={CreditCard} label={t("method_cash")} tip={t("method_cash_hint")} />
         </section>
       )) : acceptedMethods.length > 0 ? (
         <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-          <SectionTitle icon={CreditCard} label={t("howPay")} />
+          <SectionTitle icon={CreditCard} label={t("howPay")} tip={t("paymentConfirmedBy", { business: detail.organizationName })} />
           <div className="mt-4 grid gap-3">
             {acceptedMethods.map((key) => {
               const info = PAYMENT_METHODS.find((m) => m.key === key)!;
@@ -1473,8 +1519,10 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                       <i className={info.iconClass} style={{ fontSize: 19 }} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-[var(--foreground)]">{t(`method_${key}`)}</span>
-                      <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{t(`method_${key}_hint`)}</span>
+                      <span className="flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground)]">
+                        {t(`method_${key}`)}
+                        {key === "promptpay" ? <InfoTip label={t(`method_${key}`)} text={t("method_promptpay_hint")} /> : null}
+                      </span>
                     </span>
                   </label>
                   {active && !info.deliveryOnly ? (
@@ -1575,10 +1623,6 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             })}
           </div>
 
-          <p className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm leading-6 text-[var(--muted)]">
-            {t("paymentConfirmedBy", { business: detail.organizationName })}
-          </p>
-
           <input name="preferredPaymentMethod" type="hidden" value={paymentMethod} />
           <input name="paymentTiming" type="hidden" value={effectiveTiming} />
         </section>
@@ -1618,13 +1662,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       </SavedDetails>
 
       <section className="scroll-mt-4 rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm" ref={agreementRef}>
-        <SectionTitle icon={PenLine} label={t("rentalAgreement")} />
+        <SectionTitle icon={PenLine} label={t("rentalAgreement")} tip={readyToSign ? undefined : t("previewExplain", { business: detail.organizationName })} />
         {notice ? <p className="mt-3 rounded-xl bg-[var(--success-light)] p-3 text-sm font-bold text-[var(--success)]">{notice}</p> : null}
-        {!readyToSign ? (
-          <p className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm leading-6 text-[var(--foreground-secondary)]">
-            {t("previewExplain", { business: detail.organizationName })}
-          </p>
-        ) : null}
         {/* Price and deposit are at the top of the page and in the agreement itself; the version number and
             document fingerprint are kept on the record, not shown to someone renting a scooter. */}
         {isRentalDocumentEngine && publicAgreement && readyToSign && customerSigningEligibility?.customerSafeMessage ? (
@@ -1632,17 +1671,20 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         ) : null}
         {/* Before the details are saved the draft is full of "Not provided": it stays folded so the page
             scrolls past it, and anyone curious can open it. The final text to sign is always open. */}
-        {readyToSign ? (
+        {awaitingAgreement && !readyToSign ? (
+          <p className="mt-4 flex items-center gap-2 rounded-xl bg-[var(--panel-secondary)] p-4 text-sm font-bold text-[var(--foreground-secondary)]" role="status">
+            <span className="spinner" /> {t("preparingAgreement")}
+          </p>
+        ) : readyToSign ? (
           <>
             <div className="routehq-contract-preview contract-preview mt-4 h-[60vh] min-h-[420px] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] [overscroll-behavior:contain]">
               <iframe
                 className="h-full w-full border-0 bg-[var(--panel-secondary)]"
                 sandbox=""
-                srcDoc={buildContractPreviewDocument(agreementHtml)}
+                srcDoc={buildContractPreviewDocument(agreementHtml, locale)}
                 title={t("rentalAgreement")}
               />
             </div>
-            <p className="mt-1.5 text-center text-xs font-semibold text-[var(--muted)]">{t.has("previewScrollHint" as never) ? t("previewScrollHint" as never) : "Scroll inside the box to read it all."}</p>
           </>
         ) : (
           // The draft is only built when opened: in the page itself it was ~100 KB of markup nobody had asked to see.
@@ -1656,7 +1698,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                 <iframe
                   className="h-full w-full border-0 bg-[var(--panel-secondary)]"
                   sandbox=""
-                  srcDoc={buildContractPreviewDocument(agreementHtml)}
+                  srcDoc={buildContractPreviewDocument(agreementHtml, locale)}
                   title={t("rentalAgreement")}
                 />
               </div>
@@ -1725,7 +1767,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </a>
         </p>
         {error ? <p className="mt-4 rounded-xl bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
-        <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending || !pageLive} key={readyToSign ? "sign" : "review"} type="submit">
+        <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending || !pageLive || (awaitingAgreement && !readyToSign)} key={readyToSign ? "sign" : "review"} type="submit">
           {isPending ? (
             <span className="inline-flex items-center gap-2"><span className="spinner" /> {t("sending")}</span>
           ) : readyToSign ? (
@@ -2116,7 +2158,6 @@ function GoogleAddressInput({ name = "address", onChange, value, near = "" }: { 
           </button>
         ) : null}
       </div>
-      {isEnabled ? <p className="mt-2 text-xs text-[var(--muted)]">{t("addressHint")}</p> : null}
       {pinModalOpen ? (
         <PublicGooglePinModal
           // The map opens on what they typed, else the business's country (never a fixed place).
@@ -2229,7 +2270,6 @@ function SavedDetails({ folded, children }: { folded: boolean; children: React.R
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 [&::-webkit-details-marker]:hidden">
         <span>
           <span className="block text-base font-semibold text-[var(--success)]">✓ {t("detailsSaved")}</span>
-          <span className="block text-sm text-[var(--muted)]">{t("tapToChange")}</span>
         </span>
         <span aria-hidden="true" className="text-[var(--muted)] transition-transform group-open:rotate-180">▾</span>
       </summary>
@@ -2238,7 +2278,7 @@ function SavedDetails({ folded, children }: { folded: boolean; children: React.R
   );
 }
 
-function HandoverWishes({ agreed, changeLabel, children, intro, title }: { agreed: boolean; changeLabel: string; children: ReactNode; intro: string; title: string }) {
+function HandoverWishes({ agreed, changeLabel, children, title }: { agreed: boolean; changeLabel: string; children: ReactNode; title: string }) {
   if (agreed) {
     return (
       <details className="rounded-2xl border border-[var(--border)] bg-white px-5 py-4 shadow-sm">
@@ -2250,19 +2290,21 @@ function HandoverWishes({ agreed, changeLabel, children, intro, title }: { agree
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
       <SectionTitle icon={PenLine} label={title} />
-      <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{intro}</p>
       {children}
     </section>
   );
 }
 
-function SectionTitle({ icon: Icon, label }: { icon: typeof UserRound; label: string }) {
+function SectionTitle({ icon: Icon, label, tip }: { icon: typeof UserRound; label: string; /** A short explanation in an (i) beside the title. */ tip?: string }) {
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
         <Icon size={20} />
       </span>
-      <h2 className="text-xl font-semibold text-[var(--foreground)]">{label}</h2>
+      <h2 className="text-xl font-semibold text-[var(--foreground)]">
+        {label}
+        {tip ? <> <InfoTip label={label} text={tip} /></> : null}
+      </h2>
     </div>
   );
 }
@@ -2310,7 +2352,7 @@ function UploadCard({
     <div style={{ borderRadius: 10, border: "0.5px solid var(--border)", background: "var(--field-bg, #ffffff)", padding: "12px 14px", marginBottom: 8 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-          <Icon size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
+          <Icon size={16} style={{ color: "var(--primary-ink)", flexShrink: 0 }} />
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", lineHeight: 1.3 }}>{label}</span>
         </div>
         {complete || selectedFile || saved ? (
@@ -2337,8 +2379,8 @@ function UploadCard({
                 minHeight: 44,
                 borderRadius: 7,
                 cursor: "pointer",
-                border: "0.5px solid var(--border)",
-                background: "#ffffff",
+                border: "0.5px solid var(--button-border)",
+                background: "var(--panel)",
                 fontSize: 14,
                 fontWeight: 600,
                 color: "var(--foreground)"
@@ -2381,7 +2423,7 @@ function UploadCard({
                 background: "var(--primary-light)",
                 fontSize: 14,
                 fontWeight: 600,
-                color: "var(--primary)"
+                color: "var(--primary-ink)"
               }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -2406,11 +2448,6 @@ function UploadCard({
               />
             </label>
           </div>
-          {!isMobile ? (
-            <p style={{ fontSize: 14, color: "var(--muted)", margin: "4px 0 0", textAlign: "center" }}>
-              {t("takePhotoHint")}
-            </p>
-          ) : null}
         </>
       ) : (
         <label

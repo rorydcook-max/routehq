@@ -33,9 +33,9 @@ export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
     });
   }
 
-  const rows: Array<{ key: "holdHours" | "leadHours" | "gapDays" | "endNoticeDays" | "extendNoticeDays"; label: string; help: string; options: number[]; text: (value: number) => string }> = [
+  const rows: Array<{ key: "holdHours" | "leadHours" | "gapDays" | "endNoticeDays" | "extendNoticeDays"; label: string; help?: string; options: number[]; text: (value: number) => string }> = [
     { key: "holdHours", label: say("ru_hold"), help: say("ru_holdHelp"), options: HOLD_HOUR_OPTIONS, text: (value) => say("ru_hours", { count: value }) },
-    { key: "leadHours", label: say("ru_lead"), help: say("ru_leadHelp"), options: LEAD_HOUR_OPTIONS, text: (value) => hours(value, say("ru_leadNone")) },
+    { key: "leadHours", label: say("ru_lead"), options: LEAD_HOUR_OPTIONS, text: (value) => hours(value, say("ru_leadNone")) },
     { key: "gapDays", label: say("ru_gap"), help: say("ru_gapHelp"), options: GAP_DAY_OPTIONS, text: (value) => days(value, say("ru_gapNone")) },
     { key: "endNoticeDays", label: say("ru_end"), help: say("ru_endHelp"), options: END_NOTICE_OPTIONS, text: (value) => days(value, say("ru_none")) },
     { key: "extendNoticeDays", label: say("ru_extend"), help: say("ru_extendHelp"), options: EXTEND_NOTICE_OPTIONS, text: (value) => days(value, say("ru_extendNone")) }
@@ -46,7 +46,8 @@ export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
       {rows.map((row) => (
         <label className="block" key={row.key}>
           <span className="font-semibold text-[var(--foreground)]">
-            {row.label} <InfoTip label={row.label} text={row.help} />
+            {row.label}
+            {row.help ? <> <InfoTip label={row.label} text={row.help} /></> : null}
           </span>
           <select className="mt-1 block w-full" disabled={isPending} onChange={(event) => change(row.key, Number(event.target.value))} value={values[row.key]}>
             {row.options.map((option) => (
@@ -61,7 +62,6 @@ export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
       <div className="border-t border-[var(--border)] pt-4 sm:col-span-2">
         <SwitchField
           checked={values.extensionHold}
-          description={say("ru_extHoldBody", { days: values.extensionHoldDays })}
           disabled={isPending}
           label={say("ru_extHold")}
           onChange={(event) => change("extensionHold", event.target.checked)}

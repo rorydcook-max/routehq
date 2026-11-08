@@ -139,7 +139,6 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
 
   return (
     <div className="space-y-3">
-      <p className="measure font-medium text-[var(--foreground-secondary)]">{say("ps_body")}</p>
       {state === "checking" ? <p className="font-medium text-[var(--muted)]">{say("ps_checking")}</p> : null}
       {state === "unsupported" ? <p className="font-medium text-[var(--foreground)]">{say("ps_unsupported")}</p> : null}
       {state === "needs-install" ? (

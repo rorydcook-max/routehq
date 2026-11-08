@@ -25,8 +25,10 @@ import { processCustomerPortalAction } from "@/lib/portal-notifications";
 import { notifyOperator, type AlertText } from "@/lib/notify-operator";
 import { firstRentCharge, generatePaymentSchedule } from "@/lib/payment-schedule";
 import {
+  AgreementVersionChangedError,
   completeRentalDocumentCustomerSigning,
-  getCustomerExecutedAgreementDownloads
+  getCustomerExecutedAgreementDownloads,
+  loadPublicRentalAgreementForPage
 } from "@/lib/rental-document-customer-signing";
 import { toWallTime, wallTimeToIso, businessToday } from "@/lib/business-time";
 import { licenceCategoriesText } from "@/lib/licence";
@@ -550,6 +552,16 @@ function portalActionCommunicationText(actionType: string, content: Record<strin
   return "Customer submitted a booking portal action";
 }
 
+/** The agreement as the booking page shows it (lib/public-booking.ts), read straight after it was prepared; null if that read fails. */
+async function preparedAgreementFor(token: string) {
+  try {
+    return (await loadPublicRentalAgreementForPage(token)).agreement;
+  } catch (error) {
+    console.warn("[booking] prepared agreement read failed", error instanceof Error ? error.message : error);
+    return null;
+  }
+}
+
 /** Hands a failure back as `{ actionError }` (lib/action-error.ts), so the screen can say why instead of "Try again". */
 export async function completePublicBooking(...args: Parameters<typeof completePublicBookingOrThrow>) {
   return guard(() => completePublicBookingOrThrow(...args));
@@ -602,7 +614,16 @@ async function completePublicBookingOrThrow(formData: FormData) {
   // customer_id may be null when the booking was created without a customer —
   // we create the customer record from the submitted form data in that case.
   if (!bookingLink.rental_id || !bookingLink.vehicle_id || !bookingLink.contract_id) {
-    throw new Error("This booking link is missing required records.");
+    // Said plainly, with what to do (final pre-release test, 8 Nov 2026: "missing required records" on a rental already out).
+    const [{ data: business }, { data: underway }] = await Promise.all([
+      supabase.from("organizations").select("name, trading_name").eq("id", bookingLink.organization_id).maybeSingle(),
+      bookingLink.rental_id ? supabase.from("rentals").select("status").eq("id", bookingLink.rental_id).maybeSingle() : Promise.resolve({ data: null })
+    ]);
+    const businessName = String(business?.trading_name || business?.name || "").trim() || "the rental business";
+    if (["active", "due_soon", "overdue", "extended", "completed"].includes(String(underway?.status || ""))) {
+      throw new Error(`This booking is already underway. Contact ${businessName} if anything needs changing.`);
+    }
+    throw new Error(`This booking can't be completed online yet. Contact ${businessName} to finish it.`);
   }
 
   const organizationId = bookingLink.organization_id as string;
@@ -875,11 +896,16 @@ async function completePublicBookingOrThrow(formData: FormData) {
       });
       // Usually the business hasn't saved its signature yet. Tell them, and give the customer a real
       // message: a thrown error reaches the browser as a bare "Minified React error".
+      // "Not eligible" also covers the agreement itself (a vehicle with no number plate yet): only send the owner
+      // to the signature page when nothing about the vehicle or the wording is in the way (final-app test, 8 Nov 2026).
+      const signatureProblem =
+        countersigned.reason === "not_eligible" &&
+        !((countersigned as { blockingIssues?: unknown[] }).blockingIssues || []).some((issue) => /vehicle|template/i.test(String(issue)));
       notifyOperator(
         organizationId,
-        countersigned.reason === "not_eligible" ? { emoji: "✍️", key: "cantSignYet" } : { emoji: "✍️", key: "agreementNotReady" },
+        signatureProblem ? { emoji: "✍️", key: "cantSignYet" } : { emoji: "✍️", key: "agreementNotReady" },
         "portal_action",
-        countersigned.reason === "not_eligible" ? "/settings/signature" : `/bookings/${bookingLink.rental_id}`
+        signatureProblem ? "/settings/signature" : `/bookings/${bookingLink.rental_id}`
       ).catch(() => null);
       return {
         success: false,
@@ -890,7 +916,9 @@ async function completePublicBookingOrThrow(formData: FormData) {
     // step, or their details changed the agreement since they opened it, send
     // them back to read the final version first.
     if (intent === "review" || countersigned.versionId !== reviewedVersionId) {
-      return { success: true, needsReview: true, changed: intent === "sign" } as const;
+      // The prepared agreement goes back with the answer, so the page shows it at once instead of waiting on a reload
+      // (final pre-release test, 8 Nov 2026: in 2 of 4 runs it hadn't appeared after 20 seconds).
+      return { success: true, needsReview: true, changed: intent === "sign", rentalDocumentAgreement: await preparedAgreementFor(token) } as const;
     }
   }
 
@@ -930,15 +958,23 @@ async function completePublicBookingOrThrow(formData: FormData) {
       "data_handling"
     ].filter((type) => formData.get(`ack_${type}`) === "on");
 
-    const signing = await completeRentalDocumentCustomerSigning({
-      token,
-      signatureDataUrl: signature,
-      signerName: signedName,
-      ipAddress: customerIp,
-      userAgent,
-      acceptedAcknowledgementTypes,
-      reviewedVersionId: reviewedVersionId || ""
-    });
+    let signing: Awaited<ReturnType<typeof completeRentalDocumentCustomerSigning>>;
+    try {
+      signing = await completeRentalDocumentCustomerSigning({
+        token,
+        signatureDataUrl: signature,
+        signerName: signedName,
+        ipAddress: customerIp,
+        userAgent,
+        acceptedAcknowledgementTypes,
+        reviewedVersionId: reviewedVersionId || ""
+      });
+    } catch (error) {
+      // The agreement changed between what they read and what is current: show them the new one to read
+      // and sign, as when their details change it ("The agreement has changed. Please read it below...").
+      if (error instanceof AgreementVersionChangedError) return { success: true, needsReview: true, changed: true, rentalDocumentAgreement: await preparedAgreementFor(token) } as const;
+      throw error;
+    }
 
     const updatedBookingData = {
       ...((bookingLink.booking_data || {}) as Record<string, unknown>),

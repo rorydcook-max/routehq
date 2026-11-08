@@ -261,7 +261,6 @@ export function PaperworkDrafts({
         {saving ? <Loader2 className="animate-spin" size={18} /> : null}
         {saving ? t("adding") : missing ? t("paperNeedDates") : t("paperSave", { count: paperwork.length })}
       </button>
-      <p className="mt-2 px-1 text-[12px] text-[var(--muted)]">{t("paperCheck")}</p>
     </div>
   );
 }

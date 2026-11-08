@@ -43,7 +43,7 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
   const guides = docSearchIndex("en").map((entry) => ({ ...entry, video: Boolean(listDocs("en").find((doc) => doc.slug === entry.slug)?.video) }));
 
   return (
-    <AppShell hero={<PageBand keepSubtitle subtitle={t("subtitle")} title={t("title")} />} userEmail={userEmail}>
+    <AppShell hero={<PageBand title={t("title")} />} userEmail={userEmail}>
       {/* Support happens here only (Rory, 3 Nov 2026): no WhatsApp/LINE/email options, every reply is a Help conversation. */}
       <div className="min-w-0 max-w-5xl space-y-4">
 
@@ -63,7 +63,6 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="card-title">{t("liveTitle")}</h2>
-            <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("liveBody")}</p>
           </div>
           <OpenChatButton className="primary-action pressable shrink-0 justify-center" label={t("liveButton")} />
         </section>
@@ -92,7 +91,7 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
           <h2 className="card-title">{t("newTitle")}</h2>
           <div className="mt-3">
             <HelpCompose
-              hints={{ import: included ? t("importIncluded", { plan: t(`plan_${plan.id}`) }) : t("importHelp") }}
+              hints={included ? { import: t("importIncluded", { plan: t(`plan_${plan.id}`) }) } : undefined}
               initialTopic={initialTopic}
               mode="new"
             />

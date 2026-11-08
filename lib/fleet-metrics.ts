@@ -33,6 +33,8 @@ export type VehicleFigures = {
   utilizationLifetime: number;
   compliance: ComplianceItem[];
   healthScore: number;
+  /** Archived (status inactive): left out of the fleet average. */
+  archived?: boolean;
 };
 
 const COMPLIANCE_LABELS: Record<string, string> = {
@@ -65,10 +67,20 @@ export function complianceItems(metadata: any, today = businessToday(), mileage?
   return items.sort((a, b) => a.daysLeft - b.daysLeft);
 }
 
+/**
+ * How busy the fleet is: the 12-month share of days on rent (utilization12), averaged over the vehicles in the fleet
+ * (archived ones left out) and rounded to a whole percent. The fleet page's "How busy" and the vehicle page's
+ * "Fleet average" both use this, so they always agree (final pre-release test, 8 Nov 2026: 33% against 25%).
+ */
+export function fleetAverageUtilization(items: Array<{ utilization: number; archived?: boolean }>) {
+  const inFleet = items.filter((item) => !item.archived);
+  return inFleet.length ? Math.round(inFleet.reduce((sum, item) => sum + Number(item.utilization || 0), 0) / inFleet.length) : 0;
+}
+
 /** Loads what computeVehicleFigures needs for a whole business. */
 export async function loadFleetFigures(supabase: any, organizationId: string) {
   const [vehicles, rentals, transactions] = await Promise.all([
-    supabase.from("vehicles").select("id, purchase_date, created_at, mileage, metadata").eq("organization_id", organizationId).is("deleted_at", null),
+    supabase.from("vehicles").select("id, status, purchase_date, created_at, mileage, metadata").eq("organization_id", organizationId).is("deleted_at", null),
     supabase.from("rentals").select("vehicle_id, status, start_date, end_date").eq("organization_id", organizationId).is("deleted_at", null),
     supabase.from("transactions").select("vehicle_id, amount, type, is_deposit, voided").eq("organization_id", organizationId).is("deleted_at", null)
   ]);
@@ -147,7 +159,8 @@ export function computeVehicleFigures(input: {
       utilization12: Math.min(100, Math.round((rented12 / windowDays) * 100)),
       utilizationLifetime: Math.min(100, Math.round((rentedLifetime / lifetimeDays) * 100)),
       compliance,
-      healthScore
+      healthScore,
+      archived: String(vehicle.status || "") === "inactive"
     });
   }
 

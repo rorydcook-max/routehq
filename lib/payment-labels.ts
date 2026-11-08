@@ -6,5 +6,7 @@ export function customerPaymentLabel(metadata: any) {
   if (type === "extension") return "Extension";
   if (type === "charge") return String(metadata?.description || "Charge");
   if (type === "extras") return String(metadata?.description || "Extras");
+  // The charge for coming back late is saved as rent due on the return day; it is named for what it is.
+  if (metadata?.late_return) return "Late return";
   return metadata?.period_label ? `Rent · ${metadata.period_label}` : "Rent";
 }

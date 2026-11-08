@@ -83,7 +83,6 @@ export default async function AccountPage() {
 
         <section className="card p-5">
           <h2 className="card-title">{say("languageTitle")}</h2>
-          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("languageBody")}</p>
           {/* Keyed by the saved values so the form shows them after a save (React resets forms to their first defaults). */}
           <form action={updatePreferredLocale} className="mt-3 space-y-3" key={`${locale}-${profile?.preferred_calendar || ""}`}>
             <label className="block">
@@ -107,7 +106,6 @@ export default async function AccountPage() {
                     </option>
                   ))}
                 </select>
-                <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("calendarHelp")}</span>
               </label>
             ) : (
               <input name="preferredCalendar" type="hidden" value={calendarNow} />
@@ -120,7 +118,6 @@ export default async function AccountPage() {
 
         <section className="card p-5">
           <h2 className="card-title">{say("themeTitle")}</h2>
-          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("themeBody")}</p>
           <ThemePicker />
         </section>
 
@@ -138,7 +135,6 @@ export default async function AccountPage() {
         {/* GDPR / UK GDPR / PDPA (3 Nov 2026): the legal pages for everyone; ID-photo retention and delete for the owner (download: Settings › Plan). */}
         <section className="card p-5" id="privacy">
           <h2 className="card-title">{privacy("title")}</h2>
-          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{privacy("body")}</p>
           <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1">
             {(
               [

@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoTip } from "@/components/info-tip";
 import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Megaphone } from "lucide-react";
@@ -174,9 +175,11 @@ export function ReportToOthers({ customerId, reports, rentals, canReport, curren
             </label>
           </div>
           <label className="mt-3 block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("summary")}</span>
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--foreground-secondary)]">
+              {t("summary")}
+              <InfoTip label={t("summary")} text={t("summaryHint")} />
+            </span>
             <textarea className="mt-1 w-full" maxLength={600} onChange={(event) => setSummary(event.target.value)} placeholder={t("summaryPlaceholder")} rows={3} value={summary} />
-            <span className="mt-0.5 block text-xs text-[var(--muted)]">{t("summaryHint")}</span>
           </label>
           <label className="mt-3 block">
             <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("notes")}</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { InfoTip } from "@/components/info-tip";
+import { ModalSheet } from "@/components/modal-sheet";
 import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { shownError } from "@/lib/error-text";
 import { useEffect, useMemo, useState, useTransition, useRef } from "react";
@@ -448,22 +449,62 @@ export function RentalAdjustmentModal({
     );
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--foreground)]/35 px-4 py-6" role="dialog" aria-modal="true">
-      <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--border)] bg-white p-4 shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-[15px] font-medium text-[var(--foreground)]">{agreementSigned ? say("adj_titleSigned") : say("adj_title")}</h2>
-            <p className="mt-1 text-xs text-[var(--muted)]">
-              {customerName || say("adj_customer")} - {vehicleLabel || say("adj_vehicle")}
-            </p>
-          </div>
-          <button className="pressable rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--muted)]" onClick={onClose} type="button">
-            {say("adj_close")}
-          </button>
-        </div>
+  // The save button and its result stay at the bottom of the dialog while the choices above scroll (components/modal-sheet.tsx).
+  const footer = (
+    <>
+        {message ? (
+          <p className={`mb-3 rounded-lg px-3 py-2 text-sm font-bold ${[say("adj_extended"), say("adj_adjusted"), say("adj_nowOpen")].includes(message) ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]"}`} role="status">
+            {message}
+          </p>
+        ) : null}
 
-        <div className={`mt-4 grid gap-2 sm:gap-3 ${agreementSigned && !openEnded ? "sm:grid-cols-3" : agreementSigned || !openEnded ? "sm:grid-cols-2" : ""}`}>
+        <div className="flex gap-2">
+          {showPendingPanel ? (
+            <button
+              className="pressable min-h-11 flex-1 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-bold text-white"
+              onClick={() => {
+                onSuccess?.();
+                onClose();
+              }}
+              type="button"
+            >
+              {say("adj_done")}
+            </button>
+          ) : (
+            <>
+              <button className="pressable min-h-11 flex-1 rounded-full border border-[var(--border)] bg-white px-4 py-2 text-sm font-bold text-[var(--foreground-secondary)]" onClick={onClose} type="button">
+                {say("cancelBtn")}
+              </button>
+              <button
+                className="pressable min-h-11 flex-1 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
+                disabled={submitDisabled}
+                onClick={submit}
+                type="button"
+              >
+                {isPending ? say("saving") : useAmendment ? say("adj_createLink") : isExtension ? say("adj_extendTitle") : say("adj_setReturn")}
+              </button>
+            </>
+          )}
+        </div>
+    </>
+  );
+
+  return (
+    <ModalSheet
+      closeLabel={say("adj_close")}
+      dismissable={!isPending}
+      footer={footer}
+      headerExtra={
+        <p className="mt-0.5 truncate text-sm font-medium text-[var(--foreground-secondary)]">
+          {customerName || say("adj_customer")} · {vehicleLabel || say("adj_vehicle")}
+        </p>
+      }
+      onClose={onClose}
+      open
+      title={agreementSigned ? say("adj_titleSigned") : say("adj_title")}
+      width="lg"
+    >
+        <div className={`grid gap-2 sm:gap-3 ${agreementSigned && !openEnded ? "sm:grid-cols-3" : agreementSigned || !openEnded ? "sm:grid-cols-2" : ""}`}>
           {openEnded ? null : (
             <OptionCard
               icon="ti-calendar-plus"
@@ -662,43 +703,7 @@ export function RentalAdjustmentModal({
             </>
           )}
         </div>
-
-        {message ? (
-          <p className={`mt-3 rounded-lg px-3 py-2 text-sm font-bold ${[say("adj_extended"), say("adj_adjusted"), say("adj_nowOpen")].includes(message) ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]"}`}>
-            {message}
-          </p>
-        ) : null}
-
-        <div className="mt-4 flex gap-2">
-          {showPendingPanel ? (
-            <button
-              className="pressable min-h-11 flex-1 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-bold text-white"
-              onClick={() => {
-                onSuccess?.();
-                onClose();
-              }}
-              type="button"
-            >
-              {say("adj_done")}
-            </button>
-          ) : (
-            <>
-              <button className="pressable min-h-11 flex-1 rounded-full border border-[var(--border)] bg-white px-4 py-2 text-sm font-bold text-[var(--foreground-secondary)]" onClick={onClose} type="button">
-                {say("cancelBtn")}
-              </button>
-              <button
-                className="pressable min-h-11 flex-1 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
-                disabled={submitDisabled}
-                onClick={submit}
-                type="button"
-              >
-                {isPending ? say("saving") : useAmendment ? say("adj_createLink") : isExtension ? say("adj_extendTitle") : say("adj_setReturn")}
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+    </ModalSheet>
   );
 }
 
@@ -776,11 +781,22 @@ function RescheduleSheet({ rentalId, currentStartDate, currentEndDate, currentRa
     });
   }
   return (
-    <div aria-modal="true" className="fixed inset-0 z-50 flex items-end justify-center bg-[var(--foreground)]/35 p-3 sm:items-center" onClick={() => (isPending ? null : onClose())} role="dialog">
-      <div className="w-full max-w-md rounded-3xl bg-white p-5 shadow-[0_24px_80px_rgba(15,23,42,0.22)]" onClick={(event) => event.stopPropagation()}>
-        <p className="text-[19px] font-bold text-[var(--foreground)]">{say("rs_title")}</p>
-        <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{[customerName, vehicleLabel].filter(Boolean).join(" · ")}</p>
-        <div className="mt-4 grid grid-cols-2 gap-3">
+    <ModalSheet
+      closeLabel={say("adj_close")}
+      dismissable={!isPending}
+      footer={
+        <div className="flex gap-2 [&>*]:flex-1">
+          <button className="secondary-action pressable min-h-12 whitespace-nowrap" disabled={isPending} onClick={onClose} type="button">{say("adj_close")}</button>
+          <button className="primary-action pressable min-h-12 whitespace-nowrap" disabled={isPending || loading || !start || !end || done} onClick={save} type="button">{isPending ? say("saving") : say("rs_save")}</button>
+        </div>
+      }
+      headerExtra={<p className="mt-0.5 truncate font-medium text-[var(--foreground-secondary)]">{[customerName, vehicleLabel].filter(Boolean).join(" · ")}</p>}
+      onClose={onClose}
+      open
+      title={say("rs_title")}
+      width="sm"
+    >
+        <div className="grid grid-cols-2 gap-3">
           <label className="block font-semibold text-[var(--foreground-secondary)]">
             {say("rs_start")}
             <input className="mt-1 h-12 w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 text-[16px] font-semibold text-[var(--foreground)]" min={today} onChange={(event) => { setStart(event.target.value); setMessage(""); }} type="date" value={start} />
@@ -795,12 +811,7 @@ function RescheduleSheet({ rentalId, currentStartDate, currentEndDate, currentRa
         </p>
         {message ? <p className="mt-3 rounded-xl bg-[var(--danger-light)] p-3 font-semibold text-[var(--danger)]" role="alert">{message}</p> : null}
         {done ? <p className="mt-3 rounded-xl bg-[var(--success-light)] p-3 font-semibold text-[var(--success)]">{say("rs_saved")}</p> : null}
-        <div className="mt-4 flex gap-2 [&>*]:flex-1">
-          <button className="secondary-action pressable min-h-12 whitespace-nowrap" disabled={isPending} onClick={onClose} type="button">{say("adj_close")}</button>
-          <button className="primary-action pressable min-h-12 whitespace-nowrap" disabled={isPending || loading || !start || !end || done} onClick={save} type="button">{isPending ? say("saving") : say("rs_save")}</button>
-        </div>
-      </div>
-    </div>
+    </ModalSheet>
   );
 }
 

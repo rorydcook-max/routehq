@@ -2934,7 +2934,18 @@
     "freeYes": "無料で予約",
     "errAmountReceived": "受け取った金額を入力してください。",
     "plateLabel": "ナンバープレート",
-    "plateHint": "レンタル契約書に必要です。この車両に保存されます。"
+    "plateHint": "レンタル契約書に必要です。この車両に保存されます。",
+    "swapToggle": "別の車両で開始しましたか？",
+    "swapEarlierVehicle": "以前の車両",
+    "swapChooseVehicle": "車両を選択",
+    "swapDate": "この車両に変更した日",
+    "swapNeed": "以前の車両と変更日を選んでください。",
+    "swapAfterStart": "変更日は開始日より後にしてください。",
+    "swapNotFuture": "変更日を未来の日付にすることはできません。",
+    "swapBeforeEnd": "変更日は返却日より前にしてください。",
+    "clashSameCustomer": "この顧客はすでにこの車両を予約しています：{code}、{when}。",
+    "clashSameFrom": "{from}から",
+    "clashOpenIt": "開く"
   },
   "fleet": {
     "title": "車両一覧",

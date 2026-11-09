@@ -2908,7 +2908,18 @@
     "freeYes": "Gratis boeken",
     "errAmountReceived": "Voer het ontvangen bedrag in.",
     "plateLabel": "Kenteken",
-    "plateHint": "Nodig voor de huurovereenkomst. Het wordt bij dit voertuig opgeslagen."
+    "plateHint": "Nodig voor de huurovereenkomst. Het wordt bij dit voertuig opgeslagen.",
+    "swapToggle": "Begonnen met een ander voertuig?",
+    "swapEarlierVehicle": "Vorig voertuig",
+    "swapChooseVehicle": "Kies een voertuig",
+    "swapDate": "Overgestapt op dit voertuig op",
+    "swapNeed": "Kies het vorige voertuig en de dag van de wissel.",
+    "swapAfterStart": "De wissel moet na de startdatum liggen.",
+    "swapNotFuture": "De wissel kan niet in de toekomst liggen.",
+    "swapBeforeEnd": "De wissel moet vóór de retourdatum liggen.",
+    "clashSameCustomer": "Deze klant heeft al een boeking voor dit voertuig: {code}, {when}.",
+    "clashSameFrom": "vanaf {from}",
+    "clashOpenIt": "Openen"
   },
   "fleet": {
     "title": "Wagenpark",

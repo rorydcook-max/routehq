@@ -3204,7 +3204,18 @@
     "freeYes": "Kostenlos buchen",
     "errAmountReceived": "Geben Sie den erhaltenen Betrag ein.",
     "plateLabel": "Kennzeichen",
-    "plateHint": "Wird für den Mietvertrag benötigt und bei diesem Fahrzeug gespeichert."
+    "plateHint": "Wird für den Mietvertrag benötigt und bei diesem Fahrzeug gespeichert.",
+    "swapToggle": "Mit einem anderen Fahrzeug begonnen?",
+    "swapEarlierVehicle": "Vorheriges Fahrzeug",
+    "swapChooseVehicle": "Fahrzeug wählen",
+    "swapDate": "Gewechselt zu diesem Fahrzeug am",
+    "swapNeed": "Wählen Sie das vorherige Fahrzeug und den Tag des Wechsels.",
+    "swapAfterStart": "Der Wechsel muss nach dem Startdatum liegen.",
+    "swapNotFuture": "Der Wechsel darf nicht in der Zukunft liegen.",
+    "swapBeforeEnd": "Der Wechsel muss vor dem Rückgabedatum liegen.",
+    "clashSameCustomer": "Dieser Kunde hat bereits eine Buchung für dieses Fahrzeug: {code}, {when}.",
+    "clashSameFrom": "ab {from}",
+    "clashOpenIt": "Öffnen"
   },
   "fleet": {
     "title": "Fuhrpark",

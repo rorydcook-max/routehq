@@ -2934,7 +2934,18 @@
     "freeYes": "Book gratis",
     "errAmountReceived": "Skriv inn mottatt beløp.",
     "plateLabel": "Registreringsnummer",
-    "plateHint": "Trengs i leieavtalen. Det lagres på dette kjøretøyet."
+    "plateHint": "Trengs i leieavtalen. Det lagres på dette kjøretøyet.",
+    "swapToggle": "Startet med et annet kjøretøy?",
+    "swapEarlierVehicle": "Tidligere kjøretøy",
+    "swapChooseVehicle": "Velg et kjøretøy",
+    "swapDate": "Byttet til dette kjøretøyet den",
+    "swapNeed": "Velg det tidligere kjøretøyet og dagen det ble byttet.",
+    "swapAfterStart": "Byttet må være etter startdatoen.",
+    "swapNotFuture": "Byttet kan ikke være i fremtiden.",
+    "swapBeforeEnd": "Byttet må være før returdatoen.",
+    "clashSameCustomer": "Denne kunden har allerede en booking på dette kjøretøyet: {code}, {when}.",
+    "clashSameFrom": "fra {from}",
+    "clashOpenIt": "Åpne den"
   },
   "fleet": {
     "title": "Flåte",

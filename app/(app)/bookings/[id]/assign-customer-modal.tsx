@@ -3,9 +3,10 @@
 import { useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
-import { UserPlus, X } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { assignCustomerToBooking as assignCustomerToBookingAction } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
+import { ModalSheet } from "@/components/modal-sheet";
 import { unwrap } from "@/lib/action-result";
 
 // A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
@@ -65,33 +66,18 @@ export function AssignCustomerModal({
         {say("assign_open")}
       </button>
 
+      {/* The shared dialog (components/modal-sheet.tsx). "Add a new customer" inside it opens its own dialog on top. */}
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 backdrop-blur-sm sm:items-center">
-          <div className="w-full max-w-lg rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl">
-            <div className="flex items-start justify-between gap-3 p-6 pb-3">
-              <div>
-                <h2 className="text-xl font-semibold text-[var(--foreground)]">{say("assign_title")}</h2>
-              </div>
-              <button aria-label={say("closeLabel")}
-                className="pressable flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border)] text-[var(--muted)]"
-                onClick={() => { setOpen(false); setSelectedCustomer(null); setError(""); }}
-                type="button"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="space-y-3 px-6 pb-6">
-              <CustomerSelector
-                customers={customers}
-                organizationId={organizationId}
-                name="customerId"
-                onSelect={(customer) => { setSelectedCustomer(customer); setError(""); }}
-              />
+        <ModalSheet
+          closeLabel={say("closeLabel")}
+          dismissable={!isPending}
+          footer={
+            <div className="space-y-2">
               {error ? (
-                <p className="rounded-xl bg-[var(--danger-light)] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{error}</p>
+                <p className="rounded-xl bg-[var(--danger-light)] px-4 py-3 text-sm font-semibold text-[var(--danger)]" role="alert">{error}</p>
               ) : null}
               <button
-                className="pressable inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                className="pressable inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-70"
                 disabled={isPending || !selectedCustomer}
                 onClick={handleSubmit}
                 type="button"
@@ -100,8 +86,18 @@ export function AssignCustomerModal({
                 {isPending ? say("assign_busy") : say("assign_submit")}
               </button>
             </div>
-          </div>
-        </div>
+          }
+          onClose={() => { setOpen(false); setSelectedCustomer(null); setError(""); }}
+          open
+          title={say("assign_title")}
+        >
+          <CustomerSelector
+            customers={customers}
+            organizationId={organizationId}
+            name="customerId"
+            onSelect={(customer) => { setSelectedCustomer(customer); setError(""); }}
+          />
+        </ModalSheet>
       ) : null}
     </>
   );

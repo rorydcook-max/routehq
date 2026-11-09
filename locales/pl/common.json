@@ -2908,7 +2908,18 @@
     "freeYes": "Zarezerwuj bezpłatnie",
     "errAmountReceived": "Wpisz otrzymaną kwotę.",
     "plateLabel": "Numer rejestracyjny",
-    "plateHint": "Potrzebny w umowie najmu. Zostanie zapisany przy tym pojeździe."
+    "plateHint": "Potrzebny w umowie najmu. Zostanie zapisany przy tym pojeździe.",
+    "swapToggle": "Zaczęło się na innym pojeździe?",
+    "swapEarlierVehicle": "Poprzedni pojazd",
+    "swapChooseVehicle": "Wybierz pojazd",
+    "swapDate": "Zmiana na ten pojazd w dniu",
+    "swapNeed": "Wybierz poprzedni pojazd i dzień zmiany.",
+    "swapAfterStart": "Zmiana musi być po dacie rozpoczęcia.",
+    "swapNotFuture": "Zmiana nie może być w przyszłości.",
+    "swapBeforeEnd": "Zmiana musi być przed datą zwrotu.",
+    "clashSameCustomer": "Ten klient ma już rezerwację tego pojazdu: {code}, {when}.",
+    "clashSameFrom": "od {from}",
+    "clashOpenIt": "Otwórz ją"
   },
   "fleet": {
     "title": "Flota",

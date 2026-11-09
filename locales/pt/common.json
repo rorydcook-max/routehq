@@ -2934,7 +2934,18 @@
     "freeYes": "Reservar de graça",
     "errAmountReceived": "Informe o valor recebido.",
     "plateLabel": "Placa",
-    "plateHint": "Necessária no contrato de aluguel. Fica salva neste veículo."
+    "plateHint": "Necessária no contrato de aluguel. Fica salva neste veículo.",
+    "swapToggle": "Começou com outro veículo?",
+    "swapEarlierVehicle": "Veículo anterior",
+    "swapChooseVehicle": "Escolha um veículo",
+    "swapDate": "Trocou para este veículo em",
+    "swapNeed": "Escolha o veículo anterior e o dia da troca.",
+    "swapAfterStart": "A troca deve ser depois da data de início.",
+    "swapNotFuture": "A troca não pode ser no futuro.",
+    "swapBeforeEnd": "A troca deve ser antes da data de devolução.",
+    "clashSameCustomer": "Este cliente já tem uma reserva neste veículo: {code}, {when}.",
+    "clashSameFrom": "a partir de {from}",
+    "clashOpenIt": "Abrir"
   },
   "fleet": {
     "title": "Frota",

@@ -2908,7 +2908,18 @@
     "freeYes": "Reservar gratis",
     "errAmountReceived": "Ingresa el importe recibido.",
     "plateLabel": "Matrícula",
-    "plateHint": "Se necesita en el contrato de alquiler. Se guarda en este vehículo."
+    "plateHint": "Se necesita en el contrato de alquiler. Se guarda en este vehículo.",
+    "swapToggle": "¿Empezó con otro vehículo?",
+    "swapEarlierVehicle": "Vehículo anterior",
+    "swapChooseVehicle": "Elige un vehículo",
+    "swapDate": "Cambió a este vehículo el",
+    "swapNeed": "Elige el vehículo anterior y el día del cambio.",
+    "swapAfterStart": "El cambio debe ser posterior a la fecha de inicio.",
+    "swapNotFuture": "El cambio no puede ser en el futuro.",
+    "swapBeforeEnd": "El cambio debe ser anterior a la fecha de devolución.",
+    "clashSameCustomer": "Este cliente ya tiene una reserva de este vehículo: {code}, {when}.",
+    "clashSameFrom": "desde el {from}",
+    "clashOpenIt": "Abrirla"
   },
   "fleet": {
     "title": "Flota",

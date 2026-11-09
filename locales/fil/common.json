@@ -2908,7 +2908,18 @@
     "freeYes": "I-book nang libre",
     "errAmountReceived": "Ilagay ang halagang natanggap.",
     "plateLabel": "Plaka",
-    "plateHint": "Kailangan sa rental agreement. Ise-save ito sa sasakyang ito."
+    "plateHint": "Kailangan sa rental agreement. Ise-save ito sa sasakyang ito.",
+    "swapToggle": "Nagsimula sa ibang sasakyan?",
+    "swapEarlierVehicle": "Naunang sasakyan",
+    "swapChooseVehicle": "Pumili ng sasakyan",
+    "swapDate": "Lumipat sa sasakyang ito noong",
+    "swapNeed": "Piliin ang naunang sasakyan at ang araw ng paglipat.",
+    "swapAfterStart": "Dapat pagkatapos ng start date ang paglipat.",
+    "swapNotFuture": "Hindi pwedeng nasa hinaharap ang paglipat.",
+    "swapBeforeEnd": "Dapat bago ang petsa ng pagbalik ang paglipat.",
+    "clashSameCustomer": "May booking na ang customer na ito sa sasakyang ito: {code}, {when}.",
+    "clashSameFrom": "mula {from}",
+    "clashOpenIt": "Buksan"
   },
   "fleet": {
     "title": "Fleet",

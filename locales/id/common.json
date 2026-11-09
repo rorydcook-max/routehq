@@ -3230,7 +3230,18 @@
     "freeYes": "Pesan gratis",
     "errAmountReceived": "Masukkan jumlah yang diterima.",
     "plateLabel": "Nomor pelat",
-    "plateHint": "Diperlukan di perjanjian sewa. Disimpan di kendaraan ini."
+    "plateHint": "Diperlukan di perjanjian sewa. Disimpan di kendaraan ini.",
+    "swapToggle": "Mulai dengan kendaraan lain?",
+    "swapEarlierVehicle": "Kendaraan sebelumnya",
+    "swapChooseVehicle": "Pilih kendaraan",
+    "swapDate": "Ganti ke kendaraan ini pada",
+    "swapNeed": "Pilih kendaraan sebelumnya dan hari penggantiannya.",
+    "swapAfterStart": "Penggantian harus setelah tanggal mulai.",
+    "swapNotFuture": "Penggantian tidak boleh di masa depan.",
+    "swapBeforeEnd": "Penggantian harus sebelum tanggal pengembalian.",
+    "clashSameCustomer": "Pelanggan ini sudah punya pemesanan untuk kendaraan ini: {code}, {when}.",
+    "clashSameFrom": "mulai {from}",
+    "clashOpenIt": "Buka"
   },
   "fleet": {
     "title": "Armada",

@@ -24,7 +24,7 @@ import { niceMoney } from "@/lib/nice-money";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
 import { wallTimeToIso, businessToday } from "@/lib/business-time";
-import { DOUBLE_BOOKING_MESSAGE, earlyHandoverBlocker, isDoubleBookingError, vehicleConflictMessage } from "@/lib/rental-conflicts";
+import { DOUBLE_BOOKING_MESSAGE, earlyHandoverBlocker, findConflict, isDoubleBookingError, loadBusyPeriods, vehicleConflictMessage } from "@/lib/rental-conflicts";
 import { earlyStartFor, ensureEarlyStartCharge, requestEarlyWaiver, settleEarlyChoice } from "@/lib/early-start";
 import { applyLateStart, lateStartNote } from "@/lib/late-start";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
@@ -283,6 +283,76 @@ function isIsoCurrency(code: string) {
   }
 }
 
+type EarlierVehicleSwap = { vehicleId: string; swapDate: string; label: string };
+
+/**
+ * "Started on a different vehicle?" on a rental already under way: the vehicle the customer had first and the day
+ * they moved to the vehicle chosen for the booking. Null when not given.
+ */
+async function earlierVehicleSwap(supabase: any, formData: FormData, args: { organizationId: string; vehicleId: string; startDate: string; endDate: string | null }): Promise<EarlierVehicleSwap | null> {
+  const earlierId = String(formData.get("earlierVehicleId") || "").trim();
+  if (!earlierId) return null;
+  const swapDate = dateOnly(String(formData.get("swapDate") || ""));
+  if (earlierId === args.vehicleId) throw new Error("Choose a different vehicle for the start of the rental.");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(swapDate)) throw new Error("Choose the day the customer changed vehicle.");
+  if (swapDate <= args.startDate.slice(0, 10)) throw new Error("The vehicle change must be after the start date.");
+  if (swapDate > businessToday()) throw new Error("The vehicle change can't be in the future.");
+  if (args.endDate && swapDate >= args.endDate.slice(0, 10)) throw new Error("The vehicle change must be before the return date.");
+  const { data: earlier } = await supabase
+    .from("vehicles")
+    .select("id, make, model, registration_number")
+    .eq("id", earlierId)
+    .eq("organization_id", args.organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (!earlier) throw new Error("Vehicle was not found.");
+  return { vehicleId: earlier.id, swapDate, label: [earlier.make, earlier.model].filter(Boolean).join(" ") || String(earlier.registration_number || "") };
+}
+
+/**
+ * Records the earlier vehicle the way a change of vehicle made in the app is recorded (applyVehicleChange in
+ * amendments.ts): rentals.original_vehicle_id (set on insert), a vehicle_changes row and a "Vehicle changed" event on
+ * the swap date. Rent and deposit dated before the swap stay with the earlier vehicle, as they do after an in-app change.
+ */
+async function recordEarlierVehicle(
+  supabase: any,
+  args: { organizationId: string; rentalId: string; customerId: string | null; userId: string; swap: EarlierVehicleSwap; currentVehicleId: string; currentLabel: string; rate: number }
+) {
+  const { organizationId, rentalId, swap } = args;
+  const changedAt = wallTimeToIso(`${swap.swapDate}T09:00`) || `${swap.swapDate}T00:00:00.000Z`;
+  await Promise.all([
+    supabase.from("rental_payments").update({ vehicle_id: swap.vehicleId }).eq("organization_id", organizationId).eq("rental_id", rentalId).lt("due_date", swap.swapDate),
+    supabase.from("transactions").update({ vehicle_id: swap.vehicleId }).eq("organization_id", organizationId).eq("rental_id", rentalId).lt("transaction_date", swap.swapDate)
+  ]);
+  const { error } = await supabase.from("vehicle_changes").insert({
+    organization_id: organizationId,
+    rental_id: rentalId,
+    from_vehicle_id: swap.vehicleId,
+    to_vehicle_id: args.currentVehicleId,
+    reason: "other",
+    reason_notes: "Vehicle changed",
+    changed_at: changedAt,
+    changed_by: args.userId,
+    original_vehicle_disposition: "available",
+    rate_before: args.rate,
+    rate_after: args.rate
+  });
+  if (error) throw new Error(error.message);
+  await recordActivityEvent(supabase, {
+    organization_id: organizationId,
+    actor_id: args.userId,
+    entity_type: "rental",
+    entity_id: rentalId,
+    rental_id: rentalId,
+    vehicle_id: args.currentVehicleId,
+    customer_id: args.customerId,
+    event_type: "vehicle_changed",
+    title: "Vehicle changed",
+    detail: `Moved from the ${swap.label} to the ${args.currentLabel}. Dates and price unchanged.`,
+    occurred_at: changedAt
+  } as any);
+}
+
 async function createBookingOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -380,10 +450,21 @@ async function createBookingOrThrow(formData: FormData) {
   if (["maintenance", "inactive", "retired"].includes(vehicle.status)) {
     throw new Error("This vehicle is marked as unavailable (in maintenance or inactive). Change its status on the vehicle page first.");
   }
+  // A rental already under way that began on another vehicle (Rory, 9 Nov 2026): the earlier vehicle is only needed
+  // from the start to the swap date, the current one from the swap date. Recorded like a vehicle change made in the app.
+  const swap = bookingMode === "existing_rental" && !walkInFastTrack ? await earlierVehicleSwap(supabase, formData, { organizationId, vehicleId, startDate, endDate }) : null;
   // A car on rent now can still be booked for dates after it comes back.
-  const conflict = await vehicleConflictMessage(supabase, { organizationId, vehicleId, startDate, endDate });
+  const conflict = await vehicleConflictMessage(supabase, { organizationId, vehicleId, startDate: swap ? swap.swapDate : startDate, endDate, customerId });
   if (conflict) {
     throw new Error(conflict);
+  }
+  if (swap) {
+    const earlierConflict = await vehicleConflictMessage(supabase, { organizationId, vehicleId: swap.vehicleId, startDate, endDate: swap.swapDate, customerId });
+    if (earlierConflict) throw new Error(`${swap.label}: ${earlierConflict}`);
+    // The database keeps a rental's whole period on its current vehicle: an open booking on it before the swap date is in the way.
+    const busy = await loadBusyPeriods(supabase, organizationId, [vehicleId]);
+    const before = findConflict(busy[vehicleId] || [], startDate, swap.swapDate);
+    if (before) throw new Error(`This vehicle still has an open booking before the swap date (${before.code || before.customerName || "another booking"}). Return or cancel it first.`);
   }
 
   // The agreement can't be signed without a number plate (final pre-release test, 8 Nov 2026): the form asks for it
@@ -478,6 +559,7 @@ async function createBookingOrThrow(formData: FormData) {
   if (createsActiveRental) {
     rentalInsert.entered_by_operator = true;
   }
+  if (swap) rentalInsert.original_vehicle_id = swap.vehicleId;
 
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")
@@ -644,6 +726,14 @@ async function createBookingOrThrow(formData: FormData) {
       await settleExistingRental(supabase, { rental: { ...rental, vehicle_id: vehicleId, customer_id: customerId, start_date: startDate }, organizationId, userId: user.id, paidBefore, depositHeld, currency, upfrontUntil }).catch(() => null);
     }
 
+    if (swap) {
+      await recordEarlierVehicle(supabase, { organizationId, rentalId: rental.id, customerId: customerId || null, userId: user.id, swap, currentVehicleId: vehicleId, currentLabel: [vehicle.make, vehicle.model].filter(Boolean).join(" "), rate: rentalRate + extrasPriced.monthly }).catch((swapError) =>
+        console.warn("[createBooking] earlier vehicle not recorded:", swapError instanceof Error ? swapError.message : swapError)
+      );
+      revalidatePath(`/fleet/${swap.vehicleId}`);
+      revalidatePath("/calendar");
+    }
+
     await recordActivityEvent(supabase, {
       organization_id: organizationId,
       actor_id: user.id,
@@ -654,9 +744,9 @@ async function createBookingOrThrow(formData: FormData) {
       customer_id: customerId || null,
       event_type: "rental_created",
       title: walkInFastTrack ? "Walk-in rental recorded" : "Existing rental recorded",
-      detail: customer
+      detail: (customer
         ? `${bookingReference(rental)} was recorded as ${walkInFastTrack ? "a walk-in rental" : "an existing active rental"} for ${customer.full_name} and ${vehicle.registration_number}.`
-        : `${bookingReference(rental)} was recorded as ${walkInFastTrack ? "a walk-in rental" : "an existing active rental"} for ${vehicle.registration_number}.`
+        : `${bookingReference(rental)} was recorded as ${walkInFastTrack ? "a walk-in rental" : "an existing active rental"} for ${vehicle.registration_number}.`) + (swap ? ` It started on the ${swap.label}.` : "")
     });
     await markOnboardingStep(supabase, organizationId, "first_booking");
 

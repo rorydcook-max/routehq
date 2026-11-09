@@ -2908,7 +2908,18 @@
     "freeYes": "Rezerviraj besplatno",
     "errAmountReceived": "Unesite primljeni iznos.",
     "plateLabel": "Registarska oznaka",
-    "plateHint": "Potrebna je za ugovor o najmu. Sprema se uz ovo vozilo."
+    "plateHint": "Potrebna je za ugovor o najmu. Sprema se uz ovo vozilo.",
+    "swapToggle": "Započelo s drugim vozilom?",
+    "swapEarlierVehicle": "Prethodno vozilo",
+    "swapChooseVehicle": "Odaberite vozilo",
+    "swapDate": "Prešlo na ovo vozilo dana",
+    "swapNeed": "Odaberite prethodno vozilo i dan zamjene.",
+    "swapAfterStart": "Zamjena mora biti nakon datuma početka.",
+    "swapNotFuture": "Zamjena ne može biti u budućnosti.",
+    "swapBeforeEnd": "Zamjena mora biti prije datuma povrata.",
+    "clashSameCustomer": "Ovaj kupac već ima rezervaciju ovog vozila: {code}, {when}.",
+    "clashSameFrom": "od {from}",
+    "clashOpenIt": "Otvori je"
   },
   "fleet": {
     "title": "Vozni park",

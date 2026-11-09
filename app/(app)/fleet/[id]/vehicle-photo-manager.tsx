@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { Camera, ImagePlus, Move, Sparkles, Trash2, Undo2, X } from "lucide-react";
+import { Camera, ImagePlus, Move, Sparkles, Trash2, Undo2 } from "lucide-react";
 import { AiPhotoTools, useAiPhotos } from "@/components/ai-photos";
+import { ModalSheet } from "@/components/modal-sheet";
 import { removeVehiclePhoto as removeVehiclePhotoAction, reorderVehiclePhotos as reorderVehiclePhotosAction, uploadVehiclePhotos as uploadVehiclePhotosAction } from "@/app/actions/vehicles";
 import type { VehicleDetailDocument } from "@/lib/vehicle-detail";
 import { PhotoGallery } from "@/components/photo-gallery";
@@ -233,20 +234,15 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
       </button>
       )}
 
-      {isOpen ? (
-        <div aria-modal="true" className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/45 sm:items-center sm:px-4 sm:py-6" role="dialog">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl">
-            <div className="flex items-center justify-between gap-4 px-5 py-4">
-              <div className="min-w-0">
-                <h2 className="text-[20px] font-bold leading-tight text-[var(--foreground)]">{say("ph_title")}</h2>
-                <p className="truncate font-medium text-[var(--foreground-secondary)]">{vehicleLabel}</p>
-              </div>
-              <button aria-label={say("ph_close")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--panel-secondary)] text-[var(--foreground)]" onClick={() => setIsOpen(false)} type="button">
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="max-h-[calc(90vh-76px)] overflow-y-auto px-5 pb-6">
+      {/* The shared dialog (components/modal-sheet.tsx): the page behind stays put while the photos scroll. */}
+      <ModalSheet
+        closeLabel={say("ph_close")}
+        headerExtra={<p className="truncate font-medium text-[var(--foreground-secondary)]">{vehicleLabel}</p>}
+        onClose={() => setIsOpen(false)}
+        open={isOpen}
+        title={say("ph_title")}
+        width="xl"
+      >
               <input accept="image/*" className="hidden" multiple onChange={(event) => uploadChosen(event.target.files)} ref={fileInputRef} type="file" />
               <button className="primary-action w-full" disabled={isPending} onClick={() => fileInputRef.current?.click()} type="button">
                 <ImagePlus size={18} />
@@ -333,10 +329,7 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      </ModalSheet>
     </>
   );
 }

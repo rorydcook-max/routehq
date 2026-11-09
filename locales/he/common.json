@@ -3230,7 +3230,18 @@
     "freeYes": "הזמנה בחינם",
     "errAmountReceived": "הזינו את הסכום שהתקבל.",
     "plateLabel": "מספר רישוי",
-    "plateHint": "נדרש בהסכם ההשכרה. נשמר ברכב הזה."
+    "plateHint": "נדרש בהסכם ההשכרה. נשמר ברכב הזה.",
+    "swapToggle": "התחיל ברכב אחר?",
+    "swapEarlierVehicle": "הרכב הקודם",
+    "swapChooseVehicle": "בחרו רכב",
+    "swapDate": "הוחלף לרכב הזה בתאריך",
+    "swapNeed": "בחרו את הרכב הקודם ואת יום ההחלפה.",
+    "swapAfterStart": "ההחלפה חייבת להיות אחרי תאריך ההתחלה.",
+    "swapNotFuture": "ההחלפה לא יכולה להיות בעתיד.",
+    "swapBeforeEnd": "ההחלפה חייבת להיות לפני תאריך ההחזרה.",
+    "clashSameCustomer": "ללקוח הזה כבר יש הזמנה לרכב הזה: {code}, {when}.",
+    "clashSameFrom": "מ-{from}",
+    "clashOpenIt": "פתיחה"
   },
   "fleet": {
     "title": "צי הרכבים",

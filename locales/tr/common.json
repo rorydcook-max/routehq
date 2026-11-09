@@ -5747,7 +5747,18 @@
     "freeYes": "Ücretsiz rezerve et",
     "errAmountReceived": "Alınan tutarı girin.",
     "plateLabel": "Plaka",
-    "plateHint": "Kiralama sözleşmesi için gerekli. Bu araca kaydedilir."
+    "plateHint": "Kiralama sözleşmesi için gerekli. Bu araca kaydedilir.",
+    "swapToggle": "Başka bir araçla mı başladı?",
+    "swapEarlierVehicle": "Önceki araç",
+    "swapChooseVehicle": "Araç seçin",
+    "swapDate": "Bu araca geçiş tarihi",
+    "swapNeed": "Önceki aracı ve değişim gününü seçin.",
+    "swapAfterStart": "Değişim başlangıç tarihinden sonra olmalı.",
+    "swapNotFuture": "Değişim gelecekte olamaz.",
+    "swapBeforeEnd": "Değişim iade tarihinden önce olmalı.",
+    "clashSameCustomer": "Bu müşterinin bu araçta zaten bir rezervasyonu var: {code}, {when}.",
+    "clashSameFrom": "{from} tarihinden itibaren",
+    "clashOpenIt": "Aç"
   },
   "help": {
     "title": "Yardım",

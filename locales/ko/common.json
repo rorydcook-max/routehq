@@ -2934,7 +2934,18 @@
     "freeYes": "무료로 예약",
     "errAmountReceived": "받은 금액을 입력하세요.",
     "plateLabel": "번호판",
-    "plateHint": "렌털 계약서에 필요합니다. 이 차량에 저장됩니다."
+    "plateHint": "렌털 계약서에 필요합니다. 이 차량에 저장됩니다.",
+    "swapToggle": "다른 차량으로 시작했나요?",
+    "swapEarlierVehicle": "이전 차량",
+    "swapChooseVehicle": "차량 선택",
+    "swapDate": "이 차량으로 변경한 날짜",
+    "swapNeed": "이전 차량과 변경한 날을 선택하세요.",
+    "swapAfterStart": "변경일은 시작일 이후여야 합니다.",
+    "swapNotFuture": "변경일은 미래일 수 없습니다.",
+    "swapBeforeEnd": "변경일은 반납일 이전이어야 합니다.",
+    "clashSameCustomer": "이 고객은 이미 이 차량을 예약했습니다: {code}, {when}.",
+    "clashSameFrom": "{from}부터",
+    "clashOpenIt": "열기"
   },
   "fleet": {
     "title": "차량",

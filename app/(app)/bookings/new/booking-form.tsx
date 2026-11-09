@@ -18,6 +18,7 @@ import { InfoTip } from "@/components/info-tip";
 import { DateLeaf } from "@/components/glance";
 import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
+import { ModalSheet } from "@/components/modal-sheet";
 import { QuickDocs } from "@/components/quick-docs";
 import { Badge, ProgressBar } from "@/components/ui";
 import { findConflict, type BusyPeriod } from "@/lib/rental-conflicts";
@@ -396,6 +397,10 @@ export function BookingForm({
   const [existingPaid, setExistingPaid] = useState<"up_to_date" | "until" | "none">("up_to_date");
   const [existingPaidUntil, setExistingPaidUntil] = useState("");
   const [existingDepositHeld, setExistingDepositHeld] = useState(true);
+  // A rental under way that began on another vehicle: the vehicle the customer had first and the day they changed.
+  const [swapOpen, setSwapOpen] = useState(false);
+  const [earlierVehicleId, setEarlierVehicleId] = useState("");
+  const [swapDate, setSwapDate] = useState("");
   // Thailand's compulsory insurance (Por Ror Bor) comes ticked only for a business in Thailand.
   const [includedItems, setIncludedItems] = useState<string[]>(() => (businessCountry() === "TH" ? [includedOptions[1]] : []));
   // The tick boxes stay folded when the vehicle already has its usual list.
@@ -447,8 +452,19 @@ export function BookingForm({
     if (saved) setIncludedItems(saved);
     setIncludedOpen(false);
   }, [vehicleId, vehicles]);
-  const anyClash = vehicleId ? findConflict(busyPeriods[vehicleId] || [], startDate, openEnded ? null : endDate || null) : null;
-  const dateConflict = anyClash && (openEnded || endDate || String(anyClash.startDate).slice(0, 10) <= startDate) ? anyClash : null;
+  // "Started on a different vehicle?" (rental already under way, not a walk-in): each vehicle is checked only for its own part.
+  const swapAllowed = bookingMode === "existing_rental" && !walkInNow;
+  const swapActive = swapAllowed && swapOpen;
+  const swapDateProblem = !swapActive || !swapDate ? "" : swapDate <= startDate ? "swapAfterStart" : swapDate > businessToday() ? "swapNotFuture" : !openEnded && endDate && swapDate >= endDate ? "swapBeforeEnd" : "";
+  const swapReady = swapActive && Boolean(earlierVehicleId && earlierVehicleId !== vehicleId && swapDate) && !swapDateProblem;
+  const earlierVehicle = swapReady ? vehicles.find((vehicle) => vehicle.id === earlierVehicleId) || null : null;
+  const earlierConflict = swapReady ? findConflict(busyPeriods[earlierVehicleId] || [], startDate, swapDate) : null;
+  const anyClash = vehicleId ? findConflict(busyPeriods[vehicleId] || [], swapReady ? swapDate : startDate, openEnded ? null : endDate || null) : null;
+  const dateConflict = anyClash && (openEnded || endDate || String(anyClash.startDate).slice(0, 10) <= startDate) ? anyClash : earlierConflict;
+  // Which vehicle the clash is on, when it is the earlier one.
+  const conflictVehicle = dateConflict && dateConflict === earlierConflict ? earlierVehicle : null;
+  // The clash is this customer's own booking (often one recorded earlier for this same rental).
+  const sameCustomerClash = Boolean(dateConflict && !dateConflict.heldForExtension && selectedCustomer && dateConflict.customerId === selectedCustomer.id);
   const nextBooking = !dateConflict && anyClash ? anyClash : null;
   const nextBookingStart = nextBooking ? String(nextBooking.startDate).slice(0, 10) : "";
   const currencyInfo = currencyInfoFor(currency);
@@ -531,7 +547,7 @@ export function BookingForm({
   function canContinue() {
     if (step === 0) return Boolean(selectedVehicle && selectable(selectedVehicle));
     if (step === 1) return Boolean(selectedCustomer); // Only reached when not skipped
-    if (step === 2) return Boolean(startDate && rentalRate >= 0 && (openEnded || endDate) && !endBeforeStart && !dateConflict);
+    if (step === 2) return Boolean(startDate && rentalRate >= 0 && (openEnded || endDate) && !endBeforeStart && !dateConflict && (!swapActive || swapReady));
     if (step === 3) return true;
     return true;
   }
@@ -541,6 +557,7 @@ export function BookingForm({
     if (step !== 2 || dateConflict) return null;
     if (!startDate) return say("needStart");
     if (!openEnded && !endDate) return say("needReturn");
+    if (swapActive && !swapReady) return say(swapDateProblem || "swapNeed");
     return null;
   }
 
@@ -676,6 +693,8 @@ export function BookingForm({
         formData.set("existingPaid", existingPaid);
         formData.set("existingPaidUntil", existingPaidUntil);
         formData.set("existingDepositHeld", String(existingDepositHeld));
+        formData.set("earlierVehicleId", swapReady && requestedBookingMode === "existing_rental" && !fastTrack ? earlierVehicleId : "");
+        formData.set("swapDate", swapReady && requestedBookingMode === "existing_rental" && !fastTrack ? swapDate : "");
         const result = await createBooking(formData);
         if (!result.ok) {
           setError(result.error);
@@ -734,24 +753,8 @@ export function BookingForm({
       <input name="upfrontTotal" type="hidden" value={upfrontEnabled ? upfrontPeriods * upfrontRate : 0} />
 
       {/* Customer choice modal — shown after vehicle selection */}
-      {showCustomerModal ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-3 backdrop-blur-sm sm:items-center">
-          <div className="w-full max-w-lg rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl">
-            <div className="flex items-start justify-between gap-3 p-3 pb-3">
-              <div>
-                <h2 className="text-xl font-semibold text-[var(--foreground)]">{say("addCustomerQ")}</h2>
-              </div>
-              <button
-                aria-label={say("close")}
-                className="pressable shrink-0 rounded-full p-2 text-[var(--muted)] hover:bg-[var(--panel-secondary)]"
-                onClick={() => setShowCustomerModal(false)}
-                type="button"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="space-y-3 px-6 pb-6">
+      <ModalSheet closeLabel={say("close")} onClose={() => setShowCustomerModal(false)} open={showCustomerModal} title={say("addCustomerQ")}>
+            <div className="space-y-3">
               {/* Skip for now — primary / recommended */}
               {bookingMode === "booking_link" ? (
                 <button
@@ -793,9 +796,7 @@ export function BookingForm({
                 </div>
               </button>
             </div>
-          </div>
-        </div>
-      ) : null}
+      </ModalSheet>
 
       {step !== 0 ? (
         <div className="content-section flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
@@ -1063,17 +1064,64 @@ export function BookingForm({
             />
             <span>{say("openEnded")}</span>
           </label>
+          {swapAllowed ? (
+            <div className="sub-surface mt-3 rounded-lg" style={{ padding: "10px 12px" }}>
+              <label className="checkbox-label min-h-8 font-bold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center" }}>
+                <input checked={swapOpen} className="flex-shrink-0" onChange={(event) => setSwapOpen(event.target.checked)} type="checkbox" />
+                <span>{say("swapToggle")}</span>
+              </label>
+              {swapOpen ? (
+                <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:items-start">
+                  <label className="block">
+                    <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("swapEarlierVehicle")}</span>
+                    <select className={inputClass} onChange={(event) => setEarlierVehicleId(event.target.value)} value={earlierVehicleId}>
+                      <option value="">{say("swapChooseVehicle")}</option>
+                      {vehicles
+                        .filter((vehicle) => vehicle.id !== vehicleId)
+                        .map((vehicle) => (
+                          <option key={vehicle.id} value={vehicle.id}>
+                            {[vehicle.make, vehicle.model].filter(Boolean).join(" ")}
+                            {vehicle.registration_number ? ` · ${vehicle.registration_number}` : ""}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("swapDate")}</span>
+                    <input aria-invalid={Boolean(swapDateProblem) || undefined} className={inputClass} max={businessToday()} min={startDate || undefined} onChange={(event) => setSwapDate(event.target.value)} type="date" value={swapDate} />
+                  </label>
+                  {swapDateProblem ? (
+                    <p className="text-sm font-bold text-[var(--danger)] sm:col-span-2" role="alert">
+                      {say(swapDateProblem)}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           {dateConflict ? (
             <p className="mt-3 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]" role="alert">
+              {conflictVehicle ? <>{[conflictVehicle.make, conflictVehicle.model].filter(Boolean).join(" ")}: </> : null}
               {dateConflict.heldForExtension
                 ? say("clashHeld", { who: dateConflict.customerName || say("clashHeldRenter") })
+                : sameCustomerClash
+                ? say("clashSameCustomer", {
+                    code: dateConflict.code || "",
+                    when: dateConflict.endDate ? `${shortDate(dateConflict.startDate, locale)}–${shortDate(dateConflict.endDate, locale)}` : say("clashSameFrom", { from: shortDate(dateConflict.startDate, locale) })
+                  })
                 : dateConflict.endDate
                 ? say("clashUntil", { from: shortDate(dateConflict.startDate, locale), to: shortDate(dateConflict.endDate, locale), who: [dateConflict.code, dateConflict.customerName].filter(Boolean).join(", ") })
                 : say("clashOpen", { from: shortDate(dateConflict.startDate, locale), who: [dateConflict.code, dateConflict.customerName].filter(Boolean).join(", ") })}
-              {/* Nothing of their own free: a partner's vehicle keeps the customer. */}
-              <a className="mt-2 block font-bold text-[var(--primary)]" href="/partners">
-                {say("clashPartners")}
-              </a>
+              {sameCustomerClash ? (
+                <Link className="mt-2 block font-bold text-[var(--primary)]" href={`/bookings/${dateConflict.rentalId}`}>
+                  {say("clashOpenIt")}
+                </Link>
+              ) : (
+                /* Nothing of their own free: a partner's vehicle keeps the customer. */
+                <a className="mt-2 block font-bold text-[var(--primary)]" href="/partners">
+                  {say("clashPartners")}
+                </a>
+              )}
             </p>
           ) : nextBooking ? (
             <p className="mt-3 rounded-lg bg-[var(--panel-secondary)] p-3 font-semibold text-[var(--foreground-secondary)]">

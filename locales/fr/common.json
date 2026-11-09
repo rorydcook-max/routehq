@@ -3230,7 +3230,18 @@
     "freeYes": "Réserver gratuitement",
     "errAmountReceived": "Saisissez le montant reçu.",
     "plateLabel": "Plaque d'immatriculation",
-    "plateHint": "Nécessaire pour le contrat de location. Elle est enregistrée sur ce véhicule."
+    "plateHint": "Nécessaire pour le contrat de location. Elle est enregistrée sur ce véhicule.",
+    "swapToggle": "Commencé avec un autre véhicule ?",
+    "swapEarlierVehicle": "Véhicule précédent",
+    "swapChooseVehicle": "Choisir un véhicule",
+    "swapDate": "Passé à ce véhicule le",
+    "swapNeed": "Choisissez le véhicule précédent et le jour du changement.",
+    "swapAfterStart": "Le changement doit être après la date de début.",
+    "swapNotFuture": "Le changement ne peut pas être dans le futur.",
+    "swapBeforeEnd": "Le changement doit être avant la date de retour.",
+    "clashSameCustomer": "Ce client a déjà une réservation sur ce véhicule : {code}, {when}.",
+    "clashSameFrom": "à partir du {from}",
+    "clashOpenIt": "L'ouvrir"
   },
   "fleet": {
     "title": "Flotte",

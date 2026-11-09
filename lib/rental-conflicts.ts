@@ -15,6 +15,8 @@ export type BusyPeriod = {
   rentalId: string;
   code: string | null;
   customerName: string | null;
+  /** The booking's customer, so a clash with the same customer's own booking can say so. */
+  customerId?: string | null;
   startDate: string;
   endDate: string | null;
   /** True while the customer has the vehicle (handed over, not yet returned). */
@@ -102,8 +104,13 @@ function shortDate(iso: string) {
   return new Intl.DateTimeFormat(englishDateLocale(), { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
 }
 
-export function conflictMessage(period: BusyPeriod) {
+export function conflictMessage(period: BusyPeriod, customerId?: string | null) {
   if (period.heldForExtension) return `Held for extension: ${period.customerName || "the renter"} wants to extend. Confirm or release the hold first.`;
+  // The clash is this customer's own booking (often one recorded earlier for the same rental): say so.
+  if (customerId && period.customerId === customerId) {
+    const span = period.endDate ? `${shortDate(period.startDate)} to ${shortDate(period.endDate)}` : `from ${shortDate(period.startDate)}`;
+    return `This customer already has a booking on this vehicle: ${period.code || "another booking"}, ${span}. Open that booking to change it.`;
+  }
   const when = period.endDate ? `from ${shortDate(period.startDate)} to ${shortDate(period.endDate)}` : `from ${shortDate(period.startDate)} with no end date`;
   const who = [period.code, period.customerName].filter(Boolean).join(", ");
   return `This vehicle is already booked ${when}${who ? ` (${who})` : ""}. Choose other dates or another vehicle.`;
@@ -113,7 +120,7 @@ export function conflictMessage(period: BusyPeriod) {
 export async function loadBusyPeriods(supabase: any, organizationId: string, vehicleIds?: string[]) {
   let query = supabase
     .from("rentals")
-    .select(`id, vehicle_id, display_code, reference, start_date, status, ${EXTEND_HOLD_COLUMNS}, customers!rentals_customer_id_fkey(full_name)`)
+    .select(`id, vehicle_id, customer_id, display_code, reference, start_date, status, ${EXTEND_HOLD_COLUMNS}, customers!rentals_customer_id_fkey(full_name)`)
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
     .in("status", BLOCKING_RENTAL_STATUSES as unknown as string[]);
@@ -128,6 +135,7 @@ export async function loadBusyPeriods(supabase: any, organizationId: string, veh
       rentalId: row.id,
       code: row.display_code || row.reference || null,
       customerName: row.customers?.full_name || null,
+      customerId: row.customer_id || null,
       startDate: String(row.start_date).slice(0, 10),
       endDate: row.end_date ? String(row.end_date).slice(0, 10) : null,
       out: (OUT_RENTAL_STATUSES as readonly string[]).includes(String(row.status || ""))
@@ -160,7 +168,7 @@ export function isParkedVehicleError(error: { message?: string } | null | undefi
 /** Returns a friendly message when the dates clash with another booking, else null. */
 export async function vehicleConflictMessage(
   supabase: any,
-  args: { organizationId: string; vehicleId: string; startDate: string; endDate: string | null; excludeRentalId?: string | null }
+  args: { organizationId: string; vehicleId: string; startDate: string; endDate: string | null; excludeRentalId?: string | null; customerId?: string | null }
 ) {
   // Parked (over the plan's vehicle limit): no new bookings and nothing moved onto it; its own rental carries on.
   const { data: vehicle } = await supabase.from("vehicles").select("parked_at").eq("id", args.vehicleId).maybeSingle();
@@ -170,7 +178,7 @@ export async function vehicleConflictMessage(
   }
   const busy = await loadBusyPeriods(supabase, args.organizationId, [args.vehicleId]);
   const conflict = findConflict(busy[args.vehicleId] || [], args.startDate, args.endDate, args.excludeRentalId);
-  return conflict ? conflictMessage(conflict) : null;
+  return conflict ? conflictMessage(conflict, args.customerId) : null;
 }
 
 /** Maps the database's double-booking constraint error to the friendly message. */

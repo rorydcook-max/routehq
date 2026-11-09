@@ -3230,7 +3230,18 @@
     "freeYes": "免费预订",
     "errAmountReceived": "请输入收到的金额。",
     "plateLabel": "车牌号",
-    "plateHint": "租车合同需要。会保存到这辆车。"
+    "plateHint": "租车合同需要。会保存到这辆车。",
+    "swapToggle": "开始时用的是另一辆车？",
+    "swapEarlierVehicle": "之前的车辆",
+    "swapChooseVehicle": "选择车辆",
+    "swapDate": "换到这辆车的日期",
+    "swapNeed": "请选择之前的车辆和换车日期。",
+    "swapAfterStart": "换车日期必须晚于开始日期。",
+    "swapNotFuture": "换车日期不能是未来日期。",
+    "swapBeforeEnd": "换车日期必须早于还车日期。",
+    "clashSameCustomer": "该客户已有这辆车的预订：{code}，{when}。",
+    "clashSameFrom": "自 {from} 起",
+    "clashOpenIt": "打开"
   },
   "fleet": {
     "title": "车队",

@@ -6,7 +6,7 @@ import { businessToday, businessTimeZone } from "@/lib/business-time";
 import { shownError } from "@/lib/error-text";
 import { typedNote } from "@/lib/transaction-notes";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { createPortal } from "react-dom";
+import { ModalSheet } from "@/components/modal-sheet";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
@@ -480,20 +480,19 @@ export function EditableEndDate({ rentalId, currentEndDate, iconOnly = false }: 
     });
   }
 
-  if (editing && typeof document !== "undefined") {
-    const close = () => {
-      if (isPending) return;
-      setValue(dateInput(currentEndDate));
-      setMessage(null);
-      setEditing(false);
-    };
-    return createPortal(
-      <div aria-modal="true" className="fixed inset-0 z-[80] flex items-end justify-center bg-black/40 p-3 sm:items-center" onClick={close} role="dialog">
-        <div className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl" onClick={(event) => event.stopPropagation()}>
-          <p className="text-[18px] font-bold text-[var(--foreground)]">{tx.say("pc_editEnd")}</p>
-          <input autoFocus className="mt-3 h-12 w-full rounded-xl border border-[var(--border)] bg-white px-3 text-[16px] font-semibold" onChange={(event) => { setValue(event.target.value); setMessage(null); }} type="date" value={value} />
-          {message ? <p className="mt-3 rounded-xl bg-[var(--danger-light)] p-3 font-semibold text-[var(--danger)]" role="alert">{message}</p> : null}
-          <div className="mt-4 flex gap-2 [&>*]:flex-1">
+  const close = () => {
+    if (isPending) return;
+    setValue(dateInput(currentEndDate));
+    setMessage(null);
+    setEditing(false);
+  };
+  // Drawn beside the pencil (not instead of it), so focus can go back to the pencil when it closes.
+  const dialog = editing ? (
+      <ModalSheet
+        closeLabel={tx.say("cancelBtn")}
+        dismissable={!isPending}
+        footer={
+          <div className="flex gap-2 [&>*]:flex-1">
             <button className="secondary-action pressable" disabled={isPending} onClick={close} type="button">
               {tx.say("cancelBtn")}
             </button>
@@ -501,14 +500,20 @@ export function EditableEndDate({ rentalId, currentEndDate, iconOnly = false }: 
               {isPending ? tx.say("saving") : tx.say("pc_save")}
             </button>
           </div>
-        </div>
-      </div>,
-      document.body
-    );
-  }
+        }
+        onClose={close}
+        open
+        title={tx.say("pc_editEnd")}
+        width="sm"
+      >
+        <input aria-label={tx.say("pc_editEnd")} className="h-12 w-full rounded-xl border border-[var(--border)] bg-white px-3 text-[16px] font-semibold" onChange={(event) => { setValue(event.target.value); setMessage(null); }} type="date" value={value} />
+        {message ? <p className="mt-3 rounded-xl bg-[var(--danger-light)] p-3 font-semibold text-[var(--danger)]" role="alert">{message}</p> : null}
+      </ModalSheet>
+  ) : null;
 
   return (
     <span className="inline-flex items-center gap-1">
+      {dialog}
       <span className={iconOnly ? "sr-only" : undefined}>{dateLabel(currentEndDate, tx.locale)}</span>
       <button
         aria-label={tx.say("pc_editEnd")}

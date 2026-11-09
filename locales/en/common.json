@@ -2908,7 +2908,18 @@
     "freeYes": "Book for free",
     "errAmountReceived": "Enter the amount received.",
     "plateLabel": "Number plate",
-    "plateHint": "Needed on the rental agreement. It's saved to this vehicle."
+    "plateHint": "Needed on the rental agreement. It's saved to this vehicle.",
+    "swapToggle": "Started on a different vehicle?",
+    "swapEarlierVehicle": "Earlier vehicle",
+    "swapChooseVehicle": "Choose a vehicle",
+    "swapDate": "Changed to this vehicle on",
+    "swapNeed": "Choose the earlier vehicle and the day it changed.",
+    "swapAfterStart": "The change must be after the start date.",
+    "swapNotFuture": "The change can't be in the future.",
+    "swapBeforeEnd": "The change must be before the return date.",
+    "clashSameCustomer": "This customer already has a booking on this vehicle: {code}, {when}.",
+    "clashSameFrom": "from {from}",
+    "clashOpenIt": "Open it"
   },
   "fleet": {
     "title": "Fleet",

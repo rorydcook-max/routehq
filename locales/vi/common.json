@@ -3230,7 +3230,18 @@
     "freeYes": "Đặt miễn phí",
     "errAmountReceived": "Nhập số tiền đã nhận.",
     "plateLabel": "Biển số xe",
-    "plateHint": "Cần có trong hợp đồng thuê. Biển số được lưu vào xe này."
+    "plateHint": "Cần có trong hợp đồng thuê. Biển số được lưu vào xe này.",
+    "swapToggle": "Bắt đầu bằng xe khác?",
+    "swapEarlierVehicle": "Xe trước đó",
+    "swapChooseVehicle": "Chọn xe",
+    "swapDate": "Đổi sang xe này vào ngày",
+    "swapNeed": "Chọn xe trước đó và ngày đổi xe.",
+    "swapAfterStart": "Ngày đổi phải sau ngày bắt đầu.",
+    "swapNotFuture": "Ngày đổi không thể ở tương lai.",
+    "swapBeforeEnd": "Ngày đổi phải trước ngày trả xe.",
+    "clashSameCustomer": "Khách này đã có lượt đặt xe này: {code}, {when}.",
+    "clashSameFrom": "từ {from}",
+    "clashOpenIt": "Mở"
   },
   "fleet": {
     "title": "Đội xe",

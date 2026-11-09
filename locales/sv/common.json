@@ -2934,7 +2934,18 @@
     "freeYes": "Boka gratis",
     "errAmountReceived": "Ange mottaget belopp.",
     "plateLabel": "Registreringsnummer",
-    "plateHint": "Behövs i hyresavtalet. Det sparas på det här fordonet."
+    "plateHint": "Behövs i hyresavtalet. Det sparas på det här fordonet.",
+    "swapToggle": "Började med ett annat fordon?",
+    "swapEarlierVehicle": "Tidigare fordon",
+    "swapChooseVehicle": "Välj ett fordon",
+    "swapDate": "Bytte till det här fordonet den",
+    "swapNeed": "Välj det tidigare fordonet och dagen för bytet.",
+    "swapAfterStart": "Bytet måste vara efter startdatumet.",
+    "swapNotFuture": "Bytet kan inte vara i framtiden.",
+    "swapBeforeEnd": "Bytet måste vara före återlämningsdatumet.",
+    "clashSameCustomer": "Kunden har redan en bokning på det här fordonet: {code}, {when}.",
+    "clashSameFrom": "från {from}",
+    "clashOpenIt": "Öppna den"
   },
   "fleet": {
     "title": "Fordonsflotta",

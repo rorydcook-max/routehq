@@ -3230,7 +3230,18 @@
     "freeYes": "Tempah secara percuma",
     "errAmountReceived": "Masukkan jumlah yang diterima.",
     "plateLabel": "Nombor plat",
-    "plateHint": "Diperlukan dalam perjanjian sewa. Ia disimpan pada kenderaan ini."
+    "plateHint": "Diperlukan dalam perjanjian sewa. Ia disimpan pada kenderaan ini.",
+    "swapToggle": "Bermula dengan kenderaan lain?",
+    "swapEarlierVehicle": "Kenderaan sebelumnya",
+    "swapChooseVehicle": "Pilih kenderaan",
+    "swapDate": "Ditukar ke kenderaan ini pada",
+    "swapNeed": "Pilih kenderaan sebelumnya dan hari pertukaran.",
+    "swapAfterStart": "Pertukaran mesti selepas tarikh mula.",
+    "swapNotFuture": "Pertukaran tidak boleh pada masa hadapan.",
+    "swapBeforeEnd": "Pertukaran mesti sebelum tarikh pemulangan.",
+    "clashSameCustomer": "Pelanggan ini sudah ada tempahan untuk kenderaan ini: {code}, {when}.",
+    "clashSameFrom": "dari {from}",
+    "clashOpenIt": "Buka"
   },
   "fleet": {
     "title": "Armada",

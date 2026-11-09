@@ -4,13 +4,14 @@ import { useMemo, useRef, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
 import { unwrap } from "@/lib/action-result";
 import { useTranslations, useLocale } from "next-intl";
-import { ChevronLeft, Plus, Search, UserRound, X } from "lucide-react";
+import { ChevronLeft, Plus, Search, UserRound } from "lucide-react";
 import { createInlineCustomer } from "@/app/actions/customers";
 import { allCountries, countriesSorted, flagForNationality } from "@/lib/customer-options";
 import { initialsOf } from "@/components/glance";
 import { PhoneField } from "@/components/phone-field";
 import { ContactChoice } from "@/components/contact-choice";
 import { DuplicatePhoneHint } from "@/components/duplicate-phone-hint";
+import { ModalSheet } from "@/components/modal-sheet";
 import { businessCountry } from "@/lib/business-units";
 
 type SelectorCustomer = {
@@ -47,6 +48,10 @@ export function CustomerSelector({
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const listSearchRef = useRef<HTMLInputElement>(null);
+  // A new key after a customer is saved, so the next one starts on an empty form. Closing keeps what was typed.
+  const [formKey, setFormKey] = useState(0);
   const [contact, setContact] = useState("whatsapp");
   const nationalityOptions = useMemo(() => countriesSorted(locale), [locale]);
   // Starts empty (customers are often visitors, not from the business's country); a pasted number's country fills it.
@@ -97,6 +102,11 @@ export function CustomerSelector({
         setOpen(false);
         setCreating(false);
         setSearch("");
+        setFormKey((key) => key + 1);
+        setContact("whatsapp");
+        setNationality("");
+        setNationalityTouched(false);
+        setPhoneTyped("");
       } catch (createError) {
         setError(shownError(createError, say("sel_failed")));
       }
@@ -151,6 +161,8 @@ export function CustomerSelector({
           <button
             className="inline-flex min-h-11 items-center gap-2 font-bold text-[var(--primary)]"
             onClick={() => {
+              // A name typed in the search carries over into an empty name field (the form is kept between openings).
+              if (nameRef.current && !nameRef.current.value && search.trim() && !/\d/.test(search)) nameRef.current.value = search.trim();
               setCreating(true);
               setOpen(true);
             }}
@@ -188,113 +200,143 @@ export function CustomerSelector({
       </button>
       )}
 
-      {open ? (
-        <div className="fixed inset-0 z-50 bg-[var(--foreground)]/30 sm:absolute sm:inset-auto sm:top-full sm:z-30 sm:mt-2 sm:w-full sm:bg-transparent">
-          {/* One scrolling area filling the sheet (Rory, 1 Nov 2026: the add-customer form was squeezed into a small box
-              at the bottom of the screen). dvh, so the sheet shrinks above the phone keyboard rather than under it. */}
-          <div className={`absolute bottom-0 left-0 right-0 flex flex-col overflow-hidden rounded-t-2xl border border-[var(--border)] bg-white shadow-2xl sm:relative sm:rounded-lg ${creating ? "h-[92dvh] sm:h-auto sm:max-h-[640px]" : "max-h-[80dvh] sm:max-h-[420px]"}`}>
-            <div className="flex shrink-0 items-center justify-between border-b border-[var(--border)] p-3">
-              <p className="font-semibold text-[var(--foreground)]">{creating ? say("sel_create") : say("sel_select")}</p>
-              <button aria-label={say("closeLabel")} className="rounded-full p-2 text-[var(--muted)]" onClick={() => setOpen(false)} type="button">
-                <X size={18} />
+      {/* A centred dialog on computers, the bottom sheet on phones (Rory, 9 Nov 2026: it dropped down over the next card
+          and ran off the bottom of the window). Kept mounted after the first opening, so closing it by mistake (Escape,
+          a click beside it) doesn't lose what was typed; drawn on the page body, so its fields aren't part of the booking form. */}
+      <ModalSheet
+        closeLabel={say("closeLabel")}
+        dismissable={!isPending}
+        footer={
+          creating ? (
+            <div className="space-y-2">
+              {error ? (
+                <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]" role="alert">
+                  {error}
+                </p>
+              ) : null}
+              <button
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-4 py-3 text-[15px] font-bold text-white disabled:opacity-70"
+                disabled={isPending}
+                onClick={handleCreateCustomer}
+                type="button"
+              >
+                {isPending ? say("sel_creating") : say("sel_createSelect")}
               </button>
             </div>
-            {creating ? null : (
-              <div className="shrink-0 p-3">
-                <input className={inputClass} onChange={(event) => setSearch(event.target.value)} placeholder={say("search")} value={search} />
-              </div>
-            )}
-            <div className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-[max(12px,env(safe-area-inset-bottom))] ${creating ? "pt-3" : ""}`}>
-              {creating ? (
-                <button className="mb-1 flex min-h-11 items-center gap-1 text-sm font-bold text-[var(--primary)]" onClick={() => setCreating(false)} type="button">
-                  <ChevronLeft size={16} />
-                  {say("sel_select")}
-                </button>
-              ) : (
-                <button className="mb-2 flex min-h-11 w-full items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-left text-sm font-bold text-[var(--primary)]" onClick={() => setCreating(true)} type="button">
-                  <Plus size={16} />
-                  {say("sel_create")}
-                </button>
-              )}
-
-              {creating ? (
-                <div
-            className="mt-3 space-y-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3"
-            onKeyDown={(event) => {
-              // Enter saves the customer; it must not submit the booking form around this box.
-              if (event.key === "Enter" && (event.target as HTMLElement).tagName !== "TEXTAREA") {
-                event.preventDefault();
-                handleCreateCustomer();
-              }
+          ) : undefined
+        }
+        headerExtra={
+          creating ? (
+            <button className="-ml-1 mt-1 inline-flex min-h-9 items-center gap-1 rounded-md px-1 text-sm font-bold text-[var(--primary)]" onClick={() => setCreating(false)} type="button">
+              <ChevronLeft size={16} />
+              {say("sel_select")}
+            </button>
+          ) : null
+        }
+        initialFocus={creating ? nameRef : listSearchRef}
+        keepMounted
+        onClose={() => setOpen(false)}
+        open={open}
+        title={creating ? say("sel_create") : say("sel_select")}
+      >
+        <div
+          className={creating ? "space-y-4" : "hidden"}
+          key={formKey}
+          onKeyDown={(event) => {
+            // Enter saves the customer.
+            if (event.key === "Enter" && (event.target as HTMLElement).tagName !== "TEXTAREA" && (event.target as HTMLElement).tagName !== "BUTTON") {
+              event.preventDefault();
+              handleCreateCustomer();
+            }
+          }}
+          ref={formRef}
+        >
+          <input name="organizationId" type="hidden" value={organizationId} />
+          {/* A name typed in the search that found nobody carries over. */}
+          <input
+            aria-label={say("sel_fullName")}
+            className={inputClass}
+            defaultValue={/\d/.test(search) ? "" : search.trim()}
+            name="fullName"
+            placeholder={say("sel_fullName")}
+            ref={nameRef}
+            required
+          />
+          {/* Type or paste the whole number; the country code is found from it. */}
+          <PhoneField
+            defaultCountry={homeCountry || undefined}
+            inputClass={inputClass}
+            keepWords
+            onValueChange={setPhoneTyped}
+            onCountryFound={(code) => {
+              if (nationalityTouched) return;
+              const found = allCountries.find((country) => country.code === code);
+              if (found) setNationality(found.name);
             }}
-            ref={formRef}
+          />
+          <select
+            aria-label={say("sel_nationality")}
+            className={inputClass}
+            name="nationality"
+            onChange={(event) => {
+              setNationality(event.target.value);
+              setNationalityTouched(true);
+            }}
+            value={nationality}
           >
-                  <input name="organizationId" type="hidden" value={organizationId} />
-                  {/* A name typed in the search that found nobody carries over. */}
-                  <input className={inputClass} defaultValue={/\d/.test(search) ? "" : search.trim()} name="fullName" placeholder={say("sel_fullName")} required />
-                  {/* Type or paste the whole number; the country code is found from it. */}
-                  <PhoneField
-                    defaultCountry={homeCountry || undefined}
-                    inputClass={inputClass}
-                    keepWords
-                    onValueChange={setPhoneTyped}
-                    onCountryFound={(code) => {
-                      if (nationalityTouched) return;
-                      const found = allCountries.find((country) => country.code === code);
-                      if (found) setNationality(found.name);
-                    }}
-                  />
-                  <select
-                    aria-label={say("sel_nationality")}
-                    className={inputClass}
-                    name="nationality"
-                    onChange={(event) => {
-                      setNationality(event.target.value);
-                      setNationalityTouched(true);
-                    }}
-                    value={nationality}
-                  >
-                    <option value="">{say("sel_nationality")}</option>
-                    {nationalityOptions.map((country) => (
-                      <option key={country.code} value={country.name}>
-                        {country.flag} {country.label}
-                      </option>
-                    ))}
-                  </select>
-                  <ContactChoice contact={contact} inputClass={inputClass} phoneGiven={Boolean(phoneTyped)} say={say} setContact={setContact} />
-                  <DuplicatePhoneHint organizationId={organizationId} />
-                  {error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
-                  <button className="inline-flex w-full justify-center rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white disabled:opacity-70" disabled={isPending} onClick={handleCreateCustomer} type="button">
-                    {isPending ? say("sel_creating") : say("sel_createSelect")}
-                  </button>
-                </div>
-              ) : null}
-              {creating ? null : (
-                <>
-              {filteredCustomers.map((customer) => (
-                <button
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-[var(--panel-secondary)]"
-                  key={customer.id}
-                  onClick={() => {
-                    setSelectedId(customer.id);
-                    onSelect?.(customer);
-                    setOpen(false);
-                  }}
-                  type="button"
-                >
-                  <span className="text-xl">{flagForNationality(customer.nationality)}</span>
-                  <span>
-                    <span className="block font-bold text-[var(--foreground)]">{customer.full_name}</span>
-                    <span className="text-xs text-[var(--muted)]">{customer.phone || say("noPhone")}</span>
-                  </span>
-                </button>
-              ))}
-                </>
-              )}
-            </div>
-          </div>
+            <option value="">{say("sel_nationality")}</option>
+            {nationalityOptions.map((country) => (
+              <option key={country.code} value={country.name}>
+                {country.flag} {country.label}
+              </option>
+            ))}
+          </select>
+          <ContactChoice contact={contact} inputClass={inputClass} phoneGiven={Boolean(phoneTyped)} say={say} setContact={setContact} />
+          <DuplicatePhoneHint organizationId={organizationId} />
         </div>
-      ) : null}
+
+        {creating ? null : (
+          <div className="space-y-2">
+            <input
+              aria-label={say("search")}
+              className={inputClass}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder={say("search")}
+              ref={listSearchRef}
+              type="search"
+              value={search}
+            />
+            <button
+              className="flex min-h-11 w-full items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-left text-sm font-bold text-[var(--primary)]"
+              onClick={() => setCreating(true)}
+              type="button"
+            >
+              <Plus size={16} />
+              {say("sel_create")}
+            </button>
+            {filteredCustomers.map((customer) => (
+              <button
+                className="flex min-h-12 w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-[var(--panel-secondary)]"
+                key={customer.id}
+                onClick={() => {
+                  setSelectedId(customer.id);
+                  onSelect?.(customer);
+                  setOpen(false);
+                }}
+                type="button"
+              >
+                <span className="num flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[15px] text-[var(--primary)]">{initialsOf(customer.full_name)}</span>
+                <span className="min-w-0">
+                  <span className="block truncate font-bold text-[var(--foreground)]">{customer.full_name}</span>
+                  <span className="block truncate text-sm text-[var(--muted)]">
+                    {[customer.phone, customer.nationality ? `${flagForNationality(customer.nationality)} ${customer.nationality}` : null].filter(Boolean).join(" · ") || say("noPhone")}
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </ModalSheet>
     </div>
   );
 }

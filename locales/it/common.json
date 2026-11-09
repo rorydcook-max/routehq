@@ -2908,7 +2908,18 @@
     "freeYes": "Prenota gratis",
     "errAmountReceived": "Inserisci l'importo ricevuto.",
     "plateLabel": "Targa",
-    "plateHint": "Serve per il contratto di noleggio. Viene salvata su questo veicolo."
+    "plateHint": "Serve per il contratto di noleggio. Viene salvata su questo veicolo.",
+    "swapToggle": "Iniziato con un altro veicolo?",
+    "swapEarlierVehicle": "Veicolo precedente",
+    "swapChooseVehicle": "Scegli un veicolo",
+    "swapDate": "Passato a questo veicolo il",
+    "swapNeed": "Scegli il veicolo precedente e il giorno del cambio.",
+    "swapAfterStart": "Il cambio deve essere dopo la data di inizio.",
+    "swapNotFuture": "Il cambio non può essere nel futuro.",
+    "swapBeforeEnd": "Il cambio deve essere prima della data di riconsegna.",
+    "clashSameCustomer": "Questo cliente ha già una prenotazione su questo veicolo: {code}, {when}.",
+    "clashSameFrom": "dal {from}",
+    "clashOpenIt": "Aprila"
   },
   "fleet": {
     "title": "Flotta",

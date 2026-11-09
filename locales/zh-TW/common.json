@@ -2934,7 +2934,18 @@
     "freeYes": "免費預訂",
     "errAmountReceived": "請輸入收到的金額。",
     "plateLabel": "車牌號碼",
-    "plateHint": "租車合約需要。會儲存到這輛車。"
+    "plateHint": "租車合約需要。會儲存到這輛車。",
+    "swapToggle": "開始時用的是另一輛車？",
+    "swapEarlierVehicle": "之前的車輛",
+    "swapChooseVehicle": "選擇車輛",
+    "swapDate": "換到這輛車的日期",
+    "swapNeed": "請選擇之前的車輛和換車日期。",
+    "swapAfterStart": "換車日期必須晚於開始日期。",
+    "swapNotFuture": "換車日期不能是未來日期。",
+    "swapBeforeEnd": "換車日期必須早於還車日期。",
+    "clashSameCustomer": "這位顧客已有這輛車的預訂：{code}，{when}。",
+    "clashSameFrom": "自 {from} 起",
+    "clashOpenIt": "開啟"
   },
   "fleet": {
     "title": "車隊",

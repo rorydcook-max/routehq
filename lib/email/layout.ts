@@ -331,8 +331,10 @@ export function renderEmailHtml(content: EmailContent): string {
   }
   if (content.button && !buttonPlaced) body.push(button(content.button.label, content.button.url, buttonColour, align));
 
+  // The filler after the preview line keeps the email's body out of the inbox preview. A phone's notification shows
+  // that filler as blank space (Rory, 11 Nov 2026), so there is only as much as a short line needs, and none after a long one.
   const preheader = content.preheader
-    ? `<div style="display:none;font-size:1px;color:${C.page};line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">${escapeHtml(content.preheader)}${"&#847;&zwnj;&nbsp;".repeat(30)}</div>`
+    ? `<div style="display:none;font-size:1px;color:${C.page};line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">${escapeHtml(content.preheader)}${"&#847;&zwnj;&nbsp;".repeat(Math.max(0, Math.min(30, 100 - content.preheader.length)))}</div>`
     : "";
   const title = escapeHtml(content.heading || (brand.kind === "operator" ? brand.name : "RoveHQ"));
 

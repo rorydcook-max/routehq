@@ -246,31 +246,72 @@ export function adminPasswordResetEmail(input: { link: string; words: EmailWords
 
 // ── Team invites (app/actions/auth.ts inviteUser) ───────────────────────────────────────────────────────────────────
 
+const INVITE_TEXT: Record<string, { subject: string; preheader: string; hi: string; invitedBy: string; invited: string; body: string; action: string; tail: string; heading: string; business: string; role: string; by: string; button: string; reason: string; roles: Record<string, string> }> = {
+  en: {
+    subject: "You're invited to join {business} on RoveHQ",
+    preheader: "{who} to join {business} on RoveHQ as {role}. Tap to accept and choose your password. The invite works once.",
+    hi: "Hi,",
+    invitedBy: "{inviter} has invited you",
+    invited: "You've been invited",
+    body: "{who} to join {business} on RoveHQ as {role}. It's where the team runs its bookings, vehicles and payments.",
+    action: "Tap the button to accept and choose your password.",
+    tail: "The invite works once. If it has run out, ask the person who invited you to send a new one.",
+    heading: "You're invited",
+    business: "Business",
+    role: "Your role",
+    by: "Invited by",
+    button: "Accept the invite",
+    reason: "You get this because someone invited this address to {business} on RoveHQ. If you weren't expecting it, you can ignore this email.",
+    roles: {}
+  },
+  th: {
+    subject: "คุณได้รับเชิญให้เข้าร่วม {business} บน RoveHQ",
+    preheader: "{who}ให้เข้าร่วม {business} บน RoveHQ ในตำแหน่ง{role} แตะเพื่อตอบรับและตั้งรหัสผ่านของคุณ คำเชิญนี้ใช้ได้ครั้งเดียว",
+    hi: "สวัสดี",
+    invitedBy: "{inviter} เชิญคุณ",
+    invited: "คุณได้รับเชิญ",
+    body: "{who}ให้เข้าร่วม {business} บน RoveHQ ในตำแหน่ง{role} ที่นี่คือที่ที่ทีมใช้จัดการการจอง รถ และการรับชำระเงิน",
+    action: "แตะปุ่มด้านล่างเพื่อตอบรับและตั้งรหัสผ่านของคุณ",
+    tail: "คำเชิญนี้ใช้ได้ครั้งเดียว หากหมดอายุแล้ว โปรดขอให้ผู้ที่เชิญคุณส่งคำเชิญใหม่",
+    heading: "คุณได้รับเชิญ",
+    business: "ธุรกิจ",
+    role: "ตำแหน่งของคุณ",
+    by: "เชิญโดย",
+    button: "ตอบรับคำเชิญ",
+    reason: "คุณได้รับอีเมลนี้เพราะมีผู้เชิญอีเมลนี้ให้เข้าร่วม {business} บน RoveHQ หากคุณไม่ได้คาดว่าจะได้รับ สามารถเพิกเฉยต่ออีเมลนี้ได้",
+    roles: { owner: "เจ้าของ", manager: "ผู้จัดการ", teammate: "สมาชิกทีม" }
+  }
+};
+
 /**
  * "You're invited to join {business} on RoveHQ" (Rory, 9 Nov 2026: the invite arrived as Supabase's plain default).
- * English for now, like the other account emails; it goes into the final translation pass.
+ * In the language chosen for the person invited: English and Thai so far, the rest in the final translation pass
+ * (they get English until then).
  */
-export function teamInviteEmail(input: { link: string; business: string; inviter: string | null; role: string; words: EmailWords }): BuiltEmail {
+export function teamInviteEmail(input: { link: string; business: string; inviter: string | null; role: string; roleKey?: string; locale?: string | null; words: EmailWords }): BuiltEmail {
   const { words } = input;
-  const who = input.inviter ? `${input.inviter} has invited you` : "You've been invited";
-  const intro = `Hi,\n\n${who} to join ${input.business} on RoveHQ as ${input.role}. It's where the team runs its bookings, vehicles and payments.\n\nTap the button to accept and choose your password.`;
-  const tail = "The invite works once. If it has run out, ask the person who invited you to send a new one.";
-  const subject = `You're invited to join ${input.business} on RoveHQ`;
+  const text = INVITE_TEXT[String(input.locale || "").slice(0, 2)] || INVITE_TEXT.en;
+  const fill = (line: string, values: Record<string, string>) => line.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? "");
+  const role = text.roles[String(input.roleKey || "")] || input.role;
+  const who = input.inviter ? fill(text.invitedBy, { inviter: input.inviter }) : text.invited;
+  const values = { who, business: input.business, role, inviter: input.inviter || "" };
+  const intro = `${text.hi}\n\n${fill(text.body, values)}\n\n${text.action}`;
+  const subject = fill(text.subject, values);
   const html = renderEmailHtml({
     locale: words.locale,
-    preheader: `${who} to join ${input.business} on RoveHQ.`,
+    preheader: fill(text.preheader, values),
     eyebrow: input.business,
-    heading: "You're invited",
+    heading: text.heading,
     blocks: [
       { type: "text", text: intro },
-      { type: "card", rows: [{ label: "Business", value: input.business, tone: "strong" }, { label: "Your role", value: input.role }, ...(input.inviter ? [{ label: "Invited by", value: input.inviter }] : [])] },
+      { type: "card", rows: [{ label: text.business, value: input.business, tone: "strong" }, { label: text.role, value: role }, ...(input.inviter ? [{ label: text.by, value: input.inviter }] : [])] },
       { type: "fallback-link", intro: words.t("linkFallback"), url: input.link },
-      { type: "text", text: tail, tone: "muted" }
+      { type: "text", text: text.tail, tone: "muted" }
     ],
-    button: { label: "Accept the invite", url: input.link },
-    footer: { reason: `You get this because someone invited this address to ${input.business} on RoveHQ. If you weren't expecting it, you can ignore this email.` }
+    button: { label: text.button, url: input.link },
+    footer: { reason: fill(text.reason, values) }
   });
-  return { subject, text: `${intro}\n\n${input.link}\n\n${tail}\n\nRoveHQ`, html };
+  return { subject, text: `${intro}\n\n${input.link}\n\n${text.tail}\n\nRoveHQ`, html };
 }
 
 export function adminEmailChangedEmail(input: { before: string | null; email: string; words: EmailWords }): BuiltEmail {

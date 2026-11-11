@@ -463,7 +463,10 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
           business: String(business?.trading_name || business?.name || "a rental business"),
           inviter: String(inviterRow?.full_name || "").trim() || null,
           role: label,
-          words: await emailWords("en")
+          roleKey: role,
+          locale: preferredLocale,
+          // English and Thai are written; any other language gets the English email until the final translation pass.
+          words: await emailWords(String(preferredLocale || "").startsWith("th") ? "th" : "en")
         }),
         metadata: { kind: "team_invite" }
       });

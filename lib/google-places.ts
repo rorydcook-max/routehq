@@ -76,13 +76,15 @@ export function loadGooglePlaces(): Promise<void> | null {
       script.defer = true;
       script.dataset.routehqGooglePlaces = "true";
       // loading=async is Google's recommended way to load Maps; the places library is then pulled in with importLibrary.
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places&v=weekly&loading=async`;
-      script.onload = () => {
+      // Google calls this once Maps is really ready. The script's own "load" fires earlier, before importLibrary
+      // exists, which left the address box as a plain text field with no suggestions and no "drop a pin".
+      w.__routeHqMapsReady = () => {
         const maps = w.google?.maps;
         // The address box uses places; the "drop a pin" map uses maps, marker and geocoding.
         if (maps?.importLibrary) Promise.all(["places", "maps", "marker", "geocoding"].map((name) => maps.importLibrary(name))).then(() => resolve(), reject);
         else resolve();
       };
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places&v=weekly&loading=async&callback=__routeHqMapsReady`;
       script.onerror = () => reject(new Error("Google Maps failed to load."));
       document.head.appendChild(script);
     });

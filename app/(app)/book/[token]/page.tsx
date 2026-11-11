@@ -305,7 +305,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const customer = detail.customer || {};
   const contact = contactHref(organization?.settings?.phone || organization?.settings?.business_phone || customer?.phone);
   // Who the page is from, in the shared header row: the business logo or letter, and its name.
-  const errorBrand = organization?.name ? <PublicBrand logoUrl={organization?.logo_display_url || null} name={String(organization.name)} /> : undefined;
+  const errorBrand = organization?.name ? <PublicBrand logoOnly logoUrl={organization?.logo_display_url || null} name={String(organization.name)} /> : undefined;
 
   if (detail.state === "expired") {
     return <ErrorState brand={errorBrand} contact={contact} message={t("expiredMessage", { business: organization?.name || t("theRentalBusiness") })} title={t("expiredTitle")} />;
@@ -453,7 +453,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   );
 
   return (
-    <PublicShell brand={<PublicBrand detail={t("rentalBooking")} logoUrl={logoUrl} name={String(organization?.name || businessName)} />} width="narrow">
+    <PublicShell brand={<PublicBrand detail={t("rentalBooking")} logoOnly logoUrl={logoUrl} name={String(organization?.name || businessName)} />} width="narrow">
       <BrandStyle colour={organization?.contract_accent_colour} />
       {/* A flex column, so the confirmation ("You're all set") can move itself to the top once the booking is signed. */}
       <div className="flex flex-col gap-5">
@@ -716,7 +716,7 @@ function bookingFacts(rental: any, bookingData: Record<string, unknown>, deliver
     const when = delivery.arrangeLater ? "" : delivery.time.replace(/\n/g, ", ");
     const open = say("toBeConfirmed");
     // "Place to be confirmed · To be confirmed" says one thing twice.
-    const detail = place === say("placeToBeConfirmed") && when === open ? open : [place, when].filter(Boolean).join(" · ");
+    const detail = place === say("placeToBeConfirmed") && when === open ? say("f_handoverOpen") : [place, when].filter(Boolean).join(" · ");
     facts.push({ key: "handover", icon: MapPin, label: say("handover"), value: how, detail: detail || undefined, mapUrl, wide: true });
   }
   return facts;

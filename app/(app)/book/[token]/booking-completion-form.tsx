@@ -1205,7 +1205,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <UploadCard cameraName="passportCameraFile" complete={haveDoc("passport")} onUpload={uploadNow} saved={Boolean(savedUploads.passport)} icon={IdCard} label={idLabel} name="passportFile" note={readNote("passport")} noteTone={docRead.passport} onPicked={(picked) => readDocument("passport", picked)} />
           <UploadCard cameraName="driverLicenseCameraFile" complete={haveDoc("driver_license")} onUpload={uploadNow} saved={Boolean(savedUploads.driver_license)} icon={FileText} label={t("drivingLicence")} name="driverLicenseFile" note={readNote("driver_license")} noteTone={docRead.driver_license} onPicked={(picked) => readDocument("driver_license", picked)} />
-          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={haveDoc("selfie")} onUpload={uploadNow} saved={Boolean(savedUploads.selfie)} icon={ImageIcon} label={`${t("selfiePhoto")} (${t("optional")})`} name="selfieFile" />
+          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={haveDoc("selfie")} onUpload={uploadNow} saved={Boolean(savedUploads.selfie)} icon={ImageIcon} label={t("selfiePhoto")} name="selfieFile" optional />
         </div>
         {/* The numbers stay folded away: the photos fill them in. They open by themselves when something is missing. */}
         <details className="mt-2" id="document-numbers" onToggle={(event) => setIdOpen(event.currentTarget.open)} open={idOpen}>
@@ -1836,7 +1836,7 @@ function PaymentReportedButton({
 
   return (
     <button
-      className="pressable mt-3 inline-flex rounded-full bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
+      className="pressable mx-auto mt-3 flex min-h-11 items-center justify-center rounded-full bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
       disabled={isPending}
       onClick={onClick}
       type="button"
@@ -2320,8 +2320,11 @@ function UploadCard({
   noteTone,
   onPicked,
   onUpload,
+  optional = false,
   saved = false
 }: {
+  /** Nice to have: says "Optional" where the others say "Needed". */
+  optional?: boolean;
   accept?: string;
   cameraCapture?: "user" | "environment";
   cameraName: string;
@@ -2360,7 +2363,7 @@ function UploadCard({
             {selectedFile || saved ? t("added") : t("received")}
           </span>
         ) : (
-          <span style={{ fontSize: 14, color: "var(--warning)", flexShrink: 0 }}>{t("needed")}</span>
+          <span style={{ fontSize: 14, color: optional ? "var(--muted)" : "var(--warning)", flexShrink: 0 }}>{optional ? t("optional") : t("needed")}</span>
         )}
       </div>
 

@@ -52,7 +52,7 @@ import { RentalDocumentsCard } from "@/app/(app)/bookings/[id]/rental-documents-
 import { PendingAmendmentCard } from "@/app/(app)/bookings/[id]/pending-amendment-card";
 import { LoosePaymentsCard } from "@/app/(app)/bookings/[id]/loose-payments-card";
 import { loosePaymentsFor } from "@/lib/loose-payments";
-import { DesktopOpenDetails } from "@/components/desktop-open-details";
+import { MoreActions } from "@/components/desktop-open-details";
 import { withLiveDocumentStatus } from "@/lib/customer-documents";
 import { businessSignatureOf, getBookingRentalDocuments, renterSignatureOf, type BookingRentalDocument } from "@/lib/booking-rental-documents";
 import { distanceKey } from "@/lib/business-units";
@@ -831,8 +831,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <span className="num text-right text-[18px]">{formatDepositSummary(rental, tx)}</span>
               </div>
             ) : null}
-            {/* Two main actions side by side, More underneath: nothing wraps onto a second line. */}
-            <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>details]:col-span-2 [&>button]:w-full [&>*>button]:w-full lg:flex lg:flex-wrap lg:items-center lg:[&>a]:w-auto lg:[&>details]:w-auto lg:[&>details_summary]:w-auto lg:[&>button]:w-auto lg:[&>*>button]:w-auto">
+            {/* A phone: two main actions side by side, More underneath. A desktop: every action in one row, all one height. */}
+            <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>button]:w-full [&>*>button]:w-full lg:flex lg:flex-wrap lg:items-center lg:gap-2.5 lg:[&>a]:!h-11 lg:[&>a]:!min-h-0 lg:[&>a]:w-auto lg:[&>a]:whitespace-nowrap lg:[&>a]:!px-4 lg:[&>a]:!py-0 lg:[&>a]:!text-[15px] lg:[&>button]:!h-11 lg:[&>button]:w-auto lg:[&>button]:!px-4 lg:[&>*>a]:w-auto lg:[&>*>button]:!h-11 lg:[&>*>button]:!min-h-0 lg:[&>*>button]:w-auto lg:[&>*>button]:whitespace-nowrap lg:[&>*>button]:!px-4 lg:[&>*>button]:!py-0 lg:[&>*>button]:!text-[15px]">
               {awaitingSignature ? (
                 <a className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm" href="#send-link">
                   {tx.say("sendLink")}
@@ -868,17 +868,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   customerName={customer?.full_name || null}
                 />
               ) : null}
-              {/* More sits beside the other actions; opened, it takes a row of its own for the extra buttons. */}
-              {/* On a desktop there is room for every action on the one line: no "More" there (Rory, 11 Nov 2026). */}
-              <DesktopOpenDetails className="basis-full lg:contents">
-                <summary className="pressable inline-flex min-h-11 w-full cursor-pointer list-none items-center justify-center gap-1 rounded-full border-2 border-[var(--border-strong)] bg-[var(--panel)] px-4 py-2 font-bold text-[var(--foreground)] hover:bg-[var(--panel-secondary)] lg:!hidden [&::-webkit-details-marker]:hidden">
-                  {tx.say("more")}
-                </summary>
-                {/* Only the buttons in this row are stretched: the cancel and change-vehicle dialogs open from inside it,
-                    and stretching every button in them squeezed the dialog's heading into a sliver beside its close button. */}
-                {/* Every button here the same: one height, one line, the same text (Rory, 1 Nov 2026: "Cancel booking" wrapped
-                    to two lines and made its row taller than the rest). */}
-                <div className="mt-2 grid grid-cols-2 gap-2 [&>a]:!h-11 [&>a]:!min-h-0 [&>a]:overflow-hidden [&>a]:whitespace-nowrap [&>a]:!px-3 [&>a]:!text-[15px] [&>button]:!h-11 [&>button]:!min-h-0 [&>button]:w-full [&>button]:overflow-hidden [&>button]:whitespace-nowrap [&>button]:!rounded-full [&>button]:!border-2 [&>button]:!px-3 [&>button]:!text-[15px] [&>button]:!font-bold [&_svg]:shrink-0 lg:contents lg:[&>a]:w-auto lg:[&>button]:w-auto">
+              {/* Secondary actions: under More on a phone, in this same row on a desktop (components/desktop-open-details.tsx). */}
+              <MoreActions label={tx.say("more")}>
               <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
                 {tx.say("editBooking")}
               </ActionButton>
@@ -905,8 +896,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   customerName={customer?.full_name || null}
                 />
               ) : null}
-                </div>
-              </DesktopOpenDetails>
+              </MoreActions>
             </div>
           </div>
         </Card>

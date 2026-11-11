@@ -4,7 +4,7 @@ import { billingPeriodAmounts } from "@/lib/payment-schedule";
 import { firstRentCharge } from "@/lib/payment-schedule";
 import type { ReactNode } from "react";
 import { customerDate, customerDateTime } from "@/lib/i18n/customer-dates";
-import { AlertTriangle, CalendarDays, Clock, CreditCard, MapPin, ReceiptText, ShieldCheck } from "lucide-react";
+import { AlertTriangle, CalendarClock, CalendarDays, Clock, CreditCard, MapPin, ShieldCheck } from "lucide-react";
 import { VehicleArt } from "@/components/vehicle-art";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { ActiveRentalPortal } from "./active-rental-portal";
@@ -446,15 +446,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               ) : null}
             </div>
           </div>
-          {/* One fact per line on a phone: two columns broke prices and place names across four lines. Tiles keep their own height. */}
-          <div className="mt-4 grid items-start gap-3 sm:grid-cols-2">
-            <Info icon={CalendarDays} label={t("rentalPeriod")} value={rental.is_indefinite && detail.state !== "completed" ? t("openEndedFrom", { date: formatSummaryDate(rental.start_date, t, locale) }) : t("dateRange", { start: formatSummaryDate(rental.start_date, t, locale), end: formatSummaryDate(rental.end_date, t, locale) })} />
-            <Info icon={CreditCard} label={t("rateAndDeposit")} tone="success" value={`${rateLabel(rental, t)}${extrasText(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}${(detail as any).org_payment?.vat ? `\n${t("vatIncluded", { name: (detail as any).org_payment.vat.name, rate: (detail as any).org_payment.vat.rate })}` : ""}`} />
-            {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
-            {handedOver ? null : <Info icon={ReceiptText} label={t("firstPaymentDue")} tone="warning" value={paymentDueText(rental, bookingData, t, locale)} />}
-            {/* Where and when in one tile, so no tile is left alone on the last row. */}
-            {handedOver ? null : <Info icon={MapPin} label={t("handover")} tone="info" more={delivery.arrangeLater ? undefined : { icon: Clock, label: t("handoverTime"), value: delivery.time }} value={delivery.location} />}
-          </div>
+          {/* The booking in five facts, every tile the same (Rory, 11 Nov 2026): what it is, what it costs, the deposit,
+              when rent is due, and the handover. One short value each; the detail is in the agreement and Payments. */}
+          <BookingFacts facts={bookingFacts(rental, bookingData, delivery, handedOver, t, locale)} mapLabel={t("viewOnMap")} />
     </>
   );
 
@@ -665,59 +659,91 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   );
 }
 
-/** One fact about the booking as a tinted tile. `more` adds a second fact under the first (handover place, then time). */
-type InfoTone = "primary" | "success" | "warning" | "info";
-// Each tile has its own colour, carried by its icon badge and a soft tint, so the four facts read at a glance
-// instead of as four blocks of text (Rory, 11 Nov 2026).
-const INFO_TONES: Record<InfoTone, { tile: string; badge: string }> = {
-  primary: { tile: "bg-[var(--primary-light)]", badge: "bg-[var(--primary)] text-white" },
-  success: { tile: "bg-[var(--success-light)]", badge: "bg-[var(--success)] text-white" },
-  warning: { tile: "bg-[var(--warning-light)]", badge: "bg-[var(--warning)] text-white" },
-  info: { tile: "bg-[var(--info-light)]", badge: "bg-[var(--info)] text-white" }
-};
+type BookingFact = { key: string; icon: typeof Clock; label: string; value: string; detail?: string; mapUrl?: string; wide?: boolean };
 
-/** One fact about the booking as a tinted tile. `more` adds a second fact under the first (handover place, then time). */
-async function Info({ className = "", icon: Icon, label, value, more, tone = "primary" }: { className?: string; icon: typeof Clock; label: string; value: string; more?: { icon: typeof Clock; label: string; value: string }; tone?: InfoTone }) {
-  return (
-    <div className={`rounded-2xl p-3.5 ${INFO_TONES[tone].tile} ${className}`}>
-      <InfoPart icon={Icon} label={label} tone={tone} value={value} />
-      {more ? (
-        <div className="mt-3">
-          <InfoPart icon={more.icon} label={more.label} tone={tone} value={more.value} />
-        </div>
-      ) : null}
-    </div>
-  );
+/** 11 -> "11th". */
+function ordinalDay(day: number) {
+  const tens = day % 100;
+  const suffix = tens >= 11 && tens <= 13 ? "th" : day % 10 === 1 ? "st" : day % 10 === 2 ? "nd" : day % 10 === 3 ? "rd" : "th";
+  return `${day}${suffix}`;
 }
 
-async function InfoPart({ icon: Icon, label, value, tone = "primary" }: { icon: typeof Clock; label: string; value: string; tone?: InfoTone }) {
-  const t = await getTranslations("customer");
-  const lines = value.split("\n");
+/**
+ * The booking as five short facts (Rory, 11 Nov 2026: the tiles were different sizes and full of text nobody reads):
+ * the rental period, the price, the deposit, when rent is due, and the handover. One value each, at most one line under it.
+ */
+function bookingFacts(rental: any, bookingData: Record<string, unknown>, delivery: { location: string; time: string; arrangeLater: boolean }, handedOver: boolean, t: T, locale: string): BookingFact[] {
+  const say = t as unknown as (key: string, values?: Record<string, string | number>) => string;
+  const currency = String(rental?.currency || "THB");
+  const period = String(rental?.pricing_model || "monthly").toLowerCase().replace(/_/g, " ").trim();
+  const start = String(rental?.start_date || "").slice(0, 10);
+  const end = rental?.is_indefinite || !rental?.end_date ? "" : String(rental.end_date).slice(0, 10);
+  const dayMs = 86_400_000;
+  const days = start && end ? Math.round((new Date(`${end}T00:00:00Z`).getTime() - new Date(`${start}T00:00:00Z`).getTime()) / dayMs) : 0;
+  const startText = formatSummaryDate(start, t, locale);
+
+  const periodValue = period === "monthly" ? say("f_monthly") : period === "weekly" ? say("f_weekly") : days > 0 ? say("f_days", { days }) : say("f_fixed");
+  const periodDetail = end ? say("dateRange", { start: startText, end: formatSummaryDate(end, t, locale) }) : say("f_from", { date: startText });
+
+  // Rent falls due on the day of the handover (else the start), then the same day each month or week.
+  const firstDue = String(toWallTime(bookingData.delivery_datetime || rental?.delivery_datetime || rental?.start_date || "")).slice(0, 10) || start;
+  const validDue = /^\d{4}-\d{2}-\d{2}$/.test(firstDue);
+  const second = validDue ? new Date(`${firstDue}T00:00:00Z`) : null;
+  if (second) {
+    if (period === "weekly") second.setUTCDate(second.getUTCDate() + 7);
+    else second.setUTCMonth(second.getUTCMonth() + 1);
+  }
+  const onePayment = period === "custom" || period === "daily" || !validDue || Boolean(end && second && second.toISOString().slice(0, 10) >= end);
+  const dueValue = onePayment
+    ? formatSummaryDate(firstDue, t, locale)
+    : period === "weekly"
+      ? say("f_dueWeekly", { weekday: new Intl.DateTimeFormat(locale, { weekday: "long", timeZone: "UTC" }).format(new Date(`${firstDue}T00:00:00Z`)) })
+      : say("f_dueMonthly", { day: ordinalDay(Number(firstDue.slice(8, 10))) });
+
+  const facts: BookingFact[] = [
+    { key: "period", icon: CalendarDays, label: say("rentalPeriod"), value: periodValue, detail: periodDetail },
+    { key: "price", icon: CreditCard, label: say("f_price"), value: rateLabel(rental, t).split("\n")[0] },
+    { key: "deposit", icon: ShieldCheck, label: say("f_deposit"), value: Number(rental?.deposit_amount || 0) > 0 ? money(rental.deposit_amount, currency) : say("noDeposit") },
+    { key: "due", icon: CalendarClock, label: say("f_paymentDue"), value: dueValue }
+  ];
+
+  // Once the customer has the vehicle, where and when it was to be handed over is old news.
+  if (!handedOver) {
+    const lines = delivery.location.split("\n").map((line) => line.trim()).filter(Boolean);
+    const mapUrl = lines.find((line) => line.startsWith("https://www.google.com/maps"));
+    const how = String(lines[0] || "").replace(/:$/, "");
+    const place = lines.slice(1).filter((line) => !line.startsWith("https://")).join(", ");
+    const when = delivery.arrangeLater ? "" : delivery.time.replace(/\n/g, ", ");
+    const open = say("toBeConfirmed");
+    // "Place to be confirmed · To be confirmed" says one thing twice.
+    const detail = place === say("placeToBeConfirmed") && when === open ? open : [place, when].filter(Boolean).join(" · ");
+    facts.push({ key: "handover", icon: MapPin, label: say("handover"), value: how, detail: detail || undefined, mapUrl, wide: true });
+  }
+  return facts;
+}
+
+/** Five tiles, all one shape: an icon badge centred on the label and value beside it. */
+function BookingFacts({ facts, mapLabel }: { facts: BookingFact[]; mapLabel: string }) {
   return (
-    <div className="flex items-start gap-3">
-      <span aria-hidden="true" className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${INFO_TONES[tone].badge}`}>
-        <Icon size={20} />
-      </span>
-      <div className="min-w-0 flex-1">
-      <div className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{label}</div>
-      {/* The first line is the fact; lines after it (deposit, tax) are the small print under it. */}
-      <p className="mt-0.5 whitespace-pre-line [overflow-wrap:anywhere] text-[17px] font-bold leading-snug text-[var(--foreground)] [&>span:not(:first-child)]:text-[14px] [&>span:not(:first-child)]:font-semibold [&>span:not(:first-child)]:text-[var(--foreground-secondary)]">
-        {lines.map((line, index) => (
-          line.startsWith("https://www.google.com/maps") ? (
-            <a className="text-[var(--primary)] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">
-              {t("viewOnMap")}
+    <dl className="mt-4 grid gap-2.5 sm:grid-cols-2">
+      {facts.map(({ key, icon: Icon, label, value, detail, mapUrl, wide }) => (
+        <div className={`flex min-h-[88px] items-center gap-3.5 rounded-2xl border border-[var(--border)] bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] ${wide ? "sm:col-span-2" : ""}`} key={key}>
+          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
+            <Icon size={22} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <dt className="text-[12px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">{label}</dt>
+            <dd className="m-0 text-[17px] font-bold leading-tight text-[var(--foreground)] [overflow-wrap:anywhere]">{value}</dd>
+            {detail ? <dd className="m-0 mt-0.5 text-[14px] font-medium leading-snug text-[var(--foreground-secondary)] [overflow-wrap:anywhere]">{detail}</dd> : null}
+          </div>
+          {mapUrl ? (
+            <a className="pressable inline-flex min-h-11 shrink-0 items-center rounded-full border border-[var(--border)] bg-white px-3.5 text-[14px] font-bold text-[var(--primary)]" href={mapUrl} rel="noreferrer" target="_blank">
+              {mapLabel}
             </a>
-          ) : line.startsWith("https://") ? (
-            <a className="break-all text-[var(--primary)] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">
-              {line}
-            </a>
-          ) : (
-            <span key={`${line}-${index}`}>{line}</span>
-          )
-        )).reduce<ReactNode[]>((nodes, node, index) => (index ? [...nodes, "\n", node] : [node]), [])}
-      </p>
-      </div>
-    </div>
+          ) : null}
+        </div>
+      ))}
+    </dl>
   );
 }
 

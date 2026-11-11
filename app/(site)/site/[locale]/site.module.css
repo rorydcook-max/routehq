@@ -3,22 +3,22 @@
    Every surface is a 1px line or a product frame; nothing else decorates. */
 .site {
   color-scheme: light;
-  --ink: #06162b;
-  --ink-2: #0b2140;
+  --ink: #1e1b4b;
+  --ink-2: #2a2663;
   --white: #ffffff;
-  --mist: #f3f6f8;
-  --line: rgba(6, 22, 43, 0.1);
+  --mist: #f6f5fa;
+  --line: rgba(30, 27, 75, 0.1);
   --line-dark: rgba(255, 255, 255, 0.12);
-  --text: #0b1a2e;
-  --muted: #5f6b7a;
+  --text: #1e1b4b;
+  --muted: #56527f;
   --muted-dark: rgba(255, 255, 255, 0.68);
-  --teal: #12bcb8;
-  --teal-deep: #0b8f8c;
-  --font: var(--font-site), "Anuphan", system-ui, sans-serif;
+  --teal: #ff7aa8;
+  --teal-deep: #6226ab;
+  --font: "Plus Jakarta Sans Variable", "Anuphan", system-ui, sans-serif;
   --serif: var(--font-site-serif), "Anuphan", Georgia, serif;
   --section: 72px;
-  --frame-shadow-dark: 0 30px 80px -30px rgba(6, 22, 43, 0.45);
-  --frame-shadow-light: 0 24px 60px -30px rgba(6, 22, 43, 0.25);
+  --frame-shadow-dark: 0 30px 80px -30px rgba(30, 27, 75, 0.45);
+  --frame-shadow-light: 0 24px 60px -30px rgba(30, 27, 75, 0.25);
   /* The language picker and the logo read the app's names. */
   --border: var(--line);
   --primary: var(--teal-deep);
@@ -434,7 +434,7 @@
   inset: 0 0 var(--spill) 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(900px 500px at 80% -10%, rgba(18, 188, 184, 0.18), transparent 60%);
+  background: radial-gradient(900px 500px at 80% -10%, rgba(231, 53, 130, 0.18), transparent 60%);
 }
 .heroBody {
   margin-top: 24px;
@@ -1672,7 +1672,7 @@ details[open] > .select .chevron {
   width: 100%;
   height: 48px;
   padding: 0 16px;
-  border: 1px solid rgba(6, 22, 43, 0.2);
+  border: 1px solid rgba(30, 27, 75, 0.2);
   border-radius: 12px;
   background: #ffffff;
   color: var(--text);
@@ -1682,7 +1682,7 @@ details[open] > .select .chevron {
   transition: border-color 150ms ease;
 }
 .site .form .field .input.input:hover {
-  border-color: rgba(6, 22, 43, 0.36);
+  border-color: rgba(30, 27, 75, 0.36);
 }
 .site .form .field .input.input:focus-visible {
   border-color: var(--teal-deep);
@@ -1832,4 +1832,38 @@ details[open] > .select .chevron {
   margin-top: 72px;
   padding-top: 32px;
   border-top: 1px solid var(--line);
+}
+
+/* ---------------------------------------------------------------------
+   Sunset (11 Nov 2026): the website in the new brand. Ink Navy for the
+   dark bands, violet for links and buttons on white, and the phrase a
+   headline leans on set in the sunset gradient instead of an italic serif.
+   --------------------------------------------------------------------- */
+.hl,
+.dark .hl {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: inherit;
+  font-size: 1em;
+  letter-spacing: inherit;
+  background: linear-gradient(90deg, #7b45e6 0%, #e73582 55%, #ff7438 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.dark .hl { background-image: linear-gradient(90deg, #ff5fa2 0%, #ff8a4c 100%); }
+.hero::before {
+  background:
+    radial-gradient(1000px 620px at 92% 108%, rgba(255, 116, 56, 0.6), rgba(231, 53, 130, 0.42) 34%, rgba(98, 38, 171, 0.3) 58%, transparent 78%),
+    radial-gradient(700px 420px at 8% -10%, rgba(47, 107, 255, 0.22), transparent 62%);
+}
+.stepNum,
+.dark .stepNum {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6226ab 0%, #e73582 60%, #ff7438 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

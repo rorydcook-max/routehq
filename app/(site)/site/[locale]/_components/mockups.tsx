@@ -177,7 +177,7 @@ function Pill({ children, solid = false }: { children: ReactNode; solid?: boolea
   return (
     <span
       className={`inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full px-[1em] py-[0.45em] text-[0.95em] font-bold ${
-        solid ? "bg-[#0b8f8c] text-white" : "border-[0.12em] border-[#c9d2db] bg-white text-[#0b1a2e]"
+        solid ? "bg-[#6226ab] text-white" : "border-[0.12em] border-[#c9d2db] bg-white text-[#0b1a2e]"
       }`}
     >
       {children}
@@ -215,7 +215,7 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
   ];
   const bars = [38, 52, 44, 63, 58, 72, 66, 80, 74, 90];
   const week = ["2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15"].map((iso) => date(iso, { weekday: "short", day: "numeric" }));
-  const out = { bg: "#d9f4f3", fg: "#0b8f8c" };
+  const out = { bg: "#d9f4f3", fg: "#6226ab" };
   const going = { bg: "#d9f4f3", fg: "#0b6e6c" };
   const back = { bg: "#e4eef8", fg: "#1f4f7a" };
   const calendar = [
@@ -232,7 +232,7 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
           <p className="px-[0.7em] text-[0.85em] text-white/60">Powered by RoveHQ</p>
           <div className="mt-[1em] flex flex-col gap-[0.2em]">
             {nav.map(({ icon: Icon, label, active }) => (
-              <span className={`flex items-center gap-[0.7em] rounded-[0.8em] px-[0.7em] py-[0.55em] font-semibold ${active ? "bg-[rgba(18,188,184,0.16)] text-[#12bcb8]" : "text-white/70"}`} key={label}>
+              <span className={`flex items-center gap-[0.7em] rounded-[0.8em] px-[0.7em] py-[0.55em] font-semibold ${active ? "bg-[rgba(18,188,184,0.16)] text-[#6226ab]" : "text-white/70"}`} key={label}>
                 <Icon className="h-[1.2em] w-[1.2em] shrink-0" strokeWidth={2} />
                 {label}
               </span>
@@ -247,14 +247,14 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
                 {t("mockGoodMorning")}
               </p>
             </div>
-            <span className="inline-flex items-center gap-[0.4em] whitespace-nowrap rounded-full bg-[#0b8f8c] px-[1.1em] py-[0.6em] font-bold text-white">
+            <span className="inline-flex items-center gap-[0.4em] whitespace-nowrap rounded-full bg-[#6226ab] px-[1.1em] py-[0.6em] font-bold text-white">
               <Plus className="h-[1.1em] w-[1.1em]" strokeWidth={2.5} /> {t("mockNewBooking")}
             </span>
           </div>
           <div className="mt-[1.1em] flex gap-[0.6em] overflow-hidden">
             <Chip dot="#d14343">{t("mockOverdue", { count: 1 })}</Chip>
             <Chip>{t("mockForToday", { count: 3 })}</Chip>
-            <Chip dot="#12bcb8">{t("mockGoingOut", { count: 1 })}</Chip>
+            <Chip dot="#6226ab">{t("mockGoingOut", { count: 1 })}</Chip>
             <Chip dot="#4a9ad8">{t("mockComingBack", { count: 1 })}</Chip>
           </div>
           <div className="mt-[1.4em] grid grid-cols-[1.65fr_1fr] gap-[1.2em]">
@@ -283,7 +283,7 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
                 <div className="mt-[0.6em] flex items-center gap-[0.9em]">
                   <svg className="h-[4.2em] w-[4.2em] -rotate-90" viewBox="0 0 36 36">
                     <circle cx="18" cy="18" fill="none" r="15" stroke="#e6eaef" strokeWidth="4.5" />
-                    <circle cx="18" cy="18" fill="none" r="15" stroke="#0b8f8c" strokeDasharray="73 94.2" strokeLinecap="round" strokeWidth="4.5" />
+                    <circle cx="18" cy="18" fill="none" r="15" stroke="#6226ab" strokeDasharray="73 94.2" strokeLinecap="round" strokeWidth="4.5" />
                   </svg>
                   <span>
                     <span className="block text-[1.7em] font-semibold leading-none" style={{ fontFamily: "var(--font-site)" }}>
@@ -300,7 +300,7 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
                 </p>
                 <div className="mt-[0.9em] flex h-[3.2em] items-end gap-[0.35em]">
                   {bars.map((height, index) => (
-                    <span className="flex-1 rounded-t-[0.3em]" key={index} style={{ height: `${height}%`, background: index === bars.length - 1 ? "#12bcb8" : "#0b8f8c", opacity: index === bars.length - 1 ? 1 : 0.25 + index * 0.06 }} />
+                    <span className="flex-1 rounded-t-[0.3em]" key={index} style={{ height: `${height}%`, background: index === bars.length - 1 ? "#6226ab" : "#6226ab", opacity: index === bars.length - 1 ? 1 : 0.25 + index * 0.06 }} />
                   ))}
                 </div>
               </div>
@@ -310,7 +310,7 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
             <div className="grid grid-cols-[12.5em_repeat(7,1fr)] items-center gap-y-[0.45em]">
               <span className="font-semibold text-[#5f6b7a]">{t("mockNavCalendar")}</span>
               {week.map((day, index) => (
-                <span className={`text-center text-[0.9em] font-semibold ${index === 3 ? "text-[#0b8f8c]" : "text-[#5f6b7a]"}`} key={day}>
+                <span className={`text-center text-[0.9em] font-semibold ${index === 3 ? "text-[#6226ab]" : "text-[#5f6b7a]"}`} key={day}>
                   {day}
                 </span>
               ))}
@@ -343,8 +343,8 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
 export async function TodayPhoneMock({ className = "" }: { className?: string }) {
   const { t, money, date } = await kit();
   const rows = [
-    { title: t("mockRowHandover", { vehicle: vehicleName("pajero") }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, bar: "#0b8f8c" },
-    { title: t("mockRowCollect", { amount: money(2400) }), sub: "Kenji Watanabe", action: t("mockRecordPayment"), bar: "#12bcb8" },
+    { title: t("mockRowHandover", { vehicle: vehicleName("pajero") }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, bar: "#6226ab" },
+    { title: t("mockRowCollect", { amount: money(2400) }), sub: "Kenji Watanabe", action: t("mockRecordPayment"), bar: "#6226ab" },
     { title: t("mockRowReturn", { vehicle: vehicleName("corolla") }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), bar: "#4a9ad8" }
   ];
   return (
@@ -392,11 +392,11 @@ function TabBar({ active = 0 }: { active?: number }) {
     <div className="mt-auto flex items-center justify-around rounded-t-[1.6em] bg-white/90 px-[1em] pb-[1.4em] pt-[0.8em] text-[0.85em] font-semibold text-[#5f6b7a]">
       {tabs.map((Icon, index) =>
         Icon ? (
-          <span className={`flex flex-col items-center ${index === active ? "text-[#0b8f8c]" : ""}`} key={index}>
+          <span className={`flex flex-col items-center ${index === active ? "text-[#6226ab]" : ""}`} key={index}>
             <Icon className="h-[1.6em] w-[1.6em]" />
           </span>
         ) : (
-          <span className="flex h-[3em] w-[3em] items-center justify-center rounded-full bg-[#0b8f8c] text-white" key={index}>
+          <span className="flex h-[3em] w-[3em] items-center justify-center rounded-full bg-[#6226ab] text-white" key={index}>
             <Plus className="h-[1.6em] w-[1.6em]" />
           </span>
         )
@@ -417,7 +417,7 @@ export async function BookingPhoneMock({ className = "" }: { className?: string 
       <div className="flex h-full flex-col bg-[#f3f6f8]">
         <StatusBar />
         <div className="flex items-center gap-[0.6em] px-[1.2em] pt-[1.4em]">
-          <span className="flex h-[2.2em] w-[2.2em] items-center justify-center rounded-[0.6em] bg-[#0b8f8c] font-bold text-white">H</span>
+          <span className="flex h-[2.2em] w-[2.2em] items-center justify-center rounded-[0.6em] bg-[#6226ab] font-bold text-white">H</span>
           <span className="font-bold">Harbor Rentals</span>
         </div>
         <div className="mx-[0.9em] mt-[1em] rounded-[1.3em] bg-white p-[1em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
@@ -470,7 +470,7 @@ export async function BookingPhoneMock({ className = "" }: { className?: string 
           <p className="border-t border-[#e6eaef] pt-[0.3em] text-[0.9em] text-[#5f6b7a]">{t("mockSignHere")}</p>
         </div>
         <div className="mx-[0.9em] mt-auto pb-[1.6em]">
-          <span className="flex w-full items-center justify-center rounded-full bg-[#0b8f8c] py-[0.85em] text-[1.05em] font-bold text-white">{t("mockSignConfirm")}</span>
+          <span className="flex w-full items-center justify-center rounded-full bg-[#6226ab] py-[0.85em] text-[1.05em] font-bold text-white">{t("mockSignConfirm")}</span>
         </div>
       </div>
     </PhoneFrame>
@@ -511,7 +511,7 @@ export async function HandoverPhoneMock({ className = "" }: { className?: string
             {tiles.map((tile, index) => (
               <span className="relative block aspect-[4/3] overflow-hidden rounded-[0.7em] bg-[#e6eaef]" key={index}>
                 <VehiclePhoto className={tile.zoom} flip={tile.flip} id="corolla" thumb />
-                <span className="absolute bottom-[0.35em] end-[0.35em] flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-white/90 text-[#0b8f8c]">
+                <span className="absolute bottom-[0.35em] end-[0.35em] flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-white/90 text-[#6226ab]">
                   <Camera className="h-[0.9em] w-[0.9em]" />
                 </span>
               </span>
@@ -525,7 +525,7 @@ export async function HandoverPhoneMock({ className = "" }: { className?: string
               <span>¾</span>
             </div>
             <div className="mt-[0.45em] h-[0.55em] overflow-hidden rounded-full bg-[#e6eaef]">
-              <div className="h-full w-3/4 rounded-full bg-[#0b8f8c]" />
+              <div className="h-full w-3/4 rounded-full bg-[#6226ab]" />
             </div>
           </div>
           <div className="flex items-center justify-between border-t border-[#e6eaef] px-[1em] py-[0.75em] font-semibold">
@@ -540,7 +540,7 @@ export async function HandoverPhoneMock({ className = "" }: { className?: string
           </div>
         </div>
         <div className="mx-[0.9em] mt-auto pb-[1.6em]">
-          <span className="flex w-full items-center justify-center rounded-full bg-[#0b8f8c] py-[0.85em] text-[1.05em] font-bold text-white">{t("mockFinish")}</span>
+          <span className="flex w-full items-center justify-center rounded-full bg-[#6226ab] py-[0.85em] text-[1.05em] font-bold text-white">{t("mockFinish")}</span>
         </div>
       </div>
     </PhoneFrame>
@@ -654,7 +654,7 @@ export async function ImportMock({ className = "" }: { className?: string }) {
         <p className={s.importLabel}>{m("importGet")}</p>
         <div className={s.card}>
           <div className="flex items-center gap-[0.8em] border-b border-[var(--line)] px-[1.3em] py-[1em]">
-            <span className="flex h-[2.4em] w-[2.4em] shrink-0 items-center justify-center rounded-[0.7em] bg-[#d9f4f3] text-[#0b8f8c]">
+            <span className="flex h-[2.4em] w-[2.4em] shrink-0 items-center justify-center rounded-[0.7em] bg-[#d9f4f3] text-[#6226ab]">
               <Check className="h-[1.2em] w-[1.2em]" strokeWidth={2.5} />
             </span>
             <span className="font-bold leading-tight">{m("importCardTitle")}</span>
@@ -663,7 +663,7 @@ export async function ImportMock({ className = "" }: { className?: string }) {
             {rows.map((row) => (
               <div className="flex items-center justify-between gap-[1em] border-b border-[var(--line)] py-[0.75em] last:border-0" key={row.label}>
                 <span className="flex min-w-0 items-center gap-[0.6em] font-semibold">
-                  <span className="flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center rounded-full bg-[#d9f4f3] text-[#0b8f8c]">
+                  <span className="flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center rounded-full bg-[#d9f4f3] text-[#6226ab]">
                     <Check className="h-[0.95em] w-[0.95em]" strokeWidth={3} />
                   </span>
                   {row.label}
@@ -674,7 +674,7 @@ export async function ImportMock({ className = "" }: { className?: string }) {
           </div>
           <div className="flex items-center rounded-b-[1.1em] border-t border-[var(--line)] bg-[#f3f6f8] px-[1.3em] py-[0.8em]">
             <span className="inline-flex items-center gap-[0.5em] rounded-full bg-white px-[0.8em] py-[0.3em] text-[0.92em] font-semibold text-[#5f6b7a] shadow-[0_0_0_1px_rgba(6,22,43,0.1)]">
-              <span className="h-[0.5em] w-[0.5em] rounded-full bg-[#0b8f8c]" />
+              <span className="h-[0.5em] w-[0.5em] rounded-full bg-[#6226ab]" />
               {m("importCardFoot")}
             </span>
           </div>
@@ -807,7 +807,7 @@ export async function ShopPageMock({ className = "" }: { className?: string }) {
       <div className="bg-[#f3f6f8] px-[2.4em] pb-[2.4em] pt-[2em] text-[1.3em]">
         <div className="flex items-center justify-between gap-[1em]">
           <span className="flex items-center gap-[0.8em]">
-            <span className="flex h-[3em] w-[3em] items-center justify-center rounded-[0.8em] bg-[#0b8f8c] text-[1.2em] font-bold text-white">H</span>
+            <span className="flex h-[3em] w-[3em] items-center justify-center rounded-[0.8em] bg-[#6226ab] text-[1.2em] font-bold text-white">H</span>
             <span>
               <span className="block text-[1.5em] font-bold leading-tight">Harbor Rentals</span>
               <span className="block text-[#5f6b7a]">{t("mockShopTagline")}</span>

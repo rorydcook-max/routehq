@@ -928,7 +928,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--teal-deep, #0b8f8c);
+  color: var(--teal-deep, #6226ab);
 }
 .cbWide {
   grid-column: 1 / -1;
@@ -992,12 +992,12 @@
 .cbPitchList svg {
   flex-shrink: 0;
   margin-top: 3px;
-  color: var(--teal, #12bcb8);
+  color: var(--teal, #6226ab);
 }
 .cbPitchCta {
   display: inline-flex;
   margin-top: 16px;
-  background: var(--teal, #12bcb8) !important;
+  background: var(--teal, #6226ab) !important;
   color: var(--ink, #06162b) !important;
 }
 @media (max-width: 560px) {

@@ -16,24 +16,24 @@
  * names (--jade, --amber, --petrol) are kept as aliases so every page moves to the new palette together.
  */
 .rove {
-  --ink: #0b1733;
-  --ink-soft: #4a5672;
-  --ink-faint: #626d87;
-  --night: #0a1a33;
-  --night-2: #13284d;
-  --night-3: #1d3766;
-  --cobalt: #2d55f5;
-  --cobalt-deep: #1d3fd4;
-  --cobalt-tint: #e9eeff;
-  --coral: #ff7452;
-  --coral-soft: #ff9a80;
-  --coral-tint: #ffebe5;
-  --coral-ink: #a8361a;
+  --ink: #1e1b4b;
+  --ink-soft: #45416e;
+  --ink-faint: #5b5785;
+  --night: #1e1b4b;
+  --night-2: #2a2663;
+  --night-3: #3a367a;
+  --cobalt: #6226ab;
+  --cobalt-deep: #4a1c85;
+  --cobalt-tint: #eee7fa;
+  --coral: #ff7438;
+  --coral-soft: #ff9a6b;
+  --coral-tint: #ffe9dc;
+  --coral-ink: #a8480c;
   --star: #f5a524;
-  --paper: #f4f6fb;
+  --paper: #f6f5fa;
   --card: #ffffff;
-  --line: #e1e6f0;
-  --line-strong: #c8d0df;
+  --line: #e6e3f1;
+  --line-strong: #cfcbe6;
   --focus: var(--cobalt);
   /* Aliases (build-rove names). */
   --petrol: var(--night);
@@ -48,13 +48,13 @@
   --r-lg: 20px;
   --r-md: 12px;
   --r-sm: 8px;
-  --shadow-card: 0 1px 2px rgba(11, 23, 51, 0.05), 0 6px 18px -8px rgba(11, 23, 51, 0.12);
-  --shadow-lift: 0 2px 6px rgba(11, 23, 51, 0.06), 0 24px 48px -20px rgba(11, 23, 51, 0.3);
-  --shadow-float: 0 40px 80px -30px rgba(5, 12, 30, 0.6), 0 12px 28px -12px rgba(5, 12, 30, 0.3);
+  --shadow-card: 0 1px 2px rgba(30, 27, 75, 0.05), 0 6px 18px -8px rgba(30, 27, 75, 0.12);
+  --shadow-lift: 0 2px 6px rgba(30, 27, 75, 0.06), 0 24px 48px -20px rgba(30, 27, 75, 0.3);
+  --shadow-float: 0 40px 80px -30px rgba(16, 14, 42, 0.6), 0 12px 28px -12px rgba(16, 14, 42, 0.3);
   min-height: 100vh;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--rv-body), "Anuphan", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: "Plus Jakarta Sans Variable", "Anuphan", system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 16px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -105,7 +105,7 @@
   fill: var(--coral);
 }
 .logoWord {
-  font-family: var(--rv-display), system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans Variable", system-ui, sans-serif;
   font-variation-settings: "wdth" 88;
   font-size: 25px;
   font-weight: 800;
@@ -126,7 +126,7 @@
   vertical-align: -0.1em;
 }
 .display {
-  font-family: var(--rv-display), "Anuphan", system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans Variable", "Anuphan", system-ui, sans-serif;
   font-variation-settings: "wdth" 80;
   letter-spacing: -0.022em;
 }
@@ -198,7 +198,7 @@
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset, 0 6px 16px -8px rgba(45, 85, 245, 0.7);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset, 0 6px 16px -8px rgba(98, 38, 171, 0.7);
   transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 .btn:hover {
@@ -237,7 +237,7 @@
   composes: btn btnLarge;
   background: var(--coral);
   color: var(--ink) !important;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 8px 20px -10px rgba(255, 116, 82, 0.9);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 8px 20px -10px rgba(255, 116, 56, 0.9);
 }
 .btnCoral:hover {
   background: var(--coral-soft);
@@ -278,7 +278,7 @@
   position: sticky;
   top: 0;
   z-index: 30;
-  background: rgba(10, 26, 51, 0.92);
+  background: rgba(30, 27, 75, 0.92);
   backdrop-filter: saturate(1.5) blur(14px);
   -webkit-backdrop-filter: saturate(1.5) blur(14px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -330,7 +330,7 @@
   cursor: pointer;
 }
 .navLink:hover {
-  background: rgba(11, 23, 51, 0.06);
+  background: rgba(30, 27, 75, 0.06);
 }
 .navWide {
   display: none;
@@ -473,7 +473,7 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(180deg, rgba(10, 26, 51, 0.9) 0%, rgba(10, 26, 51, 0.5) 30%, rgba(10, 26, 51, 0.2) 50%, rgba(10, 26, 51, 0.5) 72%, rgba(10, 26, 51, 0.95) 100%);
+    linear-gradient(180deg, rgba(30, 27, 75, 0.9) 0%, rgba(30, 27, 75, 0.5) 30%, rgba(30, 27, 75, 0.2) 50%, rgba(30, 27, 75, 0.5) 72%, rgba(30, 27, 75, 0.95) 100%);
 }
 /* On the home page the night header runs straight into the hero, with no seam. */
 .rove:has(.heroFull) .header {
@@ -482,8 +482,8 @@
 @media (min-width: 900px) {
   .heroFull::after {
     background:
-      linear-gradient(90deg, rgba(10, 26, 51, 0.88) 0%, rgba(10, 26, 51, 0.55) 42%, rgba(10, 26, 51, 0.1) 75%),
-      linear-gradient(180deg, rgba(10, 26, 51, 0.35) 0%, transparent 30%, transparent 55%, rgba(10, 26, 51, 0.85) 100%);
+      linear-gradient(90deg, rgba(30, 27, 75, 0.88) 0%, rgba(30, 27, 75, 0.55) 42%, rgba(30, 27, 75, 0.1) 75%),
+      linear-gradient(180deg, rgba(30, 27, 75, 0.35) 0%, transparent 30%, transparent 55%, rgba(30, 27, 75, 0.85) 100%);
   }
 }
 .heroFull .placeArt img {
@@ -525,7 +525,7 @@
   letter-spacing: -0.032em;
   max-width: 12ch;
   text-wrap: balance;
-  text-shadow: 0 2px 24px rgba(5, 12, 30, 0.35);
+  text-shadow: 0 2px 24px rgba(16, 14, 42, 0.35);
 }
 .heroUsp {
   margin: 14px 0 0;
@@ -850,7 +850,7 @@
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 10px 22px -10px rgba(45, 85, 245, 0.85);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 10px 22px -10px rgba(98, 38, 171, 0.85);
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
 .searchSubmit:hover {
@@ -936,8 +936,8 @@
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(60% 80% at 100% 0%, rgba(45, 85, 245, 0.35), transparent 65%),
-    radial-gradient(50% 70% at 0% 100%, rgba(255, 116, 82, 0.16), transparent 70%);
+    radial-gradient(60% 80% at 100% 0%, rgba(98, 38, 171, 0.35), transparent 65%),
+    radial-gradient(50% 70% at 0% 100%, rgba(255, 116, 56, 0.16), transparent 70%);
 }
 .sectionNight .sectionTitle {
   color: #fff;
@@ -1030,7 +1030,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 40%, rgba(10, 26, 51, 0.82));
+  background: linear-gradient(180deg, transparent 40%, rgba(30, 27, 75, 0.82));
 }
 .kind:hover img {
   transform: scale(1.04);
@@ -1097,8 +1097,8 @@
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(70% 90% at 0% 0%, rgba(255, 116, 82, 0.28), transparent 60%),
-    radial-gradient(60% 80% at 100% 100%, rgba(45, 85, 245, 0.4), transparent 65%);
+    radial-gradient(70% 90% at 0% 0%, rgba(255, 116, 56, 0.28), transparent 60%),
+    radial-gradient(60% 80% at 100% 100%, rgba(98, 38, 171, 0.4), transparent 65%);
 }
 .bentoMonthly {
   grid-column: 1 / -1;
@@ -1164,7 +1164,7 @@
   background: var(--cobalt);
   color: #fff;
   font-size: 23px;
-  box-shadow: 0 8px 18px -10px rgba(45, 85, 245, 0.9);
+  box-shadow: 0 8px 18px -10px rgba(98, 38, 171, 0.9);
 }
 .featTitle {
   margin: 0;
@@ -1449,7 +1449,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10, 26, 51, 0.28), transparent 32%);
+  background: linear-gradient(180deg, rgba(30, 27, 75, 0.28), transparent 32%);
   pointer-events: none;
 }
 .cardPhoto img {
@@ -1759,7 +1759,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(180deg, rgba(10, 26, 51, 0) 35%, rgba(10, 26, 51, 0.78));
+  background: linear-gradient(180deg, rgba(30, 27, 75, 0) 35%, rgba(30, 27, 75, 0.78));
 }
 .placeName {
   composes: display;
@@ -1991,8 +1991,8 @@
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(70% 120% at 100% 100%, rgba(255, 116, 82, 0.32), transparent 60%),
-    radial-gradient(60% 100% at 0% 0%, rgba(45, 85, 245, 0.35), transparent 65%);
+    radial-gradient(70% 120% at 100% 100%, rgba(255, 116, 56, 0.32), transparent 60%),
+    radial-gradient(60% 100% at 0% 0%, rgba(98, 38, 171, 0.35), transparent 65%);
 }
 /* RoveHQ's R, large and faint, as the band's one ornament. */
 .operators::after {
@@ -2265,7 +2265,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(180deg, rgba(10, 26, 51, 0.6) 0%, rgba(10, 26, 51, 0.3) 38%, rgba(10, 26, 51, 0.88) 100%);
+  background: linear-gradient(180deg, rgba(30, 27, 75, 0.6) 0%, rgba(30, 27, 75, 0.3) 38%, rgba(30, 27, 75, 0.88) 100%);
 }
 .placeHero .pageTitle {
   color: #fff;
@@ -2977,7 +2977,7 @@
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
   background: #fff;
   border-top: 1px solid var(--line);
-  box-shadow: 0 -8px 24px -12px rgba(11, 23, 51, 0.25);
+  box-shadow: 0 -8px 24px -12px rgba(30, 27, 75, 0.25);
 }
 .mobileBar .price {
   font-size: 22px;
@@ -3014,7 +3014,7 @@
   line-height: 1.7;
 }
 .prose h2 {
-  font-family: var(--rv-display), "Anuphan", system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans Variable", "Anuphan", system-ui, sans-serif;
   font-variation-settings: "wdth" 80;
   letter-spacing: -0.02em;
   margin: 40px 0 10px;

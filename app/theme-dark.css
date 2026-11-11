@@ -483,3 +483,49 @@
 :root[data-theme="dark"] .kind-move { background: #1a2233; color: #9db8ff; }
 :root[data-theme="dark"] .kind-message { background: #24213a; color: #b9a8f5; }
 :root[data-theme="dark"] .calm-actions .primary-action:not(.stay-primary):not(:disabled) { background: var(--panel-secondary); color: var(--foreground); }
+
+/* Dark mode on a deep navy (Rory, 11 Nov 2026): near-black felt flat, purple was too much. Words stay neutral. */
+:root[data-theme="dark"] {
+  --background: #0b1226;
+  --panel: #131c36;
+  --panel-secondary: #19233f;
+  --panel-tertiary: #212d4d;
+  --border: #263354;
+  --border-strong: #40507a;
+  --field-border: #5d6d97;
+  --button-border: #5d6d97;
+  --foreground: #f1f4fa;
+  --foreground-secondary: #c8d0e2;
+  --muted: #97a2bd;
+  --sidebar-bg: #0f172e;
+  --sidebar-darker: #0b1226;
+  --sidebar-text: #c8d0e2;
+  --sidebar-text-muted: #97a2bd;
+  --primary-light: #22264f;
+  --primary-blue-light: #22264f;
+  --info-light: #22264f;
+  --info-line: #373d74;
+  --purple-light: #172a4d;
+  --purple-line: #284172;
+  --coming-back-light: #172a4d;
+  --messages-light: #172a4d;
+  --kind-move-bg: #172a4d;
+  --kind-message-bg: #22264f;
+  --band: #131c36;
+  --gradient-dark: #0b1226;
+  --gradient-dark-subtle: #0b1226;
+  --analytics-panel: #131c36;
+  --analytics-card: #19233f;
+  --report-grid: #263354;
+  --report-tick: #97a2bd;
+  --report-tip-line: #40507a;
+  --report-cursor: #40507a;
+}
+:root[data-theme="dark"] .app-sidebar {
+  background:
+    radial-gradient(380px 260px at 0% 100%, rgba(98, 38, 171, 0.26), transparent 70%),
+    linear-gradient(180deg, #0f172e 0%, #0c1328 100%);
+}
+:root[data-theme="dark"] .badge[class*="bg-[var(--primary-light)]"] { background: #172a4d; color: #b8cdfb; }
+:root[data-theme="dark"] .kind-move { background: #172a4d; }
+:root[data-theme="dark"] .kind-message { background: #22264f; }

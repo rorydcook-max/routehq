@@ -2440,3 +2440,14 @@ h2, .card-title, .tile .tile-title, .tile-title { font-weight: 700; }
 .tile-brick { color: #7a1040; }
 .tile-mango { color: #7a3410; }
 .tile-green { color: #0f5f40; }
+
+/* A stronger action gradient, and the page's one main button (New booking, Add vehicle) in the full sunset. */
+:root { --gradient-action: linear-gradient(95deg, #6226ab 0%, #a02ea6 58%, #e73582 100%); }
+.content-area a[class*="bg-[var(--band-action)]"],
+.content-area button[class*="bg-[var(--band-action)]"] {
+  background-image: var(--gradient-brand);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(194, 47, 143, 0.28);
+}
+.content-area a[class*="bg-[var(--band-action)]"]:hover,
+.content-area button[class*="bg-[var(--band-action)]"]:hover { filter: brightness(1.08); }

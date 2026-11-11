@@ -2382,3 +2382,61 @@ body {
   --chart-charges: #3c77fd;
   --report-in: #6226ab;
 }
+
+/* ---------------------------------------------------------------------
+   Sunset, second pass (Rory, 11 Nov 2026): closer to the brand mock-ups.
+   A warm glow behind the page, a deeper side menu with a violet chosen
+   page and coral counts, gradient main buttons, bolder headings, and
+   tinted icon chips on the dashboard tiles.
+   --------------------------------------------------------------------- */
+:root {
+  --gradient-action: linear-gradient(100deg, #6226ab 0%, #8f2bb0 55%, #d8397f 115%);
+  --gradient-sunset: linear-gradient(90deg, #6226ab 0%, #e73582 55%, #ff7438 100%);
+}
+body {
+  background:
+    radial-gradient(900px 460px at 100% -8%, rgba(231, 53, 130, 0.13), transparent 62%),
+    radial-gradient(760px 420px at 62% -18%, rgba(255, 116, 56, 0.1), transparent 60%),
+    radial-gradient(700px 500px at 18% -20%, rgba(98, 38, 171, 0.08), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
+}
+.app-sidebar {
+  background:
+    radial-gradient(420px 320px at 0% 100%, rgba(139, 79, 224, 0.42), transparent 70%),
+    radial-gradient(360px 260px at 120% 104%, rgba(231, 53, 130, 0.2), transparent 70%),
+    linear-gradient(180deg, #1e1b4b 0%, #19163f 100%);
+}
+.app-sidebar a[class*="bg-[var(--sidebar-active-bg)]"] {
+  background: linear-gradient(90deg, #6226ab 0%, #8b4fe0 100%);
+  box-shadow: 0 6px 16px rgba(98, 38, 171, 0.45);
+}
+.app-sidebar a span[class*="bg-[var(--primary)]"] { background: #e73582; }
+
+/* Main buttons carry the action gradient. Chips and dots in the same violet stay flat. */
+.content-area button[class*="bg-[var(--primary)]"],
+.content-area a[class*="bg-[var(--primary)]"],
+.btn-primary {
+  background-image: var(--gradient-action);
+  box-shadow: 0 6px 16px rgba(98, 38, 171, 0.22);
+}
+.content-area button[class*="bg-[var(--primary)]"]:hover,
+.content-area a[class*="bg-[var(--primary)]"]:hover,
+.btn-primary:hover { filter: brightness(1.08); }
+
+h1, .page-title, .page-hero h1 { font-weight: 800; letter-spacing: -0.025em; }
+h2, .card-title, .tile .tile-title, .tile-title { font-weight: 700; }
+.num { font-weight: 700; }
+
+/* Dashboard tiles: the icon sits on a tinted chip, as in the mock-ups. */
+.tile-icon {
+  display: inline-flex; height: 38px; width: 38px; flex-shrink: 0; align-items: center; justify-content: center;
+  border-radius: 12px; background: var(--primary-light); color: var(--primary);
+}
+.tile-brick .tile-icon { background: rgba(231, 53, 130, 0.16); color: #b3155c; }
+.tile-sky .tile-icon { background: rgba(60, 119, 253, 0.16); color: #1b3a8c; }
+.tile-mango .tile-icon { background: rgba(255, 116, 56, 0.18); color: #a8480c; }
+.tile-green .tile-icon { background: rgba(23, 132, 90, 0.16); color: #0f5f40; }
+.tile-brick { color: #7a1040; }
+.tile-mango { color: #7a3410; }
+.tile-green { color: #0f5f40; }

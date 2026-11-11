@@ -84,7 +84,8 @@ export function aliasTarget(rawHost: string | null | undefined): string | null {
 /** Whether a request is for the renter site (rove.rent). In development, `rove.localhost` works too. */
 export function isRenterHost(rawHost: string | null | undefined) {
   const host = bareHost(rawHost);
-  return host === renterDomain() || host === "rove.localhost";
+  // rove-staging.vercel.app: the staging copy of rove.rent, for looking at changes before they go live.
+  return host === renterDomain() || host === "rove.localhost" || host === "rove-staging.vercel.app";
 }
 
 /** Paths that belong to the renter site; anything else on its domain goes to RoveHQ. */

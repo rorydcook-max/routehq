@@ -15,9 +15,9 @@ export function Ring({ pct, label, size = 80, stroke = 10, color = "url(#rove-ri
       <svg aria-hidden="true" height={size} viewBox={`0 0 ${size} ${size}`} width={size}>
         <defs>
           <linearGradient id="rove-ring" x1="0" x2="1" y1="1" y2="0">
-            <stop offset="0" stopColor="#6226ab" />
-            <stop offset="0.6" stopColor="#e73582" />
-            <stop offset="1" stopColor="#ff7438" />
+            <stop offset="0" stopColor="#22c8ee" />
+            <stop offset="0.5" stopColor="#2f6bff" />
+            <stop offset="1" stopColor="#7b45e6" />
           </linearGradient>
         </defs>
         <circle cx={size / 2} cy={size / 2} fill="none" r={r} stroke={track} strokeWidth={stroke} />

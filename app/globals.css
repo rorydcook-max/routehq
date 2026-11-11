@@ -2451,3 +2451,54 @@ h2, .card-title, .tile .tile-title, .tile-title { font-weight: 700; }
 }
 .content-area a[class*="bg-[var(--band-action)]"]:hover,
 .content-area button[class*="bg-[var(--band-action)]"]:hover { filter: brightness(1.08); }
+
+/* ---------------------------------------------------------------------
+   Sunset, third pass (Rory, 11 Nov 2026): less purple, more of the logo's
+   range. Violet stays for actions and links. "On rent" and money in turn
+   blue, a chosen filter is Ink Navy, the side menu's icons run through the
+   logo's colours from cyan to amber, and the dashboard's icon chips each
+   take a different colour.
+   --------------------------------------------------------------------- */
+:root {
+  --on-rent: #2f6bff;
+  --chart-in: #2f6bff;
+  --report-in: #2f6bff;
+}
+body {
+  background:
+    radial-gradient(900px 460px at 100% -8%, rgba(231, 53, 130, 0.12), transparent 62%),
+    radial-gradient(760px 420px at 62% -18%, rgba(255, 116, 56, 0.1), transparent 60%),
+    radial-gradient(760px 520px at 14% -22%, rgba(34, 200, 238, 0.13), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
+}
+/* "On rent" and other plain state badges: blue, so they stop reading as buttons. */
+.badge[class*="bg-[var(--primary-light)]"] { background: #e3ecff; color: #1b3a8c; }
+/* The chosen filter at the top of a list. */
+.band-chip.band-chip-on { background: #1e1b4b; color: #ffffff; box-shadow: 0 6px 16px rgba(30, 27, 75, 0.22); }
+.band-chip.band-chip-on * { color: inherit; }
+
+/* Side menu: the chosen page runs blue to violet, and each icon takes a step through the logo's colours. */
+.app-sidebar a[class*="bg-[var(--sidebar-active-bg)]"] {
+  background: linear-gradient(90deg, #2f6bff 0%, #7b45e6 100%);
+  box-shadow: 0 6px 16px rgba(47, 107, 255, 0.4);
+}
+.app-sidebar nav a[href="/"] > svg { color: #3fd7f5; }
+.app-sidebar nav a[href="/tasks"] > svg { color: #45b4ff; }
+.app-sidebar nav a[href="/inbox"] > svg { color: #6c9bff; }
+.app-sidebar nav a[href="/bookings"] > svg { color: #9a85ff; }
+.app-sidebar nav a[href="/calendar"] > svg { color: #c277fb; }
+.app-sidebar nav a[href="/fleet"] > svg { color: #ea6fdc; }
+.app-sidebar nav a[href="/customers"] > svg { color: #ff6aa9; }
+.app-sidebar nav a[href="/transactions"] > svg { color: #ff7a7a; }
+.app-sidebar nav a[href="/reports"] > svg { color: #ff9257; }
+.app-sidebar nav a[href="/booking-page"] > svg { color: #ffab45; }
+.app-sidebar nav a[href="/partners"] > svg { color: #ffc043; }
+.app-sidebar nav a[href="/rental-calculator"] > svg { color: #ffd34d; }
+.app-sidebar nav a[class*="bg-[var(--sidebar-active-bg)]"] > svg { color: #ffffff; }
+
+/* Dashboard and list tiles: each plain tile's icon chip takes its own colour. */
+:where(.tile:nth-child(4n + 1)) .tile-icon { background: rgba(47, 107, 255, 0.14); color: #1f4fd6; }
+:where(.tile:nth-child(4n + 2)) .tile-icon { background: rgba(23, 132, 90, 0.15); color: #0f5f40; }
+:where(.tile:nth-child(4n + 3)) .tile-icon { background: rgba(255, 116, 56, 0.17); color: #a8480c; }
+:where(.tile:nth-child(4n + 4)) .tile-icon { background: rgba(231, 53, 130, 0.14); color: #b3155c; }

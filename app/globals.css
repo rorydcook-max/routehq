@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@fontsource-variable/plus-jakarta-sans";
 
 @font-face {
   font-family: "Anuphan";
@@ -2249,3 +2250,255 @@ select.app-select:not([multiple]):not([size]) {
 
 /* The website's footer ends with room for the chat button, so its last links are never under it. */
 body:has(.chat-launcher) footer { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+
+/* =====================================================================
+   DESIGN UPGRADE: "Sunset" (Rory, 11 Nov 2026)
+   Ink Navy, Violet, Coral, Orange, Amber. A new skin over what is built:
+   the same screens, panels, icons and shadows, in the new colours.
+   Violet is the action colour (buttons, links, chosen things). Coral means
+   late or needs you now, orange means due soon or waiting, green means
+   paid, available or done. The gradient is the signature: the logo, the
+   main "add" button and progress, nowhere else. The side menu is Ink Navy.
+   These override every token block above.
+   ===================================================================== */
+:root {
+  --background: #f6f5fa;
+  --panel: #ffffff;
+  --panel-secondary: #f7f5fc;
+  --panel-tertiary: #eceaf4;
+  --border: #e6e3f1;
+  --border-strong: #cfcbe6;
+
+  --foreground: #1e1b4b;
+  --foreground-secondary: #37336a;
+  --muted: #56527f;
+  --logo-ink: #1e1b4b;
+
+  --sidebar-bg: #1e1b4b;
+  --sidebar-darker: #17153d;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-text: #d8d5f2;
+  --sidebar-text-muted: #a9a5d6;
+  --sidebar-text-active: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-active: #ffffff;
+  --sidebar-active-bg: #332f73;
+  --sidebar-chip: rgba(255, 255, 255, 0.08);
+
+  --primary: #6226ab;
+  --primary-hover: #4a1c85;
+  --primary-light: #eee7fa;
+  --primary-blue: #6226ab;
+  --primary-blue-hover: #4a1c85;
+  --primary-blue-light: #eee7fa;
+  --primary-ink: var(--primary);
+
+  --accent: #ff7438;
+  --accent-hover: #e8562f;
+  --accent-ink: #1e1b4b;
+  --accent-light: #ffe9dc;
+
+  --band: #1e1b4b;
+  --band-ink: #ffffff;
+  --band-soft: rgba(255, 255, 255, 0.14);
+  --band-action: #ffffff;
+  --band-action-ink: var(--primary);
+  --band-logo-accent: #ffb66b;
+
+  --gradient-brand: linear-gradient(90deg, #6226ab 0%, #c22f8f 60%, #e8562f 100%);
+  --gradient-teal: linear-gradient(90deg, #6226ab 0%, #c22f8f 60%, #e8562f 100%);
+  --gradient-dark: #1e1b4b;
+  --gradient-dark-subtle: #1e1b4b;
+  --analytics-panel: #1e1b4b;
+  --analytics-card: #2a2663;
+
+  --success: #17845a;
+  --success-light: #dff3ea;
+  --success-line: #bfe3d2;
+  --warning: #a8480c;
+  --warning-light: #ffe9dc;
+  --warning-line: #f6cdb4;
+  --danger: #b3155c;
+  --danger-light: #fde3ee;
+  --danger-line: #f3b8d0;
+  --info: #6226ab;
+  --info-light: #eee7fa;
+  --info-line: #d5c6ee;
+  --purple: #2f5fd0;
+  --purple-light: #e6edfc;
+  --purple-line: #c5d4f6;
+
+  --urgent-red: #b3155c;
+  --urgent-amber: #a8480c;
+  --urgent-orange: #a8480c;
+  --urgent-green: #17845a;
+
+  --kind-money: #17845a;
+  --kind-money-bg: #dff3ea;
+  --kind-refund: #b3155c;
+  --kind-refund-bg: #fde3ee;
+  --kind-form: #a8480c;
+  --kind-form-bg: #ffe9dc;
+  --kind-move: #6226ab;
+  --kind-move-bg: #eee7fa;
+  --kind-message: #2f5fd0;
+  --kind-message-bg: #e6edfc;
+
+  --focus-ring: rgba(98, 38, 171, 0.2);
+  --focus-ring-strong: rgba(98, 38, 171, 0.35);
+  --shadow-float: 0 8px 24px rgba(30, 27, 75, 0.16);
+  --shadow-card: 0 1px 2px rgba(30, 27, 75, 0.06), 0 12px 30px rgba(98, 38, 171, 0.1);
+  --shadow-lift: 0 2px 4px rgba(30, 27, 75, 0.07), 0 18px 40px rgba(98, 38, 171, 0.16);
+
+  --on-rent: var(--primary);
+  --going-out: #ff7438;
+  --coming-back: #3c77fd;
+  --coming-back-light: #e6edfc;
+  --coming-back-ink: #1b3a8c;
+  --messages: #2f5fd0;
+  --messages-light: #e6edfc;
+  --messages-ink: #1b3a8c;
+
+  --font-display: "Plus Jakarta Sans Variable", "Anuphan", system-ui, sans-serif;
+  --font-geist-sans: "Plus Jakarta Sans Variable", "Anuphan";
+}
+
+/* Plus Jakarta Sans for Latin; Thai and other scripts fall through to Anuphan. */
+body {
+  font-family: "Twemoji Country Flags", "Plus Jakarta Sans Variable", "Anuphan", system-ui, sans-serif;
+}
+
+/* The side menu: Ink Navy, light words, the chosen page on a lighter navy tile. */
+.app-sidebar { background: var(--sidebar-bg); border-right-color: transparent; }
+.app-sidebar nav a:not([class*="bg-[var(--sidebar-active-bg)]"]):hover { background: var(--sidebar-hover); }
+.app-sidebar a[class*="bg-[var(--sidebar-active-bg)]"] { font-weight: 700; }
+.app-sidebar nav { scrollbar-color: rgba(255, 255, 255, 0.25) transparent; }
+
+/* Chart series in the new palette: money in is violet, money out orange-red, extras pink, charges blue. */
+:root {
+  --chart-in: #6226ab;
+  --chart-out: #e8562f;
+  --chart-extras: #c22f8f;
+  --chart-charges: #3c77fd;
+  --report-in: #6226ab;
+}
+
+/* ---------------------------------------------------------------------
+   Sunset, second pass (Rory, 11 Nov 2026): closer to the brand mock-ups.
+   A warm glow behind the page, a deeper side menu with a violet chosen
+   page and coral counts, gradient main buttons, bolder headings, and
+   tinted icon chips on the dashboard tiles.
+   --------------------------------------------------------------------- */
+:root {
+  --gradient-action: linear-gradient(100deg, #6226ab 0%, #8f2bb0 55%, #d8397f 115%);
+  --gradient-sunset: linear-gradient(90deg, #6226ab 0%, #e73582 55%, #ff7438 100%);
+}
+body {
+  background:
+    radial-gradient(900px 460px at 100% -8%, rgba(231, 53, 130, 0.13), transparent 62%),
+    radial-gradient(760px 420px at 62% -18%, rgba(255, 116, 56, 0.1), transparent 60%),
+    radial-gradient(700px 500px at 18% -20%, rgba(98, 38, 171, 0.08), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
+}
+.app-sidebar {
+  background:
+    radial-gradient(420px 320px at 0% 100%, rgba(139, 79, 224, 0.42), transparent 70%),
+    radial-gradient(360px 260px at 120% 104%, rgba(231, 53, 130, 0.2), transparent 70%),
+    linear-gradient(180deg, #1e1b4b 0%, #19163f 100%);
+}
+.app-sidebar a[class*="bg-[var(--sidebar-active-bg)]"] {
+  background: linear-gradient(90deg, #6226ab 0%, #8b4fe0 100%);
+  box-shadow: 0 6px 16px rgba(98, 38, 171, 0.45);
+}
+.app-sidebar a span[class*="bg-[var(--primary)]"] { background: #e73582; }
+
+/* Main buttons carry the action gradient. Chips and dots in the same violet stay flat. */
+.content-area button[class*="bg-[var(--primary)]"],
+.content-area a[class*="bg-[var(--primary)]"],
+.btn-primary {
+  background-image: var(--gradient-action);
+  box-shadow: 0 6px 16px rgba(98, 38, 171, 0.22);
+}
+.content-area button[class*="bg-[var(--primary)]"]:hover,
+.content-area a[class*="bg-[var(--primary)]"]:hover,
+.btn-primary:hover { filter: brightness(1.08); }
+
+h1, .page-title, .page-hero h1 { font-weight: 800; letter-spacing: -0.025em; }
+h2, .card-title, .tile .tile-title, .tile-title { font-weight: 700; }
+.num { font-weight: 700; }
+
+/* Dashboard tiles: the icon sits on a tinted chip, as in the mock-ups. */
+.tile-icon {
+  display: inline-flex; height: 38px; width: 38px; flex-shrink: 0; align-items: center; justify-content: center;
+  border-radius: 12px; background: var(--primary-light); color: var(--primary);
+}
+.tile-brick .tile-icon { background: rgba(231, 53, 130, 0.16); color: #b3155c; }
+.tile-sky .tile-icon { background: rgba(60, 119, 253, 0.16); color: #1b3a8c; }
+.tile-mango .tile-icon { background: rgba(255, 116, 56, 0.18); color: #a8480c; }
+.tile-green .tile-icon { background: rgba(23, 132, 90, 0.16); color: #0f5f40; }
+.tile-brick { color: #7a1040; }
+.tile-mango { color: #7a3410; }
+.tile-green { color: #0f5f40; }
+
+/* A stronger action gradient, and the page's one main button (New booking, Add vehicle) in the full sunset. */
+:root { --gradient-action: linear-gradient(95deg, #6226ab 0%, #a02ea6 58%, #e73582 100%); }
+.content-area a[class*="bg-[var(--band-action)]"],
+.content-area button[class*="bg-[var(--band-action)]"] {
+  background-image: var(--gradient-brand);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(194, 47, 143, 0.28);
+}
+.content-area a[class*="bg-[var(--band-action)]"]:hover,
+.content-area button[class*="bg-[var(--band-action)]"]:hover { filter: brightness(1.08); }
+
+/* ---------------------------------------------------------------------
+   Sunset, third pass (Rory, 11 Nov 2026): less purple, more of the logo's
+   range. Violet stays for actions and links. "On rent" and money in turn
+   blue, a chosen filter is Ink Navy, the side menu's icons run through the
+   logo's colours from cyan to amber, and the dashboard's icon chips each
+   take a different colour.
+   --------------------------------------------------------------------- */
+:root {
+  --on-rent: #2f6bff;
+  --chart-in: #2f6bff;
+  --report-in: #2f6bff;
+}
+body {
+  background:
+    radial-gradient(900px 460px at 100% -8%, rgba(231, 53, 130, 0.12), transparent 62%),
+    radial-gradient(760px 420px at 62% -18%, rgba(255, 116, 56, 0.1), transparent 60%),
+    radial-gradient(760px 520px at 14% -22%, rgba(34, 200, 238, 0.13), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
+}
+/* "On rent" and other plain state badges: blue, so they stop reading as buttons. */
+.badge[class*="bg-[var(--primary-light)]"] { background: #e3ecff; color: #1b3a8c; }
+/* The chosen filter at the top of a list. */
+.band-chip.band-chip-on { background: #1e1b4b; color: #ffffff; box-shadow: 0 6px 16px rgba(30, 27, 75, 0.22); }
+.band-chip.band-chip-on * { color: inherit; }
+
+/* Side menu: the chosen page runs blue to violet, and each icon takes a step through the logo's colours. */
+.app-sidebar a[class*="bg-[var(--sidebar-active-bg)]"] {
+  background: linear-gradient(90deg, #2f6bff 0%, #7b45e6 100%);
+  box-shadow: 0 6px 16px rgba(47, 107, 255, 0.4);
+}
+.app-sidebar nav a[href="/"] > svg { color: #3fd7f5; }
+.app-sidebar nav a[href="/tasks"] > svg { color: #45b4ff; }
+.app-sidebar nav a[href="/inbox"] > svg { color: #6c9bff; }
+.app-sidebar nav a[href="/bookings"] > svg { color: #9a85ff; }
+.app-sidebar nav a[href="/calendar"] > svg { color: #c277fb; }
+.app-sidebar nav a[href="/fleet"] > svg { color: #ea6fdc; }
+.app-sidebar nav a[href="/customers"] > svg { color: #ff6aa9; }
+.app-sidebar nav a[href="/transactions"] > svg { color: #ff7a7a; }
+.app-sidebar nav a[href="/reports"] > svg { color: #ff9257; }
+.app-sidebar nav a[href="/booking-page"] > svg { color: #ffab45; }
+.app-sidebar nav a[href="/partners"] > svg { color: #ffc043; }
+.app-sidebar nav a[href="/rental-calculator"] > svg { color: #ffd34d; }
+.app-sidebar nav a[class*="bg-[var(--sidebar-active-bg)]"] > svg { color: #ffffff; }
+
+/* Dashboard and list tiles: each plain tile's icon chip takes its own colour. */
+:where(.tile:nth-child(4n + 1)) .tile-icon { background: rgba(47, 107, 255, 0.14); color: #1f4fd6; }
+:where(.tile:nth-child(4n + 2)) .tile-icon { background: rgba(23, 132, 90, 0.15); color: #0f5f40; }
+:where(.tile:nth-child(4n + 3)) .tile-icon { background: rgba(255, 116, 56, 0.17); color: #a8480c; }
+:where(.tile:nth-child(4n + 4)) .tile-icon { background: rgba(231, 53, 130, 0.14); color: #b3155c; }

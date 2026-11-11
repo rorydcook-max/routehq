@@ -288,3 +288,128 @@
   border-color: #d4dde6 !important;
 }
 }
+
+/* =====================================================================
+   Dark mode in the Sunset colours (11 Nov 2026): a deep ink canvas,
+   slightly lighter ink panels, violet for what you can press, blue for
+   on rent. These override the teal tokens above.
+   ===================================================================== */
+:root[data-theme="dark"] {
+  --background: #100e2a;
+  --panel: #1a183f;
+  --panel-secondary: #211e4f;
+  --panel-tertiary: #2a2663;
+  --border: #2f2b68;
+  --border-strong: #4b4690;
+  --field-border: #6b66ad;
+  --button-border: #6b66ad;
+
+  --foreground: #f1effc;
+  --foreground-secondary: #d3cfee;
+  --muted: #a6a2cf;
+
+  --sidebar-bg: #17153d;
+  --sidebar-darker: #100e2a;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-text: #d8d5f2;
+  --sidebar-text-muted: #a9a5d6;
+  --sidebar-text-active: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-active: #ffffff;
+
+  /* White words on it 5.6:1. Words in the brand colour use the lighter violet below. */
+  --primary: #7a3fd0;
+  --primary-hover: #6a33bd;
+  --primary-light: #2b2168;
+  --primary-blue: #7a3fd0;
+  --primary-blue-hover: #6a33bd;
+  --primary-blue-light: #2b2168;
+  --primary-strong: #9160e0;
+  --primary-ink-dark: #c2a6f7;
+  --primary-ink: var(--primary-ink-dark);
+  --success-solid: #1f7a55;
+  --warning-solid: #a8480c;
+  --danger-solid: #b3155c;
+  --purple-solid: #2f5fd0;
+
+  --accent: #ff8a55;
+  --accent-hover: #ff9d70;
+  --accent-ink: #1e1b4b;
+  --accent-light: #3d2314;
+
+  --band: #1e1b4b;
+  --gradient-brand: linear-gradient(90deg, #6226ab 0%, #c22f8f 60%, #e8562f 100%);
+  --gradient-teal: linear-gradient(90deg, #6226ab 0%, #c22f8f 60%, #e8562f 100%);
+  --gradient-dark: #100e2a;
+  --gradient-dark-subtle: #100e2a;
+  --analytics-panel: #1e1b4b;
+  --analytics-card: #17153d;
+
+  --success: #6fd9a8;
+  --success-light: #14352a;
+  --success-line: #1f4d3c;
+  --warning: #ffb07e;
+  --warning-light: #3d2314;
+  --warning-line: #5c351f;
+  --danger: #ff8fbb;
+  --danger-light: #40142a;
+  --danger-line: #611f41;
+  --info: #c2a6f7;
+  --info-light: #2b2168;
+  --info-line: #44379a;
+  --purple: #9db8ff;
+  --purple-light: #1b2854;
+  --purple-line: #2c3f7d;
+
+  --urgent-red: #ff8fbb;
+  --urgent-amber: #ffb07e;
+  --urgent-orange: #ffb07e;
+  --urgent-green: #6fd9a8;
+
+  --kind-money: #6fd9a8;
+  --kind-money-bg: #14352a;
+  --kind-refund: #ff8fbb;
+  --kind-refund-bg: #40142a;
+  --kind-form: #ffb07e;
+  --kind-form-bg: #3d2314;
+  --kind-move: #c2a6f7;
+  --kind-move-bg: #2b2168;
+  --kind-message: #9db8ff;
+  --kind-message-bg: #1b2854;
+
+  --on-rent: #6b9bff;
+  --going-out: #ff8a55;
+  --coming-back: #7cb0ff;
+  --coming-back-light: #1b2854;
+  --coming-back-ink: #c6d8ff;
+  --messages: #9db8ff;
+  --messages-light: #1b2854;
+  --messages-ink: #d6e2ff;
+  --chart-in: #6b9bff;
+  --chart-out: #ff8a55;
+  --chart-extras: #f06bb4;
+  --chart-charges: #7fd0f5;
+
+  --focus-ring: rgba(169, 139, 240, 0.3);
+  --focus-ring-strong: rgba(169, 139, 240, 0.5);
+  --logo-ink: #f1effc;
+  --vehicle-art-bg: #dcd8f2;
+  --report-grid: #2f2b68;
+  --report-tick: #a6a2cf;
+  --report-tip-line: #4b4690;
+  --report-cursor: #4b4690;
+  --report-in: #6b9bff;
+  --report-out: #ff8a55;
+  --report-profit: #6fd9a8;
+}
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(900px 460px at 100% -8%, rgba(231, 53, 130, 0.14), transparent 62%),
+    radial-gradient(760px 520px at 14% -22%, rgba(47, 107, 255, 0.14), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
+}
+:root[data-theme="dark"] .badge[class*="bg-[var(--primary-light)]"] { background: #1b2854; color: #c6d8ff; }
+:root[data-theme="dark"] .band-chip.band-chip-on { background: #f1effc; color: #1e1b4b; }
+:root[data-theme="dark"] .app-sidebar a[class*="bg-[var(--sidebar-active-bg)]"] { background: linear-gradient(90deg, #2f6bff 0%, #7b45e6 100%) !important; }
+:root[data-theme="dark"] .tile-icon { background: rgba(255, 255, 255, 0.1); color: #f1effc; }

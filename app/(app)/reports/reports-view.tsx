@@ -34,9 +34,9 @@ import type { DatePreset, ReportsData, VehicleMetrics } from "@/lib/reports";
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 const PRESETS: DatePreset[] = ["this_month", "last_month", "last_3_months", "last_6_months", "this_year", "last_year", "custom"];
-const CHART_COLORS = ["#008fa3", "#c9711c", "#2f6fb8", "#a0522d", "#6b4c8a", "#c0457a", "#5f8a1e"];
+const CHART_COLORS = ["#6226ab", "#e8562f", "#3c77fd", "#c22f8f", "#17845a", "#b7791f", "#5b6b8c"];
 /** The same seven, warm first, for where money went. Also checked with the validator. */
-const OUT_COLORS = ["#c9711c", "#6b4c8a", "#a0522d", "#2f6fb8", "#c0457a", "#008fa3", "#5f8a1e"];
+const OUT_COLORS = ["#e8562f", "#3c77fd", "#c22f8f", "#b7791f", "#17845a", "#6226ab", "#5b6b8c"];
 /** Money exact in the business's own currency (฿, £, €): the shared formatMoney, decimals kept when there are any. */
 export function money(value: number) {
   const currency = businessCurrency();

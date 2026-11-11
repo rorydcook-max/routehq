@@ -7,12 +7,19 @@ import { businessTimeZone } from "@/lib/business-time";
 // Small pictures that say one thing at a glance: a ring, a week planner, a pair of bars.
 // Colours carry one meaning each (see "Look G" in globals.css).
 
-export function Ring({ pct, label, size = 80, stroke = 10, color = "var(--on-rent)", track = "var(--primary-light)", labelSize = 18 }: { pct: number; label: string; size?: number; stroke?: number; color?: string; track?: string; labelSize?: number }) {
+export function Ring({ pct, label, size = 80, stroke = 10, color = "url(#rove-ring)", track = "var(--primary-light)", labelSize = 18 }: { pct: number; label: string; size?: number; stroke?: number; color?: string; track?: string; labelSize?: number }) {
   const r = (size - stroke) / 2;
   const shown = Math.max(0, Math.min(100, pct));
   return (
     <span className="relative inline-block flex-shrink-0" style={{ height: size, width: size }}>
       <svg aria-hidden="true" height={size} viewBox={`0 0 ${size} ${size}`} width={size}>
+        <defs>
+          <linearGradient id="rove-ring" x1="0" x2="1" y1="1" y2="0">
+            <stop offset="0" stopColor="#22c8ee" />
+            <stop offset="0.5" stopColor="#2f6bff" />
+            <stop offset="1" stopColor="#7b45e6" />
+          </linearGradient>
+        </defs>
         <circle cx={size / 2} cy={size / 2} fill="none" r={r} stroke={track} strokeWidth={stroke} />
         {shown > 0 ? (
           <circle className="ring-draw" cx={size / 2} cy={size / 2} fill="none" pathLength={100} r={r} stroke={color} strokeDasharray={`${shown} 100`} strokeLinecap="round" strokeWidth={stroke} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
@@ -49,7 +56,7 @@ export function TileHead({ title, icon }: { title: string; icon?: ReactNode }) {
   return (
     <span className="flex items-center justify-between gap-2">
       <span className="tile-title">{title}</span>
-      {icon}
+      {icon ? <span className="tile-icon">{icon}</span> : null}
     </span>
   );
 }
@@ -248,9 +255,20 @@ export function Spark({ points, label, color = "var(--chart-in)" }: { points: Ar
   return (
     <span aria-label={label} className="relative mt-3 block h-14" role="img" style={{ color }}>
       <svg aria-hidden="true" className="wipe absolute inset-0 h-full w-full overflow-visible" preserveAspectRatio="none" viewBox={`0 0 ${width} ${height}`}>
-        <path d={`${line} L${width} ${height} L0 ${height} Z`} fill="currentColor" fillOpacity={0.12} />
+        <defs>
+          <linearGradient gradientUnits="userSpaceOnUse" id="rove-spark" x1="0" x2={width} y1="0" y2="0">
+            <stop offset="0" stopColor="#6226ab" />
+            <stop offset="0.6" stopColor="#e73582" />
+            <stop offset="1" stopColor="#ff7438" />
+          </linearGradient>
+          <linearGradient id="rove-spark-fill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stopColor="#e73582" stopOpacity="0.28" />
+            <stop offset="1" stopColor="#e73582" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={`${line} L${width} ${height} L0 ${height} Z`} fill={color === "var(--chart-in)" ? "url(#rove-spark-fill)" : "currentColor"} fillOpacity={color === "var(--chart-in)" ? 1 : 0.12} />
         {min < 0 ? <line stroke="var(--border-strong)" strokeDasharray="3 3" vectorEffect="non-scaling-stroke" x1={0} x2={width} y1={y(0)} y2={y(0)} /> : null}
-        <path d={line} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} vectorEffect="non-scaling-stroke" />
+        <path d={line} fill="none" stroke={color === "var(--chart-in)" ? "url(#rove-spark)" : "currentColor"} strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} vectorEffect="non-scaling-stroke" />
       </svg>
       {points.map((point, index) => (
         <span className={`spark-hit ${index === points.length - 1 ? "last" : ""}`} data-tip={point.tip} key={point.key} style={{ left: `calc(${index * step}% - ${step / 2}%)`, width: `${step}%` }} tabIndex={0}>

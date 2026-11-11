@@ -33,8 +33,6 @@ import { Toaster } from "@/components/toast";
 import { ChatLauncher } from "@/components/chat/chat-launcher";
 import { SidebarLanguage } from "@/components/sidebar-language";
 import { RouteHqLogo } from "@/components/brand-logo";
-import { BrandStyle } from "@/components/brand-style";
-import { brandCss } from "@/lib/brand";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { useInitialShellBrand } from "@/components/shell-brand-provider";
 import { FastActionSheet } from "@/components/fast-action-sheet";
@@ -178,10 +176,10 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   // colour, or going back to RoveHQ's own, the old one could still win. Only the current colour's style stays on.
   const brandColour = shell.brand?.colour ?? initialBrand?.colour ?? null;
   useEffect(() => {
-    const wanted = brandCss(brandColour) ? `brand-${String(brandColour).replace("#", "")}` : null;
+    // The operator's own screens keep RoveHQ's colours (Rory, 11 Nov 2026): a business's brand colour belongs to its
+    // customer pages. Any brand colour style left in <head> from one of those pages is switched off here.
     document.querySelectorAll<HTMLStyleElement>('style[data-precedence="brand"]').forEach((style) => {
-      const href = style.getAttribute("data-href") || style.getAttribute("href");
-      style.media = href === wanted ? "" : "not all";
+      style.media = "not all";
     });
   }, [brandColour]);
   useEffect(() => {
@@ -209,10 +207,10 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   }, []);
   const brand = shell.brand;
   // Their name in text if the logo file is missing or slow: never an empty box where the brand should be.
-  const brandName = brand?.name ? <span className="truncate text-[1.1rem] font-black leading-none tracking-[-0.02em] text-[var(--foreground)]">{brand.name}</span> : null;
+  const brandName = brand?.name ? <span className="truncate text-[1.1rem] font-black leading-none tracking-[-0.02em] text-[var(--sidebar-text-active)]">{brand.name}</span> : null;
   const brandLogo = brand ? (
     <span className="flex min-w-0 flex-col">
-      <BusinessLogoImage alt={brand.name} className="max-h-12 max-w-[190px] object-contain object-left" fallback={brandName} src={brand.logoUrl} />
+      <BusinessLogoImage alt={brand.name} className="max-h-12 max-w-[190px] rounded-xl bg-white object-contain object-left px-2 py-1.5" fallback={brandName} src={brand.logoUrl} />
       {brand.poweredBy ? <span className="mt-0.5 text-[10px] font-semibold text-[var(--sidebar-text-muted)]">{tBrand("poweredBy")}</span> : null}
     </span>
   ) : null;
@@ -241,7 +239,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
     return (
       <Link
         className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:960px)]:py-1.5 ${compact ? "min-w-0 flex-1 justify-center gap-1.5 whitespace-nowrap px-2" : "w-full"} ${
-          isActive(item.href) ? "bg-[var(--primary-light)] text-[var(--primary)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
+          isActive(item.href) ? "bg-[var(--sidebar-active-bg)] text-[var(--sidebar-text-active)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text-active)]"
         }`}
         href={item.href}
         key={item.key}
@@ -258,10 +256,9 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   // Bottom space so the last rows can scroll clear of the chat button (and, on phones, the tab bar under it).
   return (
     <div className={`min-h-screen lg:pb-24 ${onFocusedFlow ? "focused-flow pb-24" : "pb-44"}`}>
-      <BrandStyle colour={brand?.colour} />
       <aside className="app-sidebar fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
         <div className="mb-3 flex items-center px-2 pt-1">
-          {brandLogo || <RouteHqLogo />}
+          {brandLogo || <RouteHqLogo tone="dark" />}
         </div>
         {hasSeveralBusinesses ? (
           <form action={switchActiveOrganization} className="mb-3">
@@ -292,7 +289,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           <button
             aria-hidden={onFocusedFlow || undefined}
             tabIndex={onFocusedFlow ? -1 : undefined}
-            className={`${onFocusedFlow ? "invisible" : ""} flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[var(--primary)] pl-3 pr-[38px] text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)]`}
+            className={`${onFocusedFlow ? "invisible" : ""} flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[image:var(--gradient-brand)] pl-3 pr-[38px] text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:brightness-110`}
             onClick={() => setFastActionOpen(true)}
             type="button"
           >
@@ -315,7 +312,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
               <p className="px-3 pb-0.5 text-[14px] font-bold text-[var(--sidebar-text-muted)]">RoveHQ</p>
               <Link
                 className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:960px)]:py-1.5 ${
-                  pathname.startsWith("/platform") ? "bg-[var(--primary-light)] text-[var(--primary)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
+                  pathname.startsWith("/platform") ? "bg-[var(--sidebar-active-bg)] text-[var(--sidebar-text-active)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text-active)]"
                 }`}
                 href={"/platform" as Route}
               >
@@ -337,19 +334,19 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           </div>
         )}
         {userEmail ? (
-          <div className={`mt-2 flex items-center gap-2 rounded-xl bg-white p-1.5 pl-2 shadow-[var(--shadow-sm)] ${pathname.startsWith("/account") ? "ring-2 ring-[var(--primary)]" : ""}`}>
-            <Link aria-current={pathname.startsWith("/account") ? "page" : undefined} className="flex min-w-0 flex-1 items-center gap-2 rounded-lg hover:text-[var(--primary)]" href="/account" title={`${t("myAccount")} · ${userEmail}`}>
+          <div className={`mt-2 flex items-center gap-2 rounded-xl bg-[var(--sidebar-chip)] p-1.5 pl-2 ${pathname.startsWith("/account") ? "ring-2 ring-[var(--primary)]" : ""}`}>
+            <Link aria-current={pathname.startsWith("/account") ? "page" : undefined} className="flex min-w-0 flex-1 items-center gap-2 rounded-lg" href="/account" title={`${t("myAccount")} · ${userEmail}`}>
               <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[13px] font-bold uppercase text-[var(--primary)]">
                 {(shell.displayName ? shell.displayName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("") : userEmail.slice(0, 1)) || "?"}
               </span>
               <span className="min-w-0 leading-tight">
-                <span className="block truncate text-sm font-bold text-[var(--foreground)]">{shell.displayName || userEmail.split("@")[0]}</span>
-                <span className="block truncate text-[12px] font-medium text-[var(--muted)]">{userEmail}</span>
+                <span className="block truncate text-sm font-bold text-[var(--sidebar-text-active)]">{shell.displayName || userEmail.split("@")[0]}</span>
+                <span className="block truncate text-[12px] font-medium text-[var(--sidebar-text-muted)]">{userEmail}</span>
               </span>
             </Link>
             <SidebarLanguage compact />
             <form action={signOut} onSubmit={forgetShellContext}>
-              <PendingButton aria-label={t("signOut")} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]" pendingLabel="" title={t("signOut")} type="submit">
+              <PendingButton aria-label={t("signOut")} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text-active)]" pendingLabel="" title={t("signOut")} type="submit">
                 <LogOut size={16} />
               </PendingButton>
             </form>

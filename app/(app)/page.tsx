@@ -409,7 +409,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       icon: <FileWarning size={17} />,
       title: t("documentsToRenew", { count: paperwork.length }),
       detail: `${expired > 0 ? `${t("expiredCount", { count: expired })} · ` : ""}${names.slice(0, 3).join(", ")}${names.length > 3 ? ` ${t("plusMore", { count: names.length - 3 })}` : ""}`,
-      href: "/fleet",
+      // The fleet list, cut down to the vehicles whose paperwork needs doing.
+      href: "/fleet?show=attention",
       action: t("review")
     });
   }
@@ -609,10 +610,11 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         <h1 className="mt-0.5 text-[34px] leading-[1.05] tracking-[-0.025em] text-[var(--foreground)] lg:text-[44px]">{greeting}</h1>
         <div className="chip-row -my-1 mt-3 flex flex-wrap gap-2 py-1">
           {/* The same two numbers as the To do page, so the dashboard never tells a different story. */}
-          {tasksOverdue > 0 ? pill(tasksOverdue, t("pillOverdue"), "/tasks", "var(--band-alert)") : null}
-          {pill(tasksDueToday, t("pillToDo"), "/tasks")}
-          {pill(weekDays[0].out, t("pillOut"), "/calendar", "var(--going-out)")}
-          {pill(weekDays[0].back, t("pillBack"), "/calendar", "var(--coming-back)")}
+          {tasksOverdue > 0 ? pill(tasksOverdue, t("pillOverdue"), "/tasks?show=overdue", "var(--band-alert)") : null}
+          {/* What is in the Today list below, so the number and the list always agree (Rory, 11 Nov 2026). */}
+          {pill(todayItems.length, t("pillToDo"), "#today")}
+          {pill(weekDays[0].out, t("pillOut"), "/bookings?status=out_today", "var(--going-out)")}
+          {pill(weekDays[0].back, t("pillBack"), "/bookings?status=back_today", "var(--coming-back)")}
         </div>
       </div>
       {/* On a phone the + in the bar does this. */}
@@ -695,7 +697,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     smallTiles.push({
       key: "deposits",
       node: (
-        <Link className="card pressable tile p-4 tile-sky" href="/bookings">
+        <Link className="card pressable tile p-4 tile-sky" href={"/bookings?status=deposits" as Route}>
           <TileHead icon={<Lock size={22} />} title={t("depositsHeld")} />
           <span>
             <span className="flex items-center gap-1.5">
@@ -911,7 +913,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           {/* On a phone the tiles (money, overdue, deposits) come right after Today. */}
           <div className="order-4 grid grid-cols-2 gap-3 lg:hidden">{tiles}</div>
 
-          <section className="order-1 lg:order-2">
+          <section className="order-1 scroll-mt-24 lg:order-2" id="today">
             <header className="mb-2.5 flex items-center justify-between gap-3 px-1">
               <h2 className="text-[22px] text-[var(--foreground)]">{t("todayTitle")}</h2>
               <PanelLink href="/tasks">{t("allJobs")}</PanelLink>

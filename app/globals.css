@@ -2533,3 +2533,20 @@ a.band-chip[href*="show=next30"]::before { background: #8b4fe0; }
 .kind-form { background: linear-gradient(135deg, #ffe9dc, #ffd9c2); }
 .kind-move { background: linear-gradient(135deg, #e3ecff, #d0dfff); color: #1f4fd6; }
 .kind-message { background: linear-gradient(135deg, #eee7fa, #e0d3f6); color: #6226ab; }
+
+/* The phone's "More" menu: each icon in its own colour, the same run as the side menu on a computer. */
+.more-tile[href="/"] svg { color: #0ea5c6; }
+.more-tile[href="/tasks"] svg { color: #1f8fe6; }
+.more-tile[href="/inbox"] svg { color: #3f6fe8; }
+.more-tile[href="/bookings"] svg { color: #6b4fe0; }
+.more-tile[href="/calendar"] svg { color: #9a45dc; }
+.more-tile[href="/fleet"] svg { color: #c93bbf; }
+.more-tile[href="/customers"] svg { color: #e73582; }
+.more-tile[href="/transactions"] svg { color: #e8484f; }
+.more-tile[href="/reports"] svg { color: #f0652f; }
+.more-tile[href="/booking-page"] svg { color: #e8831a; }
+.more-tile[href="/partners"] svg { color: #d99a10; }
+.more-tile[href="/rental-calculator"] svg { color: #c9a400; }
+.more-tile[href="/settings"] svg { color: #56527f; }
+.more-tile[href="/help"] svg { color: #17845a; }
+:root[data-theme="dark"] .more-tile svg { filter: brightness(1.35) saturate(1.1); }

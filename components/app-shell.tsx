@@ -522,7 +522,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                         const Icon = item.icon;
                         return (
                           <Link
-                            className={`flex flex-col items-center gap-1.5 rounded-xl px-1.5 py-3 text-center text-[14px] font-bold leading-tight ${
+                            className={`more-tile flex flex-col items-center gap-1.5 rounded-xl px-1.5 py-3 text-center text-[14px] font-bold leading-tight ${
                               isActive(item.href) ? "bg-[var(--primary-light)] text-[var(--primary)]" : "bg-[var(--panel-secondary)] text-[var(--foreground)]"
                             }`}
                             href={item.href}

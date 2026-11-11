@@ -34,7 +34,7 @@ function statusLabel(status: string, tx: Tx) {
 
 const filters = ["all", "booked", "active", "due_soon", "overdue", "completed", "cancelled"] as const;
 // Set from the counts on the band ("4 on rent"), not from the filter row.
-const bandFilters = ["on_rent", "starting", "owing"] as const;
+const bandFilters = ["on_rent", "starting", "owing", "deposits", "out_today", "back_today"] as const;
 type BandFilter = (typeof bandFilters)[number];
 
 function money(value: unknown, currency = "THB") {
@@ -105,6 +105,10 @@ function matchesFilter(booking: any, filter: string) {
     return booking.status === "booked" && !!start && start >= businessToday() && start <= businessToday(7);
   }
   if (filter === "owing") return Number(booking.balance_due || 0) > 0;
+  // Opened from the dashboard: bookings holding a deposit, and the ones going out or due back today.
+  if (filter === "deposits") return Number(booking.deposit_held || 0) > 0;
+  if (filter === "out_today") return booking.status === "booked" && String(booking.start_date || "").slice(0, 10) === businessToday();
+  if (filter === "back_today") return ["active", "due_soon", "overdue", "extended"].includes(String(booking.status || "")) && String(booking.end_date || "").slice(0, 10) === businessToday();
   if (filter === "due_soon") return booking.status === "due_soon" || isDueSoon(booking);
   if (filter === "overdue") return booking.status === "overdue" || (booking.end_date && (businessDaysFromToday(booking.end_date) ?? 0) < 0 && !["completed", "cancelled"].includes(booking.status));
   return booking.status === filter;

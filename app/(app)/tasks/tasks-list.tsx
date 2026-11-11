@@ -472,11 +472,11 @@ function TaskRow({
         {/* In a board column the column already says when; the title and its line are enough at a glance. */}
         {/* Phones drop the kind picture so the title and its line get the whole width; the late/due words carry the urgency. */}
         {stacked ? (
-          <span className="hidden flex-shrink-0 sm:block lg:hidden">
+          <span className="flex-shrink-0 lg:hidden">
             <KindChip kind={jobKind(item)} />
           </span>
         ) : (
-          <span className="hidden flex-shrink-0 sm:block">
+          <span className="flex-shrink-0">
             <KindChip kind={jobKind(item)} />
           </span>
         )}

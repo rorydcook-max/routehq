@@ -413,3 +413,73 @@
 :root[data-theme="dark"] .band-chip.band-chip-on { background: #f1effc; color: #1e1b4b; }
 :root[data-theme="dark"] .app-sidebar a[class*="bg-[var(--sidebar-active-bg)]"] { background: linear-gradient(90deg, #2f6bff 0%, #7b45e6 100%) !important; }
 :root[data-theme="dark"] .tile-icon { background: rgba(255, 255, 255, 0.1); color: #f1effc; }
+
+/* =====================================================================
+   Dark mode, calmer (Rory, 11 Nov 2026): it read as purple on purple.
+   The canvas and panels are now a neutral near-black with only a hint of
+   blue, the words are neutral greys, and violet is kept for buttons and
+   the few words that are links.
+   ===================================================================== */
+:root[data-theme="dark"] {
+  --background: #0d0e14;
+  --panel: #16181f;
+  --panel-secondary: #1c1f28;
+  --panel-tertiary: #252833;
+  --border: #2a2d39;
+  --border-strong: #454958;
+  --field-border: #636878;
+  --button-border: #636878;
+
+  --foreground: #f2f3f6;
+  --foreground-secondary: #cbced8;
+  --muted: #9a9eab;
+
+  --sidebar-bg: #12131a;
+  --sidebar-darker: #0d0e14;
+  --sidebar-text: #cbced8;
+  --sidebar-text-muted: #9a9eab;
+
+  --primary-light: #24213a;
+  --primary-blue-light: #24213a;
+  --primary-ink-dark: #b9a8f5;
+  --info: #b9a8f5;
+  --info-light: #24213a;
+  --info-line: #3a3658;
+  --purple-light: #1a2233;
+  --purple-line: #2b3852;
+  --coming-back-light: #1a2233;
+  --messages-light: #1a2233;
+  --kind-move-bg: #1a2233;
+  --kind-message-bg: #24213a;
+
+  --band: #16181f;
+  --gradient-dark: #0d0e14;
+  --gradient-dark-subtle: #0d0e14;
+  --analytics-panel: #16181f;
+  --analytics-card: #1c1f28;
+  --logo-ink: #f2f3f6;
+  --vehicle-art-bg: #dfe1e8;
+  --report-grid: #2a2d39;
+  --report-tick: #9a9eab;
+  --report-tip-line: #454958;
+  --report-cursor: #454958;
+}
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(900px 420px at 100% -12%, rgba(231, 53, 130, 0.07), transparent 62%),
+    radial-gradient(760px 480px at 10% -24%, rgba(47, 107, 255, 0.08), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
+}
+:root[data-theme="dark"] .app-sidebar {
+  background:
+    radial-gradient(380px 260px at 0% 100%, rgba(98, 38, 171, 0.22), transparent 70%),
+    linear-gradient(180deg, #12131a 0%, #0f1016 100%);
+}
+:root[data-theme="dark"] .badge[class*="bg-[var(--primary-light)]"] { background: #1a2233; color: #b8cdfb; }
+:root[data-theme="dark"] .kind-money { background: #14352a; }
+:root[data-theme="dark"] .kind-refund { background: #40142a; }
+:root[data-theme="dark"] .kind-form { background: #3d2314; }
+:root[data-theme="dark"] .kind-move { background: #1a2233; color: #9db8ff; }
+:root[data-theme="dark"] .kind-message { background: #24213a; color: #b9a8f5; }
+:root[data-theme="dark"] .calm-actions .primary-action:not(.stay-primary):not(:disabled) { background: var(--panel-secondary); color: var(--foreground); }

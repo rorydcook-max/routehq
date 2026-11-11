@@ -55,7 +55,7 @@ export async function SiteFooter() {
         <div className={s.footerGrid}>
           <div className={s.footerBrand}>
             <span className="inline-block" dir="ltr">
-              <RouteHqLogo className="[&_svg]:h-8 [&_svg]:w-8" showDescriptor={false} />
+              <RouteHqLogo showDescriptor={false} />
             </span>
             <p>{m("footerTagline")}</p>
           </div>

@@ -19,7 +19,7 @@ export async function SiteHeader() {
   const logo = (
     <SiteLink aria-label={t("navHome")} className="inline-flex min-h-11 shrink-0 items-center" href={SITE_LINKS.home}>
       <span className="inline-flex items-center" dir="ltr">
-        <RouteHqLogo className="[&_svg]:h-8 [&_svg]:w-8" showDescriptor={false} tone="dark" />
+        <RouteHqLogo showDescriptor={false} tone="dark" />
       </span>
     </SiteLink>
   );

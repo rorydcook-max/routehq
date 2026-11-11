@@ -60,10 +60,6 @@ const deliverySteps = ["Confirm", "Odometer", "Fuel", "Walkaround", "Damage", "G
 const returnSteps = ["Confirm", "Odometer", "Fuel", "Walkaround", "Damage", "Deposit", "Signature"];
 const conditionSteps = ["Confirm", "Odometer", "Fuel", "Walkaround", "Damage", "GPS", "Review"];
 
-function titleFor(context: InspectionContext) {
-  return [context.vehicle.make, context.vehicle.model, context.vehicle.trim, context.vehicle.year].filter(Boolean).join(" ");
-}
-
 /** A stored date or instant as the business's calendar day (never the phone's own time zone), held at midnight UTC. */
 function businessDayOf(value: string) {
   return new Date(`${toWallTime(value).slice(0, 10)}T00:00:00Z`);
@@ -1705,15 +1701,6 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               <textarea className={inputClass} name="notes" placeholder={t("notesPlaceholder")} rows={4} />
             </label>
           )}
-          {typeof navigator !== "undefined" && "share" in navigator ? (
-            <button
-              className={`${touchButton} mt-4 border border-[var(--border)] bg-white text-[var(--foreground-secondary)]`}
-              onClick={() => navigator.share?.({ title: "RoveHQ inspection summary", text: `${titleFor(context)} inspection summary is ready.` })}
-              type="button"
-            >
-              {t("shareWithCustomer")}
-            </button>
-          ) : null}
         </StepShell>
       ) : null}
 

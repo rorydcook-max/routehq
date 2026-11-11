@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
+import { BarChart3, CalendarDays, CalendarPlus, Camera, CreditCard, FileCheck2, Globe, Handshake, ShieldCheck, Sparkles, Tags, Wrench, type LucideIcon } from "lucide-react";
 import { PLANS } from "@/lib/plans";
 import { breadcrumbLd, faqLd, softwareApplicationLd } from "@/lib/site/schema";
 import { SEGMENT_IDS, SEGMENTS, type SegmentId } from "@/lib/site/segments";
@@ -8,11 +9,27 @@ import { siteLocale } from "@/lib/site/static-page";
 import { translatedLocales } from "@/lib/site/own-translation";
 import { JsonLd } from "./content-ui";
 import { FinalCta } from "./final-cta";
+import { BookingPhoneMock, DashboardWindowMock, HandoverPhoneMock, PaymentPhoneMock, TodayPhoneMock } from "./mockups";
 import { Arrow, Container, Eyebrow, Plus, SITE_LINKS, SiteLink } from "./site-ui";
 import s from "../site.module.css";
 import c from "../content.module.css";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
+
+/** A picture for each feature, by the help article it points to: a page of features should not read as an essay. */
+const FEATURE_ICONS: Record<string, LucideIcon> = {
+  "online-booking-page": Globe,
+  "create-a-booking": CalendarPlus,
+  "handover-checks": Camera,
+  deposits: ShieldCheck,
+  "booking-and-price-rules": Tags,
+  "paperwork-and-renewals": FileCheck2,
+  "vehicle-report": BarChart3,
+  calendar: CalendarDays,
+  "plans-and-billing": CreditCard,
+  "service-and-maintenance": Wrench,
+  partners: Handshake
+};
 type Params = Promise<{ locale: string }>;
 
 /** Numbers a segment's words may carry: each plan's motorbike allowance, from lib/plans.ts. */
@@ -79,7 +96,7 @@ export async function SegmentPage({ id, params }: { id: SegmentId; params: Param
     <>
       <JsonLd data={jsonLd} />
 
-      <section className={`${s.dark} ${s.hero} ${s.heroPlain}`}>
+      <section className={`${s.dark} ${s.hero}`}>
         <Container>
           <div className={s.rise}>
             <Eyebrow>{say(`seg${k}Eyebrow`)}</Eyebrow>
@@ -95,6 +112,18 @@ export async function SegmentPage({ id, params }: { id: SegmentId; params: Param
             </div>
             <p className={`${s.note} ${s.heroNote}`}>{m("heroNote")}</p>
           </div>
+          {/* The product itself, as on the home page: the dashboard on a computer with a booking on a phone beside it. */}
+          <div className={`${s.stage} ${s.rise}`}>
+            <div className={s.stageDesk}>
+              <DashboardWindowMock />
+              <div className={s.stagePhone}>
+                <BookingPhoneMock />
+              </div>
+            </div>
+            <div className={s.stageMobile}>
+              <TodayPhoneMock />
+            </div>
+          </div>
         </Container>
       </section>
 
@@ -105,14 +134,41 @@ export async function SegmentPage({ id, params }: { id: SegmentId; params: Param
               {say(`seg${k}FeaturesTitle`)}
             </h2>
           </div>
-          <ul className={s.row4}>
+          <ul className={`${s.row4} ${c.featGrid}`}>
             {features.map((feature) => (
-              <li className={s.rowItem} key={feature.n}>
+              <li className={`${s.rowItem} ${c.featCard}`} key={feature.n}>
+                <span aria-hidden="true" className={c.featIcon}>
+                  {(() => {
+                    const Icon = FEATURE_ICONS[feature.doc] ?? Sparkles;
+                    return <Icon size={24} strokeWidth={1.9} />;
+                  })()}
+                </span>
                 <h3>{feature.title}</h3>
                 <p>{feature.body}</p>
                 <SiteLink className={`${s.link} mt-3`} href={feature.doc === "plans-and-billing" ? SITE_LINKS.pricing : `/docs/${feature.doc}`}>
                   {feature.doc === "plans-and-billing" ? m("priceLink") : m("segHowLink")} <Arrow size={16} />
                 </SiteLink>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      {/* Three screens from a rental's life: the customer books, the vehicle is handed over, the payment is matched. */}
+      <section aria-label={m("howEyebrow")} className={`${c.showBand} ${s.section}`}>
+        <Container>
+          <ul className={c.showRow}>
+            {[
+              { key: "step1Title", phone: <BookingPhoneMock /> },
+              { key: "step2Title", phone: <HandoverPhoneMock /> },
+              { key: "step3Title", phone: <PaymentPhoneMock /> }
+            ].map((shot, index) => (
+              <li className={c.showItem} key={shot.key}>
+                <div className={c.showPhone}>{shot.phone}</div>
+                <p className={c.showCaption}>
+                  <span aria-hidden="true" className={c.showNum}>{index + 1}</span>
+                  {m(shot.key)}
+                </p>
               </li>
             ))}
           </ul>

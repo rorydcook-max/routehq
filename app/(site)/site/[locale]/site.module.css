@@ -1870,9 +1870,9 @@ details[open] > .select .chevron {
 
 /* The hero no longer stops dead on white: its bottom corners are rounded on pages where no product frame runs over
    the edge, and a soft wash of the sunset carries on into the top of the next section. */
-.hero { border-radius: 0 0 40px 40px; }
-.hero::before { border-radius: inherit; }
-.hero::after {
+.heroPlain { border-radius: 0 0 40px 40px; }
+.heroPlain::before { border-radius: inherit; }
+.heroPlain::after {
   content: "";
   position: absolute;
   left: 0;

@@ -24,6 +24,10 @@ export default async function BookingsPage({ searchParams }: { searchParams: Pro
   const onRent = live.filter((booking: any) => ["active", "due_soon", "overdue", "extended"].includes(String(booking.status || ""))).length;
   const starting = live.filter((booking: any) => booking.status === "booked" && booking.start_date && String(booking.start_date).slice(0, 10) >= today && String(booking.start_date).slice(0, 10) <= weekEnd).length;
   const owing = live.filter((booking: any) => Number(booking.balance_due || 0) > 0).length;
+  const onRentStates = ["active", "due_soon", "overdue", "extended"];
+  const deposits = live.filter((booking: any) => Number(booking.deposit_held || 0) > 0).length;
+  const outToday = live.filter((booking: any) => booking.status === "booked" && String(booking.start_date || "").slice(0, 10) === today).length;
+  const backToday = live.filter((booking: any) => onRentStates.includes(String(booking.status || "")) && String(booking.end_date || "").slice(0, 10) === today).length;
 
   return (
     <AppShell
@@ -45,7 +49,11 @@ export default async function BookingsPage({ searchParams }: { searchParams: Pro
               items={[
                 { count: onRent, label: t("bandOnRent"), dot: "var(--band-dot)", href: shown === "on_rent" ? "/bookings" : "/bookings?status=on_rent", active: shown === "on_rent" },
                 { count: starting, label: t("bandStarting"), dot: "var(--going-out)", href: shown === "starting" ? "/bookings" : "/bookings?status=starting", active: shown === "starting" },
-                { count: owing, label: t("bandOwing"), dot: "var(--danger)", alert: true, href: shown === "owing" ? "/bookings" : "/bookings?status=owing", active: shown === "owing" }
+                { count: owing, label: t("bandOwing"), dot: "var(--danger)", alert: true, href: shown === "owing" ? "/bookings" : "/bookings?status=owing", active: shown === "owing" },
+                { count: deposits, label: t("bandDeposits"), dot: "var(--coming-back)", href: shown === "deposits" ? "/bookings" : "/bookings?status=deposits", active: shown === "deposits" },
+                // Going out and due back today show when there are any, or when the dashboard sent you here to see them.
+                ...(outToday > 0 || shown === "out_today" ? [{ count: outToday, label: t("bandOutToday"), dot: "var(--going-out)", href: shown === "out_today" ? "/bookings" : "/bookings?status=out_today", active: shown === "out_today" }] : []),
+                ...(backToday > 0 || shown === "back_today" ? [{ count: backToday, label: t("bandBackToday"), dot: "var(--coming-back)", href: shown === "back_today" ? "/bookings" : "/bookings?status=back_today", active: shown === "back_today" }] : [])
               ]}
             />
           </div>

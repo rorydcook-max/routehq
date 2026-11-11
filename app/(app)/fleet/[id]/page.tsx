@@ -873,7 +873,8 @@ function MaintenanceSection({ detail, organizationId, currency }: { detail: Vehi
           </label>
           <label className="block">
             <span className={labelClass}>{tx.say("m_nextDate")}</span>
-            <input className={inputClass} name="nextDueDate" type="date" />
+            {/* A year on, as most services are yearly; change or clear it. Ignored for repairs, tyres and batteries. */}
+            <input className={inputClass} defaultValue={`${Number(businessToday().slice(0, 4)) + 1}${businessToday().slice(4)}`.replace(/-02-29$/, "-02-28")} name="nextDueDate" type="date" />
           </label>
           <label className="block">
             <span className={labelClass}>{tx.say(distanceKey("m_nextKm"))}</span>

@@ -576,7 +576,8 @@ export function TransactionForm({
               </label>
               <label className="block">
                 <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("sv_nextDate")}</span>
-                <input className={inputClass} name="serviceNextDate" type="date" />
+                {/* A year after the service, as most are yearly; change or clear it. */}
+                <input className={inputClass} defaultValue={yearOn(transactionDate)} key={transactionDate} name="serviceNextDate" type="date" />
               </label>
               <label className="block">
                 <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say(distanceKey("sv_nextKm"))}</span>

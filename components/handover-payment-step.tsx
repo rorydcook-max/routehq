@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Banknote, Building2, CheckCircle2, Globe2, QrCode, X } from "lucide-react";
 import { MoneyInput } from "@/components/money-input";
-import { promptPayPayload } from "@/lib/promptpay";
+import { paymentQrText } from "@/lib/promptpay";
 
 /** The business's ways of being paid (Settings › How customers pay you), as the handover needs them. */
 export type HandoverPayOptions = {
@@ -13,6 +13,8 @@ export type HandoverPayOptions = {
   defaultMethod: string | null;
   promptpayId: string | null;
   promptpayQrUrl: string | null;
+  /** The text read from the uploaded QR, when it could be read: the QR shown then carries the amount. */
+  promptpayQrPayload?: string | null;
   bankName: string | null;
   bankAccountNumber: string | null;
   bankAccountName: string | null;
@@ -290,7 +292,7 @@ function PayScreen({
   // PromptPay carries the exact amount; Wise and Revolut open the business's own link; a bank transfer opens
   // the customer's booking page, where the details are and a slip can be sent (and matched).
   // The business's own uploaded QR always wins over one made from the PromptPay ID.
-  const promptPayText = method === "promptpay" && pay.promptpayId && !pay.promptpayQrUrl && currency === "THB" ? promptPayPayload(pay.promptpayId, shown) : null;
+  const promptPayText = method === "promptpay" && currency === "THB" ? paymentQrText({ payload: pay.promptpayQrPayload, promptPayId: pay.promptpayQrUrl ? null : pay.promptpayId }, shown) : null;
   const qrText = method === "promptpay" ? promptPayText : method === "wise" ? pay.wiseLink : method === "revolut" ? pay.revolutLink : portal;
   const staticQr = method === "promptpay" && !promptPayText ? pay.promptpayQrUrl : null;
 

@@ -8,6 +8,7 @@ import { SwitchField } from "@/components/switch-field";
 import { InfoTip } from "@/components/info-tip";
 import { unwrap } from "@/lib/action-result";
 import { shownError } from "@/lib/error-text";
+import { isThaiQrPayload } from "@/lib/promptpay";
 
 // A save that fails hands back its reason (lib/action-error.ts); these throw it, for the catch blocks below to show.
 const updatePaymentSettings = (...args: Parameters<typeof updatePaymentSettingsAction>) => unwrap(updatePaymentSettingsAction(...args));
@@ -47,12 +48,37 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
   const [promptPayQrUrl, setPromptPayQrUrl] = useState(settings.promptpay_qr_url || "");
   const [removePromptPayQr, setRemovePromptPayQr] = useState(false);
   const [qrFileName, setQrFileName] = useState("");
+  // The text inside the QR picture, read here when it is chosen: with it, customers get the QR with the amount
+  // already filled in (lib/promptpay.ts). "none" = a picture was chosen but no bank QR could be read from it.
+  const [qrText, setQrText] = useState("");
+  async function pickQr(file: File | undefined) {
+    setQrFileName(file?.name || "");
+    setQrText("");
+    if (!file) return;
+    try {
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("no canvas");
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+      const { default: jsQR } = await import("jsqr");
+      const found = jsQR(pixels.data, pixels.width, pixels.height);
+      setQrText(found?.data && isThaiQrPayload(found.data) ? found.data.trim() : "none");
+    } catch {
+      setQrText("none");
+    }
+  }
 
   // After a save the page hands back the stored picture: show it instead of the empty picker.
   useEffect(() => {
     setPromptPayQrUrl(settings.promptpay_qr_url || "");
     setRemovePromptPayQr(false);
     setQrFileName("");
+    setQrText("");
   }, [settings.promptpay_qr_url]);
   const [defaultMethod, setDefaultMethod] = useState(initialMethods.includes(settings.default_payment_method || "") ? settings.default_payment_method || "cash" : "cash");
   const [result, setResult] = useState<"saved" | "failed" | null>(null);
@@ -91,6 +117,7 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
     <form method="post" className="space-y-3" onSubmit={submitPaymentSettings}>
       <input name="accepted_payment_methods" type="hidden" value={JSON.stringify(enabledMethods)} />
       <input name="promptpay_qr_remove" type="hidden" value={removePromptPayQr ? "true" : "false"} />
+      <input name="promptpay_qr_payload" type="hidden" value={qrText === "none" ? "" : qrText} />
 
       <div className="grid gap-2.5 md:grid-cols-2">
         <MethodCard checked disabled label={say("pay_cash")} name="cash" />
@@ -115,7 +142,7 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
                   <div className="flex flex-wrap gap-2">
                     <label className="secondary-action pressable cursor-pointer">
                       {say("pm_replace")}
-                      <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original name="promptpay_qr" onChange={(event) => setQrFileName(event.target.files?.[0]?.name || "")} type="file" />
+                      <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original name="promptpay_qr" onChange={(event) => void pickQr(event.target.files?.[0])} type="file" />
                     </label>
                     <button
                       className="secondary-action pressable"
@@ -133,10 +160,13 @@ export function PaymentMethodsForm({ businessName, settings, promptPay = true }:
               ) : (
                 <label className="secondary-action pressable mt-2 w-full cursor-pointer sm:w-auto">
                   {qrFileName ? say("pm_replace") : say("pm_addQr")}
-                  <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original name="promptpay_qr" onChange={(event) => setQrFileName(event.target.files?.[0]?.name || "")} type="file" />
+                  <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original name="promptpay_qr" onChange={(event) => void pickQr(event.target.files?.[0])} type="file" />
                 </label>
               )}
               {qrFileName ? <p className="mt-2 font-semibold text-[var(--success)]">{say("pm_qrChosen", { file: qrFileName })}</p> : null}
+              {qrFileName && qrText ? (
+                <p className={`mt-1 text-[14px] font-medium ${qrText === "none" ? "text-[var(--warning)]" : "text-[var(--foreground-secondary)]"}`}>{say(qrText === "none" ? "pm_qrNotRead" : "pm_qrRead")}</p>
+              ) : null}
             </div>
           </div>
         </MethodCard>

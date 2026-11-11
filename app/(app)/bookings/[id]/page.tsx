@@ -53,6 +53,7 @@ import { PendingAmendmentCard } from "@/app/(app)/bookings/[id]/pending-amendmen
 import { LoosePaymentsCard } from "@/app/(app)/bookings/[id]/loose-payments-card";
 import { loosePaymentsFor } from "@/lib/loose-payments";
 import { DesktopOpenDetails } from "@/components/desktop-open-details";
+import { withLiveDocumentStatus } from "@/lib/customer-documents";
 import { businessSignatureOf, getBookingRentalDocuments, renterSignatureOf, type BookingRentalDocument } from "@/lib/booking-rental-documents";
 import { distanceKey } from "@/lib/business-units";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
@@ -363,7 +364,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     .limit(1)
     .maybeSingle();
   const vehicle = rental.vehicles;
-  const customer = rental.customers;
+  // The customer's documents as they are on file now, not the saved flag (lib/customer-documents.ts).
+  const customer = rental.customers?.id ? (await withLiveDocumentStatus(supabaseForVehicles, organization.id, [rental.customers]))[0] : rental.customers;
   // What other RoveHQ businesses reported about this customer (shared customer history).
   const historySignals = await sharedHistory(supabaseForVehicles, organization.id, customer).catch(() => []);
   const loosePayments = await loosePaymentsFor(supabaseForVehicles, { id: rental.id, vehicle_id: rental.vehicle_id, original_vehicle_id: rental.original_vehicle_id, status: rental.status, start_date: rental.start_date, end_date: rental.end_date, organization_id: organization.id }).catch(() => []);
@@ -830,7 +832,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               </div>
             ) : null}
             {/* Two main actions side by side, More underneath: nothing wraps onto a second line. */}
-            <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>details]:col-span-2 [&>button]:w-full [&>*>button]:w-full lg:flex lg:flex-wrap lg:[&>a]:w-auto lg:[&>details]:w-auto lg:[&>details_summary]:w-auto lg:[&>button]:w-auto lg:[&>*>button]:w-auto">
+            <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>details]:col-span-2 [&>button]:w-full [&>*>button]:w-full lg:flex lg:flex-wrap lg:items-center lg:[&>a]:w-auto lg:[&>details]:w-auto lg:[&>details_summary]:w-auto lg:[&>button]:w-auto lg:[&>*>button]:w-auto">
               {awaitingSignature ? (
                 <a className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm" href="#send-link">
                   {tx.say("sendLink")}

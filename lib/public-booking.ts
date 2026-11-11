@@ -36,6 +36,8 @@ function organizationPaymentSettings(organization: any) {
     accepted_payment_methods: acceptedMethods,
     promptpay_id: (promptPay && organization?.promptpay_id) || null,
     promptpay_qr_url: (promptPay && organization?.promptpay_qr_url) || null,
+    // The text read from that picture when it was uploaded: lets the QR shown carry the amount (lib/promptpay.ts).
+    promptpay_qr_payload: (promptPay && organization?.promptpay_qr_url && organization?.settings?.promptpay_qr_payload) || null,
     bank_name: organization?.bank_name || null,
     bank_account_number: organization?.bank_account_number || null,
     bank_account_name: organization?.bank_account_name || null,
@@ -351,7 +353,8 @@ export async function getPublicBookingDetail(token: string) {
     },
     completion: {
       details: Boolean(bookingLink.customer_details_submitted_at),
-      documents: documentCategories.every((category) => uploadedCategories.has(category)),
+      // An identity document and a driving licence; the selfie is optional (Rory, 11 Nov 2026).
+      documents: documentCategories.filter((category) => category !== "selfie").every((category) => uploadedCategories.has(category)),
       agreement: Boolean(rentalDocumentAgreement?.eligibility?.fullyExecuted)
     },
     org_payment: { ...organizationPaymentSettings(organization), promptpay_qr_url: organizationOffersPromptPay(organization) ? promptPayQrUrl : null },

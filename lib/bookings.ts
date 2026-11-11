@@ -1,4 +1,5 @@
 import { businessToday } from "@/lib/business-time";
+import { withLiveDocumentStatus } from "@/lib/customer-documents";
 import { QUIET_ACTIVITY_EVENT_FILTER } from "@/lib/activity-noise";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -407,5 +408,7 @@ export async function getCustomersForSelector(organizationId: string) {
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
     .order("full_name", { ascending: true });
-  return (data || []) as Array<{ id: string; full_name: string; phone: string | null; nationality: string | null; document_status: string | null }>;
+  // Documents already on file are never asked for again (lib/customer-documents.ts).
+  const customers = await withLiveDocumentStatus(supabase, organizationId, (data || []) as any[]);
+  return customers as Array<{ id: string; full_name: string; phone: string | null; nationality: string | null; document_status: string | null }>;
 }

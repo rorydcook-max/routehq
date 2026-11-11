@@ -876,7 +876,6 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         detail.completion.documents ||
         ((haveDoc("passport") || uploaded("passportFile", "passportCameraFile")) &&
           (haveDoc("driver_license") || uploaded("driverLicenseFile", "driverLicenseCameraFile")) &&
-          (haveDoc("selfie") || uploaded("selfieFile", "selfieCameraFile")) &&
           (Boolean(onFile?.numbers) || ID_FIELDS.every(filled))),
       agreement: detail.completion.agreement || (acceptedAgreement && Boolean(nextSignature) && filled("signedName"))
     });
@@ -964,8 +963,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     if (!detail.completion.documents) {
       const photos: Array<[UploadKind, string, string[]]> = [
         ["passport", idLabel, ["passportFile", "passportCameraFile"]],
-        ["driver_license", t("drivingLicence"), ["driverLicenseFile", "driverLicenseCameraFile"]],
-        ["selfie", t("selfiePhoto"), ["selfieFile", "selfieCameraFile"]]
+        ["driver_license", t("drivingLicence"), ["driverLicenseFile", "driverLicenseCameraFile"]]
       ];
       for (const [kind, label, names] of photos) if (!haveDoc(kind) && !savedUploads[kind] && !hasFile(...names)) missing.push(label);
     }
@@ -1172,7 +1170,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       <SavedDetails folded={readyToSign}>
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <SectionTitle icon={Upload} label={t("yourDocuments")} />
-        {!detail.customer?.id && !(detail.documentStatus.passport && detail.documentStatus.driver_license && detail.documentStatus.selfie) ? (
+        {!detail.customer?.id && !(detail.documentStatus.passport && detail.documentStatus.driver_license) ? (
           <ReturningCustomerCheck
             defaultCode={phoneCountryCode}
             onFound={(found, phone, dob) => {
@@ -1207,7 +1205,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <UploadCard cameraName="passportCameraFile" complete={haveDoc("passport")} onUpload={uploadNow} saved={Boolean(savedUploads.passport)} icon={IdCard} label={idLabel} name="passportFile" note={readNote("passport")} noteTone={docRead.passport} onPicked={(picked) => readDocument("passport", picked)} />
           <UploadCard cameraName="driverLicenseCameraFile" complete={haveDoc("driver_license")} onUpload={uploadNow} saved={Boolean(savedUploads.driver_license)} icon={FileText} label={t("drivingLicence")} name="driverLicenseFile" note={readNote("driver_license")} noteTone={docRead.driver_license} onPicked={(picked) => readDocument("driver_license", picked)} />
-          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={haveDoc("selfie")} onUpload={uploadNow} saved={Boolean(savedUploads.selfie)} icon={ImageIcon} label={t("selfiePhoto")} name="selfieFile" />
+          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={haveDoc("selfie")} onUpload={uploadNow} saved={Boolean(savedUploads.selfie)} icon={ImageIcon} label={`${t("selfiePhoto")} (${t("optional")})`} name="selfieFile" />
         </div>
         {/* The numbers stay folded away: the photos fill them in. They open by themselves when something is missing. */}
         <details className="mt-2" id="document-numbers" onToggle={(event) => setIdOpen(event.currentTarget.open)} open={idOpen}>
@@ -2511,7 +2509,7 @@ function ReturningCustomerCheck({ token, defaultCode, onFound }: {
         setResult("none");
         return;
       }
-      const all = Boolean((found as any).passport && (found as any).driver_license && (found as any).selfie);
+      const all = Boolean((found as any).passport && (found as any).driver_license);
       setResult(all ? "found" : "partial");
       onFound(found as any, { code, local }, dob);
     });

@@ -57,6 +57,7 @@ export default async function DeliveryInspectionPage({ params, searchParams }: {
       defaultMethod: org.default_payment_method === "promptpay" && !promptPay ? null : org.default_payment_method || null,
       promptpayId: (promptPay && org.promptpay_id) || null,
       promptpayQrUrl: promptPay && org.promptpay_qr_url ? await freshPromptPayQrUrl(supabase, org.promptpay_qr_url, 60 * 60).catch(() => null) : null,
+      promptpayQrPayload: (promptPay && org.promptpay_qr_url && org.settings?.promptpay_qr_payload) || null,
       bankName: org.bank_name || null,
       bankAccountNumber: org.bank_account_number || null,
       bankAccountName: org.bank_account_name || null,

@@ -4,6 +4,7 @@ import { guard, userError } from "@/lib/action-error";
 
 import { said } from "@/lib/i18n/server-text";
 import { promptPayQrPath } from "@/lib/promptpay-qr";
+import { isThaiQrPayload } from "@/lib/promptpay";
 import { revalidatePath } from "next/cache";
 import { tidyLogo } from "@/lib/logo-tidy";
 import { SIGNATURE_AUTHORISATION_TEXT, SIGNATURE_AUTHORISATION_TEXT_VERSION } from "@/lib/signature-authorisation";
@@ -279,13 +280,20 @@ async function updatePaymentSettingsOrThrow(formData: FormData) {
     promptPayQrUrl = signedUrlData?.signedUrl || null;
   }
 
+  // The text inside the QR picture, read in the browser when it was chosen (lib/promptpay.ts): kept with a new
+  // picture, dropped when the picture is removed or replaced by one that couldn't be read.
+  const currentSettings = (organization?.settings as Record<string, unknown> | null) || {};
+  const submittedQrText = String(formData.get("promptpay_qr_payload") || "").trim();
+  const newPicture = promptPayQrFile instanceof File && promptPayQrFile.size > 0;
+  const qrPayload = !promptPayQrUrl ? null : newPicture ? (isThaiQrPayload(submittedQrText) ? submittedQrText : null) : currentSettings.promptpay_qr_payload || null;
+
   const { error } = await supabase
     .from("organizations")
     .update({
       accepted_payment_methods: acceptedPaymentMethods,
       promptpay_id: optionalStringFromForm(formData, "promptpay_id"),
       // Agreements read the PromptPay number from settings: keep the two the same.
-      settings: { ...((organization?.settings as Record<string, unknown> | null) || {}), promptpay_id: optionalStringFromForm(formData, "promptpay_id") || "" },
+      settings: { ...currentSettings, promptpay_id: optionalStringFromForm(formData, "promptpay_id") || "", promptpay_qr_payload: qrPayload },
       promptpay_qr_url: promptPayQrUrl,
       bank_name: optionalStringFromForm(formData, "bank_name"),
       bank_account_number: optionalStringFromForm(formData, "bank_account_number"),

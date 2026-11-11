@@ -1,7 +1,7 @@
 import { businessToday } from "@/lib/business-time";
 import { customerPaymentLabel } from "@/lib/payment-labels";
 import { isHandedOver } from "@/lib/rental-balances";
-import { promptPayQrSvg } from "@/lib/promptpay";
+import { paymentQrSvg } from "@/lib/promptpay";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -82,7 +82,9 @@ function addDays(iso: string, days: number) {
  */
 export async function getPortalPayments(
   rentalId: string,
-  promptPayId: string | null | undefined
+  promptPayId: string | null | undefined,
+  /** The text of the business's own uploaded QR, when it could be read: used ahead of the ID (lib/promptpay.ts). */
+  qrPayload?: string | null
 ): Promise<{ payments: PortalPayment[]; bundle: PortalBundle | null }> {
   if (!rentalId) return { payments: [], bundle: null };
   const admin = createSupabaseAdminClient() as any;
@@ -126,7 +128,7 @@ export async function getPortalPayments(
         overdue: handedOver && !!dueDate && dueDate < today,
         atHandover: !handedOver && !!dueDate && dueDate <= today,
         // PromptPay only moves baht.
-        qrSvg: promptPayId && currency === "THB" ? await promptPayQrSvg(promptPayId, amount) : null,
+        qrSvg: (promptPayId || qrPayload) && currency === "THB" ? await paymentQrSvg({ payload: qrPayload, promptPayId }, amount) : null,
         receiptSentAt: receipt?.submitted_at || null,
         receiptDeclined: !receipt && !!row.metadata?.receipt_declined_at
       };
@@ -147,7 +149,7 @@ export async function getPortalPayments(
           ids: unpaid.map((payment) => payment.id),
           amount: total,
           currency: unpaid[0].currency,
-          qrSvg: promptPayId && unpaid[0].currency === "THB" ? await promptPayQrSvg(promptPayId, total) : null
+          qrSvg: (promptPayId || qrPayload) && unpaid[0].currency === "THB" ? await paymentQrSvg({ payload: qrPayload, promptPayId }, total) : null
         }
       : null;
 

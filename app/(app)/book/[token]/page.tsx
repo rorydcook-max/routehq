@@ -22,7 +22,7 @@ import { bookingRules } from "@/lib/booking-rules";
 import { rentalRateCard } from "@/lib/rental-estimate";
 import { nextMonthlyDue } from "@/lib/open-ended-billing";
 import { chatInvites } from "@/lib/customer-chat-link";
-import { promptPayQrSvg } from "@/lib/promptpay";
+import { paymentQrSvg } from "@/lib/promptpay";
 import { PortalPayments } from "./portal-payments";
 import { getLocale, getTranslations } from "next-intl/server";
 import { formatMoney as formatRegionalMoney } from "@/lib/regional";
@@ -383,7 +383,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const onRent = detail.state === "active";
   const [pendingAmendmentToken, portal, invites, activeAnswers, activeOpenEndedOffer] = await Promise.all([
     rental?.id ? pendingAmendmentFor(String(rental.id)) : Promise.resolve(null),
-    canPayHere ? getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : Promise.resolve({ payments: [], bundle: null } as Awaited<ReturnType<typeof getPortalPayments>>),
+    canPayHere ? getPortalPayments(String(rental.id), detail.org_payment?.promptpay_qr_url && !(detail.org_payment as any)?.promptpay_qr_payload ? null : detail.org_payment?.promptpay_id, (detail.org_payment as any)?.promptpay_qr_payload) : Promise.resolve({ payments: [], bundle: null } as Awaited<ReturnType<typeof getPortalPayments>>),
     wantsInvites
       ? chatInvites(createSupabaseAdminClient() as any, { organizationId: String(rental.organization_id || organization?.id || ""), customerId: String(customer.id), token }).catch(() => [])
       : Promise.resolve([]),
@@ -398,10 +398,12 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   // Before signing, "pay now" shows one QR for what is due at the start.
   // What is due at the start: the first rent and the deposit.
   const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : firstRentCharge(rental) + Number(rental?.deposit_amount || 0) + Number(rental?.extras_total || 0);
-  // The business's own uploaded QR always wins over one made from the PromptPay ID (Rory, 11 Nov 2026).
+  // The business's own uploaded QR always wins (Rory, 11 Nov 2026): with the amount filled in when its text was read
+  // at upload, else the picture itself (the customer types the amount). With no upload, one made from the PromptPay ID.
+  const ownQrText = (detail.org_payment as any)?.promptpay_qr_payload || null;
   const firstPaymentQr =
-    detail.state === "ready" && !detail.completion?.agreement && detail.org_payment?.promptpay_id && !detail.org_payment?.promptpay_qr_url && String(rental?.currency || "THB") === "THB"
-      ? await promptPayQrSvg(detail.org_payment.promptpay_id, firstPaymentAmount)
+    detail.state === "ready" && !detail.completion?.agreement && String(rental?.currency || "THB") === "THB" && (ownQrText || (detail.org_payment?.promptpay_id && !detail.org_payment?.promptpay_qr_url))
+      ? await paymentQrSvg({ payload: ownQrText, promptPayId: detail.org_payment?.promptpay_qr_url ? null : detail.org_payment?.promptpay_id }, firstPaymentAmount)
       : null;
 
   // Until it is signed, one short line says how long the customer has (Rory, 8 Nov 2026): the vehicle's hold while it

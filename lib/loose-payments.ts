@@ -57,8 +57,8 @@ export async function loosePaymentsFor(supabase: any, rental: { id: string; vehi
     .filter((row) => !(Array.isArray(row.metadata?.not_rentals) && row.metadata.not_rentals.includes(rental.id)))
     .map((row) => {
       const date = day(row.transaction_date);
-      // Likely this booking's: the same amount as one of its rents, within a few days of when that rent was due.
-      const likely = rent.some((due) => Math.abs(Number(due.amount) - Number(row.amount)) < 0.5 && daysApart(day(due.due_date), date) <= 5);
+      // Likely this booking's: the same amount as one of its rents, paid within 4 days before or after it was due.
+      const likely = rent.some((due) => Math.abs(Number(due.amount) - Number(row.amount)) < 0.5 && daysApart(day(due.due_date), date) <= 4);
       return { id: row.id, amount: Number(row.amount), date, notes: row.notes || null, likely };
     })
     .sort((a, b) => a.date.localeCompare(b.date));

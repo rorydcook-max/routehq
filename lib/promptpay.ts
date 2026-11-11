@@ -54,6 +54,74 @@ export function promptPayPayload(promptPayId: string, amount?: number | null) {
   return `${withCrcTag}${crc16(withCrcTag)}`;
 }
 
+/**
+ * The business's own QR picture, read once when it is uploaded (Settings › How customers pay you), is the same kind of
+ * text. Kept as it was read, so the money goes exactly where their own QR sends it; only the amount is added
+ * (Rory, 11 Nov 2026: an uploaded QR made the customer type the amount, a generated one fills it in).
+ */
+
+/** The top-level fields of a Thai QR text, in order. Null when it isn't well formed. */
+function readFields(payload: string): Array<[string, string]> | null {
+  const fields: Array<[string, string]> = [];
+  let at = 0;
+  while (at < payload.length) {
+    const id = payload.slice(at, at + 2);
+    const length = Number(payload.slice(at + 2, at + 4));
+    if (!/^\d{2}$/.test(id) || !Number.isInteger(length) || at + 4 + length > payload.length) return null;
+    fields.push([id, payload.slice(at + 4, at + 4 + length)]);
+    at += 4 + length;
+  }
+  return fields;
+}
+
+/** A QR text that is a Thai bank QR (PromptPay or bill payment) with a correct checksum. */
+export function isThaiQrPayload(value: unknown): value is string {
+  const payload = String(value || "").trim();
+  if (payload.length < 30 || payload.length > 400 || !/^[\x20-\x7E]+$/.test(payload)) return false;
+  const fields = readFields(payload);
+  if (!fields || fields[0]?.[0] !== "00" || fields[fields.length - 1]?.[0] !== "63") return false;
+  if (!fields.some(([id, body]) => (id === "29" || id === "30") && body.includes("A000000677"))) return false;
+  return crc16(payload.slice(0, -4)) === payload.slice(-4).toUpperCase();
+}
+
+/** The business's own QR text with the amount filled in. Null when the text isn't a Thai bank QR. */
+export function thaiQrWithAmount(payload: string | null | undefined, amount?: number | null) {
+  const text = String(payload || "").trim();
+  if (!isThaiQrPayload(text)) return null;
+  const hasAmount = typeof amount === "number" && Number.isFinite(amount) && amount > 0;
+  if (!hasAmount) return text;
+  const fields = (readFields(text) || []).filter(([id]) => id !== "54" && id !== "63");
+  const out: string[] = [];
+  let amountPlaced = false;
+  for (const [id, body] of fields) {
+    // The amount (54) sits after the currency (53); fields stay in number order.
+    if (!amountPlaced && Number(id) > 54) {
+      out.push(field("54", (amount as number).toFixed(2)));
+      amountPlaced = true;
+    }
+    out.push(field(id, id === "01" ? "12" : body));
+  }
+  if (!amountPlaced) out.push(field("54", (amount as number).toFixed(2)));
+  const withCrcTag = `${out.join("")}6304`;
+  return `${withCrcTag}${crc16(withCrcTag)}`;
+}
+
+/** The QR for an amount: from the business's own QR text when there is one, else from its PromptPay ID. */
+export function paymentQrText(source: { payload?: string | null; promptPayId?: string | null }, amount?: number | null) {
+  return thaiQrWithAmount(source.payload, amount) || (source.promptPayId ? promptPayPayload(source.promptPayId, amount) : null);
+}
+
+/** The same, as an SVG picture. */
+export async function paymentQrSvg(source: { payload?: string | null; promptPayId?: string | null }, amount?: number | null) {
+  const text = paymentQrText(source, amount);
+  if (!text) return null;
+  try {
+    return await QRCode.toString(text, { type: "svg", margin: 1, errorCorrectionLevel: "M" });
+  } catch {
+    return null;
+  }
+}
+
 /** An SVG picture of the QR, ready to drop into a page. Null when the ID isn't usable. */
 export async function promptPayQrSvg(promptPayId: string, amount?: number | null) {
   const payload = promptPayPayload(promptPayId, amount);

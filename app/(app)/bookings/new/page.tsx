@@ -48,6 +48,8 @@ function homeTerritoryFromSettings(settings: unknown) {
   return String(values.home_territory || area || "").trim();
 }
 
+import { withLiveDocumentStatus } from "@/lib/customer-documents";
+
 export default async function NewBookingPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const [{ vehicleId = "", customerId = "", startDate = "", endDate = "" }, userEmail, organization] = await Promise.all([
     searchParams,
@@ -136,7 +138,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
             busyPeriods={busyPeriods}
             extras={extrasFrom(organizationDetails?.settings).map((extra) => ({ ...extra, price: gross(extra.price) }))}
             seasons={seasonsFrom(organizationDetails?.settings)}
-            customers={customers || []}
+            customers={await withLiveDocumentStatus(supabase, organization.id, (customers || []) as any[])}
             defaultCurrency={organization.currency || "THB"}
             defaultDeposit={Number((organizationDetails?.settings as any)?.public_booking?.deposit || 0)}
             homeTerritory={homeTerritoryFromSettings(organizationDetails?.settings)}

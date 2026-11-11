@@ -929,13 +929,13 @@ async function completePublicBookingOrThrow(formData: FormData) {
       // all three read as if those uploads had failed (real-user-test, 8 Nov 2026). Returned, not thrown, so the
       // customer sees it in production too.
       const have = new Set((documents || []).map((document: any) => String(document.category)));
-      const missing = ["passport", "driver_license", "selfie"].filter((category) => !have.has(category));
+      // A selfie is optional (Rory, 11 Nov 2026).
+      const missing = ["passport", "driver_license"].filter((category) => !have.has(category));
       const onlyOne: Record<string, string> = {
         passport: "Please add a photo of your passport or ID card before signing.",
-        driver_license: "Please add a photo of your driver's license before signing.",
-        selfie: "Please add a photo of yourself before signing."
+        driver_license: "Please add a photo of your driver's license before signing."
       };
-      return { success: false, error: await said(missing.length === 1 ? onlyOne[missing[0]] : "Please upload passport, driver's license and selfie documents before signing.") } as const;
+      return { success: false, error: await said(missing.length === 1 ? onlyOne[missing[0]] : "Please add photos of your passport or ID card and your driver's license before signing.") } as const;
     }
     if (
       !currentCustomerForSigning?.passport_number ||

@@ -2414,14 +2414,14 @@ body {
 .app-sidebar a span[class*="bg-[var(--primary)]"] { background: #e73582; }
 
 /* Main buttons carry the action gradient. Chips and dots in the same violet stay flat. */
-.content-area button[class*="bg-[var(--primary)]"],
-.content-area a[class*="bg-[var(--primary)]"],
+.content-area button[class~="bg-[var(--primary)]"],
+.content-area a[class~="bg-[var(--primary)]"],
 .btn-primary {
   background-image: var(--gradient-action);
   box-shadow: 0 6px 16px rgba(98, 38, 171, 0.22);
 }
-.content-area button[class*="bg-[var(--primary)]"]:hover,
-.content-area a[class*="bg-[var(--primary)]"]:hover,
+.content-area button[class~="bg-[var(--primary)]"]:hover,
+.content-area a[class~="bg-[var(--primary)]"]:hover,
 .btn-primary:hover { filter: brightness(1.08); }
 
 h1, .page-title, .page-hero h1 { font-weight: 800; letter-spacing: -0.025em; }
@@ -2443,14 +2443,14 @@ h2, .card-title, .tile .tile-title, .tile-title { font-weight: 700; }
 
 /* A stronger action gradient, and the page's one main button (New booking, Add vehicle) in the full sunset. */
 :root { --gradient-action: linear-gradient(95deg, #6226ab 0%, #a02ea6 58%, #e73582 100%); }
-.content-area a[class*="bg-[var(--band-action)]"],
-.content-area button[class*="bg-[var(--band-action)]"] {
+.content-area a[class~="bg-[var(--band-action)]"],
+.content-area button[class~="bg-[var(--band-action)]"] {
   background-image: var(--gradient-brand);
   color: #ffffff;
   box-shadow: 0 8px 20px rgba(194, 47, 143, 0.28);
 }
-.content-area a[class*="bg-[var(--band-action)]"]:hover,
-.content-area button[class*="bg-[var(--band-action)]"]:hover { filter: brightness(1.08); }
+.content-area a[class~="bg-[var(--band-action)]"]:hover,
+.content-area button[class~="bg-[var(--band-action)]"]:hover { filter: brightness(1.08); }
 
 /* ---------------------------------------------------------------------
    Sunset, third pass (Rory, 11 Nov 2026): less purple, more of the logo's
@@ -2502,3 +2502,34 @@ body {
 :where(.tile:nth-child(4n + 2)) .tile-icon { background: rgba(23, 132, 90, 0.15); color: #0f5f40; }
 :where(.tile:nth-child(4n + 3)) .tile-icon { background: rgba(255, 116, 56, 0.17); color: #a8480c; }
 :where(.tile:nth-child(4n + 4)) .tile-icon { background: rgba(231, 53, 130, 0.14); color: #b3155c; }
+
+/* ---------------------------------------------------------------------
+   Sunset, fourth pass (Rory, 11 Nov 2026).
+   --------------------------------------------------------------------- */
+/* Solid main buttons carry the action gradient. */
+.primary-action:not(:disabled) { background-image: var(--gradient-action); }
+/* A quiet "not due yet" button stays quiet under the finger: it used to turn dark violet with its dark words still on it. */
+.calm-actions .primary-action:not(.stay-primary):not(:disabled),
+.calm-actions .primary-action:not(.stay-primary):hover:not(:disabled) {
+  background: var(--panel);
+  background-image: none;
+  color: var(--foreground);
+}
+.calm-actions .primary-action:not(.stay-primary):hover:not(:disabled) { background: var(--panel-secondary); }
+
+/* To do: each count at the top has its own colour, and every job shows its kind picture, a little larger. */
+a.band-chip[href*="show=next3"] .num { color: #c2500f; }
+a.band-chip[href*="show=next7"] .num { color: #2f6bff; }
+a.band-chip[href*="show=next30"] .num { color: #6226ab; }
+a.band-chip[href*="show="]::before {
+  content: ""; height: 10px; width: 10px; flex-shrink: 0; border-radius: 999px; background: #e73582;
+}
+a.band-chip[href*="show=next3"]::before { background: #ff7438; }
+a.band-chip[href*="show=next7"]::before { background: #2f6bff; }
+a.band-chip[href*="show=next30"]::before { background: #8b4fe0; }
+.card .kind-chip { height: 46px; width: 46px; border-radius: 14px; }
+.kind-money { background: linear-gradient(135deg, #dff3ea, #c9ecdc); }
+.kind-refund { background: linear-gradient(135deg, #fde3ee, #f9cfe0); }
+.kind-form { background: linear-gradient(135deg, #ffe9dc, #ffd9c2); }
+.kind-move { background: linear-gradient(135deg, #e3ecff, #d0dfff); color: #1f4fd6; }
+.kind-message { background: linear-gradient(135deg, #eee7fa, #e0d3f6); color: #6226ab; }

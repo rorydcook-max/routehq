@@ -4,6 +4,10 @@ import { businessToday, businessNow } from "@/lib/business-time";
 import { isHandedOver } from "@/lib/rental-balances";
 import { inRangeWithShares } from "@/lib/cost-spread";
 import { isLateReturnIncome } from "@/lib/transactions";
+import { loadVehicleChanges, rentalsForVehicle, splitRentalsByVehicle, swappedOut, type VehicleChangeRow } from "@/lib/rental-vehicle-periods";
+
+const VEHICLE_REPORT_RENTAL_COLUMNS =
+  "id, vehicle_id, original_vehicle_id, display_code, start_date, end_date, status, balance_due, rental_rate, pricing_model, billing_interval, customers!rentals_customer_id_fkey(full_name)";
 
 export type DatePreset = "this_month" | "last_month" | "last_3_months" | "last_6_months" | "this_year" | "last_year" | "custom";
 
@@ -353,7 +357,9 @@ function buildMonthlyData(transactions: any[], from: string, to: string): Monthl
  * Days each vehicle was out with a customer inside the period, counted only up to today:
  * a month four days old has four days to fill. Bookings that have not started, and cancelled ones, do not count.
  */
-export function rentedDays(rentals: any[], from: string, to: string, todayIso: string, vehicles: any[] = []) {
+export function rentedDays(rentalRows: any[], from: string, to: string, todayIso: string, vehicles: any[] = [], changes: VehicleChangeRow[] = []) {
+  // A rental that changed vehicle counts on each vehicle for its own days (lib/rental-vehicle-periods.ts).
+  const rentals = changes.length ? splitRentalsByVehicle(rentalRows, changes) : rentalRows;
   const dayMs = 86400000;
   const periodEnd = to < todayIso ? to : todayIso;
   const daysInclusive = (a: string, b: string) => Math.round((new Date(`${b}T00:00:00Z`).getTime() - new Date(`${a}T00:00:00Z`).getTime()) / dayMs) + 1;
@@ -490,6 +496,7 @@ export async function getReportsData(
   const supabase = (await createSupabaseServerClient()) as any;
 
   const txColumns = "*, vehicles!transactions_vehicle_id_fkey(registration_number, make, model, purchase_price, estimated_value), customers!transactions_customer_id_fkey(full_name)";
+  const changesQuery = loadVehicleChanges(supabase, organizationId).catch(() => [] as VehicleChangeRow[]);
   const [txResult, prevTxResult, vehiclesResult, rentalsResult, outstandingResult, depositsHeldResult, spreadResult] = await Promise.all([
     supabase
       .from("transactions")
@@ -516,7 +523,7 @@ export async function getReportsData(
 
     supabase
       .from("rentals")
-      .select("id, vehicle_id, start_date, end_date, status, balance_due, rental_rate, pricing_model, billing_interval, customer_id, customers!rentals_customer_id_fkey(full_name, phone)")
+      .select("id, vehicle_id, original_vehicle_id, start_date, end_date, status, balance_due, rental_rate, pricing_model, billing_interval, customer_id, customers!rentals_customer_id_fkey(full_name, phone)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .lte("start_date", dateRange.to)
@@ -632,7 +639,7 @@ export async function getReportsData(
     .sort((a, b) => b.amount - a.amount);
 
   // Per-vehicle rental counts and utilization
-  const { rangeDays, byVehicle: rented } = rentedDays(rentals, dateRange.from, dateRange.to, businessToday(), vehicles);
+  const { rangeDays, byVehicle: rented } = rentedDays(rentals, dateRange.from, dateRange.to, businessToday(), vehicles, await changesQuery);
 
   // Build per-vehicle metrics for vehicles that have transactions
   const vehicleIdsWithTx = new Set([...vIncomeMap.keys(), ...vExpenseMap.keys()]);
@@ -837,7 +844,7 @@ export async function getVehicleReportData(
 
     supabase
       .from("rentals")
-      .select("id, vehicle_id, display_code, start_date, end_date, status, balance_due, rental_rate, pricing_model, billing_interval, customers!rentals_customer_id_fkey(full_name)")
+      .select(VEHICLE_REPORT_RENTAL_COLUMNS)
       .eq("organization_id", organizationId)
       .eq("vehicle_id", vehicleId)
       .is("deleted_at", null)
@@ -860,7 +867,15 @@ export async function getVehicleReportData(
   const vehicle = vehicleResult.data;
   // A yearly payment counts its monthly share in each month it covers.
   const transactions: any[] = inRangeWithShares(txResult.data || [], spreadResult.data || [], dateRange.from, dateRange.to);
-  const rentals: any[] = rentalsResult.data || [];
+  // Rentals that changed vehicle show on this one for their days on it only (lib/rental-vehicle-periods.ts).
+  const rentals: any[] = await rentalsForVehicle(supabase, {
+    organizationId,
+    vehicleId,
+    rentals: rentalsResult.data || [],
+    select: VEHICLE_REPORT_RENTAL_COLUMNS,
+    keep: (row: any) => row.status !== "cancelled" && row.start_date <= dateRange.to && (!row.end_date || row.end_date >= dateRange.from)
+  }).catch(() => rentalsResult.data || []);
+  rentals.sort((a, b) => String(b.start_date).localeCompare(String(a.start_date)));
 
   let totalRevenue = 0;
   let totalExpenses = 0;
@@ -932,7 +947,8 @@ export async function getVehicleReportData(
       customerName: r.customers?.full_name || null,
       startDate: r.start_date,
       endDate: r.end_date,
-      status: r.status,
+      // Moved on to another vehicle: finished as far as this one is concerned.
+      status: swappedOut(r) ? "completed" : r.status,
       balanceDue: Number(r.balance_due || 0)
     })),
     transactions: transactions.map((tx: any) => ({

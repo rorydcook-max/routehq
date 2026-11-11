@@ -562,14 +562,24 @@ function TimelineSection({ detail }: { detail: VehicleDetail }) {
     .map((event) => ({ id: event.id, title: activityTitle(event, histNames as any), detail: tx.locale === "en" ? tidyDetail(event.detail, event.title) : null, date: event.occurred_at || event.created_at, kind: "activity" as const }));
   const rentalReturns = detail.rentals
     .filter((rental) => rental.end_date && rental.status !== "cancelled" && rental.status !== "draft")
-    .map((rental) => ({ id: `return-${rental.id}`, title: tx.say("tl_return", { name: rental.customers?.full_name || tx.say("customer") }), detail: null, date: rental.end_date!, kind: "rental" as const }));
+    .map((rental) => ({
+      id: `return-${rental.id}-${rental.start_date}`,
+      // Moved on to another vehicle on this day (lib/rental-vehicle-periods.ts).
+      title:
+        rental.vehicle_period?.toVehicleId && rental.moved_to_label
+          ? tx.say("h_changedTo", { vehicle: rental.moved_to_label })
+          : tx.say("tl_return", { name: rental.customers?.full_name || tx.say("customer") }),
+      detail: rental.vehicle_period?.toVehicleId ? rental.customers?.full_name || null : null,
+      date: rental.end_date!,
+      kind: "rental" as const
+    }));
   // The vehicle's lifecycle: each rental going out, each service or repair with its cost, and damage found on return.
   // A handover already has its own line ("Vehicle handed over"); this fills in rentals that went out without one (imports, old data).
   const handedOver = new Set((detail.activityEvents as any[]).filter((event) => ["delivery_inspection_completed", "handed_over_without_form"].includes(String(event.event_type))).map((event) => event.rental_id));
   const rentalStarts = detail.rentals
     .filter((rental) => rental.start_date && !handedOver.has(rental.id) && ["active", "due_soon", "overdue", "extended", "completed"].includes(String(rental.status)))
     .map((rental) => ({
-      id: `out-${rental.id}`,
+      id: `out-${rental.id}-${rental.start_date}`,
       title: tx.say("tl_out", { name: rental.customers?.full_name || tx.say("customer") }),
       detail: rental.end_date ? tx.say("h_range", { from: formatDate(rental.start_date, tx), to: formatDate(rental.end_date, tx) }) : null,
       date: String(rental.start_date),
@@ -1037,20 +1047,29 @@ function RentalHistorySection({ detail }: { detail: VehicleDetail }) {
         <>
           <p className="font-medium text-[var(--foreground-secondary)]">{tx.say("h_avg")}: {tx.say("h_avgDays", { count: Math.round(totalRentalDays / detail.rentals.length) })}</p>
           <div className="mt-2 space-y-2">
-            {detail.rentals.map((rental) => (
-              <Link className="block rounded-xl bg-[var(--panel-secondary)] p-3.5" href={`/bookings/${rental.id}` as Route} key={rental.id}>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[16px] font-bold text-[var(--foreground)]">{rental.customers?.full_name || tx.say("customer")}</p>
-                    <p className="font-medium text-[var(--foreground-secondary)]">
-                      {rental.end_date ? tx.say("h_range", { from: formatDate(rental.start_date, tx), to: formatDate(rental.end_date, tx) }) : tx.say("h_ongoing", { from: formatDate(rental.start_date, tx) })}
-                      {rental.km_driven ? ` · ${tx.say(distanceKey("h_km"), { km: Number(rental.km_driven).toLocaleString("en-US") })}` : ""}
-                    </p>
+            {detail.rentals.map((rental) => {
+              // Changed vehicle part-way: on this vehicle for these dates only (lib/rental-vehicle-periods.ts).
+              const movedOn = Boolean(rental.vehicle_period?.toVehicleId);
+              const status = movedOn ? "completed" : rental.status;
+              const swapLine = movedOn
+                ? rental.moved_to_label && tx.say("h_changedTo", { vehicle: rental.moved_to_label })
+                : rental.vehicle_period?.fromVehicleId && rental.moved_from_label && tx.say("h_changedFrom", { vehicle: rental.moved_from_label });
+              return (
+                <Link className="block rounded-xl bg-[var(--panel-secondary)] p-3.5" href={`/bookings/${rental.id}` as Route} key={`${rental.id}-${rental.start_date}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[16px] font-bold text-[var(--foreground)]">{rental.customers?.full_name || tx.say("customer")}</p>
+                      <p className="font-medium text-[var(--foreground-secondary)]">
+                        {rental.end_date ? tx.say("h_range", { from: formatDate(rental.start_date, tx), to: formatDate(rental.end_date, tx) }) : tx.say("h_ongoing", { from: formatDate(rental.start_date, tx) })}
+                        {rental.km_driven && !rental.vehicle_period ? ` · ${tx.say(distanceKey("h_km"), { km: Number(rental.km_driven).toLocaleString("en-US") })}` : ""}
+                      </p>
+                      {swapLine ? <p className="font-medium text-[var(--foreground-secondary)]">{swapLine}</p> : null}
+                    </div>
+                    <Badge tone={["active", "due_soon", "extended"].includes(status) ? "blue" : status === "completed" ? "green" : status === "overdue" || status === "cancelled" ? "red" : "amber"}>{statusName(status)}</Badge>
                   </div>
-                  <Badge tone={["active", "due_soon", "extended"].includes(rental.status) ? "blue" : rental.status === "completed" ? "green" : rental.status === "overdue" || rental.status === "cancelled" ? "red" : "amber"}>{statusName(rental.status)}</Badge>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </>
       )}

@@ -65,18 +65,12 @@ function contactChannelFields(formData: FormData, phone: string | null, email?: 
 
 function documentStatusFromCategories(categories: string[]) {
   const normalized = categories.map((category) => category.toLowerCase());
-  const hasPassport = normalized.some((category) => category.includes("passport"));
+  // Complete = an identity document (passport or national ID) and a driving licence. A selfie is optional
+  // (Rory, 11 Nov 2026: a customer with passport and licence uploaded still showed "missing documents").
+  const hasIdentity = normalized.some((category) => category.includes("passport") || category.includes("national_id") || category.includes("id_card"));
   const hasLicense = normalized.some((category) => category.includes("license") || category.includes("licence"));
-  const hasSelfie = normalized.some((category) => category.includes("selfie") || category.includes("photo"));
-  const count = [hasPassport, hasLicense, hasSelfie].filter(Boolean).length;
-
-  if (count === 3) {
-    return "complete";
-  }
-  if (count === 0) {
-    return "no_documents";
-  }
-  return "missing_documents";
+  if (hasIdentity && hasLicense) return "complete";
+  return normalized.length === 0 ? "no_documents" : "missing_documents";
 }
 
 async function uploadCustomerDocumentFile({
@@ -162,7 +156,10 @@ async function createCustomerDocumentUploads(supabase: any, formData: FormData, 
     }
   }
 
-  const documentStatus = documentStatusFromCategories(uploadedCategories);
+  if (uploadedCategories.length === 0) return;
+  // Counted with what the customer already has on file, not only this upload.
+  const { data: onFile } = await supabase.from("documents").select("category").eq("organization_id", organizationId).eq("owner_type", "customer").eq("owner_id", customerId).is("deleted_at", null);
+  const documentStatus = documentStatusFromCategories([...uploadedCategories, ...((onFile || []) as any[]).map((row) => String(row.category || ""))]);
   const { error } = await supabase.from("customers").update({ document_status: documentStatus }).eq("id", customerId).eq("organization_id", organizationId);
   if (error) {
     throw new Error(error.message);

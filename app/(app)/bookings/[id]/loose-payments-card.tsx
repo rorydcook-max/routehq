@@ -15,6 +15,8 @@ export async function LoosePaymentsCard({ rentalId, payments, currency }: { rent
   const [t, locale] = await Promise.all([getTranslations("booking"), getLocale()]);
   const money = (value: number) => niceMoney(value, currency);
   const total = payments.reduce((sum, payment) => sum + payment.amount, 0);
+  // Ticked to begin with: the ones that match a rent on this booking (same amount, around its due date); all of them when none do.
+  const anyLikely = payments.some((payment) => payment.likely);
 
   return (
     <ActionForm action={linkLoosePayments} className="rounded-2xl border border-[var(--info-line)] bg-[var(--info-light)] p-4">
@@ -33,7 +35,7 @@ export async function LoosePaymentsCard({ rentalId, payments, currency }: { rent
           <li key={payment.id}>
             <input name="offeredId" type="hidden" value={payment.id} />
             <label className="flex cursor-pointer items-center gap-3 rounded-xl bg-[var(--panel)] px-3 py-2.5">
-              <input className="h-4 w-4" defaultChecked name="transactionId" type="checkbox" value={payment.id} />
+              <input className="h-4 w-4" defaultChecked={anyLikely ? Boolean(payment.likely) : true} name="transactionId" type="checkbox" value={payment.id} />
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-semibold text-[var(--foreground)]">{longDate(payment.date, locale)}</span>
                 {payment.notes ? <span className="block truncate text-xs text-[var(--muted)]">{payment.notes}</span> : null}

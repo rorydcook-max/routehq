@@ -1,5 +1,6 @@
 import { businessToday } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { loadVehicleChanges, splitRentalsByVehicle, swappedOut, type VehicleChangeRow } from "@/lib/rental-vehicle-periods";
 
 export type CalendarEvent = {
   id: string;
@@ -235,7 +236,7 @@ export async function getAvailability(organizationId: string, year: number, mont
   const endDate = `${year}-${mm}-${String(lastDayOfMonth(year, month)).padStart(2, "0")}`;
   const today = businessToday();
 
-  const [vehiclesResult, rentalsResult] = await Promise.all([
+  const [vehiclesResult, rentalsResult, changes] = await Promise.all([
     supabase
       .from("vehicles")
       .select("id, make, model, registration_number, status, availability_status, vehicle_categories(code, name)")
@@ -244,28 +245,33 @@ export async function getAvailability(organizationId: string, year: number, mont
       .order("make", { ascending: true }),
     supabase
       .from("rentals")
-      .select("id, vehicle_id, start_date, end_date, status, extension_hold_until, customers!rentals_customer_id_fkey(full_name)")
+      .select("id, vehicle_id, original_vehicle_id, start_date, end_date, status, extension_hold_until, customers!rentals_customer_id_fkey(full_name)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .not("status", "in", "(cancelled,draft)")
       .lte("start_date", endDate)
-      .order("start_date", { ascending: true })
+      .order("start_date", { ascending: true }),
+    loadVehicleChanges(supabase, organizationId).catch(() => [] as VehicleChangeRow[])
   ]);
   if (vehiclesResult.error) throw new Error(vehiclesResult.error.message);
 
   const byVehicle = new Map<string, AvailabilityBooking[]>();
   const holdsByVehicle = new Map<string, AvailabilityHold[]>();
-  for (const rental of rentalsResult.data || []) {
+  // A rental that changed vehicle is a bar on each vehicle for its own days (lib/rental-vehicle-periods.ts).
+  for (const rental of splitRentalsByVehicle((rentalsResult.data || []) as any[], changes)) {
     const start = String(rental.start_date || "").slice(0, 10);
     const plannedEnd = String(rental.end_date || "").slice(0, 10);
-    const returned = rental.status === "completed";
+    // Moved on to another vehicle: back with you from the day of the change.
+    const movedOn = swappedOut(rental);
+    const returned = rental.status === "completed" || movedOn;
     const stillOut = !returned && rental.status !== "booked";
     // A vehicle that hasn't come back is still out today, whatever the end date said.
     const late = stillOut && !!plannedEnd && plannedEnd < today;
     const end = !plannedEnd ? "9999-12-31" : late ? (today > plannedEnd ? today : plannedEnd) : plannedEnd;
     // A rental that ended last month can still be held into this one (hold for extension, below).
     const heldInto = String(rental.extension_hold_until || "").slice(0, 10) > startDate;
-    if (!start || (end < startDate && !heldInto)) continue;
+    // A later vehicle's period can start after this month even though the rental started before it.
+    if (!start || start > endDate || (end < startDate && !heldInto)) continue;
     const list = byVehicle.get(rental.vehicle_id) || [];
     if (end >= startDate) list.push({
       id: rental.id,

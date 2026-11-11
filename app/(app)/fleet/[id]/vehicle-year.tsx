@@ -69,7 +69,7 @@ export function VehicleYear({
             <Link
               className="absolute top-1 flex h-7 items-center overflow-hidden rounded-md px-1.5 text-xs font-bold text-white"
               href={`/bookings/${bar.id}` as Route}
-              key={bar.id}
+              key={`${bar.id}-${bar.start}`}
               style={{ left: `${bar.left}%`, width: `${bar.width}%`, background: bar.upcoming ? "var(--going-out)" : "var(--on-rent)" }}
               title={bar.name}
             >

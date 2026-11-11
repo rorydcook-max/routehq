@@ -15,7 +15,7 @@ import { loanFromForm } from "@/lib/vehicle-loan";
 import { removeStoredFiles } from "@/lib/supabase/remove-stored-files";
 import { paperCostType, paperworkFor } from "@/lib/country-paperwork";
 import { monthsCovered } from "@/lib/cost-spread";
-import { postDueComplianceInstalments } from "@/lib/compliance-billing";
+import { nextMonthly, postDueComplianceInstalments } from "@/lib/compliance-billing";
 
 function numberFromForm(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").replace(/,/g, "").trim();
@@ -921,7 +921,15 @@ export async function renewVehicleCompliance(formData: FormData) {
   const plans = { ...(metadata.compliance_plans || {}) };
   if (isPaperwork && cost !== null) delete plans[complianceType];
   if (paidMonthly) {
-    plans[complianceType] = { amount: cost, currency, type: costType, start: coverStart, next: coverStart, until: newExpiryDate, eventId: complianceEvent.id };
+    // A set number of payments (10 for a year's cover, say): the last one falls that many months in, and none after.
+    const count = Math.floor(Number(optionalNumberFromForm(formData, "payments") || 0));
+    let lastInstalment = newExpiryDate;
+    if (count >= 1) {
+      let day = coverStart;
+      for (let i = 1; i < Math.min(count, 36); i++) day = nextMonthly(coverStart, day);
+      if (day < newExpiryDate) lastInstalment = day;
+    }
+    plans[complianceType] = { amount: cost, currency, type: costType, start: coverStart, next: coverStart, until: lastInstalment, eventId: complianceEvent.id, ...(count >= 1 ? { payments: count } : {}) };
   }
   const nextMetadata: Record<string, any> = { ...metadata, [config.section]: nextSection };
   if (Object.keys(plans).length) nextMetadata.compliance_plans = plans;

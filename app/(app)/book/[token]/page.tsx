@@ -398,8 +398,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   // Before signing, "pay now" shows one QR for what is due at the start.
   // What is due at the start: the first rent and the deposit.
   const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : firstRentCharge(rental) + Number(rental?.deposit_amount || 0) + Number(rental?.extras_total || 0);
+  // The business's own uploaded QR always wins over one made from the PromptPay ID (Rory, 11 Nov 2026).
   const firstPaymentQr =
-    detail.state === "ready" && !detail.completion?.agreement && detail.org_payment?.promptpay_id && String(rental?.currency || "THB") === "THB"
+    detail.state === "ready" && !detail.completion?.agreement && detail.org_payment?.promptpay_id && !detail.org_payment?.promptpay_qr_url && String(rental?.currency || "THB") === "THB"
       ? await promptPayQrSvg(detail.org_payment.promptpay_id, firstPaymentAmount)
       : null;
 
@@ -446,11 +447,11 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           {/* One fact per line on a phone: two columns broke prices and place names across four lines. Tiles keep their own height. */}
           <div className="mt-4 grid items-start gap-3 sm:grid-cols-2">
             <Info icon={CalendarDays} label={t("rentalPeriod")} value={rental.is_indefinite && detail.state !== "completed" ? t("openEndedFrom", { date: formatSummaryDate(rental.start_date, t, locale) }) : t("dateRange", { start: formatSummaryDate(rental.start_date, t, locale), end: formatSummaryDate(rental.end_date, t, locale) })} />
-            <Info icon={CreditCard} label={t("rateAndDeposit")} value={`${rateLabel(rental, t)}${extrasText(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}${(detail as any).org_payment?.vat ? `\n${t("vatIncluded", { name: (detail as any).org_payment.vat.name, rate: (detail as any).org_payment.vat.rate })}` : ""}`} />
+            <Info icon={CreditCard} label={t("rateAndDeposit")} tone="success" value={`${rateLabel(rental, t)}${extrasText(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}${(detail as any).org_payment?.vat ? `\n${t("vatIncluded", { name: (detail as any).org_payment.vat.name, rate: (detail as any).org_payment.vat.rate })}` : ""}`} />
             {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
-            {handedOver ? null : <Info icon={ReceiptText} label={t("firstPaymentDue")} value={paymentDueText(rental, bookingData, t, locale)} />}
+            {handedOver ? null : <Info icon={ReceiptText} label={t("firstPaymentDue")} tone="warning" value={paymentDueText(rental, bookingData, t, locale)} />}
             {/* Where and when in one tile, so no tile is left alone on the last row. */}
-            {handedOver ? null : <Info icon={MapPin} label={t("handover")} more={delivery.arrangeLater ? undefined : { icon: Clock, label: t("handoverTime"), value: delivery.time }} value={delivery.location} />}
+            {handedOver ? null : <Info icon={MapPin} label={t("handover")} tone="info" more={delivery.arrangeLater ? undefined : { icon: Clock, label: t("handoverTime"), value: delivery.time }} value={delivery.location} />}
           </div>
     </>
   );
@@ -663,29 +664,42 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 }
 
 /** One fact about the booking as a tinted tile. `more` adds a second fact under the first (handover place, then time). */
-async function Info({ className = "", icon: Icon, label, value, more }: { className?: string; icon: typeof Clock; label: string; value: string; more?: { icon: typeof Clock; label: string; value: string } }) {
+type InfoTone = "primary" | "success" | "warning" | "info";
+// Each tile has its own colour, carried by its icon badge and a soft tint, so the four facts read at a glance
+// instead of as four blocks of text (Rory, 11 Nov 2026).
+const INFO_TONES: Record<InfoTone, { tile: string; badge: string }> = {
+  primary: { tile: "bg-[var(--primary-light)]", badge: "bg-[var(--primary)] text-white" },
+  success: { tile: "bg-[var(--success-light)]", badge: "bg-[var(--success)] text-white" },
+  warning: { tile: "bg-[var(--warning-light)]", badge: "bg-[var(--warning)] text-white" },
+  info: { tile: "bg-[var(--info-light)]", badge: "bg-[var(--info)] text-white" }
+};
+
+/** One fact about the booking as a tinted tile. `more` adds a second fact under the first (handover place, then time). */
+async function Info({ className = "", icon: Icon, label, value, more, tone = "primary" }: { className?: string; icon: typeof Clock; label: string; value: string; more?: { icon: typeof Clock; label: string; value: string }; tone?: InfoTone }) {
   return (
-    <div className={`rounded-2xl bg-[var(--background)] p-3.5 ${className}`}>
-      <InfoPart icon={Icon} label={label} value={value} />
+    <div className={`rounded-2xl p-3.5 ${INFO_TONES[tone].tile} ${className}`}>
+      <InfoPart icon={Icon} label={label} tone={tone} value={value} />
       {more ? (
         <div className="mt-3">
-          <InfoPart icon={more.icon} label={more.label} value={more.value} />
+          <InfoPart icon={more.icon} label={more.label} tone={tone} value={more.value} />
         </div>
       ) : null}
     </div>
   );
 }
 
-async function InfoPart({ icon: Icon, label, value }: { icon: typeof Clock; label: string; value: string }) {
+async function InfoPart({ icon: Icon, label, value, tone = "primary" }: { icon: typeof Clock; label: string; value: string; tone?: InfoTone }) {
   const t = await getTranslations("customer");
   const lines = value.split("\n");
   return (
-    <>
-      <div className="flex items-center gap-2 font-semibold text-[var(--muted)]">
-        <Icon className="text-[var(--primary)]" size={16} />
-        {label}
-      </div>
-      <p className="mt-1 whitespace-pre-line [overflow-wrap:anywhere] text-[16px] font-bold leading-snug text-[var(--foreground)]">
+    <div className="flex items-start gap-3">
+      <span aria-hidden="true" className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${INFO_TONES[tone].badge}`}>
+        <Icon size={20} />
+      </span>
+      <div className="min-w-0 flex-1">
+      <div className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{label}</div>
+      {/* The first line is the fact; lines after it (deposit, tax) are the small print under it. */}
+      <p className="mt-0.5 whitespace-pre-line [overflow-wrap:anywhere] text-[17px] font-bold leading-snug text-[var(--foreground)] [&>span:not(:first-child)]:text-[14px] [&>span:not(:first-child)]:font-semibold [&>span:not(:first-child)]:text-[var(--foreground-secondary)]">
         {lines.map((line, index) => (
           line.startsWith("https://www.google.com/maps") ? (
             <a className="text-[var(--primary)] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">
@@ -700,7 +714,8 @@ async function InfoPart({ icon: Icon, label, value }: { icon: typeof Clock; labe
           )
         )).reduce<ReactNode[]>((nodes, node, index) => (index ? [...nodes, "\n", node] : [node]), [])}
       </p>
-    </>
+      </div>
+    </div>
   );
 }
 

@@ -5,6 +5,7 @@ import { BackLink, Card } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingDetail, getCustomersForSelector } from "@/lib/bookings";
 import { getDefaultOrganization } from "@/lib/organization";
+import { businessDay } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { BookingEditForm } from "./booking-edit-form";
 
@@ -40,6 +41,22 @@ export default async function EditBookingPage({ params }: { params: Promise<{ id
     .limit(1);
   const agreementSigned = Boolean(signedAgreements?.length);
 
+  // Changes of vehicle on this booking, so a wrong date or starting vehicle can be corrected here.
+  const [{ data: changeRows }, { data: fleetRows }] = await Promise.all([
+    supabase.from("vehicle_changes").select("id, from_vehicle_id, to_vehicle_id, changed_at").eq("organization_id", organization.id).eq("rental_id", detail.rental.id).order("changed_at", { ascending: true }),
+    supabase.from("vehicles").select("id, make, model, registration_number").eq("organization_id", organization.id).is("deleted_at", null).order("make", { ascending: true })
+  ]);
+  const vehicleLabel = (row: any) => [[row?.make, row?.model].filter(Boolean).join(" "), row?.registration_number].filter(Boolean).join(" · ");
+  const fleetById = new Map<string, any>(((fleetRows || []) as any[]).map((row) => [row.id, row]));
+  const vehicleChanges = ((changeRows || []) as any[]).map((row) => ({
+    id: String(row.id),
+    date: businessDay(row.changed_at),
+    fromVehicleId: row.from_vehicle_id || null,
+    fromLabel: vehicleLabel(fleetById.get(row.from_vehicle_id)) || "-",
+    toLabel: vehicleLabel(fleetById.get(row.to_vehicle_id)) || "-"
+  }));
+  const fleet = ((fleetRows || []) as any[]).filter((row) => row.id !== detail.rental.vehicle_id).map((row) => ({ id: String(row.id), label: vehicleLabel(row) }));
+
   // Where the delivery map opens: the business's own area from setup, or nothing (never a fixed place).
   const settings = (organization as any).settings || {};
   const mainLocation = settings.main_location && typeof settings.main_location === "object" ? settings.main_location : {};
@@ -64,6 +81,8 @@ export default async function EditBookingPage({ params }: { params: Promise<{ id
           homeTerritory={homeTerritory}
           payments={detail.payments}
           rental={detail.rental}
+          fleet={fleet}
+          vehicleChanges={vehicleChanges}
         />
       </div>
     </AppShell>

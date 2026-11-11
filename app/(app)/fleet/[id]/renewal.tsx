@@ -46,19 +46,31 @@ export function RenewalForm({
   const say = t as unknown as Say;
   const locale = useLocale();
   const fileInput = useRef<HTMLInputElement>(null);
-  const [expiry, setExpiry] = useState("");
   // The old date when it is recent or still ahead (renewing on time), else today (catching up on a lapsed one).
   const [coverStart, setCoverStart] = useState(() => {
     const old = String(currentExpiry || "").slice(0, 10);
     const recent = today ? new Date(Date.parse(`${today}T00:00:00Z`) - 60 * 86_400_000).toISOString().slice(0, 10) : "";
     return old && old >= recent ? old : today;
   });
+  // The same day a year later: where cover usually ends. Filled in from the start date until someone types their own.
+  const yearOn = (day: string) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return "";
+    const date = new Date(`${day}T00:00:00Z`);
+    date.setUTCFullYear(date.getUTCFullYear() + 1);
+    return date.toISOString().slice(0, 10);
+  };
+  const [expiry, setExpiry] = useState(() => (paperwork ? yearOn(coverStart) : ""));
   const [mode, setMode] = useState<"once" | "monthly">("once");
+  // Paid monthly but not every month (10 payments for a year's cover, say): how many payments there are.
+  const [payments, setPayments] = useState("");
+  // To the cent or satang: ฿877.78 a month is not ฿878.
   const amountText = (value: number) => {
+    const exact = Math.round(value * 100) / 100;
+    const whole = Math.abs(exact - Math.round(exact)) < 0.005;
     try {
-      return new Intl.NumberFormat(locale, { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(value);
+      return new Intl.NumberFormat(locale, { style: "currency", currency, currencyDisplay: "narrowSymbol", minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(exact);
     } catch {
-      return `${currency} ${Math.round(value).toLocaleString("en-US")}`;
+      return `${currency} ${exact.toLocaleString("en-US")}`;
     }
   };
   const dateText = (day: string) => {
@@ -130,7 +142,17 @@ export function RenewalForm({
       {paperwork ? (
         <label className="block">
           <span className={labelClass}>{say("f_coverStarts")}</span>
-          <input className={inputClass} name="coverStart" onChange={(event) => setCoverStart(event.target.value)} type="date" value={coverStart} />
+          <input
+            className={inputClass}
+            name="coverStart"
+            onChange={(event) => {
+              const start = event.target.value;
+              if (start && (!expiry || expiry === yearOn(coverStart))) setExpiry(yearOn(start));
+              setCoverStart(start);
+            }}
+            type="date"
+            value={coverStart}
+          />
         </label>
       ) : null}
       <label className="block">
@@ -163,6 +185,7 @@ export function RenewalForm({
           // What it adds to the costs each month, so the owner sees a yearly bill as 1/12 a month.
           const amount = Number(String(cost).replace(/,/g, ""));
           if (!paperwork || !(amount > 0) || !expiry) return null;
+          if (mode === "monthly" && Number(payments) >= 1) return <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{say("f_monthlyCountHint", { amount: amountText(amount), count: Math.floor(Number(payments)), date: dateText(coverStart || today) })}</span>;
           if (mode === "monthly") return <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{say("f_monthlyHint", { amount: amountText(amount), date: dateText(expiry) })}</span>;
           const from = coverStart || today;
           if (!from || expiry <= from) return null;
@@ -170,6 +193,25 @@ export function RenewalForm({
           return months >= 2 ? <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{say("f_spreadHint", { amount: amountText(amount / months), months })}</span> : null;
         })()}
       </label>
+      {paperwork && mode === "monthly" ? (
+        <label className="block sm:col-span-2">
+          <span className={`${labelClass} inline-flex items-center gap-1.5`}>
+            {say("f_payments")}
+            <InfoTip label={say("f_payments")} text={say("f_paymentsHint")} />
+          </span>
+          <input
+            className={inputClass}
+            inputMode="numeric"
+            max={36}
+            min={1}
+            name="payments"
+            onChange={(event) => setPayments(event.target.value)}
+            placeholder={coverStart && expiry > coverStart ? String(monthsCovered({ from: coverStart, to: expiry })) : "12"}
+            type="number"
+            value={payments}
+          />
+        </label>
+      ) : null}
       {inspection ? (
         <label className="block sm:col-span-2">
           <span className={`${labelClass} inline-flex items-center gap-1.5`}>

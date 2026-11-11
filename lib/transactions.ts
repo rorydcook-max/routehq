@@ -63,7 +63,7 @@ export type TransactionListItem = {
 export type TransactionFormOptions = {
   vehicles: Array<{ id: string; label: string }>;
   customers: Array<{ id: string; label: string }>;
-  rentals: Array<{ id: string; label: string; vehicleId: string; customerId: string; startDate?: string | null; endDate?: string | null; status?: string | null; depositHeld?: number }>;
+  rentals: Array<{ id: string; label: string; vehicleId: string; earlierVehicleIds?: string[]; customerId: string; startDate?: string | null; endDate?: string | null; status?: string | null; depositHeld?: number }>;
 };
 
 export type TransactionFormPrefill = {
@@ -152,10 +152,18 @@ export async function getTransactionFormOptions(organizationId: string): Promise
       .select("id, display_code, reference, vehicle_id, customer_id, status, start_date, end_date, deposit_held, deposit_refunded_amount, deposit_forfeited_amount, deposit_status, customers!rentals_customer_id_fkey(full_name)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
-      .or(`status.in.(booked,active,due_soon,overdue,extended),and(status.eq.completed,end_date.gte.${businessToday(-90)})`)
+      // Finished rentals stay on offer for a year: a repair is often billed to the renter before (Rory, 11 Nov 2026).
+      .or(`status.in.(booked,active,due_soon,overdue,extended),and(status.eq.completed,end_date.gte.${businessToday(-365)})`)
       .order("start_date", { ascending: false })
-      .limit(150)
+      .limit(300)
   ]);
+  // A rental that changed vehicle also belongs to the vehicles it was on before.
+  const { data: changeRows } = await supabase.from("vehicle_changes").select("rental_id, from_vehicle_id").eq("organization_id", organizationId);
+  const earlierVehicles = new Map<string, string[]>();
+  for (const change of (changeRows || []) as Array<{ rental_id: string; from_vehicle_id: string | null }>) {
+    if (!change.from_vehicle_id) continue;
+    earlierVehicles.set(change.rental_id, [...(earlierVehicles.get(change.rental_id) || []), change.from_vehicle_id]);
+  }
 
   const queryError = [vehiclesResult, customersResult, rentalsResult].find((result) => result.error)?.error;
   if (queryError) {
@@ -174,6 +182,7 @@ export async function getTransactionFormOptions(organizationId: string): Promise
     rentals: (rentalsResult.data || []).map((row: any) => ({
       id: row.id,
       vehicleId: row.vehicle_id,
+      earlierVehicleIds: earlierVehicles.get(row.id) || [],
       customerId: row.customer_id,
       startDate: row.start_date || null,
       endDate: row.end_date || null,

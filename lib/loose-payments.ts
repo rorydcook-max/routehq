@@ -4,34 +4,64 @@
  * this booking?" and links the ones the owner picks (Rory, 2 Nov 2026). Nothing is linked without asking.
  */
 
-export type LoosePayment = { id: string; amount: number; date: string; notes: string | null };
+import { rentalVehiclePeriods, VEHICLE_CHANGE_COLUMNS, type VehicleChangeRow } from "@/lib/rental-vehicle-periods";
+
+export type LoosePayment = { id: string; amount: number; date: string; notes: string | null; likely?: boolean };
 
 const day = (value: unknown) => String(value || "").slice(0, 10);
 const daysApart = (a: string, b: string) => Math.abs(new Date(`${a}T00:00:00Z`).getTime() - new Date(`${b}T00:00:00Z`).getTime()) / 86400000;
 
 /** Unlinked rent for this booking's vehicle within its dates (a few days' slack either side), minus any the owner said aren't from it. */
-export async function loosePaymentsFor(supabase: any, rental: { id: string; vehicle_id?: string | null; start_date?: string | null; end_date?: string | null; organization_id: string }): Promise<LoosePayment[]> {
+export async function loosePaymentsFor(supabase: any, rental: { id: string; vehicle_id?: string | null; original_vehicle_id?: string | null; status?: string | null; start_date?: string | null; end_date?: string | null; organization_id: string }): Promise<LoosePayment[]> {
   if (!rental.vehicle_id || !rental.start_date) return [];
-  const start = new Date(`${day(rental.start_date)}T00:00:00Z`);
-  start.setUTCDate(start.getUTCDate() - 3);
-  const end = new Date(`${day(rental.end_date) || new Date().toISOString().slice(0, 10)}T00:00:00Z`);
-  end.setUTCDate(end.getUTCDate() + 7);
-  const { data } = await supabase
-    .from("transactions")
-    .select("id, amount, transaction_date, notes, metadata")
-    .eq("organization_id", rental.organization_id)
-    .eq("vehicle_id", rental.vehicle_id)
-    .eq("type", "rental_income")
-    .is("rental_id", null)
-    .is("deleted_at", null)
-    .or("voided.is.null,voided.eq.false")
-    .gte("transaction_date", start.toISOString().slice(0, 10))
-    .lte("transaction_date", end.toISOString().slice(0, 10))
-    .order("transaction_date", { ascending: true })
-    .limit(60);
-  return ((data || []) as any[])
+  const shift = (iso: string, days: number) => {
+    const date = new Date(`${iso}T00:00:00Z`);
+    date.setUTCDate(date.getUTCDate() + days);
+    return date.toISOString().slice(0, 10);
+  };
+  // A rental that changed vehicle: each vehicle's payments are looked for only in the days the rental was on it
+  // (Rory, 11 Nov 2026: a booking that began on another vehicle was offered the later vehicle's unrelated payments).
+  const [{ data: changes }, { data: schedule }] = await Promise.all([
+    supabase.from("vehicle_changes").select(VEHICLE_CHANGE_COLUMNS).eq("organization_id", rental.organization_id).eq("rental_id", rental.id),
+    supabase.from("rental_payments").select("amount, due_date, voided, metadata").eq("organization_id", rental.organization_id).eq("rental_id", rental.id).is("deleted_at", null)
+  ]);
+  const periods = rentalVehiclePeriods(rental, (changes || []) as VehicleChangeRow[]);
+  if (periods.length === 0) return [];
+  const today = new Date().toISOString().slice(0, 10);
+  const found = await Promise.all(
+    periods.map((period, index) => {
+      const from = index === 0 ? shift(period.start, -3) : period.start;
+      const last = index === periods.length - 1;
+      // Up to the day before the change; the last period runs a week past the end (or today).
+      const to = last ? shift(period.end || today, 7) : shift(period.end || today, -1);
+      return supabase
+        .from("transactions")
+        .select("id, amount, transaction_date, notes, metadata")
+        .eq("organization_id", rental.organization_id)
+        .eq("vehicle_id", period.vehicleId)
+        .eq("type", "rental_income")
+        .is("rental_id", null)
+        .is("deleted_at", null)
+        .or("voided.is.null,voided.eq.false")
+        .gte("transaction_date", from)
+        .lte("transaction_date", to)
+        .order("transaction_date", { ascending: true })
+        .limit(60);
+    })
+  );
+  const rent = ((schedule || []) as any[]).filter((row) => !row.voided && row.metadata?.type !== "deposit" && row.metadata?.is_deposit !== true);
+  const seen = new Set<string>();
+  return found
+    .flatMap((result) => (result.data || []) as any[])
+    .filter((row) => !seen.has(row.id) && Boolean(seen.add(row.id)))
     .filter((row) => !(Array.isArray(row.metadata?.not_rentals) && row.metadata.not_rentals.includes(rental.id)))
-    .map((row) => ({ id: row.id, amount: Number(row.amount), date: day(row.transaction_date), notes: row.notes || null }));
+    .map((row) => {
+      const date = day(row.transaction_date);
+      // Likely this booking's: the same amount as one of its rents, within a few days of when that rent was due.
+      const likely = rent.some((due) => Math.abs(Number(due.amount) - Number(row.amount)) < 0.5 && daysApart(day(due.due_date), date) <= 5);
+      return { id: row.id, amount: Number(row.amount), date, notes: row.notes || null, likely };
+    })
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
 /**
@@ -47,7 +77,6 @@ export async function linkPaymentsToRental(supabase: any, rental: { id: string; 
       .from("transactions")
       .select("id, amount, transaction_date")
       .eq("organization_id", rental.organization_id)
-      .eq("vehicle_id", rental.vehicle_id)
       .is("rental_id", null)
       .in("id", transactionIds),
     supabase

@@ -1,3 +1,6 @@
+import { englishDateLocale } from "@/lib/i18n/customer-dates";
+import { rentalVehiclePeriods, splitRentalsByVehicle, swappedOut, VEHICLE_CHANGE_COLUMNS, type VehicleChangeRow } from "@/lib/rental-vehicle-periods";
+
 /**
  * Double-booking rules, shared by the booking form (to warn early) and the
  * server actions (to refuse). A booking holds its car from the start date up
@@ -128,6 +131,9 @@ export async function loadBusyPeriods(supabase: any, organizationId: string, veh
   const { data, error } = await query;
   if (error) throw new Error(error.message);
 
+  // A rental that changed vehicle holds the vehicle it is on now only from the day of the change, not from its start.
+  const onSince = await currentVehicleSince(supabase, organizationId, (data || []) as any[]);
+
   const byVehicle: Record<string, BusyPeriod[]> = {};
   for (const row of data || []) {
     if (!row.vehicle_id || !row.start_date) continue;
@@ -136,7 +142,7 @@ export async function loadBusyPeriods(supabase: any, organizationId: string, veh
       code: row.display_code || row.reference || null,
       customerName: row.customers?.full_name || null,
       customerId: row.customer_id || null,
-      startDate: String(row.start_date).slice(0, 10),
+      startDate: onSince[row.id] || String(row.start_date).slice(0, 10),
       endDate: row.end_date ? String(row.end_date).slice(0, 10) : null,
       out: (OUT_RENTAL_STATUSES as readonly string[]).includes(String(row.status || ""))
     });
@@ -154,8 +160,62 @@ export async function loadBusyPeriods(supabase: any, organizationId: string, veh
       });
     }
   }
+  await addSwappedOffPeriods(supabase, organizationId, vehicleIds, byVehicle);
   for (const list of Object.values(byVehicle)) list.sort((a, b) => a.startDate.localeCompare(b.startDate));
   return byVehicle;
+}
+
+/** For rentals that changed vehicle: the day each one moved onto the vehicle it is on now, keyed by rental id. */
+async function currentVehicleSince(supabase: any, organizationId: string, rentals: any[]): Promise<Record<string, string>> {
+  const since: Record<string, string> = {};
+  const ids = rentals.map((row) => row.id).filter(Boolean);
+  if (ids.length === 0) return since;
+  const { data: changes, error } = await supabase.from("vehicle_changes").select(VEHICLE_CHANGE_COLUMNS).eq("organization_id", organizationId).in("rental_id", ids);
+  if (error || !changes?.length) return since;
+  const changed = new Set((changes as VehicleChangeRow[]).map((change) => change.rental_id));
+  for (const row of rentals) {
+    if (!changed.has(row.id)) continue;
+    const periods = rentalVehiclePeriods(row, changes as VehicleChangeRow[]);
+    const last = periods[periods.length - 1];
+    if (periods.length > 1 && last?.vehicleId === row.vehicle_id) since[row.id] = last.start;
+  }
+  return since;
+}
+
+/**
+ * A rental that changed vehicle holds the earlier vehicle from its start up to (not including) the day of the change,
+ * and nothing after it (lib/rental-vehicle-periods.ts). Rentals are read by their current vehicle above, so those
+ * earlier spells are added here; a back-dated booking on the earlier vehicle then can't land on them.
+ */
+async function addSwappedOffPeriods(supabase: any, organizationId: string, vehicleIds: string[] | undefined, byVehicle: Record<string, BusyPeriod[]>) {
+  let touching = supabase.from("vehicle_changes").select("rental_id").eq("organization_id", organizationId);
+  if (vehicleIds?.length) touching = touching.in("from_vehicle_id", vehicleIds);
+  const { data: touched } = await touching;
+  const rentalIds = Array.from(new Set(((touched || []) as Array<{ rental_id: string }>).map((row) => row.rental_id)));
+  if (rentalIds.length === 0) return;
+  const [rentalsResult, changesResult] = await Promise.all([
+    supabase
+      .from("rentals")
+      .select("id, vehicle_id, original_vehicle_id, customer_id, display_code, reference, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name)")
+      .eq("organization_id", organizationId)
+      .in("id", rentalIds)
+      .is("deleted_at", null)
+      .in("status", BLOCKING_RENTAL_STATUSES as unknown as string[]),
+    supabase.from("vehicle_changes").select(VEHICLE_CHANGE_COLUMNS).eq("organization_id", organizationId).in("rental_id", rentalIds)
+  ]);
+  if (rentalsResult.error || changesResult.error) return;
+  const wanted = vehicleIds?.length ? new Set(vehicleIds) : null;
+  for (const row of splitRentalsByVehicle((rentalsResult.data || []) as any[], (changesResult.data || []) as VehicleChangeRow[])) {
+    if (!swappedOut(row) || (wanted && !wanted.has(row.vehicle_id))) continue;
+    (byVehicle[row.vehicle_id] ||= []).push({
+      rentalId: row.id,
+      code: row.display_code || row.reference || null,
+      customerName: row.customers?.full_name || null,
+      customerId: row.customer_id || null,
+      startDate: String(row.start_date).slice(0, 10),
+      endDate: row.end_date ? String(row.end_date).slice(0, 10) : null
+    });
+  }
 }
 
 export const PARKED_MESSAGE = "This vehicle is parked: your plan has room for fewer vehicles. Choose another vehicle or move up a plan.";
@@ -200,5 +260,5 @@ export async function earlyHandoverBlocker(
   return findConflict(busy[args.vehicleId] || [], args.today, args.endDate || booked, args.rentalId);
 }
 
-export const DOUBLE_BOOKING_MESSAGE = "This vehicle is already booked for some of those dates. Choose other dates or another vehicle.";import { englishDateLocale } from "@/lib/i18n/customer-dates";
+export const DOUBLE_BOOKING_MESSAGE = "This vehicle is already booked for some of those dates. Choose other dates or another vehicle.";
 

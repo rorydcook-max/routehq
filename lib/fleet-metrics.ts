@@ -1,5 +1,6 @@
 import { businessToday } from "@/lib/business-time";
 import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
+import { loadVehicleChanges, splitRentalsByVehicle, type VehicleChangeRow } from "@/lib/rental-vehicle-periods";
 
 /**
  * Per-vehicle figures worked out from the records themselves. The vehicles
@@ -79,21 +80,25 @@ export function fleetAverageUtilization(items: Array<{ utilization: number; arch
 
 /** Loads what computeVehicleFigures needs for a whole business. */
 export async function loadFleetFigures(supabase: any, organizationId: string) {
-  const [vehicles, rentals, transactions] = await Promise.all([
+  const [vehicles, rentals, transactions, changes] = await Promise.all([
     supabase.from("vehicles").select("id, status, purchase_date, created_at, mileage, metadata").eq("organization_id", organizationId).is("deleted_at", null),
-    supabase.from("rentals").select("vehicle_id, status, start_date, end_date").eq("organization_id", organizationId).is("deleted_at", null),
-    supabase.from("transactions").select("vehicle_id, amount, type, is_deposit, voided").eq("organization_id", organizationId).is("deleted_at", null)
+    supabase.from("rentals").select("id, vehicle_id, original_vehicle_id, status, start_date, end_date").eq("organization_id", organizationId).is("deleted_at", null),
+    supabase.from("transactions").select("vehicle_id, amount, type, is_deposit, voided").eq("organization_id", organizationId).is("deleted_at", null),
+    loadVehicleChanges(supabase, organizationId)
   ]);
   const error = vehicles.error || rentals.error || transactions.error;
   if (error) throw new Error(error.message);
-  return computeVehicleFigures({ vehicles: vehicles.data || [], rentals: rentals.data || [], transactions: transactions.data || [] });
+  return computeVehicleFigures({ vehicles: vehicles.data || [], rentals: rentals.data || [], transactions: transactions.data || [], changes });
 }
 
 export function computeVehicleFigures(input: {
   vehicles: any[];
   rentals: any[];
   transactions: any[];
+  /** Vehicle changes: a rental that changed vehicle counts on each vehicle for its own days (lib/rental-vehicle-periods.ts). */
+  changes?: VehicleChangeRow[];
 }): Map<string, VehicleFigures> {
+  const rentals = input.changes?.length ? splitRentalsByVehicle(input.rentals, input.changes) : input.rentals;
   const today = businessToday();
   const todayMs = toDay(today);
   const yearAgo = todayMs - 364 * DAY;
@@ -107,7 +112,7 @@ export function computeVehicleFigures(input: {
       .filter((row) => isRunningCost({ isDeposit: row.is_deposit, type: row.type }))
       .reduce((sum, row) => sum + Math.abs(Number(row.amount || 0)), 0);
 
-    const rentalSpans = input.rentals
+    const rentalSpans = rentals
       .filter((row) => row.vehicle_id === vehicle.id && !["cancelled", "booked"].includes(String(row.status || "")) && row.start_date)
       .map((row) => {
         const start = toDay(String(row.start_date).slice(0, 10));

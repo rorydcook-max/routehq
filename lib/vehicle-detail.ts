@@ -4,6 +4,8 @@ import { fleetAverageUtilization, loadFleetFigures } from "@/lib/fleet-metrics";
 import { getTaskList, type TaskListItem } from "@/lib/tasks";
 import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
 import { withShares } from "@/lib/cost-spread";
+import { SERVICE_COST_TYPES } from "@/lib/vehicle-service";
+import { rentalsForVehicle } from "@/lib/rental-vehicle-periods";
 
 /** The rental that matters now: the one the car is out on, else the soonest booking. */
 export function rentalHappeningNow<T extends { status?: string | null; start_date?: string | null }>(rentals: T[] | null | undefined): T | null {
@@ -73,6 +75,29 @@ export type VehicleDetail = {
     last365: number;
   };
 };
+
+/**
+ * Servicing and repairs that exist only as money entries (imported from a sheet, or recorded before the service
+ * history was kept) join the vehicle's service history, so the two never disagree (Rory, 11 Nov 2026).
+ */
+function withMoneyOnlyWork(events: any[], transactions: any[]) {
+  const linked = new Set(events.map((event) => event.transaction_id).filter(Boolean));
+  const extra = transactions
+    .filter((row) => SERVICE_COST_TYPES[String(row.type)] && !row.voided && !linked.has(row.id))
+    .map((row) => ({
+      id: `money-${row.id}`,
+      transaction_id: row.id,
+      event_type: SERVICE_COST_TYPES[String(row.type)],
+      service_date: String(row.transaction_date || "").slice(0, 10),
+      mileage: row.mileage ?? null,
+      cost: Number(row.amount) || null,
+      supplier: row.supplier || null,
+      notes: row.notes || null
+    }))
+    .filter((event) => event.service_date);
+  if (extra.length === 0) return events;
+  return [...events, ...extra].sort((a, b) => String(b.service_date || "").localeCompare(String(a.service_date || "")));
+}
 
 function toNumber(value: unknown) {
   return Number(value || 0);
@@ -187,12 +212,6 @@ function calculateUtilization(vehicle: any, rentals: any[], transactions: any[],
   const today = startOfDay(businessNow());
   const twelveMonthStart = new Date(today);
   twelveMonthStart.setDate(today.getDate() - 365);
-  const ownedSince = dateFromIso(vehicle.purchase_date) || dateFromIso(vehicle.created_at) || today;
-  // "This year" starts when you got the vehicle if that was after 1 January,
-  // so a car added last week does not show hundreds of idle days.
-  const januaryFirst = new Date(today.getFullYear(), 0, 1);
-  const yearStart = ownedSince > januaryFirst ? ownedSince : januaryFirst;
-
   const rentalWindows = rentals
     // A booking that has not been handed over yet is not time on rent.
     .filter((rental) => rental.status !== "cancelled" && rental.status !== "booked")
@@ -201,6 +220,14 @@ function calculateUtilization(vehicle: any, rentals: any[], transactions: any[],
       const end = dateFromIso(rental.end_date) || today;
       return { start, end, rental };
     });
+  // A rental recorded from before the vehicle was added means it was in the fleet by then (as lib/fleet-metrics.ts counts it).
+  const firstRental = rentalWindows.reduce<Date | null>((earliest, item) => (!earliest || item.start < earliest ? item.start : earliest), null);
+  const added = dateFromIso(vehicle.purchase_date) || dateFromIso(vehicle.created_at) || today;
+  const ownedSince = firstRental && firstRental < added ? (firstRental < today ? firstRental : today) : added;
+  // "This year" starts when you got the vehicle if that was after 1 January,
+  // so a car added last week does not show hundreds of idle days.
+  const januaryFirst = new Date(today.getFullYear(), 0, 1);
+  const yearStart = ownedSince > januaryFirst ? ownedSince : januaryFirst;
 
   const daysRentedLast365 = rentalWindows.reduce((total, item) => total + overlapDays(item.start, item.end, twelveMonthStart, today), 0);
   const daysRentedLifecycle = rentalWindows.reduce((total, item) => total + overlapDays(item.start, item.end, ownedSince, today), 0);
@@ -344,6 +371,27 @@ function sortVehiclePhotos(documents: VehicleDetailDocument[]) {
     });
 }
 
+const VEHICLE_RENTAL_COLUMNS = "*, customers!rentals_customer_id_fkey(full_name, nationality, phone)";
+
+/**
+ * Every rental that spent time on this vehicle, with the dates it was on it: one that changed vehicle shows here only
+ * for its own period (lib/rental-vehicle-periods.ts), and names the vehicle it came from or moved to.
+ */
+async function vehicleRentals(supabase: any, organizationId: string, vehicleId: string, own: any[]) {
+  const rows: any[] = await rentalsForVehicle(supabase, { organizationId, vehicleId, rentals: own, select: VEHICLE_RENTAL_COLUMNS }).catch(() => own);
+  const otherIds = Array.from(new Set(rows.flatMap((row) => [row.vehicle_period?.fromVehicleId, row.vehicle_period?.toVehicleId]).filter(Boolean)));
+  if (otherIds.length === 0) return rows;
+  const { data } = await supabase.from("vehicles").select("id, make, model, registration_number").eq("organization_id", organizationId).in("id", otherIds);
+  const label = new Map(((data || []) as any[]).map((v) => [v.id, [v.make, v.model].filter(Boolean).join(" ") || String(v.registration_number || "")]));
+  return rows
+    .map((row) =>
+      row.vehicle_period
+        ? { ...row, moved_from_label: label.get(row.vehicle_period.fromVehicleId) || null, moved_to_label: label.get(row.vehicle_period.toVehicleId) || null }
+        : row
+    )
+    .sort((a, b) => String(b.start_date || "").localeCompare(String(a.start_date || "")));
+}
+
 export async function getVehicleDetail(vehicleId: string, organizationId: string): Promise<VehicleDetail | null> {
   const supabase = (await createSupabaseServerClient()) as any;
 
@@ -400,7 +448,7 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
     supabase.from("compliance_events").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).is("deleted_at", null).order("expiry_date", { ascending: false }),
     supabase
       .from("rentals")
-      .select("*, customers!rentals_customer_id_fkey(full_name, nationality, phone)")
+      .select(VEHICLE_RENTAL_COLUMNS)
       .eq("organization_id", organizationId)
       .eq("vehicle_id", vehicleId)
       .is("deleted_at", null)
@@ -447,7 +495,7 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
   // Signed links for files and inspection photos, fetched side by side rather than one after the other.
   const [documents, inspections] = await Promise.all([addDocumentUrls(supabase, documentsResult.data || []), addInspectionUrls(supabase, inspectionsResult.data || [])]);
   const transactions = transactionsResult.data || [];
-  const rentals = rentalsResult.data || [];
+  const rentals = await vehicleRentals(supabase, organizationId, vehicleId, rentalsResult.data || []);
 
   return {
     vehicle,
@@ -455,7 +503,7 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
     activeRental: rentalHappeningNow(activeRentalResult.data as any[]),
     inspections,
     transactions,
-    maintenanceEvents: maintenanceResult.data || [],
+    maintenanceEvents: withMoneyOnlyWork(maintenanceResult.data || [], transactions),
     complianceEvents: complianceResult.data || [],
     rentals,
     documents,

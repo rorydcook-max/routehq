@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Loader2, Sparkles, Undo2, X } from "lucide-react";
+import { Camera, ChevronLeft, Loader2, Sparkles, Undo2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { compressImage } from "@/lib/direct-upload-client";
@@ -35,6 +35,15 @@ export function QuickPhotos() {
   const carrier = useRef<HTMLInputElement>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [busy, setBusy] = useState(false);
+  const [dragFrom, setDragFrom] = useState<number | null>(null);
+  const move = (from: number, to: number) =>
+    setPhotos((list) => {
+      if (from === to || from < 0 || to < 0 || from >= list.length || to >= list.length) return list;
+      const next = list.slice();
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
 
   const field = (name: string) => String((carrier.current?.form?.elements.namedItem(name) as HTMLInputElement | null)?.value || "").trim();
   const ai = useAiPhotos({
@@ -123,10 +132,29 @@ export function QuickPhotos() {
       <input className="hidden" multiple name="vehiclePhotos" ref={carrier} type="file" />
       <div className="mt-1.5 grid grid-cols-4 gap-2">
         {photos.map((photo, index) => (
-          <div className="relative aspect-square overflow-hidden rounded-xl bg-[var(--panel-secondary)]" key={photo.url}>
+          // Reordered before saving (Rory, 11 Nov 2026): drag a photo onto another, or tap its arrow to move it one earlier.
+          <div
+            className={`relative aspect-square overflow-hidden rounded-xl bg-[var(--panel-secondary)] ${dragFrom === index ? "opacity-50" : ""}`}
+            draggable
+            key={photo.url}
+            onDragEnd={() => setDragFrom(null)}
+            onDragOver={(event) => event.preventDefault()}
+            onDragStart={() => setDragFrom(index)}
+            onDrop={(event) => {
+              event.preventDefault();
+              if (dragFrom !== null) move(dragFrom, index);
+              setDragFrom(null);
+            }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img alt="" className="h-full w-full object-cover" src={photo.url} />
-            {index === 0 ? <span className="absolute bottom-1 left-1 rounded-full bg-black/60 px-1.5 text-[11px] font-bold text-white">{t("qp_main")}</span> : null}
+            <img alt="" className="h-full w-full object-cover" draggable={false} src={photo.url} />
+            {index === 0 ? (
+              <span className="absolute bottom-1 left-1 rounded-full bg-black/60 px-1.5 text-[11px] font-bold text-white">{t("qp_main")}</span>
+            ) : (
+              <button aria-label={t("qp_moveEarlier")} className="absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white" onClick={() => move(index, index - 1)} title={t("qp_moveEarlier")} type="button">
+                <ChevronLeft className="rtl:rotate-180" size={15} />
+              </button>
+            )}
             {photo.ai === "generated" ? (
               <span aria-label={ai.say("generated")} className="absolute bottom-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white" title={ai.say("generated")}>
                 <Sparkles size={11} />

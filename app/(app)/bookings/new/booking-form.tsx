@@ -536,6 +536,10 @@ export function BookingForm({
   // Paid extras picked for this booking, priced for its days (or a month when it has no end).
   const stayDays = !openEnded && startDate && endDate ? Math.max(1, Math.round((new Date(`${endDate}T00:00:00`).getTime() - new Date(`${startDate}T00:00:00`).getTime()) / 86400000)) : null;
   const pricedExtras = priceExtras(extras.filter((extra) => chosenExtras.includes(extra.id)), stayDays);
+  // Things this business charges for as an extra: left out of the free "included" list so nothing is offered twice.
+  const paidExtraNames = extrasFor(extras, isTwoWheeler(selectedVehicle?.category_code), selectedVehicle?.id).filter((extra) => extra.price > 0).map((extra) => String(extra.name || ""));
+  const thing = (name: string) => name.toLowerCase().replace(/\b(car|child|baby|kids?|infant|booster)\s*seat\b/g, "childseat").replace(/[^\p{L}\p{N}]/gu, "");
+  const sameThing = (a: string, b: string) => Boolean(thing(a)) && thing(a) === thing(b);
   // What is due at the start: the whole stay when priced by the day, the periods paid ahead, or the first period; plus extras paid once.
   const firstRentDue = pricingModel === "daily" ? rentalRate * (stayDays || 1) : upfrontEnabled && upfrontPeriods > 0 ? upfrontPeriods * upfrontRate : rentalRate;
   const walkInPay = walkInPaymentAmount ?? firstRentDue + pricedExtras.upfront;
@@ -1016,7 +1020,8 @@ export function BookingForm({
               <span>{say("walkInNow")}</span>
             </label>
           ) : null}
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:items-start">
+          {/* Lined up on their boxes: the start date's label carries a "Today" button, so its label row is taller. */}
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:items-end">
             <label className="block">
               <span className="flex items-center justify-between gap-2 text-[11px] font-medium text-[var(--foreground-secondary)]">
                 <span>{say("startDate")}</span>
@@ -1054,24 +1059,29 @@ export function BookingForm({
               {say("endBeforeStart")}
             </p>
           ) : null}
-          <label className="checkbox-label sub-surface mt-3 min-h-12 font-bold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}>
-            <input
-              checked={openEnded}
-              className="flex-shrink-0"
-              name="openEndedToggle"
-              onChange={(event) => setOpenEnded(event.target.checked)}
-              type="checkbox"
-            />
-            <span>{say("openEnded")}</span>
-          </label>
-          {swapAllowed ? (
-            <div className="sub-surface mt-3 rounded-lg" style={{ padding: "10px 12px" }}>
-              <label className="checkbox-label min-h-8 font-bold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center" }}>
-                <input checked={swapOpen} className="flex-shrink-0" onChange={(event) => setSwapOpen(event.target.checked)} type="checkbox" />
+          {/* The two yes/no questions side by side on one line (Rory, 11 Nov 2026); the swap's details open underneath. */}
+          <div className={`mt-3 grid gap-3 ${swapAllowed ? "sm:grid-cols-2" : ""}`}>
+            <label className="checkbox-label sub-surface min-h-12 font-bold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}>
+              <input
+                checked={openEnded}
+                className="!m-0 flex-shrink-0"
+                name="openEndedToggle"
+                onChange={(event) => setOpenEnded(event.target.checked)}
+                type="checkbox"
+              />
+              <span>{say("openEnded")}</span>
+            </label>
+            {swapAllowed ? (
+              <label className="checkbox-label sub-surface min-h-12 font-bold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}>
+                <input checked={swapOpen} className="!m-0 flex-shrink-0" onChange={(event) => setSwapOpen(event.target.checked)} type="checkbox" />
                 <span>{say("swapToggle")}</span>
               </label>
+            ) : null}
+          </div>
+          {swapAllowed ? (
+            <div className={swapOpen ? "sub-surface mt-3 rounded-lg" : "hidden"} style={{ padding: "10px 12px" }}>
               {swapOpen ? (
-                <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:items-start">
+                <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
                   <label className="block">
                     <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("swapEarlierVehicle")}</span>
                     <select className={inputClass} onChange={(event) => setEarlierVehicleId(event.target.value)} value={earlierVehicleId}>
@@ -1241,6 +1251,9 @@ export function BookingForm({
                 .filter((item) => (isTwoWheeler(selectedVehicle?.category_code) ? !notForTwoWheelers.has(item) : !twoWheelerOnly.has(item)) || includedItems.includes(item))
                   // Thailand's compulsory insurance (Por Ror Bor) means nothing elsewhere.
                   .filter((item) => item !== includedOptions[1] || businessCountry() === "TH" || includedItems.includes(item))
+                  // Sold as a paid extra below (a child seat, a second helmet): not also offered here as free
+                  // (Rory, 11 Nov 2026: "Child seat" showed twice).
+                  .filter((item) => includedItems.includes(item) || !paidExtraNames.some((name) => sameThing(name, item) || sameThing(name, say(`inc_${includedOptions.indexOf(item)}`))))
                 .map((item) => (
                 <label
                   className={`flex min-h-[56px] cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2 text-[15px] font-bold leading-tight ${
@@ -1418,6 +1431,11 @@ export function BookingForm({
                 <button className={`pressable mb-2 min-h-10 rounded-full border px-4 py-2 text-[13px] font-bold ${deliveryDateTime ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--primary)] bg-white text-[var(--primary)]"}`} onClick={setHandoverNow} type="button">
                   {startsLater ? say("onStartDay") : say("now")}
                 </button>
+                {deliveryDateTime ? (
+                  <button className="pressable mb-2 ms-2 min-h-10 rounded-full border border-[var(--border)] bg-white px-4 py-2 text-[13px] font-bold text-[var(--foreground-secondary)]" onClick={() => setDeliveryDateTime("")} type="button">
+                    {say("clearField")}
+                  </button>
+                ) : null}
                 <input className={inputClass} id="delivery-datetime" onChange={(event) => setDeliveryDateTime(event.target.value)} type="datetime-local" value={deliveryDateTime} />
               </div>
             </div>
@@ -1438,6 +1456,11 @@ export function BookingForm({
                 <button className={`pressable mb-2 min-h-10 rounded-full border px-4 py-2 text-[13px] font-bold ${collectionTime ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--primary)] bg-white text-[var(--primary)]"}`} onClick={setHandoverNow} type="button">
                   {startsLater ? say("onStartDay") : say("now")}
                 </button>
+                {collectionTime ? (
+                  <button className="pressable mb-2 ms-2 min-h-10 rounded-full border border-[var(--border)] bg-white px-4 py-2 text-[13px] font-bold text-[var(--foreground-secondary)]" onClick={() => setCollectionTime("")} type="button">
+                    {say("clearField")}
+                  </button>
+                ) : null}
                 <input className={inputClass} id="collection-datetime" onChange={(event) => setCollectionTime(event.target.value)} type="datetime-local" value={collectionTime} />
               </div>
             </div>
@@ -1938,6 +1961,34 @@ function GooglePlaceInput({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
   const [pinModalOpen, setPinModalOpen] = useState(false);
+  // Google refused the map key (billing off, key not allowed here): it locks the box and fills its list with warning
+  // signs. The box goes back to a plain text field that can be typed in and cleared (Rory, 11 Nov 2026).
+  const [mapsBroken, setMapsBroken] = useState(false);
+  useEffect(() => {
+    const win = window as unknown as { gm_authFailure?: () => void };
+    const before = win.gm_authFailure;
+    win.gm_authFailure = () => {
+      before?.();
+      setMapsBroken(true);
+      const input = inputRef.current;
+      if (input) {
+        input.disabled = false;
+        input.classList.remove("gm-err-autocomplete");
+        input.style.backgroundImage = "";
+        input.placeholder = `📍 ${placeholder}`;
+      }
+      if (!document.getElementById("routehq-pac-off")) {
+        const style = document.createElement("style");
+        style.id = "routehq-pac-off";
+        style.textContent = ".pac-container { display: none !important; }";
+        document.head.appendChild(style);
+      }
+    };
+    return () => {
+      win.gm_authFailure = before;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onPlaceSelectRef = useRef(onPlaceSelect);
   onPlaceSelectRef.current = onPlaceSelect;
@@ -1993,15 +2044,31 @@ function GooglePlaceInput({
         <InfoTip label={label} text={tooltip} />
       </span>
       <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
-        <input
-          autoComplete="off"
-          className="mt-0 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
-          onChange={(event) => onChange(event.target.value)}
-          placeholder={`📍 ${placeholder}`}
-          ref={inputRef}
-          value={value}
-        />
-        {isEnabled ? (
+        <span className="relative block">
+          <input
+            autoComplete="off"
+            className="mt-0 w-full rounded-lg border border-[var(--border)] bg-white py-2 pe-10 ps-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
+            onChange={(event) => onChange(event.target.value)}
+            placeholder={`📍 ${placeholder}`}
+            ref={inputRef}
+            value={value}
+          />
+          {/* One tap empties the place (and its map pin), so a location typed by mistake can be taken off. */}
+          {value ? (
+            <button
+              aria-label={say("clearField")}
+              className="pressable absolute inset-y-0 end-1 my-auto flex h-8 w-8 items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)]"
+              onClick={() => {
+                onPlaceSelect({ address: "", lat: null, lng: null, placeId: "" });
+                inputRef.current?.focus();
+              }}
+              type="button"
+            >
+              <X aria-hidden="true" size={16} />
+            </button>
+          ) : null}
+        </span>
+        {isEnabled && !mapsBroken ? (
           <button
             className="pressable min-h-12 rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
             onClick={() => setPinModalOpen(true)}

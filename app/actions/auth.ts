@@ -12,6 +12,9 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { appRoleFromForm, dbRoleFromApp, getCurrentMembership, OWNER_ONLY_MESSAGE, requireOwner, type AppRole } from "@/lib/auth/roles";
 import { ACTIVE_ORGANIZATION_COOKIE } from "@/lib/auth/active-organization";
 import { shellBrand } from "@/lib/shell-brand";
+import { isEmailConfigured, sendEmail } from "@/lib/email";
+import { teamInviteEmail } from "@/lib/email/templates";
+import { emailWords } from "@/lib/email/words";
 import { emailCheckToken } from "@/lib/email-check";
 import { PENDING_EVENT_COOKIE, PENDING_EVENT_MAX_AGE, type PendingEvent, type PendingMethod } from "@/lib/analytics";
 import { CONSENT_KEY, consentFromCookieValue } from "@/lib/consent";
@@ -439,12 +442,50 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
 
   const origin = await requestOrigin();
   const redirectTo = origin ? `${origin}/auth/callback?next=/accept-invite` : undefined;
-  const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
-    redirectTo,
-    data: {
-      preferred_locale: preferredLocale
+  // The invite goes out as the app's own designed email, naming the business and who invited them (Rory, 9 Nov 2026:
+  // it arrived as Supabase's plain default). Supabase makes the account and the link; we send the email. When there
+  // is no email service, or that fails before an account exists, Supabase sends its own as before.
+  let data: { user: { id: string } | null } = { user: null };
+  let error: { message?: string } | null = null;
+  let sentOurs = false;
+  if (isEmailConfigured()) {
+    const made = await admin.auth.admin.generateLink({ type: "invite", email, options: { redirectTo, data: { preferred_locale: preferredLocale } } });
+    const link = made.data?.properties?.action_link as string | undefined;
+    if (!made.error && made.data?.user && link) {
+      const [{ data: business }, { data: inviterRow }] = await Promise.all([
+        admin.from("organizations").select("name, trading_name").eq("id", inviter.organizationId).maybeSingle(),
+        admin.from("users").select("full_name").eq("id", inviter.userId).maybeSingle()
+      ]);
+      const sent = await sendEmail({
+        to: email,
+        ...teamInviteEmail({
+          link,
+          business: String(business?.trading_name || business?.name || "a rental business"),
+          inviter: String(inviterRow?.full_name || "").trim() || null,
+          role: label,
+          words: await emailWords("en")
+        }),
+        metadata: { kind: "team_invite" }
+      });
+      if (sent.status === "sent") {
+        data = { user: made.data.user };
+        sentOurs = true;
+      } else {
+        console.error("[invite] own invite email failed:", sent.status === "failed" ? sent.error : sent.status);
+        return { error: say("iv_failed") };
+      }
     }
-  });
+  }
+  if (!sentOurs) {
+    const invited = await admin.auth.admin.inviteUserByEmail(email, {
+      redirectTo,
+      data: {
+        preferred_locale: preferredLocale
+      }
+    });
+    data = { user: invited.data?.user || null };
+    error = invited.error;
+  }
 
   if (error || !data.user) {
     const message = error?.message || "";

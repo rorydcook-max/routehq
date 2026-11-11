@@ -391,6 +391,10 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
                     {showStatusBadge ? <Badge tone={statusTone(effectiveStatus)}>{statusLabel(effectiveStatus, tx)}</Badge> : null}
                     {showLinkBadge ? <Badge tone="amber">{linkLabel(booking.booking_link?.status, tx)}</Badge> : null}
+                    {/* The booking's reference (SC-2026-0005), quiet beside the badges, so it can be read out or searched for. */}
+                    {booking.reference || booking.display_code ? (
+                      <span className="num whitespace-nowrap text-[12px] font-medium text-[var(--muted)]">{booking.reference || booking.display_code}</span>
+                    ) : null}
                   </div>
                     {/* Edit, extend, cancel and delete stay one tap away without crowding every card. */}
                     {/* z-20: above the card's own tappable lines (z-10), which painted over the open menu. */}

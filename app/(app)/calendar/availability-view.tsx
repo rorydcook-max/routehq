@@ -141,7 +141,7 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
                           // overflow-clip (not hidden) so the name can stay pinned beside the vehicle column while the bar scrolls.
                           className={`z-10 mx-0.5 flex h-7 items-center overflow-clip px-1.5 text-[11px] font-semibold ${handoverLate ? lateHandoverClasses : barClasses[booking.state]} ${booking.startsBefore ? "rounded-l-none" : "rounded-l-md"} ${booking.runsOn ? "rounded-r-none" : "rounded-r-md"}`}
                           href={`/bookings/${booking.id}` as Route}
-                          key={booking.id}
+                          key={`${booking.id}-${booking.from}`}
                           style={{ gridColumn: `${dayOf(booking.from)} / ${dayOf(booking.to) + 1}`, gridRow: 1 }}
                           title={`${text} · ${shortDay(booking.from, locale)} – ${shortDay(booking.to, locale)}${booking.state === "late" || handoverLate ? "" : ` · ${t(`st_${booking.state}`)}`}`}
                         >

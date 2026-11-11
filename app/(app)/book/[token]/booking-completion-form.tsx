@@ -1503,10 +1503,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
               return (
                 <div className={`rounded-2xl border p-4 transition ${active ? "border-[var(--primary)] bg-[var(--panel-secondary)]" : "border-[var(--border)] bg-white"}`} key={key}>
-                  <label className="checkbox-label cursor-pointer">
+                  {/* The dot, the icon and the name on one centre line. */}
+                  <label className="checkbox-label cursor-pointer !items-center">
                     <input
                       checked={active}
-                      className="flex-shrink-0"
+                      className="!m-0 h-[18px] w-[18px] flex-shrink-0 accent-[var(--primary)]"
                       name="paymentMethodChoice"
                       onChange={() => {
                         setPaymentMethod(key);

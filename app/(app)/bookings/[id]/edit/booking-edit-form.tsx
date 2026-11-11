@@ -10,6 +10,7 @@ import { addRentalPayment as addRentalPaymentAction, deleteRentalPayment as dele
 import { CustomerSelector } from "@/components/customer-selector";
 import { VehicleChangeButton } from "@/app/(app)/bookings/[id]/vehicle-change-button";
 import { Badge } from "@/components/ui";
+import { VehicleChangesEditor, type VehicleChangeEntry } from "./vehicle-changes-editor";
 import { isMapsUrl } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
 import { longDate } from "@/lib/i18n/dates";
@@ -450,8 +451,12 @@ export function BookingEditForm({
   customers,
   homeTerritory,
   payments,
-  rental
+  rental,
+  vehicleChanges = [],
+  fleet = []
 }: {
+  vehicleChanges?: VehicleChangeEntry[];
+  fleet?: Array<{ id: string; label: string }>;
   agreementSigned?: boolean;
   bookingLink: any;
   customers: Customer[];
@@ -501,6 +506,7 @@ export function BookingEditForm({
           </div>
           {!["completed", "cancelled", "draft"].includes(String(rental.status)) ? <VehicleChangeButton rentalId={rental.id} /> : null}
         </div>
+        <VehicleChangesEditor changes={vehicleChanges} fleet={fleet} maxDate={toWallTime(new Date().toISOString()).slice(0, 10)} minDate={String(rental.start_date || "").slice(0, 10)} rentalId={rental.id} />
       </section>
 
       <form

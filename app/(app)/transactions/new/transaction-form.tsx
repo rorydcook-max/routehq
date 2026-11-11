@@ -36,8 +36,16 @@ function AmountBox(props: InputHTMLAttributes<HTMLInputElement> & { className: s
   );
 }
 
-/** Whole amounts in the business's currency, for the hints under the boxes. */
-const moneyText = (value: number) => formatMoney(Math.round(value), businessCurrency(), "en-GB");
+/** Amounts in the business's currency, for the hints under the boxes: to the cent or satang, never rounded to whole units. */
+const moneyText = (value: number) => niceMoney(Math.round(value * 100) / 100, businessCurrency());
+
+/** The same day a year later (YYYY-MM-DD): where cover usually ends. */
+const yearOn = (iso: string) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return "";
+  const date = new Date(`${iso}T00:00:00Z`);
+  date.setUTCFullYear(date.getUTCFullYear() + 1);
+  return date.toISOString().slice(0, 10);
+};
 
 const MONEY_IN: string[] = ["rental_income", "charge_recovered", "deposit_received", "deposit_forfeited", "deposit_deduction"];
 // Costs a renter can be responsible for. Insurance, tax and finance are the owner's own.
@@ -141,7 +149,7 @@ export function TransactionForm({
   const bookingOption = (rental: TransactionFormOptions["rentals"][number]) =>
     rental.startDate ? `${rental.label} · ${shortDate(rental.startDate, locale)}–${rental.endDate ? shortDate(rental.endDate, locale) : "…"}` : rental.label;
   const rentalsForVehicle = useMemo(
-    () => options.rentals.filter((rental) => rental.vehicleId === vehicleId),
+    () => options.rentals.filter((rental) => rental.vehicleId === vehicleId || (rental.earlierVehicleIds || []).includes(vehicleId)),
     [options.rentals, vehicleId]
   );
   // Billing the renter for this cost: off unless chosen. The booking offered first is the one the vehicle was on that day.
@@ -558,15 +566,14 @@ export function TransactionForm({
           )}
 
           {/* Servicing or a repair on a car also goes in its service history; the next service is set here, by date, km or both. */}
-          {isServiceWork ? (
+          {/* A repair is not a service: it goes in the history but sets no next service (Rory, 11 Nov 2026). */}
+          {isServiceWork && type !== "repair" ? (
             <div className="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:col-span-2 sm:grid-cols-2">
               <p className="text-[14px] font-semibold text-[var(--foreground)] sm:col-span-2">{say("sv_title")}</p>
-              {type !== "repair" ? (
-                <label className="flex items-center gap-3 text-[14px] font-semibold text-[var(--foreground)] sm:col-span-2">
-                  <input className="h-5 w-5 shrink-0" name="oilChanged" type="checkbox" value="true" />
-                  {say("sv_oil")}
-                </label>
-              ) : null}
+              <label className="flex items-center gap-3 text-[14px] font-semibold text-[var(--foreground)] sm:col-span-2">
+                <input className="h-5 w-5 shrink-0" name="oilChanged" type="checkbox" value="true" />
+                {say("sv_oil")}
+              </label>
               <label className="block">
                 <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("sv_nextDate")}</span>
                 <input className={inputClass} name="serviceNextDate" type="date" />
@@ -583,8 +590,10 @@ export function TransactionForm({
             const kinds = paperworkFor(country).filter((item) => item.costType === type);
             if (isMoneyIn || !(type === "insurance" || type === "tax" || (type === "other" && (kinds.length > 0 || coverFrom || coverTo)))) return null;
             const onCar = Boolean(vehicleId) && !noVehicle;
-            const kind = kinds.find((item) => item.key === paperKind) || (kinds.length === 1 && onCar ? kinds[0] : null);
-            const kindName = (item: (typeof kinds)[number]) => (item.local ? `${paperWords(item.nameKey as never)} (${item.local})` : paperWords(item.nameKey as never));
+            // Insurance starts on the compulsory kind (first in every country's list); "none" is "not the car's papers".
+            const kind = paperKind === "none" ? null : kinds.find((item) => item.key === paperKind) || (onCar && (kinds.length === 1 || type === "insurance") ? kinds[0] || null : null);
+            const plainName = (item: (typeof kinds)[number]) => (type === "insurance" && item.key === "insurance" && kinds.length > 1 ? say("coverVoluntary") : paperWords(item.nameKey as never));
+            const kindName = (item: (typeof kinds)[number]) => (item.local ? `${plainName(item)} (${item.local})` : plainName(item));
             const total = Number(amount || 0);
             const months = coverFrom && coverTo && coverTo > coverFrom ? monthsCovered({ from: coverFrom, to: coverTo }) : 0;
             return (
@@ -592,14 +601,14 @@ export function TransactionForm({
                 <p className="text-[14px] font-semibold text-[var(--foreground)] sm:col-span-2">{say("coverTitle")}</p>
                 {onCar && kinds.length > 1 ? (
                   <label className="block sm:col-span-2">
-                    <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("coverWhich")}</span>
-                    <select className={inputClass} onChange={(event) => setPaperKind(event.target.value)} value={kind?.key || ""}>
-                      <option value="">{say("coverNotCar")}</option>
+                    <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say(type === "insurance" ? "coverInsuranceType" : "coverWhich")}</span>
+                    <select className={inputClass} onChange={(event) => setPaperKind(event.target.value)} value={kind?.key || "none"}>
                       {kinds.map((item) => (
                         <option key={item.key} value={item.key}>
                           {kindName(item)}
                         </option>
                       ))}
+                      <option value="none">{say(type === "insurance" ? "coverOtherInsurance" : "coverNotCar")}</option>
                     </select>
                   </label>
                 ) : null}
@@ -609,7 +618,18 @@ export function TransactionForm({
                     {say("coverFrom")}
                     <InfoTip label={say("coverFrom")} text={say("coverHint")} />
                   </span>
-                  <input className={inputClass} name="coverFrom" onChange={(event) => setCoverFrom(event.target.value)} type="date" value={coverFrom} />
+                  <input
+                    className={inputClass}
+                    name="coverFrom"
+                    onChange={(event) => {
+                      const from = event.target.value;
+                      // The end fills in a year on (most cover is yearly) until someone types their own.
+                      if (from && (!coverTo || coverTo === yearOn(coverFrom))) setCoverTo(yearOn(from));
+                      setCoverFrom(from);
+                    }}
+                    type="date"
+                    value={coverFrom}
+                  />
                 </label>
                 <label className="block">
                   <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("coverTo")}</span>

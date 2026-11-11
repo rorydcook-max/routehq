@@ -114,7 +114,8 @@ function safeFileName(fileName: string) {
 
 function documentStatus(categories: string[]) {
   const set = new Set(categories);
-  if (["passport", "driver_license", "selfie"].every((category) => set.has(category))) {
+  // An identity document and a driving licence; a selfie is optional (same rule as app/actions/customers.ts).
+  if ((set.has("passport") || set.has("national_id")) && set.has("driver_license")) {
     return "complete";
   }
   if (set.size === 0) {

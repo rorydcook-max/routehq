@@ -289,7 +289,8 @@ function PayScreen({
   const portal = pay.portalUrl || (pay.portalPath && typeof window !== "undefined" ? `${window.location.origin}${pay.portalPath}` : null);
   // PromptPay carries the exact amount; Wise and Revolut open the business's own link; a bank transfer opens
   // the customer's booking page, where the details are and a slip can be sent (and matched).
-  const promptPayText = method === "promptpay" && pay.promptpayId && currency === "THB" ? promptPayPayload(pay.promptpayId, shown) : null;
+  // The business's own uploaded QR always wins over one made from the PromptPay ID.
+  const promptPayText = method === "promptpay" && pay.promptpayId && !pay.promptpayQrUrl && currency === "THB" ? promptPayPayload(pay.promptpayId, shown) : null;
   const qrText = method === "promptpay" ? promptPayText : method === "wise" ? pay.wiseLink : method === "revolut" ? pay.revolutLink : portal;
   const staticQr = method === "promptpay" && !promptPayText ? pay.promptpayQrUrl : null;
 

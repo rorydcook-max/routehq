@@ -244,6 +244,35 @@ export function adminPasswordResetEmail(input: { link: string; words: EmailWords
   return { subject: "Reset your RoveHQ password", text, html };
 }
 
+// ── Team invites (app/actions/auth.ts inviteUser) ───────────────────────────────────────────────────────────────────
+
+/**
+ * "You're invited to join {business} on RoveHQ" (Rory, 9 Nov 2026: the invite arrived as Supabase's plain default).
+ * English for now, like the other account emails; it goes into the final translation pass.
+ */
+export function teamInviteEmail(input: { link: string; business: string; inviter: string | null; role: string; words: EmailWords }): BuiltEmail {
+  const { words } = input;
+  const who = input.inviter ? `${input.inviter} has invited you` : "You've been invited";
+  const intro = `Hi,\n\n${who} to join ${input.business} on RoveHQ as ${input.role}. It's where the team runs its bookings, vehicles and payments.\n\nTap the button to accept and choose your password.`;
+  const tail = "The invite works once. If it has run out, ask the person who invited you to send a new one.";
+  const subject = `You're invited to join ${input.business} on RoveHQ`;
+  const html = renderEmailHtml({
+    locale: words.locale,
+    preheader: `${who} to join ${input.business} on RoveHQ.`,
+    eyebrow: input.business,
+    heading: "You're invited",
+    blocks: [
+      { type: "text", text: intro },
+      { type: "card", rows: [{ label: "Business", value: input.business, tone: "strong" }, { label: "Your role", value: input.role }, ...(input.inviter ? [{ label: "Invited by", value: input.inviter }] : [])] },
+      { type: "fallback-link", intro: words.t("linkFallback"), url: input.link },
+      { type: "text", text: tail, tone: "muted" }
+    ],
+    button: { label: "Accept the invite", url: input.link },
+    footer: { reason: `You get this because someone invited this address to ${input.business} on RoveHQ. If you weren't expecting it, you can ignore this email.` }
+  });
+  return { subject, text: `${intro}\n\n${input.link}\n\n${tail}\n\nRoveHQ`, html };
+}
+
 export function adminEmailChangedEmail(input: { before: string | null; email: string; words: EmailWords }): BuiltEmail {
   const changed = `RoveHQ support changed the email address you sign in with${input.before ? ` from ${input.before}` : ""} to ${input.email}.`;
   const tail = "If you didn't ask for this, reply to this email or contact RoveHQ support straight away.";

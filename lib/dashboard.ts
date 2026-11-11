@@ -1,4 +1,5 @@
 import { computeVehicleFigures, type VehicleFigures } from "@/lib/fleet-metrics";
+import { loadVehicleChanges, type VehicleChangeRow } from "@/lib/rental-vehicle-periods";
 import { customers as seedCustomers, reminders as seedReminders, rentals as seedRentals, timeline as seedTimeline, transactions as seedTransactions, vehicles as seedVehicles } from "@/lib/data";
 import { calculateDashboardMetrics } from "@/lib/metrics";
 import { HANDED_OVER_STATUSES } from "@/lib/rental-balances";
@@ -98,6 +99,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     .in("rentals.status", HANDED_OVER_STATUSES)
     .lte("due_date", businessToday())
     .then((result: any) => result);
+  const changesQuery = loadVehicleChanges(supabase, organizationId).catch(() => [] as VehicleChangeRow[]);
   const [vehiclesResult, customersResult, rentalsResult, transactionsResult, remindersResult, eventsResult] = await Promise.all([
     supabase.from("vehicles").select("*").eq("organization_id", organizationId).is("deleted_at", null).order("created_at", { ascending: true }),
     supabase.from("customers").select("*").eq("organization_id", organizationId).is("deleted_at", null).order("created_at", { ascending: true }),
@@ -156,7 +158,8 @@ export async function getDashboardData(): Promise<DashboardData> {
   const figures = computeVehicleFigures({
     vehicles: vehiclesResult.data || [],
     rentals: rentalRows,
-    transactions: transactionsResult.data || []
+    transactions: transactionsResult.data || [],
+    changes: await changesQuery
   });
   const vehicles: Vehicle[] = (vehiclesResult.data || [])
     .map((row: any) => mapVehicle(row, figures.get(row.id)))

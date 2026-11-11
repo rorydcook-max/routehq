@@ -48,7 +48,7 @@ function RentalTimeline({ rentals, from, to, today, locale, statusLabel }: { ren
             className="grow-x absolute inset-y-1 rounded-full transition hover:brightness-110"
             data-tip={`${rental.customerName || statusLabel(rental.status)} · ${shortDate(rental.startDate, locale)}${rental.endDate ? ` – ${shortDate(rental.endDate, locale)}` : ""}`}
             href={`/bookings/${rental.id}` as never}
-            key={rental.id}
+            key={`${rental.id}-${rental.startDate}`}
             style={{ left: `${left}%`, width: `${width}%`, background: paint[kind], boxShadow: kind === "booked" ? "inset 0 0 0 2px var(--on-rent)" : "0 0 0 2px #fff" }}
           />
         ))}
@@ -224,7 +224,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
         ) : (
           <div className="mt-3 space-y-2">
             {data.rentals.map((rental) => (
-              <Link className={`${tile} pressable flex items-center justify-between gap-3`} href={`/bookings/${rental.id}` as any} key={rental.id}>
+              <Link className={`${tile} pressable flex items-center justify-between gap-3`} href={`/bookings/${rental.id}` as any} key={`${rental.id}-${rental.startDate}`}>
                 <span className="min-w-0">
                   <span className="block text-[16px] font-bold text-[var(--foreground)]">{rental.customerName || rental.displayCode || say("vr_aRental")}</span>
                   <span className={`block ${soft}`}>

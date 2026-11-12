@@ -6,6 +6,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createRentalDocumentSignedUrl } from "@/lib/rental-document-storage";
 import { recordActivityEventOnce } from "@/lib/supabase/activity";
 import { sendSignedAgreementCopy } from "@/lib/customer-copies";
+import { agreementDownload, makeSignedAgreementCopy } from "@/lib/rental-document-signed-copy";
 
 export const CUSTOMER_SIGNING_ACKNOWLEDGEMENTS = [
   {
@@ -303,7 +304,9 @@ export async function loadPublicRentalAgreementForPage(token: string) {
     downloadFor(ctx, "original").catch(() => null),
     downloadFor(ctx, "certificate").catch(() => null)
   ]);
-  return { agreement, downloads: { originalAgreementUrl, executionCertificateUrl } };
+  // The signed copy carries the signing record as its last page, so the separate one is only for older signings.
+  const hasSignedCopy = await agreementDownload(idsOf(ctx), ctx.version, 60).then((result) => result.signed, () => false);
+  return { agreement, downloads: { originalAgreementUrl, executionCertificateUrl: hasSignedCopy ? null : executionCertificateUrl } };
 }
 
 function agreementFor(ctx: Extract<LoadedContext, { state: "found" }>, eligibility: Awaited<ReturnType<typeof eligibilityFor>>) {
@@ -520,6 +523,26 @@ export async function completeRentalDocumentCustomerSigning({
     });
   }
 
+  // The agreement with both signatures on it, made now so the customer's download and email copy carry it.
+  const businessSigned = ctx.signatures.find((signature: any) => signature.signer_role === "authorised_business_signatory");
+  const signedCopy = await makeSignedAgreementCopy(ctx.supabase, {
+    organizationId: ctx.bookingLink.organization_id,
+    rentalId: ctx.rental.id,
+    documentId: ctx.document.id,
+    versionId: ctx.version.id,
+    version: ctx.version,
+    signatureDataUrl,
+    signerName: normalizedSigner,
+    signedAt: new Date().toISOString(),
+    timeZone: String((ctx.organization as any)?.timezone || "UTC"),
+    verificationReference,
+    business: {
+      name: String((ctx.organization as any)?.name || ""),
+      signer: businessSigned?.signer_name || null,
+      signedAt: businessSigned?.signed_at || null
+    }
+  });
+
   const executedVersion = ctx.version;
   after(() => recordActivityEventOnce(ctx.supabase, {
     organization_id: ctx.bookingLink.organization_id,
@@ -544,19 +567,25 @@ export async function completeRentalDocumentCustomerSigning({
       rentalId,
       documentId,
       versionId: version.id,
-      agreement: {
-        bucket: version.final_pdf_storage_bucket || version.pdf_storage_bucket,
-        path: version.final_pdf_storage_path || version.pdf_storage_path,
-        filename: "rental-agreement.pdf"
-      },
-      certificate: { bucket: "documents", path: certPath, filename: "execution-certificate.pdf" }
+      // The signed copy has the signing record as its last page, so it goes alone; without it, the two files as before.
+      agreement: signedCopy
+        ? { bucket: signedCopy.bucket, path: signedCopy.path, filename: "signed-rental-agreement.pdf" }
+        : {
+            bucket: version.final_pdf_storage_bucket || version.pdf_storage_bucket,
+            path: version.final_pdf_storage_path || version.pdf_storage_path,
+            filename: "rental-agreement.pdf"
+          },
+      certificate: signedCopy ? null : { bucket: "documents", path: certPath, filename: "execution-certificate.pdf" }
     }).catch((error: unknown) => console.error("[signing] sending the signed agreement failed", error))
   );
 
   // The customer's two download links, made here from what is already known (looking the booking up again
   // to make them took over a second).
   const [original, certificate] = await Promise.all([
-    createRentalDocumentSignedUrl(version.final_pdf_storage_bucket || version.pdf_storage_bucket, version.final_pdf_storage_path || version.pdf_storage_path, 10 * 60).catch(() => null),
+    (signedCopy
+      ? createRentalDocumentSignedUrl(signedCopy.bucket, signedCopy.path, 10 * 60)
+      : createRentalDocumentSignedUrl(version.final_pdf_storage_bucket || version.pdf_storage_bucket, version.final_pdf_storage_path || version.pdf_storage_path, 10 * 60)
+    ).catch(() => null),
     createRentalDocumentSignedUrl("documents", certPath, 10 * 60).catch(() => null)
   ]);
 
@@ -575,8 +604,18 @@ export async function getCustomerExecutedAgreementDownloads(token: string): Prom
 
 async function downloadFor(ctx: Extract<LoadedContext, { state: "found" }>, kind: "original" | "certificate") {
   if (!ctx.version || !ctx.certificate) throw new Error("Executed agreement is not available.");
-  const bucket = kind === "certificate" ? ctx.certificate.certificate_storage_bucket : (ctx.version.final_pdf_storage_bucket || ctx.version.pdf_storage_bucket);
-  const path = kind === "certificate" ? ctx.certificate.certificate_storage_path : (ctx.version.final_pdf_storage_path || ctx.version.pdf_storage_path);
+  // The agreement is the signed copy (both signatures and the signing record) once it exists.
+  if (kind === "original") {
+    const { url } = await agreementDownload(idsOf(ctx), ctx.version);
+    if (!url) throw new Error("Download is not available.");
+    return url;
+  }
+  const bucket = ctx.certificate.certificate_storage_bucket;
+  const path = ctx.certificate.certificate_storage_path;
   if (!bucket || !path) throw new Error("Download is not available.");
   return createRentalDocumentSignedUrl(bucket, path, 10 * 60);
+}
+
+function idsOf(ctx: Extract<LoadedContext, { state: "found" }>) {
+  return { organizationId: ctx.bookingLink.organization_id, rentalId: ctx.rental!.id, documentId: ctx.document!.id, versionId: ctx.version!.id };
 }

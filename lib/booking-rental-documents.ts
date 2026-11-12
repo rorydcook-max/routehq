@@ -1,3 +1,4 @@
+import { agreementDownload } from "@/lib/rental-document-signed-copy";
 import { createRentalDocumentSignedUrl } from "@/lib/rental-document-storage";
 
 // The operator's view of the legally relevant documents on a booking:
@@ -92,6 +93,7 @@ export async function getBookingRentalDocuments(supabase: any, organizationId: s
       const version = document.current_version_id ? versions.get(document.current_version_id) : null;
       const certificate = version ? certificates.get(version.id) : null;
       const isFinal = version && ["finalised", "signed"].includes(String(version.status));
+      const download = isFinal ? await agreementDownload({ organizationId, rentalId, documentId: document.id, versionId: version.id }, version) : null;
       const signatures = version
         ? (signaturesResult.data || [])
             .filter((signature: any) => signature.document_version_id === version.id)
@@ -112,10 +114,10 @@ export async function getBookingRentalDocuments(supabase: any, organizationId: s
         versionNumber: version?.version_number ?? null,
         finalisedAt: version?.finalised_at || document.finalised_at || null,
         contentHash: isFinal ? version.content_hash || null : null,
-        pdfUrl: isFinal
-          ? await signedUrl(version.final_pdf_storage_bucket || version.pdf_storage_bucket, version.final_pdf_storage_path || version.pdf_storage_path)
-          : null,
-        certificateUrl: certificate ? await signedUrl(certificate.certificate_storage_bucket, certificate.certificate_storage_path) : null,
+        // The signed copy (both signatures, the signing record as its last page) when there is one.
+        pdfUrl: download?.url || null,
+        // The separate signing record is only offered for agreements signed before the signed copy existed.
+        certificateUrl: certificate && !download?.signed ? await signedUrl(certificate.certificate_storage_bucket, certificate.certificate_storage_path) : null,
         verificationReference: certificate?.verification_reference || null,
         signatures
       };

@@ -48,7 +48,7 @@ function daysBetween(from: string, to: string) {
 }
 
 // (see locales/<language>/common.json for the wording)
-type Tone = "red" | "amber" | "teal" | "blue" | "neutral";
+type Tone = "red" | "amber" | "teal" | "blue" | "neutral" | "green";
 
 type AgendaItem = {
   key: string;
@@ -68,17 +68,21 @@ const TONE_CLASSES: Record<Tone, string> = {
   amber: "bg-[var(--warning-light)] text-[var(--warning)]",
   teal: "bg-[var(--primary-light)] text-[var(--primary)]",
   blue: "bg-[var(--info-light)] text-[var(--info)]",
-  neutral: "bg-[var(--panel-tertiary)] text-[var(--muted)]"
+  neutral: "bg-[var(--panel-tertiary)] text-[var(--muted)]",
+  green: "bg-[var(--success-light)] text-[var(--success)]"
 };
 
 function AgendaRow({ item, art, card = false, delay }: { item: AgendaItem; art?: ReactNode; card?: boolean; delay?: number }) {
   // The pressing ones get a solid button; the rest are outlined so a list of eight is not a wall of colour.
   const solid = item.tone === "red" || item.tone === "teal";
+  // Something finished: a soft green row with a green button, so good news reads at a glance.
+  const done = item.tone === "green";
+  const button = solid ? "bg-[var(--primary)] text-white" : done ? "border-2 border-[var(--success)] bg-white text-[var(--success)]" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]";
   return (
     <li className={delay === undefined ? undefined : "rise"} style={delay === undefined ? undefined : ({ ["--d" as string]: `${delay}ms` } as CSSProperties)}>
-      <Link className={`group flex items-center gap-3.5 transition ${card ? "card pressable p-3" : "px-4 py-3.5 hover:bg-[var(--panel-secondary)]"}`} href={item.href as Route}>
+      <Link className={`group flex items-center gap-3.5 transition ${card ? "card pressable p-3" : "px-4 py-3.5 hover:bg-[var(--panel-secondary)]"} ${done ? "done-row bg-[var(--success-light)]" : ""}`} href={item.href as Route}>
         {/* Phones drop the picture so the words get the width; a coloured bar at the start keeps the urgency visible. */}
-        <span className={`w-1 self-stretch rounded-full sm:hidden ${item.tone === "red" ? "bg-[var(--danger)]" : item.tone === "amber" ? "bg-[var(--warning)]" : item.tone === "teal" ? "bg-[var(--primary)]" : "bg-[var(--border-strong)]"}`} />
+        <span className={`w-1 self-stretch rounded-full sm:hidden ${item.tone === "red" ? "bg-[var(--danger)]" : item.tone === "amber" ? "bg-[var(--warning)]" : item.tone === "teal" ? "bg-[var(--primary)]" : done ? "bg-[var(--success)]" : "bg-[var(--border-strong)]"}`} />
         <span className="hidden sm:contents">
           {art || <span className={`inline-flex flex-shrink-0 items-center justify-center ${card ? "h-11 w-14 rounded-xl" : "h-10 w-14 rounded-xl"} ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>}
         </span>
@@ -89,11 +93,11 @@ function AgendaRow({ item, art, card = false, delay }: { item: AgendaItem; art?:
             {item.when ? <span className={item.tone === "red" ? "font-bold text-[var(--danger)]" : ""}> · {item.when}</span> : null}
           </span>
           {/* Phones: the button sits under the words, so the title gets the whole width instead of wrapping beside it. */}
-          <span className={`mt-2 inline-flex min-h-9 items-center justify-center rounded-full px-4 text-[15px] font-bold sm:hidden ${solid ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}>
+          <span className={`mt-2 inline-flex min-h-9 items-center justify-center rounded-full px-4 text-[15px] font-bold sm:hidden ${button}`}>
             {item.action}
           </span>
         </span>
-        <span className={`hidden min-h-10 min-w-[104px] flex-shrink-0 items-center justify-center rounded-full px-4 text-[15px] font-bold sm:inline-flex ${solid ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}>
+        <span className={`hidden min-h-10 min-w-[104px] flex-shrink-0 items-center justify-center rounded-full px-4 text-[15px] font-bold sm:inline-flex ${button}`}>
           {item.action}
         </span>
       </Link>
@@ -139,7 +143,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     todo,
     bookingsT,
     [onboardingStatus, categories],
-    [receiptsWaiting, taskList, unsentResult],
+    [receiptsWaiting, taskList, unsentResult, doneRows],
     [channelsResult, chatsResult, unreadResult, onRentCount, startingCount, owingCount]
   ] = await Promise.all([
     holdsEndingSoon(createSupabaseAdminClient(), homeOrg.id).catch(() => []),
@@ -166,7 +170,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString())
         .order("created_at", { ascending: false })
         .limit(50)
-        .then((result: any) => ({ ...result, data: (result?.data || []).filter((row: any) => !row.metadata?.superseded) }), () => ({ data: [] }))
+        .then((result: any) => ({ ...result, data: (result?.data || []).filter((row: any) => !row.metadata?.superseded) }), () => ({ data: [] })),
+      recentlyDone(db, homeOrg.id).catch(() => [])
     ]),
     // Messages and bookings at a glance (Rory, 31 Oct 2026): the latest chats with what's new, and the three booking
     // counts the Bookings page leads with (same rules, same links).
@@ -451,7 +456,21 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       todayItems.push({ key: `rem-${reminder.id}`, rank: 5, tone: "neutral", icon: <Bell size={17} />, title: reminder.title, detail: reminder.target, href: "/tasks", action: t("open") });
     }
   }
-  const toneOrder: Record<Tone, number> = { red: 0, amber: 1, teal: 2, blue: 3, neutral: 4 };
+  // What was finished lately (Rory, 12 Nov 2026: "X completed, view now"), green, after anything late.
+  for (const done of doneRows) {
+    const who = done.customer || t("doneSomeone");
+    todayItems.push({
+      key: `done-${done.kind}-${done.rentalId}`,
+      rank: 0.5,
+      tone: "green",
+      icon: <CheckCircle2 size={17} />,
+      title: done.kind === "booking" ? t("doneBooking", { customer: who }) : done.kind === "handover" ? t("doneHandover", { vehicle: done.vehicle || who }) : done.kind === "return" ? t("doneReturn", { vehicle: done.vehicle || who }) : t("doneReportSigned", { customer: who }),
+      detail: [done.kind === "booking" ? done.vehicle : who, chatWhen(done.at)].filter(Boolean).join(" · "),
+      href: `/bookings/${done.rentalId}`,
+      action: t("doneView")
+    });
+  }
+  const toneOrder: Record<Tone, number> = { red: 0, amber: 1, teal: 2, blue: 3, neutral: 4, green: 5 };
   // By kind first (a late return and today's handovers before admin jobs, however overdue those are), then by urgency.
   todayItems.sort((a, b) => (a.rank ?? 4) - (b.rank ?? 4) || toneOrder[a.tone] - toneOrder[b.tone]);
   upcomingItems.sort((a, b) => a.sort.localeCompare(b.sort));
@@ -963,4 +982,44 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
 
     </AppShell>
   );
+}
+
+/** Forms and checks finished in the last 18 hours: shown green at the top of Today, each opening its booking. */
+async function recentlyDone(db: any, organizationId: string) {
+  const since = new Date(Date.now() - 18 * 3_600_000).toISOString();
+  const { data: events } = await db
+    .from("activity_events")
+    .select("event_type, rental_id, created_at")
+    .eq("organization_id", organizationId)
+    .in("event_type", ["booking_completed", "rental_document_fully_executed", "delivery_inspection_completed", "return_inspection_completed", "inspection_signed_by_customer"])
+    .not("rental_id", "is", null)
+    .gte("created_at", since)
+    .order("created_at", { ascending: false })
+    .limit(30);
+  const kindOf = (type: string) =>
+    type === "delivery_inspection_completed" ? "handover" : type === "return_inspection_completed" ? "return" : type === "inspection_signed_by_customer" ? "report" : "booking";
+  // One row per booking and kind: the booking form and its signed agreement are one thing done.
+  const seen = new Set<string>();
+  const rows = ((events || []) as any[]).filter((event) => {
+    const key = `${kindOf(event.event_type)}:${event.rental_id}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 4);
+  if (!rows.length) return [];
+  const { data: rentals } = await db
+    .from("rentals")
+    .select("id, customers!rentals_customer_id_fkey(full_name), vehicles!rentals_vehicle_id_fkey(make, model)")
+    .in("id", rows.map((row) => row.rental_id));
+  const byId = new Map(((rentals || []) as any[]).map((rental) => [rental.id, rental]));
+  return rows.map((row) => {
+    const rental: any = byId.get(row.rental_id);
+    return {
+      kind: kindOf(row.event_type) as "booking" | "handover" | "return" | "report",
+      rentalId: String(row.rental_id),
+      at: String(row.created_at),
+      customer: rental?.customers?.full_name ? String(rental.customers.full_name) : null,
+      vehicle: rental?.vehicles ? [rental.vehicles.make, rental.vehicles.model].filter(Boolean).join(" ") : null
+    };
+  });
 }

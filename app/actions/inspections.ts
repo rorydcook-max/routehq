@@ -1158,6 +1158,16 @@ async function submitInspectionOrThrow(formData: FormData) {
     revalidatePath("/tasks");
   }
 
+  // A handover finished on someone's phone reaches the owner too (Rory, 12 Nov 2026), linked to the booking.
+  if (mode === "delivery" && !isSwap) {
+    notifyOperator(
+      organizationId,
+      { emoji: "🔑", key: "handoverComplete", values: { vehicle: vehicleLabel || null, customer: customerName || null } },
+      "handover_inspection",
+      rentalId ? `/bookings/${rentalId}` : "/"
+    ).catch(() => null);
+  }
+
   if (mode === "return" && !isSwap) {
     notifyOperator(
       organizationId,

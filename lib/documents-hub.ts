@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createRentalDocumentSignedUrl } from "@/lib/rental-document-storage";
+import { agreementDownload } from "@/lib/rental-document-signed-copy";
 
 export type DocumentListItem = {
   id: string;
@@ -203,11 +204,7 @@ export async function getDocumentList(organizationId: string, limit = 150, optio
         // document service like on the booking page.
         fileUrl: fileUrl(`rental-document-${row.id}`),
         signedUrl: version && signLinks
-          ? await createRentalDocumentSignedUrl(
-              version.final_pdf_storage_bucket || version.pdf_storage_bucket || "documents",
-              version.final_pdf_storage_path || version.pdf_storage_path,
-              60 * 60
-            ).catch(() => null)
+          ? (await agreementDownload({ organizationId, rentalId: row.rental_id, documentId: row.id, versionId: version.id }, version, 60 * 60)).url
           : null,
         href: `/bookings/${row.rental_id}`
       };
@@ -256,7 +253,7 @@ export async function signDocumentFile(organizationId: string, id: string, expir
     if (!UUID.test(documentId)) return null;
     const { data: row } = await supabase
       .from("rental_documents")
-      .select("current_version_id")
+      .select("current_version_id, rental_id")
       .eq("id", documentId)
       .eq("organization_id", organizationId)
       .in("status", ["signed", "finalised"])
@@ -267,9 +264,8 @@ export async function signDocumentFile(organizationId: string, id: string, expir
       .select("final_pdf_storage_bucket, final_pdf_storage_path, pdf_storage_bucket, pdf_storage_path")
       .eq("id", row.current_version_id)
       .maybeSingle();
-    const path = version?.final_pdf_storage_path || version?.pdf_storage_path;
-    if (!path) return null;
-    return createRentalDocumentSignedUrl(version.final_pdf_storage_bucket || version.pdf_storage_bucket || "documents", path, expiresIn).catch(() => null);
+    if (!version) return null;
+    return (await agreementDownload({ organizationId, rentalId: row.rental_id, documentId, versionId: row.current_version_id }, version, expiresIn)).url;
   }
   if (id.startsWith("receipt-")) {
     const receiptId = id.slice("receipt-".length);

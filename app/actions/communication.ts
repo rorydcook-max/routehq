@@ -127,6 +127,30 @@ export async function sendApprovedCustomerMessage(id: string): Promise<{ ok: boo
   return { ok: true, sent: result.sent };
 }
 
+/**
+ * The owner closed a ready-made message without sending it (Rory, 12 Nov 2026: "Done" was unclear). It stops showing,
+ * and the record says it was not sent.
+ */
+export async function dismissCustomerMessage(id: string) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("You must be signed in.");
+  // Read and written with the member's own access, so only their business's messages can be touched.
+  const { data: entry } = await supabase.from("communication_log").select("id, rental_id, metadata").eq("id", id).maybeSingle();
+  if (!entry) return { ok: false };
+  const { error } = await supabase
+    .from("communication_log")
+    .update({ metadata: { ...(entry.metadata || {}), superseded: true, dismissed_by_hand: true, dismissed_at: new Date().toISOString(), dismissed_by: user.id } })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+  if (entry.rental_id) revalidatePath(`/bookings/${entry.rental_id}`);
+  revalidatePath("/");
+  revalidatePath("/inbox");
+  return { ok: true };
+}
+
 /** The owner sent a ready-made customer message themselves (or decided it isn't needed): it stops showing as waiting. */
 export async function markCustomerMessageSent(id: string) {
   const supabase = (await createSupabaseServerClient()) as any;

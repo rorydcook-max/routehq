@@ -3,9 +3,9 @@
 import { InfoTip } from "@/components/info-tip";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Check, Copy, Send } from "lucide-react";
+import { Check, Copy, Send, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { markCustomerMessageSent, sendApprovedCustomerMessage } from "@/app/actions/communication";
+import { dismissCustomerMessage, markCustomerMessageSent, sendApprovedCustomerMessage } from "@/app/actions/communication";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -45,10 +45,18 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
   const open = messages.filter((message) => !done.includes(message.id));
   if (open.length === 0) return null;
 
+  /** Sent: tapping "Send on WhatsApp" opens the app with the words in it, so it counts as sent; after copying, "Mark as sent". */
   function finish(...ids: string[]) {
     setDone((current) => [...current, ...ids]);
     startTransition(async () => {
       await Promise.all(ids.map((id) => markCustomerMessageSent(id).catch(() => null)));
+    });
+  }
+  /** Closed without sending: it goes away and is recorded as not sent. */
+  function close(...ids: string[]) {
+    setDone((current) => [...current, ...ids]);
+    startTransition(async () => {
+      await Promise.all(ids.map((id) => dismissCustomerMessage(id).catch(() => null)));
     });
   }
   // The newest message says what's current; older ones for the same booking fold away under it.
@@ -90,18 +98,25 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
                   </button>
                 ) : null}
                 {message.url ? (
-                  <a className={`${message.ask && !byHand.includes(message.id) ? "secondary-action" : "primary-action"} pressable min-h-11 px-3 text-sm`} href={message.url} rel="noreferrer" target="_blank">
+                  <a className={`${message.ask && !byHand.includes(message.id) ? "secondary-action" : "primary-action"} pressable min-h-11 px-3 text-sm`} data-send={message.id} href={message.url} onClick={() => finish(message.id)} rel="noreferrer" target="_blank">
                     <Send size={16} />
                     {say(`unsent_${app}`)}
                   </a>
                 ) : null}
-                <button className={`${message.url ? "secondary-action" : "primary-action"} pressable min-h-11 px-3 text-sm`} onClick={() => copy(message)} type="button">
-                  <Copy size={16} />
-                  {copied === message.id ? say("unsentCopied") : say("unsentCopy")}
-                </button>
-                <button className="secondary-action pressable min-h-11 px-3 text-sm" disabled={pending} onClick={() => finish(message.id)} type="button">
-                  <Check size={16} />
-                  {say("unsentDone")}
+                {copied === message.id ? (
+                  <button className="primary-action pressable min-h-11 px-3 text-sm" data-mark-sent={message.id} disabled={pending} onClick={() => finish(message.id)} type="button">
+                    <Check size={16} />
+                    {say("unsentMarkSent")}
+                  </button>
+                ) : (
+                  <button className={`${message.url ? "secondary-action" : "primary-action"} pressable min-h-11 px-3 text-sm`} data-copy={message.id} onClick={() => copy(message)} type="button">
+                    <Copy size={16} />
+                    {say("unsentCopy")}
+                  </button>
+                )}
+                <button className="secondary-action pressable min-h-11 px-3 text-sm" data-close={message.id} disabled={pending} onClick={() => close(message.id)} type="button">
+                  <X size={16} />
+                  {say("unsentClose")}
                 </button>
               </div>
             </div>
@@ -120,7 +135,7 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
                 </p>
               ))}
             </div>
-            <button className="secondary-action pressable mt-2.5 min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={pending} onClick={() => finish(...earlier.map((message) => message.id))} type="button">
+            <button className="secondary-action pressable mt-2.5 min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={pending} onClick={() => close(...earlier.map((message) => message.id))} type="button">
               <Check size={16} />
               {say("unsentClearEarlier")}
             </button>

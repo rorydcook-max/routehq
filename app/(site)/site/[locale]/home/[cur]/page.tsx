@@ -19,7 +19,8 @@ import { CATEGORY_KEY, JsonLd } from "../../_components/content-ui";
 import { FinalCta } from "../../_components/final-cta";
 import { HowTabs } from "../../_components/how-tabs";
 import { TimeCalc } from "../../_components/time-calc";
-import { ArrowRight, BellRing, Bike, CalendarDays, CalendarX2, CarFront, CircleCheck, CircleHelp, FileCheck2, Gift, Inbox, Keyboard, Languages, Link2, MessagesSquare, ReceiptText, ScanSearch, Smartphone, TrendingUp, Upload, Users, Zap } from "lucide-react";
+import { FeatureExplorer } from "../../_components/feature-explorer";
+import { ArrowLeftRight, ArrowRight, BellRing, Bike, BookOpen, Calculator, CalendarCheck, CalendarDays, CalendarX2, Camera, CarFront, CircleCheck, CircleHelp, ClipboardList, Code, CreditCard, FileCheck2, FileSignature, FileText, FolderOpen, Globe, Handshake, Inbox, Keyboard, Languages, LifeBuoy, Link2, MessagesSquare, Percent, ReceiptText, Repeat, Rocket, ScanLine, ScanSearch, ShieldCheck, Smartphone, Star, Store, Sunrise, TrendingUp, Upload, Users, Wallet, Wrench, Zap } from "lucide-react";
 import s from "../../site.module.css";
 import h from "../../home.module.css";
 import c from "../../content.module.css";
@@ -34,8 +35,15 @@ const GLOBAL_VARIANTS = new Set(["heroBody", "step1Body", "step3Title", "step3Bo
 
 /** A picture for each line of the home page, in the order the lines are written. */
 const NEVER_ICONS = [Keyboard, MessagesSquare, CircleHelp, ScanSearch, CalendarX2];
-const FACT_ICONS = [Gift, Smartphone, Languages, Link2];
-const REST_ICONS = [BellRing, CalendarDays, Inbox, FileCheck2, TrendingUp, ReceiptText, Users, Upload];
+/** The tools, sorted into the parts of the job. The words are marketing.fx_<group>_<n>t and _<n>b; "soon" marks one not out yet. */
+const FEATURES: Array<{ key: string; Icon: typeof Keyboard; icons: Array<typeof Keyboard>; soon?: number }> = [
+  { key: "book", Icon: CalendarCheck, icons: [Link2, Store, Code, CalendarDays, FileSignature, BellRing] },
+  { key: "pay", Icon: CreditCard, icons: [ScanLine, ShieldCheck, Repeat, ReceiptText, CreditCard], soon: 5 },
+  { key: "fleet", Icon: CarFront, icons: [Camera, ScanSearch, FileCheck2, Wrench, ArrowLeftRight, FolderOpen] },
+  { key: "money", Icon: TrendingUp, icons: [Wallet, TrendingUp, Percent, ClipboardList, FileText, Calculator] },
+  { key: "grow", Icon: Rocket, icons: [Globe, Handshake, Star, Languages, BookOpen] },
+  { key: "team", Icon: Users, icons: [Users, Inbox, Sunrise, Upload, Smartphone, LifeBuoy] }
+];
 /** Who it is for: a door to the page for each kind of rental business. */
 const WHO = [
   { key: "whoCars", href: SITE_LINKS.carRental, Icon: CarFront },
@@ -76,6 +84,9 @@ export default async function SiteHomePage({ params }: Props) {
   const say = settings as unknown as Say;
   const nl = numberLocale(locale);
   const price = (amount: number) => formatPlanPrice(amount, currency, nl);
+  // The sum's "what an hour is worth" slider, scaled to this currency from the Pro plan's price (15 where Pro is 30).
+  const proMonthly = planPrices(PLANS.find((plan) => plan.id === "pro") || PLANS[0], currency).monthly || 30;
+  const worthStep = Math.max(1, Math.pow(10, Math.floor(Math.log10(proMonthly))) / 10);
   // The summary's time the way the visitor writes it (sites-global): the page is drawn ahead per language and
   // currency, so English uses the 12-hour clock where that currency's countries do (7:00 AM) and 07:00 elsewhere.
   const TWELVE_HOUR = ["USD", "CAD", "AUD", "NZD", "PHP", "INR"];
@@ -204,20 +215,6 @@ export default async function SiteHomePage({ params }: Props) {
               </ol>
             </div>
           </div>
-          <ul className={h.facts}>
-            {[1, 2, 3, 4].map((n) => {
-              const Icon = FACT_ICONS[n - 1];
-              return (
-                <li className={h.fact} key={n}>
-                  <span aria-hidden="true" className={h.factIcon}>
-                    <Icon size={22} />
-                  </span>
-                  <strong>{m(`fact${n}Title`)}</strong>
-                  <span>{m(`fact${n}Body`)}</span>
-                </li>
-              );
-            })}
-          </ul>
         </Container>
       </section>
 
@@ -258,8 +255,32 @@ export default async function SiteHomePage({ params }: Props) {
         </Container>
       </section>
 
+      {/* 3b. Everything in it: the tools, sorted into the parts of the job, one group on screen at a time */}
+      <section className={s.section} id="features">
+        <Container>
+          <div className={`${s.head} ${h.centre}`}>
+            <Eyebrow>{m("fxEyebrow")}</Eyebrow>
+            <h2 className={s.h2}>{m.rich("fxTitle", RICH)}</h2>
+            <p className={s.lede}>{m("fxLede")}</p>
+          </div>
+          <FeatureExplorer
+            groups={FEATURES.map((group) => ({
+              key: group.key,
+              label: m(`fx_${group.key}`),
+              icon: <group.Icon size={18} />,
+              items: group.icons.map((Icon, index) => ({
+                title: m(`fx_${group.key}_${index + 1}t`),
+                body: m(`fx_${group.key}_${index + 1}b`),
+                icon: <Icon size={22} />,
+                soon: group.soon === index + 1 ? m("fxSoon") : undefined
+              }))
+            }))}
+          />
+        </Container>
+      </section>
+
       {/* 4. The sum: the visitor's own numbers, and the hours they add up to */}
-      <section className={s.section}>
+      <section className={`${s.mist} ${s.section}`}>
         <Container>
           <TimeCalc
             action={
@@ -267,7 +288,8 @@ export default async function SiteHomePage({ params }: Props) {
                 {m("heroCta")} <Arrow />
               </SiteLink>
             }
-            words={{ title: m("calcTitle"), lede: m("calcLede"), bookings: m("calcBookings"), minutes: m("calcMinutes"), hours: m("calcHours"), days: m("calcDays"), note: m("calcNote") }}
+            words={{ title: m("calcTitle"), lede: m("calcLede"), bookings: m("calcBookings"), minutes: m("calcMinutes"), worth: m("calcWorth"), hours: m("calcHours"), days: m("calcDays"), value: m("calcValue"), note: m("calcNote") }}
+            worth={{ currency, locale: nl, start: Math.round(proMonthly / 2 / worthStep) * worthStep, min: worthStep * 5, max: Math.round((proMonthly * 2) / worthStep) * worthStep, step: worthStep }}
           />
         </Container>
       </section>
@@ -364,30 +386,6 @@ export default async function SiteHomePage({ params }: Props) {
           <div>
             <ShopPageMock />
           </div>
-        </Container>
-      </section>
-
-      {/* 7. The rest of the job: eight tiles, a picture and a line each */}
-      <section className={s.section}>
-        <Container>
-          <div className={`${s.head} ${h.centre}`}>
-            <h2 className={s.h2}>{m("restTitle")}</h2>
-            <p className={s.lede}>{m("restBody")}</p>
-          </div>
-          <ul className={h.rest}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => {
-              const Icon = REST_ICONS[n - 1];
-              return (
-                <li className={h.restItem} key={n}>
-                  <span aria-hidden="true" className={h.restIcon}>
-                    <Icon size={24} />
-                  </span>
-                  <h3>{m(`rest${n}Title`)}</h3>
-                  <p>{m(`rest${n}Body`)}</p>
-                </li>
-              );
-            })}
-          </ul>
         </Container>
       </section>
 

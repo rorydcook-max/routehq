@@ -218,3 +218,39 @@ section.heroTight > div > div:nth-child(2) { margin-top: clamp(36px, 4vw, 52px);
 
 /* The fact tile's icon is a span too: keep it a white picture on its coloured square. */
 .fact .factIcon { display: inline-flex; margin-top: 0; color: #ffffff; }
+
+/* ---- Everything in it: the tools, one part of the job at a time ---- */
+.fx { margin-top: 36px; }
+.fxTabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.fxTab {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 50px; padding: 7px 16px 7px 7px; border-radius: 999px;
+  font: inherit; font-size: 16px; font-weight: 700; color: #1e1b4b; background: #ffffff; border: 1.500px solid rgba(30, 27, 75, 0.14); cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+.fxTab:hover { border-color: #6226ab; }
+.fxTabIcon { display: inline-flex; height: 36px; width: 36px; align-items: center; justify-content: center; border-radius: 999px; background: #eee7fa; color: #6226ab; }
+.fxCount { font-size: 13px; font-weight: 700; color: #8a86ad; font-variant-numeric: tabular-nums; }
+.fxTabOn { color: #ffffff; border-color: transparent; background: #1e1b4b; box-shadow: 0 14px 30px -14px rgba(30, 27, 75, 0.8); }
+.fxTabOn .fxTabIcon { color: #ffffff; background: linear-gradient(135deg, #6226ab, #e73582 70%, #ff7438); }
+.fxTabOn .fxCount { color: rgba(255, 255, 255, 0.7); }
+.fxGrid { display: grid; gap: 14px; margin: 28px 0 0; padding: 0; list-style: none; }
+.fxGrid[hidden] { display: none; }
+@media (min-width: 700px) { .fxGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1040px) { .fxGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; } }
+.fxItem {
+  display: flex; align-items: flex-start; gap: 16px; padding: 20px; border-radius: 24px; background: #ffffff;
+  border: 1px solid rgba(30, 27, 75, 0.08); box-shadow: 0 14px 34px -22px rgba(98, 38, 171, 0.3); transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.fxItem:hover { transform: translateY(-3px); box-shadow: 0 22px 44px -22px rgba(98, 38, 171, 0.45); }
+.fxIcon { display: inline-flex; height: 48px; width: 48px; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 15px; color: #ffffff; background: linear-gradient(135deg, #6226ab, #e73582); }
+.fxItem:nth-child(4n + 2) .fxIcon { background: linear-gradient(135deg, #2f6bff, #7b45e6); }
+.fxItem:nth-child(4n + 3) .fxIcon { background: linear-gradient(135deg, #e73582, #ff7438); }
+.fxItem:nth-child(4n + 4) .fxIcon { background: linear-gradient(135deg, #17845a, #22c8ee); }
+.fxText { min-width: 0; }
+.fxText strong { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; color: #1e1b4b; }
+.fxText > span { display: block; margin-top: 4px; font-size: 15px; line-height: 1.45; color: #56527f; }
+.fxSoon { padding: 3px 9px; border-radius: 999px; font-size: 12px; font-style: normal; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #a4480f; background: #ffe9d6; }
+
+/* ---- The sum: two results under the big number ---- */
+.calcFacts { display: grid; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; font-size: 16px; color: rgba(255, 255, 255, 0.82); }
+.calcFacts strong { color: #ffb66b; font-size: 19px; }

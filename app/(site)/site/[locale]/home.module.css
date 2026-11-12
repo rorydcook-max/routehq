@@ -254,3 +254,28 @@ section.heroTight > div > div:nth-child(2) { margin-top: clamp(36px, 4vw, 52px);
 /* ---- The sum: two results under the big number ---- */
 .calcFacts { display: grid; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; font-size: 16px; color: rgba(255, 255, 255, 0.82); }
 .calcFacts strong { color: #ffb66b; font-size: 19px; }
+
+/* ---- The explorer's pitch panel: wide pictures (a window, not a phone), and the tiles under it ---- */
+.howText { min-width: 0; }
+@media (min-width: 900px) { .fxPanelWide { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); } }
+.fxVisualWide { min-width: 0; }
+.fx .howPanel { background: #ffffff; box-shadow: 0 24px 60px -36px rgba(98, 38, 171, 0.45); }
+.fx .fxGrid { margin-top: 18px; }
+
+/* ---- What the businesses using it say ---- */
+.said { display: grid; gap: 18px; margin: 40px 0 0; padding: 0; list-style: none; }
+@media (min-width: 960px) { .said { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; } }
+.saidCard { display: flex; flex-direction: column; padding: 28px; border-radius: 28px; background: #ffffff; border: 1px solid rgba(30, 27, 75, 0.08); box-shadow: 0 20px 50px -30px rgba(98, 38, 171, 0.45); }
+.stars { display: inline-flex; gap: 3px; color: #ffb020; }
+.saidLead { margin: 16px 0 0; font-size: 21px; font-weight: 800; line-height: 1.25; letter-spacing: -0.015em; color: #1e1b4b; }
+.saidQuote { margin: 12px 0 0; padding: 0; border: 0; font-size: 15.500px; line-height: 1.55; color: #45416e; }
+.saidBy { display: flex; align-items: center; gap: 12px; margin: 22px 0 0; }
+.saidBy strong { display: block; font-size: 16px; color: #1e1b4b; }
+.saidBy span span { display: block; font-size: 14px; color: #6a6690; }
+.saidMark { display: inline-flex; height: 44px; width: 44px; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 999px; font-size: 18px; font-weight: 800; color: #ffffff; background: linear-gradient(135deg, #6226ab, #e73582 70%, #ff7438); }
+
+/* In the explorer the picture sits beside a short pitch, so the phone is smaller than in a full step. */
+.fx .howVisual > :first-child { width: min(50%, 230px); }
+.fx .howVisual > :nth-child(2) { width: min(46%, 270px); }
+@media (min-width: 900px) { .fx .howPanel { padding: 36px 48px; } }
+@media (max-width: 640px) { .fx .howVisual > :first-child { width: min(72%, 240px); } }

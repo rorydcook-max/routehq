@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { BarChart3, CalendarDays, Camera, Car, Check, ChevronLeft, FileSpreadsheet, FileText, Home, Inbox, ListTodo, Plus, Users } from "lucide-react";
+import { BarChart3, CalendarDays, Camera, Car, Check, ChevronLeft, CreditCard, FileSpreadsheet, FileText, Home, Inbox, ListTodo, Plus, Users } from "lucide-react";
 import { numberLocale } from "@/lib/i18n/dates";
 import { formatPlanPrice } from "@/lib/plan-currency";
 import { sampleAmount } from "@/lib/site-currency";
@@ -562,10 +562,15 @@ export async function PaymentPhoneMock({ className = "" }: { className?: string 
             <p className="mt-[0.1em] text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
               {pajeroTotal}
             </p>
-            <div className="mx-auto mt-[0.8em] w-[62%] rounded-[0.8em] border-[0.15em] border-[#e6eaef] p-[0.5em]">
+            <div className="mx-auto mt-[0.6em] w-[46%] rounded-[0.8em] border-[0.15em] border-[#e6eaef] p-[0.5em]">
               <FakeQr className="block w-full" />
             </div>
             <p className="mt-[0.6em] text-[0.95em] font-bold tracking-[0.02em] text-[#1f4f7a]">{qrName}</p>
+            {/* Card is always there too (Stripe): the QR code or the transfer is the local way to pay. */}
+            <div className="mt-[0.7em] flex items-center justify-center gap-[0.5em] rounded-full bg-[#1e1b4b] py-[0.6em] font-bold text-white">
+              <CreditCard className="h-[1.2em] w-[1.2em]" strokeWidth={2.2} />
+              {t("mockPayByCard")}
+            </div>
           </div>
         ) : (
           // Outside Asia: the booking's payment request with the business's transfer details and its Wise and Revolut
@@ -590,6 +595,11 @@ export async function PaymentPhoneMock({ className = "" }: { className?: string 
             <div className="mt-[0.8em] grid min-w-0 grid-cols-2 gap-[0.5em] [&>span]:min-w-0 [&>span]:px-[0.4em]">
               <Pill>Wise</Pill>
               <Pill>Revolut</Pill>
+            </div>
+            {/* Card is always there too (Stripe): the QR code or the transfer is the local way to pay. */}
+            <div className="mt-[0.7em] flex items-center justify-center gap-[0.5em] rounded-full bg-[#1e1b4b] py-[0.6em] font-bold text-white">
+              <CreditCard className="h-[1.2em] w-[1.2em]" strokeWidth={2.2} />
+              {t("mockPayByCard")}
             </div>
           </div>
         )}

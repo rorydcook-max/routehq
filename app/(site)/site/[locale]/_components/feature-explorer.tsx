@@ -7,13 +7,16 @@ export type FeatureGroup = {
   key: string;
   label: string;
   icon: ReactNode;
+  /** The pitch for this part of the job: a headline, a line or two, and a picture of the product doing it. */
+  panel: { title: string; body: string; visual: ReactNode; wide?: boolean };
   items: Array<{ title: string; body: string; icon: ReactNode; soon?: string }>;
 };
 
 /**
- * Everything RoveHQ does, sorted into the parts of the job (home page, 12 Nov 2026). One group on screen at a time,
- * each tool a tile with a picture and one line, so thirty-odd tools read in seconds. Every group is in the page
- * for search engines and for anyone without scripts; only the chosen one is shown.
+ * How RoveHQ works and everything in it, sorted into the parts of the job (home page, 12 Nov 2026). One part on
+ * screen at a time: its pitch and a picture, then each tool as a tile with an icon and one line, so forty tools
+ * read in seconds. Every part is in the page for search engines and for anyone without scripts; only the chosen
+ * one is shown.
  */
 export function FeatureExplorer({ groups }: { groups: FeatureGroup[] }) {
   const [active, setActive] = useState(0);
@@ -38,20 +41,29 @@ export function FeatureExplorer({ groups }: { groups: FeatureGroup[] }) {
         ))}
       </div>
       {groups.map((group, index) => (
-        <ul aria-labelledby={`fx-tab-${group.key}`} className={h.fxGrid} hidden={index !== active} id={`fx-panel-${group.key}`} key={group.key} role="tabpanel">
-          {group.items.map((item) => (
-            <li className={h.fxItem} key={item.title}>
-              <span aria-hidden="true" className={h.fxIcon}>{item.icon}</span>
-              <span className={h.fxText}>
-                <strong>
-                  {item.title}
-                  {item.soon ? <em className={h.fxSoon}>{item.soon}</em> : null}
-                </strong>
-                <span>{item.body}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
+        <div aria-labelledby={`fx-tab-${group.key}`} hidden={index !== active} id={`fx-panel-${group.key}`} key={group.key} role="tabpanel">
+          <div className={`${h.howPanel} ${group.panel.wide ? h.fxPanelWide : ""}`}>
+            <div className={h.howText}>
+              <h3 className={h.howTitle}>{group.panel.title}</h3>
+              <p className={h.howBody}>{group.panel.body}</p>
+            </div>
+            <div className={group.panel.wide ? h.fxVisualWide : h.howVisual}>{group.panel.visual}</div>
+          </div>
+          <ul className={h.fxGrid}>
+            {group.items.map((item) => (
+              <li className={h.fxItem} key={item.title}>
+                <span aria-hidden="true" className={h.fxIcon}>{item.icon}</span>
+                <span className={h.fxText}>
+                  <strong>
+                    {item.title}
+                    {item.soon ? <em className={h.fxSoon}>{item.soon}</em> : null}
+                  </strong>
+                  <span>{item.body}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       ))}
     </div>
   );

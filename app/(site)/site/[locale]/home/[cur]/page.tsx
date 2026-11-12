@@ -17,10 +17,9 @@ import { getResource, listGuidesFor } from "@/lib/site/content";
 import { paysByQr, regionForCurrency } from "@/lib/site/region";
 import { CATEGORY_KEY, JsonLd } from "../../_components/content-ui";
 import { FinalCta } from "../../_components/final-cta";
-import { HowTabs } from "../../_components/how-tabs";
 import { TimeCalc } from "../../_components/time-calc";
 import { FeatureExplorer } from "../../_components/feature-explorer";
-import { ArrowLeftRight, ArrowRight, BellRing, Bike, BookOpen, Calculator, CalendarCheck, CalendarDays, CalendarX2, Camera, CarFront, CircleCheck, CircleHelp, ClipboardList, Code, CreditCard, FileCheck2, FileSignature, FileText, FolderOpen, Globe, Handshake, Inbox, Keyboard, Languages, LifeBuoy, Link2, MessagesSquare, Percent, ReceiptText, Repeat, Rocket, ScanLine, ScanSearch, ShieldCheck, Smartphone, Star, Store, Sunrise, TrendingUp, Upload, Users, Wallet, Wrench, Zap } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, Banknote, BellRing, Bike, BookOpen, Calculator, CalendarCheck, CalendarDays, CalendarPlus, CalendarX2, Camera, CarFront, CircleCheck, CircleHelp, CirclePlus, ClipboardList, Code, Contact, CreditCard, FileCheck2, FileSignature, FileText, FolderOpen, Globe, Handshake, IdCard, Inbox, Keyboard, Landmark, Languages, LifeBuoy, Link2, MessagesSquare, Percent, QrCode, ReceiptText, Repeat, Rocket, ScanLine, ScanSearch, ShieldCheck, Smartphone, Sparkles, Star, Store, Sunrise, TrendingUp, Upload, Users, Wallet, Wrench, Zap } from "lucide-react";
 import s from "../../site.module.css";
 import h from "../../home.module.css";
 import c from "../../content.module.css";
@@ -35,14 +34,14 @@ const GLOBAL_VARIANTS = new Set(["heroBody", "step1Body", "step3Title", "step3Bo
 
 /** A picture for each line of the home page, in the order the lines are written. */
 const NEVER_ICONS = [Keyboard, MessagesSquare, CircleHelp, ScanSearch, CalendarX2];
-/** The tools, sorted into the parts of the job. The words are marketing.fx_<group>_<n>t and _<n>b; "soon" marks one not out yet. */
-const FEATURES: Array<{ key: string; Icon: typeof Keyboard; icons: Array<typeof Keyboard>; soon?: number }> = [
-  { key: "book", Icon: CalendarCheck, icons: [Link2, Store, Code, CalendarDays, FileSignature, BellRing] },
-  { key: "pay", Icon: CreditCard, icons: [ScanLine, ShieldCheck, Repeat, ReceiptText, CreditCard], soon: 5 },
+/** The tools, sorted into the parts of the job. The words are marketing.fx_<group>_<n>t and _<n>b. */
+const FEATURES: Array<{ key: string; Icon: typeof Keyboard; icons: Array<typeof Keyboard> }> = [
+  { key: "book", Icon: CalendarCheck, icons: [Link2, Store, Code, IdCard, CalendarDays, FileSignature, BellRing, CalendarPlus, Contact] },
+  { key: "pay", Icon: CreditCard, icons: [CreditCard, QrCode, Banknote, ScanLine, ShieldCheck, Repeat, ReceiptText, CirclePlus] },
   { key: "fleet", Icon: CarFront, icons: [Camera, ScanSearch, FileCheck2, Wrench, ArrowLeftRight, FolderOpen] },
-  { key: "money", Icon: TrendingUp, icons: [Wallet, TrendingUp, Percent, ClipboardList, FileText, Calculator] },
+  { key: "money", Icon: TrendingUp, icons: [Wallet, TrendingUp, Percent, ClipboardList, FileText, Calculator, Landmark] },
   { key: "grow", Icon: Rocket, icons: [Globe, Handshake, Star, Languages, BookOpen] },
-  { key: "team", Icon: Users, icons: [Users, Inbox, Sunrise, Upload, Smartphone, LifeBuoy] }
+  { key: "team", Icon: Users, icons: [Users, Inbox, Sunrise, Sparkles, Upload, Smartphone, LifeBuoy] }
 ];
 /** Who it is for: a door to the page for each kind of rental business. */
 const WHO = [
@@ -103,16 +102,41 @@ export default async function SiteHomePage({ params }: Props) {
   const magnetResource = getResource(locale, FEATURED_RESOURCE);
   const magnet = magnetResource ? { resource: magnetResource, locale: undefined } : getResource("en", FEATURED_RESOURCE) ? { resource: getResource("en", FEATURED_RESOURCE)!, locale: "en" } : null;
 
-  const steps: Array<{ n: string; key: string; phone: ReactNode; card: ReactNode; dark?: boolean }> = [
-    { n: "01", key: "step1", phone: <BookingPhoneMock />, card: <PassportCard /> },
-    { n: "02", key: "step2", phone: <HandoverPhoneMock />, card: <ReturnCard />, dark: true },
-    { n: "03", key: "step3", phone: <PaymentPhoneMock />, card: <LedgerCard /> }
-  ];
-  const stats = [
-    { label: t("mockOverdue", { count: 1 }), colour: "#d14343" },
-    { label: t("mockForToday", { count: 3 }), colour: "#12bcb8" },
-    { label: t("mockGoingOut", { count: 1 }), colour: "#4a9ad8" }
-  ];
+  // Each part of the job in the explorer: its pitch and a picture of the product doing it.
+  const panels: Record<string, { title: string; body: string; visual: ReactNode; wide?: boolean }> = {
+    book: { title: "step1Title", body: "step1Body", visual: <><div><BookingPhoneMock /></div><div><PassportCard /></div></> },
+    pay: { title: "step3Title", body: "step3Body", visual: <><div><PaymentPhoneMock /></div><div><LedgerCard /></div></> },
+    fleet: { title: "step2Title", body: "step2Body", visual: <><div><HandoverPhoneMock /></div><div><ReturnCard /></div></> },
+    money: { title: "fxMoneyTitle", body: "fxMoneyBody", visual: <DashboardWindowMock />, wide: true },
+    grow: { title: "fxGrowTitle", body: "fxGrowBody", visual: <ShopPageMock />, wide: true },
+    team: {
+      title: "fxTeamTitle",
+      body: "fxTeamBody",
+      visual: (
+        <>
+          <div>
+            <TodayPhoneMock />
+          </div>
+          <div className={s.chat}>
+            <p className={s.chatTitle}>{m("daySummaryTitle")}</p>
+            <div>
+              <div className={s.chatRow}>
+                <span className={s.chatAvatar}>R</span>
+                <div className={s.chatBubble}>
+                  <p>
+                    {t("mockOverdue", { count: 1 })} · {t("mockForToday", { count: 3 })}
+                  </p>
+                  <p>{m("daySummaryTaken", { amount: money(9800) })}</p>
+                  <p>{m("daySummaryTomorrow", { count: 2 })}</p>
+                </div>
+              </div>
+              <p className={s.chatTime}>{summaryTime}</p>
+            </div>
+          </div>
+        </>
+      )
+    }
+  };
 
   // Structured data: the product with its plans in US dollars (lib/site/schema.ts), and the questions below.
   // Organization and WebSite come from the layout.
@@ -218,25 +242,26 @@ export default async function SiteHomePage({ params }: Props) {
         </Container>
       </section>
 
-      {/* 3. How it works: three steps you press through, one on screen at a time */}
+      {/* 3. How it works and everything in it: six parts of the job, one on screen at a time, each with its pitch,
+          a picture of the product doing it, and its tools as tiles */}
       <section className={`${s.mist} ${s.section}`} id="how">
         <Container>
-          <div className={s.head}>
-            <Eyebrow>{m("howEyebrow")}</Eyebrow>
-            <h2 className={s.h2}>{m.rich("howTitle", RICH)}</h2>
+          <div className={`${s.head} ${h.centre}`}>
+            <Eyebrow>{m("fxEyebrow")}</Eyebrow>
+            <h2 className={s.h2}>{m.rich("fxTitle", RICH)}</h2>
+            <p className={s.lede}>{m("fxLede")}</p>
           </div>
-          <HowTabs
-            steps={steps.map((step) => ({
-              key: step.key,
-              title: m(g(`${step.key}Title`)),
-              body: m(g(`${step.key}Body`)),
-              bullets: [1, 2, 3].map((b) => m(g(`${step.key}b${b}`))),
-              visual: (
-                <>
-                  <div>{step.phone}</div>
-                  <div>{step.card}</div>
-                </>
-              )
+          <FeatureExplorer
+            groups={FEATURES.map((group) => ({
+              key: group.key,
+              label: m(`fx_${group.key}`),
+              icon: <group.Icon size={18} />,
+              panel: { title: m(g(panels[group.key].title)), body: m(g(panels[group.key].body)), visual: panels[group.key].visual, wide: panels[group.key].wide },
+              items: group.icons.map((Icon, index) => ({
+                title: m(`fx_${group.key}_${index + 1}t`),
+                body: m(`fx_${group.key}_${index + 1}b`),
+                icon: <Icon size={22} />
+              }))
             }))}
           />
           <ul className={h.who}>
@@ -255,32 +280,8 @@ export default async function SiteHomePage({ params }: Props) {
         </Container>
       </section>
 
-      {/* 3b. Everything in it: the tools, sorted into the parts of the job, one group on screen at a time */}
-      <section className={s.section} id="features">
-        <Container>
-          <div className={`${s.head} ${h.centre}`}>
-            <Eyebrow>{m("fxEyebrow")}</Eyebrow>
-            <h2 className={s.h2}>{m.rich("fxTitle", RICH)}</h2>
-            <p className={s.lede}>{m("fxLede")}</p>
-          </div>
-          <FeatureExplorer
-            groups={FEATURES.map((group) => ({
-              key: group.key,
-              label: m(`fx_${group.key}`),
-              icon: <group.Icon size={18} />,
-              items: group.icons.map((Icon, index) => ({
-                title: m(`fx_${group.key}_${index + 1}t`),
-                body: m(`fx_${group.key}_${index + 1}b`),
-                icon: <Icon size={22} />,
-                soon: group.soon === index + 1 ? m("fxSoon") : undefined
-              }))
-            }))}
-          />
-        </Container>
-      </section>
-
       {/* 4. The sum: the visitor's own numbers, and the hours they add up to */}
-      <section className={`${s.mist} ${s.section}`}>
+      <section className={s.section}>
         <Container>
           <TimeCalc
             action={
@@ -294,8 +295,40 @@ export default async function SiteHomePage({ params }: Props) {
         </Container>
       </section>
 
+      {/* 4a. What the businesses using it say. Real quotes, given with permission (Rory, 12 Nov 2026). */}
+      <section aria-labelledby="said-title" className={`${s.mist} ${s.section}`}>
+        <Container>
+          <div className={`${s.head} ${h.centre}`}>
+            <Eyebrow>{m("saidEyebrow")}</Eyebrow>
+            <h2 className={s.h2} id="said-title">
+              {m.rich("saidTitle", RICH)}
+            </h2>
+          </div>
+          <ul className={h.said}>
+            {[1, 2, 3].map((n) => (
+              <li className={h.saidCard} key={n}>
+                <span aria-label={m("saidStars")} className={h.stars} role="img">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star fill="currentColor" key={star} size={18} strokeWidth={0} />
+                  ))}
+                </span>
+                <p className={h.saidLead}>{m(`said${n}Lead`)}</p>
+                <blockquote className={h.saidQuote}>{m(`said${n}Quote`)}</blockquote>
+                <p className={h.saidBy}>
+                  <span aria-hidden="true" className={h.saidMark}>{m(`said${n}By`).slice(0, 1)}</span>
+                  <span>
+                    <strong>{m(`said${n}By`)}</strong>
+                    <span>{m(`said${n}Where`)}</span>
+                  </span>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
       {/* 4b. Moving in: RoveHQ brings a business's records in for it, free. The picture follows the words on phones. */}
-      <section aria-labelledby="moving-in" className={s.sectionBottom}>
+      <section aria-labelledby="moving-in" className={s.section}>
         <Container className={s.importRow}>
           <div className={s.importText}>
             <div className={s.head}>
@@ -317,74 +350,6 @@ export default async function SiteHomePage({ params }: Props) {
           </div>
           <div className={s.importVisual}>
             <ImportMock />
-          </div>
-        </Container>
-      </section>
-
-      {/* 5. Every morning */}
-      <section className={`${s.mist} ${s.section}`}>
-        <Container className={s.dayGrid}>
-          <div className={s.dayPhone}>
-            <TodayPhoneMock />
-          </div>
-          <div>
-            <div className={s.head}>
-              <Eyebrow>{m("dayEyebrow")}</Eyebrow>
-              <h2 className={s.h2}>{m.rich("dayTitle", RICH)}</h2>
-              <p className={s.lede}>{m("dayBody")}</p>
-            </div>
-            <div className={s.dayTools}>
-              <ul className={s.list}>
-                {stats.map((stat) => (
-                  <li className={s.statRow} key={stat.label}>
-                    <span aria-hidden="true" className={s.statDot} style={{ background: stat.colour }} />
-                    {stat.label}
-                  </li>
-                ))}
-              </ul>
-              <div className={s.chat}>
-                <p className={s.chatTitle}>{m("daySummaryTitle")}</p>
-                <div>
-                  <div className={s.chatRow}>
-                    <span className={s.chatAvatar}>R</span>
-                    <div className={s.chatBubble}>
-                      <p>
-                        {t("mockOverdue", { count: 1 })} · {t("mockForToday", { count: 3 })}
-                      </p>
-                      <p>{m("daySummaryTaken", { amount: money(9800) })}</p>
-                      <p>{m("daySummaryTomorrow", { count: 2 })}</p>
-                    </div>
-                  </div>
-                  <p className={s.chatTime}>{summaryTime}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* 6. Grow */}
-      <section className={`${s.dark} ${s.section}`}>
-        <Container>
-          <div className={`${s.head} ${s.headWide}`}>
-            <Eyebrow>{m("growEyebrow")}</Eyebrow>
-            <h2 className={s.h2}>{m.rich("growTitle", RICH)}</h2>
-            <p className={s.lede}>{m("growBody")}</p>
-          </div>
-        </Container>
-        <Container className={s.growGrid}>
-          <div>
-            <ul className={s.list}>
-              {[1, 2, 3].map((n) => (
-                <li className={s.listItem} key={n}>
-                  <h3>{m(`grow${n}Title`)}</h3>
-                  <p>{m(`grow${n}Body`)}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <ShopPageMock />
           </div>
         </Container>
       </section>

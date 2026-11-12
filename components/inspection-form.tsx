@@ -9,7 +9,7 @@ import { VehicleTitle } from "@/components/vehicle-identity";
 import { BackLink } from "@/components/ui";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { AlertTriangle, Camera, CheckCircle2, ChevronLeft, ChevronRight, FileVideo, Fuel, Gauge, MapPin, ShieldCheck, Smartphone, Trash2 } from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, ChevronLeft, ChevronRight, FileVideo, Fuel, Gauge, Images, MapPin, ShieldCheck, Smartphone, Trash2 } from "lucide-react";
 import { submitInspection as submitInspectionAction } from "@/app/actions/inspections";
 import { prepareInspectionUploads } from "@/app/actions/uploads";
 import { compressImage, startEarlyUpload, uploadFormFiles } from "@/lib/direct-upload-client";
@@ -162,10 +162,23 @@ function FileCapture({
   const [preview, setPreview] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  // A second picker without "capture": on a phone it opens the photo library, for photos and videos taken
+  // before the handover (Rory, 12 Nov 2026: the videos were filmed first, then had to be filmed again).
+  const libraryRef = useRef<HTMLInputElement>(null);
   const t = useTranslations("inspection");
   const isVideo = accept.startsWith("video");
+  // Puts a chosen file into the form's own input, the same way a dropped file is.
+  const takeFile = (file: File | undefined) => {
+    const input = inputRef.current;
+    if (!input || !file || !file.type.startsWith(isVideo ? "video" : "image")) return;
+    const list = new DataTransfer();
+    list.items.add(file);
+    input.files = list.files;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  };
 
   return (
+    <div>
     <label
       aria-label={label}
       className={`block cursor-pointer rounded-xl border-2 border-dashed transition-colors ${compact ? "p-2" : "p-3"} ${
@@ -184,13 +197,7 @@ function FileCapture({
       onDrop={(event) => {
         event.preventDefault();
         setDragging(false);
-        const input = inputRef.current;
-        const file = event.dataTransfer.files?.[0];
-        if (!input || !file || !file.type.startsWith(isVideo ? "video" : "image")) return;
-        const list = new DataTransfer();
-        list.items.add(file);
-        input.files = list.files;
-        input.dispatchEvent(new Event("change", { bubbles: true }));
+        takeFile(event.dataTransfer.files?.[0]);
       }}
     >
       {preview ? null : compact ? (
@@ -260,6 +267,18 @@ function FileCapture({
         )
       ) : null}
     </label>
+    {/* Phones only: a computer's box already opens its files. */}
+    <input accept={accept} className="sr-only" data-library-for={name} onChange={(event) => { takeFile(event.currentTarget.files?.[0]); event.currentTarget.value = ""; }} ref={libraryRef} tabIndex={-1} type="file" />
+    <button
+      className={`pressable mt-1.5 inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg text-[14px] font-semibold text-[var(--primary)] hover:underline lg:hidden ${compact ? "px-1" : ""}`}
+      data-library-button={name}
+      onClick={() => libraryRef.current?.click()}
+      type="button"
+    >
+      <Images className="shrink-0" size={16} />
+      {t(isVideo ? "cap_libraryVideo" : "cap_library")}
+    </button>
+    </div>
   );
 }
 

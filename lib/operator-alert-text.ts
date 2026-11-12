@@ -41,6 +41,7 @@ export type AlertKey =
   | "supportReplied"
   | "supportJoined"
   | "returnComplete"
+  | "handoverComplete"
   | "onlineBooking"
   | "planActive"
   | "vehicleChangeSigned"
@@ -78,6 +79,7 @@ const TITLE_KEYS: Record<string, string> = {
   portal_action: "titlePortalAction",
   payment_received: "titlePaymentReceived",
   contract_signed: "titleContractSigned",
+  handover_inspection: "titleHandoverInspection",
   return_inspection: "titleReturnInspection",
   new_message: "titleNewMessage",
   support_reply: "titleSupportReply",

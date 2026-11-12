@@ -955,7 +955,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 Date.now() - new Date(entry.created_at).getTime() < 3 * 86_400_000
             )
             .slice(0, 5)
-            .map((entry: any) => ({ id: entry.id, content: entry.content, url: entry.metadata?.handoff_url || null }))}
+            .map((entry: any) => ({ id: entry.id, content: entry.content, url: entry.metadata?.handoff_url || null, ask: entry.metadata?.ask_first === true }))}
         />
         {vehicleDue.length > 0 && paperVehicle && !isCancelled ? (
           <section className="card p-4" id="vehicle-due">

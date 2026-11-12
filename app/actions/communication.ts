@@ -5,6 +5,9 @@ import { guard } from "@/lib/action-error";
 import { revalidatePath } from "next/cache";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { hasCustomerChat, messageCustomer } from "@/lib/customer-messages";
+import { isEmailConfigured } from "@/lib/email";
 
 /** What to ask for when a field the person fills in arrives empty (the rest are the page's own ids). */
 const MISSING_FIELD: Record<string, string> = {"content":"Write the note first."};
@@ -81,6 +84,47 @@ async function addCommunicationNoteOrThrow(formData: FormData) {
   if (customerId) {
     revalidatePath(`/customers/${customerId}`);
   }
+}
+
+/**
+ * The owner approved a message that was waiting for their say-so ("Ask me first"): it goes out the way it would have,
+ * on the customer's chat or by email. With neither, it stays where it is for the owner to send by hand.
+ */
+export async function sendApprovedCustomerMessage(id: string): Promise<{ ok: boolean; sent: boolean }> {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("You must be signed in.");
+  // Read with the member's own access, so only their business's messages can be sent.
+  const { data: entry } = await supabase.from("communication_log").select("id, organisation_id, rental_id, customer_id, status, metadata").eq("id", id).maybeSingle();
+  if (!entry || entry.status !== "pending" || !entry.metadata?.ask_first || !entry.metadata?.raw_text) return { ok: false, sent: false };
+  const admin = createSupabaseAdminClient() as any;
+  const { data: customer } = await admin.from("customers").select("email").eq("id", entry.customer_id).maybeSingle();
+  const canSend = (await hasCustomerChat(admin, entry.organisation_id, entry.customer_id)) || (Boolean(customer?.email) && isEmailConfigured());
+  const stamp = { approved_by: user.id, approved_at: new Date().toISOString() };
+  if (!canSend) {
+    // Nothing to send it on: no longer "ask first", just a message to send by hand.
+    await admin.from("communication_log").update({ metadata: { ...entry.metadata, ask_first: false, ...stamp } }).eq("id", id);
+    if (entry.rental_id) revalidatePath(`/bookings/${entry.rental_id}`);
+    return { ok: true, sent: false };
+  }
+  const result = await messageCustomer(admin, {
+    organizationId: entry.organisation_id,
+    customerId: entry.customer_id,
+    rentalId: entry.rental_id,
+    text: String(entry.metadata.raw_text),
+    locale: entry.metadata.locale || null,
+    withLink: entry.metadata.with_link !== false,
+    sentBy: user.id,
+    metadata: { reminder_key: entry.metadata.reminder_key, approved_from: id }
+  });
+  // The send made its own record (sent, or failed with a way to send by hand), so this one steps aside.
+  await admin.from("communication_log").update({ metadata: { ...entry.metadata, superseded: true, ...stamp } }).eq("id", id);
+  if (entry.rental_id) revalidatePath(`/bookings/${entry.rental_id}`);
+  revalidatePath("/");
+  revalidatePath("/inbox");
+  return { ok: true, sent: result.sent };
 }
 
 /** The owner sent a ready-made customer message themselves (or decided it isn't needed): it stops showing as waiting. */

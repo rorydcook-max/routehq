@@ -4,11 +4,13 @@ import { InfoTip } from "@/components/info-tip";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Copy, Send } from "lucide-react";
-import { markCustomerMessageSent } from "@/app/actions/communication";
+import { useRouter } from "next/navigation";
+import { markCustomerMessageSent, sendApprovedCustomerMessage } from "@/app/actions/communication";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
-export type UnsentMessage = { id: string; content: string; url: string | null };
+/** ask: waiting for the owner's say-so ("Ask me first"), so it can also be sent for them in one tap. */
+export type UnsentMessage = { id: string; content: string; url: string | null; ask?: boolean };
 
 /** Which app a ready-made link opens, read from the link itself. */
 function appOf(url: string | null) {
@@ -29,6 +31,17 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
   const [done, setDone] = useState<string[]>([]);
   const [copied, setCopied] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
+  // Approved messages that had no chat or email to go out on: the owner sends those by hand.
+  const [byHand, setByHand] = useState<string[]>([]);
+  function approve(id: string) {
+    startTransition(async () => {
+      const result = await sendApprovedCustomerMessage(id).catch(() => ({ ok: false, sent: false }));
+      if (result.sent) setDone((current) => [...current, id]);
+      else setByHand((current) => [...current, id]);
+      router.refresh();
+    });
+  }
   const open = messages.filter((message) => !done.includes(message.id));
   if (open.length === 0) return null;
 
@@ -68,9 +81,16 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
               <p className="whitespace-pre-line text-[15px] leading-6 text-[var(--foreground)] [overflow-wrap:anywhere]">
                 <bdi>{message.content}</bdi>
               </p>
+              {byHand.includes(message.id) ? <p className="mt-2 text-[14px] font-semibold text-[var(--warning)]">{say("unsentNoRoute")}</p> : null}
               <div className="mt-3 flex flex-wrap gap-2">
+                {message.ask && !byHand.includes(message.id) ? (
+                  <button className="primary-action pressable min-h-11 px-3 text-sm" data-approve={message.id} disabled={pending} onClick={() => approve(message.id)} type="button">
+                    <Send size={16} />
+                    {say("unsentSendForMe")}
+                  </button>
+                ) : null}
                 {message.url ? (
-                  <a className="primary-action pressable min-h-11 px-3 text-sm" href={message.url} rel="noreferrer" target="_blank">
+                  <a className={`${message.ask && !byHand.includes(message.id) ? "secondary-action" : "primary-action"} pressable min-h-11 px-3 text-sm`} href={message.url} rel="noreferrer" target="_blank">
                     <Send size={16} />
                     {say(`unsent_${app}`)}
                   </a>

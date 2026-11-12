@@ -104,7 +104,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
       rentalId: row.rental_id || null,
       messages: []
     };
-    group.messages.push({ id: row.id, content: String(row.content || ""), url: row.metadata?.handoff_url || null });
+    group.messages.push({ id: row.id, content: String(row.content || ""), url: row.metadata?.handoff_url || null, ask: row.metadata?.ask_first === true });
     toSend.set(key, group);
   }
   const toSendGroups = [...toSend.values()];

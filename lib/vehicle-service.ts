@@ -88,6 +88,8 @@ export async function recordService(supabase: any, record: ServiceRecord) {
 
   // The next oil change, the same way: whatever was given now; an oil change with nothing given clears a due date or km it has passed.
   if (record.nextOilDate) compliance.oil_change_due_date = record.nextOilDate;
+  // Changed, with nothing said about the next one: a year on, as most are yearly and the km is often not known (Rory, 12 Nov 2026).
+  else if (oilChanged && !record.nextOilMileage) compliance.oil_change_due_date = `${Number(record.date.slice(0, 4)) + 1}${record.date.slice(4, 10)}`.replace(/-02-29$/, "-02-28");
   else if (oilChanged && compliance.oil_change_due_date && String(compliance.oil_change_due_date).slice(0, 10) <= record.date) compliance.oil_change_due_date = null;
   if (record.nextOilMileage) compliance.oil_change_due_mileage = record.nextOilMileage;
   else if (oilChanged && record.mileage !== null && Number(compliance.oil_change_due_mileage || 0) > 0 && Number(compliance.oil_change_due_mileage) <= record.mileage) compliance.oil_change_due_mileage = null;

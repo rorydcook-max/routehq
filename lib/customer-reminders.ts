@@ -1,5 +1,5 @@
 import { businessToday } from "@/lib/business-time";
-import { remindersOff, remindRentalCustomerOnce, type ReminderKind } from "@/lib/customer-messages";
+import { remindersAsk, remindersOff, remindRentalCustomerOnce, type ReminderKind } from "@/lib/customer-messages";
 import { complianceItems } from "@/lib/fleet-metrics";
 
 /**
@@ -35,6 +35,9 @@ export async function sendDailyCustomerReminders(admin: any, options: { organiza
   const { data: organizations } = await (only ? admin.from("organizations").select("id, settings").in("id", only) : admin.from("organizations").select("id, settings"));
   const offBy = new Map<string, ReminderKind[]>((organizations || []).map((organization: any) => [String(organization.id), remindersOff(organization.settings)]));
   const allowed = (organizationId: unknown, kind: ReminderKind) => !(offBy.get(String(organizationId)) || []).includes(kind);
+  // Reminders the business approves first: written, then left waiting for the owner (Rory, 12 Nov 2026).
+  const askBy = new Map<string, ReminderKind[]>((organizations || []).map((organization: any) => [String(organization.id), remindersAsk(organization.settings)]));
+  const asksFirst = (organizationId: unknown, kind: ReminderKind) => (askBy.get(String(organizationId)) || []).includes(kind);
 
   // ── Handover tomorrow ────────────────────────────────────────────────────
   const { data: starting } = await scoped(
@@ -112,7 +115,7 @@ export async function sendDailyCustomerReminders(admin: any, options: { organiza
         rental.id,
         `vehicle:${item.key}:${item.date}`,
         ({ say, vehicle, date }) => say(service ? "serviceDue" : "renewalDue", { vehicle, date: date(item.date) }),
-        { withLink: false }
+        { withLink: false, askFirst: asksFirst(rental.organization_id, "vehicle_due") }
       );
       if (ok) sent.vehicleDue += 1;
     }

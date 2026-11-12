@@ -40,9 +40,13 @@ export function BackLink({ href, label, className }: { href: string; label: stri
   const [cameFrom, setCameFrom] = useState<string | null>(null);
   useEffect(() => {
     try {
-      const previous = window.sessionStorage.getItem(PREVIOUS);
       const here = window.location.pathname;
-      if (previous && previous.split("?")[0] !== here && previous.split("?")[0] !== href.split("?")[0] && !flow(previous) && window.history.length > 1) setCameFrom(previous);
+      // This runs before the trail above has noted the move to this page (a page's own effects run first), so until
+      // it has, "the page you were on" is still filed as the current one. Tested 12 Nov 2026: To do, a booking, back.
+      const noted = window.sessionStorage.getItem(CURRENT);
+      const previous = noted && noted.split("?")[0] !== here ? noted : window.sessionStorage.getItem(PREVIOUS);
+      // The same list with a filter on it counts too: back returns to the filtered list, not the whole one.
+      if (previous && previous.split("?")[0] !== here && previous !== href && !flow(previous) && window.history.length > 1) setCameFrom(previous);
     } catch {
       // Stays the plain link.
     }
@@ -58,7 +62,7 @@ export function BackLink({ href, label, className }: { href: string; label: stri
       }}
     >
       <ChevronLeft aria-hidden="true" className="rtl:rotate-180" size={18} />
-      {cameFrom && common.has("back") ? common("back") : label}
+      {cameFrom && cameFrom.split("?")[0] !== href.split("?")[0] && common.has("back") ? common("back") : label}
     </Link>
   );
 }

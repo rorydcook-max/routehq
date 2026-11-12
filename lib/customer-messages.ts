@@ -54,6 +54,11 @@ type Input = {
    * to be sent by hand for the rental is out of date - "extended to the 13th" must not go out after the return.
    */
   replacesEarlier?: boolean;
+  /**
+   * The business chose "ask me first" for this kind of message: it is written and left waiting for the owner,
+   * who sends it with one tap or sets it aside. Nothing goes to the customer until then.
+   */
+  askFirst?: boolean;
 };
 
 /** Marks a rental's waiting-to-be-sent messages as overtaken, so they are no longer offered for sending. */
@@ -104,6 +109,12 @@ export type ReminderKind = (typeof REMINDER_KINDS)[number];
 export function remindersOff(settings: any): ReminderKind[] {
   const off = settings?.customer_messages?.off;
   return Array.isArray(off) ? (off.filter((kind: unknown) => (REMINDER_KINDS as readonly string[]).includes(String(kind))) as ReminderKind[]) : [];
+}
+
+/** Reminders the business wants to approve before they go out (Settings: "Ask me first"). */
+export function remindersAsk(settings: any): ReminderKind[] {
+  const ask = settings?.customer_messages?.ask;
+  return Array.isArray(ask) ? (ask.filter((kind: unknown) => (REMINDER_KINDS as readonly string[]).includes(String(kind))) as ReminderKind[]) : [];
 }
 
 async function bookingPageUrl(admin: any, rentalId: string | null | undefined) {
@@ -200,6 +211,21 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
         metadata: { automatic: true, ...(input.metadata || {}), ...metadata }
       })
       .then(() => null, () => null);
+
+  // Ask first: written and left for the owner to approve. The plain text is kept so it can be sent as it would have been.
+  if (input.askFirst) {
+    const waiting = handoffFor(await customerContact(admin, input.customerId), body);
+    await log("pending", waiting.channel === "none" ? null : waiting.channel, {
+      not_sent_reason: "ask_first",
+      ask_first: true,
+      raw_text: text,
+      with_link: input.withLink !== false,
+      locale: input.locale || null,
+      handoff_label: waiting.label,
+      handoff_url: waiting.url
+    });
+    return { sent: false, reason: "no_chat" };
+  }
 
   // 1. Their own chat with the business.
   const conversation = await originalConversation(admin, input.organizationId, input.customerId).catch(() => null);
@@ -303,7 +329,7 @@ export async function tellRentalCustomer(
   admin: any,
   rentalId: string,
   build: (context: RentalMessageContext) => string,
-  options: { sentBy?: string | null; withLink?: boolean; metadata?: Record<string, unknown>; seenAlready?: boolean; replacesEarlier?: boolean } = {}
+  options: { sentBy?: string | null; withLink?: boolean; metadata?: Record<string, unknown>; seenAlready?: boolean; replacesEarlier?: boolean; askFirst?: boolean } = {}
 ): Promise<CustomerMessageResult> {
   try {
     const { data: rental } = await admin
@@ -341,7 +367,8 @@ export async function tellRentalCustomer(
       withLink: options.withLink,
       metadata: options.metadata,
       seenAlready: options.seenAlready,
-      replacesEarlier: options.replacesEarlier
+      replacesEarlier: options.replacesEarlier,
+      askFirst: options.askFirst
     });
   } catch {
     return { sent: false, reason: "failed" };
@@ -352,14 +379,14 @@ export async function tellRentalCustomer(
  * The same, but at most once per key for a rental: the daily job can run it
  * every day and each reminder still goes out a single time.
  */
-export async function remindRentalCustomerOnce(admin: any, rentalId: string, key: string, build: (context: RentalMessageContext) => string, options: { withLink?: boolean } = {}): Promise<boolean> {
+export async function remindRentalCustomerOnce(admin: any, rentalId: string, key: string, build: (context: RentalMessageContext) => string, options: { withLink?: boolean; askFirst?: boolean } = {}): Promise<boolean> {
   // The owner said no reminders for this customer (asked when a running rental is added through the fleet assistant).
   const { data: switchRow } = await admin.from("rentals").select("customer_reminders").eq("id", rentalId).maybeSingle();
   if (switchRow && switchRow.customer_reminders === false) return false;
   // Claim the reminder first: the table's primary key lets only one run through, even if two start together.
   const { error: claimed } = await admin.from("customer_reminders").insert({ rental_id: rentalId, reminder_key: key });
   if (claimed) return false;
-  const result = await tellRentalCustomer(admin, rentalId, build, { withLink: options.withLink, metadata: { reminder_key: key } });
+  const result = await tellRentalCustomer(admin, rentalId, build, { withLink: options.withLink, askFirst: options.askFirst, metadata: { reminder_key: key } });
   if (!result.sent && (result.reason === "off" || result.reason === "no_customer")) {
     // Nothing was sent or recorded, so let it be tried again once messages are on or the customer is known.
     await admin.from("customer_reminders").delete().eq("rental_id", rentalId).eq("reminder_key", key);

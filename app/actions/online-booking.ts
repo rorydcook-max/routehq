@@ -18,7 +18,7 @@ import { isDoubleBookingError } from "@/lib/rental-conflicts";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
-import { remindersOff } from "@/lib/customer-messages";
+import { remindersAsk, remindersOff } from "@/lib/customer-messages";
 import { partnerReferrer, recordLinkReferral } from "@/lib/partner-network";
 
 type Result<T = {}> = ({ ok: true } & T) | { ok: false; error: string };
@@ -290,7 +290,7 @@ export async function saveCustomerMessages(enabled: boolean): Promise<Result> {
 }
 
 /** Turns single automatic reminders on or off (owner only). */
-export async function saveReminderKinds(off: string[]): Promise<Result> {
+export async function saveReminderKinds(off: string[], ask?: string[]): Promise<Result> {
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: await said("Please sign in again.") };
   if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY_MESSAGE) };
@@ -299,7 +299,9 @@ export async function saveReminderKinds(off: string[]): Promise<Result> {
   if (!organization) return { ok: false, error: await said("Business not found.") };
   const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
   const clean = remindersOff({ customer_messages: { off } });
-  const { error } = await admin.from("organizations").update({ settings: { ...settings, customer_messages: { ...(settings.customer_messages || {}), off: clean } } }).eq("id", membership.organizationId);
+  // "Ask me first" for a reminder; left as it was when the caller doesn't say. One that is off is not also asked about.
+  const asking = (ask === undefined ? remindersAsk(settings) : remindersAsk({ customer_messages: { ask } })).filter((kind) => !clean.includes(kind));
+  const { error } = await admin.from("organizations").update({ settings: { ...settings, customer_messages: { ...(settings.customer_messages || {}), off: clean, ask: asking } } }).eq("id", membership.organizationId);
   if (error) return { ok: false, error: await said("Couldn't save. Please try again.") };
   revalidatePath("/settings");
   return { ok: true };

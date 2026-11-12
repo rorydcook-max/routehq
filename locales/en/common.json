@@ -1160,7 +1160,8 @@
     "countBookedOrShop": "{count} booked / in shop",
     "showMore": "Show {count} more ({left} left)",
     "search": "Search",
-    "noMatches": "No matches"
+    "noMatches": "No matches",
+    "back": "Back"
   },
   "shell": {
     "quick_uploadReceipt": "Upload a receipt",
@@ -2683,7 +2684,9 @@
     "noPlateBody": "The rental agreement can't be signed until the vehicle has a number plate.",
     "noPlateAdd": "Add number plate",
     "vehicleArchived": "This booking's vehicle is archived. Put it back in the fleet or move the booking to another vehicle.",
-    "openVehicle": "Open vehicle"
+    "openVehicle": "Open vehicle",
+    "unsentSendForMe": "Send it for me",
+    "unsentNoRoute": "They have no chat or email with you yet, so send this one yourself."
   },
   "newBooking": {
     "docsSelfie": "Photo of the customer",
@@ -5002,7 +5005,10 @@
     "tp_commercialUseTip": "Allowed: renters may drive for ride-hailing or delivery apps if they hold the licenses and insurance the law requires. The agreement sets the terms.",
     "tp_commercialNotAllowed": "Not allowed",
     "tp_commercialAllowed": "Allowed",
-    "ag_n_commercial": "Commercial use (ride-hailing, deliveries)"
+    "ag_n_commercial": "Commercial use (ride-hailing, deliveries)",
+    "rem_mode_auto": "Send automatically",
+    "rem_mode_ask": "Ask me first",
+    "rem_mode_off": "Don't send"
   },
   "accountPage": {
     "roleOwner": "Owner",

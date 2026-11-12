@@ -7,6 +7,8 @@ import { AlertTriangle, ArrowRight, Car, CheckCircle2, Clock, CreditCard, FileTe
 import { CancelBookingButton } from "@/app/(app)/bookings/[id]/cancel-booking-button";
 import { VehicleChangeButton } from "@/app/(app)/bookings/[id]/vehicle-change-button";
 import { UnsentMessages } from "@/app/(app)/bookings/[id]/unsent-messages";
+import { complianceItems } from "@/lib/fleet-metrics";
+import { KindChip } from "@/components/kind-chip";
 import { activityTitle, tidyDetail, visibleActivity } from "@/lib/activity-display";
 import { UndoCancellationButton } from "@/app/(app)/bookings/[id]/undo-cancellation-button";
 import { confirmCustomerPayment } from "@/app/actions/deposits";
@@ -364,6 +366,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     .limit(1)
     .maybeSingle();
   const vehicle = rental.vehicles;
+  // What is coming up for the vehicle itself (tax, insurance, service): a message about paperwork brought you here,
+  // so the booking shows which paperwork and when (Rory, 12 Nov 2026).
+  const { data: paperVehicle } = rental.vehicle_id
+    ? await supabaseForVehicles.from("vehicles").select("id, metadata, mileage").eq("id", rental.vehicle_id).eq("organization_id", organization.id).maybeSingle()
+    : { data: null };
+  const vehicleDue = paperVehicle ? complianceItems(paperVehicle.metadata, businessToday(), paperVehicle.mileage).filter((item) => item.daysLeft <= 60 || item.kmLeft !== undefined) : [];
   // The customer's documents as they are on file now, not the saved flag (lib/customer-documents.ts).
   const customer = rental.customers?.id ? (await withLiveDocumentStatus(supabaseForVehicles, organization.id, [rental.customers]))[0] : rental.customers;
   // What other RoveHQ businesses reported about this customer (shared customer history).
@@ -949,6 +957,35 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             .slice(0, 5)
             .map((entry: any) => ({ id: entry.id, content: entry.content, url: entry.metadata?.handoff_url || null }))}
         />
+        {vehicleDue.length > 0 && paperVehicle && !isCancelled ? (
+          <section className="card p-4" id="vehicle-due">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="card-title">{tx.say("vd_title")}</h2>
+              <Link className="inline-flex min-h-9 items-center font-bold text-[var(--primary)] hover:underline" href={`/fleet/${paperVehicle.id}` as Route}>
+                {tx.say("vd_open")}
+              </Link>
+            </div>
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+              {vehicleDue.map((item) => (
+                <li className="flex items-center gap-3 rounded-xl bg-[var(--panel-secondary)] px-3 py-2.5" key={item.key}>
+                  <KindChip className="kind-chip-sm" kind="vehicle" />
+                  <span className="min-w-0">
+                    <span className="block font-bold text-[var(--foreground)]">{item.label}</span>
+                    <span className={`block text-[14px] font-semibold ${item.daysLeft < 0 || (item.kmLeft ?? 1) < 0 ? "text-[var(--danger)]" : item.daysLeft <= 7 ? "text-[var(--warning)]" : "text-[var(--foreground-secondary)]"}`}>
+                      {item.kmLeft !== undefined
+                        ? tx.say(item.kmLeft < 0 ? "vd_kmOver" : "vd_kmLeft", { km: Math.abs(item.kmLeft).toLocaleString("en-US") })
+                        : item.daysLeft < 0
+                          ? tx.say("vd_overdue", { date: shortDate(item.date, tx.locale) })
+                          : item.daysLeft === 0
+                            ? tx.say("vd_today")
+                            : tx.say("vd_due", { date: shortDate(item.date, tx.locale), days: item.daysLeft })}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
         {(swapForms || []).length > 0 ? (
           <div className="scroll-mt-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3" id="vehicle-change-forms">
             <p className="text-sm font-semibold text-[var(--warning)]">{tx.say("vehicleChanged", { name: customer?.full_name || tx.say("theCustomer") })}</p>

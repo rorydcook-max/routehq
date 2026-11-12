@@ -1586,7 +1586,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               label: tx.say("tab_paperwork"),
               content: (
                 <div className="grid gap-3">
-            <RentalDocumentsCard documents={rentalDocuments} />
+            <RentalDocumentsCard documents={rentalDocuments} rentalId={rental.id} />
 
                 </div>
               )

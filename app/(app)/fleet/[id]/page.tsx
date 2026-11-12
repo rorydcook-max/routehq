@@ -880,6 +880,15 @@ function MaintenanceSection({ detail, organizationId, currency }: { detail: Vehi
             <span className={labelClass}>{tx.say(distanceKey("m_nextKm"))}</span>
             <input className={inputClass} inputMode="numeric" min="0" name="nextDueMileage" type="number" />
           </label>
+          {/* The oil has its own due date and km, whether or not it was changed with this service. */}
+          <label className="block">
+            <span className={labelClass}>{tx.say("m_nextOilDate")}</span>
+            <input className={inputClass} name="nextOilDate" type="date" />
+          </label>
+          <label className="block">
+            <span className={labelClass}>{tx.say(distanceKey("m_nextOilKm"))}</span>
+            <input className={inputClass} inputMode="numeric" min="0" name="nextOilMileage" type="number" />
+          </label>
           <label className="block sm:col-span-2">
             <span className={labelClass}>{tx.say("m_receipt")}</span>
             <input className="mt-1 w-full" name="receiptFile" type="file" />

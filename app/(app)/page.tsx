@@ -375,7 +375,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       const label = c.has(`paper_${item.key}`) ? c(`paper_${item.key}`) : item.label;
       paperworkVehicle.set(`doc-${v.id}-${item.key}`, name);
       if (item.daysLeft <= 7) {
-        const service = item.key === "next_service_date";
+        const service = item.key === "next_service_date" || item.key === "oil_change_due_date";
         paperwork.push({
           key: `doc-${v.id}-${item.key}`,
           rank: 5,

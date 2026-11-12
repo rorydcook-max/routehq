@@ -227,13 +227,14 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
   return (
     <WindowFrame address="harbor.rovehq.app" className={className} label={t("mockDashboardLabel")}>
       <div className="grid aspect-[16/9.2] grid-cols-[15em_1fr] bg-[#f3f6f8]">
-        <aside className="flex flex-col gap-[0.3em] bg-[#0b2140] px-[1em] py-[1.4em] text-white">
+        <aside className="flex flex-col gap-[0.3em] bg-[linear-gradient(180deg,#1e1b4b_0%,#2a1f63_100%)] px-[1em] py-[1.4em] text-white">
           <p className="px-[0.6em] text-[1.15em] font-bold leading-tight">Harbor Rentals</p>
           <p className="px-[0.7em] text-[0.85em] text-white/60">Powered by RoveHQ</p>
           <div className="mt-[1em] flex flex-col gap-[0.2em]">
-            {nav.map(({ icon: Icon, label, active }) => (
-              <span className={`flex items-center gap-[0.7em] rounded-[0.8em] px-[0.7em] py-[0.55em] font-semibold ${active ? "bg-[rgba(18,188,184,0.16)] text-[#6226ab]" : "text-white/70"}`} key={label}>
-                <Icon className="h-[1.2em] w-[1.2em] shrink-0" strokeWidth={2} />
+            {nav.map(({ icon: Icon, label, active }, index) => (
+              <span className={`flex items-center gap-[0.7em] rounded-[0.8em] px-[0.7em] py-[0.55em] font-semibold ${active ? "bg-white/[0.14] text-white" : "text-white/75"}`} key={label}>
+                {/* Each menu icon takes a colour from the logo's range, as in the app. */}
+                <Icon className="h-[1.2em] w-[1.2em] shrink-0" strokeWidth={2} style={{ color: ["#22c8ee", "#4a8dff", "#7b6cf6", "#a855f7", "#e73582", "#ff7438", "#ffb66b", "#7ef0b2"][index % 8] }} />
                 {label}
               </span>
             ))}

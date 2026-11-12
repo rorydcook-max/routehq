@@ -2696,7 +2696,8 @@
     "vehicleArchived": "This booking's vehicle is archived. Put it back in the fleet or move the booking to another vehicle.",
     "openVehicle": "Open vehicle",
     "unsentClose": "Close",
-    "unsentMarkSent": "Mark as sent"
+    "unsentMarkSent": "Mark as sent",
+    "docs_view": "View"
   },
   "newBooking": {
     "docsSelfie": "Photo of the customer",

@@ -215,3 +215,6 @@ section.heroTight > div > div:nth-child(2) { margin-top: clamp(36px, 4vw, 52px);
 
 /* On phones the product ends right above this section: give the heading room. */
 @media (max-width: 767px) { .afterHero { padding-top: 44px; } }
+
+/* The fact tile's icon is a span too: keep it a white picture on its coloured square. */
+.fact .factIcon { display: inline-flex; margin-top: 0; color: #ffffff; }

@@ -25,6 +25,8 @@ export function jobKind(item: { kind: string; action?: string | null; taskType?:
   if (item.kind === "payment") return item.receipt ? "receipt" : "money";
   const action = String(item.action || "");
   if (action === "refund") return "refund";
+  if (action === "return" || action === "handover") return "move";
+  if (action === "paperwork") return "vehicle";
   if (action === "request") return "message";
   if (action === "swap_handover" || action === "swap_collection") return "move";
   if (action === "swap_signature" || action === "inspection_signature") return "form";

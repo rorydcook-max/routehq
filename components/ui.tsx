@@ -9,17 +9,7 @@ import type { ReactNode } from "react";
  * The one way back on a sub-page: a chevron and the name of where it goes ("Settings", "Fleet", "Honda City"),
  * above the page title. Every sub-page, form and flow uses this, in the same place.
  */
-export function BackLink({ href, label, className }: { href: string; label: string; className?: string }) {
-  return (
-    <Link
-      className={clsx("pressable -ms-1 mb-3 inline-flex min-h-9 items-center gap-0.5 rounded-full pe-2 text-[14px] font-semibold text-[var(--primary)] hover:underline", className)}
-      href={href as Route}
-    >
-      <ChevronLeft aria-hidden="true" className="rtl:rotate-180" size={18} strokeWidth={2.4} />
-      {label}
-    </Link>
-  );
-}
+export { BackLink } from "./back-link";
 
 export function Card({
   children,

@@ -1379,6 +1379,10 @@
     "collect_late_return": "Collect late return",
     "pay_late_return": "Late return",
     "job_add_plate": "Add the number plate",
+    "job_return": "Vehicle due back",
+    "job_paperwork": "{label} to renew",
+    "checkIn": "Check in",
+    "updateDates": "Update the date",
     "job_add_plate_detail": "Needed before its agreement can be signed or it can be booked online.",
     "addPlate": "Add number plate"
   },

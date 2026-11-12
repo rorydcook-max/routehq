@@ -33,6 +33,7 @@ import { Toaster } from "@/components/toast";
 import { ChatLauncher } from "@/components/chat/chat-launcher";
 import { SidebarLanguage } from "@/components/sidebar-language";
 import { RouteHqLogo } from "@/components/brand-logo";
+import { BackTrail } from "@/components/back-link";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { useInitialShellBrand } from "@/components/shell-brand-provider";
 import { FastActionSheet } from "@/components/fast-action-sheet";
@@ -256,6 +257,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   // Bottom space so the last rows can scroll clear of the chat button (and, on phones, the tab bar under it).
   return (
     <div className={`min-h-screen lg:pb-24 ${onFocusedFlow ? "focused-flow pb-24" : "pb-44"}`}>
+      <BackTrail />
       <aside className="app-sidebar fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
         <div className="mb-3 flex items-center px-2 pt-1">
           {brandLogo || <RouteHqLogo tone="dark" />}

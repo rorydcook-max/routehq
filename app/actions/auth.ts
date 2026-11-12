@@ -133,7 +133,15 @@ export async function getShellContext(): Promise<ShellContext> {
       const { getTaskList } = await import("@/lib/tasks");
       const { businessToday } = await import("@/lib/business-time");
       const today = businessToday();
-      return (await getTaskList(membership.organizationId, { openOnly: true })).filter((task) => !task.completedAt && !task.coveredBy && !!task.dueDate && task.dueDate <= today).length;
+      const jobs = (await getTaskList(membership.organizationId, { openOnly: true })).filter((task) => !task.completedAt && !task.coveredBy && !!task.dueDate && task.dueDate <= today).length;
+      // To do also lists vehicles due back and vehicle dates to renew (11 Nov 2026), so the badge counts those due now too.
+      const { complianceItems } = await import("@/lib/fleet-metrics");
+      const [{ count: dueBack }, { data: fleet }] = await Promise.all([
+        supabase.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", membership.organizationId).is("deleted_at", null).in("status", ["active", "due_soon", "overdue", "extended"]).lte("end_date", today),
+        supabase.from("vehicles").select("mileage, metadata").eq("organization_id", membership.organizationId).is("deleted_at", null).or("status.is.null,status.neq.inactive")
+      ]);
+      const papers = ((fleet || []) as any[]).reduce((sum, vehicle) => sum + complianceItems(vehicle.metadata, today, vehicle.mileage).filter((item) => item.daysLeft <= 0).length, 0);
+      return jobs + (dueBack || 0) + papers;
     } catch {
       return 0;
     }

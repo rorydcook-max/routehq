@@ -1033,9 +1033,12 @@ async function logVehicleMaintenanceOrThrow(formData: FormData) {
   const supplier = optionalStringFromForm(formData, "supplier");
   const notes = optionalStringFromForm(formData, "notes");
   // Only a service sets the next service: a repair, tyres or a battery leaves it as it was.
-  const setsNextService = eventType === "service" || eventType === "oil_change";
+  // An oil change on its own sets the next oil change, not the next service (Rory, 12 Nov 2026).
+  const setsNextService = eventType === "service";
   const nextDueDate = setsNextService ? optionalStringFromForm(formData, "nextDueDate") : null;
   const nextDueMileage = setsNextService ? optionalNumberFromForm(formData, "nextDueMileage") : null;
+  const nextOilDate = optionalStringFromForm(formData, "nextOilDate");
+  const nextOilMileage = optionalNumberFromForm(formData, "nextOilMileage");
   const oilChanged = String(formData.get("oilChanged") || "") === "true" || eventType === "oil_change";
 
   if (!vehicleId || !organizationId || !eventType || !serviceDate) {
@@ -1091,6 +1094,8 @@ async function logVehicleMaintenanceOrThrow(formData: FormData) {
     nextDueDate,
     nextDueMileage,
     oilChanged,
+    nextOilDate,
+    nextOilMileage,
     transactionId
   });
 

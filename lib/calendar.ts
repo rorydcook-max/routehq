@@ -17,7 +17,8 @@ const COMPLIANCE_ITEMS: Array<{ key: string; label: string }> = [
   { key: "tax_expiry_date", label: "Road tax" },
   { key: "porbor_expiry_date", label: "Compulsory insurance" },
   { key: "insurance_expiry_date", label: "Insurance" },
-  { key: "next_service_date", label: "Service" }
+  { key: "next_service_date", label: "Service" },
+  { key: "oil_change_due_date", label: "Oil change" }
 ];
 
 function lastDayOfMonth(year: number, month: number) {

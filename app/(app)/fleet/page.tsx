@@ -54,7 +54,7 @@ function ComplianceBadge({ item, attention = 0, addHref }: { item?: { key?: stri
   const days = Math.abs(item.daysLeft);
   // Road tax, insurance and the rest are named in the reader's language.
   const label = item.key && c.has(`paper_${item.key}`) ? c(`paper_${item.key}`) : item.label;
-  const isService = item.key === "next_service_date" || item.label === "Service";
+  const isService = item.key === "next_service_date" || item.key === "oil_change_due_date" || item.label === "Service";
   // Two tidy lines instead of a pill whose sentence wrapped mid-phrase:
   // "Road tax expired" (coloured) over "53 days ago · +1 more" (quiet).
   const what = item.daysLeft < 0 ? (isService ? t("p_serviceLate") : t("p_expired", { label })) : t("p_due", { label });

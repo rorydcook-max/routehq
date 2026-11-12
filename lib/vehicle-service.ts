@@ -29,6 +29,9 @@ export type ServiceRecord = {
   nextDueDate: string | null;
   nextDueMileage: number | null;
   oilChanged: boolean;
+  /** When the oil is next due, by date, km or both. Kept apart from the next service. */
+  nextOilDate?: string | null;
+  nextOilMileage?: number | null;
   transactionId: string | null;
 };
 
@@ -82,6 +85,12 @@ export async function recordService(supabase: any, record: ServiceRecord) {
   else if (isService && compliance.next_service_date && String(compliance.next_service_date).slice(0, 10) <= record.date) compliance.next_service_date = null;
   if (record.nextDueMileage) compliance.next_service_mileage = record.nextDueMileage;
   else if (isService && record.mileage !== null && Number(compliance.next_service_mileage || 0) > 0 && Number(compliance.next_service_mileage) <= record.mileage) compliance.next_service_mileage = null;
+
+  // The next oil change, the same way: whatever was given now; an oil change with nothing given clears a due date or km it has passed.
+  if (record.nextOilDate) compliance.oil_change_due_date = record.nextOilDate;
+  else if (oilChanged && compliance.oil_change_due_date && String(compliance.oil_change_due_date).slice(0, 10) <= record.date) compliance.oil_change_due_date = null;
+  if (record.nextOilMileage) compliance.oil_change_due_mileage = record.nextOilMileage;
+  else if (oilChanged && record.mileage !== null && Number(compliance.oil_change_due_mileage || 0) > 0 && Number(compliance.oil_change_due_mileage) <= record.mileage) compliance.oil_change_due_mileage = null;
 
   const update: Record<string, unknown> = { metadata: { ...metadata, compliance } };
   if (record.mileage !== null && record.mileage > Number(vehicle.mileage || 0)) update.mileage = record.mileage;

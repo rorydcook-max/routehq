@@ -583,6 +583,14 @@ export function TransactionForm({
                 <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say(distanceKey("sv_nextKm"))}</span>
                 <input className={inputClass} inputMode="numeric" min="0" name="serviceNextKm" type="number" />
               </label>
+              <label className="block">
+                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("sv_nextOilDate")}</span>
+                <input className={inputClass} name="oilNextDate" type="date" />
+              </label>
+              <label className="block">
+                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say(distanceKey("sv_nextOilKm"))}</span>
+                <input className={inputClass} inputMode="numeric" min="0" name="oilNextKm" type="number" />
+              </label>
             </div>
           ) : null}
 

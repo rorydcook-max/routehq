@@ -713,6 +713,8 @@ export async function createTransaction(formData: FormData) {
       nextDueDate: optionalString(formData, "serviceNextDate"),
       nextDueMileage: numberField(formData, "serviceNextKm"),
       oilChanged: String(formData.get("oilChanged") || "") === "true",
+      nextOilDate: optionalString(formData, "oilNextDate"),
+      nextOilMileage: numberField(formData, "oilNextKm"),
       transactionId: data.id
     });
   }

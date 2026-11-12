@@ -106,7 +106,7 @@ export async function sendDailyCustomerReminders(admin: any, options: { organiza
     if (!allowed(rental.organization_id, "vehicle_due")) continue;
     for (const item of complianceItems(rental.vehicles?.metadata, today)) {
       if (item.daysLeft < 0 || item.daysLeft > 7) continue;
-      const service = item.key === "next_service_date";
+      const service = item.key === "next_service_date" || item.key === "oil_change_due_date";
       const ok = await remindRentalCustomerOnce(
         admin,
         rental.id,

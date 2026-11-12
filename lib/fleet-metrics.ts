@@ -42,8 +42,16 @@ const COMPLIANCE_LABELS: Record<string, string> = {
   tax_expiry_date: "Road tax",
   porbor_expiry_date: "Compulsory insurance",
   insurance_expiry_date: "Insurance",
-  next_service_date: "Service"
+  next_service_date: "Service",
+  // The oil change has its own due date and km: a service often includes one, but not always (Rory, 12 Nov 2026).
+  oil_change_due_date: "Oil change"
 };
+
+/** Work due by km as well as by date: the date it is listed under, and where its due km is kept. */
+const KM_DUE: Array<{ key: string; label: string; field: string }> = [
+  { key: "next_service_date", label: "Service", field: "next_service_mileage" },
+  { key: "oil_change_due_date", label: "Oil change", field: "oil_change_due_mileage" }
+];
 
 export function complianceItems(metadata: any, today = businessToday(), mileage?: number | null): ComplianceItem[] {
   const compliance = metadata?.compliance || {};
@@ -56,12 +64,13 @@ export function complianceItems(metadata: any, today = businessToday(), mileage?
     .filter((item): item is ComplianceItem => Boolean(item));
 
   // Service by km, whichever comes first: close to (or past) the km, it is due now even if the date is months away.
-  const dueKm = Number(compliance.next_service_mileage || 0);
   const odometer = Number(mileage || 0);
-  if (dueKm > 0 && odometer > 0 && dueKm - odometer <= SERVICE_KM_WARNING) {
+  for (const work of KM_DUE) {
+    const dueKm = Number(compliance[work.field] || 0);
+    if (!(dueKm > 0 && odometer > 0 && dueKm - odometer <= SERVICE_KM_WARNING)) continue;
     const kmLeft = dueKm - odometer;
-    const byKm: ComplianceItem = { key: "next_service_date", label: "Service", date: today, daysLeft: kmLeft < 0 ? -1 : 0, kmLeft };
-    const index = items.findIndex((item) => item.key === "next_service_date");
+    const byKm: ComplianceItem = { key: work.key, label: work.label, date: today, daysLeft: kmLeft < 0 ? -1 : 0, kmLeft };
+    const index = items.findIndex((item) => item.key === work.key);
     if (index === -1) items.push(byKm);
     else if (items[index].daysLeft > byKm.daysLeft) items[index] = byKm;
   }

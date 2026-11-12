@@ -2622,7 +2622,7 @@
     "adj_dueBooked": "Due with the first rent.",
     "unsentEarlier": "{count, plural, one {# earlier message} other {# earlier messages}}",
     "unsentEarlierHint": "Probably out of date: the newest one above says what's current.",
-    "unsentClearEarlier": "Mark these done",
+    "unsentClearEarlier": "Close these",
     "tab_label": "Parts of this booking",
     "tab_overview": "Handover & contact",
     "tab_payments": "Payments",
@@ -2694,7 +2694,9 @@
     "noPlateBody": "The rental agreement can't be signed until the vehicle has a number plate.",
     "noPlateAdd": "Add number plate",
     "vehicleArchived": "This booking's vehicle is archived. Put it back in the fleet or move the booking to another vehicle.",
-    "openVehicle": "Open vehicle"
+    "openVehicle": "Open vehicle",
+    "unsentClose": "Close",
+    "unsentMarkSent": "Mark as sent"
   },
   "newBooking": {
     "docsSelfie": "Photo of the customer",

@@ -2620,7 +2620,7 @@
     "adj_dueBooked": "Due with the first rent.",
     "unsentEarlier": "{count, plural, one {# earlier message} other {# earlier messages}}",
     "unsentEarlierHint": "Probably out of date: the newest one above says what's current.",
-    "unsentClearEarlier": "Mark these done",
+    "unsentClearEarlier": "Close these",
     "tab_label": "Parts of this booking",
     "tab_overview": "Handover & contact",
     "tab_payments": "Payments",
@@ -2694,7 +2694,9 @@
     "vehicleArchived": "This booking's vehicle is archived. Put it back in the fleet or move the booking to another vehicle.",
     "openVehicle": "Open vehicle",
     "unsentSendForMe": "Send it for me",
-    "unsentNoRoute": "They have no chat or email with you yet, so send this one yourself."
+    "unsentNoRoute": "They have no chat or email with you yet, so send this one yourself.",
+    "unsentClose": "Close",
+    "unsentMarkSent": "Mark as sent"
   },
   "newBooking": {
     "docsSelfie": "Photo of the customer",

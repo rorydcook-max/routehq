@@ -128,7 +128,13 @@
     "bkAll": "All bookings",
     "emailVerified": "Email verified. Thanks!",
     "emailLinkOld": "That link has expired. Tap \"Verify your email\" to get a new one.",
-    "msgConnectGlobal": "Connect Telegram or LINE to see customer messages here."
+    "msgConnectGlobal": "Connect Telegram or LINE to see customer messages here.",
+    "doneSomeone": "The customer",
+    "doneBooking": "{customer} completed the booking form",
+    "doneHandover": "Handover done: {vehicle}",
+    "doneReturn": "Return done: {vehicle}",
+    "doneReportSigned": "{customer} signed the report",
+    "doneView": "View"
   },
   "nav": {
     "main": "Main",
@@ -453,7 +459,9 @@
     "resendSignatureLink": "Resend signature link",
     "signatureLinkSent": "Link sent",
     "signatureLinkNotSent": "Not sent automatically. Send it from the booking's messages.",
-    "videoTaken": "Video added"
+    "videoTaken": "Video added",
+    "cap_library": "Choose from phone",
+    "cap_libraryVideo": "Choose a video from phone"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -5008,7 +5016,9 @@
     "tp_commercialUseTip": "Allowed: renters may drive for ride-hailing or delivery apps if they hold the licenses and insurance the law requires. The agreement sets the terms.",
     "tp_commercialNotAllowed": "Not allowed",
     "tp_commercialAllowed": "Allowed",
-    "ag_n_commercial": "Commercial use (ride-hailing, deliveries)"
+    "ag_n_commercial": "Commercial use (ride-hailing, deliveries)",
+    "ig_ev_handover_inspection": "Vehicle handed over",
+    "ig_ev_handover_inspectionBody": "A handover check was completed."
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -7987,7 +7997,9 @@
     "extensionHoldReturning": "{customer} isn't extending: the {vehicle} is due back on {date}. The days after it are open for booking again.",
     "reviewReceived": "{customer} left a {rating}-star review.",
     "handoverReportSigned": "{customer} signed the handover report for the {vehicle}.",
-    "returnReportSigned": "{customer} signed the return report for the {vehicle}."
+    "returnReportSigned": "{customer} signed the return report for the {vehicle}.",
+    "titleHandoverInspection": "Vehicle handed over",
+    "handoverComplete": "Handover done: {vehicle} handed over to {customer}."
   },
   "handoverPay": {
     "title": "Payment",

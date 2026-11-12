@@ -17,7 +17,11 @@ import { getResource, listGuidesFor } from "@/lib/site/content";
 import { paysByQr, regionForCurrency } from "@/lib/site/region";
 import { CATEGORY_KEY, JsonLd } from "../../_components/content-ui";
 import { FinalCta } from "../../_components/final-cta";
+import { HowTabs } from "../../_components/how-tabs";
+import { TimeCalc } from "../../_components/time-calc";
+import { ArrowRight, BellRing, Bike, CalendarDays, CalendarX2, CarFront, CircleCheck, CircleHelp, FileCheck2, Gift, Inbox, Keyboard, Languages, Link2, MessagesSquare, ReceiptText, ScanSearch, Smartphone, TrendingUp, Upload, Users, Zap } from "lucide-react";
 import s from "../../site.module.css";
+import h from "../../home.module.css";
 import c from "../../content.module.css";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -27,6 +31,17 @@ const FEATURED_RESOURCE = "rental-agreement";
 
 /** Keys with a "<key>Global" wording for visitors outside Asia, who don't pay by QR code and slip (lib/site/region.ts). */
 const GLOBAL_VARIANTS = new Set(["heroBody", "step1Body", "step3Title", "step3Body", "step3b1", "step3b2", "auto2", "auto5", "never1", "never2"]);
+
+/** A picture for each line of the home page, in the order the lines are written. */
+const NEVER_ICONS = [Keyboard, MessagesSquare, CircleHelp, ScanSearch, CalendarX2];
+const FACT_ICONS = [Gift, Smartphone, Languages, Link2];
+const REST_ICONS = [BellRing, CalendarDays, Inbox, FileCheck2, TrendingUp, ReceiptText, Users, Upload];
+/** Who it is for: a door to the page for each kind of rental business. */
+const WHO = [
+  { key: "whoCars", href: SITE_LINKS.carRental, Icon: CarFront },
+  { key: "whoScooters", href: SITE_LINKS.scooterRental, Icon: Zap },
+  { key: "whoMotorcycles", href: SITE_LINKS.motorcycleRental, Icon: Bike }
+];
 
 /** The home page in a language and a currency: proxy.ts picks the visitor's currency (lib/site/internal-path.ts). */
 type Props = { params: Promise<{ locale: string; cur: string }> };
@@ -102,22 +117,29 @@ export default async function SiteHomePage({ params }: Props) {
     <>
       <JsonLd data={jsonLd} />
 
-      {/* 1. Hero: the promise, then the product, running onto the white below */}
-      <section className={`${s.dark} ${s.hero}`}>
+      {/* 1. Hero: the promise in a headline and one line, then the product, running onto the white below */}
+      <section className={`${s.dark} ${s.hero} ${h.heroTight}`}>
         <Container>
-          <div className={s.rise}>
+          <div className={`${s.rise} ${h.heroCentre}`}>
             <h1 className={s.eyebrow}>{heading}</h1>
             <p className={`${s.h1} mt-6`}>{m.rich("heroTitle", RICH_SERIF)}</p>
-            <p className={`${s.lede} ${s.heroBody}`}>{m(g("heroBody"))}</p>
+            <p className={h.heroLine}>{m("heroLine")}</p>
             <div className={s.heroActions}>
-              <SiteLink className={`${s.btn} ${s.btnLight}`} href={SITE_LINKS.signUp}>
-                {m("heroCta")}
+              <SiteLink className={`${s.btn} ${h.cta}`} href={SITE_LINKS.signUp}>
+                {m("heroCta")} <Arrow />
               </SiteLink>
               <SiteLink className={s.link} href="#how">
                 {m("heroSecondary")} <Arrow />
               </SiteLink>
             </div>
-            <p className={`${s.note} ${s.heroNote}`}>{m("heroNote")}</p>
+            <ul className={h.proof}>
+              {[m("fact1Title"), m("heroChipCard"), m("fact3Title"), m("fact2Title")].map((chip) => (
+                <li key={chip}>
+                  <CircleCheck size={16} />
+                  {chip}
+                </li>
+              ))}
+            </ul>
           </div>
           <div className={`${s.stage} ${s.rise}`}>
             <div className={s.stageDesk}>
@@ -133,81 +155,120 @@ export default async function SiteHomePage({ params }: Props) {
         </Container>
       </section>
 
-      {/* 2. On autopilot: what RoveHQ did this morning without anyone touching it, then the plain facts */}
-      <section aria-label={t("proofLabel")} className={s.sectionBottom}>
+      {/* 2. The problem and the answer, side by side: the old jobs struck through, and what RoveHQ did this morning */}
+      <section aria-label={t("proofLabel")} className={`${s.sectionBottom} ${h.afterHero}`}>
         <Container>
-          <div className={s.auto}>
-            <p className={s.autoTitle}>{m("autoTitle")}</p>
-            <ol className={s.autoFeed}>
-              {[1, 2, 3, 4, 5, 6].map((n) => (
-                <li className={s.autoItem} key={n}>
-                  <Check />
-                  <span className={s.autoText}>{m(g(`auto${n}`))}</span>
-                  <time className={s.autoTime}>{m(`auto${n}Time`)}</time>
+          <div className={`${s.head} ${h.centre}`}>
+            <h2 className={s.h2}>{m.rich("vsTitle", RICH)}</h2>
+            <p className={s.lede}>{m("vsLede")}</p>
+          </div>
+          <div className={h.vs}>
+            <div className={`${h.vsCard} ${h.vsBefore}`}>
+              <span className={h.vsLabel}>{m("neverEyebrow")}</span>
+              <p className={h.vsTitle}>{m("vsBeforeTitle")}</p>
+              <ul className={h.vsList}>
+                {[1, 2, 3, 4, 5].map((n) => {
+                  const Icon = NEVER_ICONS[n - 1];
+                  return (
+                    <li key={n}>
+                      <span aria-hidden="true" className={h.vsIcon}>
+                        <Icon size={20} />
+                      </span>
+                      <s>{m(g(`never${n}`))}</s>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <div aria-hidden="true" className={h.vsArrow}>
+              <span>
+                <ArrowRight size={24} />
+              </span>
+            </div>
+            <div className={`${h.vsCard} ${h.vsAfter}`}>
+              <span className={h.vsLabel}>
+                <span aria-hidden="true" className={h.vsLive} />
+                {m("vsAfterLabel")}
+              </span>
+              <p className={h.vsTitle}>{m("autoTitle")}</p>
+              <ol className={h.vsList}>
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <li key={n}>
+                    <span aria-hidden="true" className={h.vsIcon}>
+                      <CircleCheck size={20} />
+                    </span>
+                    <span>{m(g(`auto${n}`))}</span>
+                    <time className={h.vsTime}>{m(`auto${n}Time`)}</time>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+          <ul className={h.facts}>
+            {[1, 2, 3, 4].map((n) => {
+              const Icon = FACT_ICONS[n - 1];
+              return (
+                <li className={h.fact} key={n}>
+                  <span aria-hidden="true" className={h.factIcon}>
+                    <Icon size={22} />
+                  </span>
+                  <strong>{m(`fact${n}Title`)}</strong>
+                  <span>{m(`fact${n}Body`)}</span>
                 </li>
-              ))}
-            </ol>
-          </div>
-          <ul className={s.facts}>
-            {[1, 2, 3, 4].map((n) => (
-              <li className={s.fact} key={n}>
-                <strong>{m(`fact${n}Title`)}</strong>
-                <span>{m(`fact${n}Body`)}</span>
-              </li>
-            ))}
+              );
+            })}
           </ul>
         </Container>
       </section>
 
-      {/* 3. Things you'll never do again: the old jobs, struck through */}
-      <section className={`${s.mist} ${s.section}`}>
-        <Container>
-          <div className={s.head}>
-            <Eyebrow>{m("neverEyebrow")}</Eyebrow>
-            <h2 className={s.h2}>{m("neverTitle")}</h2>
-          </div>
-          <ul className={s.never}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <li key={n}>
-                <s>{m(g(`never${n}`))}</s>
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </section>
-
-      {/* 4. How it works */}
-      <section className={s.section} id="how">
+      {/* 3. How it works: three steps you press through, one on screen at a time */}
+      <section className={`${s.mist} ${s.section}`} id="how">
         <Container>
           <div className={s.head}>
             <Eyebrow>{m("howEyebrow")}</Eyebrow>
             <h2 className={s.h2}>{m.rich("howTitle", RICH)}</h2>
           </div>
-          <div className={s.steps}>
-            {steps.map((step, index) => (
-              <article className={`${s.stepRow} ${index % 2 ? s.stepRowFlip : ""} ${step.dark ? `${s.dark} ${s.stepPanel}` : ""}`} key={step.key}>
-                <div className={s.stepText}>
-                  <p aria-hidden="true" className={s.stepNum}>
-                    {step.n}
-                  </p>
-                  <h3 className={s.stepTitle}>{m(g(`${step.key}Title`))}</h3>
-                  <p className={`${s.body} ${s.stepBody}`}>{m(g(`${step.key}Body`))}</p>
-                  <ul className={s.checks}>
-                    {[1, 2, 3].map((b) => (
-                      <li key={b}>
-                        <Check />
-                        {m(g(`${step.key}b${b}`))}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className={`${s.stepVisual} ${s.scene}`}>
-                  <div className={s.scenePhone}>{step.phone}</div>
-                  <div className={s.sceneCard}>{step.card}</div>
-                </div>
-              </article>
+          <HowTabs
+            steps={steps.map((step) => ({
+              key: step.key,
+              title: m(g(`${step.key}Title`)),
+              body: m(g(`${step.key}Body`)),
+              bullets: [1, 2, 3].map((b) => m(g(`${step.key}b${b}`))),
+              visual: (
+                <>
+                  <div>{step.phone}</div>
+                  <div>{step.card}</div>
+                </>
+              )
+            }))}
+          />
+          <ul className={h.who}>
+            {WHO.map((item) => (
+              <li key={item.key}>
+                <SiteLink href={item.href}>
+                  <span aria-hidden="true" className={h.whoIcon}>
+                    <item.Icon size={22} />
+                  </span>
+                  {m(item.key)}
+                  <ArrowRight size={18} />
+                </SiteLink>
+              </li>
             ))}
-          </div>
+          </ul>
+        </Container>
+      </section>
+
+      {/* 4. The sum: the visitor's own numbers, and the hours they add up to */}
+      <section className={s.section}>
+        <Container>
+          <TimeCalc
+            action={
+              <SiteLink className={`${s.btn} ${h.cta}`} href={SITE_LINKS.signUp}>
+                {m("heroCta")} <Arrow />
+              </SiteLink>
+            }
+            words={{ title: m("calcTitle"), lede: m("calcLede"), bookings: m("calcBookings"), minutes: m("calcMinutes"), hours: m("calcHours"), days: m("calcDays"), note: m("calcNote") }}
+          />
         </Container>
       </section>
 
@@ -220,7 +281,7 @@ export default async function SiteHomePage({ params }: Props) {
               <h2 className={s.h2} id="moving-in">
                 {m("importTitle")}
               </h2>
-              <p className={s.body}>{m("importBody")}</p>
+              <p className={s.body}>{m("importShort")}</p>
             </div>
             <ul className={s.checks}>
               {[1, 2, 3].map((n) => (
@@ -306,20 +367,26 @@ export default async function SiteHomePage({ params }: Props) {
         </Container>
       </section>
 
-      {/* 7. The rest of the job */}
+      {/* 7. The rest of the job: eight tiles, a picture and a line each */}
       <section className={s.section}>
         <Container>
-          <div className={s.head}>
+          <div className={`${s.head} ${h.centre}`}>
             <h2 className={s.h2}>{m("restTitle")}</h2>
             <p className={s.lede}>{m("restBody")}</p>
           </div>
-          <ul className={s.row4}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-              <li className={s.rowItem} key={n}>
-                <h3>{m(`rest${n}Title`)}</h3>
-                <p>{m(`rest${n}Body`)}</p>
-              </li>
-            ))}
+          <ul className={h.rest}>
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => {
+              const Icon = REST_ICONS[n - 1];
+              return (
+                <li className={h.restItem} key={n}>
+                  <span aria-hidden="true" className={h.restIcon}>
+                    <Icon size={24} />
+                  </span>
+                  <h3>{m(`rest${n}Title`)}</h3>
+                  <p>{m(`rest${n}Body`)}</p>
+                </li>
+              );
+            })}
           </ul>
         </Container>
       </section>
@@ -359,12 +426,20 @@ export default async function SiteHomePage({ params }: Props) {
       {/* 9. Why, 10. Questions */}
       <section className={s.section}>
         <Container>
-          <div className={`${s.twoCol} ${s.twoColWhy}`}>
-            <div className={`${s.head} ${s.headWide}`}>
-              <Eyebrow>{m("whyEyebrow")}</Eyebrow>
-              <h2 className={`${s.h2} ${s.h2Why}`}>{m.rich("whyTitle", RICH)}</h2>
+          <div className={h.why}>
+            <div>
+              <p className={h.whyEyebrow}>{m("whyEyebrow")}</p>
+              <h2 className={h.whyTitle}>{m.rich("whyTitle", RICH)}</h2>
+              <p className={h.whyBody}>{m("whyBody")}</p>
             </div>
-            <p className={`${s.body} lg:pt-9`}>{m("whyBody")}</p>
+            <ul className={h.whyPoints}>
+              {[1, 2, 3, 4].map((n) => (
+                <li key={n}>
+                  <CircleCheck size={22} />
+                  {m(`whyPoint${n}`)}
+                </li>
+              ))}
+            </ul>
           </div>
           <div className={`${s.twoCol} mt-[var(--section)]`}>
             <h2 className={s.h2}>{m("faqTitle")}</h2>

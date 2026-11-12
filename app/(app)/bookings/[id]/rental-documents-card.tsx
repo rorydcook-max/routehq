@@ -1,4 +1,4 @@
-import { Download, FileSignature, ShieldCheck } from "lucide-react";
+import { Download, Eye, FileSignature, ShieldCheck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { dateFormat } from "@/lib/i18n/dates";
 import { businessTimeZone } from "@/lib/business-time";
@@ -27,7 +27,7 @@ function statusBadge(document: BookingRentalDocument, say: Say) {
   return { tone: "amber" as const, label: say("docs_awaiting") };
 }
 
-export function RentalDocumentsCard({ documents }: { documents: BookingRentalDocument[] }) {
+export function RentalDocumentsCard({ documents, rentalId }: { documents: BookingRentalDocument[]; rentalId: string }) {
   const hasAgreement = documents.some((document) => document.type === "rental_agreement");
   const say = useTranslations("booking") as unknown as Say;
   const names = useTranslations("documentsPage");
@@ -73,6 +73,13 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
               )}
               {document.pdfUrl || document.certificateUrl ? (
                 <div className="flex flex-wrap gap-2">
+                  {/* Read it as a page, no download (Rory, 12 Nov 2026). */}
+                  {document.pdfUrl ? (
+                    <a className="primary-action pressable inline-flex items-center gap-2" data-view-document={document.id} href={`/bookings/${rentalId}/documents/${document.id}`}>
+                      <Eye size={16} />
+                      {say("docs_view")}
+                    </a>
+                  ) : null}
                   {document.pdfUrl ? (
                     <a className="secondary-action pressable inline-flex items-center gap-2" href={document.pdfUrl} rel="noreferrer" target="_blank">
                       <Download size={16} />

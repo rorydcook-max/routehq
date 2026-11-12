@@ -154,6 +154,9 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   if (item.action === "settle_deposit") return { title: tx.say("job_settle_deposit"), detail: null };
   // A vehicle with no number plate (lib/tasks.ts): its agreement can't be signed and it is hidden from online booking.
   if (item.action === "add_plate") return { title: tx.say("job_add_plate"), detail: tx.say("job_add_plate_detail") };
+  // A vehicle due back, and a tax disc, insurance or service date coming up (added to the list by the To do page).
+  if (item.action === "return") return { title: tx.say("job_return"), detail: null };
+  if (item.action === "paperwork") return { title: tx.say("job_paperwork", { label: raw }), detail: null };
   // A booking whose day has come and the vehicle hasn't gone out. Nothing is owed yet: what's due is taken at the handover.
   if (item.action === "handover") {
     return { title: tx.say("job_handover"), detail: item.amount ? tx.say("job_handover_collect", { amount: money(item.amount) }) : null };
@@ -612,6 +615,21 @@ function TaskRow({
             </Link>
           </>
         ) : null}
+        {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "return" ? (
+          <>
+            <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/inspections/return/${item.rentalId}`}>
+              {tx.say("checkIn")}
+            </Link>
+            <Link className="secondary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}`}>
+              {tx.say("openBooking")}
+            </Link>
+          </>
+        ) : null}
+        {item.kind === "task" && !item.completedAt && item.vehicleId && item.action === "paperwork" ? (
+          <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/fleet/${item.vehicleId}` as Route}>
+            {tx.say("updateDates")}
+          </Link>
+        ) : null}
         {item.kind === "task" && !item.completedAt && item.action === "review" ? (
           <Link className="primary-action pressable min-h-9 px-3 text-xs" href={"/customers/reviews?show=check" as Route}>
             {tx.say("job_review_open")}
@@ -645,7 +663,7 @@ function TaskRow({
             {tx.say("addPlate")}
           </Link>
         ) : null}
-        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") && !item.id.startsWith("handover-") && !item.id.startsWith("plate-") && !waitsForDecider && !((item.action === "waive_early" || item.action === "owed_early") && canDecide) ? (
+        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") && !item.id.startsWith("handover-") && !item.id.startsWith("plate-") && !item.id.startsWith("return-") && !item.id.startsWith("paper-") && !waitsForDecider && !((item.action === "waive_early" || item.action === "owed_early") && canDecide) ? (
           <>
             {/* One main button per row. A job with its own next step keeps "mark done" and notes behind the dots. */}
             {(!item.action && !asksAnswer) || item.action === "refund" || showMore ? (

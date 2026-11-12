@@ -2550,3 +2550,8 @@ a.band-chip[href*="show=next30"]::before { background: #8b4fe0; }
 .more-tile[href="/settings"] svg { color: #56527f; }
 .more-tile[href="/help"] svg { color: #17845a; }
 :root[data-theme="dark"] .more-tile svg { filter: brightness(1.35) saturate(1.1); }
+
+/* The chosen filter moves to the front of its row, so it is never off the edge of a phone. */
+.chip-row > .band-chip-on, .band-chip.band-chip-on { order: -1; }
+/* The extra coloured dot is for To do's counts only: Fleet and Bookings chips have their own. */
+a.band-chip[href*="show="]:not([href^="/tasks"])::before { content: none; }

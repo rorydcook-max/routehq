@@ -611,8 +611,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         <div className="chip-row -my-1 mt-3 flex flex-wrap gap-2 py-1">
           {/* The same two numbers as the To do page, so the dashboard never tells a different story. */}
           {tasksOverdue > 0 ? pill(tasksOverdue, t("pillOverdue"), "/tasks?show=overdue", "var(--band-alert)") : null}
-          {/* What is in the Today list below, so the number and the list always agree (Rory, 11 Nov 2026). */}
-          {pill(todayItems.length, t("pillToDo"), "#today")}
           {pill(weekDays[0].out, t("pillOut"), "/bookings?status=out_today", "var(--going-out)")}
           {pill(weekDays[0].back, t("pillBack"), "/bookings?status=back_today", "var(--coming-back)")}
         </div>
